@@ -76,8 +76,11 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe = dependencies['token_changed_subscribe']
         set_auth_client_config(config['auth'])
+
+        provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
 
         user_service = build_user_service(provd_client)
         wazo_user_service = build_wazo_user_service()

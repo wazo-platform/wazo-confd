@@ -26,7 +26,10 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
+        token_changed_subscribe = dependencies['token_changed_subscribe']
+
         provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client)
         service_callservice = build_service_callservice()

@@ -22,6 +22,7 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
+        token_changed_subscribe = dependencies['token_changed_subscribe']
         service_id = config['wizard']['service_id']
         service_key = config['wizard']['service_key']
         auth_config = dict(config['auth'])
@@ -36,6 +37,10 @@ class Plugin(object):
                                  **auth_config)
         dird_client = DirdClient(**config['dird'])
         provd_client = ProvdClient(**config['provd'])
+
+        token_changed_subscribe(auth_client.set_token)
+        token_changed_subscribe(dird_client.set_token)
+        token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client, auth_client, dird_client, tenant_dao, infos_dao)
 

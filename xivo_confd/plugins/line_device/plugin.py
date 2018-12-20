@@ -20,7 +20,11 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
+        token_changed_subscribe = dependencies['token_changed_subscribe']
+
         provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
+
         device_dao = build_device_dao(provd_client)
         service = build_service(provd_client)
 

@@ -32,7 +32,10 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
+        token_changed_subscribe = dependencies['token_changed_subscribe']
+
         provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
 
         self.load_sip(api, provd_client)
         self.load_sccp(api, provd_client)
