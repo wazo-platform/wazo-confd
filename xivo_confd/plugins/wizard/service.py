@@ -91,6 +91,8 @@ class WizardService(object):
             self._initialize_phonebook(entity_unique_name)
         if wizard['steps']['tenant']:
             self._initialize_tenant(tenant_uuid, entity_unique_name)
+        if wizard['steps']['admin']:
+            self._initialize_admin('root', wizard['admin_password'])
 
         wizard_db.set_xivo_configured()
         self.notifier.created()
@@ -135,6 +137,12 @@ class WizardService(object):
         token = self._auth_client.token.new(expiration=60)['token']
         self._auth_client.set_token(token)
         self._auth_client.tenants.new(uuid=str(tenant_uuid), name=tenant_name)
+
+    def _initialize_admin(self, username, password):
+        token = self._auth_client.token.new(expiration=60)['token']
+        self._auth_client.set_token(token)
+        # user will be in the same tenant as wazo-auth-cli
+        self._auth_client.users.new(firstname=username, username=username, password=password)
 
     def _initialize_provd(self, address, autoprov_username, autoprov_password):
         default_config = {'X_type': 'registrar',

@@ -263,3 +263,7 @@ definitions:
         type: boolean
         default: true
         description: Create tenant in wazo-auth?
+      admin:
+        type: boolean
+        default: true
+        description: Create admin in wazo-auth?

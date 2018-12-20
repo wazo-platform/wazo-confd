@@ -1,8 +1,17 @@
 Changelog
 =========
 
+19.01
+-----
+
+* New steps parameter have been added to the wizard resource:
+
+  * `admin`
+
+
 18.14
 -----
+
 * New readonly parameters have been added to the agent resource:
 
   * `users`

@@ -65,6 +65,7 @@ COMPLETE_POST_BODY = {
         'provisioning': True,
         'phonebook': True,
         'tenant': True,
+        'admin': True,
     }
 }
 
@@ -114,6 +115,7 @@ DISABLED_STEPS_POST_BODY = {
         'provisioning': False,
         'phonebook': False,
         'tenant': False,
+        'admin': False,
     }
 }
 
