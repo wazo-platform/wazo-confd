@@ -29,8 +29,10 @@ class DeviceDao(object):
     def get(self, id):
         try:
             provd_device = self.devices.get(id)
-        except ProvdError:
-            raise errors.not_found('Device', id=id)
+        except ProvdError as e:
+            if e.status_code == 404:
+                raise errors.not_found('Device', id=id)
+            raise
         return self.build_device(provd_device)
 
     def build_device(self, provd_device):
@@ -59,12 +61,16 @@ class DeviceDao(object):
     def create_or_update(self, device):
         try:
             self.devices.update(device.device)
-        except ProvdError:
+        except ProvdError as e:
+            if e.status_code != 404:
+                raise
             self.devices.create(device.device)
 
         try:
             self.configs.update(device.config)
-        except ProvdError:
+        except ProvdError as e:
+            if e.status_code != 404:
+                raise
             self.configs.create(device.config)
 
     def edit(self, device):
@@ -72,7 +78,11 @@ class DeviceDao(object):
         self.configs.update(device.config)
 
     def delete(self, device):
-        self.devices.delete(device.id)
+        try:
+            self.devices.delete(device.id)
+        except ProvdError as e:
+            if e.status_code != 404:
+                raise
         self._remove_config(device._config)
 
     def reset_autoprov(self, device):
@@ -87,8 +97,9 @@ class DeviceDao(object):
         try:
             if config is not None:
                 self.configs.delete(config['id'])
-        except ProvdError:
-            pass
+        except ProvdError as e:
+            if e.status_code != 404:
+                raise
         logger.debug("removed config %s", config['id'])
 
     def synchronize(self, device):
