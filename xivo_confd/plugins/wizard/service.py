@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -21,6 +21,7 @@ from .validator import build_validator
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = r'^nameserver (.*)'
 PHONEBOOK_BODY = {'name': 'wazo'}
+DEFAULT_ADMIN_POLICY = 'wazo_default_admin_policy'
 ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
 ASTERISK_AUTOPROV_CONFIG_TPL = '''\
 [global](+)
@@ -142,7 +143,14 @@ class WizardService(object):
         token = self._auth_client.token.new(expiration=60)['token']
         self._auth_client.set_token(token)
         # user will be in the same tenant as wazo-auth-cli
-        self._auth_client.users.new(firstname=username, username=username, password=password)
+        user = self._auth_client.users.new(firstname=username, username=username, password=password)
+        policy = self._get_policy(DEFAULT_ADMIN_POLICY)
+        self._auth_client.users.add_policy(user['uuid'], policy['uuid'])
+
+    def _get_policy(self, policy_name):
+        policies = self._auth_client.policies.list(name=policy_name)['items']
+        for policy in policies:
+            return policy
 
     def _initialize_provd(self, address, autoprov_username, autoprov_password):
         default_config = {'X_type': 'registrar',
