@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -151,5 +151,5 @@ class ProvdHelper(object):
 
 
 def create_helper(host='localhost', port='8666'):
-    client = ProvdClient(host=host, port=port, verify_certificate=False, prefix='/provd', token='valid-token')
+    client = ProvdClient(host=host, port=port, https=False, prefix='/provd', token='valid-token')
     return ProvdHelper(client)
