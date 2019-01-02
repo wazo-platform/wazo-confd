@@ -4,11 +4,11 @@
 
 import os
 
-from xivo_auth_client import Client as AuthClient
 from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from xivo_test_helpers.bus import BusClient
 
 from .ari import ARIClient
+from .auth import AuthClient
 from .bus import setup_bus as setup_bus_helpers
 from .client import ConfdClient
 from .database import create_helper as db_create_helper
@@ -48,6 +48,12 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def setup_sysconfd(cls, *args, **kwargs):  # args seems needed for IsolatedAction
         helper = cls.create_sysconfd()
+        helper.clear()
+        return helper
+
+    @classmethod
+    def setup_auth(cls, *args, **kwargs):
+        helper = cls.create_auth()
         helper.clear()
         return helper
 
