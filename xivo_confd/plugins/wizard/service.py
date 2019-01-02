@@ -153,6 +153,8 @@ class WizardService(object):
             return policy
 
     def _initialize_provd(self, address, autoprov_username, autoprov_password):
+        token = self._auth_client.token.new(expiration=60)['token']
+        self.provd_client.set_token(token)
         default_config = {'X_type': 'registrar',
                           'id': 'default',
                           'deletable': False,
