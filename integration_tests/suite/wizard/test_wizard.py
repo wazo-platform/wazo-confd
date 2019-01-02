@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import copy
@@ -485,6 +485,10 @@ class TestWizard(IntegrationTest):
                 {'username': 'root', 'password': data['admin_password'], 'firstname': 'root'}
             )
         )
+        auth.assert_request(
+            r'^/0.1/users/.{36}/policies/.{36}$',
+            method='PUT',
+        )
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_request(
@@ -626,14 +630,18 @@ class TestWizardSteps(IntegrationTest):
 
         until.assert_(assert_bus_event_received, tries=5)
 
-    def validate_auth(self, sysconfd, data):
-        sysconfd.assert_no_request(
+    def validate_auth(self, auth, data):
+        auth.assert_no_request(
             '/0.1/tenants',
             method='POST',
         )
-        sysconfd.assert_no_request(
+        auth.assert_no_request(
             '/0.1/users',
             method='POST',
+        )
+        auth.assert_no_request(
+            r'^/0.1/users/.{36}/policies/.{36}$',
+            method='PUT',
         )
 
     def validate_sysconfd(self, sysconfd, data):
