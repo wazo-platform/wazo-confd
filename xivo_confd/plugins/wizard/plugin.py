@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -22,7 +22,6 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        token_changed_subscribe = dependencies['token_changed_subscribe']
         service_id = config['wizard']['service_id']
         service_key = config['wizard']['service_key']
         auth_config = dict(config['auth'])
@@ -37,10 +36,6 @@ class Plugin(object):
                                  **auth_config)
         dird_client = DirdClient(**config['dird'])
         provd_client = ProvdClient(**config['provd'])
-
-        token_changed_subscribe(auth_client.set_token)
-        token_changed_subscribe(dird_client.set_token)
-        token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client, auth_client, dird_client, tenant_dao, infos_dao)
 
