@@ -153,6 +153,8 @@ class WizardService(object):
             return policy
 
     def _initialize_provd(self, address, autoprov_username, autoprov_password):
+        token = self._auth_client.token.new(expiration=60)['token']
+        self.provd_client.set_token(token)
         default_config = {'X_type': 'registrar',
                           'id': 'default',
                           'deletable': False,
@@ -193,10 +195,10 @@ class WizardService(object):
                                                                  u'username': autoprov_username}}},
                            u'role': u'autocreate'}
 
-        self.provd_client.config_manager().add(base_config)
-        self.provd_client.config_manager().add(default_config)
-        self.provd_client.config_manager().add(device_config)
-        self.provd_client.config_manager().add(autoprov_config)
+        self.provd_client.configs.create(base_config)
+        self.provd_client.configs.create(default_config)
+        self.provd_client.configs.create(device_config)
+        self.provd_client.configs.create(autoprov_config)
 
     def _generate_autoprov_username(self):
         suffix = ''.join(random.choice(USERNAME_VALUES) for _ in range(8))

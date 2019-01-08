@@ -13,6 +13,7 @@ from werkzeug.exceptions import HTTPException
 from xivo import rest_api_helpers
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import ServiceError, NotFoundError
+from wazo_provd_client.exceptions import ProvdError
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,9 @@ def handle_api_exception(func):
         except rest_api_helpers.APIException as error:
             rollback()
             return [error.message], error.status_code
+        except ProvdError as error:
+            rollback()
+            return 'Provd client error: {}'.format(error.message), error.status_code
         except HTTPException as error:
             rollback()
             messages, code = extract_http_messages(error)

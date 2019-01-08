@@ -538,7 +538,7 @@ class TestWizard(IntegrationTest):
         )
 
     def validate_provd(self, ip_address):
-        configs = self.provd.configs.find()
+        configs = self.provd.configs.list()['configs']
 
         assert_that(
             configs,
@@ -673,6 +673,6 @@ class TestWizardSteps(IntegrationTest):
         )
 
     def validate_provd(self):
-        configs = self.provd.configs.find()
+        configs = self.provd.configs.list()['configs']
 
         assert_that(configs, empty())

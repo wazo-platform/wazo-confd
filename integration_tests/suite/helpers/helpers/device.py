@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from __future__ import unicode_literals
@@ -71,8 +71,8 @@ def generate_autoprov():
               'raw_config': {'sip_lines': {'1': {'username': sip_username}}}
               }
 
-    provd.devices.add(device)
-    provd.configs.add(config)
+    provd.devices.create(device)
+    provd.configs.create(config)
 
     return confd.devices(random_id).get().item
 
@@ -105,9 +105,9 @@ def generate_registrar(**params):
                  'raw_config': {'X_key': 'xivo'},
                  'registrar_backup': ip}
     registrar.update(params)
-    provd.configs.add(registrar)
+    provd.configs.create(registrar)
     return registrar
 
 
 def delete_registrar(registrar_id, check=False):
-    provd.configs.remove(registrar_id)
+    provd.configs.delete(registrar_id)

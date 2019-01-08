@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import argparse
@@ -73,6 +73,10 @@ DEFAULT_CONFIG = {
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
     },
     'provd': {
+        'host': 'localhost',
+        'port': 8666,
+        'https': False,
+        'prefix': '/provd'
     },
     'sysconfd': {
         'host': 'localhost',

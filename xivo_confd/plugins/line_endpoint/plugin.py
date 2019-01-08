@@ -7,7 +7,7 @@ from xivo_dao.resources.endpoint_sccp import dao as endpoint_sccp_dao
 from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
 from xivo_dao.resources.line import dao as line_dao
 
-from xivo_provd_client import new_provisioning_client_from_config
+from wazo_provd_client import Client as ProvdClient
 
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
@@ -32,7 +32,10 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        provd_client = new_provisioning_client_from_config(config['provd'])
+        token_changed_subscribe = dependencies['token_changed_subscribe']
+
+        provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
 
         self.load_sip(api, provd_client)
         self.load_sccp(api, provd_client)

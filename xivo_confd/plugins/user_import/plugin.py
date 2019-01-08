@@ -18,7 +18,7 @@ from xivo_dao.resources.user_call_permission import dao as user_call_permission_
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
-from xivo_provd_client import new_provisioning_client_from_config
+from wazo_provd_client import Client as ProvdClient
 
 from xivo_confd.database import user_export as user_export_dao
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
@@ -76,8 +76,11 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        provd_client = new_provisioning_client_from_config(config['provd'])
+        token_changed_subscribe = dependencies['token_changed_subscribe']
         set_auth_client_config(config['auth'])
+
+        provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
 
         user_service = build_user_service(provd_client)
         wazo_user_service = build_wazo_user_service()

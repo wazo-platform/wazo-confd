@@ -4,7 +4,7 @@
 
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
-from xivo_provd_client import new_provisioning_client_from_config
+from wazo_provd_client import Client as ProvdClient
 
 from .resource import (
     FuncKeyTemplateList,
@@ -25,7 +25,10 @@ class Plugin(object):
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
-        provd_client = new_provisioning_client_from_config(config['provd'])
+        token_changed_subscribe = dependencies['token_changed_subscribe']
+
+        provd_client = ProvdClient(**config['provd'])
+        token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client)
         service_association = build_user_funckey_template_service(provd_client)

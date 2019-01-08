@@ -10,6 +10,8 @@ import xivo_dao
 
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
+from xivo.token_renewer import TokenRenewer
+from xivo_auth_client import Client as AuthClient
 
 from .auth import authentication
 from .http_server import api, HTTPServer
@@ -31,7 +33,13 @@ class Controller(object):
             partial(self_check, config),
         ]
 
+        auth_config = dict(config['auth'])
+        auth_config.pop('key_file', None)
         authentication.set_config(config)
+
+        auth_client = AuthClient(**auth_config)
+        self.token_renewer = TokenRenewer(auth_client)
+
         self.http_server = HTTPServer(config)
 
         plugin_helpers.load(
@@ -40,11 +48,23 @@ class Controller(object):
             dependencies={
                 'api': api,
                 'config': config,
+                'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
             }
         )
 
     def run(self):
         logger.info('xivo-confd running...')
         xivo_dao.init_db_from_config(self.config)
-        with ServiceCatalogRegistration(*self._service_discovery_args):
-            self.http_server.run()
+        try:
+            with self.token_renewer:
+                with ServiceCatalogRegistration(*self._service_discovery_args):
+                    self.http_server.run()
+        finally:
+            logger.info('xivo-confd stopping...')
+            logger.debug('joining http server thread')
+            self.http_server.join()
+            logger.debug('done joining')
+
+    def stop(self, reason):
+        logger.warning('Stopping xivo-confd: %s', reason)
+        self.http_server.stop()

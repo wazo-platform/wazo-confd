@@ -1,3 +1,4 @@
 provd:
     host: provd
     port: 8666
+    verify_certificate: False

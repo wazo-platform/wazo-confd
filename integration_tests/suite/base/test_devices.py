@@ -223,7 +223,7 @@ def test_create_device_null_parameters():
 
 def test_create_device_all_parameters():
     mac, ip = h.device.generate_mac_and_ip()
-    template_config = provd.configs.find({'id': 'mockdevicetemplate'})[0]
+    template_config = provd.configs.list({'id': 'mockdevicetemplate'})['configs'][0]
 
     parameters = {'ip': ip,
                   'mac': mac,
@@ -354,7 +354,7 @@ def test_delete_device(device):
     response = confd.devices(device['id']).delete()
     response.assert_deleted()
 
-    provd_devices = provd.devices.find({'id': device['id']})
+    provd_devices = provd.devices.list({'id': device['id']})['devices']
     assert_that(provd_devices, empty())
 
 
