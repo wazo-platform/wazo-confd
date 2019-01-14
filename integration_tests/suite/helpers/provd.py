@@ -151,5 +151,5 @@ class ProvdHelper(object):
 
 
 def create_helper(host='localhost', port='8666'):
-    client = ProvdClient(host=host, port=port, https=False, prefix='/provd', token='valid-token')
+    client = ProvdClient(host=host, port=port, verify_certificate=False, prefix='/provd', token='valid-token')
     return ProvdHelper(client)
