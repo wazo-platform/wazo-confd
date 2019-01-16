@@ -437,6 +437,16 @@ def test_delete(schedule):
     response.assert_match(404, e.not_found(resource='Schedule'))
 
 
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.schedules(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Schedule'))
+
+    response = confd.schedules(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.schedule()
 def test_bus_events(schedule):
     required_body = {'closed_destination': {'type': 'none'}}
