@@ -209,6 +209,16 @@ def test_get(schedule):
     ))
 
 
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.schedules(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Schedule'))
+
+    response = confd.schedules(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.schedules.post(closed_destination={'type': 'none'})
     response.assert_created('schedules')
