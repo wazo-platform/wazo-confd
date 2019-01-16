@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -10,8 +10,8 @@ def generate_schedule(**parameters):
     return add_schedule(**parameters)
 
 
-def add_schedule(**parameters):
-    response = confd.schedules.post(parameters)
+def add_schedule(wazo_tenant=None, **parameters):
+    response = confd.schedules.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     empty,
@@ -19,6 +20,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
@@ -121,6 +126,28 @@ def error_checks(url):
         regex = r'exceptional_periods.*0.*destination'
         body = [{'destination': destination}]
         yield s.check_bogus_field_returns_error_matching_regex, url, 'exceptional_periods', body, regex
+
+
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.schedules.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.schedules.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.schedules.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.schedule(name='search', timezone='search')
