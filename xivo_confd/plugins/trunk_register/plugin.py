@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
-# SPDX-License-Identifier: GPL-3.0+
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.register_iax import dao as register_iax_dao
 from xivo_dao.resources.register_sip import dao as register_sip_dao

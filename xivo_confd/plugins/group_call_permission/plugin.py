@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
-# SPDX-License-Identifier: GPL-3.0+
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.group import dao as group_dao

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
-# SPDX-License-Identifier: GPL-3.0+
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
 from xivo_dao.resources.endpoint_sccp import dao as endpoint_sccp_dao

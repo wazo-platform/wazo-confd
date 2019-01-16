@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright 2015-2018 The Wazo Authors  (see AUTHORS file)
-# SPDX-License-Identifier: GPL-3.0+
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 from functools import partial
 from hamcrest import assert_that, has_items, has_entries, instance_of, contains_string
