@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, validates, validates_schema
@@ -23,10 +23,12 @@ class ScheduleOpenPeriod(BaseSchema):
     )
     month_days = fields.List(
         fields.Integer(validate=Range(min=1, max=31)),
-        missing=[1, 2, 3, 4, 5, 6, 7, 8, 9,
-                 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                 30, 31]
+        missing=[
+            1, 2, 3, 4, 5, 6, 7, 8, 9,
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+            30, 31
+        ]
     )
     months = fields.List(
         fields.Integer(validate=Range(min=1, max=12)),
@@ -89,26 +91,36 @@ class ScheduleSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('schedules'))
 
-    incalls = fields.Nested('IncallSchema',
-                            only=['id', 'links'],
-                            many=True,
-                            dump_only=True)
-    users = fields.Nested('UserSchema',
-                          only=['uuid', 'firstname', 'lastname', 'links'],
-                          many=True,
-                          dump_only=True)
-    groups = fields.Nested('GroupSchema',
-                           only=['id', 'name', 'links'],
-                           many=True,
-                           dump_only=True)
-    queues = fields.Nested('QueueSchema',
-                           only=['id', 'name', 'label', 'links'],
-                           many=True,
-                           dump_only=True)
-    outcalls = fields.Nested('OutcallSchema',
-                             only=['id', 'name', 'links'],
-                             many=True,
-                             dump_only=True)
+    incalls = fields.Nested(
+        'IncallSchema',
+        only=['id', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    users = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    groups = fields.Nested(
+        'GroupSchema',
+        only=['id', 'name', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    queues = fields.Nested(
+        'QueueSchema',
+        only=['id', 'name', 'label', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    outcalls = fields.Nested(
+        'OutcallSchema',
+        only=['id', 'name', 'links'],
+        many=True,
+        dump_only=True,
+    )
 
     @post_load
     def unwrap_closed_destination(self, data):
