@@ -223,7 +223,7 @@ def test_create_minimal_parameters():
     response = confd.schedules.post(closed_destination={'type': 'none'})
     response.assert_created('schedules')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, id=not_(empty())))
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 
@@ -263,7 +263,7 @@ def test_create_all_parameters():
     response.assert_created('schedules')
     response = confd.schedules(response.item['id']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 

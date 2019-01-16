@@ -82,6 +82,7 @@ class ScheduleExceptionalPeriod(ScheduleOpenPeriod):
 
 class ScheduleSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), allow_none=True)
     timezone = fields.String(validate=Length(max=128), allow_none=True)
     closed_destination = DestinationField(required=True)

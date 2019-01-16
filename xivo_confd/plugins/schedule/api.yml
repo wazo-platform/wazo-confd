@@ -130,6 +130,10 @@ definitions:
       id:
         type: integer
         readOnly: true
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
       name:
         type: string
         description: The name to identify the schedule
