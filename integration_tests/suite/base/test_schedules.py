@@ -419,6 +419,16 @@ def update_schedule_with_destination(schedule_id, destination):
     ))
 
 
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.schedules(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Schedule'))
+
+    response = confd.schedules(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.schedule()
 def test_delete(schedule):
     response = confd.schedules(schedule['id']).delete()
