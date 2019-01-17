@@ -1,3 +1,5 @@
+*.egg-info
 *.pyc
 .tox
-xivo_confd.egg-info
+pycodestyle.txt
+pylint.txt
