@@ -113,6 +113,18 @@ def test_dissociate_not_associated(user, schedule):
     response.assert_deleted()
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_user, sub_user, main_schedule, sub_schedule):
+    response = confd.users(main_user['uuid']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Schedule'))
+
+
 @fixtures.user()
 @fixtures.schedule()
 def test_get_user_relation(user, schedule):
