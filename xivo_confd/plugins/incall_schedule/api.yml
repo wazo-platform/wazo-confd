@@ -26,6 +26,7 @@ paths:
       - incalls
       - schedules
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/incallid'
       - $ref: '#/parameters/scheduleid'
       responses:

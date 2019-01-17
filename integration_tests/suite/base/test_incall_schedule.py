@@ -105,6 +105,18 @@ def test_dissociate_not_associated(incall, schedule):
     response.assert_deleted()
 
 
+@fixtures.incall(wazo_tenant=MAIN_TENANT)
+@fixtures.incall(wazo_tenant=SUB_TENANT)
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_incall, sub_incall, main_schedule, sub_schedule):
+    response = confd.incalls(main_incall['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Incall'))
+
+    response = confd.incalls(sub_incall['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Schedule'))
+
+
 @fixtures.incall()
 @fixtures.schedule()
 def test_get_incall_relation(incall, schedule):

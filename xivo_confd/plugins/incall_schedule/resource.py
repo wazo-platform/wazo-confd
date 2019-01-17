@@ -18,8 +18,9 @@ class IncallScheduleItem(ConfdResource):
 
     @required_acl('confd.incalls.{incall_id}.schedules.{schedule_id}.delete')
     def delete(self, incall_id, schedule_id):
-        incall = self.incall_dao.get(incall_id)
-        schedule = self.schedule_dao.get(schedule_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        incall = self.incall_dao.get(incall_id, tenant_uuids=tenant_uuids)
+        schedule = self.schedule_dao.get(schedule_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(incall, schedule)
         return '', 204
 
