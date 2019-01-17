@@ -88,10 +88,10 @@ class WizardService(object):
 
         entity_display_name = wizard['entity_name']
         entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
-        if wizard['steps']['phonebook']:
-            self._initialize_phonebook(entity_unique_name)
         if wizard['steps']['tenant']:
             self._initialize_tenant(tenant_uuid, entity_unique_name)
+        if wizard['steps']['phonebook']:
+            self._initialize_phonebook(entity_unique_name)
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
 
