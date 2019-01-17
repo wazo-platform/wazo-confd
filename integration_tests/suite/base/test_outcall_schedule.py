@@ -105,6 +105,18 @@ def test_dissociate_not_associated(outcall, schedule):
     response.assert_deleted()
 
 
+@fixtures.outcall(wazo_tenant=MAIN_TENANT)
+@fixtures.outcall(wazo_tenant=SUB_TENANT)
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_outcall, sub_outcall, main_schedule, sub_schedule):
+    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Outcall'))
+
+    response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Schedule'))
+
+
 @fixtures.outcall()
 @fixtures.schedule()
 def test_get_outcall_relation(outcall, schedule):

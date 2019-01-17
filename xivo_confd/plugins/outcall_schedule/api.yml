@@ -26,6 +26,7 @@ paths:
       - outcalls
       - schedules
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/outcallid'
       - $ref: '#/parameters/scheduleid'
       responses:

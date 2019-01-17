@@ -18,8 +18,9 @@ class OutcallScheduleItem(ConfdResource):
 
     @required_acl('confd.outcalls.{outcall_id}.schedules.{schedule_id}.delete')
     def delete(self, outcall_id, schedule_id):
-        outcall = self.outcall_dao.get(outcall_id)
-        schedule = self.schedule_dao.get(schedule_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
+        schedule = self.schedule_dao.get(schedule_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(outcall, schedule)
         return '', 204
 
