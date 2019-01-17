@@ -18,8 +18,9 @@ class GroupScheduleItem(ConfdResource):
 
     @required_acl('confd.groups.{group_id}.schedules.{schedule_id}.delete')
     def delete(self, group_id, schedule_id):
-        group = self.group_dao.get(group_id)
-        schedule = self.schedule_dao.get(schedule_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        group = self.group_dao.get(group_id, tenant_uuids=tenant_uuids)
+        schedule = self.schedule_dao.get(schedule_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(group, schedule)
         return '', 204
 

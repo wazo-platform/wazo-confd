@@ -26,6 +26,7 @@ paths:
       - groups
       - schedules
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/groupid'
       - $ref: '#/parameters/scheduleid'
       responses:
