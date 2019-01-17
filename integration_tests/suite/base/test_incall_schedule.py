@@ -1,16 +1,23 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
-from ..helpers import scenarios as s
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
 from . import confd
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
-
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -68,6 +75,21 @@ def test_associate_multiple_incalls_to_schedule(incall1, incall2, schedule):
         response.assert_updated()
 
 
+@fixtures.incall(wazo_tenant=MAIN_TENANT)
+@fixtures.incall(wazo_tenant=SUB_TENANT)
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_incall, sub_incall, main_schedule, sub_schedule):
+    response = confd.incalls(main_incall['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Incall'))
+
+    response = confd.incalls(sub_incall['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Schedule'))
+
+    response = confd.incalls(main_incall['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.incall()
 @fixtures.schedule()
 def test_dissociate(incall, schedule):
@@ -89,8 +111,7 @@ def test_get_incall_relation(incall, schedule):
     with a.incall_schedule(incall, schedule):
         response = confd.incalls(incall['id']).get()
         assert_that(response.item, has_entries(
-            schedules=contains(has_entries(id=schedule['id'],
-                                           name=schedule['name']))
+            schedules=contains(has_entries(id=schedule['id'], name=schedule['name']))
         ))
 
 
