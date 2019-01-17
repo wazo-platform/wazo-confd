@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains,
     empty,
@@ -19,6 +20,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
@@ -123,6 +128,28 @@ def error_checks(url):
         yield s.check_bogus_field_returns_error_matching_regex, url, 'exceptional_periods', body, regex
 
 
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.schedules.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.schedules.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.schedules.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.schedule(name='search', timezone='search')
 @fixtures.schedule(name='hidden', timezone='hidden')
 def test_search(schedule, hidden):
@@ -182,11 +209,21 @@ def test_get(schedule):
     ))
 
 
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.schedules(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Schedule'))
+
+    response = confd.schedules(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.schedules.post(closed_destination={'type': 'none'})
     response.assert_created('schedules')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, id=not_(empty())))
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 
@@ -226,7 +263,7 @@ def test_create_all_parameters():
     response.assert_created('schedules')
     response = confd.schedules(response.item['id']).get()
 
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 
@@ -382,12 +419,32 @@ def update_schedule_with_destination(schedule_id, destination):
     ))
 
 
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.schedules(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Schedule'))
+
+    response = confd.schedules(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.schedule()
 def test_delete(schedule):
     response = confd.schedules(schedule['id']).delete()
     response.assert_deleted()
     response = confd.schedules(schedule['id']).get()
     response.assert_match(404, e.not_found(resource='Schedule'))
+
+
+@fixtures.schedule(wazo_tenant=MAIN_TENANT)
+@fixtures.schedule(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.schedules(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Schedule'))
+
+    response = confd.schedules(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.schedule()

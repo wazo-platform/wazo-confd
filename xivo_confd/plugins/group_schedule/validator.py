@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -10,7 +10,15 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class GroupScheduleAssociationValidator(ValidatorAssociation):
 
     def validate(self, group, schedule):
+        self.validate_same_tenant(group, schedule)
         self.validate_group_not_already_associated(group)
+
+    def validate_same_tenant(self, group, schedule):
+        if group.tenant_uuid != schedule.tenant_uuid:
+            raise errors.different_tenants(
+                group_tenant_uuid=group.tenant_uuid,
+                schedule_tenant_uuid=schedule.tenant_uuid,
+            )
 
     def validate_group_not_already_associated(self, group):
         if group.schedules:
