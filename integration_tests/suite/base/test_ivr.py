@@ -301,6 +301,16 @@ def update_ivr_with_destination(ivr_id, destination):
     assert_that(response.item, has_entries(abort_destination=has_entries(**destination)))
 
 
+@fixtures.ivr(wazo_tenant=MAIN_TENANT)
+@fixtures.ivr(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.ivr(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IVR'))
+
+    response = confd.ivr(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.ivr()
 def test_delete(ivr):
     response = confd.ivr(ivr['id']).delete()
