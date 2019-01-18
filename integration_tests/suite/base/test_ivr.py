@@ -184,6 +184,16 @@ def test_get(ivr):
     ))
 
 
+@fixtures.ivr(wazo_tenant=MAIN_TENANT)
+@fixtures.ivr(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.ivr(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IVR'))
+
+    response = confd.ivr(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.ivr.post(name='ivr1', menu_sound='menu')
     response.assert_created('ivr')
