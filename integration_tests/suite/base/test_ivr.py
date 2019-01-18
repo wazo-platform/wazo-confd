@@ -319,6 +319,16 @@ def test_delete(ivr):
     response.assert_match(404, e.not_found(resource='IVR'))
 
 
+@fixtures.ivr(wazo_tenant=MAIN_TENANT)
+@fixtures.ivr(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.ivr(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='IVR'))
+
+    response = confd.ivr(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.ivr()
 def test_bus_events(ivr):
     yield s.check_bus_event, 'config.ivr.created', confd.ivr.post, {'name': 'a', 'menu_sound': 'hello'}
