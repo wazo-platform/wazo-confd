@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load
 from marshmallow.validate import Length, Range, Regexp
+
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.ivr_choice import IVRChoice
 
@@ -33,12 +34,16 @@ class IvrSchema(BaseSchema):
     choices = fields.Nested(IvrChoiceSchema, many=True)
     links = ListLink(Link('ivr'))
 
-    incalls = fields.Nested('IncallSchema',
-                            only=['id',
-                                  'extensions',
-                                  'links'],
-                            many=True,
-                            dump_only=True)
+    incalls = fields.Nested(
+        'IncallSchema',
+        only=[
+            'id',
+            'extensions',
+            'links'
+        ],
+        many=True,
+        dump_only=True,
+    )
 
     @post_load
     def create_objects(self, data):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -139,19 +139,21 @@ def test_sorting_offset_limit(ivr1, ivr2):
 @fixtures.ivr()
 def test_get(ivr):
     response = confd.ivr(ivr['id']).get()
-    assert_that(response.item, has_entries(id=ivr['id'],
-                                           name=ivr['name'],
-                                           description=ivr['description'],
-                                           menu_sound=ivr['menu_sound'],
-                                           invalid_sound=ivr['invalid_sound'],
-                                           abort_sound=ivr['abort_sound'],
-                                           timeout=ivr['timeout'],
-                                           max_tries=ivr['max_tries'],
-                                           invalid_destination=ivr['invalid_destination'],
-                                           timeout_destination=ivr['timeout_destination'],
-                                           abort_destination=ivr['abort_destination'],
-                                           choices=empty(),
-                                           incalls=empty()))
+    assert_that(response.item, has_entries(
+        id=ivr['id'],
+        name=ivr['name'],
+        description=ivr['description'],
+        menu_sound=ivr['menu_sound'],
+        invalid_sound=ivr['invalid_sound'],
+        abort_sound=ivr['abort_sound'],
+        timeout=ivr['timeout'],
+        max_tries=ivr['max_tries'],
+        invalid_destination=ivr['invalid_destination'],
+        timeout_destination=ivr['timeout_destination'],
+        abort_destination=ivr['abort_destination'],
+        choices=empty(),
+        incalls=empty(),
+    ))
 
 
 def test_create_minimal_parameters():
@@ -165,32 +167,36 @@ def test_create_minimal_parameters():
 @fixtures.user
 @fixtures.user
 def test_create_all_parameters(user1, user2, user3):
-    response = confd.ivr.post(name='ivr1',
-                              greeting_sound='greeting',
-                              menu_sound='menu',
-                              invalid_sound='invalid',
-                              abort_sound='abort',
-                              timeout=4,
-                              max_tries=2,
-                              description='description',
-                              invalid_destination={'type': 'user', 'user_id': user1['id']},
-                              timeout_destination={'type': 'user', 'user_id': user2['id']},
-                              abort_destination={'type': 'user', 'user_id': user3['id']},
-                              choices=[{'exten': '1', 'destination': {'type': 'none'}}])
+    response = confd.ivr.post(
+        name='ivr1',
+        greeting_sound='greeting',
+        menu_sound='menu',
+        invalid_sound='invalid',
+        abort_sound='abort',
+        timeout=4,
+        max_tries=2,
+        description='description',
+        invalid_destination={'type': 'user', 'user_id': user1['id']},
+        timeout_destination={'type': 'user', 'user_id': user2['id']},
+        abort_destination={'type': 'user', 'user_id': user3['id']},
+        choices=[{'exten': '1', 'destination': {'type': 'none'}}],
+    )
     response.assert_created('ivr')
 
-    assert_that(response.item, has_entries(name='ivr1',
-                                           greeting_sound='greeting',
-                                           menu_sound='menu',
-                                           invalid_sound='invalid',
-                                           abort_sound='abort',
-                                           timeout=4,
-                                           max_tries=2,
-                                           description='description',
-                                           invalid_destination={'type': 'user', 'user_id': user1['id']},
-                                           timeout_destination={'type': 'user', 'user_id': user2['id']},
-                                           abort_destination={'type': 'user', 'user_id': user3['id']},
-                                           choices=[{'exten': '1', 'destination': {'type': 'none'}}]))
+    assert_that(response.item, has_entries(
+        name='ivr1',
+        greeting_sound='greeting',
+        menu_sound='menu',
+        invalid_sound='invalid',
+        abort_sound='abort',
+        timeout=4,
+        max_tries=2,
+        description='description',
+        invalid_destination={'type': 'user', 'user_id': user1['id']},
+        timeout_destination={'type': 'user', 'user_id': user2['id']},
+        abort_destination={'type': 'user', 'user_id': user3['id']},
+        choices=[{'exten': '1', 'destination': {'type': 'none'}}],
+    ))
 
 
 @fixtures.ivr(name='ivr1', menu_sound='menu')
