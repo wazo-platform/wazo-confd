@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -14,8 +14,8 @@ def generate_ivr(**parameters):
     return add_ivr(**parameters)
 
 
-def add_ivr(**parameters):
-    response = confd.ivr.post(parameters)
+def add_ivr(wazo_tenant=None, **parameters):
+    response = confd.ivr.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

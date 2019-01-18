@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     not_,
 )
@@ -17,6 +19,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
@@ -96,6 +102,28 @@ def error_checks(url):
         yield s.check_bogus_field_returns_error, url, 'timeout_destination', destination
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'abort_destination', destination
+
+
+@fixtures.ivr(wazo_tenant=MAIN_TENANT)
+@fixtures.ivr(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.ivr.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.ivr.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.ivr.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
 
 
 @fixtures.ivr(description='search')
