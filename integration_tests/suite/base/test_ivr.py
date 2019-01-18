@@ -201,9 +201,9 @@ def test_create_minimal_parameters():
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, id=not_(empty())))
 
 
-@fixtures.user
-@fixtures.user
-@fixtures.user
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
 def test_create_all_parameters(user1, user2, user3):
     response = confd.ivr.post(
         name='ivr1',
@@ -231,9 +231,9 @@ def test_create_all_parameters(user1, user2, user3):
         timeout=4,
         max_tries=2,
         description='description',
-        invalid_destination={'type': 'user', 'user_id': user1['id']},
-        timeout_destination={'type': 'user', 'user_id': user2['id']},
-        abort_destination={'type': 'user', 'user_id': user3['id']},
+        invalid_destination=has_entries({'type': 'user', 'user_id': user1['id']}),
+        timeout_destination=has_entries({'type': 'user', 'user_id': user2['id']}),
+        abort_destination=has_entries({'type': 'user', 'user_id': user3['id']}),
         choices=[{'exten': '1', 'destination': {'type': 'none'}}],
     ))
 
