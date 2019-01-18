@@ -20,6 +20,7 @@ class IvrChoiceSchema(BaseSchema):
 
 class IvrSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     description = fields.String(allow_none=True)
     greeting_sound = fields.String(validate=Length(max=255), allow_none=True)

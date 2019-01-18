@@ -198,7 +198,7 @@ def test_create_minimal_parameters():
     response = confd.ivr.post(name='ivr1', menu_sound='menu')
     response.assert_created('ivr')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, id=not_(empty())))
 
 
 @fixtures.user
@@ -222,6 +222,7 @@ def test_create_all_parameters(user1, user2, user3):
     response.assert_created('ivr')
 
     assert_that(response.item, has_entries(
+        tenant_uuid=MAIN_TENANT,
         name='ivr1',
         greeting_sound='greeting',
         menu_sound='menu',
