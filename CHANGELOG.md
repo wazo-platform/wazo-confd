@@ -14,6 +14,7 @@ Changelog
   `tenant_uuid`.
 
   * `/1.1/schedules`
+  * `/1.1/ivr`
 
 
 19.01
