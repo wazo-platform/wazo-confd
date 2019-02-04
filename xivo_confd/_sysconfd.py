@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -59,30 +59,30 @@ class SysconfdPublisher(object):
 
     def commonconf_generate(self):
         url = "{}/commonconf_generate".format(self.base_url)
-        self.add_request('POST', url, data=json.dumps({}))
+        self.add_request('POST', url, json={})
 
     def set_hosts(self, hostname, domain):
         data = {'hostname': hostname,
                 'domain': domain}
         url = "{}/hosts".format(self.base_url)
-        self.add_request('POST', url, data=json.dumps(data))
+        self.add_request('POST', url, json=data)
 
     def set_resolvconf(self, nameserver, domain):
         data = {'nameservers': nameserver,
                 'search': [domain]}
         url = "{}/resolv_conf".format(self.base_url)
-        self.add_request('POST', url, data=json.dumps(data))
+        self.add_request('POST', url, json=data)
         self.flush()
 
     def xivo_service_start(self):
         data = {'wazo-service': 'start'}
         url = "{}/xivoctl".format(self.base_url)
-        self.add_request('POST', url, data=json.dumps(data))
+        self.add_request('POST', url, json=data)
 
     def xivo_service_enable(self):
         data = {'wazo-service': 'enable'}
         url = "{}/xivoctl".format(self.base_url)
-        self.add_request('POST', url, data=json.dumps(data))
+        self.add_request('POST', url, json=data)
 
     def _session(self):
         session = requests.Session()
@@ -94,8 +94,8 @@ class SysconfdPublisher(object):
             raise SysconfdError(response.status_code,
                                 response.text)
 
-    def add_request(self, action, url, data=None, params=None):
-        self.requests.append((action, url, params or {}, data))
+    def add_request(self, *args, **kwargs):
+        self.requests.append(lambda session: session.request(*args, **kwargs))
 
     def flush(self):
         session = self._session()
@@ -108,12 +108,12 @@ class SysconfdPublisher(object):
             url = "{}/exec_request_handlers".format(self.base_url)
             body = {key: tuple(commands)
                     for key, commands in self.handlers.iteritems()}
-            response = session.request('POST', url, data=json.dumps(body))
+            response = session.request('POST', url, json=body)
             self.check_for_errors(response)
 
     def flush_requests(self, session):
-        for action, url, params, data in self.requests:
-            response = session.request(action, url, params=params, data=data)
+        for request_applicator in self.requests:
+            response = request_applicator(session)
             self.check_for_errors(response)
 
     def rollback(self):

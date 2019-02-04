@@ -481,9 +481,11 @@ class TestWizard(IntegrationTest):
         auth.assert_request(
             '/0.1/users',
             method='POST',
-            body=json.dumps(
-                {'username': 'root', 'password': data['admin_password'], 'firstname': 'root'}
-            )
+            json={
+                'username': 'root',
+                'password': data['admin_password'],
+                'firstname': 'root'
+            }
         )
         auth.assert_request(
             r'^/0.1/users/.{36}/policies/.{36}$',
@@ -494,33 +496,33 @@ class TestWizard(IntegrationTest):
         sysconfd.assert_request(
             '/xivoctl',
             method='POST',
-            body=json.dumps({'wazo-service': 'enable'})
+            json={'wazo-service': 'enable'},
         )
         sysconfd.assert_request(
             '/xivoctl',
             method='POST',
-            body=json.dumps({'wazo-service': 'start'})
+            json={'wazo-service': 'start'},
         )
         sysconfd.assert_request(
             '/hosts',
             method='POST',
-            body=json.dumps({
+            json={
                 'hostname': data['network']['hostname'],
                 'domain': data['network']['domain']
-            })
+            },
         )
         sysconfd.assert_request(
             '/resolv_conf',
             method='POST',
-            body=json.dumps({
+            json={
                 'nameservers': data['network']['nameservers'],
                 'search': [data['network']['domain']]
-            })
+            },
         )
         sysconfd.assert_request(
             '/commonconf_generate',
             method='POST',
-            body=json.dumps({})
+            json={},
         )
         sysconfd.assert_request(
             '/commonconf_apply',
@@ -529,12 +531,12 @@ class TestWizard(IntegrationTest):
         sysconfd.assert_request(
             '/exec_request_handlers',
             method='POST',
-            body=json.dumps({'chown_autoprov_config': []})
+            json={'chown_autoprov_config': []},
         )
         sysconfd.assert_request(
             '/exec_request_handlers',
             method='POST',
-            body=json.dumps({'ipbx': ['module reload res_pjsip.so']})
+            json={'ipbx': ['module reload res_pjsip.so']},
         )
 
     def validate_provd(self, ip_address):
