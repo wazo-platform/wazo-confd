@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-import json
 
 from unittest import TestCase
 
@@ -37,8 +35,7 @@ class TestSysconfdClient(TestCase):
         url = "http://localhost:8668/delete_voicemail"
         self.session.request.assert_called_once_with('GET',
                                                      url,
-                                                     params={'mailbox': '123', 'context': 'default'},
-                                                     data=None)
+                                                     params={'mailbox': '123', 'context': 'default'})
 
     def test_commonconf_generate(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -47,7 +44,7 @@ class TestSysconfdClient(TestCase):
         self.client.flush()
 
         url = "http://localhost:8668/commonconf_generate"
-        self.session.request.assert_called_once_with('POST', url, params={}, data='{}')
+        self.session.request.assert_called_once_with('POST', url, json={})
 
     def test_commonconf_apply(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -56,62 +53,62 @@ class TestSysconfdClient(TestCase):
         self.client.flush()
 
         url = "http://localhost:8668/commonconf_apply"
-        self.session.request.assert_called_once_with('GET', url, params={}, data=None)
+        self.session.request.assert_called_once_with('GET', url)
 
     def test_xivo_service_start(self):
         self.session.request.return_value = Mock(status_code=200)
-        data = {'wazo-service': 'start'}
+        expected_json = {'wazo-service': 'start'}
 
         self.client.xivo_service_start()
         self.client.flush()
 
-        method, url, body = self.extract_request()
+        method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/xivoctl"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
-        self.assertEquals(json.loads(body), data)
+        self.assertEquals(json, expected_json)
 
     def test_xivo_service_enable(self):
         self.session.request.return_value = Mock(status_code=200)
-        data = {'wazo-service': 'enable'}
+        expected_json = {'wazo-service': 'enable'}
 
         self.client.xivo_service_enable()
         self.client.flush()
 
-        method, url, body = self.extract_request()
+        method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/xivoctl"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
-        self.assertEquals(json.loads(body), data)
+        self.assertEquals(json, expected_json)
 
     def test_set_hosts(self):
         self.session.request.return_value = Mock(status_code=200)
-        data = {'hostname': 'toto',
-                'domain': 'toto.tata.titi'}
+        expected_json = {'hostname': 'toto',
+                         'domain': 'toto.tata.titi'}
 
-        self.client.set_hosts(data['hostname'], data['domain'])
+        self.client.set_hosts(expected_json['hostname'], expected_json['domain'])
         self.client.flush()
 
-        method, url, body = self.extract_request()
+        method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/hosts"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
-        self.assertEquals(json.loads(body), data)
+        self.assertEquals(json, expected_json)
 
     def test_set_resolvconf(self):
         self.session.request.return_value = Mock(status_code=200)
         domain = 'toto.titi.tata'
-        data = {'nameservers': ['127.0.0.1'],
-                'search': [domain]}
+        expected_json = {'nameservers': ['127.0.0.1'],
+                         'search': [domain]}
 
-        self.client.set_resolvconf(data['nameservers'], domain)
+        self.client.set_resolvconf(expected_json['nameservers'], domain)
         self.client.flush()
 
-        method, url, body = self.extract_request()
+        method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/resolv_conf"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
-        self.assertEquals(json.loads(body), data)
+        self.assertEquals(json, expected_json)
 
     def test_move_voicemail_storage(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -126,25 +123,24 @@ class TestSysconfdClient(TestCase):
                   'new_context': 'newcontext'}
         self.session.request.assert_called_once_with('GET',
                                                      url,
-                                                     params=params,
-                                                     data=None)
+                                                     params=params)
 
     def test_exec_request_handlers_live_reload_enabled(self):
         self.session.request.return_value = Mock(status_code=200)
         self.dao.is_live_reload_enabled.return_value = True
 
-        commands = {'ctibus': [],
-                    'ipbx': []}
+        commands = {'ctibus': (),
+                    'ipbx': ()}
 
         self.client.exec_request_handlers(commands)
         self.client.flush()
 
-        method, url, body = self.extract_request()
+        method, url, json = self.extract_request()
 
         expected_url = "http://localhost:8668/exec_request_handlers"
         self.assertEquals(method, "POST")
         self.assertEquals(url, expected_url)
-        self.assertEquals(json.loads(body), commands)
+        self.assertEquals(json, commands)
 
         self.dao.is_live_reload_enabled.assert_called_once_with()
 
@@ -152,8 +148,8 @@ class TestSysconfdClient(TestCase):
         call = self.session.request.call_args_list[0]
         method = call[0][0]
         url = call[0][1]
-        body = call[1]['data']
-        return method, url, body
+        json = call[1]['json']
+        return method, url, json
 
     def test_exec_request_handlers_live_reload_disabled(self):
         self.dao.is_live_reload_enabled.return_value = False
@@ -178,8 +174,7 @@ class TestSysconfdClient(TestCase):
                                            'bus': ['command6']})
         self.client.flush()
 
-        method, url, body = self.extract_request()
-        body = json.loads(body)
+        method, url, json = self.extract_request()
 
         expected_url = "http://localhost:8668/exec_request_handlers"
         expected_body = has_entries(ctibus=has_items('command1', 'command3', 'command4'),
@@ -188,4 +183,4 @@ class TestSysconfdClient(TestCase):
 
         assert_that(method, equal_to("POST"))
         assert_that(url, equal_to(expected_url))
-        assert_that(body, expected_body)
+        assert_that(json, expected_body)
