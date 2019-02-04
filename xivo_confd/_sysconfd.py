@@ -62,27 +62,27 @@ class SysconfdPublisher(object):
         self.add_request('POST', url, json={})
 
     def set_hosts(self, hostname, domain):
-        json = {'hostname': hostname,
+        data = {'hostname': hostname,
                 'domain': domain}
         url = "{}/hosts".format(self.base_url)
-        self.add_request('POST', url, json=json)
+        self.add_request('POST', url, json=data)
 
     def set_resolvconf(self, nameserver, domain):
-        json = {'nameservers': nameserver,
+        data = {'nameservers': nameserver,
                 'search': [domain]}
         url = "{}/resolv_conf".format(self.base_url)
-        self.add_request('POST', url, json=json)
+        self.add_request('POST', url, json=data)
         self.flush()
 
     def xivo_service_start(self):
-        json = {'wazo-service': 'start'}
+        data = {'wazo-service': 'start'}
         url = "{}/xivoctl".format(self.base_url)
-        self.add_request('POST', url, json=json)
+        self.add_request('POST', url, json=data)
 
     def xivo_service_enable(self):
-        json = {'wazo-service': 'enable'}
+        data = {'wazo-service': 'enable'}
         url = "{}/xivoctl".format(self.base_url)
-        self.add_request('POST', url, json=json)
+        self.add_request('POST', url, json=data)
 
     def _session(self):
         session = requests.Session()

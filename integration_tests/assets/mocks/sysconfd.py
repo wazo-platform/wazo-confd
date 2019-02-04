@@ -13,6 +13,7 @@ def log_request():
                'path': path,
                'query': dict(request.args.items()),
                'body': request.data,
+               'json': request.json,
                'headers': dict(request.headers)}
         REQUESTS.append(log)
 
