@@ -77,12 +77,38 @@ def test_list(sound1, sound2):
         has_entries(name='system'),
     ))
 
+    response = confd.sounds.get(wazo_tenant=SUB_TENANT)
+    assert_that(response.items, has_items(
+        sound2,
+        has_entries(name='system'),
+    ))
+
+    response = confd.sounds.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(response.items, has_items(
+        sound1,
+        sound2,
+        has_entries(name='system'),
+    ))
+
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
 def test_get(main):
     response = confd.sounds(main['name']).get(wazo_tenant=MAIN_TENANT)
     assert_that(response.item, has_entries(name=main['name'],
                                            files=empty()))
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.sounds(main['name']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(name=main['name']))
+
+    response = confd.sounds(main['name']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+    response = confd.sounds(sub['name']).get(wazo_tenant=MAIN_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
@@ -197,6 +223,11 @@ def test_create_all_parameters():
     test_create_minimal_parameters()
 
 
+def test_create_unauthorized_tenant():
+    response = confd.sounds.post(wazo_tenant='wrong_tenant', name='sound1')
+    response.assert_status(401)
+
+
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
 def test_edit_unimplemented(sound):
     response = confd.sounds(sound['name']).put(wazo_tenant=MAIN_TENANT)
@@ -208,6 +239,19 @@ def test_delete(sound):
     response = confd.sounds(sound['name']).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
     response = confd.sounds(sound['name']).get(wazo_tenant=MAIN_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.sounds(main['name']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+    response = confd.sounds(main['name']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_status(204)
+
+    response = confd.sounds(sub['name']).get(wazo_tenant=MAIN_TENANT)
     response.assert_match(404, e.not_found(resource='Sound'))
 
 
@@ -463,6 +507,60 @@ def test_add_update_delete_file(sound):
 
     response = confd.sounds(sound['name']).get(wazo_tenant=MAIN_TENANT)
     assert_that(response.item, has_entries(files=empty()))
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound(wazo_tenant=SUB_TENANT)
+def test_add_update_delete_file_multi_tenant(main, sub):
+    client = _new_sound_file_client()
+
+    # add a new files
+    response = client.url.sounds(main['name']).files('foo').put(
+        wazo_tenant=SUB_TENANT,
+        content='content is not checked',
+    )
+    response.assert_match(404, e.not_found(resource='Sound'))
+    response = client.url.sounds(sub['name']).files('foo').put(
+        wazo_tenant=MAIN_TENANT,
+        content='content is not checked',
+    )
+    response.assert_match(404, e.not_found(resource='Sound'))
+    response = client.url.sounds(main['name']).files('foo').put(
+        wazo_tenant=MAIN_TENANT,
+        content='content is not checked',
+    )
+    response.assert_status(204)
+    response = client.url.sounds(sub['name']).files('foo').put(
+        wazo_tenant=SUB_TENANT,
+        content='content is not checked',
+    )
+    response.assert_status(204)
+
+    # get the files
+    response = client.url.sounds(main['name']).files('foo').get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+    response = client.url.sounds(sub['name']).files('foo').get(wazo_tenant=MAIN_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+    # update the files
+    response = client.url.sounds(main['name']).files('foo').put(
+        wazo_tenant=SUB_TENANT,
+        content='some new content'
+    )
+    response.assert_match(404, e.not_found(resource='Sound'))
+    response = client.url.sounds(sub['name']).files('foo').put(
+        wazo_tenant=MAIN_TENANT,
+        content='some new content'
+    )
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+    # delete the files
+    response = client.url.sounds(main['name']).files('foo').delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
+
+    response = client.url.sounds(sub['name']).files('foo').delete(wazo_tenant=MAIN_TENANT)
+    response.assert_match(404, e.not_found(resource='Sound'))
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
