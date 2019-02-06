@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -12,7 +12,10 @@ from .auth import AuthClient
 from .bus import setup_bus as setup_bus_helpers
 from .client import ConfdClient
 from .database import create_helper as db_create_helper
-from .filesystem import FileSystemClient
+from .filesystem import (
+    FileSystemClient,
+    TenantFileSystemClient,
+)
 from .helpers import setup_confd as setup_confd_helpers
 from .helpers import setup_database as setup_database_helpers
 from .helpers import setup_new_client as setup_new_client_helpers
@@ -100,3 +103,7 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def create_filesystem(cls, base_path):
         return FileSystemClient(base_path=base_path, execute=cls.docker_exec)
+
+    @classmethod
+    def create_tenant_filesystem(cls, base_path):
+        return TenantFileSystemClient(base_path=base_path, execute=cls.docker_exec)

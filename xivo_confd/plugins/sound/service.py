@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+import logging
 
 from requests import HTTPError
 
@@ -13,6 +15,8 @@ from .storage import build_storage
 from .validator import build_validator, build_validator_file
 from .converter import convert_ari_sounds_to_model
 
+logger = logging.getLogger(__name__)
+
 
 class SoundService(object):
 
@@ -24,19 +28,19 @@ class SoundService(object):
         self.validator_file = validator_file
         self.notifier = notifier
 
-    def search(self, parameters):
+    def search(self, parameters, tenant_uuids):
         sound_system = self._get_asterisk_sound(parameters)
-        sounds = self._storage.list_directories(parameters)
+        sounds = self._storage.list_directories(parameters, tenant_uuids)
         sounds.append(sound_system)
         total = len(sounds)
         return total, sounds
 
-    def get(self, category, parameters=None, with_files=True):
+    def get(self, tenant_uuid, category, parameters=None, with_files=True):
         parameters = parameters if parameters is not None else {}
         if category == ASTERISK_CATEGORY:
             sound = self._get_asterisk_sound(parameters, with_files)
         else:
-            sound = self._storage.get_directory(category, parameters, with_files)
+            sound = self._storage.get_directory(tenant_uuid, category, parameters, with_files)
         return sound
 
     def _get_asterisk_sound(self, parameters, with_files=True):
@@ -56,6 +60,7 @@ class SoundService(object):
         return sound
 
     def create(self, sound):
+        logger.debug('Creating %s', sound)
         self._storage.create_directory(sound)
         self.notifier.created(sound)
         return sound

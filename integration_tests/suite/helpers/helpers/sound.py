@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -13,8 +13,8 @@ def generate_sound(**parameters):
     return add_sound(**parameters)
 
 
-def add_sound(**parameters):
-    response = confd.sounds.post(parameters)
+def add_sound(wazo_tenant, **parameters):
+    response = confd.sounds.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

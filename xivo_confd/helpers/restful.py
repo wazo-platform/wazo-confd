@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -23,11 +23,17 @@ class ConfdResource(ErrorCatchingResource):
     method_decorators = [authentication.login_required] + ErrorCatchingResource.method_decorators
 
     def _has_write_tenant_uuid(self):
-        return (
-            hasattr(self, 'model')
-            and hasattr(self.model, '__mapper__')
-            and hasattr(self.model.__mapper__.c, 'tenant_uuid')
-        )
+        return (self._has_write_tenant_uuid_sqlalchemy()
+                or self._has_write_tenant_uuid_custom())
+
+    def _has_write_tenant_uuid_sqlalchemy(self):
+        return (hasattr(self, 'model')
+                and hasattr(self.model, '__mapper__')
+                and hasattr(self.model.__mapper__.c, 'tenant_uuid'))
+
+    def _has_write_tenant_uuid_custom(self):
+        return (hasattr(self, 'model')
+                and hasattr(self.model, 'has_tenant_uuid'))
 
     def _has_a_tenant_uuid(self):
         if getattr(self, 'has_tenant_uuid', None):

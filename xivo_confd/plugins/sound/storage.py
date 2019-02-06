@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import errno
@@ -31,36 +31,41 @@ class _SoundFilesystemStorage(object):
     def _build_path(self, *fragments):
         return os.path.join(self._base_path, *[fragment.encode('utf-8') for fragment in fragments if fragment])
 
-    def list_directories(self, parameters):
-        try:
-            directories = self._list_directories()
-        except OSError as e:
-            logger.error('Could not list sound directory %s: %s', self._base_path, e)
-            raise
+    def list_directories(self, parameters, tenant_uuids):
+        result = []
+        for tenant_uuid in tenant_uuids:
+            try:
+                directories = self._list_directories(tenant_uuid)
+            except OSError as e:
+                logger.error('Could not list sound directory %s/tenants/%s: %s', self._base_path, tenant_uuid, e)
+                continue
 
-        directories.sort()
-        return [self.get_directory(directory_name, parameters) for directory_name in directories]
+            directories.sort()
+            logger.debug('Found directories: %s', directories)
+            result.extend([self.get_directory(tenant_uuid, directory_name, parameters) for directory_name in directories])
 
-    def _list_directories(self):
-        return [name for name in os.listdir(self._base_path)
-                if os.path.isdir(self._build_path(name))
+        return result
+
+    def _list_directories(self, tenant_uuid):
+        return [name for name in os.listdir(self._build_path('tenants', tenant_uuid))
+                if os.path.isdir(self._build_path('tenants', tenant_uuid, name))
                 and name not in RESERVED_DIRECTORIES]
 
-    def get_directory(self, directory, parameters, with_files=True):
+    def get_directory(self, tenant_uuid, directory, parameters, with_files=True):
         if directory in RESERVED_DIRECTORIES:
             raise errors.not_found('Sound', name=directory)
 
-        if not os.path.exists(self._build_path(directory)):
+        if not os.path.exists(self._build_path('tenants', tenant_uuid, directory)):
             raise errors.not_found('Sound', name=directory, **parameters)
 
-        sound = SoundCategory(name=directory)
+        sound = SoundCategory(name=directory, tenant_uuid=tenant_uuid)
 
         if with_files:
             sound = self._populate_files(sound, parameters)
         return sound
 
     def create_directory(self, sound):
-        path = self._build_path(sound.name)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name)
         try:
             os.mkdir(path, 0o775)
         except OSError as e:
@@ -70,7 +75,7 @@ class _SoundFilesystemStorage(object):
                 logger.error('Could not create sound directory %s: %s', path, e)
 
     def remove_directory(self, sound):
-        path = self._build_path(sound.name)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name)
         try:
             shutil.rmtree(path)
         except OSError as e:
@@ -110,16 +115,16 @@ class _SoundFilesystemStorage(object):
 
     def _filter_filename_language_format(self, sound, filename_filter, language_filter, format_filter):
         filename_extension = '{}.{}'.format(filename_filter, SoundFormat(format_filter).extension)
-        path = self._build_path(sound.name, language_filter, filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, language_filter, filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
         return sound
 
     def _filter_filename_language(self, sound, filename_filter, language_filter):
-        path = self._build_path(sound.name, language_filter, filename_filter)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, language_filter, filename_filter)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         filename_extension = '{}.*'.format(filename_filter)
-        path = self._build_path(sound.name, language_filter, filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, language_filter, filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         return sound
@@ -127,57 +132,57 @@ class _SoundFilesystemStorage(object):
     def _filter_filename_format(self, sound, filename_filter, format_filter):
         filename_extension = '{}.{}'.format(filename_filter, SoundFormat(format_filter).extension)
 
-        path = self._build_path(sound.name, filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, filename_extension)
         sound = self._find_and_populate_sound(sound, path)
 
-        path = self._build_path(sound.name, '*', filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, '*', filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         return sound
 
     def _filter_filename(self, sound, filename_filter):
-        path = self._build_path(sound.name, filename_filter)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, filename_filter)
         sound = self._find_and_populate_sound(sound, path)
 
-        path = self._build_path(sound.name, '*', filename_filter)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, '*', filename_filter)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         filename_extension = '{}.*'.format(filename_filter)
-        path = self._build_path(sound.name, filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, filename_extension)
         sound = self._find_and_populate_sound(sound, path)
 
-        path = self._build_path(sound.name, '*', filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, '*', filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         return sound
 
     def _filter_language_format(self, sound, language_filter, format_filter):
         filename_extension = '*.{}'.format(SoundFormat(format_=format_filter).extension)
-        path = self._build_path(sound.name, language_filter, filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, language_filter, filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
         return sound
 
     def _filter_language(self, sound, language_filter):
-        path = self._build_path(sound.name, language_filter, '*')
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, language_filter, '*')
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
         return sound
 
     def _filter_format(self, sound, format_filter):
         filename_extension = '*.{}'.format(SoundFormat(format_=format_filter).extension)
 
-        path = self._build_path(sound.name, filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, filename_extension)
         sound = self._find_and_populate_sound(sound, path)
 
-        path = self._build_path(sound.name, '*', filename_extension)
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, '*', filename_extension)
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         return sound
 
     def _filter_none(self, sound):
-        path = self._build_path(sound.name, '*')
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, '*')
         sound = self._find_and_populate_sound(sound, path)
 
-        path = self._build_path(sound.name, '*', '*')
+        path = self._build_path('tenants', sound.tenant_uuid, sound.name, '*', '*')
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
         return sound
@@ -186,11 +191,11 @@ class _SoundFilesystemStorage(object):
         for file_ in glob.glob(path):
             if not os.path.isfile(file_):
                 continue
-            sound_file = self._create_sound_file(file_, extract_language=extract_language)
+            sound_file = self._create_sound_file(sound.tenant_uuid, file_, extract_language=extract_language)
             sound.add_file(sound_file)
         return sound
 
-    def _create_sound_file(self, path, extract_language=False):
+    def _create_sound_file(self, tenant_uuid, path, extract_language=False):
         language = None
         if extract_language:
             language = os.path.basename(os.path.dirname(path))
@@ -198,8 +203,8 @@ class _SoundFilesystemStorage(object):
         filename, extension = os.path.splitext(basename)
         extension = extension.strip('.') if extension else extension
         path_without_extension = os.path.join(os.path.dirname(path), filename)
-        sound_format = SoundFormat(language=language, path=path_without_extension, extension=extension)
-        return SoundFile(name=filename, formats=[sound_format])
+        sound_format = SoundFormat(tenant_uuid=tenant_uuid, language=language, path=path_without_extension, extension=extension)
+        return SoundFile(tenant_uuid=tenant_uuid, name=filename, formats=[sound_format])
 
     def load_first_file(self, sound):
         path = self._get_first_file_path(sound)
@@ -250,10 +255,16 @@ class _SoundFilesystemStorage(object):
 
     def _get_file_paths(self, sound):
         for file_ in sound.files:
-            return ['{}{}'.format(
-                self._build_path(sound.name, format_.language, file_.name),
-                '.{}'.format(format_.extension) if format_.extension else '',
-            ) for format_ in file_.formats]
+            if sound.tenant_uuid:
+                return ['{}{}'.format(
+                    self._build_path('tenants', sound.tenant_uuid, sound.name, format_.language, file_.name),
+                    '.{}'.format(format_.extension) if format_.extension else '',
+                ) for format_ in file_.formats]
+            else:
+                return ['{}{}'.format(
+                    self._build_path(sound.name, format_.language, file_.name),
+                    '.{}'.format(format_.extension) if format_.extension else '',
+                ) for format_ in file_.formats]
         raise errors.not_found('Sound file', name=sound.name)
 
     def _ensure_directory(self, path):
