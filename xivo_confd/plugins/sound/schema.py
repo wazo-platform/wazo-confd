@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -22,16 +22,19 @@ class SoundQueryParametersSchema(BaseSchema):
 class SoundFormatSchema(BaseSchema):
     format = fields.String()
     language = fields.String()
+    tenant_uuid = fields.String()
     text = fields.String()
     path = fields.String()
 
 
 class SoundFileSchema(BaseSchema):
+    tenant_uuid = fields.String()
     name = fields.String()
     formats = fields.Nested(SoundFormatSchema, many=True)
 
 
 class SoundSchema(BaseSchema):
+    tenant_uuid = fields.String()
     name = fields.String(validate=[Length(max=149, min=1),
                                    NoneOf([ASTERISK_CATEGORY]),
                                    NoneOf(RESERVED_DIRECTORIES, error=RESERVED_DIRECTORIES_ERROR),

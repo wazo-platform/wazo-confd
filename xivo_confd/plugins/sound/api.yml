@@ -160,6 +160,9 @@ parameters:
 definitions:
   Sound:
     properties:
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant of the category
       name:
         type: string
         description: The name of the category (can only by set on create and must be unique)
@@ -173,6 +176,9 @@ definitions:
     - name
   SoundFile:
     properties:
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant of the file
       name:
         type: string
         description: The name of the file
@@ -184,6 +190,9 @@ definitions:
           $ref: '#/definitions/SoundFormat'
   SoundFormat:
     properties:
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant of the file
       format:
         type: string
       language:
