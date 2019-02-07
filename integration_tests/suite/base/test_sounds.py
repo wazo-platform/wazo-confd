@@ -213,8 +213,11 @@ def test_create_minimal_parameters():
     response = confd.sounds.post(wazo_tenant=MAIN_TENANT, name='sound1')
     response.assert_created('sound')
 
-    assert_that(response.item, has_entries(name='sound1',
-                                           files=empty()))
+    assert_that(response.item, has_entries({
+        'tenant_uuid': MAIN_TENANT,
+        'name': 'sound1',
+        'files': empty(),
+    }))
 
     confd.sounds(response.item['name']).delete(wazo_tenant=MAIN_TENANT).assert_deleted()
 
