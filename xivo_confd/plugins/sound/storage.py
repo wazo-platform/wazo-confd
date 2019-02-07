@@ -8,6 +8,7 @@ import logging
 import os
 import shutil
 
+from contextlib import contextmanager
 from flask import send_file
 from xivo_dao.helpers import errors
 
@@ -66,13 +67,14 @@ class _SoundFilesystemStorage(object):
 
     def create_directory(self, sound):
         path = self._build_path('tenants', sound.tenant_uuid, sound.name)
-        try:
-            os.mkdir(path, 0o775)
-        except OSError as e:
-            if e.errno == errno.EEXIST:
-                raise errors.resource_exists(sound, name=sound.name)
-            else:
-                logger.error('Could not create sound directory %s: %s', path, e)
+        with umask_disabled():
+            try:
+                os.makedirs(path, 0o775)
+            except OSError as e:
+                if e.errno == errno.EEXIST:
+                    raise errors.resource_exists(sound, name=sound.name)
+                else:
+                    logger.error('Could not create sound directory %s: %s', path, e)
 
     def remove_directory(self, sound):
         path = self._build_path('tenants', sound.tenant_uuid, sound.name)
@@ -269,8 +271,18 @@ class _SoundFilesystemStorage(object):
 
     def _ensure_directory(self, path):
         if not os.path.exists(path):
-            try:
-                os.mkdir(path, 0o775)
-            except OSError as e:
-                logger.error('Could not create sound language directory %s: %s', path, e)
-                raise
+            with umask_disabled():
+                try:
+                    os.makedirs(path, 0o775)
+                except OSError as e:
+                    logger.error('Could not create sound language directory %s: %s', path, e)
+                    raise
+
+
+@contextmanager
+def umask_disabled():
+    try:
+        original_umask = os.umask(0)
+        yield
+    finally:
+        os.umask(original_umask)
