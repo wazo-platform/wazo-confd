@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -33,11 +33,9 @@ class Controller(object):
             partial(self_check, config),
         ]
 
-        auth_config = dict(config['auth'])
-        auth_config.pop('key_file', None)
         authentication.set_config(config)
 
-        auth_client = AuthClient(**auth_config)
+        auth_client = AuthClient(**config['auth'])
         self.token_renewer = TokenRenewer(auth_client)
 
         self.http_server = HTTPServer(config)
