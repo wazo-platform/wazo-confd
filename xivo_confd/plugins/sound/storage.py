@@ -30,10 +30,13 @@ class _SoundFilesystemStorage(object):
         self._base_path = base_path
 
     def _build_path(self, *fragments):
+        fragments = [fragment.encode('utf-8') for fragment in fragments if fragment]
+
         dangerous_fragments = [fragment for fragment in fragments if '..' in fragment or '/' in fragment]
         if dangerous_fragments:
             raise errors.not_permitted('Dangerous path fragment: "{}"'.format(fragment))
-        return os.path.join(self._base_path, *[fragment.encode('utf-8') for fragment in fragments if fragment])
+
+        return os.path.join(self._base_path, *fragments)
 
     def list_directories(self, parameters, tenant_uuids):
         result = []

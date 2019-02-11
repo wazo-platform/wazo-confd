@@ -29,3 +29,10 @@ class TestBuildPath(unittest.TestCase):
 
         assert_that(calling(storage._build_path).with_args('one', 'im-a-bad-guy/../../etc/passwd'),
                     raises(errors.ResourceError))
+
+    def test_build_path_empty_fragment(self):
+        storage = _SoundFilesystemStorage('/tmp')
+
+        result = storage._build_path('one', None, 'two')
+
+        assert_that(result, equal_to('/tmp/one/two'))
