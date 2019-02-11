@@ -13,7 +13,7 @@ def generate_sound(**parameters):
     return add_sound(**parameters)
 
 
-def add_sound(wazo_tenant, **parameters):
+def add_sound(wazo_tenant=None, **parameters):
     response = confd.sounds.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 

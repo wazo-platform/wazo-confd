@@ -63,7 +63,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 'system'
 
 
-@fixtures.sound(name='unique', wazo_tenant=MAIN_TENANT)
+@fixtures.sound(name='unique')
 def unique_error_checks(url, sound):
     yield s.check_bogus_field_returns_error, url, 'name', sound['name']
 
@@ -91,9 +91,9 @@ def test_list(sound1, sound2):
     ))
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_get(main):
-    response = confd.sounds(main['name']).get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(main['name']).get()
     assert_that(response.item, has_entries(name=main['name'],
                                            files=empty()))
 
@@ -161,7 +161,7 @@ def test_get_system_sound():
     ]
     ari.set_sounds(sounds)
 
-    response = confd.sounds('system').get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds('system').get()
 
     assert_that(response.item, has_entries(
         name='system',
@@ -194,7 +194,7 @@ def test_get_system_sound_remove_non_standard_language():
     ]
     ari.set_sounds(sounds)
 
-    response = confd.sounds('system').get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds('system').get()
 
     assert_that(response.item, has_entries(
         name='system',
@@ -205,7 +205,7 @@ def test_get_system_sound_remove_non_standard_language():
 
 def test_get_internal_directory():
     for name in DEFAULT_INTERNAL_DIRECTORY:
-        response = confd.sounds(name).get(wazo_tenant=MAIN_TENANT)
+        response = confd.sounds(name).get()
         response.assert_status(404)
 
 
@@ -231,17 +231,17 @@ def test_create_unauthorized_tenant():
     response.assert_status(401)
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_edit_unimplemented(sound):
-    response = confd.sounds(sound['name']).put(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).put()
     response.assert_status(405)
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_delete(sound):
-    response = confd.sounds(sound['name']).delete(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).delete()
     response.assert_deleted()
-    response = confd.sounds(sound['name']).get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).get()
     response.assert_match(404, e.not_found(resource='Sound'))
 
 
@@ -259,7 +259,7 @@ def test_delete_multi_tenant(main, sub):
 
 
 def test_delete_system_sound():
-    response = confd.sounds('system').delete(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds('system').delete()
     response.assert_status(400)
 
 
@@ -277,33 +277,30 @@ def test_delete_internal_directory():
         response.assert_status(404)
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_get_file_errors(sound):
-    response = confd.sounds(sound['name']).files('ivr').get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).files('ivr').get()
     response.assert_status(404)
 
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
 
     response = confd.sounds(sound['name']).files('ivr').get(
-        wazo_tenant=MAIN_TENANT,
         format='slin',
         language='invalid',
     )
     response.assert_status(404)
 
     response = confd.sounds(sound['name']).files('ivr').get(
-        wazo_tenant=MAIN_TENANT,
         format='ogg',
         language='fr_FR',
     )
     response.assert_status(404)
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_put_file_errors(sound):
     client = _new_sound_file_client()
     filenames = [
@@ -312,42 +309,38 @@ def test_put_file_errors(sound):
         '../bar',
     ]
     for filename in filenames:
-        response = client.url.sounds(sound['name']).files(filename).put(wazo_tenant=MAIN_TENANT)
+        response = client.url.sounds(sound['name']).files(filename).put()
         response.assert_status(404)
 
     for invalid_name in ['.foo', 'foo/bar', '../bar']:
-        response = client.url.sounds(invalid_name).files('foo').put(wazo_tenant=MAIN_TENANT)
+        response = client.url.sounds(invalid_name).files('foo').put()
         response.assert_status(404)
 
-    response = client.url.sounds('invalid').files('foo').put(wazo_tenant=MAIN_TENANT)
+    response = client.url.sounds('invalid').files('foo').put()
     response.assert_status(404)
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_get_file(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr_slin_fr_FR',
         query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr_ogg_fr_FR',
         query_string={'format': 'ogg', 'language': 'fr_FR'}
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr_ogg_fr_CA',
         query_string={'format': 'ogg', 'language': 'fr_CA'}
     ).assert_updated()
 
-    response = confd.sounds(sound['name']).files('ivr').get(wazo_tenant=MAIN_TENANT, format='ogg')
+    response = confd.sounds(sound['name']).files('ivr').get(format='ogg')
     assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_ogg_fr_CA'))
     response.assert_content_disposition('ivr.ogg')
 
     response = confd.sounds(sound['name']).files('ivr').get(
-        wazo_tenant=MAIN_TENANT,
         format='ogg',
         language='fr_FR'
     )
@@ -355,7 +348,6 @@ def test_get_file(sound):
     response.assert_content_disposition('ivr.ogg')
 
     response = confd.sounds(sound['name']).files('ivr').get(
-        wazo_tenant=MAIN_TENANT,
         language='fr_FR',
     )
     assert_that(response.raw, any_of('ivr_ogg_fr_FR', 'ivr_slin_fr_FR'))
@@ -404,14 +396,12 @@ def test_get_file_system():
     ari.set_sound(sound)
 
     response = confd.sounds('system').files(sound['id']).get(
-        wazo_tenant=MAIN_TENANT,
         format='ogg'
     )
     assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR', 'asterisk_sound_ogg_fr_CA'))
     response.assert_content_disposition('asterisk-sound.ogg')
 
     response = confd.sounds('system').files(sound['id']).get(
-        wazo_tenant=MAIN_TENANT,
         format='ogg',
         language='fr_FR'
     )
@@ -419,13 +409,11 @@ def test_get_file_system():
     response.assert_content_disposition('asterisk-sound.ogg')
 
     response = confd.sounds('system').files(sound['id']).get(
-        wazo_tenant=MAIN_TENANT,
         language='fr_FR'
     )
     assert_that(response.raw, any_of('asterisk_sound_ogg_fr_FR', 'asterisk_sound_slin_fr_FR'))
 
     response = confd.sounds('system').files(sound['id']).get(
-        wazo_tenant=MAIN_TENANT,
         format='slin',
         language='fr_FR'
     )
@@ -435,80 +423,72 @@ def test_get_file_system():
     ari.reset()
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_get_file_return_without_format_and_language_first(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr_ogg_fr_FR',
         query_string={'format': 'ogg', 'language': 'fr_FR'}
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr_fr_FR',
         query_string={'language': 'fr_FR'}
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr_ogg',
         query_string={'format': 'ogg'}
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         content='ivr',
     ).assert_updated()
 
-    response = confd.sounds(sound['name']).files('ivr').get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).files('ivr').get()
     assert_that(response.raw, equal_to('ivr'))
     response.assert_content_disposition('ivr')
 
     response = confd.sounds(sound['name']).files('ivr').get(
-        wazo_tenant=MAIN_TENANT,
         format='ogg'
     )
     assert_that(response.raw, equal_to('ivr_ogg'))
     response.assert_content_disposition('ivr.ogg')
 
     response = confd.sounds(sound['name']).files('ivr').get(
-        wazo_tenant=MAIN_TENANT,
         language='fr_FR'
     )
     assert_that(response.raw, equal_to('ivr_fr_FR'))
     response.assert_content_disposition('ivr')
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_add_update_delete_file(sound):
     client = _new_sound_file_client()
 
     # add a new file
     response = client.url.sounds(sound['name']).files('foo').put(
-        wazo_tenant=MAIN_TENANT,
         content='content is not checked',
     )
     response.assert_status(204)
 
-    response = client.url.sounds(sound['name']).files('foo').get(wazo_tenant=MAIN_TENANT)
+    response = client.url.sounds(sound['name']).files('foo').get()
     assert_that(response.raw, equal_to('content is not checked'))
 
-    response = confd.sounds(sound['name']).get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).get()
     assert_that(response.item, has_entries(files=contains(has_entries(name='foo'))))
 
     # update/overwrite the file
     response = client.url.sounds(sound['name']).files('foo').put(
-        wazo_tenant=MAIN_TENANT,
         content='some new content'
     )
     response.assert_status(204)
 
-    response = client.url.sounds(sound['name']).files('foo').get(wazo_tenant=MAIN_TENANT)
+    response = client.url.sounds(sound['name']).files('foo').get()
     assert_that(response.raw, equal_to('some new content'))
 
     # delete the file
-    response = client.url.sounds(sound['name']).files('foo').delete(wazo_tenant=MAIN_TENANT)
+    response = client.url.sounds(sound['name']).files('foo').delete()
     response.assert_deleted()
 
-    response = confd.sounds(sound['name']).get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).get()
     assert_that(response.item, has_entries(files=empty()))
 
 
@@ -566,25 +546,22 @@ def test_add_update_delete_file_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='Sound'))
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
+@fixtures.sound()
 def test_delete_file_multiple(sound):
     client = _new_sound_file_client()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         query_string={'format': 'slin', 'language': 'fr_FR'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         query_string={'format': 'ogg'},
     ).assert_updated()
     client.url.sounds(sound['name']).files('ivr').put(
-        wazo_tenant=MAIN_TENANT,
         query_string={'format': 'slin', 'language': 'fr_CA'},
     ).assert_updated()
 
-    confd.sounds(sound['name']).files('ivr').delete(wazo_tenant=MAIN_TENANT).assert_deleted()
+    confd.sounds(sound['name']).files('ivr').delete().assert_deleted()
 
-    response = confd.sounds(sound['name']).files('ivr').get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds(sound['name']).files('ivr').get()
     response.assert_status(404)
 
 
@@ -603,7 +580,7 @@ def test_delete_files_with_partial_errors(sound):
 
 
 def test_get_system_file_errors():
-    response = confd.sounds('system').files('invalid').get(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds('system').files('invalid').get()
     response.assert_status(404)
 
 
@@ -614,7 +591,7 @@ def test_update_system_file():
     }
     ari.set_sound(sound)
     client = _new_sound_file_client()
-    response = client.url.sounds('system').files('foo').put(wazo_tenant=MAIN_TENANT)
+    response = client.url.sounds('system').files('foo').put()
     response.assert_status(400)
 
 
@@ -624,7 +601,7 @@ def test_delete_system_file():
         'formats': [],
     }
     ari.set_sound(sound)
-    response = confd.sounds('system').files('foo').delete(wazo_tenant=MAIN_TENANT)
+    response = confd.sounds('system').files('foo').delete()
     response.assert_status(400)
 
 
