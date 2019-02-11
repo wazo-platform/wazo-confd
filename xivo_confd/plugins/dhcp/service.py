@@ -8,6 +8,9 @@ from xivo_dao.helpers.db_manager import Session
 
 class DHCPService(object):
 
+    def __init__(self, notifier):
+        self.notifier = notifier
+
     def get(self):
         return Session.query(Dhcp).first()
 
@@ -15,7 +18,4 @@ class DHCPService(object):
         dhcp = Session.query(Dhcp).first()
         for name, value in form.iteritems():
             setattr(dhcp, name, value)
-
-
-def build_service():
-    return DHCPService()
+        self.notifier.edited()
