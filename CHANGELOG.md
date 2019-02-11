@@ -76,7 +76,7 @@ Changelog
 18.10
 -----
 
-* Added applicationl endpoints:
+* Added applications endpoints:
 
   * GET `/1.1/applications`
   * POST `/1.1/applications`
