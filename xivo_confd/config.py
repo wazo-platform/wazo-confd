@@ -102,6 +102,7 @@ DEFAULT_CONFIG = {
         'context_context': True,
         'cti_profile': True,
         'device': True,
+        'dhcp': True,
         'endpoint_custom': True,
         'endpoint_iax': True,
         'endpoint_sccp': True,

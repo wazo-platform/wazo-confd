@@ -15,6 +15,11 @@ Changelog
 
   * `/1.1/sounds`
 
+* Added DHCP endpoints:
+
+  * GET `/1.1/dhcp`
+  * PUT `/1.1/dhcp`
+
 
 19.02
 -----
