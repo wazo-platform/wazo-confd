@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
+from ..helpers.config import (MAIN_TENANT, SUB_TENANT)
 from ..helpers.wrappers import IsolatedAction
 
 
@@ -64,5 +65,7 @@ ari = SingletonProxy(BaseIntegrationTest.create_ari)
 provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)
 
-wazo_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/var/lib/xivo/sounds')
+wazo_sound = SingletonProxy(BaseIntegrationTest.create_tenant_filesystem, '/var/lib/xivo/sounds')
 asterisk_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds')
+wazo_sound.create_directory(MAIN_TENANT, name='')
+wazo_sound.create_directory(SUB_TENANT, name='')

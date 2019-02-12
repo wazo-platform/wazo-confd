@@ -6,6 +6,9 @@ paths:
       description: '**Required ACL:** `confd.sounds.read`'
       tags:
       - sounds
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       responses:
         '200':
           description: sounds list
@@ -18,6 +21,7 @@ paths:
       tags:
       - sounds
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Sound category to create
@@ -39,6 +43,7 @@ paths:
       tags:
       - sounds
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/sound_category'
       responses:
         '200':
@@ -57,6 +62,7 @@ paths:
       tags:
       - sounds
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/sound_category'
       responses:
         '204':
@@ -73,6 +79,7 @@ paths:
       tags:
       - sounds
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/sound_category'
       - $ref: '#/parameters/sound_filename'
       - $ref: '#/parameters/sound_language'
@@ -93,6 +100,7 @@ paths:
       consumes:
       - application/octet-stream
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/sound_category'
       - $ref: '#/parameters/sound_filename'
       - $ref: '#/parameters/sound_language'
@@ -114,6 +122,7 @@ paths:
       tags:
       - sounds
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/sound_category'
       - $ref: '#/parameters/sound_filename'
       - $ref: '#/parameters/sound_language'
@@ -151,6 +160,9 @@ parameters:
 definitions:
   Sound:
     properties:
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant of the category
       name:
         type: string
         description: The name of the category (can only by set on create and must be unique)
@@ -164,6 +176,9 @@ definitions:
     - name
   SoundFile:
     properties:
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant of the file
       name:
         type: string
         description: The name of the file
@@ -175,6 +190,9 @@ definitions:
           $ref: '#/definitions/SoundFormat'
   SoundFormat:
     properties:
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant of the file
       format:
         type: string
       language:

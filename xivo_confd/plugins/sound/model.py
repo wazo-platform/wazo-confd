@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
 class SoundCategory(object):
 
-    def __init__(self, name=None, files=None):
+    has_tenant_uuid = True
+
+    def __init__(self, name=None, files=None, tenant_uuid=None):
         self.name = name
         self.files = files if files else []
+        self.tenant_uuid = tenant_uuid
 
     def add_file(self, new_file):
         for file_ in self.files:
@@ -17,12 +20,21 @@ class SoundCategory(object):
         else:
             self.files.append(new_file)
 
+    def __str__(self):
+        return ('SoundCategory(tenant_uuid={tenant_uuid}, name={name}, files=<{file_count}>)'
+                .format(tenant_uuid=self.tenant_uuid,
+                        name=self.name,
+                        file_count=len(self.files)))
+
 
 class SoundFile(object):
 
-    def __init__(self, name=None, formats=None):
+    has_tenant_uuid = True
+
+    def __init__(self, name=None, formats=None, tenant_uuid=None):
         self.name = name
         self.formats = formats if formats else []
+        self.tenant_uuid = tenant_uuid
 
     def update(self, other_file):
         if other_file.name != self.name:
@@ -42,12 +54,14 @@ class SoundFile(object):
 
 class SoundFormat(object):
 
+    has_tenant_uuid = True
+
     extension_map = {
         'wav': 'slin',
     }
     format_map = {v: k for k, v in extension_map.iteritems()}
 
-    def __init__(self, format_=None, language=None, text=None, path=None, extension=None):
+    def __init__(self, format_=None, language=None, text=None, path=None, extension=None, tenant_uuid=None):
         if format_ is not None:
             self.format = format_
         else:
@@ -55,6 +69,7 @@ class SoundFormat(object):
         self.language = language
         self.text = text
         self.path = path
+        self.tenant_uuid = tenant_uuid
 
     def __eq__(self, other):
         return (self.format == other.format
