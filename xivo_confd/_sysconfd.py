@@ -83,6 +83,15 @@ class SysconfdPublisher(object):
         url = "{}/xivoctl".format(self.base_url)
         self.add_request('POST', url, json=data)
 
+    def get_ha_config(self):
+        session = self._session()
+        url = "{}/get_ha_config".format(self.base_url)
+        return session.get(url).json()
+
+    def update_ha_config(self, ha):
+        url = "{}/update_ha_config".format(self.base_url)
+        self.add_request('POST', url, json=ha)
+
     def _session(self):
         session = requests.Session()
         session.trust_env = False

@@ -59,6 +59,7 @@ setup(
             'group_fallback = xivo_confd.plugins.group_fallback.plugin:Plugin',
             'group_member_user = xivo_confd.plugins.group_member.plugin:Plugin',
             'group_schedule = xivo_confd.plugins.group_schedule.plugin:Plugin',
+            'ha = xivo_confd.plugins.ha.plugin:Plugin',
             'iax_callnumberlimits = xivo_confd.plugins.iax_callnumberlimits.plugin:Plugin',
             'iax_general = xivo_confd.plugins.iax_general.plugin:Plugin',
             'incall = xivo_confd.plugins.incall.plugin:Plugin',

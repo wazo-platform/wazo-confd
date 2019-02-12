@@ -118,6 +118,7 @@ DEFAULT_CONFIG = {
         'group_fallback': True,
         'group_member_user': True,
         'group_schedule': True,
+        'ha': True,
         'iax_callnumberlimits': True,
         'iax_general': True,
         'incall': True,

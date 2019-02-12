@@ -20,6 +20,11 @@ Changelog
   * GET `/1.1/dhcp`
   * PUT `/1.1/dhcp`
 
+* Added High Availability endpoints:
+
+  * GET `/1.1/ha`
+  * PUT `/1.1/ha`
+
 
 19.02
 -----
