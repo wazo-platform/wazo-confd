@@ -1,0 +1,47 @@
+paths:
+  /dhcp:
+    get:
+      operationId: get_dhcp
+      summary: Get DHCP configuration
+      description: '**Required ACL:** `confd.dhcp.read`'
+      tags:
+      - dhcp
+      responses:
+        '200':
+          description: DHCP configuration
+          schema:
+            $ref: '#/definitions/DHCP'
+    put:
+      operationId: update_dhcp
+      summary: Update DHCP configuration
+      description: '**Required ACL:** `confd.dhcp.update`'
+      tags:
+      - dhcp
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/DHCP'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+definitions:
+  DHCP:
+    name: DHCP
+    type: object
+    properties:
+      active:
+        type: boolean
+        description: Is the DHCP service enabled?
+      pool_start:
+        type: string
+        description: The first IP address that can be allocated by DHCP
+      pool_end:
+        type: string
+        description: The last IP address that can be allocated by DHCP
+      extra_network_interfaces:
+        type: array
+        items:
+          type: string
+      
