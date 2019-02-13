@@ -28,7 +28,7 @@ paths:
           $ref: '#/responses/ResourceUpdated'
 definitions:
   DHCP:
-    name: DHCP
+    title: DHCP
     type: object
     properties:
       active:
@@ -44,4 +44,3 @@ definitions:
         type: array
         items:
           type: string
-      
