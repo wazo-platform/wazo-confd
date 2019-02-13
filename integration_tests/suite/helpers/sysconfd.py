@@ -26,8 +26,8 @@ class SysconfdMock(object):
         self.clear_requests()
 
     def clear_requests(self):
-        url = "{}/_requests".format(self.base_url)
-        response = requests.delete(url)
+        url = "{}/_reset".format(self.base_url)
+        response = requests.post(url)
         response.raise_for_status()
 
     def requests(self):
@@ -73,3 +73,12 @@ class SysconfdMock(object):
         if not results:
             raise AssertionError("Request not found: {} {}".format(method, path))
         return results
+
+    def set_response(self, response, content):
+        url = "{}/_set_response".format(self.base_url)
+        content = {
+            'response': response,
+            'content': content,
+        }
+        response = requests.post(url, json=content)
+        response.raise_for_status()

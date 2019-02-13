@@ -1,0 +1,46 @@
+paths:
+  /high_availability:
+    get:
+      operationId: get_high_availability
+      summary: Get High Availability configuration
+      description: '**Required ACL:** `confd.high_availability.read`'
+      tags:
+      - high_availability
+      responses:
+        '200':
+          description: High Availability configuration
+          schema:
+            $ref: '#/definitions/HA'
+    put:
+      operationId: update_high_availability
+      summary: Update High Availability configuration
+      description: '**Required ACL:** `confd.high_availability.update`'
+      tags:
+      - high_availability
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/HA'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+definitions:
+  HA:
+    name: HA
+    type: object
+    properties:
+      active:
+        type: boolean
+        description: Is the HA service enabled?
+      pool_start:
+        type: string
+        description: The first IP address that can be allocated by HA
+      pool_end:
+        type: string
+        description: The last IP address that can be allocated by HA
+      extra_network_interfaces:
+        type: array
+        items:
+          type: string
