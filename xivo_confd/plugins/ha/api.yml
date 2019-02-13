@@ -1,22 +1,22 @@
 paths:
-  /high_availability:
+  /ha:
     get:
-      operationId: get_high_availability
+      operationId: get_ha
       summary: Get High Availability configuration
-      description: '**Required ACL:** `confd.high_availability.read`'
+      description: '**Required ACL:** `confd.ha.read`'
       tags:
-      - high_availability
+      - ha
       responses:
         '200':
           description: High Availability configuration
           schema:
             $ref: '#/definitions/HA'
     put:
-      operationId: update_high_availability
+      operationId: update_ha
       summary: Update High Availability configuration
-      description: '**Required ACL:** `confd.high_availability.update`'
+      description: '**Required ACL:** `confd.ha.update`'
       tags:
-      - high_availability
+      - ha
       parameters:
       - name: body
         in: body
@@ -31,16 +31,15 @@ definitions:
     name: HA
     type: object
     properties:
-      active:
-        type: boolean
-        description: Is the HA service enabled?
-      pool_start:
+      node_type:
         type: string
-        description: The first IP address that can be allocated by HA
-      pool_end:
+        description: The role of this server in a HA cluster.
+        enum:
+        - disabled
+        - master
+        - slave
+      remote_address:
         type: string
-        description: The last IP address that can be allocated by HA
-      extra_network_interfaces:
-        type: array
-        items:
-          type: string
+        description: The remote host of the other machine in the HA cluster.
+    required:
+      - node_type
