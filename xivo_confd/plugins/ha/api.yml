@@ -28,7 +28,7 @@ paths:
           $ref: '#/responses/ResourceUpdated'
 definitions:
   HA:
-    name: HA
+    title: HA
     type: object
     properties:
       node_type:
