@@ -67,5 +67,3 @@ db = SingletonProxy(BaseIntegrationTest.create_database)
 
 wazo_sound = SingletonProxy(BaseIntegrationTest.create_tenant_filesystem, '/var/lib/xivo/sounds')
 asterisk_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds')
-wazo_sound.create_directory(MAIN_TENANT, name='')
-wazo_sound.create_directory(SUB_TENANT, name='')

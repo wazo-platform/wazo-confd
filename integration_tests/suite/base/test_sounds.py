@@ -28,6 +28,10 @@ DEFAULT_INTERNAL_DIRECTORY = ('monitor', 'recordings-meetme')
 DEFAULT_CATEGORY = ('acd', 'features', 'playback', 'recordings')
 
 
+def setup_module():
+    wazo_sound.create_directory(MAIN_TENANT, name='')
+    wazo_sound.create_directory(SUB_TENANT, name='')
+
 def test_get_errors():
     fake_sound = confd.sounds('invalid').get
     yield s.check_resource_not_found, fake_sound, 'Sound'
