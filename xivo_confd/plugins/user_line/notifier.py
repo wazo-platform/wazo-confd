@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_line.event import UserLineAssociatedEvent, UserLineDissociatedEvent
@@ -22,18 +22,26 @@ class UserLineNotifier(object):
 
     def associated(self, user_line):
         self._send_sysconfd_handlers()
-        event = UserLineAssociatedEvent(user_line.user_id,
-                                        user_line.line_id,
-                                        user_line.main_user,
-                                        user_line.main_line)
+        event = UserLineAssociatedEvent(
+            user_line.user.uuid,
+            user_line.user_id,
+            user_line.line_id,
+            user_line.main_user,
+            user_line.main_line,
+            user_line.user.tenant_uuid,
+        )
         self._bus.send_bus_event(event)
 
     def dissociated(self, user_line):
         self._send_sysconfd_handlers()
-        event = UserLineDissociatedEvent(user_line.user_id,
-                                         user_line.line_id,
-                                         user_line.main_user,
-                                         user_line.main_line)
+        event = UserLineDissociatedEvent(
+            user_line.user.uuid,
+            user_line.user_id,
+            user_line.line_id,
+            user_line.main_user,
+            user_line.main_line,
+            user_line.user.tenant_uuid,
+        )
         self._bus.send_bus_event(event)
 
 
