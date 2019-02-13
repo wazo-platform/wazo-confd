@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -351,14 +351,17 @@ def test_get_extension_relation(line, exten):
         )
 
 
-@fixtures.line_sip()
+@fixtures.line()
+@fixtures.sip()
 @fixtures.extension()
-def test_get_line_relation(line, extension):
-    with a.line_extension(line, extension):
-        response = confd.extensions(extension['id']).get()
-        assert_that(
-            response.item['lines'],
-            contains(
-                has_entries(id=line['id']),
+def test_get_line_relation(line, sip, extension):
+    with a.line_endpoint_sip(line, sip):
+        with a.line_extension(line, extension):
+            line = confd.lines(line['id']).get().item
+            response = confd.extensions(extension['id']).get()
+            assert_that(
+                response.item['lines'],
+                contains(
+                    has_entries(id=line['id'], name=line['name']),
+                )
             )
-        )
