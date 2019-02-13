@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -475,23 +475,26 @@ def test_get_users_relation(user, line):
 
 
 @fixtures.user()
-@fixtures.line_sip()
-def test_get_lines_relation(user, line):
-    line = confd.lines(line['id']).get().item
-    with a.user_line(user, line):
-        response = confd.users(user['id']).get()
-        assert_that(
-            response.item['lines'],
-            contains(
-                has_entries(
-                    id=line['id'],
-                    endpoint_sip=line['endpoint_sip'],
-                    endpoint_sccp=line['endpoint_sccp'],
-                    endpoint_custom=line['endpoint_custom'],
-                    extensions=line['extensions'],
+@fixtures.line()
+@fixtures.sip()
+def test_get_lines_relation(user, line, sip):
+    with a.line_endpoint_sip(line, sip):
+        with a.user_line(user, line):
+            line = confd.lines(line['id']).get().item
+            response = confd.users(user['id']).get()
+            assert_that(
+                response.item['lines'],
+                contains(
+                    has_entries(
+                        id=line['id'],
+                        name=line['name'],
+                        endpoint_sip=line['endpoint_sip'],
+                        endpoint_sccp=line['endpoint_sccp'],
+                        endpoint_custom=line['endpoint_custom'],
+                        extensions=line['extensions'],
+                    )
                 )
             )
-        )
 
 
 @fixtures.user()

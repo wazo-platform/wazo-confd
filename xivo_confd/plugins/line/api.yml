@@ -135,10 +135,6 @@ definitions:
           type: integer
           description: '*Deprecated* Please use `position`'
           readOnly: true
-        name:
-          type: string
-          description: The name of the line
-          readOnly: true
         protocol:
           type: string
           enum:
@@ -168,6 +164,10 @@ definitions:
       id:
         type: integer
         description: Line ID
+        readOnly: true
+      name:
+        type: string
+        description: The name of the line
         readOnly: true
   LineRelationEndpoints:
     properties:
