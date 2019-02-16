@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -462,3 +462,15 @@ def check_dissociate_when_not_associated(line1, device1, line2, device2):
 
         response = confd.lines(line2['id']).get()
         assert_that(response.item, has_entries(device_id=device2['id']))
+
+
+@fixtures.device()
+def test_bus_events(device):
+    with line_fellowship('sip') as (user, line, extension, sip):
+        associate_url = confd.lines(line['id']).devices(device['id']).put
+        routing_key = 'config.lines.{}.devices.{}.updated'.format(line['id'], device['id'])
+        yield s.check_bus_event, routing_key, associate_url
+
+        dissociate_url = confd.lines(line['id']).devices(device['id']).delete
+        routing_key = 'config.lines.{}.devices.{}.deleted'.format(line['id'], device['id'])
+        yield s.check_bus_event, routing_key, dissociate_url
