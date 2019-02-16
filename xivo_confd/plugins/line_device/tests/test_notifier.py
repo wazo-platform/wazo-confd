@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -9,16 +9,19 @@ from mock import Mock
 from hamcrest import assert_that, equal_to
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
+
 from xivo_confd.plugins.device.model import Device
 
-from xivo_confd.plugins.line_device.notifier import LineDeviceNotifier
+from ..notifier import LineDeviceNotifier
 
 
 class TestLineDeviceNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
-                        'agentbus': [],
-                        'ctibus': []}
+    REQUEST_HANDLERS = {
+        'ipbx': ['module reload chan_sccp.so'],
+        'agentbus': [],
+        'ctibus': [],
+    }
 
     def setUp(self):
         self.sysconfd = Mock()
