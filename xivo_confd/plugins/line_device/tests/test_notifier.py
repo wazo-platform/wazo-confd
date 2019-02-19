@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -8,23 +8,31 @@ from mock import Mock
 
 from hamcrest import assert_that, equal_to
 
+from xivo_bus.resources.line_device.event import (
+    LineDeviceAssociatedEvent,
+    LineDeviceDissociatedEvent,
+)
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
+
 from xivo_confd.plugins.device.model import Device
 
-from xivo_confd.plugins.line_device.notifier import LineDeviceNotifier
+from ..notifier import LineDeviceNotifier
 
 
 class TestLineDeviceNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'],
-                        'agentbus': [],
-                        'ctibus': []}
+    REQUEST_HANDLERS = {
+        'ipbx': ['module reload chan_sccp.so'],
+        'agentbus': [],
+        'ctibus': [],
+    }
 
     def setUp(self):
         self.sysconfd = Mock()
         self.line = Mock(Line)
         self.device = Mock(Device)
-        self.notifier = LineDeviceNotifier(self.sysconfd)
+        self.bus = Mock()
+        self.notifier = LineDeviceNotifier(self.bus, self.sysconfd)
 
     def test_given_line_is_not_sccp_when_associated_then_sccp_not_reloaded(self):
         self.line.endpoint = "sip"
@@ -49,3 +57,17 @@ class TestLineDeviceNotifier(unittest.TestCase):
         self.notifier.dissociated(self.line, self.device)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+
+    def test_associate_then_bus_event(self):
+        expected_event = LineDeviceAssociatedEvent(line=self.line, device=self.device)
+
+        self.notifier.associated(self.line, self.device)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_dissociate_then_bus_event(self):
+        expected_event = LineDeviceDissociatedEvent(line=self.line, device=self.device)
+
+        self.notifier.dissociated(self.line, self.device)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
