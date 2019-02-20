@@ -29,8 +29,15 @@ class TestLineDeviceNotifier(unittest.TestCase):
 
     def setUp(self):
         self.sysconfd = Mock()
-        self.line = Mock(Line)
-        self.device = Mock(Device)
+        self.line = Mock(
+            Line,
+            id=1,
+            endpoint_sip={'id': 2},
+            endpoint_sccp=None,
+            endpoint_custom=None,
+        )
+        self.line.name = u'limitation of mock instantiation with name ...'
+        self.device = Mock(Device, id='custom-id')
         self.bus = Mock()
         self.notifier = LineDeviceNotifier(self.bus, self.sysconfd)
 
@@ -59,14 +66,32 @@ class TestLineDeviceNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
 
     def test_associate_then_bus_event(self):
-        expected_event = LineDeviceAssociatedEvent(line=self.line, device=self.device)
+        expected_event = LineDeviceAssociatedEvent(
+            line={
+                'id': self.line.id,
+                'name': self.line.name,
+                'endpoint_sip': self.line.endpoint_sip,
+                'endpoint_sccp': self.line.endpoint_sccp,
+                'endpoint_custom': self.line.endpoint_custom,
+            },
+            device={'id': self.device.id}
+        )
 
         self.notifier.associated(self.line, self.device)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = LineDeviceDissociatedEvent(line=self.line, device=self.device)
+        expected_event = LineDeviceDissociatedEvent(
+            line={
+                'id': self.line.id,
+                'name': self.line.name,
+                'endpoint_sip': self.line.endpoint_sip,
+                'endpoint_sccp': self.line.endpoint_sccp,
+                'endpoint_custom': self.line.endpoint_custom,
+            },
+            device={'id': self.device.id}
+        )
 
         self.notifier.dissociated(self.line, self.device)
 

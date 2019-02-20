@@ -11,6 +11,18 @@ from xivo_bus.resources.line_device.event import (
     LineDeviceDissociatedEvent,
 )
 
+LINE_FIELDS = [
+    'id',
+    'name',
+    'endpoint_sip.id',
+    'endpoint_sccp.id',
+    'endpoint_custom.id',
+]
+
+DEVICE_FIELDS = [
+    'id',
+]
+
 
 class LineDeviceNotifier(object):
 
@@ -27,16 +39,16 @@ class LineDeviceNotifier(object):
     def associated(self, line, device):
         self._reload_sccp(line)
 
-        line_serialized = LineSchema().dump(line).data
-        device_serialized = DeviceSchema().dump(device).data
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(line).data
+        device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device).data
         event = LineDeviceAssociatedEvent(line=line_serialized, device=device_serialized)
         self._bus.send_bus_event(event)
 
     def dissociated(self, line, device):
         self._reload_sccp(line)
 
-        line_serialized = LineSchema().dump(line).data
-        device_serialized = DeviceSchema().dump(device).data
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(line).data
+        device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device).data
         event = LineDeviceDissociatedEvent(line=line_serialized, device=device_serialized)
         self._bus.send_bus_event(event)
 
