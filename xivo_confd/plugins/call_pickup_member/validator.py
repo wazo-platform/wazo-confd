@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -10,7 +10,16 @@ from xivo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class CallPickupGroupValidator(ValidatorAssociation):
 
     def validate(self, call_pickup, groups):
+        self.validate_same_tenant(call_pickup, groups)
         self.validate_no_duplicate_group(groups)
+
+    def validate_same_tenant(self, call_pickup, groups):
+        for group in groups:
+            if call_pickup.tenant_uuid != group.tenant_uuid:
+                raise errors.different_tenants(
+                    call_pickup_tenant_uuid=call_pickup.tenant_uuid,
+                    group_tenant_uuid=group.tenant_uuid,
+                )
 
     def validate_no_duplicate_group(self, groups):
         if len(groups) != len(set(groups)):
