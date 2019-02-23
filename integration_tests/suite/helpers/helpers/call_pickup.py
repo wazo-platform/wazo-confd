@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -13,8 +13,8 @@ def generate_call_pickup(**params):
     return add_call_pickup(**params)
 
 
-def add_call_pickup(**params):
-    response = confd.callpickups.post(params)
+def add_call_pickup(wazo_tenant=None, **params):
+    response = confd.callpickups.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 

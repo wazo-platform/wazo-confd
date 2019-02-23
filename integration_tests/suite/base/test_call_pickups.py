@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -17,6 +19,10 @@ from . import confd
 from ..helpers import (
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -63,12 +69,36 @@ def unique_error_checks(url, call_pickup):
     yield s.check_bogus_field_returns_error, url, 'name', call_pickup['name']
 
 
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.callpickups.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.callpickups.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.callpickups.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.call_pickup(name="search", description="SearchDesc")
 @fixtures.call_pickup(name="hidden", description="HiddenDesc")
 def test_search(call_pickup, hidden):
     url = confd.callpickups
-    searches = {'name': 'search',
-                'description': 'Search'}
+    searches = {
+        'name': 'search',
+        'description': 'Search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, call_pickup, hidden, field, term
