@@ -227,3 +227,13 @@ def test_delete(call_pickup):
     response = confd.callpickups(call_pickup['id']).delete()
     response.assert_deleted()
     confd.callpickups(call_pickup['id']).get().assert_status(404)
+
+
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.callpickups(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPickup'))
+
+    response = confd.callpickups(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
