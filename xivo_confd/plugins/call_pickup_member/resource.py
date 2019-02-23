@@ -96,6 +96,7 @@ class CallPickupInterceptorUserList(ConfdResource):
 class CallPickupTargetUserList(ConfdResource):
 
     schema = CallPickupTargetUsersSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, call_pickup_dao, user_dao):
         self.service = service
@@ -104,10 +105,12 @@ class CallPickupTargetUserList(ConfdResource):
 
     @required_acl('confd.callpickups.{call_pickup_id}.targets.users.update')
     def put(self, call_pickup_id):
-        call_pickup = self.call_pickup_dao.get(call_pickup_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
         try:
-            targets = [self.user_dao.get_by(uuid=user['uuid']) for user in form['users']]
+            targets = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
+                       for user in form['users']]
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 
