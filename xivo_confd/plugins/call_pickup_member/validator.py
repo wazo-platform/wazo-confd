@@ -41,7 +41,16 @@ def build_validator_interceptor_group():
 class CallPickupUserValidator(ValidatorAssociation):
 
     def validate(self, call_pickup, users):
+        self.validate_same_tenant(call_pickup, users)
         self.validate_no_duplicate_user(users)
+
+    def validate_same_tenant(self, call_pickup, users):
+        for user in users:
+            if call_pickup.tenant_uuid != user.tenant_uuid:
+                raise errors.different_tenants(
+                    call_pickup_tenant_uuid=call_pickup.tenant_uuid,
+                    user_tenant_uuid=user.tenant_uuid,
+                )
 
     def validate_no_duplicate_user(self, users):
         if len(users) != len(set(users)):
