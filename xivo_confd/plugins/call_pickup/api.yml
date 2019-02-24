@@ -7,6 +7,8 @@ paths:
       tags:
       - callpickups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - callpickups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Call Pickup to create
@@ -45,6 +48,7 @@ paths:
       tags:
       - callpickups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       responses:
         '200':
@@ -60,6 +64,7 @@ paths:
       tags:
       - callpickups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       - name: body
         in: body
@@ -80,6 +85,7 @@ paths:
       tags:
       - callpickups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       responses:
         '204':
@@ -106,6 +112,10 @@ definitions:
           type: integer
           readOnly: true
           description: The id of the call pickup
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         name:
           type: string
           description: The name of the call pickup

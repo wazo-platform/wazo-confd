@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     none,
     not_,
@@ -15,8 +17,13 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import (
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -63,12 +70,36 @@ def unique_error_checks(url, call_pickup):
     yield s.check_bogus_field_returns_error, url, 'name', call_pickup['name']
 
 
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.callpickups.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.callpickups.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.callpickups.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.call_pickup(name="search", description="SearchDesc")
 @fixtures.call_pickup(name="hidden", description="HiddenDesc")
 def test_search(call_pickup, hidden):
     url = confd.callpickups
-    searches = {'name': 'search',
-                'description': 'Search'}
+    searches = {
+        'name': 'search',
+        'description': 'Search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, call_pickup, hidden, field, term
@@ -121,13 +152,23 @@ def test_get(call_pickup):
     ))
 
 
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.callpickups(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPickup'))
+
+    response = confd.callpickups(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
+
 def test_create_minimal_parameters():
     response = confd.callpickups.post(
         name='minimal',
     )
     response.assert_created('callpickups')
 
-    assert_that(response.item, has_entries(id=not_(empty())))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, id=not_(empty())))
 
     confd.callpickups(response.item['id']).delete().assert_deleted()
 
@@ -141,7 +182,7 @@ def test_create_all_parameters():
 
     response = confd.callpickups.post(**parameters)
     response.assert_created('callpickups')
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
     confd.callpickups(response.item['id']).delete().assert_deleted()
 
 
@@ -171,8 +212,28 @@ def test_edit_all_parameters(call_pickup):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.callpickups(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPickup'))
+
+    response = confd.callpickups(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.call_pickup()
 def test_delete(call_pickup):
     response = confd.callpickups(call_pickup['id']).delete()
     response.assert_deleted()
     confd.callpickups(call_pickup['id']).get().assert_status(404)
+
+
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.callpickups(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='CallPickup'))
+
+    response = confd.callpickups(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()

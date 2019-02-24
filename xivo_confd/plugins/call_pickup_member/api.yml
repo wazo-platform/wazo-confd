@@ -12,6 +12,7 @@ paths:
       - callpickups
       - groups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       - name: body
         in: body
@@ -40,6 +41,7 @@ paths:
       - callpickups
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       - name: body
         in: body
@@ -68,6 +70,7 @@ paths:
       - callpickups
       - groups
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       - name: body
         in: body
@@ -96,6 +99,7 @@ paths:
       - callpickups
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/callpickupid'
       - name: body
         in: body

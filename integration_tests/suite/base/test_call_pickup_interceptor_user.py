@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -12,8 +12,13 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -75,6 +80,33 @@ def test_associate_multiple(call_pickup, user1, user2, user3):
 def test_associate_same_user(call_pickup, user):
     response = confd.callpickups(call_pickup['id']).interceptors.users.put(users=[user, user])
     response.assert_status(400)
+
+
+@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
+@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_call_pickup, sub_call_pickup, main_user, sub_user):
+    response = (
+        confd.callpickups(main_call_pickup['id'])
+        .interceptors.users(users=[sub_user])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('CallPickup'))
+
+    response = (
+        confd.callpickups(sub_call_pickup['id'])
+        .interceptors.users(users=[main_user])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(400, e.not_found('User'))
+
+    response = (
+        confd.callpickups(sub_call_pickup['id'])
+        .interceptors.users(users=[main_user])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.call_pickup()
