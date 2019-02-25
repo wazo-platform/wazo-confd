@@ -4,6 +4,13 @@ Changelog
 19.04
 -----
 
+* New readonly parameters have been added to the funckeys resource:
+
+  * For destinations of type `bsfilter`:
+
+      * `filter_member_firstname`
+      * `filter_member_lastname`
+
 * New readonly parameters have been added to the call filter surrogate resource:
 
   * `member_id`

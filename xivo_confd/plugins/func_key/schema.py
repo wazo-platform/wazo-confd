@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -149,6 +149,26 @@ class ParkingDestinationSchema(BaseDestinationSchema):
 
 class BSFilterDestinationSchema(BaseDestinationSchema):
     filter_member_id = fields.Integer(required=True)
+
+    filter_member = fields.Nested(
+        '_BSFilterMemberDestinationSchema',
+        attribute='filtermember',
+        dump_only=True,
+        missing={},
+    )
+
+    @post_dump
+    def make_member_fields_flat(self, data):
+        if data['filter_member'].get('user'):
+            data['filter_member_firstname'] = data['filter_member']['user']['firstname']
+            data['filter_member_lastname'] = data['filter_member']['user']['lastname']
+
+        data.pop('filter_member', None)
+        return data
+
+
+class _BSFilterMemberDestinationSchema(Schema):
+    user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
 
 class AgentDestinationSchema(BaseDestinationSchema):

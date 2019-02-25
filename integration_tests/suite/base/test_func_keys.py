@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -553,6 +553,25 @@ def test_get_user_destination_relation(user):
                                 user_firstname=user['firstname'],
                                 user_lastname=user['lastname'])
     ))
+
+
+@fixtures.call_filter()
+@fixtures.user()
+def test_get_bsfilter_destination_relation(call_filter, user):
+    with a.call_filter_surrogate_user(call_filter, user):
+        user_member = confd.callfilters(call_filter['id']).get().item['surrogates']['users'][0]
+        destination = {'type': 'bsfilter', 'filter_member_id': user_member['member_id']}
+        response = confd.users(user['id']).funckeys(1).put(destination=destination)
+        response.assert_updated()
+
+        response = confd.users(user['id']).funckeys(1).get()
+        assert_that(response.item, has_entries(
+            destination=has_entries(
+                filter_member_id=user_member['member_id'],
+                filter_member_firstname=user['firstname'],
+                filter_member_lastname=user['lastname'],
+            )
+        ))
 
 
 @fixtures.user()
