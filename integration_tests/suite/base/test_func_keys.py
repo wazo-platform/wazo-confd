@@ -343,12 +343,14 @@ class TestTemplateAssociation(BaseTestFuncKey):
     def setUp(self):
         super(TestTemplateAssociation, self).setUp()
 
-        self.funckeys = {'1': {'destination': {'type': 'custom', 'exten': '9999'}},
-                         '2': {'destination': {'type': 'parking'}}}
+        self.funckeys = {
+            '1': {'destination': {'type': 'custom', 'exten': '9999'}},
+            '2': {'destination': {'type': 'parking'}},
+        }
 
         self.provd_funckeys = {
             '1': {'label': '', 'type': 'blf', 'line': 1, 'value': '9999'},
-            '2': {'label': '', 'type': 'park', 'line': 1, 'value': '700'}
+            '2': {'label': '', 'type': 'park', 'line': 1, 'value': '700'},
         }
 
         response = confd.funckeys.templates.post(keys=self.funckeys)
@@ -419,48 +421,56 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
         response = confd.users(self.user['id']).funckeys(1).get()
 
-        expected_destination = self.funckeys['1']['destination']
-        assert_that(response.item, has_entry('inherited', True))
-        assert_that(response.item['destination'], has_entries(expected_destination))
+        assert_that(response.item, has_entries(
+            inherited=True,
+            destination=has_entries(self.funckeys['1']['destination']),
+        ))
 
     def test_given_template_associated_when_getting_func_key_using_uuid_then_fetches_from_unified_template(self):
         self.uuid_url.put().assert_updated()
 
         response = confd.users(self.user['uuid']).funckeys(1).get()
 
-        expected_destination = self.funckeys['1']['destination']
-        assert_that(response.item, has_entry('inherited', True))
-        assert_that(response.item['destination'], has_entries(expected_destination))
+        assert_that(response.item, has_entries(
+            inherited=True,
+            destination=has_entries(self.funckeys['1']['destination']),
+        ))
 
     def test_given_template_associated_when_getting_association_then_user_associated(self):
         self.association_url.put().assert_updated()
 
         response = confd.users(self.user['id']).funckeys.templates.get()
 
-        expected_association = {'user_id': self.user['id'],
-                                'template_id': self.template['id']}
-
-        assert_that(response.items, contains(has_entries(expected_association)))
+        assert_that(response.items, contains(
+            has_entries(
+                user_id=self.user['id'],
+                template_id=self.template['id'],
+            )
+        ))
 
     def test_given_template_associated_when_getting_association_using_uuid_then_user_associated(self):
         self.uuid_url.put().assert_updated()
 
         response = confd.users(self.user['uuid']).funckeys.templates.get()
 
-        expected_association = {'user_id': self.user['id'],
-                                'template_id': self.template['id']}
-
-        assert_that(response.items, contains(has_entries(expected_association)))
+        assert_that(response.items, contains(
+            has_entries(
+                user_id=self.user['id'],
+                template_id=self.template['id'],
+            )
+        ))
 
     def test_given_template_associated_when_getting_association_then_template_associated(self):
         self.association_url.put().assert_updated()
 
         response = confd.funckeys.templates(self.template['id']).users.get()
 
-        expected_association = {'user_id': self.user['id'],
-                                'template_id': self.template['id']}
-
-        assert_that(response.items, contains(has_entries(expected_association)))
+        assert_that(response.items, contains(
+            has_entries(
+                user_id=self.user['id'],
+                template_id=self.template['id'],
+            )
+        ))
 
     def test_associate_errors(self):
         fake_user = confd.users(FAKE_ID).funckeys.templates(self.template['id']).put
@@ -485,8 +495,10 @@ class TestTemplateAssociation(BaseTestFuncKey):
         # s.check_resource_not_found(fake_template, 'FuncKeyTemplate')
 
     def test_associate_second_template_then_overwrite_previous_template(self):
-        funckeys_2 = {'1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
-                      '2': {'destination': {'type': 'onlinerec'}}}
+        funckeys_2 = {
+            '1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
+            '2': {'destination': {'type': 'onlinerec'}},
+        }
         provd_funckeys_2 = {
             '1': {'label': '', 'type': 'blf', 'line': 1, 'value': '1000'},
             '2': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
@@ -543,15 +555,17 @@ def test_delete_user_when_user_and_funckey_template_associated(user, funckey_tem
 
 @fixtures.user()
 def test_get_user_destination_relation(user):
-    response = confd.users(user['id']).funckeys(1).put(destination={'type': 'user',
-                                                                    'user_id': user['id']})
+    destination = {'type': 'user', 'user_id': user['id']}
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
     response.assert_updated()
 
     response = confd.users(user['id']).funckeys(1).get()
     assert_that(response.item, has_entries(
-        destination=has_entries(user_id=user['id'],
-                                user_firstname=user['firstname'],
-                                user_lastname=user['lastname'])
+        destination=has_entries(
+            user_id=user['id'],
+            user_firstname=user['firstname'],
+            user_lastname=user['lastname'],
+        )
     ))
 
 
@@ -577,14 +591,16 @@ def test_get_bsfilter_destination_relation(call_filter, user):
 @fixtures.user()
 @fixtures.group()
 def test_get_group_destination_relation(user, group):
-    response = confd.users(user['id']).funckeys(1).put(destination={'type': 'group',
-                                                                    'group_id': group['id']})
+    destination = {'type': 'group', 'group_id': group['id']}
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
     response.assert_updated()
 
     response = confd.users(user['id']).funckeys(1).get()
     assert_that(response.item, has_entries(
-        destination=has_entries(group_id=group['id'],
-                                group_name=group['name'])
+        destination=has_entries(
+            group_id=group['id'],
+            group_name=group['name'],
+        )
     ))
 
 
