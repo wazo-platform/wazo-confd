@@ -30,10 +30,14 @@ class CallFilterSurrogatesSchema(BaseSchema):
         only=['uuid', 'firstname', 'lastname', 'links'],
         dump_only=True,
     )
+    member_id = fields.Integer(attribute='id', dump_only=True)
 
     @post_dump
     def merge_user(self, data):
-        return data.pop('user', {})
+        user = data.pop('user', {})
+        if user:
+            data.update(user)
+        return data
 
 
 class CallFilterSchema(BaseSchema):
