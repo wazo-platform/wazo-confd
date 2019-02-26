@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -19,8 +19,8 @@ def generate_device(**params):
     return add_device(**params)
 
 
-def add_device(**params):
-    response = confd.devices.post(params)
+def add_device(wazo_tenant=None, **params):
+    response = confd.devices.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 

@@ -69,6 +69,10 @@ class ProvdHelper(object):
     def devices(self):
         return self.client.devices
 
+    @property
+    def params(self):
+        return self.client.params
+
     def reset(self):
         self.clean_devices()
         self.clean_configs()
@@ -150,6 +154,6 @@ class ProvdHelper(object):
                 return client.logs(container['Id'], since=timestamp)
 
 
-def create_helper(host='localhost', port='8666'):
-    client = ProvdClient(host=host, port=port, verify_certificate=False, prefix='/provd', token='valid-token')
+def create_helper(host='localhost', port='8666', token='valid-token-multitenant'):
+    client = ProvdClient(host=host, port=port, verify_certificate=False, prefix='/provd', token=token)
     return ProvdHelper(client)

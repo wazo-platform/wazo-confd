@@ -18,6 +18,7 @@ services:
       - "8666"
     volumes:
       - "./etc/xivo-provd/config.yml:/etc/xivo-provd/config.yml"
+      - "./keys/xivo-provd-key.yml:/var/lib/wazo-auth-keys/xivo-provd-key.yml"
       - "./ssl:/usr/local/share/ssl"
       - "./provd/null:/var/lib/xivo-provd/plugins/null"
       - "./provd/zero:/var/lib/xivo-provd/plugins/zero"
