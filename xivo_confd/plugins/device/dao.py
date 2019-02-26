@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -26,9 +26,9 @@ class DeviceDao(object):
     def configs(self):
         return self.client.configs
 
-    def get(self, id):
+    def get(self, id, tenant_uuid=None):
         try:
-            provd_device = self.devices.get(id)
+            provd_device = self.devices.get(id, tenant_uuid=tenant_uuid)
         except ProvdError as e:
             if e.status_code == 404:
                 raise errors.not_found('Device', id=id)
@@ -47,24 +47,24 @@ class DeviceDao(object):
         if provd_devices:
             return self.build_device(provd_devices[0])
 
-    def create(self, device):
-        new_device = self.new_device()
+    def create(self, device, tenant_uuid=None):
+        new_device = self.new_device(tenant_uuid=tenant_uuid)
         new_device.merge(device)
-        self.edit(new_device)
+        self.edit(new_device, tenant_uuid=tenant_uuid)
         return new_device
 
-    def new_device(self):
+    def new_device(self, tenant_uuid=None):
         config_id = self.configs.autocreate()['id']
-        device_id = self.devices.create({'config': config_id})['id']
-        return self.get(device_id)
+        device_id = self.devices.create({'config': config_id}, tenant_uuid=tenant_uuid)['id']
+        return self.get(device_id, tenant_uuid=tenant_uuid)
 
-    def create_or_update(self, device):
+    def create_or_update(self, device, tenant_uuid=None):
         try:
-            self.devices.update(device.device)
+            self.devices.update(device.device, tenant_uuid=tenant_uuid)
         except ProvdError as e:
             if e.status_code != 404:
                 raise
-            self.devices.create(device.device)
+            self.devices.create(device.device, tenant_uuid=tenant_uuid)
 
         try:
             self.configs.update(device.config)
@@ -73,24 +73,24 @@ class DeviceDao(object):
                 raise
             self.configs.create(device.config)
 
-    def edit(self, device):
-        self.devices.update(device.device)
+    def edit(self, device, tenant_uuid=None):
+        self.devices.update(device.device, tenant_uuid=tenant_uuid)
         self.configs.update(device.config)
 
-    def delete(self, device):
+    def delete(self, device, tenant_uuid=None):
         try:
-            self.devices.delete(device.id)
+            self.devices.delete(device.id, tenant_uuid=tenant_uuid)
         except ProvdError as e:
             if e.status_code != 404:
                 raise
         self._remove_config(device._config)
 
-    def reset_autoprov(self, device):
+    def reset_autoprov(self, device, tenant_uuid=None):
         old_config = device._config
         autoprov_id = self.configs.autocreate()['id']
         autoprov_config = self.configs.get(autoprov_id)
         device.reset_autoprov(autoprov_config)
-        self.edit(device)
+        self.edit(device, tenant_uuid=device.tenant_uuid)
         self._remove_config(old_config)
 
     def _remove_config(self, config):
@@ -102,8 +102,8 @@ class DeviceDao(object):
                 raise
         logger.debug("removed config %s", config['id'])
 
-    def synchronize(self, device):
-        self.devices.synchronize(device.id)
+    def synchronize(self, device, tenant_uuid=None):
+        self.devices.synchronize(device.id, tenant_uuid=tenant_uuid)
 
     def plugins(self):
         return self.client.plugins.list()['plugins']

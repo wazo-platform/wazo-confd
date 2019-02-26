@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -53,10 +53,10 @@ class DeviceUpdater(object):
 
     def update_for_line(self, line):
         if line.device_id:
-            self.provd_updater.update(line.device_id)
+            self.provd_updater.update(line.device_id, tenant_uuid=line.tenant_uuid)
 
-    def update_device(self, device):
-        self.provd_updater.update(device.id)
+    def update_device(self, device, tenant_uuid=None):
+        self.provd_updater.update(device.id, tenant_uuid=tenant_uuid)
 
 
 class ProvdUpdater(object):
@@ -66,30 +66,30 @@ class ProvdUpdater(object):
         self.config_generator = config_generator
         self.line_dao = line_dao
 
-    def update(self, device_id):
+    def update(self, device_id, tenant_uuid=None):
         device = self.dao.get(device_id)
         has_lines = self.device_has_lines(device)
 
         if device.is_autoprov() and has_lines:
-            self.create_device(device)
+            self.create_device(device, tenant_uuid=tenant_uuid)
         elif has_lines:
-            self.update_device(device)
+            self.update_device(device, tenant_uuid=tenant_uuid)
         else:
-            self.reset_autoprov(device)
+            self.reset_autoprov(device, tenant_uuid=tenant_uuid)
 
     def device_has_lines(self, device):
         lines = self.line_dao.find_all_by(device_id=device.id)
         return len(lines) > 0
 
-    def create_device(self, device):
+    def create_device(self, device, tenant_uuid=None):
         config = self.config_generator.generate(device)
         device.update_config(config)
-        self.dao.create_or_update(device)
+        self.dao.create_or_update(device, tenant_uuid=tenant_uuid)
 
-    def update_device(self, device):
+    def update_device(self, device, tenant_uuid=None):
         config = self.config_generator.generate(device)
         device.update_config(config)
-        self.dao.edit(device)
+        self.dao.edit(device, tenant_uuid=tenant_uuid)
 
-    def reset_autoprov(self, device):
-        self.dao.reset_autoprov(device)
+    def reset_autoprov(self, device, tenant_uuid=None):
+        self.dao.reset_autoprov(device, tenant_uuid=tenant_uuid)

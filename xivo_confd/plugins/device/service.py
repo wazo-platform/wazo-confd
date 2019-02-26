@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.helpers import errors
 
 from xivo_confd.helpers.resource import CRUDService
+from xivo_dao.helpers.db_manager import Session
 
 
 class DeviceService(CRUDService):
@@ -15,17 +16,34 @@ class DeviceService(CRUDService):
         self.search_engine = search_engine
         self.line_dao = line_dao
 
-    def search(self, parameters):
-        return self.search_engine.search(parameters)
+    def create(self, resource, tenant_uuid=None):
+        self.validator.validate_create(resource)
+        created_resource = self.dao.create(resource, tenant_uuid=tenant_uuid)
+        self.notifier.created(created_resource)
+        return created_resource
 
-    def synchronize(self, device):
-        self.dao.synchronize(device)
+    def edit(self, resource, updated_fields=None, tenant_uuid=None):
+        with Session.no_autoflush:
+            self.validator.validate_edit(resource)
+        self.dao.edit(resource, tenant_uuid=tenant_uuid)
+        self.notifier.edited(resource)
 
-    def reset_autoprov(self, device):
+    def search(self, parameters, tenant_uuid=None):
+        return self.search_engine.search(parameters, tenant_uuid=tenant_uuid)
+
+    def synchronize(self, device, tenant_uuid=None):
+        self.dao.synchronize(device, tenant_uuid=tenant_uuid)
+
+    def reset_autoprov(self, device, tenant_uuid=None):
         for line in self.line_dao.find_all_by(device=device.id):
             line.remove_device()
             self.line_dao.edit(line)
-        self.dao.reset_autoprov(device)
+        self.dao.reset_autoprov(device, tenant_uuid=tenant_uuid)
+
+    def delete(self, resource, tenant_uuid=None):
+        self.validator.validate_delete(resource)
+        self.dao.delete(resource, tenant_uuid=tenant_uuid)
+        self.notifier.deleted(resource)
 
 
 class SearchEngine(object):
@@ -51,9 +69,9 @@ class SearchEngine(object):
     def __init__(self, dao):
         self.dao = dao
 
-    def search(self, parameters):
+    def search(self, parameters, tenant_uuid=None):
         self.validate_parameters(parameters)
-        provd_devices = self.find_all_devices(parameters)
+        provd_devices = self.find_all_devices(parameters, tenant_uuid=tenant_uuid)
         provd_devices = self.filter_devices(provd_devices,
                                             parameters.get('search'))
         total = len(provd_devices)
@@ -76,12 +94,13 @@ class SearchEngine(object):
             if parameters['order'] not in self.PROVD_DEVICE_KEYS:
                 raise errors.invalid_ordering(parameters['order'], self.PROVD_DEVICE_KEYS)
 
-    def find_all_devices(self, parameters):
+    def find_all_devices(self, parameters, tenant_uuid=None):
         query = {key: value for key, value in parameters.iteritems()
                  if key in self.PROVD_DEVICE_KEYS}
         order = parameters.get('order', self.DEFAULT_ORDER)
         direction = parameters.get('direction', self.DEFAULT_DIRECTION)
-        return self.dao.devices.list(search=query, order=order, direction=direction)['devices']
+        recurse = parameters.get('recurse', False)
+        return self.dao.devices.list(search=query, order=order, direction=direction, tenant_uuid=tenant_uuid, recurse=recurse)['devices']
 
     def filter_devices(self, devices, search=None):
         if search is None:
