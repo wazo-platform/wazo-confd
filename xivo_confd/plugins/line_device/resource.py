@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
+
+from xivo.tenant_flask_helpers import Tenant
 
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -28,20 +30,25 @@ class LineDevice(ConfdResource):
         self.device_dao = device_dao
         self.service = service
 
+    def _add_tenant_uuid(self):
+        tenant_uuid = Tenant.autodetect().uuid
+        return {'tenant_uuid': tenant_uuid}
+
 
 class LineDeviceAssociation(LineDevice):
 
     @required_acl('confd.lines.{line_id}.devices.{device_id}.update')
     def put(self, line_id, device_id):
+        kwargs = self._add_tenant_uuid()
         line = self.line_dao.get(line_id)
-        device = self.device_dao.get(device_id)
+        device = self.device_dao.get(device_id, **kwargs)
         self.service.associate(line, device)
         return '', 204
 
     @required_acl('confd.lines.{line_id}.devices.{device_id}.delete')
     def delete(self, line_id, device_id):
         line = self.line_dao.get(line_id)
-        device = self.device_dao.get(device_id)
+        device = self.device_dao.get(device_id, tenant_uuid=line.tenant_uuid)
         self.service.dissociate(line, device)
         return '', 204
 
