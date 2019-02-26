@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -13,21 +13,25 @@ EXTEN_REGEX = r'[A-Z0-9+*]+'
 
 
 class BaseDestinationSchema(Schema):
-    type = fields.String(validate=OneOf(['user',
-                                         'group',
-                                         'queue',
-                                         'conference',
-                                         'paging',
-                                         'service',
-                                         'custom',
-                                         'forward',
-                                         'transfer',
-                                         'park_position',
-                                         'parking',
-                                         'bsfilter',
-                                         'agent',
-                                         'onlinerec']),
-                         required=True)
+    type = fields.String(
+        validate=OneOf([
+            'user',
+            'group',
+            'queue',
+            'conference',
+            'paging',
+            'service',
+            'custom',
+            'forward',
+            'transfer',
+            'park_position',
+            'parking',
+            'bsfilter',
+            'agent',
+            'onlinerec',
+        ]),
+        required=True,
+    )
 
     href = fields.String(default=None, allow_none=True, dump_only=True)
 
@@ -55,11 +59,12 @@ class BaseDestinationSchema(Schema):
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(required=True)
 
-    user = fields.Nested('UserSchema',
-                         attribute='userfeatures',
-                         only=['firstname',
-                               'lastname'],
-                         dump_only=True)
+    user = fields.Nested(
+        'UserSchema',
+        attribute='userfeatures',
+        only=['firstname', 'lastname'],
+        dump_only=True,
+    )
 
     endpoint_list = 'users_list'
 
@@ -82,10 +87,12 @@ class UserDestinationSchema(BaseDestinationSchema):
 class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
 
-    group = fields.Nested('GroupSchema',
-                          attribute='groupfeatures',
-                          only=['name'],
-                          dump_only=True)
+    group = fields.Nested(
+        'GroupSchema',
+        attribute='groupfeatures',
+        only=['name'],
+        dump_only=True,
+    )
 
     @post_dump
     def make_group_fields_flat(self, data):
@@ -109,19 +116,23 @@ class PagingDestinationSchema(BaseDestinationSchema):
 
 
 class ServiceDestinationSchema(BaseDestinationSchema):
-    service = fields.String(validate=OneOf(["enablevm",
-                                            "vmusermsg",
-                                            "vmuserpurge",
-                                            "phonestatus",
-                                            "recsnd",
-                                            "calllistening",
-                                            "directoryaccess",
-                                            "fwdundoall",
-                                            "pickup",
-                                            "callrecord",
-                                            "incallfilter",
-                                            "enablednd"]),
-                            required=True)
+    service = fields.String(
+        validate=OneOf([
+            "enablevm",
+            "vmusermsg",
+            "vmuserpurge",
+            "phonestatus",
+            "recsnd",
+            "calllistening",
+            "directoryaccess",
+            "fwdundoall",
+            "pickup",
+            "callrecord",
+            "incallfilter",
+            "enablednd",
+        ]),
+        required=True,
+    )
 
 
 class CustomDestinationSchema(BaseDestinationSchema):
@@ -129,14 +140,18 @@ class CustomDestinationSchema(BaseDestinationSchema):
 
 
 class ForwardDestinationSchema(BaseDestinationSchema):
-    forward = fields.String(validate=OneOf(['busy', 'noanswer', 'unconditional']),
-                            required=True)
+    forward = fields.String(
+        validate=OneOf(['busy', 'noanswer', 'unconditional']),
+        required=True,
+    )
     exten = fields.String(validate=Regexp(EXTEN_REGEX), allow_none=True)
 
 
 class TransferDestinationSchema(BaseDestinationSchema):
-    transfer = fields.String(validate=OneOf(['blind', 'attended']),
-                             required=True)
+    transfer = fields.String(
+        validate=OneOf(['blind', 'attended']),
+        required=True,
+    )
 
 
 class ParkPositionDestinationSchema(BaseDestinationSchema):
@@ -149,6 +164,26 @@ class ParkingDestinationSchema(BaseDestinationSchema):
 
 class BSFilterDestinationSchema(BaseDestinationSchema):
     filter_member_id = fields.Integer(required=True)
+
+    filter_member = fields.Nested(
+        '_BSFilterMemberDestinationSchema',
+        attribute='filtermember',
+        dump_only=True,
+        missing={},
+    )
+
+    @post_dump
+    def make_member_fields_flat(self, data):
+        if data['filter_member'].get('user'):
+            data['filter_member_firstname'] = data['filter_member']['user']['firstname']
+            data['filter_member_lastname'] = data['filter_member']['user']['lastname']
+
+        data.pop('filter_member', None)
+        return data
+
+
+class _BSFilterMemberDestinationSchema(Schema):
+    user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
 
 class AgentDestinationSchema(BaseDestinationSchema):
@@ -163,20 +198,22 @@ class OnlineRecordingDestinationSchema(BaseDestinationSchema):
 
 class FuncKeyDestinationField(fields.Nested):
 
-    destination_schemas = {'user': UserDestinationSchema,
-                           'group': GroupDestinationSchema,
-                           'queue': QueueDestinationSchema,
-                           'conference': ConferenceDestinationSchema,
-                           'paging': PagingDestinationSchema,
-                           'service': ServiceDestinationSchema,
-                           'custom': CustomDestinationSchema,
-                           'forward': ForwardDestinationSchema,
-                           'transfer': TransferDestinationSchema,
-                           'park_position': ParkPositionDestinationSchema,
-                           'parking': ParkingDestinationSchema,
-                           'bsfilter': BSFilterDestinationSchema,
-                           'agent': AgentDestinationSchema,
-                           'onlinerec': OnlineRecordingDestinationSchema}
+    destination_schemas = {
+        'user': UserDestinationSchema,
+        'group': GroupDestinationSchema,
+        'queue': QueueDestinationSchema,
+        'conference': ConferenceDestinationSchema,
+        'paging': PagingDestinationSchema,
+        'service': ServiceDestinationSchema,
+        'custom': CustomDestinationSchema,
+        'forward': ForwardDestinationSchema,
+        'transfer': TransferDestinationSchema,
+        'park_position': ParkPositionDestinationSchema,
+        'parking': ParkingDestinationSchema,
+        'bsfilter': BSFilterDestinationSchema,
+        'agent': AgentDestinationSchema,
+        'onlinerec': OnlineRecordingDestinationSchema,
+    }
 
     def _deserialize(self, value, attr, data):
         self.schema.context = self.context
@@ -231,23 +268,26 @@ class FuncKeyPositionField(fields.Field):
 class FuncKeyTemplateSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(validate=Length(max=128))
-    keys = FuncKeyPositionField(fields.Integer(validate=Range(min=1)),
-                                fields.Nested(FuncKeySchema, required=True))
+    keys = FuncKeyPositionField(
+        fields.Integer(validate=Range(min=1)),
+        fields.Nested(FuncKeySchema, required=True),
+    )
     links = ListLink(Link('func_keys_templates'))
 
 
 class FuncKeyUnifiedTemplateSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(validate=Length(max=128))
-    keys = FuncKeyPositionField(fields.Integer(validate=Range(min=1)),
-                                fields.Nested(FuncKeySchema, required=True))
+    keys = FuncKeyPositionField(
+        fields.Integer(validate=Range(min=1)),
+        fields.Nested(FuncKeySchema, required=True),
+    )
 
 
 class FuncKeyTemplateUserSchema(BaseSchema):
     user_id = fields.Integer(attribute='id')
     template_id = fields.Integer(attribute='func_key_template_id')
-    links = ListLink(Link('func_keys_templates',
-                          field='func_key_template_id',
-                          target='id'),
-                     Link('users',
-                          field='id'))
+    links = ListLink(
+        Link('func_keys_templates', field='func_key_template_id', target='id'),
+        Link('users', field='id'),
+    )

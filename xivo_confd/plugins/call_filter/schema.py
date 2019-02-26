@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -9,9 +9,11 @@ from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
 
 class CallFilterRecipientsSchema(BaseSchema):
-    user = fields.Nested('UserSchema',
-                         only=['uuid', 'firstname', 'lastname', 'links'],
-                         dump_only=True)
+    user = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        dump_only=True,
+    )
     timeout = fields.Integer(dump_only=True)
 
     @post_dump
@@ -23,13 +25,19 @@ class CallFilterRecipientsSchema(BaseSchema):
 
 
 class CallFilterSurrogatesSchema(BaseSchema):
-    user = fields.Nested('UserSchema',
-                         only=['uuid', 'firstname', 'lastname', 'links'],
-                         dump_only=True)
+    user = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        dump_only=True,
+    )
+    member_id = fields.Integer(attribute='id', dump_only=True)
 
     @post_dump
     def merge_user(self, data):
-        return data.pop('user', {})
+        user = data.pop('user', {})
+        if user:
+            data.update(user)
+        return data
 
 
 class CallFilterSchema(BaseSchema):

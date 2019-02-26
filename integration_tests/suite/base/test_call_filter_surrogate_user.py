@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -7,6 +7,8 @@ from hamcrest import (
     contains,
     empty,
     has_entries,
+    is_not,
+    none,
 )
 
 from . import confd
@@ -127,11 +129,13 @@ def test_get_users_associated_to_call_filter(call_filter, user1, user2):
                     uuid=user2['uuid'],
                     firstname=user2['firstname'],
                     lastname=user2['lastname'],
+                    member_id=is_not(none()),
                 ),
                 has_entries(
                     uuid=user1['uuid'],
                     firstname=user1['firstname'],
                     lastname=user1['lastname'],
+                    member_id=is_not(none()),
                 ),
             ))
         ))

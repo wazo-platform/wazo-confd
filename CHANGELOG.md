@@ -4,6 +4,17 @@ Changelog
 19.04
 -----
 
+* New readonly parameters have been added to the funckeys resource:
+
+  * For destinations of type `bsfilter`:
+
+      * `filter_member_firstname`
+      * `filter_member_lastname`
+
+* New readonly parameters have been added to the call filter surrogate resource:
+
+  * `member_id`
+
 * The following endpoints are now multi-tenant.
 
   This means that created resources will be in the same tenant as the creator or in the tenant

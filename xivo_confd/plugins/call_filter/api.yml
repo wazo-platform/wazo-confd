@@ -199,10 +199,16 @@ definitions:
         type: array
         readOnly: true
         items:
-          $ref: '#/definitions/UserRelationBase'
+          $ref: '#/definitions/CallFilterSurrogateUser'
   CallFilterRecipientUser:
     allOf:
     - properties:
         timeout:
+          type: integer
+    - $ref: '#/definitions/UserRelationBase'
+  CallFilterSurrogateUser:
+    allOf:
+    - properties:
+        member_id:
           type: integer
     - $ref: '#/definitions/UserRelationBase'
