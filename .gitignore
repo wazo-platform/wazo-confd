@@ -3,3 +3,6 @@
 .tox
 pycodestyle.txt
 pylint.txt
+.coverage
+nosetests.xml
+coverage.xml
