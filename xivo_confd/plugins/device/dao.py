@@ -43,7 +43,7 @@ class DeviceDao(object):
         return Device(provd_device, provd_config)
 
     def find_by(self, **criteria):
-        provd_devices = self.devices.list(criteria)['devices']
+        provd_devices = self.devices.list(criteria, recurse=True)['devices']
         if provd_devices:
             return self.build_device(provd_devices[0])
 
