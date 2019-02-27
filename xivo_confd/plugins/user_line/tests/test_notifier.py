@@ -25,24 +25,38 @@ class TestUserLineNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
+        self.user = Mock(uuid=USER_UUID, id=1, tenant_uuid=TENANT_UUID)
+        self.line = Mock(
+            id=2,
+            endpoint_sip={'id': 3},
+            endpoint_sccp=None,
+            endpoint_custom=None,
+        )
+        self.line.name = u'limitation of mock instantiation with name ...'
         self.user_line = Mock(
-            user=Mock(uuid=USER_UUID, tenant_uuid=TENANT_UUID),
-            user_id=1,
-            line_id=2,
+            user=self.user,
+            line=self.line,
             main_user=True,
             main_line=True,
         )
-
         self.notifier = UserLineNotifier(self.bus, self.sysconfd)
 
     def test_associated_then_bus_event(self):
         expected_event = UserLineAssociatedEvent(
-            self.user_line.user.uuid,
-            self.user_line.user_id,
-            self.user_line.line_id,
-            self.user_line.main_user,
-            self.user_line.main_line,
-            self.user_line.user.tenant_uuid,
+            user={
+                'uuid': self.user.uuid,
+                'id': self.user.id,
+                'tenant_uuid': self.user.tenant_uuid,
+            },
+            line={
+                'id': self.line.id,
+                'name': self.line.name,
+                'endpoint_sip': self.line.endpoint_sip,
+                'endpoint_sccp': self.line.endpoint_sccp,
+                'endpoint_custom': self.line.endpoint_custom,
+            },
+            main_line=self.user_line.main_line,
+            main_user=self.user_line.main_user,
         )
 
         self.notifier.associated(self.user_line)
@@ -56,12 +70,20 @@ class TestUserLineNotifier(unittest.TestCase):
 
     def test_dissociated_then_bus_event(self):
         expected_event = UserLineDissociatedEvent(
-            self.user_line.user.uuid,
-            self.user_line.user_id,
-            self.user_line.line_id,
-            self.user_line.main_user,
-            self.user_line.main_line,
-            self.user_line.user.tenant_uuid,
+            user={
+                'uuid': self.user.uuid,
+                'id': self.user.id,
+                'tenant_uuid': self.user.tenant_uuid,
+            },
+            line={
+                'id': self.line.id,
+                'name': self.line.name,
+                'endpoint_sip': self.line.endpoint_sip,
+                'endpoint_sccp': self.line.endpoint_sccp,
+                'endpoint_custom': self.line.endpoint_custom,
+            },
+            main_line=self.user_line.main_line,
+            main_user=self.user_line.main_user,
         )
 
         self.notifier.dissociated(self.user_line)
