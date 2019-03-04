@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.context.event import (
@@ -9,6 +9,15 @@ from xivo_bus.resources.context.event import (
 )
 
 from xivo_confd import bus, sysconfd
+
+from .schema import ContextSchema
+
+CONTEXT_FIELDS = [
+    'id',
+    'name',
+    'type',
+    'tenant_uuid',
+]
 
 
 class ContextNotifier(object):
@@ -25,17 +34,20 @@ class ContextNotifier(object):
 
     def created(self, context):
         self.send_sysconfd_handlers()
-        event = CreateContextEvent(context.id)
+        context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context).data
+        event = CreateContextEvent(context=context_serialized)
         self.bus.send_bus_event(event)
 
     def edited(self, context):
         self.send_sysconfd_handlers()
-        event = EditContextEvent(context.id)
+        context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context).data
+        event = EditContextEvent(context=context_serialized)
         self.bus.send_bus_event(event)
 
     def deleted(self, context):
         self.send_sysconfd_handlers()
-        event = DeleteContextEvent(context.id)
+        context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context).data
+        event = DeleteContextEvent(context_serialized)
         self.bus.send_bus_event(event)
 
 
