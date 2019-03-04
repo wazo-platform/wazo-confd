@@ -28,6 +28,7 @@ from ..helpers import helpers as h
 from . import confd, db, provd
 from ..helpers.config import (
     MAIN_TENANT,
+    MAIN_TENANT as DEFAULT_DEVICE_TENANT,
     SUB_TENANT,
 )
 
@@ -342,7 +343,7 @@ def test_associate_sip_line_multitenant(device):
         assert_sip_config(user, sip, extension, provd_config)
 
 
-@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
 def test_associate_sip_line_change_tenant(device):
     registrar = provd.configs.get('default')
     registrar['proxy_backup'] = '127.0.0.2'
@@ -466,8 +467,8 @@ def test_associate_sccp_line(device):
         assert_sccp_in_db(line, device)
 
 
-@fixtures.device(wazo_tenant=MAIN_TENANT)
-def test_associate_sccp_line_multitenant(device):
+@fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
+def test_associate_sccp_line_change_tenant(device):
     registrar = provd.configs.get('default')
     registrar['proxy_backup'] = '127.0.0.2'
     provd.configs.update(registrar)
