@@ -323,26 +323,6 @@ def test_associate_sip_line(device):
         assert_sip_config(user, sip, extension, provd_config)
 
 
-@fixtures.device(wazo_tenant=MAIN_TENANT)
-def test_associate_sip_line_multitenant(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    registrar['registrar_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
-
-    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, line, extension, sip):
-        response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_updated()
-
-        device_config = provd.devices.get(device['id'])
-        assert_that(device_config['config'], is_not(starts_with('autoprov')))
-        assert_that(device_config['tenant_uuid'], is_(MAIN_TENANT))
-
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user, line, provd_config)
-        assert_sip_config(user, sip, extension, provd_config)
-
-
 @fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
 def test_associate_sip_line_change_tenant(device):
     registrar = provd.configs.get('default')
@@ -355,12 +335,7 @@ def test_associate_sip_line_change_tenant(device):
         response.assert_updated()
 
         device_config = provd.devices.get(device['id'])
-        assert_that(device_config['config'], is_not(starts_with('autoprov')))
         assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
-
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user, line, provd_config)
-        assert_sip_config(user, sip, extension, provd_config)
 
 
 @fixtures.device()
@@ -383,27 +358,8 @@ def test_associate_2_sip_lines(device):
         assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
-@fixtures.device(wazo_tenant=SUB_TENANT)
-def test_associate_2_sip_lines_multitenant(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    registrar['registrar_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
 
-    with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user1, line1, extension1, sip1), \
-            line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user2, line2, extension2, sip2):
 
-        confd.lines(line2['id']).put(position=2).assert_updated()
-        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
-        confd.lines(line2['id']).devices(device['id']).put().assert_updated()
-
-        device_config = provd.devices.get(device['id'])
-        assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
-
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user1, line1, provd_config)
-        assert_sip_config(user1, sip1, extension1, provd_config, position=1)
-        assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
 @fixtures.device()
@@ -422,18 +378,6 @@ def test_associate_2_sccp_lines(device):
 def test_associate_lines_with_different_endpoints(device):
     with line_fellowship('sip') as (user1, line1, extension1, sip), \
             line_fellowship('sccp') as (user2, line2, extension2, sccp):
-
-        confd.lines(line2['id']).put(position=2).assert_updated()
-        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
-
-        response = confd.lines(line2['id']).devices(device['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
-
-
-@fixtures.device(wazo_tenant=MAIN_TENANT)
-def test_associate_lines_with_different_endpoints_multitenant(device):
-    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user1, line1, extension1, sip), \
-            line_fellowship('sccp', wazo_tenant=SUB_TENANT) as (user2, line2, extension2, sccp):
 
         confd.lines(line2['id']).put(position=2).assert_updated()
         confd.lines(line1['id']).devices(device['id']).put().assert_updated()
@@ -478,13 +422,7 @@ def test_associate_sccp_line_change_tenant(device):
         response.assert_updated()
 
         device_config = provd.devices.get(device['id'], wazo_tenant=SUB_TENANT)
-        assert_that(device_config['config'], is_not(starts_with('autoprov')))
         assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
-
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user, line, provd_config)
-        assert_sccp_config(provd_config)
-        assert_sccp_in_db(line, device)
 
 
 def test_associate_when_device_already_associated():
@@ -501,12 +439,6 @@ def check_associate_when_device_already_associated(line, device):
         response.assert_updated()
 
 
-def test_associate_when_device_already_associated_multitenant():
-    with line_and_device('sip', wazo_tenant=SUB_TENANT) as (line, device):
-        yield check_associate_when_device_already_associated, line, device
-
-    with line_and_device('sccp', wazo_tenant=SUB_TENANT) as (line, device):
-        yield check_associate_when_device_already_associated, line, device
 
 
 def test_associate_with_another_device_when_already_associated():
@@ -523,16 +455,6 @@ def check_associate_with_another_device_when_already_associated(line, device1, d
     with a.line_device(line, device1):
         response = confd.lines(line['id']).devices(device2['id']).put()
         response.assert_match(400, e.resource_associated('Line', 'Device'))
-
-
-def test_associate_with_another_device_when_already_associated_multitenant():
-    device2 = h.device.generate_device(wazo_tenant=MAIN_TENANT)
-
-    with line_and_device('sip', wazo_tenant=SUB_TENANT) as (line, device1):
-        yield check_associate_with_another_device_when_already_associated_multitenant, line, device1, device2
-
-    with line_and_device('sccp', wazo_tenant=SUB_TENANT) as (line, device1):
-        yield check_associate_with_another_device_when_already_associated_multitenant, line, device1, device2
 
 
 def check_associate_with_another_device_when_already_associated_multitenant(line, device1, device2):
