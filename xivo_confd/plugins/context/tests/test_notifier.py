@@ -41,7 +41,7 @@ class TestContextNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_context_created_then_event_sent_on_bus(self):
-        expected_event = CreateContextEvent(self.expected_body)
+        expected_event = CreateContextEvent(**self.expected_body)
 
         self.notifier.created(self.context)
 
@@ -53,7 +53,7 @@ class TestContextNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_context_edited_then_event_sent_on_bus(self):
-        expected_event = EditContextEvent(self.expected_body)
+        expected_event = EditContextEvent(**self.expected_body)
 
         self.notifier.edited(self.context)
 
@@ -65,7 +65,7 @@ class TestContextNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_context_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteContextEvent(self.expected_body)
+        expected_event = DeleteContextEvent(**self.expected_body)
 
         self.notifier.deleted(self.context)
 

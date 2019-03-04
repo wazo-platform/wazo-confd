@@ -35,19 +35,19 @@ class ContextNotifier(object):
     def created(self, context):
         self.send_sysconfd_handlers()
         context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context).data
-        event = CreateContextEvent(context=context_serialized)
+        event = CreateContextEvent(**context_serialized)
         self.bus.send_bus_event(event)
 
     def edited(self, context):
         self.send_sysconfd_handlers()
         context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context).data
-        event = EditContextEvent(context=context_serialized)
+        event = EditContextEvent(**context_serialized)
         self.bus.send_bus_event(event)
 
     def deleted(self, context):
         self.send_sysconfd_handlers()
         context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context).data
-        event = DeleteContextEvent(context_serialized)
+        event = DeleteContextEvent(**context_serialized)
         self.bus.send_bus_event(event)
 
 
