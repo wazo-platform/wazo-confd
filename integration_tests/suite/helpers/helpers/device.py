@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -7,9 +7,14 @@ from __future__ import unicode_literals
 import string
 import hashlib
 
-from . import confd, provd
+from random import (
+    choice,
+    randint,
+    random,
+    randrange,
+)
 
-from random import randrange, choice, randint, random
+from . import confd, provd
 
 
 def generate_device(**params):
@@ -19,8 +24,8 @@ def generate_device(**params):
     return add_device(**params)
 
 
-def add_device(**params):
-    response = confd.devices.post(params)
+def add_device(wazo_tenant=None, **params):
+    response = confd.devices.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 
@@ -52,24 +57,26 @@ def generate_autoprov():
     sip_username = "".join(choice(string.ascii_letters) for _ in range(20))
     random_id = hashlib.md5(str(random())).hexdigest()
 
-    device = {'added': 'auto',
-              'config': autoprov_id,
-              'configured': True,
-              'id': random_id,
-              'ip': ip,
-              'mac': mac,
-              'model': '6731i',
-              'plugin': 'xivo-aastra-3.3.1-SP4',
-              'remote_state_sip_username': sip_username,
-              'vendor': 'Aastra',
-              'version': '3.3.1.4322'
-              }
+    device = {
+        'added': 'auto',
+        'config': autoprov_id,
+        'configured': True,
+        'id': random_id,
+        'ip': ip,
+        'mac': mac,
+        'model': '6731i',
+        'plugin': 'xivo-aastra-3.3.1-SP4',
+        'remote_state_sip_username': sip_username,
+        'vendor': 'Aastra',
+        'version': '3.3.1.4322'
+    }
 
-    config = {'id': autoprov_id,
-              'transient': True,
-              'parent_ids': ['autoprov'],
-              'raw_config': {'sip_lines': {'1': {'username': sip_username}}}
-              }
+    config = {
+        'id': autoprov_id,
+        'transient': True,
+        'parent_ids': ['autoprov'],
+        'raw_config': {'sip_lines': {'1': {'username': sip_username}}}
+    }
 
     provd.devices.create(device)
     provd.configs.create(config)
@@ -94,16 +101,18 @@ def _random_ip(ips):
 def generate_registrar(**params):
     name = "".join(choice(string.ascii_letters) for _ in range(20))
     ip = generate_ip()
-    registrar = {'X_type': 'registrar',
-                 'deletable': True,
-                 'displayname': name,
-                 'id': name,
-                 'parent_ids': [],
-                 'proxy_main': ip,
-                 'proxy_backup': ip,
-                 'registrar_main': ip,
-                 'raw_config': {'X_key': 'xivo'},
-                 'registrar_backup': ip}
+    registrar = {
+        'X_type': 'registrar',
+        'deletable': True,
+        'displayname': name,
+        'id': name,
+        'parent_ids': [],
+        'proxy_main': ip,
+        'proxy_backup': ip,
+        'registrar_main': ip,
+        'raw_config': {'X_key': 'xivo'},
+        'registrar_backup': ip,
+    }
     registrar.update(params)
     provd.configs.create(registrar)
     return registrar

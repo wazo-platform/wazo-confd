@@ -7,6 +7,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -26,6 +27,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Device to create
@@ -47,6 +49,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/deviceid'
       responses:
         '200':
@@ -62,6 +65,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/deviceid'
       - name: body
         in: body
@@ -86,6 +90,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/deviceid'
       responses:
         '204':
@@ -107,6 +112,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/deviceid'
       responses:
         '204':
@@ -127,6 +133,7 @@ paths:
       tags:
       - devices
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/deviceid'
       responses:
         '204':

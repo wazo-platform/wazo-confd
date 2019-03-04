@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -19,7 +19,7 @@ class DeviceOptionsSchema(BaseSchema):
 class DeviceSchema(BaseSchema):
     id = fields.String(dump_only=True)
     status = fields.String(dump_only=True)
-
+    tenant_uuid = fields.String(dump_only=True)
     ip = fields.String(validate=Regexp(IP_REGEX), allow_none=True)
     mac = fields.String(validate=Regexp(MAC_REGEX), allow_none=True)
     sn = fields.String(allow_none=True)

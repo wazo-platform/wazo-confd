@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -17,6 +17,9 @@ from hamcrest import (
     none,
     not_none,
     starts_with,
+    all_of,
+    not_,
+    has_items,
 )
 
 from . import confd, mocks, provd
@@ -26,6 +29,10 @@ from ..helpers import (
     fixtures,
     helpers as h,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -134,6 +141,28 @@ def check_search(url, device, hidden, field, term):
     assert_that(response.items, hidden_device)
 
 
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.devices.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.devices.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.devices.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items,
+        has_items(main, sub),
+    )
+
+
 @fixtures.device(ip="99.20.30.40",
                  mac="aa:bb:aa:cc:01:23",
                  model="SortModel1",
@@ -181,6 +210,39 @@ def test_get(device):
                                            options={'switchboard': True}))
 
 
+@fixtures.device(template_id="mockdevicetemplate",
+                 plugin='zero',
+                 vendor='myvendor',
+                 version='1.0',
+                 description='getdevice',
+                 options={'switchboard': True},
+                 tenant_uuid=MAIN_TENANT)
+@fixtures.device(template_id="mockdevicetemplate",
+                 plugin='zero',
+                 vendor='myvendor',
+                 version='1.0',
+                 description='getdevice',
+                 options={'switchboard': True},
+                 tenant_uuid=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.devices(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.item,
+        has_entries(ip=sub['ip'],
+                    mac=sub['mac'],
+                    template_id='mockdevicetemplate',
+                    plugin='zero',
+                    vendor='myvendor',
+                    version='1.0',
+                    description='getdevice',
+                    options={'switchboard': True},
+                    tenant_uuid=MAIN_TENANT),
+    )
+
+    response = confd.devices(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Device'))
+
+
 def test_create_device_minimal_parameters():
     response = confd.devices.post()
     response.assert_created('devices')
@@ -196,6 +258,13 @@ def test_create_device_minimal_parameters():
 
     provd_device = provd.devices.get(response.item['id'])
     assert_that(provd_device['config'], starts_with('autoprov'))
+
+
+def test_create_device_multi_tenant():
+    response = confd.devices.post(wazo_tenant=SUB_TENANT)
+    response.assert_created('devices')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 def test_create_device_null_parameters():
@@ -262,9 +331,21 @@ def test_create_2_devices_with_same_mac(device):
     response.assert_match(400, e.resource_exists('Device'))
 
 
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+def test_create_2_devices_with_same_mac_different_tenants(device):
+    response = confd.devices.post(mac=device['mac'], wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.resource_exists('Device'))
+
+
 @fixtures.device()
 def test_create_2_devices_with_same_ip(device):
     response = confd.devices.post(ip=device['ip'])
+    response.assert_created('devices')
+
+
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+def test_create_2_devices_with_same_ip_different_tenants(device):
+    response = confd.devices.post(ip=device['ip'], wazo_tenant=SUB_TENANT)
     response.assert_created('devices')
 
 
@@ -297,6 +378,16 @@ def test_edit_device_all_parameters(device):
 
     response = confd.devices(device['id']).get()
     assert_that(response.item, has_entries(parameters))
+
+
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_edit_device_multi_tenant(main, sub):
+    response = confd.devices(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Device'))
+
+    response = confd.devices(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
 
 
 @fixtures.device(ip="127.8.0.8",
@@ -337,6 +428,13 @@ def test_edit_device_with_same_mac(first_device, second_device):
     response.assert_match(400, e.resource_exists('Device'))
 
 
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_edit_device_with_same_mac_different_tenants(first_device, second_device):
+    response = confd.devices(first_device['id']).put(mac=second_device['mac'], wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.resource_exists('Device'))
+
+
 @fixtures.device()
 def test_edit_device_with_fake_plugin(device):
     response = confd.devices(device['id']).put(plugin='superduperplugin')
@@ -358,6 +456,20 @@ def test_delete_device(device):
     assert_that(provd_devices, empty())
 
 
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_delete_device_multi_tenant(main, sub):
+    response = confd.devices(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Device'))
+
+    response = confd.devices(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+    params = {'id': sub['id']}
+    provd_devices = provd.devices.list(params, tenant_uuid=MAIN_TENANT, recurse=True)['devices']
+    assert_that(provd_devices, empty())
+
+
 @mocks.provd()
 @fixtures.device()
 @fixtures.line()
@@ -365,9 +477,6 @@ def test_reset_to_autoprov_device_associated_to_line(provd, device, line):
     with a.line_device(line, device, check=False):
         response = confd.devices(device['id']).autoprov.get()
         response.assert_ok()
-
-        response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entry('device_id', none()))
 
         device_cfg = provd.devices.get(device['id'])
         assert_that(device_cfg, has_entries(config=starts_with('autoprov')))
@@ -381,6 +490,33 @@ def test_reset_to_autoprov_device_associated_to_line(provd, device, line):
 
 
 @mocks.provd()
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+@fixtures.line(context='main_ctx')
+@fixtures.line(context='sub_ctx')
+def test_reset_to_autoprov_multi_tenant(provd, _, __, main_device, sub_device, main_line, sub_line):
+    with a.line_device(main_line, main_device, check=False) \
+            and a.line_device(sub_line, sub_device, check=False):
+        response = confd.devices(main_device['id']).autoprov.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Device'))
+
+        response = confd.devices(sub_device['id']).autoprov.get(wazo_tenant=MAIN_TENANT)
+        response.assert_ok()
+
+        device_cfg = provd.devices.get(sub_device['id'])
+        assert_that(device_cfg, has_entries(config=starts_with('autoprov')))
+        assert_that(device_cfg, is_not(has_key('options')))
+
+        config_cfg = provd.configs.get(device_cfg['config'])
+        assert_that(config_cfg, not_none())
+
+        response = confd.lines(sub_line['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(device_id=none()))
+
+
+@mocks.provd()
 @fixtures.device()
 def test_synchronize_device(provd, device):
     timestamp = datetime.utcnow()
@@ -389,4 +525,20 @@ def test_synchronize_device(provd, device):
     response.assert_ok()
 
     synchonized = provd.has_synchronized(device['id'], timestamp)
+    assert_that(synchonized, "Device was not synchronized")
+
+
+@mocks.provd()
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_synchronize_device_multi_tenant(provd, main, sub):
+    response = confd.devices(main['id']).synchronize.get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Device'))
+
+    timestamp = datetime.utcnow()
+
+    response = confd.devices(sub['id']).synchronize.get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
+
+    synchonized = provd.has_synchronized(sub['id'], timestamp)
     assert_that(synchonized, "Device was not synchronized")

@@ -15,6 +15,10 @@ Changelog
 
   * `member_id`
 
+* New readonly parameters have been added to the device resource:
+
+  * `tenant_uuid`
+
 * The following endpoints are now multi-tenant.
 
   This means that created resources will be in the same tenant as the creator or in the tenant
@@ -25,6 +29,7 @@ Changelog
   `tenant_uuid`.
 
   * `/1.1/callpickups`
+  * `/1.1/devices`
 
 
 19.03
