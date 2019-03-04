@@ -427,40 +427,28 @@ def test_associate_sccp_line_change_tenant(device):
 
 def test_associate_when_device_already_associated():
     with line_and_device('sip') as (line, device):
-        yield check_associate_when_device_already_associated, line, device
+        with a.line_device(line, device):
+            response = confd.lines(line['id']).devices(device['id']).put()
+            response.assert_updated()
 
     with line_and_device('sccp') as (line, device):
-        yield check_associate_when_device_already_associated, line, device
-
-
-def check_associate_when_device_already_associated(line, device):
-    with a.line_device(line, device):
-        response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_updated()
-
-
+        with a.line_device(line, device):
+            response = confd.lines(line['id']).devices(device['id']).put()
+            response.assert_updated()
 
 
 def test_associate_with_another_device_when_already_associated():
     device2 = h.device.generate_device()
 
     with line_and_device('sip') as (line, device1):
-        yield check_associate_with_another_device_when_already_associated, line, device1, device2
+        with a.line_device(line, device1):
+            response = confd.lines(line['id']).devices(device2['id']).put()
+            response.assert_match(400, e.resource_associated('Line', 'Device'))
 
     with line_and_device('sccp') as (line, device1):
-        yield check_associate_with_another_device_when_already_associated, line, device1, device2
-
-
-def check_associate_with_another_device_when_already_associated(line, device1, device2):
-    with a.line_device(line, device1):
-        response = confd.lines(line['id']).devices(device2['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
-
-
-def check_associate_with_another_device_when_already_associated_multitenant(line, device1, device2):
-    with a.line_device(line, device1):
-        response = confd.lines(line['id']).devices(device2['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
+        with a.line_device(line, device1):
+            response = confd.lines(line['id']).devices(device2['id']).put()
+            response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 def test_dissociate():
