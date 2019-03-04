@@ -42,8 +42,12 @@ class DeviceDao(object):
             provd_config = None
         return Device(provd_device, provd_config)
 
-    def find_by(self, **criteria):
-        provd_devices = self.devices.list(criteria, recurse=True)['devices']
+    def find_by(self, tenant_uuid=None, **criteria):
+        kwargs = {}
+        if tenant_uuid is None:
+            kwargs['recurse'] = True
+
+        provd_devices = self.devices.list(criteria, **kwargs)['devices']
         if provd_devices:
             return self.build_device(provd_devices[0])
 
