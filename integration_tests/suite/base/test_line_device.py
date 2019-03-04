@@ -358,8 +358,21 @@ def test_associate_2_sip_lines(device):
         assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_device, sub_device):
+    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
+        response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Line'))
 
+    with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, sub_line, extension, sip):
+        response = confd.lines(sub_line['id']).devices(main_device['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Device'))
 
+    # We should catch exception from xivo-provd to expose the "different_tenant" exception
+    # with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
+    #     response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=MAIN_TENANT)
+    #     response.assert_match(400, e.different_tenant())
 
 
 @fixtures.device()
@@ -475,22 +488,16 @@ def check_dissociate_sccp(line, device):
         assert_that(q.line_has_sccp_device(line['id'], sccp_device), equal_to(False))
 
 
-def test_dissociate_multitenant():
-    with line_and_device('sip', wazo_tenant=SUB_TENANT) as (line, device):
-        yield check_dissociate_multitenant, line, device
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_device, sub_device):
+    with line_and_device('sip', wazo_tenant=MAIN_TENANT) as (main_line, main_device), \
+            line_and_device('sip', wazo_tenant=SUB_TENANT) as (sub_line, sub_device):
+        response = confd.lines(main_line['id']).devices(sub_device['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Line'))
 
-    with line_and_device('sccp', wazo_tenant=SUB_TENANT) as (line, device):
-        yield check_dissociate_multitenant, line, device
-        yield check_dissociate_sccp, line, device
-
-
-def check_dissociate_multitenant(line, device):
-    with a.line_device(line, device, check=False):
-        response = confd.lines(line['id']).devices(device['id']).delete()
-        response.assert_deleted()
-
-        provd_device = provd.devices.get(device['id'], wazo_tenant=SUB_TENANT)
-        assert_that(provd_device['config'], starts_with('autoprov'))
+        response = confd.lines(sub_line['id']).devices(main_device['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Device'))
 
 
 def test_dissociate_when_not_associated():

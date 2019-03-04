@@ -30,25 +30,26 @@ class LineDevice(ConfdResource):
         self.device_dao = device_dao
         self.service = service
 
-    def _add_tenant_uuid(self):
-        tenant_uuid = Tenant.autodetect().uuid
-        return {'tenant_uuid': tenant_uuid}
-
 
 class LineDeviceAssociation(LineDevice):
 
+    has_tenant_uuid = True
+
     @required_acl('confd.lines.{line_id}.devices.{device_id}.update')
     def put(self, line_id, device_id):
-        kwargs = self._add_tenant_uuid()
-        line = self.line_dao.get(line_id)
-        device = self.device_dao.get(device_id, **kwargs)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        tenant_uuid = Tenant.autodetect().uuid
+        device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
         self.service.associate(line, device)
         return '', 204
 
     @required_acl('confd.lines.{line_id}.devices.{device_id}.delete')
     def delete(self, line_id, device_id):
-        line = self.line_dao.get(line_id)
-        device = self.device_dao.get(device_id, tenant_uuid=line.tenant_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        tenant_uuid = Tenant.autodetect().uuid
+        device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
         self.service.dissociate(line, device)
         return '', 204
 
