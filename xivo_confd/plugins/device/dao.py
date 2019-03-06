@@ -100,9 +100,10 @@ class DeviceDao(object):
         self._remove_config(old_config)
 
     def _remove_config(self, config):
+        if config is None:
+            return
         try:
-            if config is not None:
-                self.configs.delete(config['id'])
+            self.configs.delete(config['id'])
         except ProvdError as e:
             if e.status_code != 404:
                 raise
