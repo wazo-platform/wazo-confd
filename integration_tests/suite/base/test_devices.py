@@ -198,14 +198,11 @@ def test_get(device):
     assert_that(response.item, has_entries(**device))
 
 
-@fixtures.device(tenant_uuid=MAIN_TENANT)
-@fixtures.device(tenant_uuid=SUB_TENANT)
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device(wazo_tenant=SUB_TENANT)
 def test_get_multi_tenant(main, sub):
     response = confd.devices(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.item,
-        has_entries(**sub),
-    )
+    assert_that(response.item, has_entries(**sub))
 
     response = confd.devices(main['id']).get(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Device'))
