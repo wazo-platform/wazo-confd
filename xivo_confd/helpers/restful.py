@@ -52,8 +52,8 @@ class ConfdResource(ErrorCatchingResource):
 
         tenants = []
         auth_client = get_auth_client()
-        token_data = get_token()
-        auth_client.set_token(token_data['token'])
+        token_object = get_token()
+        auth_client.set_token(token_object.uuid)
 
         try:
             tenants = auth_client.tenants.list(tenant_uuid=tenant)['items']
