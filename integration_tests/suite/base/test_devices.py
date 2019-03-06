@@ -192,51 +192,19 @@ def test_sorting_offset_limit(device1, device2):
     yield s.check_limit, url, device1, device2, 'mac', 'aa:bb'
 
 
-@fixtures.device(template_id="mockdevicetemplate",
-                 plugin='zero',
-                 vendor='myvendor',
-                 version='1.0',
-                 description='getdevice',
-                 options={'switchboard': True})
+@fixtures.device()
 def test_get(device):
     response = confd.devices(device['id']).get()
-    assert_that(response.item, has_entries(ip=device['ip'],
-                                           mac=device['mac'],
-                                           template_id="mockdevicetemplate",
-                                           plugin='zero',
-                                           vendor='myvendor',
-                                           version='1.0',
-                                           description='getdevice',
-                                           options={'switchboard': True}))
+    assert_that(response.item, has_entries(**device))
 
 
-@fixtures.device(template_id="mockdevicetemplate",
-                 plugin='zero',
-                 vendor='myvendor',
-                 version='1.0',
-                 description='getdevice',
-                 options={'switchboard': True},
-                 tenant_uuid=MAIN_TENANT)
-@fixtures.device(template_id="mockdevicetemplate",
-                 plugin='zero',
-                 vendor='myvendor',
-                 version='1.0',
-                 description='getdevice',
-                 options={'switchboard': True},
-                 tenant_uuid=SUB_TENANT)
+@fixtures.device(tenant_uuid=MAIN_TENANT)
+@fixtures.device(tenant_uuid=SUB_TENANT)
 def test_get_multi_tenant(main, sub):
     response = confd.devices(sub['id']).get(wazo_tenant=MAIN_TENANT)
     assert_that(
         response.item,
-        has_entries(ip=sub['ip'],
-                    mac=sub['mac'],
-                    template_id='mockdevicetemplate',
-                    plugin='zero',
-                    vendor='myvendor',
-                    version='1.0',
-                    description='getdevice',
-                    options={'switchboard': True},
-                    tenant_uuid=MAIN_TENANT),
+        has_entries(**sub),
     )
 
     response = confd.devices(main['id']).get(wazo_tenant=SUB_TENANT)
