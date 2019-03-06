@@ -46,6 +46,8 @@ class DeviceDao(object):
         kwargs = {}
         if tenant_uuid is None:
             kwargs['recurse'] = True
+        else:
+            kwargs['tenant_uuid'] = tenant_uuid
 
         provd_devices = self.devices.list(criteria, **kwargs)['devices']
         if provd_devices:

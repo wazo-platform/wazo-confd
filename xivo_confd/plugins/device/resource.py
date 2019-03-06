@@ -26,19 +26,6 @@ class SingleTenantListResource(ListResource):
         return {'total': total,
                 'items': self.schema().dump(items, many=True).data}
 
-    def put(self, id):
-        kwargs = self._add_tenant_uuid()
-        model = self.service.get(id, tenant_uuid=kwargs['tenant_uuid'])
-        self.parse_and_update(model, tenant_uuid=kwargs['tenant_uuid'])
-        return '', 204
-
-    def delete(self, id, **kwargs):
-        if not kwargs:
-            kwargs = self._add_tenant_uuid()
-        model = self.service.get(id, tenant_uuid=kwargs['tenant_uuid'])
-        self.service.delete(model, tenant_uuid=kwargs['tenant_uuid'])
-        return '', 204
-
     def _add_tenant_uuid(self):
         tenant_uuid = Tenant.autodetect().uuid
         return {'tenant_uuid': tenant_uuid}
