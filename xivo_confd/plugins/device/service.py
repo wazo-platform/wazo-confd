@@ -11,10 +11,11 @@ from xivo_dao.helpers.db_manager import Session
 
 class DeviceService(CRUDService):
 
-    def __init__(self, dao, validator, notifier, search_engine, line_dao):
+    def __init__(self, dao, validator, notifier, search_engine, line_dao, line_device):
         super(DeviceService, self).__init__(dao, validator, notifier)
         self.search_engine = search_engine
         self.line_dao = line_dao
+        self.line_device = line_device
 
     def create(self, resource, tenant_uuid=None):
         self.validator.validate_create(resource)
@@ -36,9 +37,7 @@ class DeviceService(CRUDService):
 
     def reset_autoprov(self, device, tenant_uuid=None):
         for line in self.line_dao.find_all_by(device=device.id):
-            line.remove_device()
-            self.line_dao.edit(line)
-        self.dao.reset_autoprov(device, tenant_uuid=tenant_uuid)
+            self.line_device.dissociate(line, device)
 
     def delete(self, resource, tenant_uuid=None):
         self.validator.validate_delete(resource)
