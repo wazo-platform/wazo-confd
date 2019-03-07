@@ -37,7 +37,8 @@ def handle_api_exception(func):
             return [message], 400
         except rest_api_helpers.APIException as error:
             rollback()
-            logger.error("%s: %s", error, error.details, exc_info=True)
+            if error.status_code >= 500:
+                logger.error("%s: %s", error, error.details, exc_info=True)
             return [error.message], error.status_code
         except ProvdError as error:
             rollback()
