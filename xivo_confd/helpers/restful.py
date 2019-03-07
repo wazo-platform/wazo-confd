@@ -45,23 +45,23 @@ class ConfdResource(ErrorCatchingResource):
         if not self._has_a_tenant_uuid():
             return
 
-        tenant = Tenant.autodetect().uuid
+        tenant_uuid = Tenant.autodetect().uuid
         recurse = params.get('recurse', False)
         if not recurse:
-            return [tenant]
+            return [tenant_uuid]
 
         tenants = []
         auth_client = get_auth_client()
-        token_data = get_token()
-        auth_client.set_token(token_data['token'])
+        token_object = get_token()
+        auth_client.set_token(token_object.uuid)
 
         try:
-            tenants = auth_client.tenants.list(tenant_uuid=tenant)['items']
+            tenants = auth_client.tenants.list(tenant_uuid=tenant_uuid)['items']
         except HTTPError as e:
             response = getattr(e, 'response', None)
             status_code = getattr(response, 'status_code', None)
             if status_code == 401:
-                return [tenant]
+                return [tenant_uuid]
             raise
 
         return [t['uuid'] for t in tenants]

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -37,6 +37,8 @@ def handle_api_exception(func):
             return [message], 400
         except rest_api_helpers.APIException as error:
             rollback()
+            if error.status_code >= 500:
+                logger.error("%s: %s", error, error.details, exc_info=True)
             return [error.message], error.status_code
         except ProvdError as error:
             rollback()
