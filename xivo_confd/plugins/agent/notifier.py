@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.agent.event import (
@@ -25,13 +25,15 @@ class AgentNotifier(object):
 
     def created(self, agent):
         ctibus_command = 'xivo[agent,add,{agent_id}]'.format(agent_id=agent.id)
-        self.send_sysconfd_handlers(ctibus_command)
+        ipbx_command = 'module reload app_queue.so'
+        self.send_sysconfd_handlers(ctibus_command, ipbx_command)
         event = CreateAgentEvent(agent.id)
         self.bus.send_bus_event(event)
 
     def edited(self, agent):
         ctibus_command = 'xivo[agent,edit,{agent_id}]'.format(agent_id=agent.id)
-        self.send_sysconfd_handlers(ctibus_command)
+        ipbx_command = 'module reload app_queue.so'
+        self.send_sysconfd_handlers(ctibus_command, ipbx_command)
         event = EditAgentEvent(agent.id)
         self.bus.send_bus_event(event)
 
