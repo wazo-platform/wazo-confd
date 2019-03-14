@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -203,6 +203,53 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
         username=None,
         password=None,
     ))
+
+
+@fixtures.csv_entry(
+    voicemail=True,
+    extension=True,
+    incall=True,
+    call_permissions=1,
+    line_protocol='sip',
+)
+def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tenant(entry):
+    user_uuid = entry['user_uuid']
+
+    user = confd.users(user_uuid).get().item
+    assert_that(user, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    line = confd.lines(entry['line_id']).get().item
+    assert_that(line, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    voicemail = confd.voicemails(entry['voicemail_id']).get().item
+    assert_that(voicemail, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    extension = confd.extensions(entry['extension_id']).get().item
+    assert_that(extension, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    sip_endpoint = confd.endpoints.sip(entry['sip_id']).get().item
+    assert_that(sip_endpoint, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    incall_extension = confd.extensions(entry['incall_extension_id']).get().item
+    assert_that(incall_extension, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    for call_permission_id in entry['call_permission_ids']:
+        call_permission = confd.callpermissions(call_permission_id).get().item
+        assert_that(call_permission, has_entries(
+            tenant_uuid=config.MAIN_TENANT,
+        ))
 
 
 def test_given_csv_column_has_wrong_type_then_error_returned():
