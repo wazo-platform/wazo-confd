@@ -167,6 +167,16 @@ def check_get_device_associated_to_line(line, device):
                                                device_id=device['id']))
 
 
+def test_get_device_associated_to_line_from_sub_tenant_errors():
+    with line_and_device('sip', wazo_tenant=MAIN_TENANT) as (line, device), a.line_device(line, device):
+        response = confd.lines(line['id']).devices.get(wazo_tenant=SUB_TENANT)
+        response.assert_status(404)
+
+    with line_and_device('sccp', wazo_tenant=MAIN_TENANT) as (line, device), a.line_device(line, device):
+        response = confd.lines(line['id']).devices.get(wazo_tenant=SUB_TENANT)
+        response.assert_status(404)
+
+
 def test_get_device_after_dissociation():
     with line_and_device('sip') as (line, device):
         yield check_get_device_after_dissociation, line, device
@@ -201,6 +211,16 @@ def check_get_line_associated_to_a_device(line, device):
     with a.line_device(line, device):
         response = confd.devices(device['id']).lines.get()
         assert_that(response.items, expected)
+
+
+def test_get_line_associated_to_a_device_from_sub_tenant_errors():
+    with line_and_device('sip', wazo_tenant=MAIN_TENANT) as (line, device), a.line_device(line, device):
+        response = confd.devices(device['id']).lines.get(wazo_tenant=SUB_TENANT)
+        response.assert_status(404)
+
+    with line_and_device('sccp', wazo_tenant=MAIN_TENANT) as (line, device), a.line_device(line, device):
+        response = confd.devices(device['id']).lines.get(wazo_tenant=SUB_TENANT)
+        response.assert_status(404)
 
 
 def test_registrar_addresses_without_backup_on_sip_device():
@@ -369,10 +389,9 @@ def test_associate_multi_tenant(main_device, sub_device):
         response = confd.lines(sub_line['id']).devices(main_device['id']).put(wazo_tenant=SUB_TENANT)
         response.assert_match(404, e.not_found('Device'))
 
-    # We should catch exception from xivo-provd to expose the "different_tenant" exception
-    # with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
-    #     response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=MAIN_TENANT)
-    #     response.assert_match(400, e.different_tenant())
+    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
+        response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
 
 
 @fixtures.device()
