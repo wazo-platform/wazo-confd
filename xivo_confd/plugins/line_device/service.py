@@ -51,7 +51,7 @@ class LineDeviceService(object):
 
         self.validator.validate_dissociation(line, device)
         self.dissociate_line_device(line, device)
-        self.device_updater.update_device(device, line.tenant_uuid)
+        self.device_updater.update_device(device, tenant_uuid=line.tenant_uuid)
         self.notifier.dissociated(line, device)
 
     def dissociate_line_device(self, line, device):
