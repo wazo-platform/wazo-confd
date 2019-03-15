@@ -20,6 +20,7 @@ class DeviceSchema(BaseSchema):
     id = fields.String(dump_only=True)
     status = fields.String(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
+    is_new = StrictBoolean(dump_only=True)
     ip = fields.String(validate=Regexp(IP_REGEX), allow_none=True)
     mac = fields.String(validate=Regexp(MAC_REGEX), allow_none=True)
     sn = fields.String(allow_none=True)
