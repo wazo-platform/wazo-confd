@@ -270,6 +270,15 @@ def test_given_csv_column_has_wrong_type_then_error_returned():
     assert_error(response, has_error_field('supervision_enabled'))
 
 
+@fixtures.entity(wazo_tenant=config.SUB_TENANT)
+def test_given_the_specified_entity_is_in_another_tenant(entity):
+    csv = [{'firstname': 'Alice',
+            'entity_id': entity['id']}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('Entity was not found'))
+
+
 def test_given_user_contains_error_then_error_returned():
     csv = [{"firstname": "richard",
             "mobile_phone_number": "blah"}]

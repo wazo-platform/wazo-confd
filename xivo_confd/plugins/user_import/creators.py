@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -96,7 +96,7 @@ class EntityCreator(Creator):
     def find(self, fields, tenant_uuid):
         entity_id = fields.get('id')
         if entity_id:
-            return self.service.get_by(id=entity_id)
+            return self.service.get_by(tenant_uuids=[tenant_uuid], id=entity_id)
 
     def create(self, fields, tenant_uuid):
         return None
