@@ -687,6 +687,15 @@ def test_given_call_permission_does_not_exist_then_error_raised():
     assert_error(response, has_error_field('CallPermission'))
 
 
+@fixtures.call_permission(wazo_tenant=config.SUB_TENANT)
+def test_given_call_permission_in_other_tenant_then_error_raised(permission):
+    csv = [{"firstname": "Trévor",
+            "call_permissions": permission['name']}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('CallPermission'))
+
+
 def test_given_csv_has_all_resources_then_all_relations_created():
     exten = h.extension.find_available_exten(config.CONTEXT)
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)

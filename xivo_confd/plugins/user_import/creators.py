@@ -292,7 +292,7 @@ class CallPermissionCreator(Creator):
     def find(self, fields, tenant_uuid):
         names = fields.get('names')
         if names is not None:
-            return [self.service.get_by(name=name) for name in names]
+            return [self.service.get_by(tenant_uuids=[tenant_uuid], name=name) for name in names]
 
     def create(self, fields, tenant_uuid):
         return self.find(fields, tenant_uuid)
