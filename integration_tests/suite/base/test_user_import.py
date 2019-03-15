@@ -513,6 +513,16 @@ def test_given_csv_incall_has_errors_then_errors_returned():
     assert_error(response, has_error_field('context'))
 
 
+@fixtures.context(type='incall', wazo_tenant=config.SUB_TENANT)
+def test_given_csv_incall_in_other_context_then_errors_returned(incall):
+    csv = [{"firstname": "Géorge",
+            "incall_exten": "9999",
+            "incall_context": incall['name']}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('context'))
+
+
 def test_given_csv_has_cti_fields_then_cti_profile_associated():
     csv = [{"firstname": "Thômas",
             "username": "thomas1",
