@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -141,29 +141,6 @@ class EntityAssociator(Associator):
 
     def associated(self, user, entity):
         return self.service.find_by(user_id=user.id, entity_id=entity.id) is not None
-
-
-class CtiProfileAssociator(Associator):
-
-    def __init__(self, service, dao):
-        super(CtiProfileAssociator, self).__init__(service)
-        self.dao = dao
-
-    def associate(self, entry):
-        cti_profile = entry.get_resource('cti_profile')
-        if cti_profile:
-            self.associate_profile(entry)
-
-    def update(self, entry):
-        self.associate(entry)
-
-    def associate_profile(self, entry):
-        user = entry.get_resource('user')
-        name = entry.extract_field('cti_profile', 'name')
-        if name:
-            form = {'cti_profile_id': self.dao.get_id_by_name(name),
-                    'cti_enabled': entry.extract_field('cti_profile', 'enabled')}
-            self.service.edit(user, form)
 
 
 class IncallAssociator(Associator):

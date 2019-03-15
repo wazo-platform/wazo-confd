@@ -21,7 +21,6 @@ class Entry(object):
         self.extension = None
         self.extension_incall = None
         self.incall = None
-        self.cti_profile = None
         self.call_permissions = []
 
     def extract_ids(self):
@@ -35,7 +34,6 @@ class Entry(object):
             'sccp_id': self.sccp.id if self.sccp else None,
             'extension_id': self.extension.id if self.extension else None,
             'incall_extension_id': self.extension_incall.id if self.extension_incall else None,
-            'cti_profile_id': self.cti_profile.id if self.cti_profile else None,
             'call_permission_ids': self.extract_call_permission_ids(),
         }
 
@@ -94,7 +92,6 @@ class EntryCreator(object):
         entry.find_or_create('extension', self.creators['extension'], tenant_uuid)
         entry.find_or_create('extension_incall', self.creators['extension_incall'], tenant_uuid)
         entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
-        entry.find_or_create('cti_profile', self.creators['cti_profile'], tenant_uuid)
         self.create_endpoint(entry, tenant_uuid)
         return entry
 
@@ -118,7 +115,7 @@ class EntryAssociator(object):
 
 class EntryFinder(object):
 
-    def __init__(self, user_dao, entity_dao, voicemail_dao, user_voicemail_dao, cti_profile_dao,
+    def __init__(self, user_dao, entity_dao, voicemail_dao, user_voicemail_dao,
                  line_dao, user_line_dao, line_extension_dao,
                  sip_dao, sccp_dao, extension_dao, incall_dao, call_permission_dao,
                  user_call_permission_dao):
@@ -126,7 +123,6 @@ class EntryFinder(object):
         self.entity_dao = entity_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
-        self.cti_profile_dao = cti_profile_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
         self.line_extension_dao = line_extension_dao
@@ -152,9 +148,6 @@ class EntryFinder(object):
             'username': user.username,
             'emails': [email] if email else []
         }
-
-        if user.cti_profile_id:
-            entry.cti_profile = self.cti_profile_dao.get(user.cti_profile_id)
 
         entity_id = entry.extract_field('entity', 'id')
         if entity_id:
@@ -213,7 +206,6 @@ class EntryUpdater(object):
         entry.find_or_create('extension', self.creators['extension'], tenant_uuid)
         entry.find_or_create('extension_incall', self.creators['extension_incall'], tenant_uuid)
         entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
-        entry.find_or_create('cti_profile', self.creators['cti_profile'], tenant_uuid)
         entry.find_or_create('line', self.creators['line'], tenant_uuid)
         self.find_or_create_endpoint(entry, tenant_uuid)
 

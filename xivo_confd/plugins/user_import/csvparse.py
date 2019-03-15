@@ -139,10 +139,6 @@ class CsvRow(object):
         UnicodeRule('context', 'context'),
     )
 
-    CTI_PROFILE_RULES = (
-        UnicodeRule('cti_profile_name', 'name'),
-    )
-
     INCALL_RULES = (
         UnicodeRule('incall_exten', 'exten'),
         UnicodeRule('incall_context', 'context'),
@@ -160,8 +156,6 @@ class CsvRow(object):
         UnicodeRule('email', 'email_address'),
         UnicodeRule('username', 'username'),
         UnicodeRule('password', 'password'),
-        BooleanRule('cti_profile_enabled', 'enabled'),
-
     )
 
     def __init__(self, fields, position):
@@ -178,7 +172,6 @@ class CsvRow(object):
             'sip': self.parse_rules(self.SIP_RULES),
             'extension_incall': self.parse_rules(self.INCALL_RULES),
             'incall': self.parse_rules(self.INCALL_RULES),
-            'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
             'extension': self.parse_rules(self.EXTENSION_RULES),
             'call_permissions': self.parse_rules(self.CALL_PERMISSION_RULES),
             'sccp': {},

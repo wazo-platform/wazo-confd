@@ -208,30 +208,6 @@ class ExtensionCreator(Creator):
             return self.service.create(Extension(**form), tenant_uuids=tenant_uuids)
 
 
-class CtiProfileCreator(Creator):
-
-    def __init__(self, dao):
-        self.dao = dao
-
-    def find(self, fields, tenant_uuid):
-        name = fields.get('name')
-        if name:
-            try:
-                cti_profile_id = self.dao.get_id_by_name(name)
-                return self.dao.get(cti_profile_id)
-            except NotFoundError:
-                return None
-
-    def update(self, fields, resource):
-        pass
-
-    def create(self, fields, tenant_uuid):
-        name = fields.get('name')
-        if name:
-            cti_profile_id = self.dao.get_id_by_name(name)
-            return self.dao.get(cti_profile_id)
-
-
 class ExtensionIncallCreator(Creator):
 
     def find(self, fields, tenant_uuid):
