@@ -470,7 +470,7 @@ def test_given_csv_extension_has_errors_then_errors_returned():
             "context": "invalid"}]
 
     response = client.post("/users/import", csv)
-    assert_error(response, has_error_field('context'))
+    assert_error(response, has_error_field('Context was not found'))
 
 
 def test_given_csv_has_minimal_incall_fields_then_incall_created():
