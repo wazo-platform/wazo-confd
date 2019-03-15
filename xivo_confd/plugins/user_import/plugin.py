@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import OrderedDict
@@ -22,6 +22,7 @@ from wazo_provd_client import Client as ProvdClient
 
 from xivo_confd.database import user_export as user_export_dao
 from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
+from xivo_confd.plugins.context.service import build_service as build_context_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
 from xivo_confd.plugins.entity.service import build_service as build_entity_service
@@ -53,6 +54,7 @@ from .associators import (
 )
 from .creators import (
     CallPermissionCreator,
+    ContextCreator,
     CtiProfileCreator,
     EntityCreator,
     ExtensionCreator,
@@ -101,6 +103,7 @@ class Plugin(object):
         user_call_permission_service = build_user_call_permission_service()
         incall_service = build_incall_service()
         incall_extension_service = build_incall_extension_service()
+        context_service = build_context_service()
 
         creators = {
             'user': UserCreator(user_service),
@@ -115,6 +118,7 @@ class Plugin(object):
             'incall': IncallCreator(incall_service),
             'cti_profile': CtiProfileCreator(cti_profile_dao),
             'call_permissions': CallPermissionCreator(call_permission_service),
+            'context': ContextCreator(context_service),
         }
 
         entry_creator = EntryCreator(creators)

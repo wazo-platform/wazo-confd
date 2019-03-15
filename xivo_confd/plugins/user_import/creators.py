@@ -91,6 +91,20 @@ class WazoUserCreator(Creator):
             model['emails'] = [email] if email else []
 
 
+class ContextCreator(Creator):
+
+    def find(self, fields, tenant_uuid):
+        name = fields.get('context')
+        if name:
+            return self.service.get_by(tenant_uuids=[tenant_uuid], name=name)
+
+    def create(self, fields, tenant_uuid):
+        return None
+
+    def update(self, fields, model):
+        pass
+
+
 class EntityCreator(Creator):
 
     def find(self, fields, tenant_uuid):

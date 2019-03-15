@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import time
@@ -105,6 +105,10 @@ class CsvRow(object):
         IntRule('simultaneous_calls', 'simultaneous_calls'),
     )
 
+    CONTEXT_RULES = (
+        UnicodeRule('context', 'context'),
+    )
+
     ENTITY_RULES = (
         IntRule('entity_id', 'id'),
     )
@@ -178,6 +182,7 @@ class CsvRow(object):
             'extension': self.parse_rules(self.EXTENSION_RULES),
             'call_permissions': self.parse_rules(self.CALL_PERMISSION_RULES),
             'sccp': {},
+            'context': self.parse_rules(self.CONTEXT_RULES),
         }
 
     def parse_rules(self, rules):

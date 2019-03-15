@@ -252,14 +252,23 @@ def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tena
         ))
 
 
-@fixtures.context(wazo_tenant=config.SUB_TENANT, name='sub-internal')
+def test_given_an_unknown_context_then_error_returned():
+    csv = [{'firstname': 'foo',
+            'context': 'unknowncontext',
+            "line_protocol": "sip"}]
+
+    response = client.post('/users/import', csv)
+    assert_error(response, has_error_field('Context was not found'))
+
+
+@fixtures.context(wazo_tenant=config.SUB_TENANT)
 def test_given_context_in_another_tenant_then_error_returned(context):
     csv = [{'firstname': 'foo',
             'context': context['name'],
             "line_protocol": "sip"}]
 
     response = client.post('/users/import', csv)
-    assert_error(response, has_error_field('different tenants'))
+    assert_error(response, has_error_field('Context was not found'))
 
 
 def test_given_csv_column_has_wrong_type_then_error_returned():

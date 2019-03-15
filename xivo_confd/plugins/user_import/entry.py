@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -10,6 +10,7 @@ class Entry(object):
     def __init__(self, number, entry_dict):
         self.number = number
         self.entry_dict = entry_dict
+        self.context = None
         self.user = None
         self.wazo_user = None  # will be a dictionnary instead of sql object
         self.entity = None
@@ -83,6 +84,7 @@ class EntryCreator(object):
     def create(self, row, tenant_uuid):
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
+        entry.find('context', self.creators['context'], tenant_uuid)
         entry.create('user', self.creators['user'], tenant_uuid)
         entry.create('wazo_user', self.creators['wazo_user'], tenant_uuid)
         entry.find('entity', self.creators['entity'], tenant_uuid)
