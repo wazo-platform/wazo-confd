@@ -35,8 +35,8 @@ paths:
       tags:
       - users
       parameters:
-      - $ref: '#/parameters/csvbody'
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/csvbody'
       responses:
         '201':
           description: Users imported successfully
@@ -61,8 +61,8 @@ paths:
       tags:
       - users
       parameters:
-      - $ref: '#/parameters/csvbody'
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/csvbody'
       responses:
         '200':
           description: Users updated successfully
