@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .auth_client import auth_client
@@ -19,6 +19,7 @@ class WazoUserService(object):
             username=user.get('username') or user.get('email_address') or user.get('uuid'),
             password=user.get('password'),
             enabled=user.get('enabled') if user.get('enabled') is not None else True,
+            tenant_uuid=user.get('tenant_uuid'),
         )
 
     def update(self, user):

@@ -76,6 +76,7 @@ class WazoUserCreator(Creator):
 
     def create(self, fields, tenant_uuid):
         fields = self.schema(handle_error=False, strict=True).load(fields).data
+        fields['tenant_uuid'] = tenant_uuid
         # We need to have user_uuid on create, so the real create is on associate
         return fields
 
