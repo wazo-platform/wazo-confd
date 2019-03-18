@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -25,7 +25,15 @@ class ValidateLineHasNoDevice(Validator):
 class ValidateLineDeviceAssociation(ValidatorAssociation):
 
     def validate(self, line, device):
+        self.validate_same_tenant(line, device)
         ValidateLineHasNoDevice().validate(line)
+
+    def validate_same_tenant(self, line, device):
+        if not device.is_new and line.tenant_uuid != device.tenant_uuid:
+            raise errors.different_tenants(
+                line_tenant_uuid=line.tenant_uuid,
+                device_tenant_uuid=device.tenant_uuid,
+            )
 
 
 class ValidateLinePosition(ValidatorAssociation):

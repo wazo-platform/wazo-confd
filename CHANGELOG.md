@@ -1,6 +1,14 @@
 Changelog
 =========
 
+19.05
+-----
+
+* New readonly parameters have been added to the device resource:
+
+  * `is_new`
+
+
 19.04
 -----
 

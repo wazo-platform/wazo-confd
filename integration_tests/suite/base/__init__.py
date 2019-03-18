@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
-from ..helpers.config import (MAIN_TENANT, SUB_TENANT)
 from ..helpers.wrappers import IsolatedAction
 
 

@@ -144,6 +144,10 @@ class Device(object):
     def tenant_uuid(self, value):
         self.set_value('tenant_uuid', value)
 
+    @property
+    def is_new(self):
+        return self.device.get('is_new')
+
     def is_autoprov(self):
         return 'autoprov' in self.config['parent_ids']
 

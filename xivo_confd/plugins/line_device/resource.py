@@ -5,6 +5,9 @@
 from marshmallow import fields
 
 from xivo.tenant_flask_helpers import Tenant
+from requests.exceptions import HTTPError
+
+from xivo_dao.helpers import errors
 
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -57,10 +60,12 @@ class LineDeviceAssociation(LineDevice):
 class LineDeviceGet(LineDevice):
 
     schema = LineDeviceSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.lines.{line_id}.devices.read')
     def get(self, line_id):
-        line = self.line_dao.get(line_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
         line_device = self.service.get_association_from_line(line)
         return self.schema().dump(line_device).data
 
@@ -71,7 +76,8 @@ class DeviceLineGet(LineDevice):
 
     @required_acl('confd.devices.{device_id}.lines.read')
     def get(self, device_id):
-        device = self.device_dao.get(device_id)
+        tenant_uuid = Tenant.autodetect().uuid
+        device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
         line_devices = self.service.find_all_associations_from_device(device)
         return {'total': len(line_devices),
                 'items': self.schema().dump(line_devices, many=True).data}
