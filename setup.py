@@ -81,6 +81,7 @@ setup(
             'paging_user = xivo_confd.plugins.paging_user.plugin:Plugin',
             'parking_lot = xivo_confd.plugins.parking_lot.plugin:Plugin',
             'parking_lot_extension = xivo_confd.plugins.parking_lot_extension.plugin:Plugin',
+            'provisioning_networking = xivo_confd.plugins.provisioning_networking.plugin:Plugin',
             'queue = xivo_confd.plugins.queue.plugin:Plugin',
             'queue_extension = xivo_confd.plugins.queue_extension.plugin:Plugin',
             'queue_fallback = xivo_confd.plugins.queue_fallback.plugin:Plugin',

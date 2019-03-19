@@ -1,0 +1,55 @@
+paths:
+  /provisioning/networking:
+    get:
+      operationId: get_provisioning_networking
+      summary: Get Provisioning Networking configuration
+      description: '**Required ACL:** `confd.provisioning.networking.read`'
+      tags:
+      - provisioning
+      responses:
+        '200':
+          description: Provisioning Networking configuration
+          schema:
+            $ref: '#/definitions/ProvisioningNetworking'
+    put:
+      operationId: update_provisioning_networking
+      summary: Update Provisioning Networking configuration
+      description: '**Required ACL:** `confd.provisioning.networking.update`'
+      tags:
+      - provisioning
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/ProvisioningNetworking'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+definitions:
+  ProvisioningNetworking:
+    title: Provisioning Networking
+    type: object
+    properties:
+      provision_ip:
+        type: string
+        description: The IP address used for HTTP and TFTP provisioning requests.
+        format: ipv4
+      provision_http_port:
+        type: integer
+        description: The port used by the HTTP provisioning server.
+      rest_ip:
+        type: string
+        description: The IP address used for the HTTPS REST API server.
+        format: ipv4
+      rest_https_port:
+        type: integer
+        description: The port used by the HTTPS REST API server.
+      dhcp_integration:
+        type: boolean
+        description: Enable or disable the DHCP integration.
+    required:
+      - provision_ip
+      - provision_http_port
+      - rest_ip
+      - rest_https_port
