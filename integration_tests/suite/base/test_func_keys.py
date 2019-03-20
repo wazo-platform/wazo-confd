@@ -30,20 +30,13 @@ invalid_destinations = [
     'string',
     {'type': 'invalid'},
 
-    {'type': 'user'},
-    {'type': 'user', 'bad_field': 123},
-    {'type': 'user', 'user_id': 'string'},
-    {'type': 'user', 'user_id': None},
+    {'type': 'agent'},
+    {'type': 'agent', 'agent_id': 'invalid'},
+    {'type': 'agent', 'agent_id': None},
 
-    {'type': 'group'},
-    {'type': 'group', 'bad_field': 123},
-    {'type': 'group', 'group_id': 'string'},
-    {'type': 'group', 'group_id': None},
-
-    {'type': 'queue'},
-    {'type': 'queue', 'bad_field': 123},
-    {'type': 'queue', 'queue_id': 'string'},
-    {'type': 'queue', 'queue_id': None},
+    {'type': 'bsfilter'},
+    {'type': 'bsfilter', 'filter_member_id': 'invalid'},
+    {'type': 'bsfilter', 'filter_member_id': None},
 
     {'type': 'conference'},
     {'type': 'conference', 'bad_field': 123},
@@ -56,13 +49,6 @@ invalid_destinations = [
     {'type': 'custom', 'exten': True},
     {'type': 'custom', 'exten': None},
 
-    {'type': 'service'},
-    {'type': 'service', 'bad_field': 'enablevm'},
-    {'type': 'service', 'service': 'invalid'},
-    {'type': 'service', 'service': True},
-    {'type': 'service', 'service': None},
-    {'type': 'service', 'service': 1234},
-
     {'type': 'forward'},
     {'type': 'forward', 'bad_field': 'busy'},
     {'type': 'forward', 'forward': 'invalid'},
@@ -72,6 +58,33 @@ invalid_destinations = [
     {'type': 'forward', 'forward': 'busy', 'exten': True},
     {'type': 'forward', 'forward': 'busy', 'exten': 1234},
 
+    {'type': 'group'},
+    {'type': 'group', 'bad_field': 123},
+    {'type': 'group', 'group_id': 'string'},
+    {'type': 'group', 'group_id': None},
+
+    {'type': 'paging'},
+    {'type': 'paging', 'bad_field': 123},
+    {'type': 'paging', 'paging_id': 'invalid'},
+    {'type': 'paging', 'paging_id': None},
+
+    {'type': 'park_position'},
+    {'type': 'park_position', 'bad_field': 123},
+    {'type': 'park_position', 'position': 'invalid'},
+    {'type': 'park_position', 'position': None},
+
+    {'type': 'queue'},
+    {'type': 'queue', 'bad_field': 123},
+    {'type': 'queue', 'queue_id': 'string'},
+    {'type': 'queue', 'queue_id': None},
+
+    {'type': 'service'},
+    {'type': 'service', 'bad_field': 'enablevm'},
+    {'type': 'service', 'service': 'invalid'},
+    {'type': 'service', 'service': True},
+    {'type': 'service', 'service': None},
+    {'type': 'service', 'service': 1234},
+
     {'type': 'transfer'},
     {'type': 'transfer', 'bad_field': 'blind'},
     {'type': 'transfer', 'transfer': 'invalid'},
@@ -79,24 +92,10 @@ invalid_destinations = [
     {'type': 'transfer', 'transfer': None},
     {'type': 'transfer', 'transfer': 1234},
 
-    {'type': 'park_position'},
-    {'type': 'park_position', 'bad_field': 123},
-    {'type': 'park_position', 'position': 'invalid'},
-    {'type': 'park_position', 'position': None},
-
-    {'type': 'agent'},
-    {'type': 'agent', 'agent_id': 'invalid'},
-    {'type': 'agent', 'agent_id': None},
-
-    {'type': 'bsfilter'},
-    {'type': 'bsfilter', 'filter_member_id': 'invalid'},
-    {'type': 'bsfilter', 'filter_member_id': None},
-
-    {'type': 'paging'},
-    {'type': 'paging', 'bad_field': 123},
-    {'type': 'paging', 'paging_id': 'invalid'},
-    {'type': 'paging', 'paging_id': None},
-
+    {'type': 'user'},
+    {'type': 'user', 'bad_field': 123},
+    {'type': 'user', 'user_id': 'string'},
+    {'type': 'user', 'user_id': None},
 ]
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -118,20 +118,20 @@ class BSFilterValidator(FuncKeyValidator):
 
 def build_validator():
     destination_validators = {
-        'user': [GetResource('user_id', user_dao.get, 'User')],
-        'group': [GetResource('group_id', group_dao.get, 'Group')],
-        'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
+        'agent': [GetResource('agent_id', agent_dao.get, 'Agent')],
+        'bsfilter': [ResourceExists('filter_member_id', call_filter_dao.member_exists, 'FilterMember')],
         'conference': [ResourceExists('conference_id', conference_dao.exists, 'Conference')],
         'custom': [CustomValidator()],
-        'service': [],
         'forward': [ForwardValidator()],
-        'transfer': [],
-        'agent': [GetResource('agent_id', agent_dao.get, 'Agent')],
-        'park_position': [ParkPositionValidator(feature_dao)],
-        'parking': [],
+        'group': [GetResource('group_id', group_dao.get, 'Group')],
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
-        'bsfilter': [ResourceExists('filter_member_id', call_filter_dao.member_exists, 'FilterMember')],
+        'park_position': [ParkPositionValidator(feature_dao)],
+        'parking': [],
+        'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
+        'service': [],
+        'transfer': [],
+        'user': [GetResource('user_id', user_dao.get, 'User')],
     }
 
     funckey_validator = FuncKeyModelValidator(destination_validators)

@@ -15,20 +15,20 @@ EXTEN_REGEX = r'[A-Z0-9+*]+'
 class BaseDestinationSchema(Schema):
     type = fields.String(
         validate=OneOf([
-            'user',
-            'group',
-            'queue',
+            'agent',
+            'bsfilter',
             'conference',
-            'paging',
-            'service',
             'custom',
             'forward',
-            'transfer',
+            'group',
+            'onlinerec',
+            'paging',
             'park_position',
             'parking',
-            'bsfilter',
-            'agent',
-            'onlinerec',
+            'queue',
+            'service',
+            'transfer',
+            'user',
         ]),
         required=True,
     )
@@ -199,20 +199,20 @@ class OnlineRecordingDestinationSchema(BaseDestinationSchema):
 class FuncKeyDestinationField(fields.Nested):
 
     destination_schemas = {
-        'user': UserDestinationSchema,
-        'group': GroupDestinationSchema,
-        'queue': QueueDestinationSchema,
+        'agent': AgentDestinationSchema,
+        'bsfilter': BSFilterDestinationSchema,
         'conference': ConferenceDestinationSchema,
-        'paging': PagingDestinationSchema,
-        'service': ServiceDestinationSchema,
         'custom': CustomDestinationSchema,
         'forward': ForwardDestinationSchema,
-        'transfer': TransferDestinationSchema,
+        'group': GroupDestinationSchema,
+        'onlinerec': OnlineRecordingDestinationSchema,
+        'paging': PagingDestinationSchema,
         'park_position': ParkPositionDestinationSchema,
         'parking': ParkingDestinationSchema,
-        'bsfilter': BSFilterDestinationSchema,
-        'agent': AgentDestinationSchema,
-        'onlinerec': OnlineRecordingDestinationSchema,
+        'queue': QueueDestinationSchema,
+        'service': ServiceDestinationSchema,
+        'transfer': TransferDestinationSchema,
+        'user': UserDestinationSchema,
     }
 
     def _deserialize(self, value, attr, data):

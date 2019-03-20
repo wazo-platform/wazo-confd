@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -35,20 +35,20 @@ from .schema import (
 )
 
 models_destination = {
-    'user': FuncKeyDestUser,
-    'group': FuncKeyDestGroup,
-    'queue': FuncKeyDestQueue,
+    'agent': FuncKeyDestAgent,
+    'bsfilter': FuncKeyDestBSFilter,
     'conference': FuncKeyDestConference,
-    'paging': FuncKeyDestPaging,
-    'service': FuncKeyDestService,
     'custom': FuncKeyDestCustom,
     'forward': FuncKeyDestForward,
-    'transfer': FuncKeyDestTransfer,
+    'group': FuncKeyDestGroup,
+    'onlinerec': FuncKeyDestOnlineRecording,
+    'paging': FuncKeyDestPaging,
     'park_position': FuncKeyDestParkPosition,
     'parking': FuncKeyDestParking,
-    'bsfilter': FuncKeyDestBSFilter,
-    'agent': FuncKeyDestAgent,
-    'onlinerec': FuncKeyDestOnlineRecording
+    'queue': FuncKeyDestQueue,
+    'service': FuncKeyDestService,
+    'transfer': FuncKeyDestTransfer,
+    'user': FuncKeyDestUser,
 }
 
 
