@@ -19,7 +19,6 @@ def test_get():
         'provision_http_port': 8667,
         'rest_ip': 'provd',
         'rest_https_port': 8666,
-        'dhcp_integration': False,
     }))
 
 
@@ -33,22 +32,6 @@ def test_put_minimal_parameters():
         'provision_http_port': 8667,
         'rest_ip': 'provd',
         'rest_https_port': 8666,
-        'dhcp_integration': False,
-    }
-    assert_that(response.item, has_entries(expected_response))
-
-    body = {
-        'dhcp_integration': True,
-    }
-    result = confd.provisioning.networking.put(body)
-    result.assert_status(204)
-    response = confd.provisioning.networking.get()
-    expected_response = {
-        'provision_ip': '',
-        'provision_http_port': 8667,
-        'rest_ip': 'provd',
-        'rest_https_port': 8666,
-        'dhcp_integration': True,
     }
     assert_that(response.item, has_entries(expected_response))
 
@@ -63,7 +46,6 @@ def test_put_minimal_parameters():
         'provision_http_port': 8667,
         'rest_ip': 'provd',
         'rest_https_port': 8666,
-        'dhcp_integration': True,
     }
     assert_that(response.item, has_entries(expected_response))
 
@@ -74,7 +56,6 @@ def test_put_all_parameters():
         'provision_http_port': 8665,
         'rest_ip': '127.0.0.1',
         'rest_https_port': 8664,
-        'dhcp_integration': True,
     }
     result = confd.provisioning.networking.put(body)
     result.assert_status(204)

@@ -4,7 +4,7 @@
 
 import socket
 
-from marshmallow import fields, post_load, validates
+from marshmallow import fields, validates
 from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema
@@ -16,7 +16,6 @@ class ProvisioningNetworkingSchema(BaseSchema):
     provision_http_port = fields.Integer(attribute='http_port')
     rest_ip = fields.String(attribute='net4_ip_rest')
     rest_https_port = fields.Integer(attribute='rest_port')
-    dhcp_integration = fields.Boolean(attribute='dhcp_integration')
 
     def _check_ip(self, field_name, ip):
         try:
@@ -31,9 +30,3 @@ class ProvisioningNetworkingSchema(BaseSchema):
     @validates('rest_ip')
     def check_rest_ip(self, value):
         self._check_ip('rest_ip', value)
-
-    @post_load
-    def to_db_model(self, data):
-        if 'dhcp_integration' in data:
-            data['dhcp_integration'] = int(data['dhcp_integration'])
-        return data

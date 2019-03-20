@@ -45,11 +45,3 @@ definitions:
       rest_https_port:
         type: integer
         description: The port used by the HTTPS REST API server.
-      dhcp_integration:
-        type: boolean
-        description: Enable or disable the DHCP integration.
-    required:
-      - provision_ip
-      - provision_http_port
-      - rest_ip
-      - rest_https_port

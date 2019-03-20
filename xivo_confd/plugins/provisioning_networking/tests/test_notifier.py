@@ -26,7 +26,6 @@ class TestProvisioningNetworkingNotifier(unittest.TestCase):
             'provision_http_port': 8666,
             'rest_ip': '2.3.4.5',
             'rest_https_port': 8667,
-            'dhcp_integration': True,
         }
 
         self.notifier.edited(provisioning_networking)
