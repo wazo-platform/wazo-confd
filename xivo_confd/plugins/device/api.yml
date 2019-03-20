@@ -200,6 +200,14 @@ definitions:
       version:
         type: string
         description: Firmware version
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
+      is_new:
+        type: boolean
+        description: Indicates if the device is a new device, ie in the master tenant
+        readOnly: true
   DeviceOptions:
     title: DeviceOptions
     description: List of standard keys
