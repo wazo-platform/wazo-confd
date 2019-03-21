@@ -14,6 +14,6 @@ class ProvisioningNetworkingService(object):
     def get(self):
         return provisioning_networking_dao.get()
 
-    def edit(self, form):
-        provisioning_networking_dao.update(form)
-        self.notifier.edited(form)
+    def edit(self, resource):
+        provisioning_networking_dao.update(resource)
+        self.notifier.edited(resource)

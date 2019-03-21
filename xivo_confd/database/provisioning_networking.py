@@ -10,7 +10,6 @@ def get():
     return Session.query(Provisioning).first()
 
 
-def update(provisioning_networking_form):
-    provisioning_networking = Session.query(Provisioning).first()
-    for name, value in provisioning_networking_form.iteritems():
-        setattr(provisioning_networking, name, value)
+def update(provisioning_networking):
+    Session.add(provisioning_networking)
+    Session.flush()
