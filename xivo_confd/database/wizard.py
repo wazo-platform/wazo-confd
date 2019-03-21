@@ -14,15 +14,6 @@ from xivo_dao.alchemy.staticsip import StaticSIP
 from xivo_dao.helpers.db_manager import Session
 
 
-def set_default_entity(display_name, name, tenant_uuid):
-    row = Entity(displayname=display_name, name=name, description='Wizard Entity', tenant_uuid=tenant_uuid)
-    Session.add(row)
-
-
-def entity_unique_name(display_name):
-    return ''.join(c for c in display_name if c.isalnum()).lower()
-
-
 def set_language(language):
 
     row = Session.query(StaticSIP).filter(StaticSIP.var_name == 'language').first()
@@ -75,19 +66,17 @@ def set_netiface(interface, address, netmask, gateway):
                          description='Wizard Configuration'))
 
 
-def set_context_switchboard(entity, tenant_uuid):
+def set_context_switchboard(tenant_uuid):
     Session.add(Context(name='__switchboard_directory',
                         displayname='Switchboard',
-                        entity=entity,
                         contexttype='others',
                         description='',
                         tenant_uuid=str(tenant_uuid)))
 
 
-def set_context_internal(context, entity, tenant_uuid):
+def set_context_internal(context, tenant_uuid):
     Session.add(Context(name='default',
                         displayname=context['display_name'],
-                        entity=entity,
                         contexttype='internal',
                         description='',
                         tenant_uuid=str(tenant_uuid)))
@@ -98,10 +87,9 @@ def set_context_internal(context, entity, tenant_uuid):
                                numberend=context['number_end']))
 
 
-def set_context_incall(context, entity, tenant_uuid):
+def set_context_incall(context, tenant_uuid):
     Session.add(Context(name='from-extern',
                         displayname=context['display_name'],
-                        entity=entity,
                         contexttype='incall',
                         description='',
                         tenant_uuid=str(tenant_uuid)))
@@ -140,15 +128,13 @@ def get_xivo_configured():
 
 def create(wizard, tenant_uuid):
     network = wizard['network']
-    entity = entity_unique_name(wizard['entity_name'])
 
-    set_default_entity(wizard['entity_name'], entity, tenant_uuid)
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
-    set_context_switchboard(entity, tenant_uuid)
-    set_context_incall(wizard['context_incall'], entity, tenant_uuid)
-    set_context_internal(wizard['context_internal'], entity, tenant_uuid)
-    set_context_outcall(wizard['context_outcall'], entity, tenant_uuid)
+    set_context_switchboard(tenant_uuid)
+    set_context_incall(wizard['context_incall'], tenant_uuid)
+    set_context_internal(wizard['context_internal'], tenant_uuid)
+    set_context_outcall(wizard['context_outcall'], tenant_uuid)
     include_outcall_context_in_internal_context()

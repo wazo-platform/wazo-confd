@@ -86,12 +86,11 @@ class WizardService(object):
             self.sysconfd.flush()
             self.sysconfd.exec_request_handlers({'ipbx': ['module reload res_pjsip.so']})
 
-        entity_display_name = wizard['entity_name']
-        entity_unique_name = wizard_db.entity_unique_name(entity_display_name)
+        tenant_name = unique_tenant_name(wizard['entity_name'])
         if wizard['steps']['tenant']:
-            self._initialize_tenant(tenant_uuid, entity_unique_name)
+            self._initialize_tenant(tenant_uuid, tenant_name)
         if wizard['steps']['phonebook']:
-            self._initialize_phonebook(entity_unique_name)
+            self._initialize_phonebook(tenant_name)
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
 
@@ -129,10 +128,9 @@ class WizardService(object):
             self.sysconfd.commonconf_apply()
             self.sysconfd.flush()
 
-    def _initialize_phonebook(self, entity):
+    def _initialize_phonebook(self, tenant_name):
         token = self._auth_client.token.new(expiration=60)['token']
-        phonebook = self._dird_client.phonebook.create(tenant=entity, phonebook_body=PHONEBOOK_BODY, token=token)
-        wizard_db.set_phonebook(entity, phonebook)
+        self._dird_client.phonebook.create(tenant=tenant_name, phonebook_body=PHONEBOOK_BODY, token=token)
 
     def _initialize_tenant(self, tenant_uuid, tenant_name):
         token = self._auth_client.token.new(expiration=60)['token']
@@ -278,3 +276,7 @@ def build_service(provd_client, auth_client, dird_client, tenant_dao, infos_dao)
         dird_client,
         sysconfd,
     )
+
+
+def unique_tenant_name(name):
+    return ''.join(c for c in name if c.isalnum()).lower()
