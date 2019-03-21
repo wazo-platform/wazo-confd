@@ -169,6 +169,10 @@ definitions:
         type: string
         description: The name of the line
         readOnly: true
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
   LineRelationEndpoints:
     properties:
       endpoint_sip:
