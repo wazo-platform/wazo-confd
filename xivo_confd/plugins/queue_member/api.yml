@@ -22,7 +22,7 @@ paths:
         '200':
           description: Agent and Queue associated
           schema:
-            $ref: '#/definitions/AgentQueue'
+            $ref: '#/definitions/QueueMemberAgentLegacy'
         '400':
           $ref: '#/responses/GenericError'
         '404':
