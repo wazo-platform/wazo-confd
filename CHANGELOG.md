@@ -8,7 +8,7 @@ Changelog
 
   * `is_new`
 
-* The `cti_profile_name` and `cti_profile_enabled` fields have been removed from the `/1.1/users/import` resource.
+* The `cti_profile_name`, `cti_profile_enabled` and `entity` fields have been removed from the `/1.1/users/import` resource.
 * The `/1.1/users/import` will now create the users in the creator's tenant or the specified tenant.
 
 

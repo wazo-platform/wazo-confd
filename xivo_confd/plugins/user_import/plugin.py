@@ -7,7 +7,6 @@ from collections import OrderedDict
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
-from xivo_dao.resources.entity import dao as entity_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.line import dao as line_dao
@@ -24,7 +23,6 @@ from xivo_confd.plugins.call_permission.service import build_service as build_ca
 from xivo_confd.plugins.context.service import build_service as build_context_service
 from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
-from xivo_confd.plugins.entity.service import build_service as build_entity_service
 from xivo_confd.plugins.extension.service import build_service as build_extension_service
 from xivo_confd.plugins.incall.service import build_service as build_incall_service
 from xivo_confd.plugins.incall_extension.service import build_service as build_incall_extension_service
@@ -33,14 +31,12 @@ from xivo_confd.plugins.line_endpoint.service import build_service as build_le_s
 from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 from xivo_confd.plugins.user.service import build_service as build_user_service
 from xivo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
-from xivo_confd.plugins.user_entity.service import build_service as build_user_entity_service
 from xivo_confd.plugins.user_line.service import build_service as build_ul_service
 from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
 from xivo_confd.plugins.voicemail.service import build_service as build_voicemail_service
 
 from .associators import (
     CallPermissionAssociator,
-    EntityAssociator,
     ExtensionAssociator,
     IncallAssociator,
     LineAssociator,
@@ -52,7 +48,6 @@ from .associators import (
 from .creators import (
     CallPermissionCreator,
     ContextCreator,
-    EntityCreator,
     ExtensionCreator,
     IncallCreator,
     LineCreator,
@@ -82,7 +77,6 @@ class Plugin(object):
 
         user_service = build_user_service(provd_client)
         wazo_user_service = build_wazo_user_service()
-        entity_service = build_entity_service()
         user_voicemail_service = build_uv_service()
         voicemail_service = build_voicemail_service()
         line_service = build_line_service(provd_client)
@@ -92,7 +86,6 @@ class Plugin(object):
         line_sccp_service = build_le_service(provd_client, 'sccp', sccp_service)
         extension_service = build_extension_service(provd_client)
         user_line_service = build_ul_service()
-        user_entity_service = build_user_entity_service()
         line_extension_service = build_line_extension_service()
         call_permission_service = build_call_permission_service()
         user_call_permission_service = build_user_call_permission_service()
@@ -103,7 +96,6 @@ class Plugin(object):
         creators = {
             'user': UserCreator(user_service),
             'wazo_user': WazoUserCreator(wazo_user_service),
-            'entity': EntityCreator(entity_service),
             'line': LineCreator(line_service),
             'voicemail': VoicemailCreator(voicemail_service),
             'sip': SipCreator(sip_service),
@@ -118,7 +110,6 @@ class Plugin(object):
         entry_creator = EntryCreator(creators)
 
         associators = OrderedDict([
-            ('entity', EntityAssociator(user_entity_service)),
             ('wazo_user', WazoUserAssociator(wazo_user_service)),
             ('voicemail', VoicemailAssociator(user_voicemail_service)),
             ('sip', SipAssociator(line_sip_service)),
@@ -134,7 +125,6 @@ class Plugin(object):
 
         entry_finder = EntryFinder(
             user_dao,
-            entity_dao,
             voicemail_dao,
             user_voicemail_dao,
             line_dao,

@@ -109,10 +109,6 @@ class CsvRow(object):
         UnicodeRule('context', 'context'),
     )
 
-    ENTITY_RULES = (
-        IntRule('entity_id', 'id'),
-    )
-
     VOICEMAIL_RULES = (
         UnicodeRule('voicemail_name', 'name'),
         UnicodeRule('voicemail_number', 'number'),
@@ -166,7 +162,6 @@ class CsvRow(object):
         return {
             'user': self.parse_rules(self.USER_RULES),
             'wazo_user': self.parse_rules(self.WAZO_USER_RULES),
-            'entity': self.parse_rules(self.ENTITY_RULES),
             'voicemail': self.parse_rules(self.VOICEMAIL_RULES),
             'line': self.parse_rules(self.LINE_RULES),
             'sip': self.parse_rules(self.SIP_RULES),
