@@ -205,17 +205,33 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
     ))
 
 
-@fixtures.csv_entry(
-    voicemail=True,
-    extension=True,
-    incall=True,
-    call_permissions=1,
-    line_protocol='sip',
-)
-def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tenant(entry):
-    user_uuid = entry['user_uuid']
+@fixtures.call_permission()
+def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tenant(call_permission):
+    number = h.voicemail.find_available_number(config.CONTEXT)
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
+    csv = [{
+        "firstname": "Bobby",
+        "entity_id": "1",
 
-    user = confd.users(user_uuid).get().item
+        "voicemail_name": "Bobby VM",
+        "voicemail_number": number,
+        "voicemail_context": config.CONTEXT,
+
+        "exten": exten,
+        "context": config.CONTEXT,
+        "line_protocol": "sip",
+
+        "incall_exten": incall_exten,
+        "incall_context": config.INCALL_CONTEXT,
+
+        "call_permissions": call_permission['name'],
+    }]
+
+    response = client.post("/users/import", csv)
+    entry = response.item['created'][0]
+
+    user = confd.users(entry['user_uuid']).get().item
     assert_that(user, has_entries(
         tenant_uuid=config.MAIN_TENANT,
     ))
