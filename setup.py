@@ -48,7 +48,6 @@ setup(
             'endpoint_iax = xivo_confd.plugins.endpoint_iax.plugin:Plugin',
             'endpoint_sccp = xivo_confd.plugins.endpoint_sccp.plugin:Plugin',
             'endpoint_sip = xivo_confd.plugins.endpoint_sip.plugin:Plugin',
-            'entity = xivo_confd.plugins.entity.plugin:Plugin',
             'extension = xivo_confd.plugins.extension.plugin:Plugin',
             'extension_feature = xivo_confd.plugins.extension_feature.plugin:Plugin',
             'features = xivo_confd.plugins.features.plugin:Plugin',
