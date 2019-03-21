@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -72,9 +72,8 @@ class ExportService(object):
         for user in users:
             wazo_user = wazo_users[user['uuid']]
             user['username'] = wazo_user['username']
-            user['cti_profile_enabled'] = '1' if wazo_user['enabled'] else '0'
 
-        csv_header = csv_header + ('username', 'cti_profile_enabled')
+        csv_header = csv_header + ('username',)
 
         return csv_header, users
 

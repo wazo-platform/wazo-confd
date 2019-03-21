@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -86,10 +86,6 @@ def make_entry(params):
         exten = extension.find_available_exten(config.INCALL_CONTEXT)
         entry['incall_exten'] = params.get('incall_exten', exten)
         entry['incall_context'] = params.get('incall_context', config.INCALL_CONTEXT)
-
-    if params.get('cti_profile'):
-        entry['cti_profile_enabled'] = params.get('cti_profile_enabled', '1')
-        entry['cti_profile_name'] = params.get('cti_profile_name', 'Client')
 
     nb_permissions = params.pop('call_permissions', 0)
     if nb_permissions > 0:

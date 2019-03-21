@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import time
@@ -105,6 +105,10 @@ class CsvRow(object):
         IntRule('simultaneous_calls', 'simultaneous_calls'),
     )
 
+    CONTEXT_RULES = (
+        UnicodeRule('context', 'context'),
+    )
+
     ENTITY_RULES = (
         IntRule('entity_id', 'id'),
     )
@@ -135,10 +139,6 @@ class CsvRow(object):
         UnicodeRule('context', 'context'),
     )
 
-    CTI_PROFILE_RULES = (
-        UnicodeRule('cti_profile_name', 'name'),
-    )
-
     INCALL_RULES = (
         UnicodeRule('incall_exten', 'exten'),
         UnicodeRule('incall_context', 'context'),
@@ -156,8 +156,6 @@ class CsvRow(object):
         UnicodeRule('email', 'email_address'),
         UnicodeRule('username', 'username'),
         UnicodeRule('password', 'password'),
-        BooleanRule('cti_profile_enabled', 'enabled'),
-
     )
 
     def __init__(self, fields, position):
@@ -174,10 +172,10 @@ class CsvRow(object):
             'sip': self.parse_rules(self.SIP_RULES),
             'extension_incall': self.parse_rules(self.INCALL_RULES),
             'incall': self.parse_rules(self.INCALL_RULES),
-            'cti_profile': self.parse_rules(self.CTI_PROFILE_RULES),
             'extension': self.parse_rules(self.EXTENSION_RULES),
             'call_permissions': self.parse_rules(self.CALL_PERMISSION_RULES),
             'sccp': {},
+            'context': self.parse_rules(self.CONTEXT_RULES),
         }
 
     def parse_rules(self, rules):

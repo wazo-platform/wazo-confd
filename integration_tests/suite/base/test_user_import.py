@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -205,12 +205,103 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
     ))
 
 
+@fixtures.call_permission()
+def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tenant(call_permission):
+    number = h.voicemail.find_available_number(config.CONTEXT)
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
+    csv = [{
+        "firstname": "Bobby",
+        "entity_id": "1",
+
+        "voicemail_name": "Bobby VM",
+        "voicemail_number": number,
+        "voicemail_context": config.CONTEXT,
+
+        "exten": exten,
+        "context": config.CONTEXT,
+        "line_protocol": "sip",
+
+        "incall_exten": incall_exten,
+        "incall_context": config.INCALL_CONTEXT,
+
+        "call_permissions": call_permission['name'],
+    }]
+
+    response = client.post("/users/import", csv)
+    entry = response.item['created'][0]
+
+    user = confd.users(entry['user_uuid']).get().item
+    assert_that(user, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    line = confd.lines(entry['line_id']).get().item
+    assert_that(line, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    voicemail = confd.voicemails(entry['voicemail_id']).get().item
+    assert_that(voicemail, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    extension = confd.extensions(entry['extension_id']).get().item
+    assert_that(extension, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    sip_endpoint = confd.endpoints.sip(entry['sip_id']).get().item
+    assert_that(sip_endpoint, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    incall_extension = confd.extensions(entry['incall_extension_id']).get().item
+    assert_that(incall_extension, has_entries(
+        tenant_uuid=config.MAIN_TENANT,
+    ))
+
+    for call_permission_id in entry['call_permission_ids']:
+        call_permission = confd.callpermissions(call_permission_id).get().item
+        assert_that(call_permission, has_entries(
+            tenant_uuid=config.MAIN_TENANT,
+        ))
+
+
+def test_given_an_unknown_context_then_error_returned():
+    csv = [{'firstname': 'foo',
+            'context': 'unknowncontext',
+            "line_protocol": "sip"}]
+
+    response = client.post('/users/import', csv)
+    assert_error(response, has_error_field('Context was not found'))
+
+
+@fixtures.context(wazo_tenant=config.SUB_TENANT)
+def test_given_context_in_another_tenant_then_error_returned(context):
+    csv = [{'firstname': 'foo',
+            'context': context['name'],
+            "line_protocol": "sip"}]
+
+    response = client.post('/users/import', csv)
+    assert_error(response, has_error_field('Context was not found'))
+
+
 def test_given_csv_column_has_wrong_type_then_error_returned():
     csv = [{'firstname': 'invalidbool',
             'supervision_enabled': 'yeah'}]
 
     response = client.post("/users/import", csv)
     assert_error(response, has_error_field('supervision_enabled'))
+
+
+@fixtures.entity(wazo_tenant=config.SUB_TENANT)
+def test_given_the_specified_entity_is_in_another_tenant(entity):
+    csv = [{'firstname': 'Alice',
+            'entity_id': entity['id']}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('Entity was not found'))
 
 
 def test_given_user_contains_error_then_error_returned():
@@ -395,7 +486,7 @@ def test_given_csv_extension_has_errors_then_errors_returned():
             "context": "invalid"}]
 
     response = client.post("/users/import", csv)
-    assert_error(response, has_error_field('context'))
+    assert_error(response, has_error_field('Context was not found'))
 
 
 def test_given_csv_has_minimal_incall_fields_then_incall_created():
@@ -438,19 +529,14 @@ def test_given_csv_incall_has_errors_then_errors_returned():
     assert_error(response, has_error_field('context'))
 
 
-def test_given_csv_has_cti_fields_then_cti_profile_associated():
-    csv = [{"firstname": "Thômas",
-            "username": "thomas1",
-            "password": "secret",
-            "cti_profile_enabled": "1",
-            "cti_profile_name": "Client"}]
+@fixtures.context(type='incall', wazo_tenant=config.SUB_TENANT)
+def test_given_csv_incall_in_other_context_then_errors_returned(incall):
+    csv = [{"firstname": "Géorge",
+            "incall_exten": "9999",
+            "incall_context": incall['name']}]
 
     response = client.post("/users/import", csv)
-    cti_profile_id = get_import_field(response, 'cti_profile_id')
-    user_id = get_import_field(response, 'user_id')
-
-    response = confd.users(user_id).cti.get()
-    assert_that(response.item, has_entries(cti_profile_id=cti_profile_id))
+    assert_error(response, has_error_field('context'))
 
 
 def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
@@ -458,8 +544,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
             "lastname": "dakin",
             "username": "thomas1",
             "password": "secret",
-            "email": "thom.dak@user-import.com",
-            "cti_profile_enabled": "0"}]
+            "email": "thom.dak@user-import.com"}]
 
     response = client.post("/users/import", csv)
     user_uuid = get_import_field(response, 'user_uuid')
@@ -471,11 +556,10 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
         lastname="dakin",
         username="thomas1",
         emails=contains(has_entries(address="thom.dak@user-import.com")),
-        enabled=False,
     ))
 
 
-@fixtures.csv_entry(cti_profile=True)
+@fixtures.csv_entry()
 def test_update_wazo_user_fields_then_wazo_user_updated(entry):
     user_uuid = entry["user_uuid"]
     csv = [{"uuid": user_uuid,
@@ -483,8 +567,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
             "lastname": "user-import",
             "username": "user-import",
             "email": "user-import@user-import.com",
-            "password": "user-import",
-            "cti_profile_enabled": "0"}]
+            "password": "user-import"}]
 
     response = client.put("/users/import", csv)
     response.assert_ok()
@@ -496,7 +579,6 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
         lastname="user-import",
         username="user-import",
         emails=contains(has_entries(address="user-import@user-import.com")),
-        enabled=False,
     ))
 
 
@@ -551,17 +633,6 @@ def test_given_csv_has_error_then_wazo_user_deleted():
     assert_that(wazo_user['items'], is_not(has_items(has_entries(firstname=unique_firstname))))
 
 
-def test_given_csv_cti_profile_has_errors_then_errors_returned():
-    csv = [{"firstname": "Thômas",
-            "username": "thomas2",
-            "password": "secret",
-            "cti_profile_enabled": "1",
-            "cti_profile_name": "InvalidProfile"}]
-
-    response = client.post("/users/import", csv)
-    assert_error(response, has_error_field('CtiProfile'))
-
-
 @fixtures.call_permission()
 def test_given_csv_has_call_permission_then_call_permission_associated(call_permission):
     csv = [{"firstname": "Gërtrüde",
@@ -612,6 +683,15 @@ def test_given_call_permission_does_not_exist_then_error_raised():
     assert_error(response, has_error_field('CallPermission'))
 
 
+@fixtures.call_permission(wazo_tenant=config.SUB_TENANT)
+def test_given_call_permission_in_other_tenant_then_error_raised(permission):
+    csv = [{"firstname": "Trévor",
+            "call_permissions": permission['name']}]
+
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('CallPermission'))
+
+
 def test_given_csv_has_all_resources_then_all_relations_created():
     exten = h.extension.find_available_exten(config.CONTEXT)
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
@@ -627,7 +707,6 @@ def test_given_csv_has_all_resources_then_all_relations_created():
         "voicemail_name": "francois",
         "voicemail_number": vm_number,
         "voicemail_context": config.CONTEXT,
-        "cti_profile_name": "Client",
     }]
 
     response = client.post("/users/import", csv)
@@ -638,7 +717,6 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     extension_id = get_import_field(response, 'extension_id')
     extension_incall_id = get_import_field(response, 'incall_extension_id')
     sip_id = get_import_field(response, 'sip_id')
-    cti_profile_id = get_import_field(response, 'cti_profile_id')
 
     response = confd.users(user_id).lines.get()
     assert_that(response.items, contains(has_entries(line_id=line_id)))
@@ -656,18 +734,14 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     assert_that(response.item, has_entries(endpoint='sip',
                                            endpoint_id=sip_id))
 
-    response = confd.users(user_id).cti.get()
-    assert_that(response.item, has_entries(cti_profile_id=cti_profile_id))
-
 
 @fixtures.sip()
 @fixtures.extension()
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.voicemail()
 @fixtures.call_permission()
-@fixtures.cti_profile()
 def test_given_resources_already_exist_when_importing_then_resources_associated(
-    sip, extension, extension_incall, voicemail, call_permission, cti_profile
+    sip, extension, extension_incall, voicemail, call_permission,
 ):
     csv = [{
         "firstname": "importassociate",
@@ -679,7 +753,6 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
         "incall_context": extension_incall['context'],
         "voicemail_number": voicemail['number'],
         "voicemail_context": voicemail['context'],
-        "cti_profile_name": cti_profile['name'],
         "call_permissions": call_permission['name'],
         "entity_id": "1",
     }]
@@ -705,9 +778,6 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     response = confd.lines(line_id).endpoints.sip.get()
     assert_that(response.item, has_entries(endpoint='sip',
                                            endpoint_id=sip['id']))
-
-    response = confd.users(user_id).cti.get()
-    assert_that(response.item, has_entries(cti_profile_id=cti_profile['id']))
 
     response = confd.users(user_id).callpermissions.get()
     assert_that(response.items, contains(has_entries(call_permission_id=call_permission['id'],
@@ -764,8 +834,6 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
             "voicemail_attach_audio": "1",
             "voicemail_delete_messages": "1",
             "voicemail_ask_password": "1",
-            "cti_profile_name": "Client",
-            "cti_profile_enabled": "1",
             "username": "jean",
             "password": "secret",
             "call_permissions": perm1['name']
@@ -802,8 +870,6 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
             "voicemail_attach_audio": "1",
             "voicemail_delete_messages": "1",
             "voicemail_ask_password": "1",
-            "cti_profile_name": "Client",
-            "cti_profile_enabled": "1",
             "username": "moussa2",
             "password": "secret",
             "call_permissions": perm2['name']
@@ -816,12 +882,6 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
 
 
 def test_given_field_group_is_empty_then_resource_is_not_created():
-    group = {"cti_profile_enabled": "",
-             "cti_profile_name": "",
-             "username": "",
-             "password": ""}
-    yield import_empty_group, group, 'cti_profile_id'
-
     group = {"voicemail_name": "",
              "voicemail_number": "",
              "voicemail_context": "",
@@ -1144,34 +1204,6 @@ def test_when_adding_incall_then_incall_created(entry):
                                        context=config.INCALL_CONTEXT))
 
 
-@fixtures.csv_entry(cti_profile=True,
-                    cti_profile_name="Client")
-@fixtures.cti_profile()
-def test_when_updating_cti_profile_fields_then_cti_profile_updated(entry, cti_profile):
-    csv = [{"uuid": entry['user_uuid'],
-            "cti_profile_name": cti_profile['name']}]
-
-    response = client.put("/users/import", csv)
-    user_id = get_update_field(response, 'user_id')
-
-    user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id']))
-
-
-@fixtures.csv_entry()
-@fixtures.cti_profile()
-def test_when_adding_cti_profile_fields_then_cti_profile_added(entry, cti_profile):
-    csv = [{"uuid": entry['user_uuid'],
-            "cti_profile_name": cti_profile['name'],
-            "cti_profile_enabled": "1"}]
-
-    response = client.put("/users/import", csv)
-    user_id = get_update_field(response, 'user_id')
-
-    user_cti_profile = confd.users(user_id).cti.get().item
-    assert_that(user_cti_profile, has_entries(cti_profile_id=cti_profile['id']))
-
-
 @fixtures.csv_entry(call_permissions=2)
 @fixtures.call_permission()
 @fixtures.call_permission()
@@ -1244,16 +1276,14 @@ def check_error_on_update(entry, fields, error):
 
 
 def test_given_csv_has_errors_then_errors_returned():
-    with fixtures.csv_entry(voicemail=True, incall=True,
-                            cti_profile=True, line_protocol="sip") as entry:
+    with fixtures.csv_entry(voicemail=True, incall=True, line_protocol="sip") as entry:
         yield check_error_on_update, entry, {'firstname': ''}, 'firstname'
         yield check_error_on_update, entry, {'voicemail_number': '^]'}, 'number'
         yield check_error_on_update, entry, {'sip_username': '^]'}, 'name'
-        yield check_error_on_update, entry, {'cti_profile_name': '^]'}, 'CtiProfile'
 
 
-@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sip")
-@fixtures.csv_entry(extension=True, voicemail=True, incall=True, cti_profile=True, line_protocol="sccp")
+@fixtures.csv_entry(extension=True, voicemail=True, incall=True, line_protocol="sip")
+@fixtures.csv_entry(extension=True, voicemail=True, incall=True, line_protocol="sccp")
 def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
     exten1 = h.extension.find_available_exten(config.CONTEXT)
     incall_exten1 = h.extension.find_available_exten(config.INCALL_CONTEXT)
@@ -1298,8 +1328,6 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
             "voicemail_attach_audio": "1",
             "voicemail_delete_messages": "1",
             "voicemail_ask_password": "1",
-            "cti_profile_name": "Agent",
-            "cti_profile_enabled": "1",
             "username": "george",
             "password": "secret"
         },
@@ -1335,8 +1363,6 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
             "voicemail_attach_audio": "1",
             "voicemail_delete_messages": "1",
             "voicemail_ask_password": "1",
-            "cti_profile_name": "Agent",
-            "cti_profile_enabled": "1",
             "username": "moussa1",
             "password": "secret"
         },
@@ -1351,7 +1377,6 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
             line_id=entry1['line_id'],
             extension_id=entry1['extension_id'],
             voicemail_id=entry1['voicemail_id'],
-            cti_profile_id=entry1['cti_profile_id'],
             sip_id=entry1['sip_id'],
             incall_extension_id=entry1['incall_extension_id']
         ),
@@ -1360,7 +1385,6 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
             line_id=entry2['line_id'],
             extension_id=entry2['extension_id'],
             voicemail_id=entry2['voicemail_id'],
-            cti_profile_id=entry2['cti_profile_id'],
             sccp_id=entry2['sccp_id'],
             incall_extension_id=entry2['incall_extension_id']
         ),
@@ -1391,7 +1415,6 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
         "incall_context": extension_incall['context'],
         "voicemail_number": voicemail['number'],
         "voicemail_context": voicemail['context'],
-        "cti_profile_name": "Client",
         "call_permissions": call_permission['name'],
     }]
 
@@ -1415,9 +1438,6 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     assert_that(response.item, has_entries(endpoint='sip',
                                            endpoint_id=entry['sip_id']))
 
-    response = confd.users(entry['user_id']).cti.get()
-    assert_that(response.item, has_entries(cti_profile_id=entry['cti_profile_id']))
-
     response = confd.users(entry['user_id']).callpermissions.get()
     assert_that(response.items, contains_inanyorder(has_entries(call_permission_id=call_permission['id'],
                                                                 user_id=entry['user_id'])))
@@ -1426,7 +1446,6 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
 @fixtures.csv_entry(extension=True,
                     voicemail=True,
                     incall=True,
-                    cti_profile=True,
                     line_protocol="sip",
                     call_permissions=1)
 @fixtures.call_permission()
@@ -1468,8 +1487,6 @@ def test_given_each_field_updated_individually_then_entry_updated(entry, call_pe
         "voicemail_attach_audio": "1",
         "voicemail_delete_messages": "1",
         "voicemail_ask_password": "1",
-        "cti_profile_name": "Agent",
-        "cti_profile_enabled": "1",
         "username": "fabien",
         "call_permissions": call_permission['name'],
         "password": "secret"

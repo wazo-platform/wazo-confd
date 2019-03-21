@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -76,6 +76,7 @@ class WazoUserCreator(Creator):
 
     def create(self, fields, tenant_uuid):
         fields = self.schema(handle_error=False, strict=True).load(fields).data
+        fields['tenant_uuid'] = tenant_uuid
         # We need to have user_uuid on create, so the real create is on associate
         return fields
 
@@ -91,12 +92,26 @@ class WazoUserCreator(Creator):
             model['emails'] = [email] if email else []
 
 
+class ContextCreator(Creator):
+
+    def find(self, fields, tenant_uuid):
+        name = fields.get('context')
+        if name:
+            return self.service.get_by(tenant_uuids=[tenant_uuid], name=name)
+
+    def create(self, fields, tenant_uuid):
+        return None
+
+    def update(self, fields, model):
+        pass
+
+
 class EntityCreator(Creator):
 
     def find(self, fields, tenant_uuid):
         entity_id = fields.get('id')
         if entity_id:
-            return self.service.get_by(id=entity_id)
+            return self.service.get_by(tenant_uuids=[tenant_uuid], id=entity_id)
 
     def create(self, fields, tenant_uuid):
         return None
@@ -194,30 +209,6 @@ class ExtensionCreator(Creator):
             return self.service.create(Extension(**form), tenant_uuids=tenant_uuids)
 
 
-class CtiProfileCreator(Creator):
-
-    def __init__(self, dao):
-        self.dao = dao
-
-    def find(self, fields, tenant_uuid):
-        name = fields.get('name')
-        if name:
-            try:
-                cti_profile_id = self.dao.get_id_by_name(name)
-                return self.dao.get(cti_profile_id)
-            except NotFoundError:
-                return None
-
-    def update(self, fields, resource):
-        pass
-
-    def create(self, fields, tenant_uuid):
-        name = fields.get('name')
-        if name:
-            cti_profile_id = self.dao.get_id_by_name(name)
-            return self.dao.get(cti_profile_id)
-
-
 class ExtensionIncallCreator(Creator):
 
     def find(self, fields, tenant_uuid):
@@ -278,7 +269,7 @@ class CallPermissionCreator(Creator):
     def find(self, fields, tenant_uuid):
         names = fields.get('names')
         if names is not None:
-            return [self.service.get_by(name=name) for name in names]
+            return [self.service.get_by(tenant_uuids=[tenant_uuid], name=name) for name in names]
 
     def create(self, fields, tenant_uuid):
         return self.find(fields, tenant_uuid)
