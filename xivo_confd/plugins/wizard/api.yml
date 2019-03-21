@@ -82,7 +82,7 @@ definitions:
         description: The language in which the Wazo will play sounds
       entity_name:
         type: string
-        description: Name of the default entity (e.g. company name or last name)
+        description: Name of the first tenant on this engine
       network:
         $ref: '#/definitions/WizardNetwork'
       context_incall:
