@@ -21,6 +21,7 @@ def build_converters():
         'custom': CustomConverter(),
         'forward': ForwardConverter(extension_dao_module),
         'group': GroupConverter(extension_dao_module),
+        'groupmember': GroupMemberConverter(extension_dao_module),
         'onlinerec': OnlineRecordingConverter(features_dao_module),
         'paging': PagingConverter(extension_dao_module, paging_dao_module),
         'park_position': ParkPositionConverter(),
@@ -113,6 +114,23 @@ class GroupConverter(FuncKeyConverter):
 
     def determine_type(self, funckey):
         return 'speeddial'
+
+
+class GroupMemberConverter(FuncKeyConverter):
+
+    def __init__(self, extension_dao):
+        self.extension_dao = extension_dao
+
+    def build(self, user, line, position, funckey):
+        prog_exten = self.extension_dao.get_by(type='extenfeatures', typeval='phoneprogfunckey')
+        action_exten = self.extension_dao.get(funckey.destination.extension_id)
+
+        value = self.progfunckey(prog_exten.exten,
+                                 user.id,
+                                 action_exten.exten,
+                                 funckey.destination.group_id)
+
+        return self.provd_funckey(line, position, funckey, value)
 
 
 class QueueConverter(FuncKeyConverter):

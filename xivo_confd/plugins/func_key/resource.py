@@ -15,6 +15,7 @@ from xivo_dao.alchemy.func_key_dest_features import (
 )
 from xivo_dao.alchemy.func_key_dest_forward import FuncKeyDestForward
 from xivo_dao.alchemy.func_key_dest_group import FuncKeyDestGroup
+from xivo_dao.alchemy.func_key_dest_group_member import FuncKeyDestGroupMember
 from xivo_dao.alchemy.func_key_dest_paging import FuncKeyDestPaging
 from xivo_dao.alchemy.func_key_dest_park_position import FuncKeyDestParkPosition
 from xivo_dao.alchemy.func_key_dest_queue import FuncKeyDestQueue
@@ -41,6 +42,7 @@ models_destination = {
     'custom': FuncKeyDestCustom,
     'forward': FuncKeyDestForward,
     'group': FuncKeyDestGroup,
+    'groupmember': FuncKeyDestGroupMember,
     'onlinerec': FuncKeyDestOnlineRecording,
     'paging': FuncKeyDestPaging,
     'park_position': FuncKeyDestParkPosition,

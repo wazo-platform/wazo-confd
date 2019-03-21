@@ -63,6 +63,14 @@ invalid_destinations = [
     {'type': 'group', 'group_id': 'string'},
     {'type': 'group', 'group_id': None},
 
+    {'type': 'groupmember'},
+    {'type': 'groupmember', 'action': 'join', 'bad_field': 123},
+    {'type': 'groupmember', 'action': 'join', 'group_id': 'string'},
+    {'type': 'groupmember', 'action': 'join', 'group_id': None},
+    {'type': 'groupmember', 'action': 123, 'group_id': 123},
+    {'type': 'groupmember', 'action': None, 'group_id': 123},
+    {'type': 'groupmember', 'action': 'unknown', 'group_id': 123},
+
     {'type': 'paging'},
     {'type': 'paging', 'bad_field': 123},
     {'type': 'paging', 'paging_id': 'invalid'},
@@ -244,6 +252,12 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                    'value': '*37{member_id}'.format(member_id=filter_member_id)},
             '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
             '31': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
+            '32': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***251*{group_id}'.format(user_id=self.user['id'], group_id=group_id)},
+            '33': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***252*{group_id}'.format(user_id=self.user['id'], group_id=group_id)},
+            '34': {'label': '', 'type': 'speeddial', 'line': 1,
+                   'value': '*735{user_id}***250*{group_id}'.format(user_id=self.user['id'], group_id=group_id)},
         }
 
         self.confd_funckeys = {
@@ -278,6 +292,9 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
             '29': {'blf': False, 'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
             '30': {'blf': False, 'destination': {'type': 'onlinerec'}},
             '31': {'blf': False, 'destination': {'type': 'service', 'service': 'fwdundoall'}},
+            '32': {'blf': False, 'destination': {'type': 'groupmember', 'action': 'join', 'group_id': group_id}},
+            '33': {'blf': False, 'destination': {'type': 'groupmember', 'action': 'leave', 'group_id': group_id}},
+            '34': {'blf': False, 'destination': {'type': 'groupmember', 'action': 'toggle', 'group_id': group_id}},
         }
 
         self.exclude_for_template = ['23', '24', '25', '29']
@@ -609,6 +626,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         super(TestBlfFuncKeys, self).setUp()
 
         user_exten = '1000'
+        group_exten = '2000'
         conf_exten = '4000'
         forward_number = '5000'
         custom_exten = '9999'
@@ -619,6 +637,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             agent_id = queries.insert_agent(self.user['id'])
             filter_member_id = queries.insert_filter_member(callfilter_id, self.user['id'])
+            group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
 
         self.confd_funckeys = {
             '1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
@@ -637,6 +656,9 @@ class TestBlfFuncKeys(BaseTestFuncKey):
             '25': {'destination': {'type': 'agent', 'action': 'toggle', 'agent_id': agent_id}},
             '26': {'destination': {'type': 'park_position', 'position': park_pos}},
             '29': {'destination': {'type': 'bsfilter', 'filter_member_id': filter_member_id}},
+            '32': {'destination': {'type': 'groupmember', 'action': 'join', 'group_id': group_id}},
+            '33': {'destination': {'type': 'groupmember', 'action': 'leave', 'group_id': group_id}},
+            '34': {'destination': {'type': 'groupmember', 'action': 'toggle', 'group_id': group_id}},
         }
 
         self.provd_funckeys = {
@@ -668,6 +690,12 @@ class TestBlfFuncKeys(BaseTestFuncKey):
             '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
             '29': {'label': '', 'type': 'blf', 'line': 1,
                    'value': '*37{member_id}'.format(member_id=filter_member_id)},
+            '32': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***251*{group_id}'.format(user_id=self.user['id'], group_id=group_id)},
+            '33': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***252*{group_id}'.format(user_id=self.user['id'], group_id=group_id)},
+            '34': {'label': '', 'type': 'blf', 'line': 1,
+                   'value': '*735{user_id}***250*{group_id}'.format(user_id=self.user['id'], group_id=group_id)},
         }
 
     def test_when_creating_funckey_then_blf_activated_by_default(self):

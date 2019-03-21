@@ -21,6 +21,7 @@ class BaseDestinationSchema(Schema):
             'custom',
             'forward',
             'group',
+            'groupmember',
             'onlinerec',
             'paging',
             'park_position',
@@ -101,6 +102,12 @@ class GroupDestinationSchema(BaseDestinationSchema):
 
         data.pop('group', None)
         return data
+
+
+class GroupMemberDestinationSchema(BaseDestinationSchema):
+    group_id = fields.Integer(required=True)
+    action = fields.String(validate=OneOf(['join', 'leave', 'toggle']),
+                           required=True)
 
 
 class QueueDestinationSchema(BaseDestinationSchema):
@@ -205,6 +212,7 @@ class FuncKeyDestinationField(fields.Nested):
         'custom': CustomDestinationSchema,
         'forward': ForwardDestinationSchema,
         'group': GroupDestinationSchema,
+        'groupmember': GroupMemberDestinationSchema,
         'onlinerec': OnlineRecordingDestinationSchema,
         'paging': PagingDestinationSchema,
         'park_position': ParkPositionDestinationSchema,

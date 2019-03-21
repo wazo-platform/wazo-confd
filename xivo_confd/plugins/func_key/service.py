@@ -20,6 +20,7 @@ class TemplateService(object):
         'conference',
         'custom',
         'forward',
+        'groupmember',
         'park_position',
         'user',
     )

@@ -124,6 +124,7 @@ def build_validator():
         'custom': [CustomValidator()],
         'forward': [ForwardValidator()],
         'group': [GetResource('group_id', group_dao.get, 'Group')],
+        'groupmember': [GetResource('group_id', group_dao.get, 'Group')],
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
         'park_position': [ParkPositionValidator(feature_dao)],
