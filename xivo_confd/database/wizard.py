@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.context import Context
 from xivo_dao.alchemy.contextinclude import ContextInclude
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
-from xivo_dao.alchemy.cti_contexts import CtiContexts
-from xivo_dao.alchemy.ctidirectories import CtiDirectories
-from xivo_dao.alchemy.ctidirectoryfields import CtiDirectoryFields
-from xivo_dao.alchemy.ctireversedirectories import CtiReverseDirectories
-from xivo_dao.alchemy.directories import Directories
-from xivo_dao.alchemy.entity import Entity
 from xivo_dao.alchemy.general import General
 from xivo_dao.alchemy.netiface import Netiface
 from xivo_dao.alchemy.resolvconf import Resolvconf
@@ -120,59 +114,12 @@ def set_context_incall(context, entity, tenant_uuid):
                                    didlength=context['did_length']))
 
 
-def set_context_outcall(context, entity, tenant_uuid):
+def set_context_outcall(context, tenant_uuid):
     Session.add(Context(name='to-extern',
                         displayname=context['display_name'],
-                        entity=entity,
                         contexttype='outcall',
                         description='',
                         tenant_uuid=str(tenant_uuid)))
-
-
-def set_phonebook(entity, phonebook_body):
-    directories = Directories(uri='postgresql://asterisk:proformatique@localhost/asterisk',
-                              dirtype='dird_phonebook',
-                              name='phonebook',
-                              description='Wazo phonebook',
-                              dird_tenant=entity,
-                              dird_phonebook=phonebook_body['name'])
-    Session.add(directories)
-    Session.commit()
-    cti_directories = CtiDirectories(name='wazophonebook',
-                                     match_direct='["firstname", "lastname", "displayname", "society", "number_office"]',
-                                     match_reverse='["number_office", "number_mobile"]',
-                                     description='Default Wazo phonebook',
-                                     deletable=1,
-                                     directory_id=directories.id)
-    Session.add(cti_directories)
-    Session.commit()
-    name = '{firstname} {lastname}'
-    fields = [
-        ('fullname', name),
-        ('name', name),
-        ('display_name', '{displayname}'),
-        ('phone', '{number_office}'),
-        ('phone_mobile', '{number_mobile}'),
-        ('phone_home', '{number_home}'),
-        ('phone_other', '{number_other}'),
-        ('company', '{society}'),
-        ('reverse', name),
-    ]
-    for name, value in fields:
-        Session.add(CtiDirectoryFields(dir_id=cti_directories.id,
-                                       fieldname=name,
-                                       value=value))
-
-    for profile in Session.query(CtiContexts).all():
-        raw_directories = profile.directories
-        if not raw_directories:
-            available_directories = []
-        else:
-            available_directories = profile.directories.split(',')
-        available_directories.append('wazophonebook')
-        profile.directories = ','.join(available_directories)
-        Session.add(profile)
-    Session.add(CtiReverseDirectories(directories='["wazophonebook"]'))
 
 
 def include_outcall_context_in_internal_context():
