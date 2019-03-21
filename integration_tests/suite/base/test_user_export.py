@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -61,7 +61,6 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
         entity_id="1",
 
         username="ursule",
-        cti_profile_enabled="0",
     )))
 
 
@@ -87,21 +86,6 @@ def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(u
             voicemail_attach_audio="1",
             voicemail_delete_messages="1",
             voicemail_ask_password="1"
-        )))
-
-
-@database.reset(db)
-@fixtures.cti_profile()
-@fixtures.user()
-def test_given_user_has_cti_profile_when_exporting_then_csv_has_cti_profile_fields(cti_profile, user):
-    auth.users.new(uuid=user['uuid'], username='floogle', enabled=True)
-    with a.user_cti_profile(user, cti_profile, enabled=False):
-        response = confd_csv.users.export.get()
-        assert_that(response.csv(), has_item(has_entries(
-            uuid=user['uuid'],
-            username='floogle',
-            cti_profile_name=cti_profile['name'],
-            cti_profile_enabled="1"
         )))
 
 
