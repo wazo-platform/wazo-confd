@@ -469,9 +469,6 @@ class TestWizard(IntegrationTest):
             assert_that(queries.context_has_outcall(data['context_outcall']['display_name']))
             assert_that(queries.context_has_switchboard())
             assert_that(queries.internal_context_include_outcall_context())
-            assert_that(queries.profile_as_phonebook_for_lookup())
-            assert_that(queries.profile_as_phonebook_for_reverse_lookup())
-            assert_that(queries.phonebook_source_is_configured())
 
     def validate_auth(self, auth, data):
         auth.assert_request(

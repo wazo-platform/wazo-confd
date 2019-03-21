@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -698,21 +698,6 @@ class DatabaseQueries(object):
         query = text("""DELETE from call_log
                         WHERE id = :id""")
         self.connection.execute(query, id=call_log_id)
-
-    def profile_as_phonebook_for_lookup(self):
-        query = text("""select count(id) from cticontexts where directories like '%wazophonebook%'""")
-        return self.connection.execute(query).scalar() == 2  # default and __switchboard
-
-    def profile_as_phonebook_for_reverse_lookup(self):
-        query = text("""select count(id) from ctireversedirectories where directories like '%"wazophonebook"%'""")
-        return self.connection.execute(query).scalar() == 1
-
-    def phonebook_source_is_configured(self):
-        query = text("""select count(*) from ctidirectories, directories where ctidirectories.directory_id = directories.id and directories.dirtype='dird_phonebook'""")
-        ctidirectories_configured = self.connection.execute(query).scalar() == 1
-        query = text("""select count(ctidirectoryfields) from ctidirectoryfields, ctidirectories, directories where ctidirectoryfields.dir_id = ctidirectories.id and ctidirectories.directory_id = directories.id and directories.dirtype='dird_phonebook'""")
-        fields_configured = self.connection.execute(query).scalar() == 9
-        return ctidirectories_configured and fields_configured
 
 
 def create_helper(user='asterisk', password='proformatique', host='localhost', port=5432, db='asterisk'):
