@@ -27,13 +27,12 @@ def test_put_minimal_parameters():
     result = confd.provisioning.networking.put(body)
     result.assert_status(204)
     response = confd.provisioning.networking.get()
-    expected_response = {
+    assert_that(response.item, has_entries({
         'provision_ip': '',
         'provision_http_port': 8667,
         'rest_ip': 'provd',
         'rest_https_port': 8666,
-    }
-    assert_that(response.item, has_entries(expected_response))
+    }))
 
     body = {
         'provision_ip': '127.0.0.1',
@@ -41,13 +40,12 @@ def test_put_minimal_parameters():
     result = confd.provisioning.networking.put(body)
     result.assert_status(204)
     response = confd.provisioning.networking.get()
-    expected_response = {
+    assert_that(response.item, has_entries({
         'provision_ip': '127.0.0.1',
         'provision_http_port': 8667,
         'rest_ip': 'provd',
         'rest_https_port': 8666,
-    }
-    assert_that(response.item, has_entries(expected_response))
+    }))
 
 
 def test_put_all_parameters():
