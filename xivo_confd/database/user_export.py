@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -10,7 +10,6 @@ from sqlalchemy.orm import aliased
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.voicemail import Voicemail
-from xivo_dao.alchemy.cti_profile import CtiProfile
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.user_line import UserLine
@@ -23,7 +22,6 @@ from xivo_dao.alchemy.rightcallmember import RightCallMember
 
 
 COLUMNS = ('uuid',
-           'entity_id',
            'firstname',
            'lastname',
            'email',
@@ -40,7 +38,6 @@ COLUMNS = ('uuid',
            'call_record_enabled',
            'online_call_record_enabled',
            'userfield',
-           'cti_profile_name',
            'voicemail_name',
            'voicemail_number',
            'voicemail_context',
@@ -112,7 +109,6 @@ def export_query(separator=";"):
 
     columns = (
         User.uuid,
-        cast(User.entity_id, String),
         User.firstname,
         User.lastname,
         User.email,
@@ -129,7 +125,6 @@ def export_query(separator=";"):
         cast(User.callrecord, String),
         cast(User.enableonlinerec, String),
         User.userfield,
-        CtiProfile.name,
         Voicemail.name,
         Voicemail.number,
         Voicemail.context,
@@ -152,7 +147,6 @@ def export_query(separator=";"):
     query = (
         Session.query(*columns)
         .outerjoin(User.voicemail)
-        .outerjoin(User.cti_profile)
         .outerjoin(User.main_line_rel)
         .outerjoin(UserLine.main_line_rel)
         .outerjoin(Line.endpoint_sip)
