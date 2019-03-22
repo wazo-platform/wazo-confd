@@ -17,16 +17,16 @@ class ProvisioningNetworkingSchema(BaseSchema):
     rest_ip = fields.String(attribute='net4_ip_rest')
     rest_https_port = fields.Integer(attribute='rest_port')
 
-    def _check_ip(self, field_name, ip):
+    def _check_ip(self, ip):
         try:
-            _ = socket.inet_aton(ip)
+            socket.inet_aton(ip)
         except socket.error:
-            raise ValidationError('{}: invalid IP address: {}'.format(field_name, ip))
+            raise ValidationError('Invalid IP address: {}'.format(ip))
 
     @validates('provision_ip')
     def check_provision_ip(self, value):
-        self._check_ip('provision_ip', value)
+        self._check_ip(value)
 
     @validates('rest_ip')
     def check_rest_ip(self, value):
-        self._check_ip('rest_ip', value)
+        self._check_ip(value)
