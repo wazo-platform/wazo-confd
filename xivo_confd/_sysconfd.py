@@ -73,6 +73,14 @@ class SysconfdPublisher(object):
         self.add_request('POST', url, json=data)
         self.flush()
 
+    def service_action(self, service_name, action):
+        data = {service_name: action}
+        url = "{}/services".format(self.base_url)
+        self.add_request('POST', url, json=data)
+
+    def restart_provd(self):
+        self.service_action('xivo-provd', 'restart')
+
     def xivo_service_start(self):
         data = {'wazo-service': 'start'}
         url = "{}/xivoctl".format(self.base_url)

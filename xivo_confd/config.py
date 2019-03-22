@@ -140,6 +140,7 @@ DEFAULT_CONFIG = {
         'paging_user': True,
         'parking_lot': True,
         'parking_lot_extension': True,
+        'provisioning_networking': True,
         'queue': True,
         'queue_extension': True,
         'queue_fallback': True,

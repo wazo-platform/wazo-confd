@@ -55,6 +55,19 @@ class TestSysconfdClient(TestCase):
         url = "http://localhost:8668/commonconf_apply"
         self.session.request.assert_called_once_with('GET', url)
 
+    def test_service_action(self):
+        self.session.request.return_value = Mock(status_code=200)
+        expected_json = {'service-test': 'restart'}
+
+        self.client.service_action('service-test', 'restart')
+        self.client.flush()
+
+        method, url, json = self.extract_request()
+        expected_url = "http://localhost:8668/services"
+        self.assertEquals(method, "POST")
+        self.assertEquals(url, expected_url)
+        self.assertEquals(json, expected_json)
+
     def test_xivo_service_start(self):
         self.session.request.return_value = Mock(status_code=200)
         expected_json = {'wazo-service': 'start'}

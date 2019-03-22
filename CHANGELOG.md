@@ -4,6 +4,11 @@ Changelog
 19.05
 -----
 
+* Added Provisioning Networking Configuration endpoints:
+
+  * GET `/1.1/provisioning/networking`
+  * PUT `/1.1/provisioning/networking`
+
 * New readonly parameters have been added to the device resource:
 
   * `is_new`
