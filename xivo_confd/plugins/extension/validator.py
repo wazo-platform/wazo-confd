@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -97,12 +97,14 @@ class SameTenantValidator(Validator):
         self._context_dao = context_dao
 
     def validate(self, extension):
-        context = self._context_dao.get_by_name(extension.context)
+        old_context_name = extension.get_old_context()
+        old_context = self._context_dao.get_by_name(old_context_name)
+        new_context = self._context_dao.get_by_name(extension.context)
 
-        if extension.tenant_uuid != context.tenant_uuid:
+        if old_context.tenant_uuid != new_context.tenant_uuid:
             raise errors.different_tenants(
-                current_tenant_uuid=extension.tenant_uuid,
-                context_tenant_uuid=context.tenant_uuid,
+                current_tenant_uuid=old_context.tenant_uuid,
+                context_tenant_uuid=new_context.tenant_uuid,
             )
 
 

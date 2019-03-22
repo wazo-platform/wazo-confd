@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .wrappers import IsolatedAction
@@ -87,12 +87,6 @@ class call_permission(IsolatedAction):
 
     actions = {'generate': h.call_permission.generate_call_permission,
                'delete': h.call_permission.delete_call_permission}
-
-
-class entity(IsolatedAction):
-
-    actions = {'generate': h.entity.generate_entity,
-               'delete': h.entity.delete_entity}
 
 
 class agent(IsolatedAction):
