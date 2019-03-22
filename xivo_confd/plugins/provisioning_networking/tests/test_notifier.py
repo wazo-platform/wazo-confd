@@ -31,6 +31,4 @@ class TestProvisioningNetworkingNotifier(unittest.TestCase):
         self.notifier.edited(provisioning_networking)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
-        self.sysconfd.commonconf_generate.assert_called_once_with()
-        self.sysconfd.commonconf_apply.assert_called_once_with()
         self.sysconfd.restart_provd.assert_called_once_with()
