@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -17,6 +17,8 @@ from ..helpers import (
 from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
+    MAIN_TENANT,
+    SUB_TENANT,
     gen_queue_exten,
 )
 from . import confd
@@ -108,6 +110,23 @@ def test_associate_when_exten_pattern(extension, queue):
     response.assert_updated()
 
 
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.extension(context='main-internal', exten=gen_queue_exten())
+@fixtures.extension(context='sub-internal', exten=gen_queue_exten())
+def test_associate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx, main_exten, sub_exten):
+    response = confd.queues(sub_queue['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.queues(main_queue['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Queue'))
+
+    response = confd.queues(main_queue['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.extension(exten=gen_queue_exten())
 @fixtures.queue()
 def test_dissociate(extension, queue):
@@ -121,6 +140,20 @@ def test_dissociate(extension, queue):
 def test_dissociate_not_associated(extension, queue):
     response = confd.queues(queue['id']).extensions(extension['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.extension(context='main-internal', exten=gen_queue_exten())
+@fixtures.extension(context='sub-internal', exten=gen_queue_exten())
+def test_dissociate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx, main_exten, sub_exten):
+    response = confd.queues(sub_queue['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Extension'))
+
+    response = confd.queues(main_queue['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Queue'))
 
 
 @fixtures.extension(exten=gen_queue_exten())
