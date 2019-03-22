@@ -33,7 +33,7 @@ COMPLETE_POST_BODY = {
     'admin_password': 'password',
     'license': True,
     'language': 'en_US',
-    'entity_name': 'Test_Entity',
+    'entity_name': 'Test_Tenant',
     'timezone': 'America/Montreal',
     'network': {
         'hostname': 'Tutu',
@@ -73,7 +73,7 @@ MINIMAL_POST_BODY = {
     'admin_password': 'password',
     'license': True,
     'timezone': 'America/Montreal',
-    'entity_name': 'xivo',
+    'entity_name': 'wazo',
     'network': {
         'hostname': 'Tutu',
         'domain': 'domain.example.com',
@@ -93,7 +93,7 @@ DISABLED_STEPS_POST_BODY = {
     'admin_password': 'password',
     'license': True,
     'timezone': 'America/Montreal',
-    'entity_name': 'xivo',
+    'entity_name': 'wazo',
     'network': {
         'hostname': 'Tutu',
         'domain': 'domain.example.com',
@@ -441,7 +441,6 @@ class TestWizard(IntegrationTest):
 
     def validate_db(self, data):
         with self.db.queries() as queries:
-            assert_that(queries.entity_has_name_displayname('testentity', data['entity_name']))
             assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
@@ -469,9 +468,6 @@ class TestWizard(IntegrationTest):
             assert_that(queries.context_has_outcall(data['context_outcall']['display_name']))
             assert_that(queries.context_has_switchboard())
             assert_that(queries.internal_context_include_outcall_context())
-            assert_that(queries.profile_as_phonebook_for_lookup())
-            assert_that(queries.profile_as_phonebook_for_reverse_lookup())
-            assert_that(queries.phonebook_source_is_configured())
 
     def validate_auth(self, auth, data):
         auth.assert_request(

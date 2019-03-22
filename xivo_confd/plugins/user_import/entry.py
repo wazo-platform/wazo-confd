@@ -13,7 +13,6 @@ class Entry(object):
         self.context = None
         self.user = None
         self.wazo_user = None  # will be a dictionnary instead of sql object
-        self.entity = None
         self.voicemail = None
         self.line = None
         self.sip = None
@@ -85,7 +84,6 @@ class EntryCreator(object):
         entry.find('context', self.creators['context'], tenant_uuid)
         entry.create('user', self.creators['user'], tenant_uuid)
         entry.create('wazo_user', self.creators['wazo_user'], tenant_uuid)
-        entry.find('entity', self.creators['entity'], tenant_uuid)
         entry.find_or_create('voicemail', self.creators['voicemail'], tenant_uuid)
         entry.find_or_create('call_permissions', self.creators['call_permissions'], tenant_uuid)
         entry.find_or_create('line', self.creators['line'], tenant_uuid)
@@ -115,12 +113,11 @@ class EntryAssociator(object):
 
 class EntryFinder(object):
 
-    def __init__(self, user_dao, entity_dao, voicemail_dao, user_voicemail_dao,
+    def __init__(self, user_dao, voicemail_dao, user_voicemail_dao,
                  line_dao, user_line_dao, line_extension_dao,
                  sip_dao, sccp_dao, extension_dao, incall_dao, call_permission_dao,
                  user_call_permission_dao):
         self.user_dao = user_dao
-        self.entity_dao = entity_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
         self.line_dao = line_dao
@@ -148,10 +145,6 @@ class EntryFinder(object):
             'username': user.username,
             'emails': [email] if email else []
         }
-
-        entity_id = entry.extract_field('entity', 'id')
-        if entity_id:
-            entry.entity = self.entity_dao.get_by(id=entity_id)
 
         user_call_permissions = self.user_call_permission_dao.find_all_by(user_id=user.id)
         for user_call_permission in user_call_permissions:

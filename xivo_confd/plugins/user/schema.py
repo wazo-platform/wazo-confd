@@ -135,7 +135,6 @@ class UserSummarySchema(BaseSchema):
     extension = fields.String()
     context = fields.String()
     provisioning_code = fields.String()
-    entity = fields.String()
     protocol = fields.String()
     enabled = StrictBoolean()
 

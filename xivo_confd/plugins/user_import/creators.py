@@ -106,20 +106,6 @@ class ContextCreator(Creator):
         pass
 
 
-class EntityCreator(Creator):
-
-    def find(self, fields, tenant_uuid):
-        entity_id = fields.get('id')
-        if entity_id:
-            return self.service.get_by(tenant_uuids=[tenant_uuid], id=entity_id)
-
-    def create(self, fields, tenant_uuid):
-        return None
-
-    def update(self, fields, model):
-        pass
-
-
 class VoicemailCreator(Creator):
 
     schema = VoicemailSchema

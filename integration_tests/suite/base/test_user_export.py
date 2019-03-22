@@ -58,8 +58,6 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
         online_call_record_enabled="0",
         call_permission_password="1234",
         enabled="1",
-        entity_id="1",
-
         username="ursule",
     )))
 

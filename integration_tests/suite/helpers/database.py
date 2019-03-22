@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -350,9 +350,8 @@ class DatabaseQueries(object):
     def insert_callfilter(self, name='bsfilter', type_='bosssecretary', bosssecretary='secretary-simult',
                           tenant_uuid=None):
         query = text("""
-        INSERT INTO callfilter (entity_id, name, type, bosssecretary, tenant_uuid)
+        INSERT INTO callfilter (name, type, bosssecretary, tenant_uuid)
         VALUES (
-        (SELECT id FROM entity LIMIT 1),
         :name,
         :type,
         :bosssecretary,
@@ -389,10 +388,6 @@ class DatabaseQueries(object):
 
         return filter_member_id
 
-    def associate_context_entity(self, context_name, entity_name):
-        query = text("UPDATE context SET entity = :entity_name WHERE name = :context_name")
-        self.connection.execute(query, entity_name=entity_name, context_name=context_name)
-
     def delete_context(self, name):
         query = text("DELETE FROM context WHERE name = :name")
         self.connection.execute(query, name=name)
@@ -412,22 +407,6 @@ class DatabaseQueries(object):
     def dissociate_cti_profile(self, cti_profile_id):
         query = text("UPDATE userfeatures SET cti_profile_id = NULL WHERE cti_profile_id = :cti_profile_id")
         self.connection.execute(query, cti_profile_id=cti_profile_id)
-
-    def associate_user_entity(self, user_id, entity_id):
-        query = text("UPDATE userfeatures SET entityid = :entity_id WHERE id = :user_id")
-        self.connection.execute(query, entity_id=entity_id, user_id=user_id)
-
-    def associate_call_pickup_entity(self, call_pickup_id, entity_id):
-        query = text("UPDATE pickup SET entity_id = :entity_id WHERE id = :call_pickup_id")
-        self.connection.execute(query, entity_id=entity_id, call_pickup_id=call_pickup_id)
-
-    def associate_call_filter_entity(self, call_filter_id, entity_id):
-        query = text("UPDATE callfilter SET entity_id = :entity_id WHERE id = :call_filter_id")
-        self.connection.execute(query, entity_id=entity_id, call_filter_id=call_filter_id)
-
-    def associate_schedule_entity(self, schedule_id, entity_id):
-        query = text("UPDATE schedule SET entity_id = :entity_id WHERE id = :schedule_id")
-        self.connection.execute(query, entity_id=entity_id, schedule_id=schedule_id)
 
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")
@@ -453,21 +432,6 @@ class DatabaseQueries(object):
                  .execute(query,
                           line_id=line_id,
                           sccp_device=sccp_device)
-                 .scalar())
-
-        return count > 0
-
-    def entity_has_name_displayname(self, name, displayname):
-        query = text("""SELECT COUNT(*)
-                     FROM entity
-                     WHERE
-                        name = :name
-                        AND displayname = :displayname
-                     """)
-        count = (self.connection
-                 .execute(query,
-                          name=name,
-                          displayname=displayname)
                  .scalar())
 
         return count > 0
@@ -698,21 +662,6 @@ class DatabaseQueries(object):
         query = text("""DELETE from call_log
                         WHERE id = :id""")
         self.connection.execute(query, id=call_log_id)
-
-    def profile_as_phonebook_for_lookup(self):
-        query = text("""select count(id) from cticontexts where directories like '%wazophonebook%'""")
-        return self.connection.execute(query).scalar() == 2  # default and __switchboard
-
-    def profile_as_phonebook_for_reverse_lookup(self):
-        query = text("""select count(id) from ctireversedirectories where directories like '%"wazophonebook"%'""")
-        return self.connection.execute(query).scalar() == 1
-
-    def phonebook_source_is_configured(self):
-        query = text("""select count(*) from ctidirectories, directories where ctidirectories.directory_id = directories.id and directories.dirtype='dird_phonebook'""")
-        ctidirectories_configured = self.connection.execute(query).scalar() == 1
-        query = text("""select count(ctidirectoryfields) from ctidirectoryfields, ctidirectories, directories where ctidirectoryfields.dir_id = ctidirectories.id and ctidirectories.directory_id = directories.id and directories.dirtype='dird_phonebook'""")
-        fields_configured = self.connection.execute(query).scalar() == 9
-        return ctidirectories_configured and fields_configured
 
 
 def create_helper(user='asterisk', password='proformatique', host='localhost', port=5432, db='asterisk'):

@@ -8,8 +8,11 @@ Changelog
 
   * `is_new`
 
-* The `cti_profile_name` and `cti_profile_enabled` fields have been removed from the `/1.1/users/import` resource.
+* The `cti_profile_name`, `cti_profile_enabled` and `entity` fields have been removed from the `/1.1/users/import` resource.
 * The `/1.1/users/import` will now create the users in the creator's tenant or the specified tenant.
+* The `/1.1/user/<user_id>/entities` resource has been removed.
+* The `/1.1/entities` resource has been removed.
+* The `summary` view does not return the entity anymore.
 
 
 19.04

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -7,7 +7,6 @@ import random
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
 OUTCALL_CONTEXT = 'to-extern'
-ENTITY_NAME = 'xivotest'
 EXTEN_OUTSIDE_RANGE = str('99999')
 USER_EXTENSION_RANGE = list(range(1000, 2000))
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'

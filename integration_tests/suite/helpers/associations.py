@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -82,36 +82,6 @@ def user_funckey_template(user, funckey_template, check=True):
     h.user_funckey_template.associate(user['id'], funckey_template['id'], check)
     yield
     h.user_funckey_template.dissociate(user['id'], funckey_template['id'], check)
-
-
-@contextmanager
-def user_entity(user, entity, check=True):
-    h.user_entity.associate(user['id'], entity['id'], check)
-    yield
-
-
-@contextmanager
-def call_filter_entity(call_filter, entity, check=True):
-    h.call_filter_entity.associate(call_filter['id'], entity['id'], check)
-    yield
-
-
-@contextmanager
-def call_pickup_entity(call_pickup, entity, check=True):
-    h.call_pickup_entity.associate(call_pickup['id'], entity['id'], check)
-    yield
-
-
-@contextmanager
-def context_entity(context, entity, check=True):
-    h.context_entity.associate(context['name'], entity['name'], check)
-    yield
-
-
-@contextmanager
-def schedule_entity(schedule, entity, check=True):
-    h.schedule_entity.associate(schedule['id'], entity['id'], check)
-    yield
 
 
 @contextmanager

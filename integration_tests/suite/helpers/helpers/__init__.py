@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..client import ConfdClient
@@ -92,13 +92,11 @@ from . import agent_login_status
 from . import agent_skill
 from . import application
 from . import call_filter
-from . import call_filter_entity
 from . import call_filter_recipient_user
 from . import call_filter_surrogate_user
 from . import call_log
 from . import call_permission
 from . import call_pickup
-from . import call_pickup_entity
 from . import call_pickup_interceptor_group
 from . import call_pickup_interceptor_user
 from . import call_pickup_target_group
@@ -106,14 +104,12 @@ from . import call_pickup_target_user
 from . import conference
 from . import conference_extension
 from . import context_context
-from . import context_entity
 from . import cti_profile
 from . import device
 from . import endpoint_custom
 from . import endpoint_iax
 from . import endpoint_sccp
 from . import endpoint_sip
-from . import entity
 from . import extension
 from . import extension_feature
 from . import funckey_template
@@ -156,7 +152,6 @@ from . import register_iax
 from . import register_sip
 from . import sound
 from . import schedule
-from . import schedule_entity
 from . import skill
 from . import skill_rule
 from . import switchboard
@@ -171,7 +166,6 @@ from . import user
 from . import user_agent
 from . import user_call_permission
 from . import user_cti_profile
-from . import user_entity
 from . import user_funckey_template
 from . import user_import
 from . import user_line
@@ -188,13 +182,11 @@ __all__ = [
     'agent_skill',
     'application',
     'call_filter',
-    'call_filter_entity',
     'call_filter_recipient_user',
     'call_filter_surrogate_user',
     'call_log',
     'call_permission',
     'call_pickup',
-    'call_pickup_entity',
     'call_pickup_interceptor_group',
     'call_pickup_interceptor_user',
     'call_pickup_target_group',
@@ -202,14 +194,12 @@ __all__ = [
     'conference',
     'conference_extension',
     'context_context',
-    'context_entity',
     'cti_profile',
     'device',
     'endpoint_custom',
     'endpoint_iax',
     'endpoint_sccp',
     'endpoint_sip',
-    'entity',
     'extension',
     'extension_feature',
     'funckey_template',
@@ -252,7 +242,6 @@ __all__ = [
     'register_sip',
     'sound',
     'schedule',
-    'schedule_entity',
     'skill',
     'skill_rule',
     'switchboard',
@@ -267,7 +256,6 @@ __all__ = [
     'user_agent',
     'user_call_permission',
     'user_cti_profile',
-    'user_entity',
     'user_funckey_template',
     'user_import',
     'user_line',

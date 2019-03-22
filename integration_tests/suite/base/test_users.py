@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -22,7 +22,6 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
-    config,
     fixtures,
     scenarios as s,
 )
@@ -292,7 +291,6 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
                            provisioning_code=line['provisioning_code'],
                            extension=extension['exten'],
                            context=extension['context'],
-                           entity=config.ENTITY_NAME,
                            enabled=True,
                            protocol='sip')
 
@@ -316,7 +314,6 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
                            provisioning_code=line['provisioning_code'],
                            extension=extension['exten'],
                            context=extension['context'],
-                           entity=config.ENTITY_NAME,
                            enabled=True,
                            protocol='sccp')
 
@@ -340,7 +337,6 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
                            provisioning_code=none(),
                            extension=extension['exten'],
                            context=extension['context'],
-                           entity=config.ENTITY_NAME,
                            enabled=True,
                            protocol='custom')
 
@@ -361,7 +357,6 @@ def test_summary_view_on_user_without_line(user):
                            provisioning_code=none(),
                            extension=none(),
                            context=none(),
-                           entity=config.ENTITY_NAME,
                            enabled=True,
                            protocol=none())
 

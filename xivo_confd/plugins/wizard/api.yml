@@ -60,7 +60,7 @@ definitions:
     properties:
       admin_password:
         type: string
-        description: XiVO administrator ``root`` password
+        description: Wazo administrator ``root`` password
       license:
         type: boolean
         description: 'Accept/decline the GPLv3: http://www.gnu.org/licenses/gpl-3.0.en.html'
@@ -79,10 +79,10 @@ definitions:
         - fr_CA
         - it_IT
         - nl_NL
-        description: The language in which the XiVO will play sounds
+        description: The language in which the Wazo will play sounds
       entity_name:
         type: string
-        description: Name of the default entity (e.g. company name or last name)
+        description: Name of the first tenant on this engine
       network:
         $ref: '#/definitions/WizardNetwork'
       context_incall:
@@ -105,7 +105,7 @@ definitions:
     properties:
       configured:
         type: boolean
-        description: Whether XiVO has already been configured or not
+        description: Whether Wazo has already been configured or not
   WizardContextIncall:
     title: WizardContextIncall
     properties:

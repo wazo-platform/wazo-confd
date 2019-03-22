@@ -75,72 +75,6 @@ def test_given_required_fields_missing_then_error_returned():
     assert_error(response, has_error_field("firstname"))
 
 
-def test_given_entity_id_does_not_exist_then_error_returned():
-    csv = [{"firstname": "entityfirstname",
-            "entity_id": "999999999"}]
-
-    response = client.post("/users/import", csv)
-    assert_error(response, has_error_field("Entity"))
-
-
-@fixtures.csv_entry()
-def test_given_entity_id_does_not_exist_when_update_then_error_returned(entry):
-    csv = [{'uuid': entry['user_uuid'],
-            'entity_id': "999999999"}]
-
-    response = client.put("/users/import", csv)
-    assert_error(response, has_error_field("Entity"))
-
-
-@fixtures.entity()
-def test_given_non_default_entity_then_user_imported(entity):
-    csv = [{"firstname": "Rîchard",
-            "entity_id": entity['id']}]
-
-    response = client.post("/users/import", csv)
-    user_id = get_import_field(response, 'user_id')
-
-    user_entity = confd.users(user_id).entities.get()
-    assert_that(user_entity.item, has_entries(user_id=user_id,
-                                              entity_id=entity['id']))
-
-
-@fixtures.csv_entry()
-@fixtures.entity()
-def test_given_non_default_entity_then_user_entity_updated(entry, entity):
-    csv = [{"uuid": entry['user_uuid'],
-            "entity_id": entity['id']}]
-
-    user_id = entry['user_id']
-    user_entity = confd.users(user_id).entities.get()
-    assert_that(user_entity.item, has_entries(user_id=user_id,
-                                              entity_id=is_not(entity['id'])))
-
-    client.put("/users/import", csv).assert_ok()
-
-    user_entity = confd.users(user_id).entities.get()
-    assert_that(user_entity.item, has_entries(user_id=user_id,
-                                              entity_id=entity['id']))
-
-
-@fixtures.entity()
-@fixtures.context(start='1000', end='1999')
-def test_given_two_entities_then_can_create_user_in_second_entity(entity, context):
-    with a.context_entity(context, entity, check=False):
-            csv = [{'firstname': 'Rîchard',
-                    'entity_id': entity['id'],
-                    'exten': '1000',
-                    'context': context['name'],
-                    'line_protocol': 'sip'}]
-
-            response = client.post('/users/import', csv)
-            user_id = get_import_field(response, 'user_id')
-
-            user_entity = confd.users(user_id).entities.get()
-            assert_that(user_entity.item, has_entries(user_id=user_id,
-                                                      entity_id=entity['id']))
-
-
 def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
     csv = [{"firstname": "Rîchard"}]
 
@@ -157,7 +91,6 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
         "firstname": "Rîchard",
         "lastname": "Lâpointe",
         "email": "richard@lapointe.org",
-        "entity_id": "1",
         "language": "fr_FR",
         "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
         "mobile_phone_number": "4181234567",
@@ -212,7 +145,6 @@ def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tena
     incall_exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     csv = [{
         "firstname": "Bobby",
-        "entity_id": "1",
 
         "voicemail_name": "Bobby VM",
         "voicemail_number": number,
@@ -293,15 +225,6 @@ def test_given_csv_column_has_wrong_type_then_error_returned():
 
     response = client.post("/users/import", csv)
     assert_error(response, has_error_field('supervision_enabled'))
-
-
-@fixtures.entity(wazo_tenant=config.SUB_TENANT)
-def test_given_the_specified_entity_is_in_another_tenant(entity):
-    csv = [{'firstname': 'Alice',
-            'entity_id': entity['id']}]
-
-    response = client.post("/users/import", csv)
-    assert_error(response, has_error_field('Entity was not found'))
 
 
 def test_given_user_contains_error_then_error_returned():
@@ -754,7 +677,6 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
         "voicemail_number": voicemail['number'],
         "voicemail_context": voicemail['context'],
         "call_permissions": call_permission['name'],
-        "entity_id": "1",
     }]
 
     response = client.post("/users/import", csv)
@@ -783,10 +705,6 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     assert_that(response.items, contains(has_entries(call_permission_id=call_permission['id'],
                                                      user_id=user_id)))
 
-    response = confd.users(user_id).entities.get()
-    assert_that(response.item, has_entries(entity_id=1,
-                                           user_id=user_id))
-
 
 @fixtures.call_permission()
 @fixtures.call_permission()
@@ -801,7 +719,6 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
 
     csv = [
         {
-            "entity_id": "1",
             "firstname": "Jèan",
             "lastname": "Bâptiste",
             "email": "jean@baptiste.st",
@@ -839,7 +756,6 @@ def test_given_csv_has_more_than_one_entry_then_all_entries_imported(perm1, perm
             "call_permissions": perm1['name']
         },
         {
-            "entity_id": "1",
             "firstname": "Moùssa",
             "lastname": "Nôbamgo",
             "email": "moussa@nobamgo.ta",
@@ -1296,7 +1212,6 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
     csv = [
         {
             "uuid": entry1["user_uuid"],
-            "entity_id": "1",
             "exten": exten1,
             "context": config.CONTEXT,
             "firstname": "Géorge",
@@ -1333,7 +1248,6 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
         },
         {
             "uuid": entry2['user_uuid'],
-            "entity_id": "1",
             "firstname": "Moùssa",
             "lastname": "Nôbamgo",
             "email": "moussa@nobamgo.sd",
@@ -1455,7 +1369,6 @@ def test_given_each_field_updated_individually_then_entry_updated(entry, call_pe
     vm_number = h.voicemail.find_available_number(config.CONTEXT)
 
     fields = {
-        "entity_id": "1",
         "exten": exten,
         "context": config.CONTEXT,
         "firstname": "Fàbien",
