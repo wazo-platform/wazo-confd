@@ -13,6 +13,7 @@ Changelog
   not tenant accessible will result in a 404. New readonly parameter has also been added:
   `tenant_uuid`.
 
+  * `/1.1/queues`
   * `/1.1/switchboards`
 
 * Added Provisioning Networking Configuration endpoints:

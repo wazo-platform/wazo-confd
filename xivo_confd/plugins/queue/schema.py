@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -14,6 +14,7 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
 class QueueSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=(Regexp(NAME_REGEX), Length(max=128)), required=True)
     label = fields.String(validate=Length(max=128), missing=None)
     data_quality = StrictBoolean(attribute='data_quality_bool')

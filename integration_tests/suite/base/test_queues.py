@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains_inanyorder,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
     not_,
 )
@@ -18,6 +20,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
@@ -243,6 +249,28 @@ def check_search(url, queue, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.queues.get(wazo_tenant=MAIN_TENANT)
+    expected = all_of(
+        has_item(has_entry('id', main['id'])),
+        not_(has_item(has_entry('id', sub['id']))),
+    )
+    assert_that(response.items, expected)
+
+    response = confd.queues.get(wazo_tenant=SUB_TENANT)
+    expected = all_of(
+        has_item(has_entry('id', sub['id'])),
+        not_(has_item(has_entry('id', main['id']))),
+    )
+    assert_that(response.items, expected)
+
+    response = confd.queues.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    expected = has_items(has_entry('id', main['id']), has_entry('id', sub['id']))
+    assert_that(response.items, expected)
+
+
 @fixtures.queue(name='sort1', preprocess_subroutine='sort1')
 @fixtures.queue(name='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(queue1, queue2):
@@ -295,6 +323,16 @@ def test_get(queue):
     ))
 
 
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.queues(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Queue'))
+
+    response = confd.queues(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(id=sub['id']))
+
+
 def test_create_minimal_parameters():
     response = confd.queues.post(name='MyQueue')
     response.assert_created('queues')
@@ -343,6 +381,13 @@ def test_create_all_parameters():
     assert_that(response.item['options'], contains_inanyorder(*options))
 
     confd.queues(response.item['id']).delete().assert_deleted()
+
+
+def test_create_multi_tenant():
+    response = confd.queues.post(name='MyQueue', wazo_tenant=SUB_TENANT)
+    response.assert_created('queues')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 @fixtures.queue()
@@ -430,6 +475,16 @@ def test_edit_name_unavailable(queue):
     assert_that(response.item, has_entries(name=queue['name']))
 
 
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.queues(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Queue'))
+
+    response = confd.queues(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.queue()
 def test_delete(queue):
     response = confd.queues(queue['id']).delete()
@@ -437,6 +492,16 @@ def test_delete(queue):
 
     response = confd.queues(queue['id']).get()
     response.assert_match(404, e.not_found(resource='Queue'))
+
+
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.queues(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Queue'))
+
+    response = confd.queues(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.queue()
