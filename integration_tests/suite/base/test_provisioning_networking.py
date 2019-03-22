@@ -2,8 +2,6 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import re
-
 from hamcrest import (
     assert_that,
     has_entries,
@@ -59,21 +57,3 @@ def test_put_all_parameters():
     result.assert_status(204)
     response = confd.provisioning.networking.get()
     assert_that(response.item, has_entries(body))
-
-
-def test_put_errors():
-    # wrong ip address
-    body = {
-        'provision_ip': 'abcd',
-        'rest_ip': '10.0.0.254',
-    }
-    result = confd.provisioning.networking.put(body)
-    result.assert_match(400, re.compile(re.escape('provision_ip')))
-
-    # wrong ip address
-    body = {
-        'provision_ip': '10.0.0.254',
-        'rest_ip': 'abcd',
-    }
-    result = confd.provisioning.networking.put(body)
-    result.assert_match(400, re.compile(re.escape('rest_ip')))
