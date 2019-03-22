@@ -22,9 +22,9 @@ class TestProvisioningNetworkingNotifier(unittest.TestCase):
     def test_when_provisioning_networking_edited_then_event_sent_on_bus(self):
         expected_event = EditProvisioningNetworkingEvent()
         provisioning_networking = {
-            'provision_ip': '1.2.3.4',
+            'provision_host': '1.2.3.4',
             'provision_http_port': 8666,
-            'rest_ip': '2.3.4.5',
+            'rest_host': '2.3.4.5',
             'rest_https_port': 8667,
         }
 

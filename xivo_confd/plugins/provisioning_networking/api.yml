@@ -31,17 +31,15 @@ definitions:
     title: Provisioning Networking
     type: object
     properties:
-      provision_ip:
+      provision_host:
         type: string
-        description: The IP address used for HTTP and TFTP provisioning requests.
-        format: ipv4
+        description: The hostname or IP address used for HTTP and TFTP provisioning requests.
       provision_http_port:
         type: integer
         description: The port used by the HTTP provisioning server.
-      rest_ip:
+      rest_host:
         type: string
-        description: The IP address used for the HTTPS REST API server.
-        format: ipv4
+        description: The hostname or IP address used for the HTTPS REST API server.
       rest_https_port:
         type: integer
         description: The port used by the HTTPS REST API server.

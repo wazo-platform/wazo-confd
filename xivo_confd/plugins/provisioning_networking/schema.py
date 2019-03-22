@@ -9,7 +9,7 @@ from xivo_confd.helpers.mallow import BaseSchema
 
 class ProvisioningNetworkingSchema(BaseSchema):
 
-    provision_ip = fields.String(attribute='net4_ip')
+    provision_host = fields.String(attribute='net4_ip')
     provision_http_port = fields.Integer(attribute='http_port')
-    rest_ip = fields.String(attribute='net4_ip_rest')
+    rest_host = fields.String(attribute='net4_ip_rest')
     rest_https_port = fields.Integer(attribute='rest_port')
