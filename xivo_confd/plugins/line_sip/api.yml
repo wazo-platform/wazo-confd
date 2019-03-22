@@ -89,7 +89,7 @@ paths:
         in: body
         required: true
         schema:
-          $ref: '#/definitions/AgentQueue'
+          $ref: '#/definitions/LineSip'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
