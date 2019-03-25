@@ -18,6 +18,17 @@ Changelog
 * The `/1.1/user/<user_id>/entities` resource has been removed.
 * The `/1.1/entities` resource has been removed.
 * The `summary` view does not return the entity anymore.
+* The following fields have been removed from the `/1.1/wizard` POST body
+
+  * `entity_name`
+  * `context_outcall`
+  * `context_incall`
+  * `context_internal`
+
+* The following steps have been removed from the `/1.1/wizard` POST body
+
+  * `phonebook`
+  * `tenant`
 
 
 19.04
