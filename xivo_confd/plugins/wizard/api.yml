@@ -80,9 +80,6 @@ definitions:
         - it_IT
         - nl_NL
         description: The language in which the Wazo will play sounds
-      entity_name:
-        type: string
-        description: Name of the first tenant on this engine
       network:
         $ref: '#/definitions/WizardNetwork'
       steps:
@@ -91,7 +88,6 @@ definitions:
     - admin_password
     - license
     - timezone
-    - entity_name
     - network
   WizardConfigured:
     title: WizardConfigured
@@ -208,10 +204,6 @@ definitions:
         type: boolean
         default: true
         description: Initialize xivo-provd database?
-      tenant:
-        type: boolean
-        default: true
-        description: Create tenant in wazo-auth?
       admin:
         type: boolean
         default: true

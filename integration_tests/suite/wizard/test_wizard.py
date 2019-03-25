@@ -33,7 +33,6 @@ COMPLETE_POST_BODY = {
     'admin_password': 'password',
     'license': True,
     'language': 'en_US',
-    'entity_name': 'Test_Tenant',
     'timezone': 'America/Montreal',
     'network': {
         'hostname': 'Tutu',
@@ -51,7 +50,6 @@ COMPLETE_POST_BODY = {
         'manage_resolv_file': True,
         'commonconf': True,
         'provisioning': True,
-        'tenant': True,
         'admin': True,
     }
 }
@@ -60,7 +58,6 @@ MINIMAL_POST_BODY = {
     'admin_password': 'password',
     'license': True,
     'timezone': 'America/Montreal',
-    'entity_name': 'wazo',
     'network': {
         'hostname': 'Tutu',
         'domain': 'domain.example.com',
@@ -76,7 +73,6 @@ DISABLED_STEPS_POST_BODY = {
     'admin_password': 'password',
     'license': True,
     'timezone': 'America/Montreal',
-    'entity_name': 'wazo',
     'network': {
         'hostname': 'Tutu',
         'domain': 'domain.example.com',
@@ -92,7 +88,6 @@ DISABLED_STEPS_POST_BODY = {
         'manage_resolv_file': False,
         'commonconf': False,
         'provisioning': False,
-        'tenant': False,
         'admin': False,
     }
 }
@@ -147,14 +142,6 @@ class TestWizardErrors(IntegrationTest):
         self.check_bogus_field_returns_error('language', None)
         self.check_bogus_field_returns_error('language', True)
         self.check_bogus_field_returns_error('language', 'fr_US')
-
-    def test_error_entity_name(self):
-        self.check_bogus_field_returns_error('entity_name', 1234)
-        self.check_bogus_field_returns_error('entity_name', None)
-        self.check_bogus_field_returns_error('entity_name', True)
-        self.check_bogus_field_returns_error('entity_name', ' __  ')
-        self.check_bogus_field_returns_error('entity_name', build_string(65))
-        self.check_bogus_field_returns_error('entity_name', build_string(2))
 
     def test_error_timezone(self):
         self.check_bogus_field_returns_error('timezone', 1234)
@@ -328,10 +315,6 @@ class TestWizard(IntegrationTest):
 
     def validate_auth(self, auth, data):
         auth.assert_request(
-            '/0.1/tenants',
-            method='POST',
-        )
-        auth.assert_request(
             '/0.1/users',
             method='POST',
             json={
@@ -486,10 +469,6 @@ class TestWizardSteps(IntegrationTest):
         until.assert_(assert_bus_event_received, tries=5)
 
     def validate_auth(self, auth, data):
-        auth.assert_no_request(
-            '/0.1/tenants',
-            method='POST',
-        )
         auth.assert_no_request(
             '/0.1/users',
             method='POST',

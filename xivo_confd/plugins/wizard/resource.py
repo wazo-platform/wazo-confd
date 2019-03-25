@@ -4,12 +4,9 @@
 
 from __future__ import unicode_literals
 
-import string
-
 from flask import request
-from marshmallow import fields, validates
+from marshmallow import fields
 from marshmallow.validate import Equal, Regexp, Length, OneOf
-from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 from xivo_confd.helpers.restful import ErrorCatchingResource
@@ -40,7 +37,6 @@ class WizardStepsSchema(BaseSchema):
     manage_resolv_file = fields.Boolean(missing=True)
     commonconf = fields.Boolean(missing=True)
     provisioning = fields.Boolean(missing=True)
-    tenant = fields.Boolean(missing=True)
     admin = fields.Boolean(missing=True)
 
 
@@ -50,17 +46,9 @@ class WizardSchema(BaseSchema):
     admin_password = fields.String(validate=Regexp(ADMIN_PASSWORD_REGEX), required=True)
     license = StrictBoolean(validate=Equal(True), required=True)
     language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
-    entity_name = fields.String(validate=Length(min=3, max=64), required=True)
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
     steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
-
-    @validates('entity_name')
-    def validate_entity_name(self, entity_name):
-        sub_name = ''.join(c for c in entity_name if (c in string.ascii_letters
-                                                      or c in string.digits))
-        if len(sub_name) < 3:
-            raise ValidationError('Shorter than alphanumeric minimum length 3.')
 
 
 class ConfiguredSchema(BaseSchema):

@@ -73,7 +73,7 @@ def get_xivo_configured():
     return Session.query(General).first()
 
 
-def create(wizard, tenant_uuid):
+def create(wizard):
     network = wizard['network']
 
     set_language(wizard['language'])
