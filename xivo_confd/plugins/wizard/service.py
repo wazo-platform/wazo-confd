@@ -20,7 +20,6 @@ from .validator import build_validator
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = r'^nameserver (.*)'
-PHONEBOOK_BODY = {'name': 'wazo'}
 DEFAULT_ADMIN_POLICY = 'wazo_default_admin_policy'
 ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
 ASTERISK_AUTOPROV_CONFIG_TPL = '''\
@@ -89,8 +88,6 @@ class WizardService(object):
         tenant_name = unique_tenant_name(wizard['entity_name'])
         if wizard['steps']['tenant']:
             self._initialize_tenant(tenant_uuid, tenant_name)
-        if wizard['steps']['phonebook']:
-            self._initialize_phonebook(tenant_name)
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
 
@@ -127,10 +124,6 @@ class WizardService(object):
             self.sysconfd.flush()
             self.sysconfd.commonconf_apply()
             self.sysconfd.flush()
-
-    def _initialize_phonebook(self, tenant_name):
-        token = self._auth_client.token.new(expiration=60)['token']
-        self._dird_client.phonebook.create(tenant=tenant_name, phonebook_body=PHONEBOOK_BODY, token=token)
 
     def _initialize_tenant(self, tenant_uuid, tenant_name):
         token = self._auth_client.token.new(expiration=60)['token']

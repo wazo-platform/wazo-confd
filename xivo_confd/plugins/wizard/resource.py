@@ -40,7 +40,6 @@ class WizardStepsSchema(BaseSchema):
     manage_resolv_file = fields.Boolean(missing=True)
     commonconf = fields.Boolean(missing=True)
     provisioning = fields.Boolean(missing=True)
-    phonebook = fields.Boolean(missing=True)
     tenant = fields.Boolean(missing=True)
     admin = fields.Boolean(missing=True)
 
