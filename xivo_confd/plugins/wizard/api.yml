@@ -89,8 +89,6 @@ definitions:
         $ref: '#/definitions/WizardContextIncall'
       context_internal:
         $ref: '#/definitions/WizardContextInternal'
-      context_outcall:
-        $ref: '#/definitions/WizardContextOutcall'
       steps:
         $ref: '#/definitions/WizardSteps'
     required:
@@ -139,13 +137,6 @@ definitions:
     required:
     - number_start
     - number_end
-  WizardContextOutcall:
-    title: WizardContextOutcall
-    properties:
-      display_name:
-        type: string
-        default: Outcalls
-        description: Name of the context
   WizardDiscover:
     title: WizardDiscover
     properties:

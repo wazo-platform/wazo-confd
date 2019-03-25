@@ -599,37 +599,6 @@ class DatabaseQueries(object):
 
         return count > 0
 
-    def context_has_outcall(self, display_name):
-        query = text("""SELECT COUNT(*)
-                     FROM context
-                     WHERE
-                        context.name = 'to-extern'
-                        AND context.displayname = :display_name
-                        AND context.contexttype = 'outcall'
-                     """)
-
-        count = (self.connection
-                 .execute(query,
-                          display_name=display_name)
-                 .scalar())
-
-        return count > 0
-
-    def internal_context_include_outcall_context(self):
-        query = text("""SELECT COUNT(*)
-                     FROM contextinclude
-                     WHERE
-                        context = 'default'
-                        AND include = 'to-extern'
-                        AND priority = 0
-                     """)
-
-        count = (self.connection
-                 .execute(query)
-                 .scalar())
-
-        return count > 0
-
     def insert_call_log(self, date, date_answer, date_end, source_name, source_exten, destination_exten, user_field):
         query = text("""INSERT INTO call_log(date, date_answer, date_end, source_name, source_exten, destination_exten, user_field)
                         VALUES (:date, :date_answer, :date_end, :source_name, :source_exten, :destination_exten, :user_field)

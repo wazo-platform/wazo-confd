@@ -55,7 +55,6 @@ COMPLETE_POST_BODY = {
         'number_end': '2999',
         'did_length': 4
     },
-    'context_outcall': {'display_name': 'Outcalls'},
     'steps': {
         'database': True,
         'manage_services': True,
@@ -282,13 +281,6 @@ class TestWizardErrors(IntegrationTest):
         self.check_context_incall_bogus_field_returns_error('did_length', -1)
         self.check_context_incall_bogus_field_returns_error('did_length', 21)
 
-    def test_error_context_outcall_display_name(self):
-        self.check_context_outcall_bogus_field_returns_error('display_name', 1234)
-        self.check_context_outcall_bogus_field_returns_error('display_name', None)
-        self.check_context_outcall_bogus_field_returns_error('display_name', True)
-        self.check_context_outcall_bogus_field_returns_error('display_name', build_string(2))
-        self.check_context_outcall_bogus_field_returns_error('display_name', build_string(129))
-
     def check_bogus_field_returns_error(self, field, bogus, sub_field=None):
         body = copy.deepcopy(COMPLETE_POST_BODY)
         if sub_field is None:
@@ -307,9 +299,6 @@ class TestWizardErrors(IntegrationTest):
 
     def check_context_incall_bogus_field_returns_error(self, field, bogus):
         self.check_bogus_field_returns_error(field, bogus, 'context_incall')
-
-    def check_context_outcall_bogus_field_returns_error(self, field, bogus):
-        self.check_bogus_field_returns_error(field, bogus, 'context_outcall')
 
     def test_context_internal_bad_range(self):
         body = {'context_internal': {'number_start': '3000',
@@ -409,7 +398,6 @@ class TestWizardDefaultValue(IntegrationTest):
                 body['context_internal']['number_end']
             ))
             assert_that(queries.context_has_incall('Incalls'))
-            assert_that(queries.context_has_outcall('Outcalls'))
 
 
 class TestWizard(IntegrationTest):
@@ -465,8 +453,6 @@ class TestWizard(IntegrationTest):
                 data['context_incall']['number_end'],
                 data['context_incall']['did_length']
             ))
-            assert_that(queries.context_has_outcall(data['context_outcall']['display_name']))
-            assert_that(queries.internal_context_include_outcall_context())
 
     def validate_auth(self, auth, data):
         auth.assert_request(

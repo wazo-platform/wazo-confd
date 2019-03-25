@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
@@ -31,10 +31,6 @@ class WizardNetworkSchema(BaseSchema):
     netmask = fields.String(validate=Regexp(IP_ADDRESS_REGEX), required=True)
     gateway = fields.String(validate=Regexp(IP_ADDRESS_REGEX), required=True)
     nameservers = fields.List(fields.String(validate=Regexp(IP_ADDRESS_REGEX)), validate=Length(max=3), required=True)
-
-
-class WizardContextOutcallSchema(BaseSchema):
-    display_name = fields.String(validate=Length(min=3, max=128), missing='Outcalls')
 
 
 class WizardContextInternalSchema(BaseSchema):
@@ -92,7 +88,6 @@ class WizardSchema(BaseSchema):
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
     context_internal = fields.Nested(WizardContextInternalSchema, required=True)
-    context_outcall = fields.Nested(WizardContextOutcallSchema, missing=WizardContextOutcallSchema().load({}).data)
     context_incall = fields.Nested(WizardContextIncallSchema, missing=WizardContextIncallSchema().load({}).data)
     steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
 

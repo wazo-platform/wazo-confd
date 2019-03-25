@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.context import Context
-from xivo_dao.alchemy.contextinclude import ContextInclude
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 from xivo_dao.alchemy.general import General
 from xivo_dao.alchemy.netiface import Netiface
@@ -94,20 +93,6 @@ def set_context_incall(context, tenant_uuid):
                                    didlength=context['did_length']))
 
 
-def set_context_outcall(context, tenant_uuid):
-    Session.add(Context(name='to-extern',
-                        displayname=context['display_name'],
-                        contexttype='outcall',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-
-def include_outcall_context_in_internal_context():
-    Session.add(ContextInclude(context='default',
-                               include='to-extern',
-                               priority=0))
-
-
 def set_xivo_configured():
     row = Session.query(General).first()
     row.configured = True
@@ -127,5 +112,3 @@ def create(wizard, tenant_uuid):
     set_timezone(wizard['timezone'])
     set_context_incall(wizard['context_incall'], tenant_uuid)
     set_context_internal(wizard['context_internal'], tenant_uuid)
-    set_context_outcall(wizard['context_outcall'], tenant_uuid)
-    include_outcall_context_in_internal_context()
