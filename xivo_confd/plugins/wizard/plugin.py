@@ -4,7 +4,6 @@
 
 import logging
 
-from wazo_dird_client import Client as DirdClient
 from xivo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
 
@@ -33,10 +32,9 @@ class Plugin(object):
         auth_client = AuthClient(username=service_id,
                                  password=service_key,
                                  **auth_config)
-        dird_client = DirdClient(**config['dird'])
         provd_client = ProvdClient(**config['provd'])
 
-        service = build_service(provd_client, auth_client, dird_client, infos_dao)
+        service = build_service(provd_client, auth_client, infos_dao)
 
         api.add_resource(
             WizardResource,

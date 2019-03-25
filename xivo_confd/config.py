@@ -67,11 +67,6 @@ DEFAULT_CONFIG = {
         'port': 8500,
         'verify': '/usr/share/xivo-certs/server.crt',
     },
-    'dird': {
-        'host': 'localhost',
-        'port': 9489,
-        'verify_certificate': '/usr/share/xivo-certs/server.crt',
-    },
     'provd': {
         'host': 'localhost',
         'port': 8666,

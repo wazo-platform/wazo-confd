@@ -43,14 +43,13 @@ logger = logging.getLogger(__name__)
 
 class WizardService(object):
 
-    def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, dird_client, sysconfd):
+    def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, sysconfd):
         self.validator = validator
         self.notifier = notifier
         self.infos_dao = infos_dao
         self.provd_client = provd_client
         self.sysconfd = sysconfd
         self._auth_client = auth_client
-        self._dird_client = dird_client
 
     def get(self):
         return wizard_db.get_xivo_configured()
@@ -248,13 +247,12 @@ class WizardService(object):
         return None
 
 
-def build_service(provd_client, auth_client, dird_client, infos_dao):
+def build_service(provd_client, auth_client, infos_dao):
     return WizardService(
         build_validator(),
         build_notifier(),
         infos_dao,
         provd_client,
         auth_client,
-        dird_client,
         sysconfd,
     )
