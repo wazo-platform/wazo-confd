@@ -85,8 +85,6 @@ definitions:
         description: Name of the first tenant on this engine
       network:
         $ref: '#/definitions/WizardNetwork'
-      context_incall:
-        $ref: '#/definitions/WizardContextIncall'
       context_internal:
         $ref: '#/definitions/WizardContextInternal'
       steps:
@@ -104,23 +102,6 @@ definitions:
       configured:
         type: boolean
         description: Whether Wazo has already been configured or not
-  WizardContextIncall:
-    title: WizardContextIncall
-    properties:
-      display_name:
-        type: string
-        default: Incalls
-        description: Name of the context
-      number_start:
-        type: string
-        description: Beginning of the range of phone numbers for incoming calls
-      number_end:
-        type: string
-        description: End of the range of phone numbers for incoming calls
-      did_length:
-        type: integer
-        description: Length of the DID. Required if number_start and number_end are
-          defined
   WizardContextInternal:
     title: WizardContextInternal
     properties:

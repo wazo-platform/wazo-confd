@@ -49,12 +49,6 @@ COMPLETE_POST_BODY = {
         'number_start': '1000',
         'number_end': '1999'
     },
-    'context_incall': {
-        'display_name': 'Incalls',
-        'number_start': '2000',
-        'number_end': '2999',
-        'did_length': 4
-    },
     'steps': {
         'database': True,
         'manage_services': True,
@@ -253,34 +247,6 @@ class TestWizardErrors(IntegrationTest):
         self.check_context_internal_bogus_field_returns_error('number_end', 'a1234')
         self.check_context_internal_bogus_field_returns_error('number_end', build_string(17))
 
-    def test_error_context_incall_display_name(self):
-        self.check_context_incall_bogus_field_returns_error('display_name', 1234)
-        self.check_context_incall_bogus_field_returns_error('display_name', None)
-        self.check_context_incall_bogus_field_returns_error('display_name', True)
-        self.check_context_incall_bogus_field_returns_error('display_name', build_string(2))
-        self.check_context_incall_bogus_field_returns_error('display_name', build_string(129))
-
-    def test_error_context_incall_number_start(self):
-        self.check_context_incall_bogus_field_returns_error('number_start', 1234)
-        self.check_context_incall_bogus_field_returns_error('number_start', None)
-        self.check_context_incall_bogus_field_returns_error('number_start', True)
-        self.check_context_incall_bogus_field_returns_error('number_start', 'a1234')
-        self.check_context_incall_bogus_field_returns_error('number_start', build_string(17))
-
-    def test_error_context_incall_number_end(self):
-        self.check_context_incall_bogus_field_returns_error('number_end', 1234)
-        self.check_context_incall_bogus_field_returns_error('number_end', None)
-        self.check_context_incall_bogus_field_returns_error('number_end', True)
-        self.check_context_incall_bogus_field_returns_error('number_end', 'a1234')
-        self.check_context_incall_bogus_field_returns_error('number_end', build_string(17))
-
-    def test_error_context_incall_did_length(self):
-        self.check_context_incall_bogus_field_returns_error('did_length', None)
-        # True is interpreted as 1 = valid
-        self.check_context_incall_bogus_field_returns_error('did_length', 'abcd')
-        self.check_context_incall_bogus_field_returns_error('did_length', -1)
-        self.check_context_incall_bogus_field_returns_error('did_length', 21)
-
     def check_bogus_field_returns_error(self, field, bogus, sub_field=None):
         body = copy.deepcopy(COMPLETE_POST_BODY)
         if sub_field is None:
@@ -297,9 +263,6 @@ class TestWizardErrors(IntegrationTest):
     def check_context_internal_bogus_field_returns_error(self, field, bogus):
         self.check_bogus_field_returns_error(field, bogus, 'context_internal')
 
-    def check_context_incall_bogus_field_returns_error(self, field, bogus):
-        self.check_bogus_field_returns_error(field, bogus, 'context_incall')
-
     def test_context_internal_bad_range(self):
         body = {'context_internal': {'number_start': '3000',
                                      'number_end': '2000'}}
@@ -311,29 +274,6 @@ class TestWizardErrors(IntegrationTest):
                                      'number_end': '0199'}}
         result = self.confd.wizard.post(body)
         result.assert_match(400, re.compile(re.escape('context_internal')))
-
-    def test_context_incall_bad_range(self):
-        body = {'context_incall': {'number_start': '3000',
-                                   'number_end': '2000'}}
-        result = self.confd.wizard.post(body)
-        result.assert_match(400, re.compile(re.escape('context_incall')))
-
-    def test_context_incall_bad_length(self):
-        body = {'context_incall': {'number_start': '100',
-                                   'number_end': '0199'}}
-        result = self.confd.wizard.post(body)
-        result.assert_match(400, re.compile(re.escape('context_incall')))
-
-    def test_context_incall_missing_number(self):
-        body = {'context_incall': {'number_start': '2000'}}
-        result = self.confd.wizard.post(body)
-        result.assert_match(400, re.compile(re.escape('context_incall')))
-
-    def test_context_incall_missing_did_length(self):
-        body = {'context_incall': {'number_start': '2000',
-                                   'number_end': '3000'}}
-        result = self.confd.wizard.post(body)
-        result.assert_match(400, re.compile(re.escape('did_length')))
 
 
 class TestWizardDiscover(IntegrationTest):
@@ -397,7 +337,6 @@ class TestWizardDefaultValue(IntegrationTest):
                 body['context_internal']['number_start'],
                 body['context_internal']['number_end']
             ))
-            assert_that(queries.context_has_incall('Incalls'))
 
 
 class TestWizard(IntegrationTest):
@@ -446,12 +385,6 @@ class TestWizard(IntegrationTest):
                 data['context_internal']['display_name'],
                 data['context_internal']['number_start'],
                 data['context_internal']['number_end']
-            ))
-            assert_that(queries.context_has_incall(
-                data['context_incall']['display_name'],
-                data['context_incall']['number_start'],
-                data['context_incall']['number_end'],
-                data['context_incall']['did_length']
             ))
 
     def validate_auth(self, auth, data):

@@ -78,21 +78,6 @@ def set_context_internal(context, tenant_uuid):
                                numberend=context['number_end']))
 
 
-def set_context_incall(context, tenant_uuid):
-    Session.add(Context(name='from-extern',
-                        displayname=context['display_name'],
-                        contexttype='incall',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-    if context.get('number_start') and context.get('number_end'):
-        Session.add(ContextNumbers(context='from-extern',
-                                   type='incall',
-                                   numberbeg=context['number_start'],
-                                   numberend=context['number_end'],
-                                   didlength=context['did_length']))
-
-
 def set_xivo_configured():
     row = Session.query(General).first()
     row.configured = True
@@ -110,5 +95,4 @@ def create(wizard, tenant_uuid):
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
-    set_context_incall(wizard['context_incall'], tenant_uuid)
     set_context_internal(wizard['context_internal'], tenant_uuid)

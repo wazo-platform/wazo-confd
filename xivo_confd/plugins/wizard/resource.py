@@ -52,20 +52,6 @@ class WizardContextInternalSchema(BaseSchema):
             raise ValidationError('It is not a valid interval')
 
 
-class WizardContextIncallSchema(WizardContextInternalSchema):
-    display_name = fields.String(validate=Length(min=3, max=128), missing='Incalls')
-    did_length = fields.Integer(validate=Range(min=0, max=20))
-    number_start = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
-    number_end = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
-
-    @validates_schema
-    def validate_numbers(self, data):
-        super(WizardContextIncallSchema, self).validate_numbers(data)
-        if data.get('number_start') and data.get('number_end'):
-            if not data.get('did_length'):
-                raise ValidationError('Missing data for required field.', 'did_length')
-
-
 class WizardStepsSchema(BaseSchema):
     database = fields.Boolean(missing=True)
     manage_services = fields.Boolean(missing=True)
@@ -88,7 +74,6 @@ class WizardSchema(BaseSchema):
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
     context_internal = fields.Nested(WizardContextInternalSchema, required=True)
-    context_incall = fields.Nested(WizardContextIncallSchema, missing=WizardContextIncallSchema().load({}).data)
     steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
 
     @validates('entity_name')
