@@ -44,11 +44,6 @@ COMPLETE_POST_BODY = {
         'gateway': '127.2.5.1',
         'nameservers': ['8.8.8.8', '1.2.3.4']
     },
-    'context_internal': {
-        'display_name': 'Default',
-        'number_start': '1000',
-        'number_end': '1999'
-    },
     'steps': {
         'database': True,
         'manage_services': True,
@@ -76,10 +71,6 @@ MINIMAL_POST_BODY = {
         'gateway': '127.2.5.1',
         'nameservers': ['8.8.8.8']
     },
-    'context_internal': {
-        'number_start': '1000',
-        'number_end': '1999'
-    }
 }
 
 DISABLED_STEPS_POST_BODY = {
@@ -95,10 +86,6 @@ DISABLED_STEPS_POST_BODY = {
         'netmask': '255.255.0.0',
         'gateway': '127.2.5.1',
         'nameservers': ['8.8.8.8']},
-    'context_internal': {
-        'number_start': '1000',
-        'number_end': '1999'
-    },
     'steps': {
         'database': False,
         'manage_services': False,
@@ -226,27 +213,6 @@ class TestWizardErrors(IntegrationTest):
         self.check_network_bogus_field_returns_error('gateway', True)
         self.check_network_bogus_field_returns_error('gateway', '1234.192.192.0')
 
-    def test_error_context_internal_display_name(self):
-        self.check_context_internal_bogus_field_returns_error('display_name', 1234)
-        self.check_context_internal_bogus_field_returns_error('display_name', None)
-        self.check_context_internal_bogus_field_returns_error('display_name', True)
-        self.check_context_internal_bogus_field_returns_error('display_name', build_string(2))
-        self.check_context_internal_bogus_field_returns_error('display_name', build_string(129))
-
-    def test_error_context_internal_number_start(self):
-        self.check_context_internal_bogus_field_returns_error('number_start', 1234)
-        self.check_context_internal_bogus_field_returns_error('number_start', None)
-        self.check_context_internal_bogus_field_returns_error('number_start', True)
-        self.check_context_internal_bogus_field_returns_error('number_start', 'a1234')
-        self.check_context_internal_bogus_field_returns_error('number_start', build_string(17))
-
-    def test_error_context_internal_number_end(self):
-        self.check_context_internal_bogus_field_returns_error('number_end', 1234)
-        self.check_context_internal_bogus_field_returns_error('number_end', None)
-        self.check_context_internal_bogus_field_returns_error('number_end', True)
-        self.check_context_internal_bogus_field_returns_error('number_end', 'a1234')
-        self.check_context_internal_bogus_field_returns_error('number_end', build_string(17))
-
     def check_bogus_field_returns_error(self, field, bogus, sub_field=None):
         body = copy.deepcopy(COMPLETE_POST_BODY)
         if sub_field is None:
@@ -259,21 +225,6 @@ class TestWizardErrors(IntegrationTest):
 
     def check_network_bogus_field_returns_error(self, field, bogus):
         self.check_bogus_field_returns_error(field, bogus, 'network')
-
-    def check_context_internal_bogus_field_returns_error(self, field, bogus):
-        self.check_bogus_field_returns_error(field, bogus, 'context_internal')
-
-    def test_context_internal_bad_range(self):
-        body = {'context_internal': {'number_start': '3000',
-                                     'number_end': '2000'}}
-        result = self.confd.wizard.post(body)
-        result.assert_match(400, re.compile(re.escape('context_internal')))
-
-    def test_context_internal_bad_length(self):
-        body = {'context_internal': {'number_start': '100',
-                                     'number_end': '0199'}}
-        result = self.confd.wizard.post(body)
-        result.assert_match(400, re.compile(re.escape('context_internal')))
 
 
 class TestWizardDiscover(IntegrationTest):
@@ -332,11 +283,6 @@ class TestWizardDefaultValue(IntegrationTest):
             assert_that(queries.sip_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))
-            assert_that(queries.context_has_internal(
-                'Default',
-                body['context_internal']['number_start'],
-                body['context_internal']['number_end']
-            ))
 
 
 class TestWizard(IntegrationTest):
@@ -380,11 +326,6 @@ class TestWizard(IntegrationTest):
             assert_that(queries.netiface_is_configured(
                 data['network']['ip_address'],
                 data['network']['gateway']
-            ))
-            assert_that(queries.context_has_internal(
-                data['context_internal']['display_name'],
-                data['context_internal']['number_start'],
-                data['context_internal']['number_end']
             ))
 
     def validate_auth(self, auth, data):

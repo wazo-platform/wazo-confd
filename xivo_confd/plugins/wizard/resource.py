@@ -7,8 +7,8 @@ from __future__ import unicode_literals
 import string
 
 from flask import request
-from marshmallow import fields, validates_schema, validates
-from marshmallow.validate import Equal, Regexp, Length, OneOf, Predicate, Range
+from marshmallow import fields, validates
+from marshmallow.validate import Equal, Regexp, Length, OneOf
 from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
@@ -33,25 +33,6 @@ class WizardNetworkSchema(BaseSchema):
     nameservers = fields.List(fields.String(validate=Regexp(IP_ADDRESS_REGEX)), validate=Length(max=3), required=True)
 
 
-class WizardContextInternalSchema(BaseSchema):
-    display_name = fields.String(validate=Length(min=3, max=128), missing='Default')
-    number_start = fields.String(validate=(Predicate('isdigit'), Length(max=16)), required=True)
-    number_end = fields.String(validate=(Predicate('isdigit'), Length(max=16)), required=True)
-
-    @validates_schema
-    def validate_numbers(self, data):
-        if not data.get('number_start') and not data.get('number_end'):
-            return
-        if not data.get('number_start') or not data.get('number_end'):
-            raise ValidationError('Both numbers, number_start and number_end, must be set')
-
-        if len(data['number_start']) != len(data['number_end']):
-            raise ValidationError('Numbers do not have de same length')
-
-        if int(data['number_start']) > int(data['number_end']):
-            raise ValidationError('It is not a valid interval')
-
-
 class WizardStepsSchema(BaseSchema):
     database = fields.Boolean(missing=True)
     manage_services = fields.Boolean(missing=True)
@@ -73,7 +54,6 @@ class WizardSchema(BaseSchema):
     entity_name = fields.String(validate=Length(min=3, max=64), required=True)
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
-    context_internal = fields.Nested(WizardContextInternalSchema, required=True)
     steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
 
     @validates('entity_name')

@@ -2,8 +2,6 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.alchemy.context import Context
-from xivo_dao.alchemy.contextnumbers import ContextNumbers
 from xivo_dao.alchemy.general import General
 from xivo_dao.alchemy.netiface import Netiface
 from xivo_dao.alchemy.resolvconf import Resolvconf
@@ -65,19 +63,6 @@ def set_netiface(interface, address, netmask, gateway):
                          description='Wizard Configuration'))
 
 
-def set_context_internal(context, tenant_uuid):
-    Session.add(Context(name='default',
-                        displayname=context['display_name'],
-                        contexttype='internal',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-    Session.add(ContextNumbers(context='default',
-                               type='user',
-                               numberbeg=context['number_start'],
-                               numberend=context['number_end']))
-
-
 def set_xivo_configured():
     row = Session.query(General).first()
     row.configured = True
@@ -95,4 +80,3 @@ def create(wizard, tenant_uuid):
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
-    set_context_internal(wizard['context_internal'], tenant_uuid)
