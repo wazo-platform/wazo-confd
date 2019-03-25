@@ -7,6 +7,7 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       responses:
         '200':
@@ -23,6 +24,7 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - name: body
         in: body
