@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -9,27 +9,42 @@ from . import confd, BaseIntegrationTest
 
 def test_get_destinations():
     expected_result = [
-        {'type': 'park_position',
-         'parameters': [{'name': 'position'}]},
         {'type': 'agent',
          'parameters': [{'values': ['login',
                                     'logout',
                                     'toggle'],
                          'name': 'action'},
                         {'name': 'agent_id'}]},
-        {'type': 'onlinerec',
-         'parameters': []},
-        {'type': 'user',
-         'parameters': [{'name': 'user_id',
-                         'collection': 'https://localhost:{}/1.1/users'.format(
-                             BaseIntegrationTest.service_port(9486, 'confd')
-                         )}]},
-        {'type': 'parking',
-         'parameters': []},
+        {'type': 'bsfilter',
+         'parameters': [{'name': 'filter_member_id'}]},
         {'type': 'conference',
          'parameters': [{'name': 'conference_id'}]},
+        {'type': 'custom',
+         'parameters': [{'name': 'exten'}]},
+        {'type': 'forward',
+         'parameters': [{'values': ['busy',
+                                    'noanswer',
+                                    'unconditional'],
+                         'name': 'forward'},
+                        {'name': 'exten'}]},
         {'type': 'group',
          'parameters': [{'name': 'group_id'}]},
+        {'type': 'groupmember',
+         'parameters': [{'name': 'action',
+                         'values': ['join',
+                                    'leave',
+                                    'toggle']},
+                        {'name': 'group_id'}]},
+        {'type': 'onlinerec',
+         'parameters': []},
+        {'type': 'paging',
+         'parameters': [{'name': 'paging_id'}]},
+        {'type': 'park_position',
+         'parameters': [{'name': 'position'}]},
+        {'type': 'parking',
+         'parameters': []},
+        {'type': 'queue',
+         'parameters': [{'name': 'queue_id'}]},
         {'type': 'service',
          'parameters': [{'values': ['enablevm',
                                     'vmusermsg',
@@ -48,20 +63,11 @@ def test_get_destinations():
          'parameters': [{'values': ['blind',
                                     'attended'],
                          'name': 'transfer'}]},
-        {'type': 'bsfilter',
-         'parameters': [{'name': 'filter_member_id'}]},
-        {'type': 'custom',
-         'parameters': [{'name': 'exten'}]},
-        {'type': 'queue',
-         'parameters': [{'name': 'queue_id'}]},
-        {'type': 'paging',
-         'parameters': [{'name': 'paging_id'}]},
-        {'type': 'forward',
-         'parameters': [{'values': ['busy',
-                                    'noanswer',
-                                    'unconditional'],
-                         'name': 'forward'},
-                        {'name': 'exten'}]}
+        {'type': 'user',
+         'parameters': [{'name': 'user_id',
+                         'collection': 'https://localhost:{}/1.1/users'.format(
+                             BaseIntegrationTest.service_port(9486, 'confd')
+                         )}]},
     ]
 
     response = confd.funckeys.destinations.get()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -14,23 +14,26 @@ from xivo_dao.resources.paging import dao as paging_dao_module
 
 
 def build_converters():
-    return {'user': UserConverter(line_dao_module,
-                                  user_line_dao_module,
-                                  line_extension_dao_module,
-                                  extension_dao_module),
-            'group': GroupConverter(extension_dao_module),
-            'queue': QueueConverter(extension_dao_module),
-            'conference': ConferenceConverter(extension_dao_module),
-            'paging': PagingConverter(extension_dao_module, paging_dao_module),
-            'service': ServiceConverter(extension_dao_module),
-            'custom': CustomConverter(),
-            'forward': ForwardConverter(extension_dao_module),
-            'transfer': TransferConverter(features_dao_module),
-            'park_position': ParkPositionConverter(),
-            'parking': ParkingConverter(features_dao_module),
-            'bsfilter': BSFilterConverter(extension_dao_module),
-            'agent': AgentConverter(extension_dao_module),
-            'onlinerec': OnlineRecordingConverter(features_dao_module)}
+    return {
+        'agent': AgentConverter(extension_dao_module),
+        'bsfilter': BSFilterConverter(extension_dao_module),
+        'conference': ConferenceConverter(extension_dao_module),
+        'custom': CustomConverter(),
+        'forward': ForwardConverter(extension_dao_module),
+        'group': GroupConverter(extension_dao_module),
+        'groupmember': GroupMemberConverter(extension_dao_module),
+        'onlinerec': OnlineRecordingConverter(features_dao_module),
+        'paging': PagingConverter(extension_dao_module, paging_dao_module),
+        'park_position': ParkPositionConverter(),
+        'parking': ParkingConverter(features_dao_module),
+        'queue': QueueConverter(extension_dao_module),
+        'service': ServiceConverter(extension_dao_module),
+        'transfer': TransferConverter(features_dao_module),
+        'user': UserConverter(line_dao_module,
+                              user_line_dao_module,
+                              line_extension_dao_module,
+                              extension_dao_module),
+    }
 
 
 class FuncKeyConverter(object):
@@ -111,6 +114,23 @@ class GroupConverter(FuncKeyConverter):
 
     def determine_type(self, funckey):
         return 'speeddial'
+
+
+class GroupMemberConverter(FuncKeyConverter):
+
+    def __init__(self, extension_dao):
+        self.extension_dao = extension_dao
+
+    def build(self, user, line, position, funckey):
+        prog_exten = self.extension_dao.get_by(type='extenfeatures', typeval='phoneprogfunckey')
+        action_exten = self.extension_dao.get(funckey.destination.extension_id)
+
+        value = self.progfunckey(prog_exten.exten,
+                                 user.id,
+                                 action_exten.exten,
+                                 funckey.destination.group_id)
+
+        return self.provd_funckey(line, position, funckey, value)
 
 
 class QueueConverter(FuncKeyConverter):

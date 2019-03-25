@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -14,18 +14,23 @@ from .validator import build_validator, build_validator_bsfilter
 
 class TemplateService(object):
 
-    DESTINATION_BLFS = ('user',
-                        'conference',
-                        'custom',
-                        'bsfilter',
-                        'forward',
-                        'agent',
-                        'park_position')
+    DESTINATION_BLFS = (
+        'agent',
+        'bsfilter',
+        'conference',
+        'custom',
+        'forward',
+        'groupmember',
+        'park_position',
+        'user',
+    )
 
-    SERVICE_BLFS = ('callrecord',
-                    'incallfilter',
-                    'enablednd',
-                    'enablevm')
+    SERVICE_BLFS = (
+        'callrecord',
+        'enablednd',
+        'enablevm',
+        'incallfilter',
+    )
 
     def __init__(self, template_dao, user_dao, validator, validator_bsfilter, notifier, device_updater):
         self.template_dao = template_dao
