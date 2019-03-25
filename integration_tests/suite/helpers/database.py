@@ -615,21 +615,6 @@ class DatabaseQueries(object):
 
         return count > 0
 
-    def context_has_switchboard(self):
-        query = text("""SELECT COUNT(*)
-                     FROM context
-                     WHERE
-                        context.name = '__switchboard_directory'
-                        AND context.displayname = 'Switchboard'
-                        AND context.contexttype = 'others'
-                     """)
-
-        count = (self.connection
-                 .execute(query)
-                 .scalar())
-
-        return count > 0
-
     def internal_context_include_outcall_context(self):
         query = text("""SELECT COUNT(*)
                      FROM contextinclude

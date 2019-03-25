@@ -66,14 +66,6 @@ def set_netiface(interface, address, netmask, gateway):
                          description='Wizard Configuration'))
 
 
-def set_context_switchboard(tenant_uuid):
-    Session.add(Context(name='__switchboard_directory',
-                        displayname='Switchboard',
-                        contexttype='others',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-
 def set_context_internal(context, tenant_uuid):
     Session.add(Context(name='default',
                         displayname=context['display_name'],
@@ -133,7 +125,6 @@ def create(wizard, tenant_uuid):
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
-    set_context_switchboard(tenant_uuid)
     set_context_incall(wizard['context_incall'], tenant_uuid)
     set_context_internal(wizard['context_internal'], tenant_uuid)
     set_context_outcall(wizard['context_outcall'], tenant_uuid)
