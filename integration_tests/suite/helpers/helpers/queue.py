@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
 import string
 
 from . import confd
+from ..config import MAIN_TENANT
 
 
 def generate_queue(**parameters):
     parameters.setdefault('name', generate_name())
+    parameters.setdefault('wazo_tenant', MAIN_TENANT)
     return add_queue(**parameters)
 
 
-def add_queue(**parameters):
-    response = confd.queues.post(parameters)
+def add_queue(wazo_tenant=None, **parameters):
+    response = confd.queues.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

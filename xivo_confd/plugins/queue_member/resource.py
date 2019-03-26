@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -74,6 +74,7 @@ class QueueMemberAgentItem(ConfdResource):
 class QueueMemberUserItem(ConfdResource):
 
     schema = QueueMemberUserSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, queue_dao, user_dao):
         super(QueueMemberUserItem, self).__init__()
@@ -83,8 +84,9 @@ class QueueMemberUserItem(ConfdResource):
 
     @required_acl('confd.queues.{queue_id}.members.users.{user_id}.update')
     def put(self, queue_id, user_id):
-        queue = self.queue_dao.get(queue_id)
-        user = self.user_dao.get_by_id_uuid(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, user)
         form = self.schema().load(request.get_json()).data
         setattr(member, 'priority', form['priority'])
@@ -93,8 +95,9 @@ class QueueMemberUserItem(ConfdResource):
 
     @required_acl('confd.queues.{queue_id}.members.users.{user_id}.delete')
     def delete(self, queue_id, user_id):
-        queue = self.queue_dao.get(queue_id)
-        user = self.user_dao.get_by_id_uuid(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, user)
         self.service.dissociate_member_user(queue, member)
         return '', 204

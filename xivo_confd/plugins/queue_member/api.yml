@@ -92,6 +92,7 @@ paths:
       - queues
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/useriduuid'
       - name: body
@@ -113,6 +114,7 @@ paths:
       - queues
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/useriduuid'
       responses:

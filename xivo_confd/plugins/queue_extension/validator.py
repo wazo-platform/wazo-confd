@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -18,11 +18,19 @@ class QueueExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRang
         self._context_dao = context_dao
 
     def validate(self, queue, extension):
+        self.validate_same_tenant(queue, extension)
         self.validate_queue_not_already_associated(queue)
         self.validate_extension_not_already_associated(extension)
         self.validate_extension_not_associated_to_other_resource(extension)
         self.validate_extension_is_in_internal_context(extension)
         self.validate_exten_is_in_context_queue_range(extension)
+
+    def validate_same_tenant(self, queue, extension):
+        if extension.tenant_uuid != queue.tenant_uuid:
+            raise errors.different_tenants(
+                extension_tenant_uuid=extension.tenant_uuid,
+                queue_tenant_uuid=queue.tenant_uuid,
+            )
 
     def validate_queue_not_already_associated(self, queue):
         if queue.extensions:

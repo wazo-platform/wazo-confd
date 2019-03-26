@@ -7,6 +7,8 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -24,6 +26,7 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Queue to create
@@ -45,6 +48,7 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       responses:
         '200':
@@ -60,6 +64,7 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - name: body
         in: body
@@ -80,6 +85,7 @@ paths:
       tags:
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       responses:
         '204':
@@ -250,6 +256,10 @@ definitions:
           items:
             $ref: '#/definitions/KeyValueOption'
           default: []
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
     - $ref: '#/definitions/QueueRelationSchedules'
     - $ref: '#/definitions/QueueRelationMembers'
     required:
