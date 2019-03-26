@@ -87,6 +87,11 @@ definitions:
     - properties:
         uuid:
           type: string
+          readOnly: true
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         name:
           type: string
     - $ref: '#/definitions/SwitchboardRelationIncalls'

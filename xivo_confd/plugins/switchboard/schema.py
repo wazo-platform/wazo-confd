@@ -10,6 +10,7 @@ from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class SwitchboardSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     queue_music_on_hold = fields.String(validate=Length(max=128), allow_none=True)

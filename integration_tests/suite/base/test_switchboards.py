@@ -157,6 +157,7 @@ def test_create_minimal_parameters():
 
     assert_that(response.item, has_entries(
         uuid=not_(empty()),
+        tenant_uuid=MAIN_TENANT,
         name='MySwitchboard',
     ))
 
