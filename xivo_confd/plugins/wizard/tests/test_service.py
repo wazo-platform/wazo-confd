@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -15,7 +15,7 @@ from ..service import WizardService
 class TestWizardService(unittest.TestCase):
 
     def setUp(self):
-        self.service = WizardService(Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
+        self.service = WizardService(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
 
     @patch('xivo_confd.plugins.wizard.service.netifaces')
     def test_get_interfaces(self, netifaces):
