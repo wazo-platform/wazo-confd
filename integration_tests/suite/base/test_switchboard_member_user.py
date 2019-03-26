@@ -12,9 +12,14 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     helpers as h,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_UUID = 'uuid-not-found'
@@ -58,6 +63,33 @@ def test_associate_same_user_twice(switchboard, user):
     users = [{'uuid': user['uuid']}, {'uuid': user['uuid']}]
     response = confd.switchboards(switchboard['uuid']).members.users.put(users=users)
     response.assert_updated()
+
+
+@fixtures.switchboard(wazo_tenant=MAIN_TENANT)
+@fixtures.switchboard(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_switchboard, sub_switchboard, main_user, sub_user):
+    response = (
+        confd.switchboards(main_switchboard['uuid'])
+        .members.users(users=[sub_user])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('Switchboard'))
+
+    response = (
+        confd.switchboards(sub_switchboard['uuid'])
+        .members.users(users=[main_user])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(400, e.not_found('User'))
+
+    response = (
+        confd.switchboards(sub_switchboard['uuid'])
+        .members.users(users=[main_user])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.switchboard()
