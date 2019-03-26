@@ -192,6 +192,16 @@ def test_delete(switchboard):
     response.assert_match(404, e.not_found(resource='Switchboard'))
 
 
+@fixtures.switchboard(wazo_tenant=MAIN_TENANT)
+@fixtures.switchboard(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.switchboards(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Switchboard'))
+
+    response = confd.switchboards(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.switchboard()
 def test_bus_events(switchboard):
     routing_key_create = 'config.switchboards.*.created'
