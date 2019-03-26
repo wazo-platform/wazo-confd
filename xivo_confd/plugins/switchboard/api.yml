@@ -5,6 +5,9 @@ paths:
       description: '**Required ACL:** `confd.switchboards.read`'
       tags:
         - switchboards
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
       responses:
         '200':
           description: List of switchboards
@@ -19,12 +22,13 @@ paths:
       summary: Create a switchboard
       description: '**Required ACL:** `confd.switchboard.create`'
       parameters:
-      - name: body
-        in: body
-        description: Switchboard parameters
-        required: true
-        schema:
-          $ref: '#/definitions/Switchboard'
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: Switchboard parameters
+          required: true
+          schema:
+            $ref: '#/definitions/Switchboard'
       tags:
         - switchboards
       responses:
@@ -41,6 +45,7 @@ paths:
       tags:
         - switchboards
       parameters:
+        - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/switchboard_uuid'
       responses:
         '200':
@@ -55,6 +60,7 @@ paths:
       tags:
         - switchboards
       parameters:
+        - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/switchboard_uuid'
         - name: body
           in: body
@@ -74,6 +80,7 @@ paths:
       tags:
         - switchboards
       parameters:
+        - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/switchboard_uuid'
       responses:
         '204':
@@ -87,6 +94,11 @@ definitions:
     - properties:
         uuid:
           type: string
+          readOnly: true
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         name:
           type: string
     - $ref: '#/definitions/SwitchboardRelationIncalls'

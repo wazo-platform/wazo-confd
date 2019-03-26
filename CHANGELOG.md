@@ -4,6 +4,17 @@ Changelog
 19.05
 -----
 
+* The following endpoints are now multi-tenant.
+
+  This means that created resources will be in the same tenant as the creator or in the tenant
+  specified by the Wazo-Tenant HTTP header. Listing resources will also only list the ones in the
+  user's tenant unless a sub-tenant is specified using the Wazo-Tenant header. The `recurse=true`
+  query string can be used to list from multiple tenants. GET, DELETE and PUT on a resource that is
+  not tenant accessible will result in a 404. New readonly parameter has also been added:
+  `tenant_uuid`.
+
+  * `/1.1/switchboards`
+
 * Added Provisioning Networking Configuration endpoints:
 
   * GET `/1.1/provisioning/networking`
@@ -44,10 +55,6 @@ Changelog
 * New readonly parameters have been added to the call filter surrogate resource:
 
   * `member_id`
-
-* New readonly parameters have been added to the device resource:
-
-  * `tenant_uuid`
 
 * The following endpoints are now multi-tenant.
 
