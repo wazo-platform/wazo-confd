@@ -1,4 +1,3 @@
-git+https://github.com/wazo-pbx/wazo-dird-client.git
 git+https://github.com/wazo-pbx/wazo-provd-client.git
 git+https://github.com/wazo-pbx/xivo-auth-client.git
 git+https://github.com/wazo-pbx/xivo-bus.git

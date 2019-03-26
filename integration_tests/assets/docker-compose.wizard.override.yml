@@ -8,24 +8,14 @@ services:
       - rabbitmq
       - sysconfd
       - confd
-      - dird
     environment:
-      TARGETS: "postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,dird:9489,confd:9486"
+      TARGETS: "postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
 
   postgres:
     image: wazopbx/postgres
 
-  dird:
-    image: p0bailey/docker-flask
-    expose:
-      - "9489"
-    volumes:
-      - "./mocks/dird.py:/tmp/dird.py"
-    command: "python /tmp/dird.py"
-
   confd:
     volumes:
       - "./etc/timezone:/etc/timezone"
-      - "./etc/xivo-confd/conf.d/dird.yml:/etc/xivo-confd/conf.d/dird.yml"
       - "./etc/xivo-confd/conf.d/wizard.yml:/etc/xivo-confd/conf.d/wizard.yml"
     domainname: example.com

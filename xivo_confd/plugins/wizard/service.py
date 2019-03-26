@@ -20,7 +20,6 @@ from .validator import build_validator
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = r'^nameserver (.*)'
-PHONEBOOK_BODY = {'name': 'wazo'}
 DEFAULT_ADMIN_POLICY = 'wazo_default_admin_policy'
 ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
 ASTERISK_AUTOPROV_CONFIG_TPL = '''\
@@ -44,26 +43,23 @@ logger = logging.getLogger(__name__)
 
 class WizardService(object):
 
-    def __init__(self, validator, notifier, tenant_dao, infos_dao, provd_client, auth_client, dird_client, sysconfd):
+    def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, sysconfd):
         self.validator = validator
         self.notifier = notifier
-        self.tenant_dao = tenant_dao
         self.infos_dao = infos_dao
         self.provd_client = provd_client
         self.sysconfd = sysconfd
         self._auth_client = auth_client
-        self._dird_client = dird_client
 
     def get(self):
         return wizard_db.get_xivo_configured()
 
     def create(self, wizard):
         self.validator.validate_create(wizard)
-        tenant_uuid = self.tenant_dao.find().uuid
 
         if wizard['steps']['database']:
             with session_scope():
-                wizard_db.create(wizard, tenant_uuid)
+                wizard_db.create(wizard)
 
         self._send_sysconfd_cmd(
             wizard['network']['hostname'],
@@ -86,11 +82,6 @@ class WizardService(object):
             self.sysconfd.flush()
             self.sysconfd.exec_request_handlers({'ipbx': ['module reload res_pjsip.so']})
 
-        tenant_name = unique_tenant_name(wizard['entity_name'])
-        if wizard['steps']['tenant']:
-            self._initialize_tenant(tenant_uuid, tenant_name)
-        if wizard['steps']['phonebook']:
-            self._initialize_phonebook(tenant_name)
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
 
@@ -127,15 +118,6 @@ class WizardService(object):
             self.sysconfd.flush()
             self.sysconfd.commonconf_apply()
             self.sysconfd.flush()
-
-    def _initialize_phonebook(self, tenant_name):
-        token = self._auth_client.token.new(expiration=60)['token']
-        self._dird_client.phonebook.create(tenant=tenant_name, phonebook_body=PHONEBOOK_BODY, token=token)
-
-    def _initialize_tenant(self, tenant_uuid, tenant_name):
-        token = self._auth_client.token.new(expiration=60)['token']
-        self._auth_client.set_token(token)
-        self._auth_client.tenants.new(uuid=str(tenant_uuid), name=tenant_name)
 
     def _initialize_admin(self, username, password):
         token = self._auth_client.token.new(expiration=60)['token']
@@ -265,18 +247,12 @@ class WizardService(object):
         return None
 
 
-def build_service(provd_client, auth_client, dird_client, tenant_dao, infos_dao):
+def build_service(provd_client, auth_client, infos_dao):
     return WizardService(
         build_validator(),
         build_notifier(),
-        tenant_dao,
         infos_dao,
         provd_client,
         auth_client,
-        dird_client,
         sysconfd,
     )
-
-
-def unique_tenant_name(name):
-    return ''.join(c for c in name if c.isalnum()).lower()

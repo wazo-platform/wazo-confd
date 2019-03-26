@@ -80,72 +80,21 @@ definitions:
         - it_IT
         - nl_NL
         description: The language in which the Wazo will play sounds
-      entity_name:
-        type: string
-        description: Name of the first tenant on this engine
       network:
         $ref: '#/definitions/WizardNetwork'
-      context_incall:
-        $ref: '#/definitions/WizardContextIncall'
-      context_internal:
-        $ref: '#/definitions/WizardContextInternal'
-      context_outcall:
-        $ref: '#/definitions/WizardContextOutcall'
       steps:
         $ref: '#/definitions/WizardSteps'
     required:
     - admin_password
     - license
     - timezone
-    - entity_name
     - network
-    - context_internal
   WizardConfigured:
     title: WizardConfigured
     properties:
       configured:
         type: boolean
         description: Whether Wazo has already been configured or not
-  WizardContextIncall:
-    title: WizardContextIncall
-    properties:
-      display_name:
-        type: string
-        default: Incalls
-        description: Name of the context
-      number_start:
-        type: string
-        description: Beginning of the range of phone numbers for incoming calls
-      number_end:
-        type: string
-        description: End of the range of phone numbers for incoming calls
-      did_length:
-        type: integer
-        description: Length of the DID. Required if number_start and number_end are
-          defined
-  WizardContextInternal:
-    title: WizardContextInternal
-    properties:
-      display_name:
-        type: string
-        default: Default
-        description: Name of the context
-      number_start:
-        type: string
-        description: Beginning of the range of phone numbers for users
-      number_end:
-        type: string
-        description: End of the range of phone numbers for users
-    required:
-    - number_start
-    - number_end
-  WizardContextOutcall:
-    title: WizardContextOutcall
-    properties:
-      display_name:
-        type: string
-        default: Outcalls
-        description: Name of the context
   WizardDiscover:
     title: WizardDiscover
     properties:
@@ -255,14 +204,6 @@ definitions:
         type: boolean
         default: true
         description: Initialize xivo-provd database?
-      phonebook:
-        type: boolean
-        default: true
-        description: Create phonebook in wazo-dird?
-      tenant:
-        type: boolean
-        default: true
-        description: Create tenant in wazo-auth?
       admin:
         type: boolean
         default: true

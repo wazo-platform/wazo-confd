@@ -2,9 +2,6 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.alchemy.context import Context
-from xivo_dao.alchemy.contextinclude import ContextInclude
-from xivo_dao.alchemy.contextnumbers import ContextNumbers
 from xivo_dao.alchemy.general import General
 from xivo_dao.alchemy.netiface import Netiface
 from xivo_dao.alchemy.resolvconf import Resolvconf
@@ -66,56 +63,6 @@ def set_netiface(interface, address, netmask, gateway):
                          description='Wizard Configuration'))
 
 
-def set_context_switchboard(tenant_uuid):
-    Session.add(Context(name='__switchboard_directory',
-                        displayname='Switchboard',
-                        contexttype='others',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-
-def set_context_internal(context, tenant_uuid):
-    Session.add(Context(name='default',
-                        displayname=context['display_name'],
-                        contexttype='internal',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-    Session.add(ContextNumbers(context='default',
-                               type='user',
-                               numberbeg=context['number_start'],
-                               numberend=context['number_end']))
-
-
-def set_context_incall(context, tenant_uuid):
-    Session.add(Context(name='from-extern',
-                        displayname=context['display_name'],
-                        contexttype='incall',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-    if context.get('number_start') and context.get('number_end'):
-        Session.add(ContextNumbers(context='from-extern',
-                                   type='incall',
-                                   numberbeg=context['number_start'],
-                                   numberend=context['number_end'],
-                                   didlength=context['did_length']))
-
-
-def set_context_outcall(context, tenant_uuid):
-    Session.add(Context(name='to-extern',
-                        displayname=context['display_name'],
-                        contexttype='outcall',
-                        description='',
-                        tenant_uuid=str(tenant_uuid)))
-
-
-def include_outcall_context_in_internal_context():
-    Session.add(ContextInclude(context='default',
-                               include='to-extern',
-                               priority=0))
-
-
 def set_xivo_configured():
     row = Session.query(General).first()
     row.configured = True
@@ -126,15 +73,10 @@ def get_xivo_configured():
     return Session.query(General).first()
 
 
-def create(wizard, tenant_uuid):
+def create(wizard):
     network = wizard['network']
 
     set_language(wizard['language'])
     set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])
-    set_context_switchboard(tenant_uuid)
-    set_context_incall(wizard['context_incall'], tenant_uuid)
-    set_context_internal(wizard['context_internal'], tenant_uuid)
-    set_context_outcall(wizard['context_outcall'], tenant_uuid)
-    include_outcall_context_in_internal_context()

@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
-import string
-
 from flask import request
-from marshmallow import fields, validates_schema, validates
-from marshmallow.validate import Equal, Regexp, Length, OneOf, Predicate, Range
-from marshmallow.exceptions import ValidationError
+from marshmallow import fields
+from marshmallow.validate import Equal, Regexp, Length, OneOf
 
 from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
 from xivo_confd.helpers.restful import ErrorCatchingResource
@@ -33,43 +30,6 @@ class WizardNetworkSchema(BaseSchema):
     nameservers = fields.List(fields.String(validate=Regexp(IP_ADDRESS_REGEX)), validate=Length(max=3), required=True)
 
 
-class WizardContextOutcallSchema(BaseSchema):
-    display_name = fields.String(validate=Length(min=3, max=128), missing='Outcalls')
-
-
-class WizardContextInternalSchema(BaseSchema):
-    display_name = fields.String(validate=Length(min=3, max=128), missing='Default')
-    number_start = fields.String(validate=(Predicate('isdigit'), Length(max=16)), required=True)
-    number_end = fields.String(validate=(Predicate('isdigit'), Length(max=16)), required=True)
-
-    @validates_schema
-    def validate_numbers(self, data):
-        if not data.get('number_start') and not data.get('number_end'):
-            return
-        if not data.get('number_start') or not data.get('number_end'):
-            raise ValidationError('Both numbers, number_start and number_end, must be set')
-
-        if len(data['number_start']) != len(data['number_end']):
-            raise ValidationError('Numbers do not have de same length')
-
-        if int(data['number_start']) > int(data['number_end']):
-            raise ValidationError('It is not a valid interval')
-
-
-class WizardContextIncallSchema(WizardContextInternalSchema):
-    display_name = fields.String(validate=Length(min=3, max=128), missing='Incalls')
-    did_length = fields.Integer(validate=Range(min=0, max=20))
-    number_start = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
-    number_end = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
-
-    @validates_schema
-    def validate_numbers(self, data):
-        super(WizardContextIncallSchema, self).validate_numbers(data)
-        if data.get('number_start') and data.get('number_end'):
-            if not data.get('did_length'):
-                raise ValidationError('Missing data for required field.', 'did_length')
-
-
 class WizardStepsSchema(BaseSchema):
     database = fields.Boolean(missing=True)
     manage_services = fields.Boolean(missing=True)
@@ -77,8 +37,6 @@ class WizardStepsSchema(BaseSchema):
     manage_resolv_file = fields.Boolean(missing=True)
     commonconf = fields.Boolean(missing=True)
     provisioning = fields.Boolean(missing=True)
-    phonebook = fields.Boolean(missing=True)
-    tenant = fields.Boolean(missing=True)
     admin = fields.Boolean(missing=True)
 
 
@@ -88,20 +46,9 @@ class WizardSchema(BaseSchema):
     admin_password = fields.String(validate=Regexp(ADMIN_PASSWORD_REGEX), required=True)
     license = StrictBoolean(validate=Equal(True), required=True)
     language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
-    entity_name = fields.String(validate=Length(min=3, max=64), required=True)
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
-    context_internal = fields.Nested(WizardContextInternalSchema, required=True)
-    context_outcall = fields.Nested(WizardContextOutcallSchema, missing=WizardContextOutcallSchema().load({}).data)
-    context_incall = fields.Nested(WizardContextIncallSchema, missing=WizardContextIncallSchema().load({}).data)
     steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
-
-    @validates('entity_name')
-    def validate_entity_name(self, entity_name):
-        sub_name = ''.join(c for c in entity_name if (c in string.ascii_letters
-                                                      or c in string.digits))
-        if len(sub_name) < 3:
-            raise ValidationError('Shorter than alphanumeric minimum length 3.')
 
 
 class ConfiguredSchema(BaseSchema):
