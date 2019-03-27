@@ -225,7 +225,7 @@ def test_associate_line_to_extension_already_associated(extension, line):
 @fixtures.line_sip()
 def test_associate_line_to_extension_already_associated_to_other_resource(line):
     with db.queries() as queries:
-        queries.insert_queue(number='1234')
+        queries.insert_queue(number='1234', tenant_uuid=MAIN_TENANT)
 
     extension_id = confd.extensions.get(exten='1234').items[0]['id']
 

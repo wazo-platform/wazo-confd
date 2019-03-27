@@ -77,10 +77,10 @@ class DatabaseQueries(object):
     def __init__(self, connection):
         self.connection = connection
 
-    def insert_queue(self, name='myqueue', number='3000', context='default'):
+    def insert_queue(self, name='myqueue', number='3000', context='default', tenant_uuid=None):
         queue_query = text("""
-        INSERT INTO queuefeatures (name, displayname, number, context)
-        VALUES (:name, :displayname, :number, :context)
+        INSERT INTO queuefeatures (name, displayname, number, context, tenant_uuid)
+        VALUES (:name, :displayname, :number, :context, :tenant_uuid)
         RETURNING id
         """)
 
@@ -89,7 +89,8 @@ class DatabaseQueries(object):
                              name=name,
                              displayname=name,
                              number=number,
-                             context=context)
+                             context=context,
+                             tenant_uuid=tenant_uuid)
                     .scalar())
 
         self.insert_extension(number, context, 'queue', queue_id)
