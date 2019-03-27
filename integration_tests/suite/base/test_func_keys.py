@@ -200,7 +200,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
 
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
-            queue_id = queries.insert_queue(number=queue_exten)
+            queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
             conference_id = queries.insert_conference(number=conf_exten)
             agent_id = queries.insert_agent(self.user['id'])
             paging_id = queries.insert_paging(number=paging_number, tenant_uuid=MAIN_TENANT)
