@@ -45,6 +45,19 @@ def test_put_minimal_parameters():
         'rest_https_port': 8666,
     }))
 
+    body = {
+        'provision_host': None,
+    }
+    result = confd.provisioning.networking.put(body)
+    result.assert_status(204)
+    response = confd.provisioning.networking.get()
+    assert_that(response.item, has_entries({
+        'provision_host': None,
+        'provision_http_port': 8667,
+        'rest_host': 'provd',
+        'rest_https_port': 8666,
+    }))
+
 
 def test_put_all_parameters():
     body = {
