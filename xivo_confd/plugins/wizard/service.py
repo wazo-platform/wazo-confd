@@ -81,6 +81,7 @@ class WizardService(object):
             self.sysconfd.exec_request_handlers({'chown_autoprov_config': []})
             self.sysconfd.flush()
             self.sysconfd.exec_request_handlers({'ipbx': ['module reload res_pjsip.so']})
+            self.sysconfd.restart_provd()
 
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
