@@ -42,6 +42,8 @@ Changelog
   * `phonebook`
   * `tenant`
 
+* In `/dhcp`, the field `extra_network_interfaces` is renamed to `network_intergaces`.
+
 
 19.04
 -----
