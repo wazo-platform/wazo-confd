@@ -40,7 +40,8 @@ definitions:
       pool_end:
         type: string
         description: The last IP address that can be allocated by DHCP
-      extra_network_interfaces:
+      network_interfaces:
         type: array
         items:
           type: string
+        description: A comma separated list of network interface that the DHCP server listens on

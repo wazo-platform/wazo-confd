@@ -5,22 +5,10 @@
 import re
 
 from hamcrest import (
-    all_of,
     assert_that,
-    empty,
     has_entries,
-    has_entry,
-    has_item,
-    has_items,
-    is_not,
-    not_,
 )
 
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
 from . import confd
 
 
@@ -30,7 +18,7 @@ def test_get():
         'active': False,
         'pool_start': '',
         'pool_end': '',
-        'extra_network_interfaces': [],
+        'network_interfaces': [],
     }))
 
 
@@ -59,7 +47,7 @@ def test_put_all_parameters():
         'active': True,
         'pool_start': '10.0.0.1',
         'pool_end': '10.0.0.254',
-        'extra_network_interfaces': ['ens0p2', 'ens0p3'],
+        'network_interfaces': ['ens0p2', 'ens0p3'],
     }
     result = confd.dhcp.put(body)
     result.assert_status(204)

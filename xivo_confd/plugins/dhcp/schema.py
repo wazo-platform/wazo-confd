@@ -4,7 +4,7 @@
 
 import socket
 
-from marshmallow import fields, post_load, pre_dump, validates, validates_schema
+from marshmallow import fields, post_load, pre_dump, validates_schema
 from marshmallow.exceptions import ValidationError
 
 from xivo_confd.helpers.mallow import BaseSchema
@@ -15,7 +15,7 @@ class DHCPSchema(BaseSchema):
     active = fields.Boolean(required=True)
     pool_start = fields.String()
     pool_end = fields.String()
-    extra_network_interfaces = fields.List(fields.String(), missing=list, attribute='extra_ifaces')
+    network_interfaces = fields.List(fields.String(), missing=list, attribute='extra_ifaces')
 
     @validates_schema
     def check_pool_if_active(self, data):
