@@ -43,6 +43,7 @@ Changelog
   * `tenant`
 
 * In `/dhcp`, the field `extra_network_interfaces` is renamed to `network_interfaces`.
+* A new function key type has been added: `groupmember`
 
 
 19.04
