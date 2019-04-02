@@ -437,6 +437,18 @@ class DatabaseQueries(object):
 
         return count > 0
 
+    def sccp_device_exists(self, sccp_device):
+        query = text("""SELECT COUNT(*)
+                     FROM sccpdevice
+                     WHERE
+                        sccpdevice.device = :sccp_device
+                     """)
+        count = (self.connection
+                 .execute(query,
+                          sccp_device=sccp_device)
+                 .scalar())
+        return count > 0
+
     def sip_has_language(self, language):
         query = text("""SELECT COUNT(*)
                      FROM staticsip

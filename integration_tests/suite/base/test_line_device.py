@@ -507,6 +507,23 @@ def check_dissociate_sccp(line, device):
         assert_that(q.line_has_sccp_device(line['id'], sccp_device), equal_to(False))
 
 
+def test_reset_sccp_to_autoprov():
+    with line_and_device('sccp') as (line, device):
+        response = confd.lines(line['id']).devices(device['id']).put()
+        response.assert_ok()
+
+        confd.devices(device['id']).autoprov.get()
+        provd_device = provd.devices.get(device['id'])
+        assert_that(provd_device['config'], starts_with('autoprov'))
+        yield check_sccp_reset_to_autoprov, device
+
+
+def check_sccp_reset_to_autoprov(device):
+    sccp_device = 'SEP' + device['mac'].replace(":", "").upper()
+    with db.queries() as q:
+        assert_that(q.sccp_device_exists(sccp_device), equal_to(False))
+
+
 @fixtures.device(wazo_tenant=MAIN_TENANT)
 @fixtures.device(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_device, sub_device):
