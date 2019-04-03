@@ -6,7 +6,6 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao_module
 
 from xivo_confd.database import device as device_db
-from xivo_confd.plugins.device.builder import build_device_updater
 
 from .notifier import build_notifier
 from .validator import build_validator
@@ -70,8 +69,7 @@ class LineDeviceService(object):
         return [LineDevice.from_line(line) for line in lines]
 
 
-def build_service(provd_client):
+def build_service(provd_client, device_updater):
     validator = build_validator()
-    updater = build_device_updater(provd_client)
     notifier = build_notifier()
-    return LineDeviceService(validator, line_dao_module, notifier, updater)
+    return LineDeviceService(validator, line_dao_module, notifier, device_updater)

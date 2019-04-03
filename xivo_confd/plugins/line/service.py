@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -63,4 +63,4 @@ def build_service(provd_client):
                        device_updater,
                        device_dao,
                        user_line_build_service(),
-                       line_device_build_service(provd_client))
+                       line_device_build_service(provd_client, device_updater))

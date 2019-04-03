@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
@@ -23,7 +23,7 @@ class Plugin(object):
         token_changed_subscribe(provd_client.set_token)
 
         dao = build_dao(provd_client)
-        service = build_service(dao)
+        service = build_service(dao, provd_client)
 
         api.add_resource(
             DeviceItem,

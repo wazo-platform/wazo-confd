@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.line import dao as line_dao
 from wazo_provd_client import Client as ProvdClient
 
-from xivo_confd.plugins.device.builder import build_dao as build_device_dao
+from xivo_confd.plugins.device.builder import build_dao as build_device_dao, build_device_updater
 
 from .resource import (
     LineDeviceAssociation,
@@ -26,7 +26,8 @@ class Plugin(object):
         token_changed_subscribe(provd_client.set_token)
 
         device_dao = build_device_dao(provd_client)
-        service = build_service(provd_client)
+        device_updater = build_device_updater(provd_client)
+        service = build_service(provd_client, device_updater)
 
         api.add_resource(
             LineDeviceAssociation,

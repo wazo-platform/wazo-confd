@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.extension import dao as extension_dao
@@ -9,7 +9,7 @@ from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 
-from xivo_confd import bus
+from xivo_confd import bus, sysconfd
 from xivo_confd.database import (
     device as device_db,
     func_key_template as func_key_template_db,
@@ -33,6 +33,10 @@ from xivo_confd.plugins.device.update import (
     ProvdUpdater,
 )
 
+from xivo_confd.plugins.line_device.service import LineDeviceService
+from xivo_confd.plugins.line_device.validator import build_validator as build_line_device_validator
+from xivo_confd.plugins.line_device.notifier import LineDeviceNotifier
+
 from .dao import DeviceDao
 from .notifier import DeviceNotifier
 from .validator import build_validator
@@ -42,15 +46,20 @@ def build_dao(provd_client):
     return DeviceDao(provd_client)
 
 
-def build_service(device_dao):
+def build_service(device_dao, provd_client):
     search_engine = SearchEngine(device_dao)
     device_validator = build_validator(device_dao, line_dao)
     device_notifier = DeviceNotifier(bus)
+    device_updater = build_device_updater(provd_client)
+    line_device_validator = build_line_device_validator()
+    line_device_notifier = LineDeviceNotifier(bus, sysconfd)
+    line_device = LineDeviceService(line_device_validator, line_dao, line_device_notifier, device_updater)
     device_service = DeviceService(device_dao,
                                    device_validator,
                                    device_notifier,
                                    search_engine,
-                                   line_dao)
+                                   line_dao,
+                                   line_device)
 
     return device_service
 
