@@ -82,6 +82,8 @@ class WizardService(object):
             self.sysconfd.flush()
             self.sysconfd.exec_request_handlers({'ipbx': ['module reload res_pjsip.so']})
             self.sysconfd.restart_provd()
+            self.sysconfd.dhcpd_update()
+            self.sysconfd.flush()
 
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
