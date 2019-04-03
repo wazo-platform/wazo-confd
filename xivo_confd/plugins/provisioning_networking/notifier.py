@@ -16,4 +16,6 @@ class ProvisioningNetworkingNotifier(object):
     def edited(self, provisioning_networking):
         event = EditProvisioningNetworkingEvent()
         self.bus.send_bus_event(event)
+        self.sysconfd.commonconf_generate()
+        self.sysconfd.commonconf_apply()
         self.sysconfd.restart_provd()
