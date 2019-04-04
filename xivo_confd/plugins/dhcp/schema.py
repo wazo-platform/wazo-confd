@@ -15,7 +15,7 @@ class DHCPSchema(BaseSchema):
     active = fields.Boolean(required=True)
     pool_start = fields.String()
     pool_end = fields.String()
-    network_interfaces = fields.List(fields.String(), missing=list, attribute='extra_ifaces')
+    network_interfaces = fields.List(fields.String(), missing=list)
 
     @validates_schema
     def check_pool_if_active(self, data):
@@ -45,14 +45,14 @@ class DHCPSchema(BaseSchema):
             'active': bool(data.active),
             'pool_start': data.pool_start,
             'pool_end': data.pool_end,
-            'extra_ifaces': [],
+            'network_interfaces': [],
         }
-        if data.extra_ifaces:
-            result['extra_ifaces'] = data.extra_ifaces.split(',')
+        if data.network_interfaces:
+            result['network_interfaces'] = data.network_interfaces.split(',')
         return result
 
     @post_load
     def to_db_model(self, data):
         data['active'] = int(data['active'])
-        data['extra_ifaces'] = ','.join(data['extra_ifaces'])
+        data['network_interfaces'] = ','.join(data['network_interfaces'])
         return data
