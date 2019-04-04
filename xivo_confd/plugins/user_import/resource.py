@@ -37,8 +37,7 @@ class UserImportResource(ConfdResource):
         return response, status_code
 
     @required_acl('confd.users.import.update')
-    def put(self):
-        return 'Method Not Allowed', 405
+    def put_disabled(self):
         parser = csvparse.parse()
         tenant = Tenant.autodetect()
         entries, errors = self.service.update_rows(parser, tenant.uuid)
