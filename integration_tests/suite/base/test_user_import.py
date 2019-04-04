@@ -4,6 +4,7 @@
 
 from __future__ import unicode_literals
 
+import unittest
 import uuid
 
 from hamcrest import (
@@ -288,6 +289,7 @@ def test_given_voicemail_contains_error_then_error_returned():
     assert_error(response, has_error_field('number'))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(voicemail=True)
 def test_update_voicemail_contains_error_then_error_returned(entry):
     csv = [{"uuid": entry["user_uuid"],
@@ -482,6 +484,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
     ))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry()
 def test_update_wazo_user_fields_then_wazo_user_updated(entry):
     user_uuid = entry["user_uuid"]
@@ -505,6 +508,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
     ))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry()
 @fixtures.csv_entry()
 def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2):
@@ -835,6 +839,7 @@ def import_empty_group(fields, parameter, expected=None):
     assert_that(entry, has_entries({parameter: expected}))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry()
 def test_when_updating_user_fields_then_user_resource_updated(entry):
     csv = [{
@@ -889,6 +894,7 @@ def test_when_updating_user_fields_then_user_resource_updated(entry):
     ))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(voicemail=True)
 def test_when_updating_voicemail_fields_then_voicemail_updated(entry):
     number = h.voicemail.find_available_number(config.CONTEXT)
@@ -921,6 +927,7 @@ def test_when_updating_voicemail_fields_then_voicemail_updated(entry):
     ))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry()
 def test_when_adding_voicemail_fields_then_voicemail_created(entry):
     number = h.voicemail.find_available_number(config.CONTEXT)
@@ -953,6 +960,7 @@ def test_when_adding_voicemail_fields_then_voicemail_created(entry):
     ))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_updating_sip_line_fields_then_sip_updated(entry):
     csv = [{
@@ -969,6 +977,7 @@ def test_when_updating_sip_line_fields_then_sip_updated(entry):
                                  secret="mynewsippassword"))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_updating_sip_line_fields_to_none_then_error_raised(entry):
     csv = [{
@@ -982,6 +991,7 @@ def test_when_updating_sip_line_fields_to_none_then_error_raised(entry):
     assert_error(response, has_error_field('secret'))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry()
 def test_when_adding_sip_line_then_sip_created(entry):
     csv = [{
@@ -999,6 +1009,7 @@ def test_when_adding_sip_line_then_sip_created(entry):
                                  secret="createdsippassword"))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry()
 def test_when_adding_sccp_line_then_sccp_created(entry):
     csv = [{
@@ -1013,6 +1024,7 @@ def test_when_adding_sccp_line_then_sccp_created(entry):
     assert_that(sccp, has_entries(id=sccp_id))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_changing_line_protocol_then_error_raised(entry):
     csv = [{
@@ -1025,6 +1037,7 @@ def test_when_changing_line_protocol_then_error_raised(entry):
     assert_error(response, has_error_field('endpoint'))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(extension=True)
 def test_when_updating_extension_then_extension_updated(entry):
     exten = h.extension.find_available_exten(config.CONTEXT)
@@ -1043,6 +1056,7 @@ def test_when_updating_extension_then_extension_updated(entry):
                                        context=config.CONTEXT))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(extension=True)
 @fixtures.line_sip()
 @fixtures.extension()
@@ -1068,6 +1082,7 @@ def test_when_updating_extension_then_only_main_extension_updated(entry, line2, 
         assert_that(response, has_entries(exten=extension2['exten']))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(line_protocol="sip")
 def test_when_adding_extension_then_extension_created(entry):
     exten = h.extension.find_available_exten(config.CONTEXT)
@@ -1086,6 +1101,7 @@ def test_when_adding_extension_then_extension_created(entry):
                                        context=config.CONTEXT))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(incall=True)
 def test_when_updating_incall_fields_then_incall_updated(entry):
     exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
@@ -1103,6 +1119,7 @@ def test_when_updating_incall_fields_then_incall_updated(entry):
                                        context=config.INCALL_CONTEXT))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(line_protocol="sip", extension=True)
 def test_when_adding_incall_then_incall_created(entry):
     exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
@@ -1120,6 +1137,7 @@ def test_when_adding_incall_then_incall_created(entry):
                                        context=config.INCALL_CONTEXT))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(call_permissions=2)
 @fixtures.call_permission()
 @fixtures.call_permission()
@@ -1147,6 +1165,7 @@ def test_when_updating_call_permission_field_then_call_permissions_updated(entry
                                                                 user_id=user_id)))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(call_permissions=1)
 def test_when_call_permission_column_is_empty_then_call_permission_is_removed(entry):
     csv = [{"uuid": entry['user_uuid'],
@@ -1167,6 +1186,7 @@ def test_when_call_permission_column_is_empty_then_call_permission_is_removed(en
     assert_that(response.items, empty())
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(call_permissions=1)
 def test_when_call_permission_column_is_not_in_csv_then_call_permission_remains_unchanged(entry):
     csv = [{"uuid": entry['user_uuid']}]
@@ -1191,6 +1211,7 @@ def check_error_on_update(entry, fields, error):
     assert_error(response, has_error_field(error))
 
 
+@unittest.skip('PUT has been disabled')
 def test_given_csv_has_errors_then_errors_returned():
     with fixtures.csv_entry(voicemail=True, incall=True, line_protocol="sip") as entry:
         yield check_error_on_update, entry, {'firstname': ''}, 'firstname'
@@ -1198,6 +1219,7 @@ def test_given_csv_has_errors_then_errors_returned():
         yield check_error_on_update, entry, {'sip_username': '^]'}, 'name'
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(extension=True, voicemail=True, incall=True, line_protocol="sip")
 @fixtures.csv_entry(extension=True, voicemail=True, incall=True, line_protocol="sccp")
 def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
@@ -1305,6 +1327,7 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
     ))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.user()
 @fixtures.sip()
 @fixtures.extension()
@@ -1357,6 +1380,7 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
                                                                 user_id=entry['user_id'])))
 
 
+@unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(extension=True,
                     voicemail=True,
                     incall=True,

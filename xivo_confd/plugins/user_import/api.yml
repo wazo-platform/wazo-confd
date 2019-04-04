@@ -48,11 +48,15 @@ paths:
             $ref: '#/definitions/UserImportError'
     put:
       operationId: update_users_csv
-      summary: Mass import users and associated resources
-      description: '**Required ACL:** `confd.users.import.update`
+      summary: '**Disabled!** Mass import users and associated resources'
+      description: '** This endpoint is disabled.**
+
+      **Required ACL:** `confd.users.import.update`
 
 
-        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html'
+        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html
+
+        This resource has been disabled since it creates invalid configurations'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
         url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
@@ -72,6 +76,8 @@ paths:
           description: Errors occurred during update
           schema:
             $ref: '#/definitions/UserImportError'
+        '405':
+          description: This method is not supported for this resource
 
 parameters:
   csvbody:

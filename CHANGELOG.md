@@ -1,6 +1,12 @@
 Changelog
 =========
 
+19.06
+-----
+
+* The `/1.1/users/import` PUT has been disabled since it creates invalid configurations
+
+
 19.05
 -----
 

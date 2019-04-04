@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.tenant_flask_helpers import Tenant
@@ -37,7 +37,7 @@ class UserImportResource(ConfdResource):
         return response, status_code
 
     @required_acl('confd.users.import.update')
-    def put(self):
+    def put_disabled(self):
         parser = csvparse.parse()
         tenant = Tenant.autodetect()
         entries, errors = self.service.update_rows(parser, tenant.uuid)
