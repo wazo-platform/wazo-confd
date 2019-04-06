@@ -24,11 +24,7 @@ class HEPConfigurationNotifier(object):
             event = HEPGeneralUpdatedEvent()
             self.bus.send_bus_event(event)
 
-        self.send_sysconfd_handlers([
-            'module reload res_hep.so',
-            'module reload res_hep_pjsip.so',
-            'module reload res_hep_rtcp.so'
-        ])
+        self.send_sysconfd_handlers(['module reload res_hep.so'])
 
 
 def build_notifier():
