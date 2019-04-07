@@ -14,8 +14,6 @@ SYSCONFD_HANDLERS = {
     'ctibus': [],
     'ipbx': [
         'module reload res_hep.so',
-        'module reload res_hep_pjsip.so',
-        'module reload res_hep_rtcp.so',
     ],
     'agentbus': [],
 }
