@@ -53,6 +53,7 @@ paths:
       - agents
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/agentid'
       - name: body
@@ -74,6 +75,7 @@ paths:
       - agents
       - queues
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/agentid'
       responses:

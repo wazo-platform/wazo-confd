@@ -31,6 +31,7 @@ class QueueMemberUserSchema(BaseSchema):
 class QueueMemberAgentItem(ConfdResource):
 
     schema = QueueMemberAgentSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, queue_dao, agent_dao):
         super(QueueMemberAgentItem, self).__init__()
@@ -40,15 +41,17 @@ class QueueMemberAgentItem(ConfdResource):
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.read')
     def get(self, queue_id, agent_id):
-        queue = self.queue_dao.get(queue_id)
-        agent = self.agent_dao.get(agent_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
+        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         member = self.service.get_member_agent(queue, agent)
         return QueueMemberAgentLegacySchema().dump(member).data
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.update')
     def put(self, queue_id, agent_id):
-        queue = self.queue_dao.get(queue_id)
-        agent = self.agent_dao.get(agent_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
+        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, agent)
         form = self.schema().load(request.get_json()).data
         member.penalty = form['penalty']
@@ -58,8 +61,9 @@ class QueueMemberAgentItem(ConfdResource):
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.delete')
     def delete(self, queue_id, agent_id):
-        queue = self.queue_dao.get(queue_id)
-        agent = self.agent_dao.get(agent_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
+        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, agent)
         self.service.dissociate_member_agent(queue, member)
         return '', 204

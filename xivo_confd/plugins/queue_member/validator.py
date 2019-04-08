@@ -33,7 +33,26 @@ class QueueMemberUserAssociationValidator(ValidatorAssociation):
             )
 
 
+class QueueMemberAgentAssociationValidator(ValidatorAssociation):
+
+    def validate(self, queue, member):
+        self.validate_same_tenant(queue, member.agent)
+
+    def validate_same_tenant(self, queue, agent):
+        if queue.tenant_uuid != agent.tenant_uuid:
+            raise errors.different_tenants(
+                queue_tenant_uuid=queue.tenant_uuid,
+                agent_tenant_uuid=agent.tenant_uuid
+            )
+
+
 def build_validator_member_user():
     return ValidationAssociation(
         association=[QueueMemberUserAssociationValidator()],
+    )
+
+
+def build_validator_member_agent():
+    return ValidationAssociation(
+        association=[QueueMemberAgentAssociationValidator()],
     )
