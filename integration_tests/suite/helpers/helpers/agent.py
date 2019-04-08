@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
 
 from . import confd
+from ..config import MAIN_TENANT
 
 
 def generate_agent(**parameters):
     parameters.setdefault('number', generate_number())
+    parameters.setdefault('wazo_tenant', MAIN_TENANT)
     return add_agent(**parameters)
 
 
-def add_agent(**parameters):
-    response = confd.agents.post(parameters)
+def add_agent(wazo_tenant=None, **parameters):
+    response = confd.agents.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

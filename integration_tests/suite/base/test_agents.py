@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -10,6 +10,9 @@ from hamcrest import (
     has_item,
     is_not,
     instance_of,
+    all_of,
+    not_,
+    has_items,
 )
 
 from . import confd
@@ -17,6 +20,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -121,6 +128,22 @@ def check_search(url, agent, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.agents.get(wazo_tenant=MAIN_TENANT)
+    expected = all_of(has_item(main)), not_(has_item(sub))
+    assert_that(response.items, expected)
+
+    response = confd.agents.get(wazo_tenant=SUB_TENANT)
+    expected = all_of(has_item(sub), not_(has_item(main)))
+    assert_that(response.items, expected)
+
+    response = confd.agents.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    expected = has_items(main, sub)
+    assert_that(response.items, expected)
+
+
 @fixtures.agent(firstname='sort1', lastname='sort1', preprocess_subroutine='sort1')
 @fixtures.agent(firstname='sort2', lastname='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(agent1, agent2):
@@ -150,6 +173,16 @@ def test_get(agent):
         skills=empty(),
         users=empty(),
     ))
+
+
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.agents(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Agent'))
+
+    response = confd.agents(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_parameters():
@@ -187,6 +220,13 @@ def test_create_all_parameters():
     confd.agents(response.item['id']).delete().assert_deleted()
 
 
+def test_create_multi_tenant():
+    response = confd.agents.post(number='1234', wazo_tenant=SUB_TENANT)
+    response.assert_created('agents')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
+
+
 @fixtures.agent()
 def test_edit_minimal_parameters(agent):
     response = confd.agents(agent['id']).put()
@@ -219,6 +259,16 @@ def test_edit_number_unavailable(agent):
     assert_that(response.item, has_entries(number=agent['number']))
 
 
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.agents(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Agent'))
+
+    response = confd.agents(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.agent()
 def test_delete(agent):
     response = confd.agents(agent['id']).delete()
@@ -226,6 +276,16 @@ def test_delete(agent):
 
     response = confd.agents(agent['id']).get()
     response.assert_match(404, e.not_found(resource='Agent'))
+
+
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.agents(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Agent'))
+
+    response = confd.agents(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.agent()
