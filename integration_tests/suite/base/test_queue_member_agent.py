@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -14,6 +14,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -168,6 +172,21 @@ def test_associate_multiple_queues_to_agent(queue1, queue2, agent):
         response.assert_created()
 
 
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_queue, sub_queue, main_agent, sub_agent):
+    response = confd.queues(main_queue['id']).members.agents(main_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Queue'))
+
+    response = confd.queues(sub_queue['id']).members.agents(main_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Agent'))
+
+    response = confd.queues(main_queue['id']).members.agents(sub_agent['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.queue()
 @fixtures.agent()
 def test_dissociate(queue, agent):
@@ -184,6 +203,14 @@ def test_dissociate(queue, agent):
 def test_dissociate_not_associated(queue, agent):
     response = confd.queues(queue['id']).members.agents(agent['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+def test_dissociate_multi_tenant(queue, agent):
+    with a.queue_member_agent(queue, agent, check=False):
+        response = confd.queues(queue['id']).members.agents(agent['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Queue'))
 
 
 @fixtures.queue()
