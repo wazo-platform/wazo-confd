@@ -116,6 +116,7 @@ class QueueMemberUserItem(ConfdResource):
 class QueueMemberAgentListLegacy(ConfdResource):
 
     schema = QueueMemberAgentLegacySchema
+    has_tenant_uuid = True
 
     def __init__(self, service, queue_dao, agent_dao):
         super(QueueMemberAgentListLegacy, self).__init__()
@@ -131,9 +132,10 @@ class QueueMemberAgentListLegacy(ConfdResource):
 
     @required_acl('confd.queues.{queue_id}.members.agents.create')
     def post(self, queue_id):
-        queue = self.queue_dao.get(queue_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json()).data
-        agent = self.service.get_agent(form['agent']['id'])
+        agent = self.service.get_agent(form['agent']['id'], tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, agent)
         member.penalty = form['penalty']
         self.service.associate_legacy(queue, member)

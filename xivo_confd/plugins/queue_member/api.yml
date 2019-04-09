@@ -12,6 +12,7 @@ paths:
       tags:
       - deprecated
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - name: body
         in: body
@@ -36,6 +37,7 @@ paths:
       tags:
       - deprecated
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/queueid'
       - $ref: '#/parameters/agentid'
       responses:
