@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -15,7 +15,6 @@ from ..notifier import RegisterIAXNotifier
 
 
 EXPECTED_SYSCONFD_HANDLERS = {
-    'ctibus': [],
     'ipbx': ['iax2 reload'],
     'agentbus': []
 }

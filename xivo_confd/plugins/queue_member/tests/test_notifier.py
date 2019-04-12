@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -40,7 +40,6 @@ class TestQueueMemberNotifier(unittest.TestCase):
         expected_handlers = {
             'ipbx': [],
             'agentbus': ['agent.edit.{}'.format(self.member.agent.id)],
-            'ctibus': ['xivo[queuemember,update]'],
         }
 
         self.notifier.agent_associated(self.queue, self.member)
@@ -58,7 +57,6 @@ class TestQueueMemberNotifier(unittest.TestCase):
         expected_handlers = {
             'ipbx': [],
             'agentbus': ['agent.edit.{}'.format(self.member.agent.id)],
-            'ctibus': ['xivo[queuemember,update]'],
         }
 
         self.notifier.agent_dissociated(self.queue, self.member)
@@ -76,7 +74,6 @@ class TestQueueMemberNotifier(unittest.TestCase):
         expected_handlers = {
             'agentbus': [],
             'ipbx': ['module reload res_pjsip.so', 'module reload app_queue.so', 'module reload chan_sccp.so'],
-            'ctibus': ['xivo[queuemember,update]'],
         }
 
         self.notifier.user_associated(self.queue, self.member)
@@ -94,7 +91,6 @@ class TestQueueMemberNotifier(unittest.TestCase):
         expected_handlers = {
             'agentbus': [],
             'ipbx': ['module reload res_pjsip.so', 'module reload app_queue.so', 'module reload chan_sccp.so'],
-            'ctibus': ['xivo[queuemember,update]'],
         }
 
         self.notifier.user_dissociated(self.queue, self.member)

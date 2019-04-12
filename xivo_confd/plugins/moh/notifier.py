@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import ArbitraryEvent
@@ -14,9 +14,10 @@ class MohNotifier(object):
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ctibus': [],
-                    'ipbx': ['moh reload'],
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ['moh reload'],
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, moh):

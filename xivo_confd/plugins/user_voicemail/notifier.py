@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_voicemail.event import (
@@ -15,31 +15,20 @@ class UserVoicemailNotifier(object):
         self._bus = bus
         self._sysconfd = sysconfd
 
-    def _send_sysconfd_handlers(self, cti_commands):
+    def _send_sysconfd_handlers(self):
         handlers = {
-            'ctibus': cti_commands,
             'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
             'agentbus': [],
         }
         self._sysconfd.exec_request_handlers(handlers)
 
-    def _generate_cti_commands(self, user):
-        ctibus = ['xivo[user,edit,{}]'.format(user.id)]
-
-        for line in user.lines:
-            ctibus.append('xivo[phone,edit,{}]'.format(line.id))
-
-        return ctibus
-
     def associated(self, user, voicemail):
-        cti_commands = self._generate_cti_commands(user)
-        self._send_sysconfd_handlers(cti_commands)
+        self._send_sysconfd_handlers()
         event = UserVoicemailAssociatedEvent(user.uuid, voicemail.id)
         self._bus.send_bus_event(event)
 
     def dissociated(self, user, voicemail):
-        cti_commands = self._generate_cti_commands(user)
-        self._send_sysconfd_handlers(cti_commands)
+        self._send_sysconfd_handlers()
         event = UserVoicemailDissociatedEvent(user.uuid, voicemail.id)
         self._bus.send_bus_event(event)
 

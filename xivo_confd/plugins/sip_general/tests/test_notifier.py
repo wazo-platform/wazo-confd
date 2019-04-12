@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -11,9 +11,10 @@ from xivo_dao.alchemy.staticsip import StaticSIP
 from ..notifier import SIPGeneralNotifier
 
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload res_pjsip.so'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': ['module reload res_pjsip.so'],
+    'agentbus': [],
+}
 
 
 class TestSIPGeneralNotifier(unittest.TestCase):

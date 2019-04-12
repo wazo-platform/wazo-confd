@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -13,9 +13,10 @@ from xivo_bus.resources.parking_lot.event import (
 
 from ..notifier import ParkingLotNotifier
 
-EXPECTED_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload res_parking.so'],
-                     'agentbus': []}
+EXPECTED_HANDLERS = {
+    'ipbx': ['module reload res_parking.so'],
+    'agentbus': [],
+}
 
 
 class TestParkingLotNotifier(unittest.TestCase):

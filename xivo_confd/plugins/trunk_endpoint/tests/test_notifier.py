@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -55,9 +55,10 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
 
     def test_associate_sip_then_sysconfd_event(self):
         self.notifier_sip.associated(self.trunk, self.sip)
-        expected = {'ctibus': [],
-                    'ipbx': ['module reload res_pjsip.so'],
-                    'agentbus': []}
+        expected = {
+            'ipbx': ['module reload res_pjsip.so'],
+            'agentbus': [],
+        }
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected)
 
@@ -68,9 +69,10 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
 
     def test_associate_iax_then_sysconfd_event(self):
         self.notifier_iax.associated(self.trunk, self.iax)
-        expected = {'ctibus': [],
-                    'ipbx': ['iax2 reload'],
-                    'agentbus': []}
+        expected = {
+            'ipbx': ['iax2 reload'],
+            'agentbus': [],
+        }
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected)
 

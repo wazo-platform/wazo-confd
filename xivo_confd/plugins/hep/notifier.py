@@ -14,9 +14,10 @@ class HEPConfigurationNotifier(object):
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ctibus': [],
-                    'ipbx': ipbx,
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ipbx,
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, section_name, hep):

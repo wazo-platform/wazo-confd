@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.sccp_general.event import EditSCCPGeneralEvent
@@ -14,9 +14,10 @@ class SCCPGeneralNotifier(object):
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ctibus': [],
-                    'ipbx': ipbx,
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ipbx,
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, sccp_general):

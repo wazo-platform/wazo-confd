@@ -11,10 +11,7 @@ from ..notifier import HEPConfigurationNotifier
 
 
 SYSCONFD_HANDLERS = {
-    'ctibus': [],
-    'ipbx': [
-        'module reload res_hep.so',
-    ],
+    'ipbx': ['module reload res_hep.so'],
     'agentbus': [],
 }
 

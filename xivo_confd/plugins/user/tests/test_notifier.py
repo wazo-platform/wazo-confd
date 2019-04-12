@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -27,14 +27,15 @@ from ..resource_sub import (
 )
 
 
-def sysconfd_handler(action, user_id):
-    cti = 'xivo[user,{},{}]'.format(action, user_id)
-    return {'ctibus': [cti],
-            'ipbx': ['dialplan reload',
-                     'module reload chan_sccp.so',
-                     'module reload app_queue.so',
-                     'module reload res_pjsip.so'],
-            'agentbus': []}
+EXPECTED_HANDLERS = {
+    'ipbx': [
+        'dialplan reload',
+        'module reload chan_sccp.so',
+        'module reload app_queue.so',
+        'module reload res_pjsip.so',
+    ],
+    'agentbus': [],
+}
 
 
 class TestUserNotifier(unittest.TestCase):
@@ -55,8 +56,7 @@ class TestUserNotifier(unittest.TestCase):
     def test_when_user_created_then_sip_reloaded(self):
         self.notifier.created(self.user)
 
-        handler = sysconfd_handler('add', self.user.id)
-        self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_user_created_then_event_sent_on_bus(self):
         expected_event = CreateUserEvent(
@@ -74,8 +74,7 @@ class TestUserNotifier(unittest.TestCase):
     def test_when_user_edited_then_sip_reloaded(self):
         self.notifier.edited(self.user)
 
-        handler = sysconfd_handler('edit', self.user.id)
-        self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_user_edited_then_event_sent_on_bus(self):
         expected_event = EditUserEvent(
@@ -93,8 +92,7 @@ class TestUserNotifier(unittest.TestCase):
     def test_when_user_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.user)
 
-        handler = sysconfd_handler('delete', self.user.id)
-        self.sysconfd.exec_request_handlers.assert_called_once_with(handler)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_user_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteUserEvent(
@@ -120,95 +118,130 @@ class TestUserServiceNotifier(unittest.TestCase):
 
     def test_when_user_service_dnd_edited_then_event_sent_on_bus(self):
         schema = ServiceDNDSchema()
-        expected_event = EditUserServiceEvent(self.user.uuid,
-                                              schema.types[0],
-                                              self.user.dnd_enabled)
+        expected_event = EditUserServiceEvent(
+            self.user.uuid,
+            schema.types[0],
+            self.user.dnd_enabled,
+        )
 
         self.notifier.edited(self.user, schema)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event,
+            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+        )
 
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
         schema = ServiceIncallFilterSchema()
-        expected_event = EditUserServiceEvent(self.user.uuid,
-                                              schema.types[0],
-                                              self.user.incallfilter_enabled)
+        expected_event = EditUserServiceEvent(
+            self.user.uuid,
+            schema.types[0],
+            self.user.incallfilter_enabled,
+        )
 
         self.notifier.edited(self.user, schema)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event,
+            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+        )
 
 
 class TestUserForwardNotifier(unittest.TestCase):
 
     def setUp(self):
         self.bus = Mock()
-        self.user = Mock(User, uuid='1234-abcd',
-                         busy_enabled=True, busy_destination='123',
-                         noanswer_enabled=False, noanswer_destination='456',
-                         unconditional_enabled=True, unconditional_destination='789')
+        self.user = Mock(
+            User, uuid='1234-abcd',
+            busy_enabled=True, busy_destination='123',
+            noanswer_enabled=False, noanswer_destination='456',
+            unconditional_enabled=True, unconditional_destination='789',
+        )
 
         self.notifier = UserForwardNotifier(self.bus)
 
     def test_when_user_forward_busy_edited_then_event_sent_on_bus(self):
         schema = ForwardBusySchema()
-        expected_event = EditUserForwardEvent(self.user.uuid,
-                                              'busy',
-                                              self.user.busy_enabled,
-                                              self.user.busy_destination)
+        expected_event = EditUserForwardEvent(
+            self.user.uuid,
+            'busy',
+            self.user.busy_enabled,
+            self.user.busy_destination,
+        )
 
         self.notifier.edited(self.user, schema)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event,
+            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+        )
 
     def test_when_user_forward_noanswer_edited_then_event_sent_on_bus(self):
         schema = ForwardNoAnswerSchema()
-        expected_event = EditUserForwardEvent(self.user.uuid,
-                                              'noanswer',
-                                              self.user.noanswer_enabled,
-                                              self.user.noanswer_destination)
+        expected_event = EditUserForwardEvent(
+            self.user.uuid,
+            'noanswer',
+            self.user.noanswer_enabled,
+            self.user.noanswer_destination,
+        )
 
         self.notifier.edited(self.user, schema)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event,
+            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+        )
 
     def test_when_user_forward_unconditional_edited_then_event_sent_on_bus(self):
         schema = ForwardUnconditionalSchema()
-        expected_event = EditUserForwardEvent(self.user.uuid,
-                                              'unconditional',
-                                              self.user.unconditional_enabled,
-                                              self.user.unconditional_destination)
+        expected_event = EditUserForwardEvent(
+            self.user.uuid,
+            'unconditional',
+            self.user.unconditional_enabled,
+            self.user.unconditional_destination,
+        )
 
         self.notifier.edited(self.user, schema)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event,
-                                                        headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event,
+            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+        )
 
     def test_when_user_forwards_edited_then_event_sent_on_bus(self):
         schema = ForwardsSchema()
         self.notifier.edited(self.user, schema)
 
-        expected_busy_event = EditUserForwardEvent(self.user.uuid,
-                                                   'busy',
-                                                   self.user.busy_enabled,
-                                                   self.user.busy_destination)
-
-        expected_noanswer_event = EditUserForwardEvent(self.user.uuid,
-                                                       'noanswer',
-                                                       self.user.noanswer_enabled,
-                                                       self.user.noanswer_destination)
-        expected_unconditional_event = EditUserForwardEvent(self.user.uuid,
-                                                            'unconditional',
-                                                            self.user.unconditional_enabled,
-                                                            self.user.unconditional_destination)
-        expected_calls = [call(expected_busy_event,
-                               headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}),
-                          call(expected_noanswer_event,
-                               headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}),
-                          call(expected_unconditional_event,
-                               headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True})]
+        expected_busy_event = EditUserForwardEvent(
+            self.user.uuid,
+            'busy',
+            self.user.busy_enabled,
+            self.user.busy_destination,
+        )
+        expected_noanswer_event = EditUserForwardEvent(
+            self.user.uuid,
+            'noanswer',
+            self.user.noanswer_enabled,
+            self.user.noanswer_destination,
+        )
+        expected_unconditional_event = EditUserForwardEvent(
+            self.user.uuid,
+            'unconditional',
+            self.user.unconditional_enabled,
+            self.user.unconditional_destination,
+        )
+        expected_calls = [
+            call(
+                expected_busy_event,
+                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}
+            ),
+            call(
+                expected_noanswer_event,
+                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}
+            ),
+            call(
+                expected_unconditional_event,
+                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}
+            ),
+        ]
         self.bus.send_bus_event.assert_has_calls(expected_calls)

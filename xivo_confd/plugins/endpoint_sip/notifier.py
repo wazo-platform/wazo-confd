@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_sip.event import (
@@ -18,9 +18,10 @@ class SipEndpointNotifier(object):
         self.bus = bus
 
     def send_sysconfd_handlers(self):
-        handlers = {'ctibus': [],
-                    'ipbx': ['module reload res_pjsip.so', 'dialplan reload'],
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ['module reload res_pjsip.so', 'dialplan reload'],
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, line):

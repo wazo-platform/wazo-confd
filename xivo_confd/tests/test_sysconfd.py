@@ -33,9 +33,11 @@ class TestSysconfdClient(TestCase):
         self.client.flush()
 
         url = "http://localhost:8668/delete_voicemail"
-        self.session.request.assert_called_once_with('GET',
-                                                     url,
-                                                     params={'mailbox': '123', 'context': 'default'})
+        self.session.request.assert_called_once_with(
+            'GET',
+            url,
+            params={'mailbox': '123', 'context': 'default'},
+        )
 
     def test_commonconf_generate(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -96,8 +98,7 @@ class TestSysconfdClient(TestCase):
 
     def test_set_hosts(self):
         self.session.request.return_value = Mock(status_code=200)
-        expected_json = {'hostname': 'toto',
-                         'domain': 'toto.tata.titi'}
+        expected_json = {'hostname': 'toto', 'domain': 'toto.tata.titi'}
 
         self.client.set_hosts(expected_json['hostname'], expected_json['domain'])
         self.client.flush()
@@ -111,8 +112,7 @@ class TestSysconfdClient(TestCase):
     def test_set_resolvconf(self):
         self.session.request.return_value = Mock(status_code=200)
         domain = 'toto.titi.tata'
-        expected_json = {'nameservers': ['127.0.0.1'],
-                         'search': [domain]}
+        expected_json = {'nameservers': ['127.0.0.1'], 'search': [domain]}
 
         self.client.set_resolvconf(expected_json['nameservers'], domain)
         self.client.flush()
@@ -130,20 +130,19 @@ class TestSysconfdClient(TestCase):
         self.client.flush()
 
         url = "http://localhost:8668/move_voicemail"
-        params = {'old_mailbox': '100',
-                  'old_context': 'default',
-                  'new_mailbox': '2000',
-                  'new_context': 'newcontext'}
-        self.session.request.assert_called_once_with('GET',
-                                                     url,
-                                                     params=params)
+        params = {
+            'old_mailbox': '100',
+            'old_context': 'default',
+            'new_mailbox': '2000',
+            'new_context': 'newcontext',
+        }
+        self.session.request.assert_called_once_with('GET', url, params=params)
 
     def test_exec_request_handlers_live_reload_enabled(self):
         self.session.request.return_value = Mock(status_code=200)
         self.dao.is_live_reload_enabled.return_value = True
 
-        commands = {'ctibus': (),
-                    'ipbx': ()}
+        commands = {'ipbx': ()}
 
         self.client.exec_request_handlers(commands)
         self.client.flush()
@@ -167,8 +166,7 @@ class TestSysconfdClient(TestCase):
     def test_exec_request_handlers_live_reload_disabled(self):
         self.dao.is_live_reload_enabled.return_value = False
 
-        commands = {'ctibus': [],
-                    'ipbx': []}
+        commands = {'ipbx': []}
 
         self.client.exec_request_handlers(commands)
         self.client.flush()
@@ -180,19 +178,17 @@ class TestSysconfdClient(TestCase):
         self.session.request.return_value = Mock(status_code=200)
         self.dao.is_live_reload_enabled.return_value = True
 
-        self.client.exec_request_handlers({'ctibus': ['command1'],
-                                           'ipbx': ['command2']})
-        self.client.exec_request_handlers({'ctibus': ['command1', 'command3', 'command4'],
-                                           'ipbx': ['command5'],
-                                           'bus': ['command6']})
+        self.client.exec_request_handlers({'ipbx': ['command2']})
+        self.client.exec_request_handlers({'ipbx': ['command5'], 'bus': ['command6']})
         self.client.flush()
 
         method, url, json = self.extract_request()
 
         expected_url = "http://localhost:8668/exec_request_handlers"
-        expected_body = has_entries(ctibus=has_items('command1', 'command3', 'command4'),
-                                    ipbx=has_items('command2', 'command5'),
-                                    bus=has_items('command6'))
+        expected_body = has_entries(
+            ipbx=has_items('command2', 'command5'),
+            bus=has_items('command6'),
+        )
 
         assert_that(method, equal_to("POST"))
         assert_that(url, equal_to(expected_url))

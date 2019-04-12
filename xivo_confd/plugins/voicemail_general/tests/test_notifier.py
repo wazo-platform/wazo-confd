@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -10,9 +10,10 @@ from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
 from ..notifier import VoicemailGeneralNotifier
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['voicemail reload'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': ['voicemail reload'],
+    'agentbus': [],
+}
 
 
 class TestVoicemailGeneralNotifier(unittest.TestCase):

@@ -15,7 +15,6 @@ from xivo_dao.alchemy.pickup import Pickup as CallPickup
 from ..notifier import CallPickupNotifier
 
 SYSCONFD_HANDLERS = {
-    'ctibus': [],
     'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
     'agentbus': [],
 }

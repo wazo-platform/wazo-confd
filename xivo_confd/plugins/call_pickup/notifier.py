@@ -19,7 +19,6 @@ class CallPickupNotifier(object):
 
     def send_sysconfd_handlers(self):
         handlers = {
-            'ctibus': [],
             'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
             'agentbus': [],
         }
