@@ -68,7 +68,8 @@ class UserExportResource(ConfdResource):
 
     @required_acl('confd.users.export.read')
     def get(self):
-        csv_header, users = self.service.export()
+        tenant = Tenant.autodetect()
+        csv_header, users = self.service.export(tenant.uuid)
         return {
             'headers': csv_header,
             'content': users,
