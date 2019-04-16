@@ -63,11 +63,11 @@ class ExportService(object):
         self._user_export_dao = user_export_dao
         self._auth_client = auth_client
 
-    def export(self):
-        csv_header, users = self._user_export_dao.export_query()
+    def export(self, tenant_uuid):
+        csv_header, users = self._user_export_dao.export_query(tenant_uuid)
         users = list(self._format_users(csv_header, users))
 
-        wazo_users = self._auth_client.users.list()['items']
+        wazo_users = self._auth_client.users.list(tenant_uuid=tenant_uuid)['items']
         wazo_users = {user['uuid']: user for user in wazo_users}
         for user in users:
             wazo_user = wazo_users[user['uuid']]

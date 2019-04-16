@@ -57,7 +57,7 @@ COLUMNS = ('uuid',
            'call_permissions')
 
 
-def export_query(separator=";"):
+def export_query(tenant_uuid, separator=";"):
     ordered_incalls = aliased(
         Session.query(
             Incall.exten.label('exten'),
@@ -156,6 +156,7 @@ def export_query(separator=";"):
                    User.id == grouped_incalls.c.user_id)
         .outerjoin(grouped_call_permissions,
                    User.id == grouped_call_permissions.c.user_id)
+        .filter(User.tenant_uuid == tenant_uuid)
     )
 
     return COLUMNS, query

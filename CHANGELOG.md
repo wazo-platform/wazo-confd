@@ -5,6 +5,7 @@ Changelog
 -----
 
 * The `/1.1/users/import` PUT has been disabled since it creates invalid configurations
+* The `/1.1/users/export` resource will now only list users from the specified tenant.
 
 
 19.05

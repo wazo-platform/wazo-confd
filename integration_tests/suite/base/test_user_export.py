@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 from hamcrest import (
     assert_that,
+    contains,
     has_entries,
     has_item,
 )
@@ -16,7 +17,13 @@ from ..helpers import (
     database,
     fixtures,
 )
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 from . import confd_csv, auth, db
+
+UNKNOWN_TENANT = '00000000-0000-0000-0000-000000000000'
 
 
 @database.reset(db)
@@ -60,6 +67,32 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
         enabled="1",
         username="ursule",
     )))
+
+
+@database.reset(db)
+@fixtures.user(firstname='main', wazo_tenant=MAIN_TENANT)
+@fixtures.user(firstname='sub', wazo_tenant=SUB_TENANT)
+def test_given_user_in_another_tenant(user_main, user_sub):
+    auth.users.new(uuid=user_main['uuid'], tenant_uuid=MAIN_TENANT)
+    auth.users.new(uuid=user_sub['uuid'], tenant_uuid=SUB_TENANT)
+
+    response = confd_csv.users.export.get()
+    assert_that(response.csv(), contains(
+        has_entries(uuid=user_main['uuid']),
+    ))
+
+    response = confd_csv.users.export.get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.csv(), contains(
+        has_entries(uuid=user_main['uuid']),
+    ))
+
+    response = confd_csv.users.export.get(wazo_tenant=SUB_TENANT)
+    assert_that(response.csv(), contains(
+        has_entries(uuid=user_sub['uuid']),
+    ))
+
+    response = confd_csv.users.export.get(wazo_tenant=UNKNOWN_TENANT)
+    response.assert_status(401)
 
 
 @database.reset(db)
