@@ -22,7 +22,6 @@ pid_filename: /var/run/xivo-confd/xivo-confd.pid
 rest_api:
 
   https:
-    enabled: true
     listen: 0.0.0.0
     port: 9486
 

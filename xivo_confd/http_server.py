@@ -119,10 +119,6 @@ class HTTPServer(object):
         cherrypy.server.unsubscribe()
         cherrypy.config.update({'environment': 'production'})
 
-        if not https_config['enabled']:
-            logger.critical('No HTTPS server enabled')
-            return
-
         try:
             bind_addr_https = (https_config['listen'], https_config['port'])
             server_https = wsgi.WSGIServer(bind_addr=bind_addr_https, wsgi_app=wsgi_app)

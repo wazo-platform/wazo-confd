@@ -23,7 +23,6 @@ DEFAULT_CONFIG = {
     'rest_api': {
         'profile': None,
         'https': {
-            'enabled': True,
             'listen': '0.0.0.0',
             'port': 9486,
             'certificate': '/usr/share/xivo-certs/server.crt',
