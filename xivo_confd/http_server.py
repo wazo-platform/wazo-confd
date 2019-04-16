@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -109,47 +109,32 @@ class HTTPServer(object):
             CORS(app, **cors_config)
 
     def run(self):
-        http_config = self.config['http']
         https_config = self.config['https']
 
         if self.config['profile']:
-            app.wsgi_app = ProfilerMiddleware(app.wsgi_app,
-                                              profile_dir=self.config['profile'])
+            app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir=self.config['profile'])
 
         wsgi_app = ReverseProxied(ProxyFix(wsgi.WSGIPathInfoDispatcher({'/': app})))
 
         cherrypy.server.unsubscribe()
         cherrypy.config.update({'environment': 'production'})
 
-        if not (http_config['enabled'] or https_config['enabled']):
-            logger.critical('No HTTP/HTTPS server enabled')
+        if not https_config['enabled']:
+            logger.critical('No HTTPS server enabled')
             return
 
-        if https_config['enabled']:
-            try:
-                bind_addr_https = (https_config['listen'], https_config['port'])
-                server_https = wsgi.WSGIServer(bind_addr=bind_addr_https,
-                                               wsgi_app=wsgi_app)
-                server_https.ssl_adapter = http_helpers.ssl_adapter(https_config['certificate'],
-                                                                    https_config['private_key'])
-                ServerAdapter(cherrypy.engine, server_https).subscribe()
+        try:
+            bind_addr_https = (https_config['listen'], https_config['port'])
+            server_https = wsgi.WSGIServer(bind_addr=bind_addr_https, wsgi_app=wsgi_app)
+            server_https.ssl_adapter = http_helpers.ssl_adapter(
+                https_config['certificate'],
+                https_config['private_key'],
+            )
+            ServerAdapter(cherrypy.engine, server_https).subscribe()
 
-                logger.debug('HTTPS server starting on %s:%s', *bind_addr_https)
-
-            except IOError as e:
-                logger.warning("HTTPS server won't start: %s", e)
-        else:
-            logger.debug('HTTPS server is disabled')
-
-        if http_config['enabled']:
-            bind_addr_http = (http_config['listen'], http_config['port'])
-            server_http = wsgi.WSGIServer(bind_addr=bind_addr_http,
-                                          wsgi_app=wsgi_app)
-            ServerAdapter(cherrypy.engine, server_http).subscribe()
-
-            logger.debug('HTTP server starting on %s:%s', *bind_addr_http)
-        else:
-            logger.debug('HTTP server is disabled')
+            logger.debug('HTTPS server starting on %s:%s', *bind_addr_https)
+        except IOError as e:
+            logger.warning("HTTPS server won't start: %s", e)
 
         try:
             cherrypy.engine.start()
