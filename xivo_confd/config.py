@@ -195,7 +195,7 @@ DEFAULT_CONFIG = {
 def load(argv):
     try:
         with open(WIZARD_KEY_FILE, 'r') as f:
-            key_config = {'wizard': yaml.load(f)}
+            key_config = {'wizard': yaml.safe_load(f)}
     except IOError:
         key_config = {}
 
