@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -35,9 +35,7 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_voicemail_created_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': ['voicemail reload'],
-                             'agentbus': [],
-                             'ctibus': ['xivo[voicemail,add,{}]'.format(self.voicemail.id)]}
+        expected_handlers = {'ipbx': ['voicemail reload'], 'agentbus': []}
         self.notifier.created(self.voicemail)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
@@ -50,14 +48,20 @@ class TestVoicemailNotifier(unittest.TestCase):
 
         self.notifier.edited(self.voicemail)
 
-        assert_that(self.bus.send_bus_event.call_args_list,
-                    contains(call(expected_event1),
-                             call(expected_event2)))
+        assert_that(
+            self.bus.send_bus_event.call_args_list,
+            contains(call(expected_event1), call(expected_event2))
+        )
 
     def test_when_voicemail_edited_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': ['voicemail reload', 'module reload res_pjsip.so', 'module reload chan_sccp.so'],
-                             'agentbus': [],
-                             'ctibus': ['xivo[voicemail,edit,{}]'.format(self.voicemail.id)]}
+        expected_handlers = {
+            'ipbx': [
+                'voicemail reload',
+                'module reload res_pjsip.so',
+                'module reload chan_sccp.so',
+            ],
+            'agentbus': [],
+        }
         self.notifier.edited(self.voicemail)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
@@ -70,9 +74,7 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_voicemail_deleted_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': ['voicemail reload'],
-                             'agentbus': [],
-                             'ctibus': ['xivo[voicemail,delete,{}]'.format(self.voicemail.id)]}
+        expected_handlers = {'ipbx': ['voicemail reload'], 'agentbus': []}
         self.notifier.deleted(self.voicemail)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)

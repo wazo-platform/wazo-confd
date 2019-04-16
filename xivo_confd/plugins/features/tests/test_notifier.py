@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -14,9 +14,10 @@ from xivo_bus.resources.features.event import (
 from ..notifier import FeaturesConfigurationNotifier
 
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload features'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': ['module reload features'],
+    'agentbus': [],
+}
 
 
 class TestFeaturesConfigurationNotifier(unittest.TestCase):

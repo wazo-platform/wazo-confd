@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -15,9 +15,10 @@ from xivo_dao.alchemy.useriax import UserIAX as IAXEndpoint
 from ..notifier import IAXEndpointNotifier
 
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['iax2 reload'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': ['iax2 reload'],
+    'agentbus': [],
+}
 
 
 class TestIAXEndpointNotifier(unittest.TestCase):

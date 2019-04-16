@@ -1,30 +1,21 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.configuration.event import LiveReloadEditedEvent
 
-from xivo_confd import bus, sysconfd
+from xivo_confd import bus
 
 
 class LiveReloadNotifier(object):
 
-    def __init__(self, bus, sysconfd):
+    def __init__(self, bus):
         self.bus = bus
-        self.sysconfd = sysconfd
-
-    def send_sysconfd_handlers(self, cti_commands):
-        handlers = {'ctibus': cti_commands,
-                    'ipbx': [],
-                    'agentbus': []}
-        self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, live_reload):
         event = LiveReloadEditedEvent(live_reload['enabled'])
         self.bus.send_bus_event(event)
-        if live_reload['enabled']:
-            self.send_sysconfd_handlers(['xivo[cticonfig,update]'])
 
 
 def build_notifier():
-    return LiveReloadNotifier(bus, sysconfd)
+    return LiveReloadNotifier(bus)

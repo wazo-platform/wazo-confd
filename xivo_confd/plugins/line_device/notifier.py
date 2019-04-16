@@ -29,7 +29,6 @@ class LineDeviceNotifier(object):
     REQUEST_HANDLERS = {
         'ipbx': ['module reload chan_sccp.so'],
         'agentbus': [],
-        'ctibus': [],
     }
 
     def __init__(self, bus, sysconfd):

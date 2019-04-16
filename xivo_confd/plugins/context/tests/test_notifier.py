@@ -13,9 +13,10 @@ from xivo_bus.resources.context.event import (
 
 from ..notifier import ContextNotifier
 
-EXPECTED_HANDLERS = {'ctibus': [],
-                     'ipbx': ['dialplan reload'],
-                     'agentbus': []}
+EXPECTED_HANDLERS = {
+    'ipbx': ['dialplan reload'],
+    'agentbus': [],
+}
 
 
 class TestContextNotifier(unittest.TestCase):

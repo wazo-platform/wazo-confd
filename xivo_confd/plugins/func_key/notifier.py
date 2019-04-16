@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.func_key.event import (
@@ -20,9 +20,10 @@ class FuncKeyTemplateNotifier(object):
         self.device_db = device_db
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ctibus': [],
-                    'ipbx': ipbx,
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ipbx,
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, template):

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -23,9 +23,10 @@ class TestExtensionFeatureNotifier(unittest.TestCase):
         self.notifier = ExtensionFeatureNotifier(self.sysconfd, self.bus)
 
     def test_when_extension_edited_then_handlers_sent(self):
-        expected_handlers = {'ctibus': [],
-                             'ipbx': ['dialplan reload'],
-                             'agentbus': []}
+        expected_handlers = {
+            'ipbx': ['dialplan reload'],
+            'agentbus': [],
+        }
         updated_fields = ['exten']
         self.notifier.edited(self.extension, updated_fields)
 

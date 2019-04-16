@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user.event import (
@@ -19,18 +19,20 @@ class UserNotifier(object):
         self.sysconfd = sysconfd
         self.bus = bus
 
-    def send_sysconfd_handlers(self, action, user_id):
-        cti_command = 'xivo[user,{},{}]'.format(action, user_id)
-        handlers = {'ctibus': [cti_command],
-                    'ipbx': ['dialplan reload',
-                             'module reload chan_sccp.so',
-                             'module reload app_queue.so',
-                             'module reload res_pjsip.so'],
-                    'agentbus': []}
+    def send_sysconfd_handlers(self):
+        handlers = {
+            'ipbx': [
+                'dialplan reload',
+                'module reload chan_sccp.so',
+                'module reload app_queue.so',
+                'module reload res_pjsip.so',
+            ],
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, user):
-        self.send_sysconfd_handlers('add', user.id)
+        self.send_sysconfd_handlers()
         event = CreateUserEvent(
             user.id,
             user.uuid,
@@ -41,7 +43,7 @@ class UserNotifier(object):
         self.bus.send_bus_event(event)
 
     def edited(self, user):
-        self.send_sysconfd_handlers('edit', user.id)
+        self.send_sysconfd_handlers()
         event = EditUserEvent(
             user.id,
             user.uuid,
@@ -52,7 +54,7 @@ class UserNotifier(object):
         self.bus.send_bus_event(event)
 
     def deleted(self, user):
-        self.send_sysconfd_handlers('delete', user.id)
+        self.send_sysconfd_handlers()
         event = DeleteUserEvent(
             user.id,
             user.uuid,

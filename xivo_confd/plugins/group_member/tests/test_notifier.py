@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -13,11 +13,14 @@ from xivo_bus.resources.group_member.event import (
 
 from ..notifier import GroupMemberNotifier
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload res_pjsip.so',
-                              'module reload app_queue.so',
-                              'module reload chan_sccp.so'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': [
+        'module reload res_pjsip.so',
+        'module reload app_queue.so',
+        'module reload chan_sccp.so',
+    ],
+    'agentbus': [],
+}
 
 
 class TestGroupMemberUserNotifier(unittest.TestCase):

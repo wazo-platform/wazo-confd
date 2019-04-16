@@ -34,7 +34,6 @@ class UserLineNotifier(object):
 
     def _send_sysconfd_handlers(self):
         handlers = {
-            'ctibus': [],
             'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
             'agentbus': [],
         }

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
-from mock import Mock, patch
+from mock import Mock
 
 from xivo_bus.resources.line_extension.event import (
     LineExtensionAssociatedEvent,
@@ -16,10 +16,6 @@ from ..notifier import LineExtensionNotifier
 USER_ID = 1
 LINE_ID = 2
 SYSCONFD_HANDLERS = {
-    'ctibus': [
-        'xivo[phone,edit,{}]'.format(LINE_ID),
-        'xivo[user,edit,{}]'.format(USER_ID),
-    ],
     'ipbx': [
         'dialplan reload',
         'module reload res_pjsip.so',
@@ -29,7 +25,6 @@ SYSCONFD_HANDLERS = {
 }
 
 
-@patch('xivo_dao.resources.user_line.dao.find_all_by_line_id', Mock(return_value=[Mock(user_id=USER_ID)]))
 class TestLineExtensionNotifier(unittest.TestCase):
 
     def setUp(self):
@@ -41,8 +36,7 @@ class TestLineExtensionNotifier(unittest.TestCase):
         self.notifier = LineExtensionNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = LineExtensionAssociatedEvent(self.line.id,
-                                                      self.extension.id)
+        expected_event = LineExtensionAssociatedEvent(self.line.id, self.extension.id)
 
         self.notifier.associated(self.line, self.extension)
 
@@ -54,8 +48,7 @@ class TestLineExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = LineExtensionDissociatedEvent(self.line.id,
-                                                       self.extension.id)
+        expected_event = LineExtensionDissociatedEvent(self.line.id, self.extension.id)
 
         self.notifier.dissociated(self.line, self.extension)
 

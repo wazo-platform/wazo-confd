@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.rtp.event import (
@@ -17,9 +17,10 @@ class RTPConfigurationNotifier(object):
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ctibus': [],
-                    'ipbx': ipbx,
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ipbx,
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, section_name, rtp):

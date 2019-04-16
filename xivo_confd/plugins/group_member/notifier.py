@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.group_member.event import (
@@ -17,11 +17,14 @@ class GroupMemberNotifier(object):
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ctibus': [],
-                    'ipbx': ['module reload res_pjsip.so',
-                             'module reload app_queue.so',
-                             'module reload chan_sccp.so'],
-                    'agentbus': []}
+        handlers = {
+            'ipbx': [
+                'module reload res_pjsip.so',
+                'module reload app_queue.so',
+                'module reload chan_sccp.so',
+            ],
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def users_associated(self, group, members):

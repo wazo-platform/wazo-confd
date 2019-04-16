@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -9,9 +9,10 @@ from xivo_bus.resources.queue_general.event import EditQueueGeneralEvent
 
 from ..notifier import QueueGeneralNotifier
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload app_queue.so'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': ['module reload app_queue.so'],
+    'agentbus': [],
+}
 
 
 class TestQueueGeneralNotifier(unittest.TestCase):

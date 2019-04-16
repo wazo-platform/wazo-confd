@@ -11,7 +11,6 @@ from xivo_bus.resources.user_line.event import UserLineAssociatedEvent, UserLine
 from ..notifier import UserLineNotifier
 
 EXPECTED_SYSCONFD_HANDLERS = {
-    'ctibus': [],
     'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
     'agentbus': []
 }

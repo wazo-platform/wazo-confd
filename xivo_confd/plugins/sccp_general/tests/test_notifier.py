@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -11,9 +11,10 @@ from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 
 from ..notifier import SCCPGeneralNotifier
 
-SYSCONFD_HANDLERS = {'ctibus': [],
-                     'ipbx': ['module reload chan_sccp.so'],
-                     'agentbus': []}
+SYSCONFD_HANDLERS = {
+    'ipbx': ['module reload chan_sccp.so'],
+    'agentbus': [],
+}
 
 
 class TestSCCPGeneralNotifier(unittest.TestCase):

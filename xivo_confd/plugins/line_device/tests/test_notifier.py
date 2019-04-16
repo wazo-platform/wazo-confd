@@ -24,7 +24,6 @@ class TestLineDeviceNotifier(unittest.TestCase):
     REQUEST_HANDLERS = {
         'ipbx': ['module reload chan_sccp.so'],
         'agentbus': [],
-        'ctibus': [],
     }
 
     def setUp(self):

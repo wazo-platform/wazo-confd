@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.voicemail_general.event import EditVoicemailGeneralEvent
@@ -14,9 +14,10 @@ class VoicemailGeneralNotifier(object):
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ctibus': [],
-                    'ipbx': ipbx,
-                    'agentbus': []}
+        handlers = {
+            'ipbx': ipbx,
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, voicemail_general):
