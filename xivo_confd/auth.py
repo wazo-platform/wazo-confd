@@ -44,7 +44,7 @@ class Authentication(HTTPDigestAuth):
     def _verify_token(self, func, *args, **kwargs):
         try:
             token = self.auth_verifier.token()
-            current_required_acl = self._acl(func, *args, **kwargs)
+            current_required_acl = self.auth_verifier.acl(func, *args, **kwargs)
             token_is_valid = self.auth_verifier.client().token.is_valid(token, current_required_acl)
         except requests.RequestException as e:
             logger.error('Authentication server on %s:%s unreachable: %s',
@@ -52,12 +52,6 @@ class Authentication(HTTPDigestAuth):
             return False
 
         return token_is_valid
-
-    def _acl(self, func, *args, **kwargs):
-        current_required_acl = self.auth_verifier.acl(func, *args, **kwargs)
-        if not current_required_acl:
-            return 'confd.#'
-        return current_required_acl
 
 
 authentication = Authentication()
