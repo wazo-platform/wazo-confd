@@ -8,6 +8,7 @@ paths:
       tags:
       - deprecated
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       responses:
         '200':
@@ -24,6 +25,7 @@ paths:
       - users
       - agents
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       responses:
         '204':
@@ -41,6 +43,7 @@ paths:
       - users
       - agents
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/agentid'
       responses:

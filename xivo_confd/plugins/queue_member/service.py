@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -7,16 +7,17 @@ from xivo_dao.resources.agent import dao as agent_dao_module
 from xivo_dao.resources.queue import dao as queue_dao_module
 
 from .notifier import build_notifier
-from .validator import build_validator_member_user
+from .validator import build_validator_member_user, build_validator_member_agent
 
 
 class QueueMemberService(object):
 
-    def __init__(self, queue_dao, agent_dao, validator_member_user, notifier):
+    def __init__(self, queue_dao, agent_dao, validator_member_user, validator_member_agent, notifier):
         self.queue_dao = queue_dao
         self.agent_dao = agent_dao
         self.notifier = notifier
         self.validator_member_user = validator_member_user
+        self.validator_member_agent = validator_member_agent
 
     def get_member_agent(self, queue, agent):
         member = self.find_member_agent(queue, agent)
@@ -24,8 +25,8 @@ class QueueMemberService(object):
             raise errors.not_found('QueueMember', agent_id=agent.id, queue_id=queue.id)
         return member
 
-    def get_agent(self, agent_id):
-        agent = self.agent_dao.find(agent_id)
+    def get_agent(self, agent_id, tenant_uuids=None):
+        agent = self.agent_dao.find(agent_id, tenant_uuids=tenant_uuids)
         if not agent:
             raise errors.param_not_found('agent_id', 'Agent')
         return agent
@@ -45,6 +46,8 @@ class QueueMemberService(object):
     def associate_legacy(self, queue, member):
         if member in queue.agent_queue_members:
             raise errors.resource_associated('Agent', 'Queue', member.agent.id, queue.id)
+
+        self.validator_member_agent.validate_association(queue, member)
         self.queue_dao.associate_member_agent(queue, member)
         self.notifier.agent_associated(queue, member)
 
@@ -52,6 +55,7 @@ class QueueMemberService(object):
         if member in queue.agent_queue_members:
             return
 
+        self.validator_member_agent.validate_association(queue, member)
         self.queue_dao.associate_member_agent(queue, member)
         self.notifier.agent_associated(queue, member)
 
@@ -83,5 +87,6 @@ def build_service():
         queue_dao_module,
         agent_dao_module,
         build_validator_member_user(),
+        build_validator_member_agent(),
         build_notifier(),
     )

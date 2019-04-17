@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -12,6 +12,7 @@ NUMBER_REGEX = r"^[0-9\*#]{1,40}$"
 
 class AgentSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     number = fields.String(validate=Regexp(NUMBER_REGEX), required=True)
     firstname = fields.String(validate=Length(max=128), allow_none=True)
     lastname = fields.String(validate=Length(max=128), allow_none=True)

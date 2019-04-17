@@ -7,6 +7,17 @@ Changelog
 * The `/1.1/users/import` PUT has been disabled since it creates invalid configurations
 * The `/1.1/users/export` resource will now only list users from the specified tenant.
 
+* The following endpoints are now multi-tenant.
+
+  This means that created resources will be in the same tenant as the creator or in the tenant
+  specified by the Wazo-Tenant HTTP header. Listing resources will also only list the ones in the
+  user's tenant unless a sub-tenant is specified using the Wazo-Tenant header. The `recurse=true`
+  query string can be used to list from multiple tenants. GET, DELETE and PUT on a resource that is
+  not tenant accessible will result in a 404. New readonly parameter has also been added:
+  `tenant_uuid`.
+
+  * `/1.1/agents`
+
 
 19.05
 -----

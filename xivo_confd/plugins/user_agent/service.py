@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao
@@ -15,8 +15,8 @@ class UserAgentService(object):
         self.validator = validator
         self.notifier = notifier
 
-    def find_by_user_id(self, user_id):
-        return self.dao.find_by(id=user_id)
+    def find_by_user_id(self, user_id, tenant_uuids=None):
+        return self.dao.find_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
 
     def associate(self, user, agent):
         if agent.id == user.agent_id:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -16,6 +16,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -55,6 +59,21 @@ def test_associate_user_agent(agent, user):
 def test_associate_using_uuid(agent, user):
     response = confd.users(user['uuid']).agents(agent['id']).put()
     response.assert_updated()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_user, sub_user, main_agent, sub_agent):
+    response = confd.users(main_user['uuid']).agents(sub_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(sub_user['uuid']).agents(main_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Agent'))
+
+    response = confd.users(main_user['uuid']).agents(sub_agent['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
 
 
 @fixtures.agent()
@@ -105,6 +124,14 @@ def test_dissociate(agent, user):
 def test_dissociate_not_associated(agent, user):
     response = confd.users(user['uuid']).agents().delete()
     response.assert_deleted()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+def test_dissociate_multi_tenant(user, agent):
+    with a.user_agent(user, agent, check=False):
+        response = confd.users(user['uuid']).agents().delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('User'))
 
 
 @fixtures.agent()
