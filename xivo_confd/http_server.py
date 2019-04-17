@@ -25,6 +25,7 @@ from xivo_dao.resources.infos import dao as info_dao
 from ._bus import BusPublisher
 from ._sysconfd import SysconfdPublisher
 from .helpers.converter import FilenameConverter
+from .helpers.restful import auth_verifier
 
 logger = logging.getLogger(__name__)
 app = Flask('xivo_confd')
@@ -100,6 +101,7 @@ class HTTPServer(object):
         app.config.update(global_config)
         app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
 
+        auth_verifier.set_config(global_config['auth'])
         self._load_cors()
 
     def _load_cors(self):

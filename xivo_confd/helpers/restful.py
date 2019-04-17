@@ -6,12 +6,14 @@ from flask import request
 from flask_restful import Resource
 from requests import HTTPError
 
+from xivo.auth_verifier import AuthVerifier
 from xivo.tenant_flask_helpers import get_auth_client, get_token, Tenant
 from xivo_dao import tenant_dao
 from xivo_dao.helpers import errors
 
-from xivo_confd.auth import authentication
 from xivo_confd.helpers.common import handle_api_exception
+
+auth_verifier = AuthVerifier()
 
 
 class ErrorCatchingResource(Resource):
@@ -20,7 +22,7 @@ class ErrorCatchingResource(Resource):
 
 class ConfdResource(ErrorCatchingResource):
 
-    method_decorators = [authentication.login_required] + ErrorCatchingResource.method_decorators
+    method_decorators = [auth_verifier.verify_token] + ErrorCatchingResource.method_decorators
 
     def _has_write_tenant_uuid(self):
         return (self._has_write_tenant_uuid_sqlalchemy()
