@@ -22,12 +22,10 @@ DEFAULT_CONFIG = {
     'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
     'rest_api': {
         'profile': None,
-        'https': {
-            'listen': '0.0.0.0',
-            'port': 9486,
-            'certificate': '/usr/share/xivo-certs/server.crt',
-            'private_key': '/usr/share/xivo-certs/server.key',
-        },
+        'listen': '0.0.0.0',
+        'port': 9486,
+        'certificate': '/usr/share/xivo-certs/server.crt',
+        'private_key': '/usr/share/xivo-certs/server.key',
         'cors': {
             'enabled': True,
             'allow_headers': ['Content-Type', 'X-Auth-Token', 'Wazo-Tenant'],

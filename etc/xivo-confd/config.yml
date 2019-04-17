@@ -21,12 +21,11 @@ pid_filename: /var/run/xivo-confd/xivo-confd.pid
 # REST API server
 rest_api:
 
-  https:
-    listen: 0.0.0.0
-    port: 9486
+  listen: 0.0.0.0
+  port: 9486
 
-    certificate: /usr/share/xivo-certs/server.crt
-    private_key: /usr/share/xivo-certs/server.key
+  certificate: /usr/share/xivo-certs/server.crt
+  private_key: /usr/share/xivo-certs/server.key
 
   cors:
     #CORS configuration. See Flask-CORS documentation for other values.
