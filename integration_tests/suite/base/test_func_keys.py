@@ -202,7 +202,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
             queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
             conference_id = queries.insert_conference(number=conf_exten)
-            agent_id = queries.insert_agent(self.user['id'])
+            agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
             paging_id = queries.insert_paging(number=paging_number, tenant_uuid=MAIN_TENANT)
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             filter_member_id = queries.insert_filter_member(callfilter_id, self.user['id'])
@@ -635,7 +635,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         with self.db.queries() as queries:
             conference_id = queries.insert_conference(number=conf_exten)
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
-            agent_id = queries.insert_agent(self.user['id'])
+            agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
             filter_member_id = queries.insert_filter_member(callfilter_id, self.user['id'])
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
 
