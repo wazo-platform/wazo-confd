@@ -19,7 +19,7 @@ The test framework offers a helper for building and sending requests to URLs wit
 strings and variables haphazardly. URL building works by chaining together calls to the helper.
 
 ```python
-from test_api import confd
+from . import confd
 
 url = confd.foo.bar.spam.eggs
 print url # http://confd:9486/1.1/foo/bar/spam/eggs
@@ -144,7 +144,7 @@ Test associators
 
 Associators are helpers that associate 2 resources together. They are used in tests where 2
 resources are assumed to have been previously associated. Associators are used as context
-managers inside a test. The association will be destroyed when the context manager exits. 
+managers inside a test. The association will be destroyed when the context manager exits.
 
 ```python
 from test_api import fixtures, confd, association
