@@ -111,8 +111,6 @@ class HTTPServer(object):
             CORS(app, **cors_config)
 
     def run(self):
-        https_config = self.config['https']
-
         if self.config['profile']:
             app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir=self.config['profile'])
 
@@ -122,11 +120,11 @@ class HTTPServer(object):
         cherrypy.config.update({'environment': 'production'})
 
         try:
-            bind_addr_https = (https_config['listen'], https_config['port'])
+            bind_addr_https = (self.config['listen'], self.config['port'])
             server_https = wsgi.WSGIServer(bind_addr=bind_addr_https, wsgi_app=wsgi_app)
             server_https.ssl_adapter = http_helpers.ssl_adapter(
-                https_config['certificate'],
-                https_config['private_key'],
+                self.config['certificate'],
+                self.config['private_key'],
             )
             ServerAdapter(cherrypy.engine, server_https).subscribe()
 
