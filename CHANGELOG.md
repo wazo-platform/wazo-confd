@@ -4,6 +4,8 @@ Changelog
 19.06
 -----
 
+* The `http` configuration section has been removed. Also the `https` section has moved to
+  `rest_api` to be similar with other daemons.
 * The `/1.1/users/import` PUT has been disabled since it creates invalid configurations
 * The `/1.1/users/export` resource will now only list users from the specified tenant.
 

@@ -13,7 +13,6 @@ from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo.token_renewer import TokenRenewer
 from xivo_auth_client import Client as AuthClient
 
-from .auth import authentication
 from .http_server import api, HTTPServer
 from .service_discovery import self_check
 
@@ -32,8 +31,6 @@ class Controller(object):
             config['bus'],
             partial(self_check, config),
         ]
-
-        authentication.set_config(config)
 
         auth_client = AuthClient(**config['auth'])
         self.token_renewer = TokenRenewer(auth_client)
