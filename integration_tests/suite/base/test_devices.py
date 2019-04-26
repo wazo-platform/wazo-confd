@@ -163,6 +163,22 @@ def test_list_multi_tenant(main, sub):
     )
 
 
+@fixtures.device()
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_list_unallocated(main, sub):
+    response = confd.devices.unallocated.get()
+    assert_that(
+        response.items,
+        all_of(has_item(main), not_(has_item(sub))),
+    )
+
+    response = confd.devices.unallocated.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main), not_(has_item(sub))),
+    )
+
+
 @fixtures.device(ip="99.20.30.40",
                  mac="aa:bb:aa:cc:01:23",
                  model="SortModel1",

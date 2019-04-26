@@ -66,6 +66,23 @@ class DeviceList(SingleTenantListResource):
         return self.schema().dump(model).data, 201, self.build_headers(model)
 
 
+class UnallocatedDeviceList(SingleTenantListResource):
+
+    model = Device.from_args
+    schema = DeviceSchema
+
+    @required_acl('confd.devices.unallocated.read')
+    def get(self):
+        params = self.search_params()
+
+        if 'recurse' in params:
+            del params['recurse']
+
+        total, items = self.service.search(params)
+        return {'total': total,
+                'items': self.schema().dump(items, many=True).data}
+
+
 class DeviceItem(SingleTenantItemResource):
 
     schema = DeviceSchema
