@@ -165,6 +165,24 @@ paths:
         '400':
           $ref: '#/responses/GenericError'
 
+  /devices/unallocated/{device_id}:
+    put:
+      operationId: assign_unallocated_device_tenant
+      summary: Assign unallocated device tenant
+      description: '**Required ACL:** `confd.devices.unallocated.{device_id}.update`'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/deviceid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
 parameters:
   deviceid:
     required: true

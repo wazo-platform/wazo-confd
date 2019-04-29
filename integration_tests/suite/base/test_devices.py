@@ -371,6 +371,18 @@ def test_edit_device_multi_tenant(main, sub):
     response.assert_updated()
 
 
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+def test_change_tenant_unallocated(main):
+    response = confd.devices.unallocated(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_updated()
+
+    response = confd.devices(main['id']).get(wazo_tenant=SUB_TENANT)
+    assert_that(response.item, has_entries(id=main['id']))
+
+    response = confd.devices.unallocated(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Device'))
+
+
 @fixtures.device(ip="127.8.0.8",
                  mac="a1:b1:c1:d1:e1:f1",
                  model='6731i',

@@ -8,6 +8,7 @@ from xivo.tenant_flask_helpers import Tenant
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
 from xivo_confd.plugins.device.model import Device
+from xivo_dao.helpers import errors
 
 from .schema import DeviceSchema
 
@@ -68,6 +69,23 @@ class UnallocatedDeviceList(ListResource):
         total, items = self.service.search(params)
         return {'total': total,
                 'items': self.schema().dump(items, many=True).data}
+
+
+class UnallocatedDeviceItem(SingleTenantConfdResource):
+
+    def __init__(self, service):
+        self.service = service
+
+    @required_acl('confd.devices.unallocated.{id}.update')
+    def put(self, id):
+        device = self.service.get(id)
+        if not device.is_new:
+            raise errors.not_found('Device', id=id)
+
+        kwargs = self._add_tenant_uuid()
+        self.service.assign_tenant(device, **kwargs)
+
+        return ('', 204)
 
 
 class DeviceItem(SingleTenantMixin, ItemResource):
