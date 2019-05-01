@@ -62,9 +62,7 @@ class UnallocatedDeviceList(ListResource):
     @required_acl('confd.devices.unallocated.read')
     def get(self):
         params = self.search_params()
-
-        if 'recurse' in params:
-            del params['recurse']
+        params['recurse'] = False
 
         total, items = self.service.search(params)
         return {'total': total,
