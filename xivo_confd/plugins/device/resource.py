@@ -8,12 +8,31 @@ from xivo.tenant_flask_helpers import Tenant
 from xivo_confd.auth import required_acl
 from xivo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
 from xivo_confd.plugins.device.model import Device
+from xivo_dao.helpers import errors
 
 from .schema import DeviceSchema
 
 
-class SingleTenantListResource(ListResource):
+class SingleTenantMixin(object):
 
+    def _add_tenant_uuid(self):
+        tenant_uuid = Tenant.autodetect().uuid
+        return {'tenant_uuid': tenant_uuid}
+
+
+class SingleTenantConfdResource(SingleTenantMixin, ConfdResource):
+    pass
+
+
+class DeviceList(SingleTenantMixin, ListResource):
+
+    model = Device.from_args
+    schema = DeviceSchema
+
+    def build_headers(self, device):
+        return {'Location': url_for('devices', id=device.id, _external=True)}
+
+    @required_acl('confd.devices.read')
     def get(self):
         params = self.search_params()
         tenant_uuid = Tenant.autodetect().uuid
@@ -26,37 +45,6 @@ class SingleTenantListResource(ListResource):
         return {'total': total,
                 'items': self.schema().dump(items, many=True).data}
 
-    def _add_tenant_uuid(self):
-        tenant_uuid = Tenant.autodetect().uuid
-        return {'tenant_uuid': tenant_uuid}
-
-
-class SingleTenantItemResource(ItemResource):
-
-    def _add_tenant_uuid(self):
-        tenant_uuid = Tenant.autodetect().uuid
-        return {'tenant_uuid': tenant_uuid}
-
-
-class SingleTenantConfdResource(ConfdResource):
-
-    def _add_tenant_uuid(self):
-        tenant_uuid = Tenant.autodetect().uuid
-        return {'tenant_uuid': tenant_uuid}
-
-
-class DeviceList(SingleTenantListResource):
-
-    model = Device.from_args
-    schema = DeviceSchema
-
-    def build_headers(self, device):
-        return {'Location': url_for('devices', id=device.id, _external=True)}
-
-    @required_acl('confd.devices.read')
-    def get(self):
-        return super(DeviceList, self).get()
-
     @required_acl('confd.devices.create')
     def post(self):
         form = self.schema().load(request.get_json()).data
@@ -66,7 +54,39 @@ class DeviceList(SingleTenantListResource):
         return self.schema().dump(model).data, 201, self.build_headers(model)
 
 
-class DeviceItem(SingleTenantItemResource):
+class UnallocatedDeviceList(ListResource):
+
+    model = Device.from_args
+    schema = DeviceSchema
+
+    @required_acl('confd.devices.unallocated.read')
+    def get(self):
+        params = self.search_params()
+        params['recurse'] = False
+
+        total, items = self.service.search(params)
+        return {'total': total,
+                'items': self.schema().dump(items, many=True).data}
+
+
+class UnallocatedDeviceItem(SingleTenantConfdResource):
+
+    def __init__(self, service):
+        self.service = service
+
+    @required_acl('confd.devices.unallocated.{id}.update')
+    def put(self, id):
+        device = self.service.get(id)
+        if not device.is_new:
+            raise errors.not_found('Device', id=id)
+
+        kwargs = self._add_tenant_uuid()
+        self.service.assign_tenant(device, **kwargs)
+
+        return ('', 204)
+
+
+class DeviceItem(SingleTenantMixin, ItemResource):
 
     schema = DeviceSchema
 

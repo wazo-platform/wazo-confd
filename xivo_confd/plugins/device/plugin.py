@@ -8,6 +8,8 @@ from .builder import build_dao, build_service
 from .resource import (
     DeviceItem,
     DeviceList,
+    UnallocatedDeviceList,
+    UnallocatedDeviceItem,
     DeviceAutoprov,
     DeviceSynchronize
 )
@@ -47,5 +49,17 @@ class Plugin(object):
         api.add_resource(
             DeviceSynchronize,
             '/devices/<id>/synchronize',
+            resource_class_args=(service,)
+        )
+
+        api.add_resource(
+            UnallocatedDeviceList,
+            '/devices/unallocated',
+            resource_class_args=(service,)
+        )
+
+        api.add_resource(
+            UnallocatedDeviceItem,
+            '/devices/unallocated/<id>',
             resource_class_args=(service,)
         )

@@ -1,6 +1,14 @@
 Changelog
 =========
 
+19.07
+-----
+
+* Added Unallocated devices endpoints:
+  * GET `/1.1/devices/unallocated`
+  * PUT `/1.1/devices/unallocated/<device_id>`
+
+
 19.06
 -----
 

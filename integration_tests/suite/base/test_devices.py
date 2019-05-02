@@ -163,6 +163,22 @@ def test_list_multi_tenant(main, sub):
     )
 
 
+@fixtures.device()
+@fixtures.device(wazo_tenant=SUB_TENANT)
+def test_list_unallocated(main, sub):
+    response = confd.devices.unallocated.get()
+    assert_that(
+        response.items,
+        all_of(has_item(main), not_(has_item(sub))),
+    )
+
+    response = confd.devices.unallocated.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items,
+        all_of(has_item(main), not_(has_item(sub))),
+    )
+
+
 @fixtures.device(ip="99.20.30.40",
                  mac="aa:bb:aa:cc:01:23",
                  model="SortModel1",
@@ -353,6 +369,18 @@ def test_edit_device_multi_tenant(main, sub):
 
     response = confd.devices(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
+
+
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+def test_change_tenant_unallocated(main):
+    response = confd.devices.unallocated(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_updated()
+
+    response = confd.devices(main['id']).get(wazo_tenant=SUB_TENANT)
+    assert_that(response.item, has_entries(id=main['id']))
+
+    response = confd.devices.unallocated(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Device'))
 
 
 @fixtures.device(ip="127.8.0.8",

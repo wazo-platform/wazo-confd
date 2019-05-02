@@ -144,6 +144,45 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
 
+  /devices/unallocated:
+    get:
+      operationId: list_unallocated_devices
+      summary: List unallocated devices
+      description: '**Required ACL:** `confd.devices.unallocated.read`'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Device list
+          schema:
+            $ref: '#/definitions/DeviceItems'
+        '400':
+          $ref: '#/responses/GenericError'
+
+  /devices/unallocated/{device_id}:
+    put:
+      operationId: assign_unallocated_device_tenant
+      summary: Assign unallocated device tenant
+      description: '**Required ACL:** `confd.devices.unallocated.{device_id}.update`'
+      tags:
+      - devices
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/deviceid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
 parameters:
   deviceid:
     required: true

@@ -39,6 +39,10 @@ class DeviceService(CRUDService):
         for line in self.line_dao.find_all_by(device=device.id):
             self.line_device.dissociate(line, device)
 
+    def assign_tenant(self, device, tenant_uuid=None):
+        self.dao.edit(device, tenant_uuid=tenant_uuid)
+        self.notifier.edited(device)
+
     def delete(self, resource, tenant_uuid=None):
         self.validator.validate_delete(resource)
         self.dao.delete(resource, tenant_uuid=tenant_uuid)
