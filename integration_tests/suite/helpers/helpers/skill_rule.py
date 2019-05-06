@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
 import string
 
 from . import confd
+from ..config import MAIN_TENANT
 
 
 def generate_skill_rule(**parameters):
     parameters.setdefault('name', generate_name())
+    parameters.setdefault('wazo_tenant', MAIN_TENANT)
     return add_skill_rule(**parameters)
 
 
-def add_skill_rule(**parameters):
-    response = confd.queues.skillrules.post(parameters)
+def add_skill_rule(wazo_tenant=None, **parameters):
+    response = confd.queues.skillrules.post(parameters, wazo_tenant=wazo_tenant)
     return response.item
 
 

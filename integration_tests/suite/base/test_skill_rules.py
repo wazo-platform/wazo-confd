@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     is_not,
+    not_,
     not_none,
 )
 
@@ -17,6 +20,10 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 
@@ -99,6 +106,28 @@ def check_search(url, skill, hidden, field, term):
     assert_that(response.items, is_not(not_expected))
 
 
+@fixtures.skill_rule(wazo_tenant=MAIN_TENANT)
+@fixtures.skill_rule(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.queues.skillrules.get(wazo_tenant=MAIN_TENANT)
+    expected = all_of(
+        has_item(has_entry('id', main['id'])),
+        not_(has_item(has_entry('id', sub['id']))),
+    )
+    assert_that(response.items, expected)
+
+    response = confd.queues.skillrules.get(wazo_tenant=SUB_TENANT)
+    expected = all_of(
+        has_item(has_entry('id', sub['id'])),
+        not_(has_item(has_entry('id', main['id']))),
+    )
+    assert_that(response.items, expected)
+
+    response = confd.queues.skillrules.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    expected = has_items(has_entry('id', main['id']), has_entry('id', sub['id']))
+    assert_that(response.items, expected)
+
+
 @fixtures.skill_rule(name='sort1')
 @fixtures.skill_rule(name='sort2')
 def test_sort_offset_limit(skill1, skill2):
@@ -119,6 +148,16 @@ def test_get(skill_rule):
         name=skill_rule['name'],
         rules=empty(),
     ))
+
+
+@fixtures.skill_rule(wazo_tenant=MAIN_TENANT)
+@fixtures.skill_rule(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.queues.skillrules(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SkillRule'))
+
+    response = confd.queues.skillrules(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(id=sub['id']))
 
 
 def test_create_minimal_parameters():
@@ -145,6 +184,13 @@ def test_create_all_parameters():
     confd.queues.skillrules(response.item['id']).delete().assert_deleted()
 
 
+def test_create_multi_tenant():
+    response = confd.queues.skillrules.post(name='MySkillRule', wazo_tenant=SUB_TENANT)
+    response.assert_created('skillrules')
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
+
+
 @fixtures.skill_rule()
 def test_edit_minimal_parameters(skill_rule):
     response = confd.queues.skillrules(skill_rule['id']).put()
@@ -165,12 +211,32 @@ def test_edit_all_parameters(skill_rule):
     assert_that(response.item, has_entries(parameters))
 
 
+@fixtures.skill_rule(wazo_tenant=MAIN_TENANT)
+@fixtures.skill_rule(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.queues.skillrules(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SkillRule'))
+
+    response = confd.queues.skillrules(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.skill_rule()
 def test_delete(skill_rule):
     response = confd.queues.skillrules(skill_rule['id']).delete()
     response.assert_deleted()
     response = confd.queues.skillrules(skill_rule['id']).get()
     response.assert_match(404, e.not_found(resource='SkillRule'))
+
+
+@fixtures.skill_rule(wazo_tenant=MAIN_TENANT)
+@fixtures.skill_rule(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.queues.skillrules(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='SkillRule'))
+
+    response = confd.queues.skillrules(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.skill_rule()
