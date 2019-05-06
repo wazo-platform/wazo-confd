@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -66,8 +66,17 @@ class UniqueField(Validator):
         self.resource = resource
 
     def validate(self, model):
+        self._validate(model)
+
+    def validate_with_tenant_uuids(self, model, tenant_uuids):
+        self._validate(model, tenant_uuids)
+
+    def _validate(self, model, tenant_uuids=None):
         value = getattr(model, self.field)
-        found = self.dao_find(value)
+        if tenant_uuids is None:
+            found = self.dao_find(value)
+        else:
+            found = self.dao_find(value, tenant_uuids=tenant_uuids)
         if found is not None:
             metadata = {self.field: value}
             raise errors.resource_exists(self.resource, **metadata)
@@ -81,9 +90,18 @@ class UniqueFieldChanged(Validator):
         self.resource = resource
 
     def validate(self, model):
+        self._validate(model)
+
+    def validate_with_tenant_uuids(self, model, tenant_uuids):
+        self._validate(model, tenant_uuids)
+
+    def _validate(self, model, tenant_uuids=None):
         value = getattr(model, self.field)
         query = {self.field: value}
-        found = self.dao.find_by(**query)
+        if tenant_uuids is None:
+            found = self.dao.find_by(**query)
+        else:
+            found = self.dao.find_by(tenant_uuids=tenant_uuids, **query)
         if found is not None and found.id != model.id:
             metadata = {self.field: value}
             raise errors.resource_exists(self.resource, **metadata)
