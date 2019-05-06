@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
-from marshmallow.validate import Length, OneOf, Range, Regexp
+from marshmallow.validate import Length, NoneOf, OneOf, Range, Regexp
 
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_confd.helpers.destination import DestinationField
@@ -15,7 +15,7 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 class QueueSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=(Regexp(NAME_REGEX), Length(max=128)), required=True)
+    name = fields.String(validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)), required=True)
     label = fields.String(validate=Length(max=128), missing=None)
     data_quality = StrictBoolean(attribute='data_quality_bool')
     dtmf_hangup_callee_enabled = StrictBoolean()

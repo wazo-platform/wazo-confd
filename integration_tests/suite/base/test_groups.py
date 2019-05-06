@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -53,6 +53,7 @@ def test_put_errors(group):
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
+    yield s.check_bogus_field_returns_error, url, 'name', 'general'
     yield s.check_bogus_field_returns_error, url, 'name', True
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
