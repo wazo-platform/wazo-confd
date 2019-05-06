@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -11,8 +11,13 @@ from hamcrest import (
 from . import confd
 from ..helpers import (
     associations as a,
+    errors as e,
     fixtures,
     scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
 )
 
 FAKE_ID = 999999999
@@ -116,6 +121,21 @@ def test_associate_multiple_agents_to_skill(agent1, agent2, skill):
         ))
 
 
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+@fixtures.skill(wazo_tenant=MAIN_TENANT)
+@fixtures.skill(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_agent, sub_agent, main_skill, sub_skill):
+    response = confd.agents(main_agent['id']).skills(main_skill['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Agent'))
+
+    response = confd.agents(sub_agent['id']).skills(main_skill['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Skill'))
+
+    response = confd.agents(main_agent['id']).skills(sub_skill['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+
 @fixtures.agent()
 @fixtures.skill()
 def test_dissociate(agent, skill):
@@ -129,6 +149,18 @@ def test_dissociate(agent, skill):
 def test_dissociate_not_associated(agent, skill):
     response = confd.agents(agent['id']).skills(skill['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.agent(wazo_tenant=MAIN_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+@fixtures.skill(wazo_tenant=MAIN_TENANT)
+@fixtures.skill(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_agent, sub_agent, main_skill, sub_skill):
+    response = confd.agents(main_agent['id']).skills(sub_skill['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Agent'))
+
+    response = confd.agents(sub_agent['id']).skills(main_skill['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('Skill'))
 
 
 @fixtures.agent()
