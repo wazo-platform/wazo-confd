@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -20,6 +20,7 @@ class AgentSkillSchema(BaseSchema):
 class AgentSkillItem(ConfdResource):
 
     schema = AgentSkillSchema
+    has_tenant_uuid = True
 
     def __init__(self, service, agent_dao, skill_dao):
         super(AgentSkillItem, self).__init__()
@@ -29,8 +30,9 @@ class AgentSkillItem(ConfdResource):
 
     @required_acl('confd.agents.{agent_id}.skills.{skill_id}.update')
     def put(self, agent_id, skill_id):
-        agent = self.agent_dao.get(agent_id)
-        skill = self.skill_dao.get(skill_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
+        skill = self.skill_dao.get(skill_id, tenant_uuids=tenant_uuids)
         agent_skill = self._find_or_create_agent_skill(agent, skill)
         form = self.schema().load(request.get_json()).data
         agent_skill.weight = form['weight']
@@ -39,8 +41,9 @@ class AgentSkillItem(ConfdResource):
 
     @required_acl('confd.agents.{agent_id}.skills.{skill_id}.delete')
     def delete(self, agent_id, skill_id):
-        agent = self.agent_dao.get(agent_id)
-        skill = self.skill_dao.get(skill_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
+        skill = self.skill_dao.get(skill_id, tenant_uuids=tenant_uuids)
         agent_skill = self._find_or_create_agent_skill(agent, skill)
         self.service.dissociate_agent_skill(agent, agent_skill)
         return '', 204

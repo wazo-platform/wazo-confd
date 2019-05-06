@@ -8,6 +8,7 @@ paths:
       - skills
       - agents
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/agentid'
       - $ref: '#/parameters/skillid'
       - name: body
@@ -29,6 +30,7 @@ paths:
       - skills
       - agents
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/agentid'
       - $ref: '#/parameters/skillid'
       responses:
