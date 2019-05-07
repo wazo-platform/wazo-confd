@@ -5,12 +5,10 @@
 import random
 
 from . import confd
-from ..config import MAIN_TENANT
 
 
 def generate_agent(**parameters):
     parameters.setdefault('number', generate_number())
-    parameters.setdefault('wazo_tenant', MAIN_TENANT)
     return add_agent(**parameters)
 
 
