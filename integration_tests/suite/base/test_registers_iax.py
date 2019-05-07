@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -10,9 +10,9 @@ from hamcrest import (
     not_,
 )
 
-from ..helpers import scenarios as s
-from ..helpers import fixtures
 from . import confd
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 
 
 def test_get_errors():
@@ -39,13 +39,6 @@ def test_put_errors(register_iax):
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'auth_password', ':'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', '/'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', 123
-    yield s.check_bogus_field_returns_error, url, 'auth_password', True
-    yield s.check_bogus_field_returns_error, url, 'auth_password', []
-    yield s.check_bogus_field_returns_error, url, 'auth_password', {}
     yield s.check_bogus_field_returns_error, url, 'auth_username', ':'
     yield s.check_bogus_field_returns_error, url, 'auth_username', '/'
     yield s.check_bogus_field_returns_error, url, 'auth_username', 'value with space'
@@ -53,6 +46,13 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'auth_username', True
     yield s.check_bogus_field_returns_error, url, 'auth_username', []
     yield s.check_bogus_field_returns_error, url, 'auth_username', {}
+    yield s.check_bogus_field_returns_error, url, 'auth_password', ':'
+    yield s.check_bogus_field_returns_error, url, 'auth_password', '/'
+    yield s.check_bogus_field_returns_error, url, 'auth_password', 'value with space'
+    yield s.check_bogus_field_returns_error, url, 'auth_password', 123
+    yield s.check_bogus_field_returns_error, url, 'auth_password', True
+    yield s.check_bogus_field_returns_error, url, 'auth_password', []
+    yield s.check_bogus_field_returns_error, url, 'auth_password', {}
     yield s.check_bogus_field_returns_error, url, 'remote_host', ':'
     yield s.check_bogus_field_returns_error, url, 'remote_host', '/'
     yield s.check_bogus_field_returns_error, url, 'remote_host', '?'
@@ -85,8 +85,8 @@ def test_get(register_iax):
     response = confd.registers.iax(register_iax['id']).get()
     assert_that(response.item, has_entries(
         id=register_iax['id'],
-        auth_password=none(),
         auth_username=none(),
+        auth_password=none(),
         remote_host=register_iax['remote_host'],
         remote_port=none(),
         callback_extension=none(),
@@ -108,8 +108,8 @@ def test_create_minimal_parameters():
 
 def test_create_all_parameters():
     parameters = dict(
-        auth_password='auth-password',
         auth_username='auth-username',
+        auth_password='auth-password',
         remote_host='remote-host',
         remote_port=1234,
         callback_extension='callback-extension',
@@ -133,8 +133,8 @@ def test_edit_minimal_parameters(register_iax):
 @fixtures.register_iax()
 def test_edit_all_parameters(register_iax):
     parameters = dict(
-        auth_password='auth-password',
         auth_username='auth-username',
+        auth_password='auth-password',
         remote_host='remote-host',
         remote_port=1234,
         callback_extension='callback-extension',

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -15,16 +15,19 @@ from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
-REGISTER_REGEX = re.compile(r'''^
-                            (?:
-                            (?P<auth_password>[^:/]*)
-                            (?::(?P<auth_username>[^:/]*))?
-                            @)?
-                            (?P<remote_host>[^:?/]*)
-                            (?::(?P<remote_port>\d*))?
-                            (?:/(?P<callback_extension>[^?]*))?
-                            (?:\?(?P<callback_context>.*))?
-                            $''', re.VERBOSE)
+REGISTER_REGEX = re.compile(
+    r'''^
+    (?:
+    (?P<auth_username>[^:/]*)
+    (?::(?P<auth_password>[^:/]*))?
+    @)?
+    (?P<remote_host>[^:?/]*)
+    (?::(?P<remote_port>\d*))?
+    (?:/(?P<callback_extension>[^?]*))?
+    (?:\?(?P<callback_context>.*))?
+    $''',
+    re.VERBOSE,
+)
 
 INVALID_CHAR = r'^[^:/ ]*$'
 INVALID_REMOTE_HOST = r'^[^:/? ]*$'
@@ -47,14 +50,18 @@ class RegisterIAXSchema(BaseSchema):
     @validates_schema
     def validate_auth_username(self, data):
         if data.get('auth_username') and not data.get('auth_password'):
-            raise ValidationError('Cannot set field "auth_username" if the field "auth_password" is not set',
-                                  'auth_username')
+            raise ValidationError(
+                'Cannot set field "auth_username" if the field "auth_password" is not set',
+                'auth_username',
+            )
 
     @validates_schema
     def validate_callback_context(self, data):
         if data.get('callback_context') and not data.get('callback_extension'):
-            raise ValidationError('Cannot set field "callback_context" if the field "callback_extension" is not set',
-                                  'callback_context')
+            raise ValidationError(
+                'Cannot set field "callback_context" if the field "callback_extension" is not set',
+                'callback_context',
+            )
 
     @validates_schema
     def validate_total_length(self, data):
@@ -63,12 +70,12 @@ class RegisterIAXSchema(BaseSchema):
 
     @post_load
     def convert_to_chaniax(self, data):
-        chaniax_fmt = '{auth_password}{auth_username}{separator}'\
+        chaniax_fmt = '{auth_username}{auth_password}{separator}'\
                       '{remote_host}{remote_port}{callback_extension}{callback_context}'
         data['var_val'] = chaniax_fmt.format(
-            auth_password=data.get('auth_password') if data.get('auth_password') else '',
-            auth_username=':{}'.format(data.get('auth_username')) if data.get('auth_username') else '',
-            separator='@' if data.get('auth_password') or data.get('auth_username') else '',
+            auth_username=data.get('auth_username') if data.get('auth_username') else '',
+            auth_password=':{}'.format(data.get('auth_password')) if data.get('auth_password') else '',
+            separator='@' if data.get('auth_username') or data.get('auth_password') else '',
             remote_host=data.get('remote_host'),
             remote_port=':{}'.format(data.get('remote_port')) if data.get('remote_port') else '',
             callback_extension='/{}'.format(data.get('callback_extension')) if data.get('callback_extension') else '',
@@ -97,11 +104,13 @@ class RegisterIAXList(ListResource):
     @required_acl('confd.registers.create')
     def post(self):
         form = self.schema().load(request.get_json()).data
-        model = self.model(filename='iax.conf',
-                           category='general',
-                           var_name='register',
-                           var_val=form['var_val'],
-                           enabled=form['enabled'])
+        model = self.model(
+            filename='iax.conf',
+            category='general',
+            var_name='register',
+            var_val=form['var_val'],
+            enabled=form['enabled'],
+        )
         model = self.service.create(model)
         return self.schema().dump(model).data, 201, self.build_headers(model)
 
