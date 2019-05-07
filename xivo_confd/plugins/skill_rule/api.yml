@@ -65,6 +65,7 @@ paths:
       summary: Update skill rule
       description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.update`'
       tags:
+      - queues
       - skills
       parameters:
       - $ref: '#/parameters/tenantuuid'
@@ -86,6 +87,7 @@ paths:
       summary: Delete skill rule
       description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.delete`'
       tags:
+      - queues
       - skills
       parameters:
       - $ref: '#/parameters/tenantuuid'
