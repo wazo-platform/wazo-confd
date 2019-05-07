@@ -15,16 +15,19 @@ from xivo_confd.auth import required_acl
 from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from xivo_confd.helpers.restful import ListResource, ItemResource
 
-REGISTER_REGEX = re.compile(r'''^
-                            (?:
-                            (?P<auth_username>[^:/]*)
-                            (?::(?P<auth_password>[^:/]*))?
-                            @)?
-                            (?P<remote_host>[^:?/]*)
-                            (?::(?P<remote_port>\d*))?
-                            (?:/(?P<callback_extension>[^?]*))?
-                            (?:\?(?P<callback_context>.*))?
-                            $''', re.VERBOSE)
+REGISTER_REGEX = re.compile(
+    r'''^
+    (?:
+    (?P<auth_username>[^:/]*)
+    (?::(?P<auth_password>[^:/]*))?
+    @)?
+    (?P<remote_host>[^:?/]*)
+    (?::(?P<remote_port>\d*))?
+    (?:/(?P<callback_extension>[^?]*))?
+    (?:\?(?P<callback_context>.*))?
+    $''',
+    re.VERBOSE,
+)
 
 INVALID_CHAR = r'^[^:/ ]*$'
 INVALID_REMOTE_HOST = r'^[^:/? ]*$'
@@ -47,14 +50,18 @@ class RegisterIAXSchema(BaseSchema):
     @validates_schema
     def validate_auth_username(self, data):
         if data.get('auth_username') and not data.get('auth_password'):
-            raise ValidationError('Cannot set field "auth_username" if the field "auth_password" is not set',
-                                  'auth_username')
+            raise ValidationError(
+                'Cannot set field "auth_username" if the field "auth_password" is not set',
+                'auth_username',
+            )
 
     @validates_schema
     def validate_callback_context(self, data):
         if data.get('callback_context') and not data.get('callback_extension'):
-            raise ValidationError('Cannot set field "callback_context" if the field "callback_extension" is not set',
-                                  'callback_context')
+            raise ValidationError(
+                'Cannot set field "callback_context" if the field "callback_extension" is not set',
+                'callback_context',
+            )
 
     @validates_schema
     def validate_total_length(self, data):
@@ -97,11 +104,13 @@ class RegisterIAXList(ListResource):
     @required_acl('confd.registers.create')
     def post(self):
         form = self.schema().load(request.get_json()).data
-        model = self.model(filename='iax.conf',
-                           category='general',
-                           var_name='register',
-                           var_val=form['var_val'],
-                           enabled=form['enabled'])
+        model = self.model(
+            filename='iax.conf',
+            category='general',
+            var_name='register',
+            var_val=form['var_val'],
+            enabled=form['enabled'],
+        )
         model = self.service.create(model)
         return self.schema().dump(model).data, 201, self.build_headers(model)
 
