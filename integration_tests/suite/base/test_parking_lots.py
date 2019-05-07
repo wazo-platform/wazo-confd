@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -96,18 +96,12 @@ def test_search(parking_lot, hidden):
 
 def check_search(url, parking_lot, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, parking_lot[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, parking_lot[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: parking_lot[field]})
-
-    expected = has_item(has_entry('id', parking_lot['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', parking_lot['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.parking_lot(name='sort1')

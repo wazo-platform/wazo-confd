@@ -114,34 +114,25 @@ def test_search(hidden, agent):
 
 def check_search(url, agent, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, agent[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, agent[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: agent[field]})
-
-    expected = has_item(has_entry('id', agent['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', agent['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.agent(wazo_tenant=MAIN_TENANT)
 @fixtures.agent(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.agents.get(wazo_tenant=MAIN_TENANT)
-    expected = all_of(has_item(main)), not_(has_item(sub))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.agents.get(wazo_tenant=SUB_TENANT)
-    expected = all_of(has_item(sub), not_(has_item(main)))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.agents.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    expected = has_items(main, sub)
-    assert_that(response.items, expected)
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.agent(firstname='sort1', lastname='sort1', preprocess_subroutine='sort1')

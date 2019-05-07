@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -74,18 +74,12 @@ def test_search(_, __, trunk, hidden):
 
 def check_search(url, trunk, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, trunk[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, trunk[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: trunk[field]})
-
-    expected = has_item(has_entry('id', trunk['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', trunk['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.context(name='sort1')

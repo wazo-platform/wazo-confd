@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -119,25 +119,31 @@ def test_associate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
 @fixtures.trunk()
 @fixtures.sip()
 def test_get_endpoint_associated_to_trunk(trunk, sip):
-    expected = has_entries({'trunk_id': trunk['id'],
-                            'endpoint': 'sip',
-                            'endpoint_id': sip['id']})
-
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).endpoints.sip.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                trunk_id=trunk['id'],
+                endpoint='sip',
+                endpoint_id=sip['id'],
+            )
+        )
 
 
 @fixtures.trunk()
 @fixtures.sip()
 def test_get_trunk_associated_to_endpoint(trunk, sip):
-    expected = has_entries({'trunk_id': trunk['id'],
-                            'endpoint': 'sip',
-                            'endpoint_id': sip['id']})
-
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.endpoints.sip(sip['id']).trunks.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                trunk_id=trunk['id'],
+                endpoint='sip',
+                endpoint_id=sip['id'],
+            )
+        )
 
 
 @fixtures.trunk()
@@ -176,26 +182,25 @@ def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
 @fixtures.trunk()
 @fixtures.sip()
 def test_get_endpoint_sip_relation(trunk, sip):
-    expected = has_entries(
-        endpoint_sip=has_entries(id=sip['id'],
-                                 username=sip['username'])
-    )
-
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                endpoint_sip=has_entries(id=sip['id'], username=sip['username'])
+            )
+        )
 
 
 @fixtures.trunk()
 @fixtures.sip()
 def test_get_trunk_relation(trunk, sip):
-    expected = has_entries(
-        trunk=has_entries(id=trunk['id'])
-    )
-
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.endpoints.sip(sip['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(trunk=has_entries(id=trunk['id']))
+        )
 
 
 @fixtures.trunk()

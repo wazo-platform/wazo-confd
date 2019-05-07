@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -69,8 +69,10 @@ def test_delete_unimplemented(extension):
 @fixtures.extension_feature(exten='9999', feature='hidden')
 def test_search(extension, hidden):
     url = confd.extensions.features
-    searches = {'exten': '499',
-                'feature': 'sea'}
+    searches = {
+        'exten': '499',
+        'feature': 'sea',
+    }
 
     for field, term in searches.items():
         yield check_search, url, extension, hidden, field, term
@@ -78,18 +80,12 @@ def test_search(extension, hidden):
 
 def check_search(url, extension, hidden, field, term):
     response = url.get(search=term)
-
-    expected_extension = has_item(has_entry(field, extension[field]))
-    hidden_extension = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_extension)
-    assert_that(response.items, hidden_extension)
+    assert_that(response.items, has_item(has_entry(field, extension[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: extension[field]})
-
-    expected_extension = has_item(has_entry('id', extension['id']))
-    hidden_extension = is_not(has_item(has_entry('id', hidden['id'])))
-    assert_that(response.items, expected_extension)
-    assert_that(response.items, hidden_extension)
+    assert_that(response.items, has_item(has_entry('id', extension['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.extension_feature(exten='9998')
@@ -123,8 +119,7 @@ def test_edit_minimal_parameters(extension):
 
 @fixtures.extension_feature()
 def test_edit_all_parameters(extension):
-    parameters = {'exten': '*911',
-                  'enabled': False}
+    parameters = {'exten': '*911', 'enabled': False}
 
     response = confd.extensions.features(extension['id']).put(**parameters)
     response.assert_updated()

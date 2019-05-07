@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -107,18 +107,12 @@ def test_sorting_offset_limit(call_permission1, call_permission2):
 
 def check_search(url, call_permission, hidden, field, term):
     response = url.get(search=term)
-
-    expected_call_permission = has_item(has_entry(field, call_permission[field]))
-    hidden_call_permission = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_call_permission)
-    assert_that(response.items, hidden_call_permission)
+    assert_that(response.items, has_item(has_entry(field, call_permission[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: call_permission[field]})
-
-    expected_call_permission = has_item(has_entry('id', call_permission['id']))
-    hidden_call_permission = is_not(has_item(has_entry('id', hidden['id'])))
-    assert_that(response.items, expected_call_permission)
-    assert_that(response.items, hidden_call_permission)
+    assert_that(response.items, has_item(has_entry('id', call_permission['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.call_permission(wazo_tenant=MAIN_TENANT)

@@ -13,22 +13,24 @@ from hamcrest import (
     has_entries,
     has_items,
     has_key,
+    is_,
     is_not,
     none,
     not_,
     starts_with,
-    is_,
 )
 
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
-from ..helpers import helpers as h
 from . import confd, db, provd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    helpers as h,
+    scenarios as s,
+)
 from ..helpers.config import (
-    MAIN_TENANT,
     MAIN_TENANT as DEFAULT_DEVICE_TENANT,
+    MAIN_TENANT,
     SUB_TENANT,
 )
 
@@ -205,12 +207,11 @@ def check_get_line_associated_to_a_device(line, device):
     response = confd.devices(device['id']).lines.get()
     assert_that(response.total, equal_to(0))
 
-    expected = contains(has_entries(line_id=line['id'],
-                                    device_id=device['id']))
-
     with a.line_device(line, device):
         response = confd.devices(device['id']).lines.get()
-        assert_that(response.items, expected)
+        assert_that(response.items, contains(
+            has_entries(line_id=line['id'], device_id=device['id'])
+        ))
 
 
 def test_get_line_associated_to_a_device_from_sub_tenant_errors():
@@ -258,7 +259,7 @@ def check_registrar_addresses_without_backup_on_sccp_device():
 
 
 def assert_provd_config(user, line, provd_config):
-    expected = has_entries(
+    assert_that(provd_config, has_entries(
         id=is_not(starts_with('autoprov')),
         configdevice='defaultconfigdevice',
         deletable=True,
@@ -278,16 +279,15 @@ def assert_provd_config(user, line, provd_config):
             exten_park=none(),
             exten_pickup_group=none()
         )
-    )
-
-    assert_that(provd_config, expected)
+    ))
 
 
 def assert_sip_config(user, sip, extension, provd_config, position=1):
     position = str(position)
     fullname = "{u[firstname]} {u[lastname]}".format(u=user)
     registrar = provd.configs.get('default')
-    expected = has_entries(
+
+    assert_that(provd_config['raw_config'], has_entries(
         protocol='SIP',
         sip_lines=has_entries({
             position: has_entries(
@@ -302,14 +302,13 @@ def assert_sip_config(user, sip, extension, provd_config, position=1):
                 backup_registrar_ip=registrar['registrar_backup']
             )
         })
-    )
-
-    assert_that(provd_config['raw_config'], expected)
+    ))
 
 
 def assert_sccp_config(provd_config):
     registrar = provd.configs.get('default')
-    expected = has_entries(
+
+    assert_that(provd_config['raw_config'], has_entries(
         protocol='SCCP',
         sccp_call_managers=has_entries({
             '1': has_entries(
@@ -319,9 +318,7 @@ def assert_sccp_config(provd_config):
                 ip=registrar['proxy_backup']
             )
         })
-    )
-
-    assert_that(provd_config['raw_config'], expected)
+    ))
 
 
 @fixtures.device()

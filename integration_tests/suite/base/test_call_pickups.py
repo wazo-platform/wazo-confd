@@ -107,18 +107,13 @@ def test_search(call_pickup, hidden):
 
 def check_search(url, call_pickup, hidden, field, term):
     response = url.get(search=term)
-
-    expected_call_pickup = has_item(has_entry(field, call_pickup[field]))
-    hidden_call_pickup = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_call_pickup)
-    assert_that(response.items, hidden_call_pickup)
+    assert_that(response.items, has_item(has_entry(field, call_pickup[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: call_pickup[field]})
 
-    expected_call_pickup = has_item(has_entry('id', call_pickup['id']))
-    hidden_call_pickup = is_not(has_item(has_entry('id', hidden['id'])))
-    assert_that(response.items, expected_call_pickup)
-    assert_that(response.items, hidden_call_pickup)
+    assert_that(response.items, has_item(has_entry('id', call_pickup['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.call_pickup(name="sort1", description="Sort 1")

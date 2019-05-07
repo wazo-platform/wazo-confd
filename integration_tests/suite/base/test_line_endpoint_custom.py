@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -57,9 +57,14 @@ def test_get_custom_endpoint_associated_to_line(line, custom):
 
     with a.line_endpoint_custom(line, custom):
         response = confd.lines(line['id']).endpoints.custom.get()
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'endpoint_id': custom['id'],
-                                                'endpoint': 'custom'}))
+        assert_that(
+            response.item,
+            has_entries(
+                line_id=line['id'],
+                endpoint_id=custom['id'],
+                endpoint='custom'
+            )
+        )
 
 
 @fixtures.line()
@@ -80,9 +85,14 @@ def test_get_line_associated_to_a_custom_endpoint(line, custom):
 
     with a.line_endpoint_custom(line, custom):
         response = confd.endpoints.custom(custom['id']).lines.get()
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'endpoint_id': custom['id'],
-                                                'endpoint': 'custom'}))
+        assert_that(
+            response.item,
+            has_entries(
+                line_id=line['id'],
+                endpoint_id=custom['id'],
+                endpoint='custom'
+            )
+        )
 
 
 @fixtures.line()
@@ -194,26 +204,26 @@ def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_custom, sub_cu
 @fixtures.line()
 @fixtures.custom()
 def test_get_endpoint_custom_relation(line, custom):
-    expected = has_entries(
-        endpoint_custom=has_entries(id=custom['id'],
-                                    interface=custom['interface'])
-    )
-
     with a.line_endpoint_custom(line, custom):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(endpoint_custom=has_entries(
+                id=custom['id'],
+                interface=custom['interface'],
+            ))
+        )
 
 
 @fixtures.line()
 @fixtures.custom()
 def test_get_line_relation(line, custom):
-    expected = has_entries(
-        line=has_entries(id=line['id'])
-    )
-
     with a.line_endpoint_custom(line, custom):
         response = confd.endpoints.custom(custom['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(line=has_entries(id=line['id']))
+        )
 
 
 @fixtures.line()

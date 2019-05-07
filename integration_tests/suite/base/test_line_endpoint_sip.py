@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -57,9 +57,14 @@ def test_get_sip_endpoint_associated_to_line(line, sip):
 
     with a.line_endpoint_sip(line, sip):
         response = confd.lines(line['id']).endpoints.sip.get()
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'endpoint': 'sip',
-                                                'endpoint_id': sip['id']}))
+        assert_that(
+            response.item,
+            has_entries(
+                line_id=line['id'],
+                endpoint_id=sip['id'],
+                endpoint='sip',
+            )
+        )
 
 
 @fixtures.line()
@@ -80,9 +85,14 @@ def test_get_line_associated_to_a_sip_endpoint(line, sip):
 
     with a.line_endpoint_sip(line, sip):
         response = confd.endpoints.sip(sip['id']).lines.get()
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'endpoint': 'sip',
-                                                'endpoint_id': sip['id']}))
+        assert_that(
+            response.item,
+            has_entries(
+                line_id=line['id'],
+                endpoint_id=sip['id'],
+                endpoint='sip',
+            )
+        )
 
 
 @fixtures.line()
@@ -194,26 +204,26 @@ def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sip, sub_sip):
 @fixtures.line()
 @fixtures.sip()
 def test_get_endpoint_sip_relation(line, sip):
-    expected = has_entries(
-        endpoint_sip=has_entries(id=sip['id'],
-                                 username=sip['username'])
-    )
-
     with a.line_endpoint_sip(line, sip):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(endpoint_sip=has_entries(
+                id=sip['id'],
+                username=sip['username'],
+            ))
+        )
 
 
 @fixtures.line()
 @fixtures.sip()
 def test_get_line_relation(line, sip):
-    expected = has_entries(
-        line=has_entries(id=line['id'])
-    )
-
     with a.line_endpoint_sip(line, sip):
         response = confd.endpoints.sip(sip['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(line=has_entries(id=line['id']))
+        )
 
 
 @fixtures.line()

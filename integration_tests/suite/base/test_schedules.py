@@ -154,8 +154,10 @@ def test_list_multi_tenant(main, sub):
 @fixtures.schedule(name='hidden', timezone='hidden')
 def test_search(schedule, hidden):
     url = confd.schedules
-    searches = {'name': 'search',
-                'timezone': 'search'}
+    searches = {
+        'name': 'search',
+        'timezone': 'search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, schedule, hidden, field, term
@@ -163,18 +165,12 @@ def test_search(schedule, hidden):
 
 def check_search(url, schedule, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, schedule[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, schedule[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: schedule[field]})
-
-    expected = has_item(has_entry('id', schedule['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', schedule['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.schedule(name='sort1')

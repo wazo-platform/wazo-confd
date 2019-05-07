@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 
 from hamcrest import (
     all_of,
@@ -16,14 +15,17 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
-from . import mocks
-from ..helpers import fixtures
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers.helpers import voicemail as vm_helper
-from ..helpers.helpers import context as context_helper
+from . import confd, mocks
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.helpers import (
+    context as context_helper,
+    voicemail as vm_helper,
+)
 from ..helpers.config import (
     MAIN_TENANT,
     SUB_TENANT,
@@ -175,12 +177,16 @@ def test_edit_voicemail_with_same_number_and_context(first_voicemail, second_voi
     response.assert_match(400, e.resource_exists('Voicemail'))
 
 
-@fixtures.voicemail(name="SearchVoicemail",
-                    email="searchemail@proformatique.com",
-                    pager="searchpager@proformatique.com")
-@fixtures.voicemail(name="HiddenVoicemail",
-                    email="hiddenvoicemail@proformatique.com",
-                    pager="hiddenpager@proformatique.com")
+@fixtures.voicemail(
+    name="SearchVoicemail",
+    email="searchemail@proformatique.com",
+    pager="searchpager@proformatique.com",
+)
+@fixtures.voicemail(
+    name="HiddenVoicemail",
+    email="hiddenvoicemail@proformatique.com",
+    pager="hiddenpager@proformatique.com",
+)
 def test_search(voicemail, hidden):
     url = confd.voicemails
 
@@ -197,18 +203,12 @@ def test_search(voicemail, hidden):
 
 def check_search(url, voicemail, hidden, field, term):
     response = url.get(search=term)
-
-    expected_voicemail = has_item(has_entry(field, voicemail[field]))
-    hidden_voicemail = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_voicemail)
-    assert_that(response.items, hidden_voicemail)
+    assert_that(response.items, has_item(has_entry(field, voicemail[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: voicemail[field]})
-
-    expected_voicemail = has_item(has_entry('id', voicemail['id']))
-    hidden_voicemail = is_not(has_item(has_entry('id', hidden['id'])))
-    assert_that(response.items, expected_voicemail)
-    assert_that(response.items, hidden_voicemail)
+    assert_that(response.items, has_item(has_entry('id', voicemail['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
@@ -235,14 +235,18 @@ def test_list_multi_tenant(_, __, main, sub):
     )
 
 
-@fixtures.voicemail(name='sort1',
-                    number='8001',
-                    email='sort1@example.com',
-                    pager='sort1@example.com')
-@fixtures.voicemail(name='sort2',
-                    number='8002',
-                    email='sort2@example.com',
-                    pager='sort2@example.com')
+@fixtures.voicemail(
+    name='sort1',
+    number='8001',
+    email='sort1@example.com',
+    pager='sort1@example.com',
+)
+@fixtures.voicemail(
+    name='sort2',
+    number='8002',
+    email='sort2@example.com',
+    pager='sort2@example.com',
+)
 def test_sorting_offset_limit(voicemail1, voicemail2):
     url = confd.voicemails.get
     yield s.check_sorting, url, voicemail1, voicemail2, 'name', 'sort'
@@ -260,8 +264,7 @@ def test_sorting_offset_limit(voicemail1, voicemail2):
 @fixtures.voicemail()
 def test_list_voicemails(first, second):
     response = confd.voicemails.get()
-    expected = has_items(has_entries(first), has_entries(second))
-    assert_that(response.items, expected)
+    assert_that(response.items, has_items(has_entries(first), has_entries(second)))
 
 
 @fixtures.voicemail()

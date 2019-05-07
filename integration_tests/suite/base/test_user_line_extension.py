@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import unicode_literals
 
 from hamcrest import assert_that, has_items, has_entries
 
-from ..helpers import fixtures
-from ..helpers import associations as a
 from . import confd
+from ..helpers import (
+    associations as a,
+    fixtures,
+)
 
 
 @fixtures.user()
@@ -63,13 +65,15 @@ def test_dissociate_extension_then_line_then_user(user, line, extension):
 @fixtures.line_sip()
 @fixtures.extension(context='default')
 def test_get_line_extension_associations(user, line, extension):
-    expected = has_items(has_entries({'line_id': line['id'],
-                                      'extension_id': extension['id']})
-                         )
-
     with a.user_line(user, line), a.line_extension(line, extension):
         response = confd.lines(line['id']).extensions.get()
-        assert_that(response.items, expected)
+        assert_that(
+            response.items,
+            has_items(has_entries(
+                line_id=line['id'],
+                extension_id=extension['id'],
+            ))
+        )
 
 
 @fixtures.user(firstname="Jôhn", lastname="Smîth")

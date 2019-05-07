@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -57,9 +57,14 @@ def test_get_sccp_endpoint_associated_to_line(line, sccp):
 
     with a.line_endpoint_sccp(line, sccp):
         response = confd.lines(line['id']).endpoints.sccp.get()
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'endpoint_id': sccp['id'],
-                                                'endpoint': 'sccp'}))
+        assert_that(
+            response.item,
+            has_entries(
+                line_id=line['id'],
+                endpoint_id=sccp['id'],
+                endpoint='sccp'
+            )
+        )
 
 
 @fixtures.line()
@@ -80,9 +85,14 @@ def test_get_line_associated_to_a_sccp_endpoint(line, sccp):
 
     with a.line_endpoint_sccp(line, sccp):
         response = confd.endpoints.sccp(sccp['id']).lines.get()
-        assert_that(response.item, has_entries({'line_id': line['id'],
-                                                'endpoint_id': sccp['id'],
-                                                'endpoint': 'sccp'}))
+        assert_that(
+            response.item,
+            has_entries(
+                line_id=line['id'],
+                endpoint_id=sccp['id'],
+                endpoint='sccp'
+            )
+        )
 
 
 @fixtures.line()
@@ -185,25 +195,23 @@ def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp
 @fixtures.line()
 @fixtures.sccp()
 def test_get_endpoint_sccp_relation(line, sccp):
-    expected = has_entries(
-        endpoint_sccp=has_entries(id=sccp['id'])
-    )
-
     with a.line_endpoint_sccp(line, sccp):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(endpoint_sccp=has_entries(id=sccp['id']))
+        )
 
 
 @fixtures.line()
 @fixtures.sccp()
 def test_get_line_relation(line, sccp):
-    expected = has_entries(
-        line=has_entries(id=line['id'])
-    )
-
     with a.line_endpoint_sccp(line, sccp):
         response = confd.endpoints.sccp(sccp['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(line=has_entries(id=line['id']))
+        )
 
 
 @fixtures.line()

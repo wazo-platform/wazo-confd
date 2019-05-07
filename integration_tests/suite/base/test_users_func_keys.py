@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (assert_that,
-                      has_entries,
-                      has_key,
-                      is_not)
-
-from ..helpers import associations as a
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
+from hamcrest import (
+    assert_that,
+    has_entries,
+    has_key,
+    is_not,
+)
 
 from . import confd, provd
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 
@@ -74,14 +77,17 @@ def test_list(user, line_sip, extension, device):
         confd.users(user['id']).funckeys.templates(template['id']).put()
 
         response = confd.users(user['id']).funckeys.get()
-        expected_result = has_entries({'keys': has_entries({
-            '1': has_entries({'destination': has_entries(destination_1)}),
-            '2': has_entries({'destination': has_entries(destination_2)}),
-            '3': has_entries({'destination': has_entries(destination_3)}),
-            '4': has_entries({'destination': has_entries(destination_4)})})
-        })
-
-        assert_that(response.item, expected_result)
+        assert_that(
+            response.item,
+            has_entries(
+                keys=has_entries({
+                    '1': has_entries(destination=has_entries(destination_1)),
+                    '2': has_entries(destination=has_entries(destination_2)),
+                    '3': has_entries(destination=has_entries(destination_3)),
+                    '4': has_entries(destination=has_entries(destination_4)),
+                })
+            )
+        )
 
 
 @fixtures.user()
@@ -89,23 +95,29 @@ def test_list(user, line_sip, extension, device):
 @fixtures.extension()
 @fixtures.device()
 def test_put_position(user, line_sip, extension, device):
-    modified_funckey = {'blf': False,
-                        'label': 'myfunckey',
-                        'destination': {'type': 'park_position',
-                                        'position': 701}}
-    uuid_funckey = {'blf': False,
-                    'label': 'myfunckey',
-                    'destination': {'type': 'park_position',
-                                    'position': 702}}
+    modified_funckey = {
+        'blf': False,
+        'label': 'myfunckey',
+        'destination': {'type': 'park_position', 'position': 701}
+    }
+    uuid_funckey = {
+        'blf': False,
+        'label': 'myfunckey',
+        'destination': {'type': 'park_position', 'position': 702}
+    }
 
-    provd_funckey = {'label': 'myfunckey',
-                     'type': 'speeddial',
-                     'line': 1,
-                     'value': '701'}
-    provd_uuid_funckey = {'label': 'myfunckey',
-                          'type': 'speeddial',
-                          'line': 1,
-                          'value': '702'}
+    provd_funckey = {
+        'label': 'myfunckey',
+        'type': 'speeddial',
+        'line': 1,
+        'value': '701',
+    }
+    provd_uuid_funckey = {
+        'label': 'myfunckey',
+        'type': 'speeddial',
+        'line': 1,
+        'value': '702',
+    }
     position = 1
 
     with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):

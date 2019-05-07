@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -78,11 +78,8 @@ def test_search_on_funckey_template(funckey_template, hidden):
 
 def check_search(url, funckey_template, hidden, field, term):
     response = url.get(search=term)
-
-    shows_expected_funckey_template = has_item(has_entry(field, funckey_template[field]))
-    discards_hidden_funckey_template = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, shows_expected_funckey_template)
-    assert_that(response.items, discards_hidden_funckey_template)
+    assert_that(response.items, has_item(has_entry(field, funckey_template[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
 
 @fixtures.funckey_template(name='sort1')

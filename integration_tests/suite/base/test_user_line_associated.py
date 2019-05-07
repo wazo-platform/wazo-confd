@@ -1,16 +1,20 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (assert_that,
-                      equal_to,
-                      has_entries,
-                      has_length,
-                      instance_of,)
+from hamcrest import (
+    assert_that,
+    equal_to,
+    has_entries,
+    has_length,
+    instance_of,
+)
 
-from ..helpers import fixtures
-from ..helpers import associations as a
 from . import confd
+from ..helpers import (
+    associations as a,
+    fixtures,
+)
 
 
 @fixtures.user()
@@ -18,14 +22,17 @@ from . import confd
 @fixtures.sip()
 def test_get_user_line_id_associated_endpoints_sip(user, line, sip):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line):
-        expected = has_entries({'username': has_length(8),
-                                'secret': has_length(8),
-                                'type': 'friend',
-                                'host': 'dynamic',
-                                'options': instance_of(list),
-                                })
         response = confd.users(user['uuid']).lines(line['id']).associated.endpoints.sip.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                username=has_length(8),
+                secret=has_length(8),
+                type='friend',
+                host='dynamic',
+                options=instance_of(list),
+            )
+        )
 
 
 @fixtures.user()
@@ -57,14 +64,17 @@ def test_get_user_line_id_associated_endpoints_sip_when_user_line_not_associated
 @fixtures.sip()
 def test_get_user_line_main_associated_endpoints_sip(user, line, sip):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line):
-        expected = has_entries({'username': has_length(8),
-                                'secret': has_length(8),
-                                'type': 'friend',
-                                'host': 'dynamic',
-                                'options': instance_of(list),
-                                })
         response = confd.users(user['uuid']).lines.main.associated.endpoints.sip.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                username=has_length(8),
+                secret=has_length(8),
+                type='friend',
+                host='dynamic',
+                options=instance_of(list),
+            )
+        )
 
 
 @fixtures.user()

@@ -222,25 +222,25 @@ class TestWizardDiscover(IntegrationTest):
         ip_address = network_settings['IPAddress']
         gateway = network_settings['Gateway']
 
-        expected_response = {
-            'domain': DOMAIN,
-            'nameservers': RESOLVCONF_NAMESERVERS,
-            'hostname': hostname,
-            'gateways':  has_item(has_entry('gateway', gateway)),
-            'timezone': TIMEZONE,
-            'interfaces': has_item(has_entry('ip_address', ip_address))
-        }
-
         response = self.confd.wizard.discover.get()
-        assert_that(response.item, has_entries(expected_response))
+        assert_that(
+            response.item,
+            has_entries(
+                domain=DOMAIN,
+                nameservers=RESOLVCONF_NAMESERVERS,
+                hostname=hostname,
+                gateways=has_item(has_entry('gateway', gateway)),
+                timezone=TIMEZONE,
+                interfaces=has_item(has_entry('ip_address', ip_address)),
+            )
+        )
 
     def test_wizard_discover_ignores_interface_lo(self):
-        expected_response = {
-            'interfaces': is_not(has_item(has_entry('interface', 'lo')))
-        }
-
         response = self.confd.wizard.discover.get()
-        assert_that(response.item, has_entries(expected_response))
+        assert_that(
+            response.item,
+            has_entries(interfaces=is_not(has_item(has_entry('interface', 'lo'))))
+        )
 
 
 class TestWizardErrorConfigured(IntegrationTest):

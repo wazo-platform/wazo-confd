@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -128,25 +128,31 @@ def test_associate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_endpoint_associated_to_trunk(trunk, custom):
-    expected = has_entries({'trunk_id': trunk['id'],
-                            'endpoint': 'custom',
-                            'endpoint_id': custom['id']})
-
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.trunks(trunk['id']).endpoints.custom.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                trunk_id=trunk['id'],
+                endpoint='custom',
+                endpoint_id=custom['id'],
+            )
+        )
 
 
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_trunk_associated_to_endpoint(trunk, custom):
-    expected = has_entries({'trunk_id': trunk['id'],
-                            'endpoint': 'custom',
-                            'endpoint_id': custom['id']})
-
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.endpoints.custom(custom['id']).trunks.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                trunk_id=trunk['id'],
+                endpoint='custom',
+                endpoint_id=custom['id'],
+            )
+        )
 
 
 @fixtures.trunk()
@@ -185,26 +191,30 @@ def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom)
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_endpoint_custom_relation(trunk, custom):
-    expected = has_entries(
-        endpoint_custom=has_entries(id=custom['id'],
-                                    interface=custom['interface'])
-    )
-
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                endpoint_custom=has_entries(
+                    id=custom['id'],
+                    interface=custom['interface']
+                )
+            )
+        )
 
 
 @fixtures.trunk()
 @fixtures.custom()
 def test_get_trunk_relation(trunk, custom):
-    expected = has_entries(
-        trunk=has_entries(id=trunk['id'])
-    )
-
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.endpoints.custom(custom['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                trunk=has_entries(id=trunk['id'])
+            )
+        )
 
 
 @fixtures.trunk()

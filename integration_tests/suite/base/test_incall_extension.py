@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
+from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import (
     INCALL_CONTEXT,
     CONTEXT,
     MAIN_TENANT,
     SUB_TENANT,
 )
-from . import confd
-
 
 FAKE_ID = 999999999
 
@@ -138,27 +142,26 @@ def test_dissociate_not_associated(incall, extension):
 @fixtures.incall()
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_get_incall_relation(incall, extension):
-    expected = has_entries(
-        extensions=contains(has_entries(id=extension['id'],
-                                        exten=extension['exten'],
-                                        context=extension['context']))
-    )
-
     with a.incall_extension(incall, extension):
         response = confd.incalls(incall['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                extensions=contains(has_entries(
+                    id=extension['id'],
+                    exten=extension['exten'],
+                    context=extension['context'],
+                ))
+            )
+        )
 
 
 @fixtures.extension(context=INCALL_CONTEXT)
 @fixtures.incall()
 def test_get_extension_relation(extension, incall):
-    expected = has_entries(
-        incall=has_entries(id=incall['id'])
-    )
-
     with a.incall_extension(incall, extension):
         response = confd.extensions(extension['id']).get()
-        assert_that(response.item, expected)
+        assert_that(response.item, has_entries(incall=has_entries(id=incall['id'])))
 
 
 @fixtures.incall()

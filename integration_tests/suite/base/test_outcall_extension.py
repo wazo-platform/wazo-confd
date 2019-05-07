@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (assert_that,
-                      contains,
-                      has_entries)
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-from ..helpers import fixtures
-from ..helpers import associations as a
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
+from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import (
     OUTCALL_CONTEXT,
     CONTEXT,
     MAIN_TENANT,
     SUB_TENANT,
 )
-from . import confd
-
 
 FAKE_ID = 999999999
 
@@ -176,33 +180,38 @@ def test_dissociate_not_associated(outcall, extension):
 @fixtures.outcall()
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_get_outcall_relations(outcall, extension):
-    expected = has_entries(
-        extensions=contains(has_entries(id=extension['id'],
-                                        exten=extension['exten'],
-                                        context=extension['context'],
-                                        external_prefix='123',
-                                        prefix='456',
-                                        strip_digits=2,
-                                        caller_id='toto'))
-    )
-
     with a.outcall_extension(outcall, extension,
                              external_prefix='123', prefix='456', strip_digits=2, caller_id='toto'):
         response = confd.outcalls(outcall['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                extensions=contains(
+                    has_entries(
+                        id=extension['id'],
+                        exten=extension['exten'],
+                        context=extension['context'],
+                        external_prefix='123',
+                        prefix='456',
+                        strip_digits=2,
+                        caller_id='toto'
+                    )
+                )
+            )
+        )
 
 
 @fixtures.outcall()
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_get_extension_relations(outcall, extension):
-    expected = has_entries(
-        outcall=has_entries(id=outcall['id'],
-                            name=outcall['name'])
-    )
-
     with a.outcall_extension(outcall, extension):
         response = confd.extensions(extension['id']).get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(
+                outcall=has_entries(id=outcall['id'], name=outcall['name'])
+            )
+        )
 
 
 @fixtures.outcall()

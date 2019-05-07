@@ -236,40 +236,40 @@ def test_search(hidden, queue):
 
 def check_search(url, queue, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, queue[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, queue[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: queue[field]})
-
-    expected = has_item(has_entry('id', queue['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', queue['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.queue(wazo_tenant=MAIN_TENANT)
 @fixtures.queue(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.queues.get(wazo_tenant=MAIN_TENANT)
-    expected = all_of(
-        has_item(has_entry('id', main['id'])),
-        not_(has_item(has_entry('id', sub['id']))),
+    assert_that(
+        response.items,
+        all_of(
+            has_item(has_entry('id', main['id'])),
+            not_(has_item(has_entry('id', sub['id']))),
+        )
     )
-    assert_that(response.items, expected)
 
     response = confd.queues.get(wazo_tenant=SUB_TENANT)
-    expected = all_of(
-        has_item(has_entry('id', sub['id'])),
-        not_(has_item(has_entry('id', main['id']))),
+    assert_that(
+        response.items,
+        all_of(
+            has_item(has_entry('id', sub['id'])),
+            not_(has_item(has_entry('id', main['id']))),
+        )
     )
-    assert_that(response.items, expected)
 
     response = confd.queues.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    expected = has_items(has_entry('id', main['id']), has_entry('id', sub['id']))
-    assert_that(response.items, expected)
+    assert_that(
+        response.items,
+        has_items(has_entry('id', main['id']), has_entry('id', sub['id']))
+    )
 
 
 @fixtures.queue(name='sort1', preprocess_subroutine='sort1')

@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
 
 import re
 
-from ..helpers import config
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+    has_entry,
+    has_items,
+    has_length,
+    none,
+    not_none,
+)
 
-from ..helpers import fixtures
-from ..helpers import scenarios as s
-from ..helpers import errors as e
-
-from hamcrest import assert_that, has_entries, none, not_none, has_length, \
-    has_items, has_entry, contains
 from . import confd
+from ..helpers import (
+    config,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 
 def test_get_errors():
@@ -55,31 +63,34 @@ def test_delete_errors(line):
 
 @fixtures.line_sip(context=config.CONTEXT)
 def test_get(line):
-    expected = has_entries({'username': has_length(8),
-                            'secret': has_length(8),
-                            'context': config.CONTEXT,
-                            'device_slot': 1,
-                            'provisioning_extension': has_length(6),
-                            'callerid': none(),
-                            })
-
     response = confd.lines_sip(line['id']).get()
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            username=has_length(8),
+            secret=has_length(8),
+            context=config.CONTEXT,
+            device_slot=1,
+            provisioning_extension=has_length(6),
+            callerid=none(),
+        )
+    )
 
 
 @fixtures.line_sip()
 @fixtures.line_sip()
 def test_list(line1, line2):
-    expected = has_items(has_entry('id', line1['id']),
-                         has_entry('id', line2['id']))
-
     response = confd.lines_sip.get()
-    assert_that(response.items, expected)
-
-    expected = contains(has_entry('id', line1['id']))
+    assert_that(
+        response.items,
+        has_items(
+            has_entry('id', line1['id']),
+            has_entry('id', line2['id']),
+        )
+    )
 
     response = confd.lines_sip.get(search=line1['provisioning_extension'])
-    assert_that(response.items, expected)
+    assert_that(response.items, contains(has_entry('id', line1['id'])))
 
 
 def test_create_line_with_fake_context():
@@ -88,44 +99,48 @@ def test_create_line_with_fake_context():
 
 
 def test_create_line_with_minimal_parameters():
-    expected = has_entries({'callerid': none(),
-                            'context': config.CONTEXT,
-                            'device_slot': 1,
-                            'provisioning_extension': has_length(6),
-                            'secret': not_none(),
-                            'username': not_none()}
-                           )
-
-    response = confd.lines_sip.post(context=config.CONTEXT,
-                                    device_slot=1)
+    response = confd.lines_sip.post(context=config.CONTEXT, device_slot=1)
 
     response.assert_created('lines_sip')
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            callerid=none(),
+            context=config.CONTEXT,
+            device_slot=1,
+            provisioning_extension=has_length(6),
+            secret=not_none(),
+            username=not_none(),
+        )
+    )
 
 
 def test_create_line_with_all_parameters():
-    expected = has_entries({'callerid': u'"Fodé Sanderson" <1000>',
-                            'context': config.CONTEXT,
-                            'device_slot': 2,
-                            'provisioning_extension': u"333222",
-                            'secret': u"secret",
-                            'username': u"username"}
-                           )
+    response = confd.lines_sip.post(
+        context=config.CONTEXT,
+        device_slot=2,
+        callerid=u'"Fodé Sanderson" <1000>',
+        provisioning_extension=u"333222",
+        secret=u"secret",
+        username=u"username",
+    )
 
-    response = confd.lines_sip.post(context=config.CONTEXT,
-                                    device_slot=2,
-                                    callerid=u'"Fodé Sanderson" <1000>',
-                                    provisioning_extension=u"333222",
-                                    secret=u"secret",
-                                    username=u"username")
-
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            callerid=u'"Fodé Sanderson" <1000>',
+            context=config.CONTEXT,
+            device_slot=2,
+            provisioning_extension=u"333222",
+            secret=u"secret",
+            username=u"username"
+        )
+    )
 
 
 @fixtures.line_sip(provisioning_extension="123456")
 def test_create_line_with_provisioning_code_already_taken(line):
-    response = confd.lines_sip.post(context=config.CONTEXT,
-                                    provisioning_extension="123456")
+    response = confd.lines_sip.post(context=config.CONTEXT, provisioning_extension="123456")
     response.assert_match(400, re.compile("provisioning_code"))
 
 
@@ -139,23 +154,28 @@ def test_update_line_with_fake_context(line):
 @fixtures.context()
 def test_update_all_parameters_on_line(line, context):
     url = confd.lines_sip(line['id'])
-    expected = has_entries({'context': context['name'],
-                            'device_slot': 2,
-                            'callerid': u'"Mamàsta Michel" <2000>',
-                            'provisioning_extension': '234567',
-                            'secret': 'newsecret',
-                            'username': 'newusername'})
-
-    response = url.put(context=context['name'],
-                       device_slot=2,
-                       callerid=u'"Mamàsta Michel" <2000>',
-                       provisioning_extension='234567',
-                       secret='newsecret',
-                       username='newusername')
+    response = url.put(
+        context=context['name'],
+        device_slot=2,
+        callerid=u'"Mamàsta Michel" <2000>',
+        provisioning_extension='234567',
+        secret='newsecret',
+        username='newusername',
+    )
     response.assert_updated()
 
     response = url.get()
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(
+            context=context['name'],
+            device_slot=2,
+            callerid=u'"Mamàsta Michel" <2000>',
+            provisioning_extension='234567',
+            secret='newsecret',
+            username='newusername'
+        )
+    )
 
 
 @fixtures.line_sip(callerid=u'"Fodé Sanderson" <1000>"')

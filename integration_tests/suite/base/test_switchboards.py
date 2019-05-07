@@ -98,18 +98,12 @@ def test_search(hidden, switchboard):
 
 def check_search(url, switchboard, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, switchboard[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, switchboard[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: switchboard[field]})
-
-    expected = has_item(has_entry('uuid', switchboard['uuid']))
-    not_expected = has_item(has_entry('uuid', hidden['uuid']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('uuid', switchboard['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
 @fixtures.switchboard(name='sort1')
@@ -169,9 +163,8 @@ def test_edit_minimal_parameters(switchboard):
     response = confd.switchboards(switchboard['uuid']).put(name='after_edit')
     response.assert_updated()
 
-    expected = {'name': 'after_edit'}
     response = confd.switchboards(switchboard['uuid']).get()
-    assert_that(response.item, has_entries(expected))
+    assert_that(response.item, has_entries(name='after_edit'))
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)

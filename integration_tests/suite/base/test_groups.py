@@ -128,34 +128,25 @@ def test_search(hidden, group):
 
 def check_search(url, group, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, group[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, group[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: group[field]})
-
-    expected = has_item(has_entry('id', group['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', group['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.groups.get(wazo_tenant=MAIN_TENANT)
-    expected = all_of(has_item(main)), not_(has_item(sub))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.groups.get(wazo_tenant=SUB_TENANT)
-    expected = all_of(has_item(sub), not_(has_item(main)))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.groups.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    expected = has_items(main, sub)
-    assert_that(response.items, expected)
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.group(name='sort1', preprocess_subroutine='sort1')

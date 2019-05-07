@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -99,8 +99,10 @@ def unique_error_checks(url, call_filter):
 @fixtures.call_filter(name="hidden", description="HiddenDesc")
 def test_search(call_filter, hidden):
     url = confd.callfilters
-    searches = {'name': 'search',
-                'description': 'Search'}
+    searches = {
+        'name': 'search',
+        'description': 'Search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, call_filter, hidden, field, term
@@ -108,18 +110,12 @@ def test_search(call_filter, hidden):
 
 def check_search(url, call_filter, hidden, field, term):
     response = url.get(search=term)
-
-    expected_call_filter = has_item(has_entry(field, call_filter[field]))
-    hidden_call_filter = is_not(has_item(has_entry(field, hidden[field])))
-    assert_that(response.items, expected_call_filter)
-    assert_that(response.items, hidden_call_filter)
+    assert_that(response.items, has_item(has_entry(field, call_filter[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: call_filter[field]})
-
-    expected_call_filter = has_item(has_entry('id', call_filter['id']))
-    hidden_call_filter = is_not(has_item(has_entry('id', hidden['id'])))
-    assert_that(response.items, expected_call_filter)
-    assert_that(response.items, hidden_call_filter)
+    assert_that(response.items, has_item(has_entry('id', call_filter['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.call_filter(name="sort1", description="Sort 1")

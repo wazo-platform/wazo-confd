@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 
-from ..helpers import associations as a
-from ..helpers import errors as e
-from ..helpers import scenarios as s
-from ..helpers import fixtures as f
-
 from . import confd
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures as f,
+    scenarios as s,
+)
 
 FAKE_ID = 999999999
 
@@ -54,25 +55,25 @@ def test_dissociate_not_associated(line, extension):
 @f.line_sip()
 @f.extension()
 def test_associate_line_and_extension(line, extension):
-    expected = has_entries({'line_id': line['id'],
-                            'extension_id': extension['id']})
-
     response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
     response.assert_created('lines', 'extension')
-    assert_that(response.item, expected)
+    assert_that(
+        response.item,
+        has_entries(line_id=line['id'], extension_id=extension['id'])
+    )
 
 
 @f.user()
 @f.line_sip()
 @f.extension()
 def test_associate_user_line_extension(user, line, extension):
-    expected = has_entries({'line_id': line['id'],
-                            'extension_id': extension['id']})
-
     with a.user_line(user, line, check=False):
         response = confd.lines(line['id']).extension.post(extension_id=extension['id'])
         response.assert_created('lines', 'extension')
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(line_id=line['id'], extension_id=extension['id'])
+        )
 
 
 @f.user()
@@ -87,23 +88,23 @@ def test_dissociate_user_line_extension(user, line, extension):
 @f.line_sip()
 @f.extension()
 def test_get_line_from_extension(line, extension):
-    expected = has_entries({'line_id': line['id'],
-                            'extension_id': extension['id']})
-
     with a.line_extension(line, extension):
         response = confd.lines(line['id']).extension.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(line_id=line['id'], extension_id=extension['id'])
+        )
 
 
 @f.line_sip()
 @f.extension()
 def test_get_extension_from_line(line, extension):
-    expected = has_entries({'line_id': line['id'],
-                            'extension_id': extension['id']})
-
     with a.line_extension(line, extension):
         response = confd.extensions(extension['id']).line.get()
-        assert_that(response.item, expected)
+        assert_that(
+            response.item,
+            has_entries(line_id=line['id'], extension_id=extension['id'])
+        )
 
 
 @f.user()

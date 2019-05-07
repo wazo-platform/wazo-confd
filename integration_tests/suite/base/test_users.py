@@ -30,55 +30,57 @@ from ..helpers.config import (
     SUB_TENANT,
 )
 
+FULL_USER = {
+    "firstname": "Jôhn",
+    "lastname": "Smêth",
+    "username": "jsmeth",
+    "email": "jsmeth@smeth.com",
+    "mobile_phone_number": "+4185551234*2",
+    "userfield": "userfield",
+    "caller_id": '"Jôhnny Smith" <4185551234>',
+    "outgoing_caller_id": '"Johnny" <123>',
+    "music_on_hold": "default",
+    "language": "fr_FR",
+    "timezone": "America/Montreal",
+    "preprocess_subroutine": "preprocess_subroutine",
+    "password": "password",
+    "description": "John's description",
+    "supervision_enabled": False,
+    "call_transfer_enabled": False,
+    "dtmf_hangup_enabled": True,
+    "call_record_enabled": True,
+    "online_call_record_enabled": True,
+    "call_permission_password": '1234',
+    "enabled": False,
+    "ring_seconds": 60,
+    "simultaneous_calls": 10,
+    "subscription_type": 1,
+}
 
-FULL_USER = {"firstname": "Jôhn",
-             "lastname": "Smêth",
-             "username": "jsmeth",
-             "email": "jsmeth@smeth.com",
-             "mobile_phone_number": "+4185551234*2",
-             "userfield": "userfield",
-             "caller_id": '"Jôhnny Smith" <4185551234>',
-             "outgoing_caller_id": '"Johnny" <123>',
-             "music_on_hold": "default",
-             "language": "fr_FR",
-             "timezone": "America/Montreal",
-             "preprocess_subroutine": "preprocess_subroutine",
-             "password": "password",
-             "description": "John's description",
-             "supervision_enabled": False,
-             "call_transfer_enabled": False,
-             "dtmf_hangup_enabled": True,
-             "call_record_enabled": True,
-             "online_call_record_enabled": True,
-             "call_permission_password": '1234',
-             "enabled": False,
-             "ring_seconds": 60,
-             "simultaneous_calls": 10,
-             "subscription_type": 1}
-
-
-NULL_USER = {"firstname": "Jôhn",
-             "lastname": None,
-             "username": None,
-             "email": None,
-             "mobile_phone_number": None,
-             "userfield": None,
-             "outgoing_caller_id": None,
-             "music_on_hold": None,
-             "language": None,
-             "timezone": None,
-             "preprocess_subroutine": None,
-             "password": None,
-             "description": None,
-             "supervision_enabled": True,
-             "call_transfer_enabled": True,
-             "dtmf_hangup_enabled": False,
-             "call_record_enabled": False,
-             "online_call_record_enabled": False,
-             "call_permission_password": None,
-             "enabled": True,
-             "ring_seconds": 30,
-             "simultaneous_calls": 5}
+NULL_USER = {
+    "firstname": "Jôhn",
+    "lastname": None,
+    "username": None,
+    "email": None,
+    "mobile_phone_number": None,
+    "userfield": None,
+    "outgoing_caller_id": None,
+    "music_on_hold": None,
+    "language": None,
+    "timezone": None,
+    "preprocess_subroutine": None,
+    "password": None,
+    "description": None,
+    "supervision_enabled": True,
+    "call_transfer_enabled": True,
+    "dtmf_hangup_enabled": False,
+    "call_record_enabled": False,
+    "online_call_record_enabled": False,
+    "call_permission_password": None,
+    "enabled": True,
+    "ring_seconds": 30,
+    "simultaneous_calls": 5,
+}
 
 
 def test_search_errors():
@@ -283,22 +285,25 @@ def test_that_the_directory_view_works_with_unicode_characters(user):
 @fixtures.sip()
 @fixtures.extension()
 def test_summary_view_on_sip_endpoint(user, line, sip, extension):
-    expected = has_entries(id=user['id'],
-                           uuid=user['uuid'],
-                           firstname=user['firstname'],
-                           lastname=user['lastname'],
-                           email=user['email'],
-                           provisioning_code=line['provisioning_code'],
-                           extension=extension['exten'],
-                           context=extension['context'],
-                           enabled=True,
-                           protocol='sip')
-
     with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), \
             a.user_line(user, line):
 
         response = confd.users.get(view='summary', id=user['id'])
-        assert_that(response.items, contains(expected))
+        assert_that(
+            response.items,
+            contains(has_entries(
+                id=user['id'],
+                uuid=user['uuid'],
+                firstname=user['firstname'],
+                lastname=user['lastname'],
+                email=user['email'],
+                provisioning_code=line['provisioning_code'],
+                extension=extension['exten'],
+                context=extension['context'],
+                enabled=True,
+                protocol='sip',
+            ))
+        )
 
 
 @fixtures.user()
@@ -306,22 +311,25 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
 @fixtures.sccp()
 @fixtures.extension()
 def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
-    expected = has_entries(id=user['id'],
-                           uuid=user['uuid'],
-                           firstname=user['firstname'],
-                           lastname=user['lastname'],
-                           email=user['email'],
-                           provisioning_code=line['provisioning_code'],
-                           extension=extension['exten'],
-                           context=extension['context'],
-                           enabled=True,
-                           protocol='sccp')
-
     with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), \
             a.user_line(user, line):
 
         response = confd.users.get(view='summary', id=user['id'])
-        assert_that(response.items, contains(expected))
+        assert_that(
+            response.items,
+            contains(has_entries(
+                id=user['id'],
+                uuid=user['uuid'],
+                firstname=user['firstname'],
+                lastname=user['lastname'],
+                email=user['email'],
+                provisioning_code=line['provisioning_code'],
+                extension=extension['exten'],
+                context=extension['context'],
+                enabled=True,
+                protocol='sccp',
+            ))
+        )
 
 
 @fixtures.user()
@@ -329,64 +337,68 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
 @fixtures.custom()
 @fixtures.extension()
 def test_summary_view_on_custom_endpoint(user, line, custom, extension):
-    expected = has_entries(id=user['id'],
-                           uuid=user['uuid'],
-                           firstname=user['firstname'],
-                           lastname=user['lastname'],
-                           email=user['email'],
-                           provisioning_code=none(),
-                           extension=extension['exten'],
-                           context=extension['context'],
-                           enabled=True,
-                           protocol='custom')
-
     with a.line_endpoint_custom(line, custom), a.line_extension(line, extension), \
             a.user_line(user, line):
 
         response = confd.users.get(view='summary', id=user['id'])
-        assert_that(response.items, contains(expected))
+        assert_that(
+            response.items,
+            contains(has_entries(
+                id=user['id'],
+                uuid=user['uuid'],
+                firstname=user['firstname'],
+                lastname=user['lastname'],
+                email=user['email'],
+                provisioning_code=none(),
+                extension=extension['exten'],
+                context=extension['context'],
+                enabled=True,
+                protocol='custom',
+            ))
+        )
 
 
 @fixtures.user()
 def test_summary_view_on_user_without_line(user):
-    expected = has_entries(id=user['id'],
-                           uuid=user['uuid'],
-                           firstname=user['firstname'],
-                           lastname=user['lastname'],
-                           email=user['email'],
-                           provisioning_code=none(),
-                           extension=none(),
-                           context=none(),
-                           enabled=True,
-                           protocol=none())
-
     response = confd.users.get(view='summary', id=user['id'])
-    assert_that(response.items, contains(expected))
+    assert_that(
+        response.items,
+        contains(has_entries(
+            id=user['id'],
+            uuid=user['uuid'],
+            firstname=user['firstname'],
+            lastname=user['lastname'],
+            email=user['email'],
+            provisioning_code=none(),
+            extension=none(),
+            context=none(),
+            enabled=True,
+            protocol=none(),
+        ))
+    )
 
 
 @fixtures.user(firstname="Lègacy", lastname="Usér")
 @fixtures.user(firstname="Hîde", lastname="Mé")
 def test_search_using_legacy_parameter(user1, user2):
-    expected_found = has_item(has_entries(firstname="Lègacy", lastname="Usér"))
-    expected_hidden = has_item(has_entries(firstname="Hîde", lastname="Mé"))
-
     response = confd.users.get(q="lègacy usér")
+    assert_that(response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér")))
+    assert_that(response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé"))))
 
-    assert_that(response.items, expected_found)
-    assert_that(response.items, is_not(expected_hidden))
 
-
-@fixtures.user(firstname="Léeroy",
-               lastname="Jénkins",
-               email="jenkins@leeroy.com",
-               outgoing_caller_id='"Mystery Man" <5551234567>',
-               username="leeroyjenkins",
-               music_on_hold="leeroy_music_on_hold",
-               mobile_phone_number="5552423232",
-               userfield="leeroy jenkins userfield",
-               description="Léeroy Jénkin's bio",
-               enabled=False,
-               preprocess_subroutine="leeroy_preprocess")
+@fixtures.user(
+    firstname="Léeroy",
+    lastname="Jénkins",
+    email="jenkins@leeroy.com",
+    outgoing_caller_id='"Mystery Man" <5551234567>',
+    username="leeroyjenkins",
+    music_on_hold="leeroy_music_on_hold",
+    mobile_phone_number="5552423232",
+    userfield="leeroy jenkins userfield",
+    description="Léeroy Jénkin's bio",
+    enabled=False,
+    preprocess_subroutine="leeroy_preprocess",
+)
 def test_search_on_user_view(user):
     url = confd.users
     searches = {
@@ -405,12 +417,14 @@ def test_search_on_user_view(user):
         yield check_search, url, field, term, user[field]
 
 
-@fixtures.user(firstname="Môustapha",
-               lastname="Bângoura",
-               email="moustapha@bangoura.com",
-               mobile_phone_number="+5559284759",
-               userfield="Moustapha userfield",
-               description="Moustapha the greatest dancer")
+@fixtures.user(
+    firstname="Môustapha",
+    lastname="Bângoura",
+    email="moustapha@bangoura.com",
+    mobile_phone_number="+5559284759",
+    userfield="Moustapha userfield",
+    description="Moustapha the greatest dancer",
+)
 def test_search_on_directory_view(user):
     url = confd.users(view='directory')
 
@@ -449,9 +463,11 @@ def test_search_on_users_with_context_filter(user, line, extension):
         assert_that(response.total, equal_to(0))
 
 
-@fixtures.user(firstname="Âboubacar",
-               lastname="Manè",
-               description="Âboubacar le grand danseur")
+@fixtures.user(
+    firstname="Âboubacar",
+    lastname="Manè",
+    description="Âboubacar le grand danseur",
+)
 @fixtures.line()
 @fixtures.sip()
 @fixtures.extension()
@@ -466,9 +482,8 @@ def test_search_on_summary_view(user, line, sip, extension):
 
 
 def check_search(url, field, term, value):
-    expected = has_item(has_entry(field, value))
     response = url.get(search=term)
-    assert_that(response.items, expected)
+    assert_that(response.items, has_item(has_entry(field, value)))
 
 
 @fixtures.user(wazo_tenant=MAIN_TENANT)
@@ -493,18 +508,22 @@ def test_list_multi_tenant(main, sub):
     )
 
 
-@fixtures.user(firstname="firstname1",
-               lastname="lastname1",
-               email="email1@example.com",
-               mobile_phone_number="+5551",
-               userfield="sort userfield1",
-               description="description1")
-@fixtures.user(firstname="firstname2",
-               lastname="lastname2",
-               email="email2@example.com",
-               mobile_phone_number="+5552",
-               userfield="sort userfield2",
-               description="description2")
+@fixtures.user(
+    firstname="firstname1",
+    lastname="lastname1",
+    email="email1@example.com",
+    mobile_phone_number="+5551",
+    userfield="sort userfield1",
+    description="description1",
+)
+@fixtures.user(
+    firstname="firstname2",
+    lastname="lastname2",
+    email="email2@example.com",
+    mobile_phone_number="+5552",
+    userfield="sort userfield2",
+    description="description2",
+)
 def test_sorting_offset_limit(user1, user2):
     url = confd.users.get
     yield s.check_sorting, url, user1, user2, 'firstname', 'firstname'
@@ -530,20 +549,27 @@ def test_head_user(user):
 def test_get_user(user):
     response = confd.users(user['id']).get()
     assert_that(response.item, has_entries(FULL_USER))
-    assert_that(response.item, has_entries(
-        agent=none(),
-        call_permissions=empty(),
-        incalls=empty(),
-        lines=empty(),
-        groups=empty(),
-        forwards={'busy': {'destination': None, 'enabled': False},
-                  'noanswer': {'destination': None, 'enabled': False},
-                  'unconditional': {'destination': None, 'enabled': False}},
-        services={'dnd': {'enabled': False},
-                  'incallfilter': {'enabled': False}},
-        voicemail=none(),
-        queues=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            agent=none(),
+            call_permissions=empty(),
+            incalls=empty(),
+            lines=empty(),
+            groups=empty(),
+            forwards={
+                'busy': {'destination': None, 'enabled': False},
+                'noanswer': {'destination': None, 'enabled': False},
+                'unconditional': {'destination': None, 'enabled': False},
+            },
+            services={
+                'dnd': {'enabled': False},
+                'incallfilter': {'enabled': False},
+            },
+            voicemail=none(),
+            queues=empty(),
+        )
+    )
 
 
 @fixtures.user(firstname="Snôm", lastname="Whîte")
@@ -559,9 +585,11 @@ def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
 def test_that_the_username_can_be_an_email(user):
     result = confd.users(user['id']).get()
 
-    assert_that(result.item, has_entries(firstname='Snôw',
-                                         lastname='Whîte',
-                                         username='snow.white+dwarves@disney.example.com'))
+    assert_that(result.item, has_entries(
+        firstname='Snôw',
+        lastname='Whîte',
+        username='snow.white+dwarves@disney.example.com',
+    ))
 
 
 def test_create_minimal_parameters():
@@ -575,14 +603,19 @@ def test_create_with_null_parameters_fills_default_values():
     response = confd.users.post(firstname="Charlie")
     response.assert_created('users')
 
-    assert_that(response.item, has_entries(caller_id='"Charlie"',
-                                           call_transfer_enabled=False,
-                                           dtmf_hangup_enabled=False,
-                                           call_record_enabled=False,
-                                           online_call_record_enabled=False,
-                                           supervision_enabled=True,
-                                           ring_seconds=30,
-                                           simultaneous_calls=5))
+    assert_that(
+        response.item,
+        has_entries(
+            caller_id='"Charlie"',
+            call_transfer_enabled=False,
+            dtmf_hangup_enabled=False,
+            call_record_enabled=False,
+            online_call_record_enabled=False,
+            supervision_enabled=True,
+            ring_seconds=30,
+            simultaneous_calls=5,
+        )
+    )
 
 
 def test_create_user_with_all_parameters():
@@ -599,25 +632,25 @@ def test_create_user_with_all_parameters_null():
 
 
 def test_create_user_generates_appropriate_caller_id():
-    expected_caller_id = '"Jôhn"'
     response = confd.users.post(firstname='Jôhn')
-    assert_that(response.item, has_entry('caller_id', expected_caller_id))
+    assert_that(response.item, has_entry('caller_id', '"Jôhn"'))
 
-    expected_caller_id = '"Jôhn Doe"'
     response = confd.users.post(firstname='Jôhn', lastname='Doe')
-    assert_that(response.item['caller_id'], equal_to(expected_caller_id))
+    assert_that(response.item['caller_id'], equal_to('"Jôhn Doe"'))
 
 
-@fixtures.user(firstname="Léeroy",
-               lastname="Jénkins",
-               email="leeroy@jenkins.com",
-               outgoing_caller_id='"Mystery Man" <5551234567>',
-               username="leeroyjenkins",
-               music_on_hold="leeroy_music_on_hold",
-               mobile_phone_number="5552423232",
-               userfield="leeroy jenkins userfield",
-               description="Léeroy Jénkin's bio",
-               preprocess_subroutine="leeroy_preprocess")
+@fixtures.user(
+    firstname="Léeroy",
+    lastname="Jénkins",
+    email="leeroy@jenkins.com",
+    outgoing_caller_id='"Mystery Man" <5551234567>',
+    username="leeroyjenkins",
+    music_on_hold="leeroy_music_on_hold",
+    mobile_phone_number="5552423232",
+    userfield="leeroy jenkins userfield",
+    description="Léeroy Jénkin's bio",
+    preprocess_subroutine="leeroy_preprocess",
+)
 def test_update_user_with_all_parameters(user):
     user_url = confd.users(user['id'])
 
@@ -639,8 +672,7 @@ def test_update_user_with_all_parameters_null(user):
 
 @fixtures.user()
 def test_that_users_can_be_edited_by_uuid(user):
-    response = confd.users(user['uuid']).put({'firstname': 'Fôo',
-                                              'lastname': 'Bâr'})
+    response = confd.users(user['uuid']).put({'firstname': 'Fôo', 'lastname': 'Bâr'})
     response.assert_updated()
 
     response = confd.users(user['uuid']).get()

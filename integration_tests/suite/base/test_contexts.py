@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -136,9 +136,11 @@ def unique_error_checks(url, context):
 @fixtures.context(name='hidden', type='incall', description='hidden')
 def test_search(context, hidden):
     url = confd.contexts
-    searches = {'name': 'search',
-                'type': 'internal',
-                'description': 'desc_search'}
+    searches = {
+        'name': 'search',
+        'type': 'internal',
+        'description': 'desc_search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, context, hidden, field, term
@@ -146,34 +148,25 @@ def test_search(context, hidden):
 
 def check_search(url, context, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, context[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, context[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: context[field]})
-
-    expected = has_item(has_entry('id', context['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', context['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
 @fixtures.context(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.contexts.get(wazo_tenant=MAIN_TENANT)
-    expected = all_of(has_item(main)), not_(has_item(sub))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.contexts.get(wazo_tenant=SUB_TENANT)
-    expected = all_of(has_item(sub), not_(has_item(main)))
-    assert_that(response.items, expected)
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.contexts.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    expected = has_items(main, sub)
-    assert_that(response.items, expected)
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.context(name='sort1', description='sort1')
@@ -231,16 +224,18 @@ def test_create_in_authorized_tenant():
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyContext',
-                  'label': 'Context Power',
-                  'type': 'outcall',
-                  'user_ranges': [{'start': '1000', 'end': '1999'}],
-                  'group_ranges': [{'start': '2000', 'end': '2999'}],
-                  'queue_ranges': [{'start': '3000', 'end': '3999'}],
-                  'conference_room_ranges': [{'start': '4000', 'end': '4999'}],
-                  'incall_ranges': [{'start': '1000', 'end': '4999', 'did_length': 2}],
-                  'description': 'context description',
-                  'enabled': False}
+    parameters = {
+        'name': 'MyContext',
+        'label': 'Context Power',
+        'type': 'outcall',
+        'user_ranges': [{'start': '1000', 'end': '1999'}],
+        'group_ranges': [{'start': '2000', 'end': '2999'}],
+        'queue_ranges': [{'start': '3000', 'end': '3999'}],
+        'conference_room_ranges': [{'start': '4000', 'end': '4999'}],
+        'incall_ranges': [{'start': '1000', 'end': '4999', 'did_length': 2}],
+        'description': 'context description',
+        'enabled': False,
+    }
 
     response = confd.contexts.post(**parameters)
     response.assert_created('contexts')
@@ -258,15 +253,17 @@ def test_edit_minimal_parameters(context):
 
 @fixtures.context()
 def test_edit_all_parameters(context):
-    parameters = {'label': 'Context Power',
-                  'type': 'outcall',
-                  'user_ranges': [{'start': '1000', 'end': '1999'}],
-                  'group_ranges': [{'start': '2000', 'end': '2999'}],
-                  'queue_ranges': [{'start': '3000', 'end': '3999'}],
-                  'conference_room_ranges': [{'start': '4000', 'end': '4999'}],
-                  'incall_ranges': [{'start': '1000', 'end': '4999', 'did_length': 2}],
-                  'description': 'context description',
-                  'enabled': False}
+    parameters = {
+        'label': 'Context Power',
+        'type': 'outcall',
+        'user_ranges': [{'start': '1000', 'end': '1999'}],
+        'group_ranges': [{'start': '2000', 'end': '2999'}],
+        'queue_ranges': [{'start': '3000', 'end': '3999'}],
+        'conference_room_ranges': [{'start': '4000', 'end': '4999'}],
+        'incall_ranges': [{'start': '1000', 'end': '4999', 'did_length': 2}],
+        'description': 'context description',
+        'enabled': False,
+    }
 
     response = confd.contexts(context['id']).put(**parameters)
     response.assert_updated()
@@ -322,8 +319,7 @@ def test_delete_when_agent_is_logged(context, agent_login_status):
 
 @fixtures.context()
 def test_delete_when_sip_general_option_associated(context):
-    parameters = {'ordered_options': [],
-                  'options': {'context': context['name']}}
+    parameters = {'ordered_options': [], 'options': {'context': context['name']}}
     confd.asterisk.sip.general.put(**parameters).assert_updated()
 
     response = confd.contexts(context['id']).delete()

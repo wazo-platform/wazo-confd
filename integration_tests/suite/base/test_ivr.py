@@ -138,18 +138,12 @@ def test_search(ivr, hidden):
 
 def check_search(url, ivr, hidden, field, term):
     response = url.get(search=term)
-
-    expected = has_item(has_entry(field, ivr[field]))
-    not_expected = has_item(has_entry(field, hidden[field]))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry(field, ivr[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: ivr[field]})
-
-    expected = has_item(has_entry('id', ivr['id']))
-    not_expected = has_item(has_entry('id', hidden['id']))
-    assert_that(response.items, expected)
-    assert_that(response.items, is_not(not_expected))
+    assert_that(response.items, has_item(has_entry('id', ivr['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.ivr(description='sort1')
