@@ -23,13 +23,13 @@ class AgentMemberService(object):
                 return agent_skill
         return None
 
-    def associate_agent_skill(self, agent, agent_queue_skill):
-        if agent_queue_skill in agent.agent_queue_skills:
+    def associate_agent_skill(self, agent, agent_skill):
+        if agent_skill in agent.agent_queue_skills:
             return
 
-        self.validator.validate_association(agent, agent_queue_skill)
-        self.agent_dao.associate_agent_skill(agent, agent_queue_skill)
-        self.notifier.skill_associated(agent, agent_queue_skill)
+        self.validator.validate_association(agent, agent_skill)
+        self.agent_dao.associate_agent_skill(agent, agent_skill)
+        self.notifier.skill_associated(agent, agent_skill)
 
     def dissociate_agent_skill(self, agent, agent_skill):
         if agent_skill not in agent.agent_queue_skills:
