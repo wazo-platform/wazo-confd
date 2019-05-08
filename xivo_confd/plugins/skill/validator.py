@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.skill import dao as skill_dao
@@ -14,9 +14,11 @@ from xivo_confd.helpers.validator import (
 def build_validator():
     return ValidationGroup(
         create=[
-            UniqueField('name',
-                        lambda name: skill_dao.find_by(name=name),
-                        'Skill'),
+            UniqueField(
+                'name',
+                lambda name, tenant_uuids: skill_dao.find_by(name=name, tenant_uuids=tenant_uuids),
+                'Skill'
+            ),
         ],
         edit=[
             UniqueFieldChanged('name', skill_dao, 'Skill'),

@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.agent import dao as agent_dao_module
 from xivo_dao.resources.skill import dao as skill_dao_module
 
 from .notifier import build_notifier
+from .validator import build_validator
 
 
 class AgentMemberService(object):
 
-    def __init__(self, agent_dao, skill_dao, notifier):
+    def __init__(self, agent_dao, skill_dao, validator, notifier):
         self.agent_dao = agent_dao
         self.skill_dao = skill_dao
+        self.validator = validator
         self.notifier = notifier
 
     def find_agent_skill(self, agent, skill):
@@ -25,6 +27,7 @@ class AgentMemberService(object):
         if agent_skill in agent.agent_queue_skills:
             return
 
+        self.validator.validate_association(agent, agent_skill)
         self.agent_dao.associate_agent_skill(agent, agent_skill)
         self.notifier.skill_associated(agent, agent_skill)
 
@@ -40,5 +43,6 @@ def build_service():
     return AgentMemberService(
         agent_dao_module,
         skill_dao_module,
+        build_validator(),
         build_notifier(),
     )

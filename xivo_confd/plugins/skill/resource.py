@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -32,6 +32,7 @@ class SkillList(ListResource):
 class SkillItem(ItemResource):
 
     schema = SkillSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.agents.skills.{id}.read')
     def get(self, id):

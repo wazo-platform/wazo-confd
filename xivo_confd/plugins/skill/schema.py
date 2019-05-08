@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-import re
 
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Regexp
@@ -14,6 +12,7 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
 class SkillSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=(Regexp(NAME_REGEX), Length(max=64)), required=True)
     category = fields.String(validate=Length(max=64), allow_none=True)
     description = fields.String(allow_none=True)

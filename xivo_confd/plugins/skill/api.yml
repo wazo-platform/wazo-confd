@@ -8,6 +8,8 @@ paths:
       - agents
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -26,6 +28,7 @@ paths:
       - agents
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Skill to create
@@ -48,6 +51,7 @@ paths:
       - agents
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/skillid'
       responses:
         '200':
@@ -63,6 +67,7 @@ paths:
       tags:
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/skillid'
       - name: body
         in: body
@@ -83,6 +88,7 @@ paths:
       tags:
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/skillid'
       responses:
         '204':
@@ -116,6 +122,10 @@ definitions:
       id:
         type: integer
         readOnly: true
+      tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
       name:
         type: string
         description: The name to identify the skill
