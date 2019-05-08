@@ -54,7 +54,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', True
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(65)
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
@@ -70,14 +69,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': 1234}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': []}], regex
     yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': {}}], regex
-
-    for check in unique_error_checks(url):
-        yield check
-
-
-@fixtures.skill_rule(name='unique')
-def unique_error_checks(url, skill_rule):
-    yield s.check_bogus_field_returns_error, url, 'name', skill_rule['name']
 
 
 @fixtures.skill_rule(name='search')
