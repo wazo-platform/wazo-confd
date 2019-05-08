@@ -6,12 +6,10 @@ import random
 import string
 
 from . import confd
-from ..config import MAIN_TENANT
 
 
 def generate_skill_rule(**parameters):
     parameters.setdefault('name', generate_name())
-    parameters.setdefault('wazo_tenant', MAIN_TENANT)
     return add_skill_rule(**parameters)
 
 
