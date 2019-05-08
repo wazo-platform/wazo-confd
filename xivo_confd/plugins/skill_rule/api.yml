@@ -8,6 +8,8 @@ paths:
       - queues
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -26,6 +28,7 @@ paths:
       - queues
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Skill rule to create
@@ -48,6 +51,7 @@ paths:
       - queues
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/skillruleid'
       responses:
         '200':
@@ -61,8 +65,10 @@ paths:
       summary: Update skill rule
       description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.update`'
       tags:
+      - queues
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/skillruleid'
       - name: body
         in: body
@@ -81,8 +87,10 @@ paths:
       summary: Delete skill rule
       description: '**Required ACL:** `confd.queues.skillrules.{skillrule_id}.delete`'
       tags:
+      - queues
       - skills
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/skillruleid'
       responses:
         '204':
@@ -105,6 +113,10 @@ definitions:
       id:
         type: integer
         readOnly: true
+      tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
       name:
         type: string
         description: The name to identify the skill rule
