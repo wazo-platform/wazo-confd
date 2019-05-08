@@ -12,9 +12,7 @@ EXTEN_OUTCALL_REGEX = r'^_?\+?[*#0-9_XxZzNn\[\].!-]*$'
 LANGUAGE_REGEX = r"^[a-z]{2}_[A-Z]{2}$"
 
 
-class Validator(object):
-
-    __metaclass__ = abc.ABCMeta
+class Validator(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def validate(self, model):
@@ -24,9 +22,7 @@ class Validator(object):
         self.validate(model)
 
 
-class ValidatorAssociation(object):
-
-    __metaclass__ = abc.ABCMeta
+class ValidatorAssociation(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def validate(self, model1, model2):

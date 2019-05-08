@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -24,8 +24,8 @@ class TestCommon(unittest.TestCase):
     def assertResponse(self, response, expected_code, result):
         data, status_code = response
 
-        self.assertEquals(status_code, expected_code)
-        self.assertEquals(data, result)
+        self.assertEqual(status_code, expected_code)
+        self.assertEqual(data, result)
 
 
 class TestHandleError(TestCommon):

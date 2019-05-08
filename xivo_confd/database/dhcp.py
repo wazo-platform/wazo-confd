@@ -12,5 +12,5 @@ def get():
 
 def update(dhcp_form):
     dhcp = Session.query(Dhcp).first()
-    for name, value in dhcp_form.iteritems():
+    for name, value in dhcp_form.items():
         setattr(dhcp, name, value)

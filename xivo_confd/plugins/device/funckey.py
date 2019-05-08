@@ -36,9 +36,7 @@ def build_converters():
     }
 
 
-class FuncKeyConverter(object):
-
-    __metaclass__ = abc.ABCMeta
+class FuncKeyConverter(metaclass=abc.ABCMeta):
 
     INVALID_CHARS = "\n\r\t;"
 

@@ -22,19 +22,19 @@ class MohNotifier(object):
 
     def created(self, moh):
         self.send_sysconfd_handlers()
-        event = ArbitraryEvent(u'moh_created', {u'uuid': moh.uuid})
+        event = ArbitraryEvent('moh_created', {'uuid': moh.uuid})
         event.routing_key = 'config.moh.created'
         self.bus.send_bus_event(event)
 
     def edited(self, moh):
         self.send_sysconfd_handlers()
-        event = ArbitraryEvent(u'moh_edited', {u'uuid': moh.uuid})
+        event = ArbitraryEvent('moh_edited', {'uuid': moh.uuid})
         event.routing_key = 'config.moh.edited'
         self.bus.send_bus_event(event)
 
     def deleted(self, moh):
         self.send_sysconfd_handlers()
-        event = ArbitraryEvent(u'moh_deleted', {u'uuid': moh.uuid})
+        event = ArbitraryEvent('moh_deleted', {'uuid': moh.uuid})
         event.routing_key = 'config.moh.deleted'
         self.bus.send_bus_event(event)
 

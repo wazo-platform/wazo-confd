@@ -214,5 +214,5 @@ class EntryUpdater(object):
             associator.update(entry)
 
     def update_resources(self, entry):
-        for resource, creator in self.creators.iteritems():
+        for resource, creator in self.creators.items():
             entry.update(resource, creator)

@@ -8,7 +8,7 @@ class Device(object):
     @classmethod
     def from_args(cls, **kwargs):
         device = cls({}, {'parent_ids': []})
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             setattr(device, key, value)
         return device
 

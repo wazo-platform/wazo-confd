@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import errno
@@ -23,10 +23,10 @@ class _MohFilesystemStorage(object):
         self._base_path = base_path
 
     def _directory_path(self, moh):
-        return os.path.join(self._base_path, moh.name.encode('utf-8'))
+        return os.path.join(self._base_path, moh.name)
 
     def _filename_path(self, moh, filename):
-        return os.path.join(self._base_path, moh.name.encode('utf-8'), filename.encode('utf-8'))
+        return os.path.join(self._base_path, moh.name, filename)
 
     def create_directory(self, moh):
         path = self._directory_path(moh)

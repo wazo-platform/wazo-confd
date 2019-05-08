@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2012-2016 Avencall
+# Copyright 2012-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
-from StringIO import StringIO
+from io import StringIO
 from xivo.unicode_csv import UnicodeDictWriter
 
 CSV_HEADERS = ['Call Date',

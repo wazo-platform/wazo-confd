@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -113,7 +113,7 @@ class FuncKeyGenerator(object):
 
     def convert_funckeys(self, user, line, template):
         funckeys = {}
-        for pos, funckey in template.keys.iteritems():
+        for pos, funckey in template.keys.items():
             converter = self.converters[funckey.destination.type]
             funckeys.update(converter.build(user, line, pos, funckey))
         return funckeys

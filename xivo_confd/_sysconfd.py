@@ -34,7 +34,7 @@ class SysconfdPublisher(object):
             self.add_handlers(args)
 
     def add_handlers(self, args):
-        for service, new_commands in args.iteritems():
+        for service, new_commands in args.items():
             commands = self.handlers.setdefault(service, set())
             commands.update(set(new_commands))
 
@@ -127,7 +127,7 @@ class SysconfdPublisher(object):
         if len(self.handlers) > 0:
             url = "{}/exec_request_handlers".format(self.base_url)
             body = {key: tuple(commands)
-                    for key, commands in self.handlers.iteritems()}
+                    for key, commands in self.handlers.items()}
             response = session.request('POST', url, json=body)
             self.check_for_errors(response)
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -122,7 +122,7 @@ class RegisterSIPItem(ItemResource):
         form = self.schema().load(request.get_json(), partial=True).data
 
         model_json = self.schema().dump(model).data
-        for name, value in form.iteritems():
+        for name, value in form.items():
             model_json[name] = value
         model_json = self.schema().load(model_json).data  # update var_val
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Proformatique Inc.
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import post_load
@@ -14,7 +14,7 @@ class GroupFallbackSchema(BaseSchema):
 
     @post_load
     def create_objects(self, data):
-        for key, form in data.iteritems():
+        for key, form in data.items():
             if form:
                 data[key] = Dialaction(**form)
         return data

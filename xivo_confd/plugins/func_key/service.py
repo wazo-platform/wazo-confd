@@ -79,7 +79,7 @@ class TemplateService(object):
         self.edit_funckey(funckey, template, position)
 
     def edit_user_template(self, user, template, updated_fields):
-        for funckey in template.keys.itervalues():
+        for funckey in template.keys.values():
             self.validator_bsfilter.validate(user, funckey)
         self.edit(template, updated_fields)
 

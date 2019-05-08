@@ -66,9 +66,9 @@ class TestSysconfdClient(TestCase):
 
         method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/services"
-        self.assertEquals(method, "POST")
-        self.assertEquals(url, expected_url)
-        self.assertEquals(json, expected_json)
+        self.assertEqual(method, "POST")
+        self.assertEqual(url, expected_url)
+        self.assertEqual(json, expected_json)
 
     def test_xivo_service_start(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -79,9 +79,9 @@ class TestSysconfdClient(TestCase):
 
         method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/xivoctl"
-        self.assertEquals(method, "POST")
-        self.assertEquals(url, expected_url)
-        self.assertEquals(json, expected_json)
+        self.assertEqual(method, "POST")
+        self.assertEqual(url, expected_url)
+        self.assertEqual(json, expected_json)
 
     def test_xivo_service_enable(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -92,9 +92,9 @@ class TestSysconfdClient(TestCase):
 
         method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/xivoctl"
-        self.assertEquals(method, "POST")
-        self.assertEquals(url, expected_url)
-        self.assertEquals(json, expected_json)
+        self.assertEqual(method, "POST")
+        self.assertEqual(url, expected_url)
+        self.assertEqual(json, expected_json)
 
     def test_set_hosts(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -105,9 +105,9 @@ class TestSysconfdClient(TestCase):
 
         method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/hosts"
-        self.assertEquals(method, "POST")
-        self.assertEquals(url, expected_url)
-        self.assertEquals(json, expected_json)
+        self.assertEqual(method, "POST")
+        self.assertEqual(url, expected_url)
+        self.assertEqual(json, expected_json)
 
     def test_set_resolvconf(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -119,9 +119,9 @@ class TestSysconfdClient(TestCase):
 
         method, url, json = self.extract_request()
         expected_url = "http://localhost:8668/resolv_conf"
-        self.assertEquals(method, "POST")
-        self.assertEquals(url, expected_url)
-        self.assertEquals(json, expected_json)
+        self.assertEqual(method, "POST")
+        self.assertEqual(url, expected_url)
+        self.assertEqual(json, expected_json)
 
     def test_move_voicemail_storage(self):
         self.session.request.return_value = Mock(status_code=200)
@@ -150,9 +150,9 @@ class TestSysconfdClient(TestCase):
         method, url, json = self.extract_request()
 
         expected_url = "http://localhost:8668/exec_request_handlers"
-        self.assertEquals(method, "POST")
-        self.assertEquals(url, expected_url)
-        self.assertEquals(json, commands)
+        self.assertEqual(method, "POST")
+        self.assertEqual(url, expected_url)
+        self.assertEqual(json, commands)
 
         self.dao.is_live_reload_enabled.assert_called_once_with()
 

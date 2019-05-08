@@ -48,7 +48,7 @@ class FuncKeyMappingValidator(Validator):
         self.funckey_validator = funckey_validator
 
     def validate(self, template):
-        for pos, funckey in template.keys.iteritems():
+        for pos, funckey in template.keys.items():
             self.funckey_validator.validate(funckey)
 
 

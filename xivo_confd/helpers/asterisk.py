@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -26,7 +26,7 @@ class AsteriskConfigurationSchema(BaseSchema):
     def convert_options_to_collection(self, data):
         options = data.get('options')
         if isinstance(options, dict):
-            data['options'] = [{'key': key, 'value': value} for key, value in options.iteritems()]
+            data['options'] = [{'key': key, 'value': value} for key, value in options.items()]
         return data
 
     @post_dump

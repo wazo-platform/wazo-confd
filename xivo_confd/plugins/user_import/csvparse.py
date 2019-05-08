@@ -29,7 +29,7 @@ class CsvIterator(object):
         self.reader = reader
         self.position = 0
 
-    def next(self):
+    def __next__(self):
         row = next(self.reader)
         self.position += 1
         return CsvRow(row, self.position)
@@ -180,7 +180,7 @@ class CsvRow(object):
         return entry
 
     def format_error(self, exc):
-        return {'message': unicode(exc),
+        return {'message': str(exc),
                 'timestamp': int(time.time()),
                 'details': {'row': self.fields,
                             'row_number': self.position}}

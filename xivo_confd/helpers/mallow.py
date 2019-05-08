@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -122,7 +122,7 @@ class AsteriskSection(object):
 
     def __init__(self, max_length=79, regex=DEFAULT_REGEX, reserved_names=DEFAULT_RESERVED_NAMES):
         self._max_length = max_length
-        self._regex = re.compile(regex) if isinstance(regex, basestring) else regex
+        self._regex = re.compile(regex) if isinstance(regex, str) else regex
         self._reserved_names = reserved_names
 
     def __call__(self, value):

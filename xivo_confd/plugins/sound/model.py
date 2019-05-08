@@ -59,7 +59,7 @@ class SoundFormat(object):
     extension_map = {
         'wav': 'slin',
     }
-    format_map = {v: k for k, v in extension_map.iteritems()}
+    format_map = {v: k for k, v in extension_map.items()}
 
     def __init__(self, format_=None, language=None, text=None, path=None, extension=None, tenant_uuid=None):
         if format_ is not None:

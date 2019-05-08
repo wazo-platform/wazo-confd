@@ -26,7 +26,7 @@ class ProvisioningNetworkingResource(ConfdResource):
     def put(self):
         model = self.service.get()
         form = self.schema().load(request.get_json(), partial=True).data
-        for name, value in form.iteritems():
+        for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model)
         return '', 204
