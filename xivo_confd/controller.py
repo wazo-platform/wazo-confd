@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+import signal
 
 from functools import partial
 
@@ -50,16 +51,16 @@ class Controller(object):
     def run(self):
         logger.info('xivo-confd running...')
         xivo_dao.init_db_from_config(self.config)
-        try:
-            with self.token_renewer:
-                with ServiceCatalogRegistration(*self._service_discovery_args):
-                    self.http_server.run()
-        finally:
-            logger.info('xivo-confd stopping...')
-            logger.debug('joining http server thread')
-            self.http_server.join()
-            logger.debug('done joining')
+        signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
+
+        with self.token_renewer:
+            with ServiceCatalogRegistration(*self._service_discovery_args):
+                self.http_server.run()
 
     def stop(self, reason):
         logger.warning('Stopping xivo-confd: %s', reason)
         self.http_server.stop()
+
+
+def _sigterm_handler(controller, signum, frame):
+    controller.stop(reason='SIGTERM')
