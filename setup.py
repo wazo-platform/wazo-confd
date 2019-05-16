@@ -21,7 +21,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'xivo-confd=xivo_confd.bin.daemon:main',
+            'xivo-confd=xivo_confd.main:main',
         ],
         'xivo_confd.plugins': [
             'agent = xivo_confd.plugins.agent.plugin:Plugin',
