@@ -4,10 +4,7 @@
 
 import os
 import logging
-import cherrypy
 
-from cherrypy.process.wspbus import states
-from cherrypy.process.servers import ServerAdapter
 from cheroot import wsgi
 from flask import Flask, g
 from flask_cors import CORS
@@ -103,6 +100,7 @@ class HTTPServer(object):
 
         auth_verifier.set_config(global_config['auth'])
         self._load_cors()
+        self.server = None
 
     def _load_cors(self):
         cors_config = dict(self.config.get('cors', {}))
@@ -116,32 +114,27 @@ class HTTPServer(object):
 
         wsgi_app = ReverseProxied(ProxyFix(wsgi.WSGIPathInfoDispatcher({'/': app})))
 
-        cherrypy.server.unsubscribe()
-        cherrypy.config.update({'environment': 'production'})
+        bind_addr = (self.config['listen'], self.config['port'])
+        self.server = wsgi.WSGIServer(bind_addr=bind_addr, wsgi_app=wsgi_app)
+        self.server.ssl_adapter = http_helpers.ssl_adapter(
+            self.config['certificate'],
+            self.config['private_key'],
+        )
+        logger.debug(
+            'WSGIServer starting... uid: %s, listen: %s:%s',
+            os.getuid(),
+            bind_addr[0],
+            bind_addr[1]
+        )
+        for route in http_helpers.list_routes(app):
+            logger.debug(route)
 
         try:
-            bind_addr_https = (self.config['listen'], self.config['port'])
-            server_https = wsgi.WSGIServer(bind_addr=bind_addr_https, wsgi_app=wsgi_app)
-            server_https.ssl_adapter = http_helpers.ssl_adapter(
-                self.config['certificate'],
-                self.config['private_key'],
-            )
-            ServerAdapter(cherrypy.engine, server_https).subscribe()
-
-            logger.debug('HTTPS server starting on %s:%s', *bind_addr_https)
-        except IOError as e:
-            logger.warning("HTTPS server won't start: %s", e)
-
-        try:
-            cherrypy.engine.start()
-            cherrypy.engine.wait(states.EXITING)
+            self.server.start()
         except KeyboardInterrupt:
             logger.warning('Stopping xivo-confd: KeyboardInterrupt')
-            cherrypy.engine.exit()
+            self.server.stop()
 
     def stop(self):
-        cherrypy.engine.exit()
-
-    def join(self):
-        if cherrypy.engine.state == states.EXITING:
-            cherrypy.engine.block()
+        if self.server:
+            self.server.stop()

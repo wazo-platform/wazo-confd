@@ -52,15 +52,10 @@ class Controller(object):
         logger.info('xivo-confd running...')
         xivo_dao.init_db_from_config(self.config)
         signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
-        try:
-            with self.token_renewer:
-                with ServiceCatalogRegistration(*self._service_discovery_args):
-                    self.http_server.run()
-        finally:
-            logger.info('xivo-confd stopping...')
-            logger.debug('joining http server thread')
-            self.http_server.join()
-            logger.debug('done joining')
+
+        with self.token_renewer:
+            with ServiceCatalogRegistration(*self._service_discovery_args):
+                self.http_server.run()
 
     def stop(self, reason):
         logger.warning('Stopping xivo-confd: %s', reason)
