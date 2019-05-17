@@ -4,7 +4,7 @@
 
 import re
 
-from xivo_auth_client import Client as AuthClient
+from wazo_auth_client import Client as AuthClient
 
 from pprint import pformat
 from hamcrest import (

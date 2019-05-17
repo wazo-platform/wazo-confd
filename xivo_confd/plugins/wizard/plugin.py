@@ -4,7 +4,7 @@
 
 import logging
 
-from xivo_auth_client import Client as AuthClient
+from wazo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
 
 from xivo_dao.resources.infos import dao as infos_dao

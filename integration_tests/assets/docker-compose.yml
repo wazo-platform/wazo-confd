@@ -62,8 +62,8 @@ services:
       - "./keys/xivo-confd-key.yml:/var/lib/wazo-auth-keys/xivo-confd-key.yml"
 
       - "./etc/ssl:/usr/share/xivo-certs"
+      # - "${LOCAL_GIT_REPOS}/wazo-auth-client/wazo_auth_client:/usr/local/lib/python2.7/site-packages/wazo_auth_client"
       # - "${LOCAL_GIT_REPOS}/wazo-provd-client/wazo_provd_client:/usr/local/lib/python2.7/site-packages/wazo_provd_client"
-      # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"
-      # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
       # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python2.7/site-packages/xivo_bus"
-      # - "${LOCAL_GIT_REPOS}/xivo-auth-client/xivo_auth_client:/usr/local/lib/python2.7/site-packages/xivo_auth_client"
+      # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/usr/local/lib/python2.7/site-packages/xivo_dao"
+      # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/usr/local/lib/python2.7/site-packages/xivo"

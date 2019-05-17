@@ -9,10 +9,10 @@ from functools import partial
 
 import xivo_dao
 
+from wazo_auth_client import Client as AuthClient
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo.token_renewer import TokenRenewer
-from xivo_auth_client import Client as AuthClient
 
 from .http_server import api, HTTPServer
 from .service_discovery import self_check
