@@ -34,7 +34,7 @@ class _SoundFilesystemStorage(object):
 
         dangerous_fragments = [fragment for fragment in fragments if '..' in fragment or '/' in fragment]
         if dangerous_fragments:
-            raise errors.not_permitted('Dangerous path fragment: "{}"'.format(fragment))
+            raise errors.not_permitted('Dangerous path fragment: "{}"'.format(fragments))
 
         return os.path.join(self._base_path, *fragments)
 
