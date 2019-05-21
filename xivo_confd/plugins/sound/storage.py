@@ -20,7 +20,7 @@ DEFAULT_DIRECTORIES = ['acd', 'features', 'playback', 'recordings']
 RESERVED_DIRECTORIES = ['monitor', 'recordings-meetme']
 
 
-def build_storage(base_path='/var/lib/xivo/sounds'):
+def build_storage(base_path='/var/lib/wazo/sounds'):
     return _SoundFilesystemStorage(base_path)
 
 

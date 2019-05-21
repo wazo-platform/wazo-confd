@@ -161,8 +161,8 @@ definitions:
     example:
       name: ivr1
       description: My IVR
-      greeting_sound: /var/lib/xivo/sounds/playback/ivr1-greeting
-      menu_sound: /var/lib/xivo/sounds/playback/ivr1-menu
+      greeting_sound: /var/lib/wazo/sounds/playback/ivr1-greeting
+      menu_sound: /var/lib/wazo/sounds/playback/ivr1-menu
       abort_destination:
         type: group
         group_id: 1

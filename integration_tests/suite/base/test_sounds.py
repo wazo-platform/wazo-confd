@@ -32,6 +32,7 @@ def setup_module():
     wazo_sound.create_directory(MAIN_TENANT, name='')
     wazo_sound.create_directory(SUB_TENANT, name='')
 
+
 def test_get_errors():
     fake_sound = confd.sounds('invalid').get
     yield s.check_resource_not_found, fake_sound, 'Sound'
@@ -136,14 +137,14 @@ def test_get_with_files(sound):
                 has_entries(format='slin',
                             language='fr_FR',
                             path=(
-                                '/var/lib/xivo/sounds/tenants/{tenant}/{category}/fr_FR/ivr'
+                                '/var/lib/wazo/sounds/tenants/{tenant}/{category}/fr_FR/ivr'
                                 .format(tenant=MAIN_TENANT, category=sound['name'])
                             ),
                             text=None),
                 has_entries(format='ogg',
                             language='en_US',
                             path=(
-                                '/var/lib/xivo/sounds/tenants/{tenant}/{category}/en_US/ivr'
+                                '/var/lib/wazo/sounds/tenants/{tenant}/{category}/en_US/ivr'
                                 .format(tenant=MAIN_TENANT, category=sound['name'])
                             ),
                             text=None),

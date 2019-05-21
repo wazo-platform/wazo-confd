@@ -65,5 +65,5 @@ provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)
 sysconfd = SingletonProxy(BaseIntegrationTest.create_sysconfd)
 
-wazo_sound = SingletonProxy(BaseIntegrationTest.create_tenant_filesystem, '/var/lib/xivo/sounds')
+wazo_sound = SingletonProxy(BaseIntegrationTest.create_tenant_filesystem, '/var/lib/wazo/sounds')
 asterisk_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds')
