@@ -83,19 +83,10 @@ class TestHandleError(TestCommon):
 
         self.assertResponse(response, expected_status_code, expected_message)
 
-    def test_when_generic_exception_is_raised_str(self):
-        expected_status_code = 500
-        expected_message = [u"Unexpected error: error message. not ascii: é, not utf-8: \ufffd"]
-        exception = Exception("error message. not ascii: é, not utf-8: \xc9")
-
-        response = handle_api_exception(lambda: self.raise_(exception))()
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
     def test_when_generic_exception_is_raised_unicode(self):
         expected_status_code = 500
-        expected_message = [u"Unexpected error: error message. not ascii: é"]
-        exception = Exception(u"error message. not ascii: é")
+        expected_message = ["Unexpected error: error message. not ascii: é"]
+        exception = Exception("error message. not ascii: é")
 
         response = handle_api_exception(lambda: self.raise_(exception))()
 

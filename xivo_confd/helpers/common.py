@@ -68,10 +68,7 @@ def rollback():
 
 
 def decode_and_log_error(error, exc_info=False):
-    try:
-        error_message = str(error)
-    except UnicodeDecodeError:
-        error_message = str(error).decode('utf-8', errors='replace')
+    error_message = str(error)
     logger.error(error_message, exc_info=exc_info)
     return error_message
 
