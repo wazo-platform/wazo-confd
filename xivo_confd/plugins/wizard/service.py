@@ -189,7 +189,7 @@ class WizardService(object):
 
     def _generate_phone_password(self, length):
         chars = string.ascii_letters + string.digits
-        return "".join(chars[ord(c) % len(chars)] for c in urandom(length))
+        return "".join(chars[c % len(chars)] for c in urandom(length))
 
     def get_interfaces(self):
         result = []
