@@ -5,6 +5,7 @@
 from hamcrest import (
     all_of,
     assert_that,
+    contains_inanyorder,
     empty,
     has_entries,
     has_entry,
@@ -153,7 +154,7 @@ def test_get(call_permission):
         description='SearchDesc',
         mode='deny',
         enabled=True,
-        extensions=['123', '456'],
+        extensions=contains_inanyorder('123', '456'),
         users=empty(),
         outcalls=empty(),
         groups=empty(),
@@ -197,6 +198,7 @@ def test_create_all_parameters():
 
     response = confd.callpermissions.post(**parameters)
     response.assert_created('callpermissions')
+    parameters['extensions'] = contains_inanyorder(*parameters['extensions'])
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
 
@@ -223,7 +225,13 @@ def test_create_with_duplicate_extensions():
 
     response = confd.callpermissions.post(**parameters)
     response.assert_created('callpermissions')
-    assert_that(response.item, has_entries(name=parameters['name'], extensions=['123', '456']))
+    assert_that(
+        response.item,
+        has_entries(
+            name=parameters['name'],
+            extensions=contains_inanyorder('123', '456'),
+        )
+    )
 
 
 @fixtures.call_permission(name='name1', extension=['123'])
@@ -241,6 +249,7 @@ def test_edit_all_parameters(call_permission):
     response.assert_updated()
 
     response = confd.callpermissions(call_permission['id']).get()
+    parameters['extensions'] = contains_inanyorder(*parameters['extensions'])
     assert_that(response.item, has_entries(parameters))
 
 
