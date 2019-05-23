@@ -50,9 +50,9 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
         response = confd.devices.post(template_id=self.template_id)
         response.assert_status(201)
 
-        device_id = response.json[u'id']
+        device_id = response.json['id']
         device = self.provd.devices.get(device_id)
-        config = self.provd.configs.get(device[u'config'])
+        config = self.provd.configs.get(device['config'])
         self.provd.assert_device_has_autoprov_config(device)
         self.provd.assert_config_use_device_template(config, self.template_id)
         self.provd.assert_config_does_not_exist(device_id)

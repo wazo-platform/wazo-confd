@@ -119,7 +119,7 @@ def test_create_line_with_all_parameters():
     response = confd.lines_sip.post(
         context=config.CONTEXT,
         device_slot=2,
-        callerid=u'"Fodé Sanderson" <1000>',
+        callerid='"Fodé Sanderson" <1000>',
         provisioning_extension=u"333222",
         secret=u"secret",
         username=u"username",
@@ -128,7 +128,7 @@ def test_create_line_with_all_parameters():
     assert_that(
         response.item,
         has_entries(
-            callerid=u'"Fodé Sanderson" <1000>',
+            callerid='"Fodé Sanderson" <1000>',
             context=config.CONTEXT,
             device_slot=2,
             provisioning_extension=u"333222",
@@ -150,14 +150,14 @@ def test_update_line_with_fake_context(line):
     response.assert_match(400, e.not_found('Context'))
 
 
-@fixtures.line_sip(callerid=u'"Fodé Sanderson" <1000>"')
+@fixtures.line_sip(callerid='"Fodé Sanderson" <1000>"')
 @fixtures.context()
 def test_update_all_parameters_on_line(line, context):
     url = confd.lines_sip(line['id'])
     response = url.put(
         context=context['name'],
         device_slot=2,
-        callerid=u'"Mamàsta Michel" <2000>',
+        callerid='"Mamàsta Michel" <2000>',
         provisioning_extension='234567',
         secret='newsecret',
         username='newusername',
@@ -170,7 +170,7 @@ def test_update_all_parameters_on_line(line, context):
         has_entries(
             context=context['name'],
             device_slot=2,
-            callerid=u'"Mamàsta Michel" <2000>',
+            callerid='"Mamàsta Michel" <2000>',
             provisioning_extension='234567',
             secret='newsecret',
             username='newusername'
@@ -178,7 +178,7 @@ def test_update_all_parameters_on_line(line, context):
     )
 
 
-@fixtures.line_sip(callerid=u'"Fodé Sanderson" <1000>"')
+@fixtures.line_sip(callerid='"Fodé Sanderson" <1000>"')
 def test_update_null_parameters(line):
     url = confd.lines_sip(line['id'])
 

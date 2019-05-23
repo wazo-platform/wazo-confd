@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import unicode_literals
 
 import csv
 import json
 import logging
 import pprint
 import requests
-import sys
-
 from io import BytesIO
 from hamcrest import (
     assert_that,
@@ -64,8 +60,6 @@ class ConfdClient(object):
         return Response(response)
 
     def log_request(self, method, url, parameters, data):
-        if sys.version_info[0] == 2:
-            data = unicode(data, encoding='utf8') if data is not None else data
         logger.info('%s %s params: %s body: %s', method, url, parameters, data)
 
     def head(self, url, **parameters):
