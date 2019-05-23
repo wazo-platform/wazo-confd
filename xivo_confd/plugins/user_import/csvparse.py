@@ -2,12 +2,12 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import csv
 import time
 
 from collections import namedtuple
 from flask import request
 
-from xivo.unicode_csv import UnicodeDictReader
 from xivo_dao.helpers import errors
 
 
@@ -16,8 +16,8 @@ ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])
 
 class CsvParser(object):
 
-    def __init__(self, lines, encoding):
-        self.reader = UnicodeDictReader(lines, encoding=encoding)
+    def __init__(self, lines):
+        self.reader = csv.DictReader(lines)
 
     def __iter__(self):
         return CsvIterator(self.reader)
@@ -188,5 +188,6 @@ class CsvRow(object):
 
 def parse():
     charset = request.mimetype_params.get('charset', 'utf-8')
-    lines = request.data.split("\n")
-    return CsvParser(lines, charset)
+    lines = request.data.decode(charset)
+    lines = lines.split('\n')
+    return CsvParser(lines)
