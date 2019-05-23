@@ -19,7 +19,14 @@ class BaseSchema(Schema):
 
         if handle_error:
             def handle_error_fn(error, data):
-                return abort(400, message=error.message)
+                # Ugly hack to keep the same error message from python2 to python3
+                # The message can be a dictionary and we do not want to cast it to string,
+                # because there are some logic with the `type` in common.py
+                if len(error.args):
+                    message = error.args[0]
+                else:
+                    message = str(error)
+                return abort(400, message=message)
 
             self.handle_error = handle_error_fn
 
