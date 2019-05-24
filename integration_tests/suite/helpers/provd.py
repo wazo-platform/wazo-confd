@@ -155,5 +155,5 @@ class ProvdHelper(object):
 
 
 def create_helper(host='localhost', port='8666', token='valid-token-multitenant'):
-    client = ProvdClient(host=host, port=port, verify_certificate=False, prefix='/provd', token=token)
+    client = ProvdClient(host=host, port=port, verify_certificate=False, token=token)
     return ProvdHelper(client)
