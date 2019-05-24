@@ -10,7 +10,7 @@ from xivo_bus.resources.incall_extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class IncallExtensionNotifier(object):
+class IncallExtensionNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

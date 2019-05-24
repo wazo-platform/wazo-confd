@@ -11,7 +11,7 @@ from xivo_bus.resources.ivr.event import (
 from xivo_confd import bus, sysconfd
 
 
-class IvrNotifier(object):
+class IvrNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

@@ -24,7 +24,7 @@ DEVICE_FIELDS = [
 ]
 
 
-class LineDeviceNotifier(object):
+class LineDeviceNotifier:
 
     REQUEST_HANDLERS = {
         'ipbx': ['module reload chan_sccp.so'],

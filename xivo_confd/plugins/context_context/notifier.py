@@ -7,7 +7,7 @@ from xivo_bus.resources.context_context.event import ContextContextsAssociatedEv
 from xivo_confd import bus, sysconfd
 
 
-class ContextContextNotifier(object):
+class ContextContextNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

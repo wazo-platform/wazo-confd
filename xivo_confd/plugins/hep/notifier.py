@@ -7,7 +7,7 @@ from xivo_bus.resources.hep.event import HEPGeneralUpdatedEvent
 from xivo_confd import bus, sysconfd
 
 
-class HEPConfigurationNotifier(object):
+class HEPConfigurationNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

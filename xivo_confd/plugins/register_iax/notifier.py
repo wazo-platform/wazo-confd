@@ -11,7 +11,7 @@ from xivo_bus.resources.register.event import (
 from xivo_confd import bus, sysconfd
 
 
-class RegisterIAXNotifier(object):
+class RegisterIAXNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

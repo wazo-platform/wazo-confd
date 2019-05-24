@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.features import dao as features_dao
@@ -7,7 +7,7 @@ from xivo_dao.resources.features import dao as features_dao
 from .notifier import build_notifier
 
 
-class FeaturesConfigurationService(object):
+class FeaturesConfigurationService:
 
     def __init__(self, dao, notifier):
         self.dao = dao

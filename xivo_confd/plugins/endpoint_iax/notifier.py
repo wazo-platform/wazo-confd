@@ -11,7 +11,7 @@ from xivo_bus.resources.endpoint_iax.event import (
 from xivo_confd import bus, sysconfd
 
 
-class IAXEndpointNotifier(object):
+class IAXEndpointNotifier:
 
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd

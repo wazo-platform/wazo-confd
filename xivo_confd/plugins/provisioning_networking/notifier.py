@@ -7,7 +7,7 @@ from xivo_bus.resources.provisioning_networking.event import (
 )
 
 
-class ProvisioningNetworkingNotifier(object):
+class ProvisioningNetworkingNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

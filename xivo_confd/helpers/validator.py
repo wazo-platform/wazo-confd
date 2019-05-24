@@ -146,7 +146,7 @@ class MemberOfSequence(Validator):
             raise errors.param_not_found(self.field, self.resource, **metadata)
 
 
-class ValidationGroup(object):
+class ValidationGroup:
 
     def __init__(self, common=None, create=None, edit=None, delete=None):
         self.common = common or []
@@ -173,7 +173,7 @@ class ValidationGroup(object):
             validator.validate_with_tenant_uuids(model, tenant_uuids)
 
 
-class ValidationAssociation(object):
+class ValidationAssociation:
 
     def __init__(self, common=None, association=None, dissociation=None):
         self.common = common or []
@@ -189,7 +189,7 @@ class ValidationAssociation(object):
             validator.validate(*models)
 
 
-class BaseExtensionRangeMixin(object):
+class BaseExtensionRangeMixin:
 
     def _exten_in_range(self, exten, context_ranges):
         return any(context_range.in_range(exten)

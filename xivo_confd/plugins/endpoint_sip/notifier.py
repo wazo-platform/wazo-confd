@@ -11,7 +11,7 @@ from xivo_bus.resources.endpoint_sip.event import (
 from xivo_confd import bus, sysconfd
 
 
-class SipEndpointNotifier(object):
+class SipEndpointNotifier:
 
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.group import dao as group_dao_module
@@ -8,7 +8,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class GroupCallPermissionService(object):
+class GroupCallPermissionService:
 
     def __init__(self, group_dao, notifier, validator):
         self.group_dao = group_dao

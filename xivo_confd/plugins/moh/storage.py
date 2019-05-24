@@ -17,7 +17,7 @@ def build_storage(base_path='/var/lib/asterisk/moh'):
     return _MohFilesystemStorage(base_path)
 
 
-class _MohFilesystemStorage(object):
+class _MohFilesystemStorage:
 
     def __init__(self, base_path):
         self._base_path = base_path

@@ -11,7 +11,7 @@ from xivo_bus.resources.queue.event import (
 from xivo_confd import bus, sysconfd
 
 
-class QueueNotifier(object):
+class QueueNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

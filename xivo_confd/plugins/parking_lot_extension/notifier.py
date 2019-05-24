@@ -10,7 +10,7 @@ from xivo_bus.resources.parking_lot_extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class ParkingLotExtensionNotifier(object):
+class ParkingLotExtensionNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

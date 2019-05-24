@@ -11,7 +11,7 @@ from xivo_bus.resources.conference.event import (
 from xivo_confd import bus, sysconfd
 
 
-class ConferenceNotifier(object):
+class ConferenceNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

@@ -11,7 +11,7 @@ from xivo_bus.resources.line.event import (
 from xivo_confd import bus, sysconfd
 
 
-class LineNotifier(object):
+class LineNotifier:
 
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd

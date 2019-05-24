@@ -5,7 +5,7 @@
 from xivo_confd.database import provisioning_networking as provisioning_networking_dao
 
 
-class ProvisioningNetworkingService(object):
+class ProvisioningNetworkingService:
 
     def __init__(self, notifier, sysconfd):
         self.notifier = notifier

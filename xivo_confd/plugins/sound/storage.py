@@ -24,7 +24,7 @@ def build_storage(base_path='/var/lib/wazo/sounds'):
     return _SoundFilesystemStorage(base_path)
 
 
-class _SoundFilesystemStorage(object):
+class _SoundFilesystemStorage:
 
     def __init__(self, base_path):
         self._base_path = base_path

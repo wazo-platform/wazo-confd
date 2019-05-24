@@ -7,7 +7,7 @@ from xivo_bus.resources.sccp_general.event import EditSCCPGeneralEvent
 from xivo_confd import bus, sysconfd
 
 
-class SCCPGeneralNotifier(object):
+class SCCPGeneralNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

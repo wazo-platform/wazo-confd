@@ -11,7 +11,7 @@ from xivo_dao.helpers.exception import ServiceError
 logger = logging.getLogger(__name__)
 
 
-class ImportService(object):
+class ImportService:
 
     def __init__(self, entry_creator, entry_associator, entry_updater):
         self.entry_creator = entry_creator
@@ -57,7 +57,7 @@ class ImportService(object):
         return entry
 
 
-class ExportService(object):
+class ExportService:
 
     def __init__(self, user_export_dao, auth_client):
         self._user_export_dao = user_export_dao

@@ -10,7 +10,7 @@ from xivo_bus.resources.trunk_endpoint.event import (
 from xivo_confd import bus, sysconfd
 
 
-class TrunkEndpointNotifier(object):
+class TrunkEndpointNotifier:
 
     def __init__(self, endpoint, bus, sysconfd):
         self.endpoint = endpoint

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -9,7 +9,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class CallFilterFallbackService(object):
+class CallFilterFallbackService:
 
     def __init__(self, dao, notifier, validator):
         self.call_filter_dao = dao

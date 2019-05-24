@@ -14,7 +14,7 @@ from xivo_dao.helpers import errors
 ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])
 
 
-class CsvParser(object):
+class CsvParser:
 
     def __init__(self, lines):
         self.reader = csv.DictReader(lines)
@@ -23,7 +23,7 @@ class CsvParser(object):
         return CsvIterator(self.reader)
 
 
-class CsvIterator(object):
+class CsvIterator:
 
     def __init__(self, reader):
         self.reader = reader
@@ -35,7 +35,7 @@ class CsvIterator(object):
         return CsvRow(row, self.position)
 
 
-class Rule(object):
+class Rule:
 
     def __init__(self, csv_name, name):
         self.csv_name = csv_name
@@ -83,7 +83,7 @@ class ColonListRule(Rule):
         return value.split(";")
 
 
-class CsvRow(object):
+class CsvRow:
 
     USER_RULES = (
         UnicodeRule('uuid', 'uuid'),

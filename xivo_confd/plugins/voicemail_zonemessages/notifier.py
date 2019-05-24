@@ -7,7 +7,7 @@ from xivo_bus.resources.voicemail_zonemessages.event import EditVoicemailZoneMes
 from xivo_confd import bus, sysconfd
 
 
-class VoicemailZoneMessagesNotifier(object):
+class VoicemailZoneMessagesNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

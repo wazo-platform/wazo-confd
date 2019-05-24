@@ -9,7 +9,7 @@ from .resource import HAResource
 from .service import HAService
 
 
-class Plugin(object):
+class Plugin:
 
     def load(self, dependencies):
         api = dependencies['api']

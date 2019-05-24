@@ -15,7 +15,7 @@ from .resource import (
 )
 
 
-class Plugin(object):
+class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']

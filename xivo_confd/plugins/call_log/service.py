@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2013-2016 Avencall
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.call_log import dao as call_log_dao
 
 
-class CallLogService(object):
+class CallLogService:
 
     def __init__(self, dao):
         self.dao = dao

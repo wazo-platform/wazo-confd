@@ -16,7 +16,7 @@ class SysconfdError(Exception):
         return "sysconfd error: status {} - {}".format(self.code, self.value)
 
 
-class SysconfdPublisher(object):
+class SysconfdPublisher:
 
     @classmethod
     def from_config(cls, config):

@@ -20,7 +20,7 @@ def reset(db):
     return decorated
 
 
-class DbHelper(object):
+class DbHelper:
 
     TEMPLATE = "xivotemplate"
 
@@ -72,7 +72,7 @@ class DbHelper(object):
             yield DatabaseQueries(connection)
 
 
-class DatabaseQueries(object):
+class DatabaseQueries:
 
     def __init__(self, connection):
         self.connection = connection

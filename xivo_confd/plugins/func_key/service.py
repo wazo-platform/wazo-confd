@@ -12,7 +12,7 @@ from .notifier import build_notifier
 from .validator import build_validator, build_validator_bsfilter
 
 
-class TemplateService(object):
+class TemplateService:
 
     DESTINATION_BLFS = (
         'agent',
@@ -119,7 +119,7 @@ def build_service(provd_client):
                            device_updater)
 
 
-class UserFuncKeyTemplateService(object):
+class UserFuncKeyTemplateService:
 
     def __init__(self, user_dao, validator, notifier, device_updater):
         self.user_dao = user_dao

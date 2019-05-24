@@ -8,7 +8,7 @@ from xivo_confd.plugins.user_agent.notifier import build_notifier
 from xivo_confd.plugins.user_agent.validator import build_validator
 
 
-class UserAgentService(object):
+class UserAgentService:
 
     def __init__(self, dao, validator, notifier):
         self.dao = dao

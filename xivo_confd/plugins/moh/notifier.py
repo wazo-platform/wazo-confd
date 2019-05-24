@@ -7,7 +7,7 @@ from xivo_bus.resources.common.event import ArbitraryEvent
 from xivo_confd import bus, sysconfd
 
 
-class MohNotifier(object):
+class MohNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

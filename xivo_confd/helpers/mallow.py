@@ -122,7 +122,7 @@ class ListLink(fields.Field):
         return output
 
 
-class AsteriskSection(object):
+class AsteriskSection:
 
     DEFAULT_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
     DEFAULT_RESERVED_NAMES = ['general']

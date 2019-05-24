@@ -5,7 +5,7 @@
 from xivo_confd.database import dhcp as dhcp_dao
 
 
-class DHCPService(object):
+class DHCPService:
 
     def __init__(self, notifier):
         self.notifier = notifier

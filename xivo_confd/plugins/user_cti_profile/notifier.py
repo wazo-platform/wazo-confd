@@ -6,7 +6,7 @@ from xivo_bus.resources.user_cti_profile.event import UserCtiProfileEditedEvent
 from xivo_confd import bus
 
 
-class UserCtiProfileNotifier(object):
+class UserCtiProfileNotifier:
 
     def __init__(self, bus):
         self._bus = bus

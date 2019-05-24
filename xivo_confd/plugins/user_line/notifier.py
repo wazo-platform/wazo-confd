@@ -26,7 +26,7 @@ LINE_FIELDS = [
 ]
 
 
-class UserLineNotifier(object):
+class UserLineNotifier:
 
     def __init__(self, bus, sysconfd):
         self._bus = bus

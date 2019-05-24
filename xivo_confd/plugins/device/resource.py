@@ -13,7 +13,7 @@ from xivo_dao.helpers import errors
 from .schema import DeviceSchema
 
 
-class SingleTenantMixin(object):
+class SingleTenantMixin:
 
     def _add_tenant_uuid(self):
         tenant_uuid = Tenant.autodetect().uuid

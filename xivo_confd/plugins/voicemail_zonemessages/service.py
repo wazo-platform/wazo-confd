@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.voicemail_zonemessages import dao as voicemail_zonemessages_dao
@@ -7,7 +7,7 @@ from xivo_dao.resources.voicemail_zonemessages import dao as voicemail_zonemessa
 from .notifier import build_notifier
 
 
-class VoicemailZoneMessagesService(object):
+class VoicemailZoneMessagesService:
 
     def __init__(self, dao, notifier):
         self.dao = dao

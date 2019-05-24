@@ -10,7 +10,7 @@ from xivo_bus.resources.group_extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class GroupExtensionNotifier(object):
+class GroupExtensionNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

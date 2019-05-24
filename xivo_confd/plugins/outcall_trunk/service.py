@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .notifier import build_notifier
 from .validator import build_validator
 
 
-class OutcallTrunkService(object):
+class OutcallTrunkService:
 
     def __init__(self, notifier, validator):
         self.notifier = notifier

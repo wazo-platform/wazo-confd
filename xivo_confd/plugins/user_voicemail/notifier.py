@@ -9,7 +9,7 @@ from xivo_bus.resources.user_voicemail.event import (
 from xivo_confd import bus, sysconfd
 
 
-class UserVoicemailNotifier(object):
+class UserVoicemailNotifier:
 
     def __init__(self, bus, sysconfd):
         self._bus = bus

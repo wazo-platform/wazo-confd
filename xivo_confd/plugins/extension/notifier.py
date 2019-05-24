@@ -11,7 +11,7 @@ from xivo_bus.resources.extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class ExtensionNotifier(object):
+class ExtensionNotifier:
 
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd

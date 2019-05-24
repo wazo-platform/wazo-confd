@@ -10,7 +10,7 @@ from xivo_bus.resources.queue_extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class QueueExtensionNotifier(object):
+class QueueExtensionNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

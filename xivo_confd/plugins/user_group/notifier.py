@@ -7,7 +7,7 @@ from xivo_bus.resources.user_group.event import UserGroupsAssociatedEvent
 from xivo_confd import bus, sysconfd
 
 
-class UserGroupNotifier(object):
+class UserGroupNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

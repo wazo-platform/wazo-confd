@@ -5,7 +5,7 @@
 from .auth_client import auth_client
 
 
-class WazoUserService(object):
+class WazoUserService:
 
     def __init__(self, auth_client):
         self._auth_client = auth_client

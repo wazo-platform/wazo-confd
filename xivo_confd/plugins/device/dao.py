@@ -13,7 +13,7 @@ from xivo_confd.plugins.device.model import Device
 logger = logging.getLogger(__name__)
 
 
-class DeviceDao(object):
+class DeviceDao:
 
     def __init__(self, client):
         self.client = client

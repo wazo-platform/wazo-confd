@@ -11,7 +11,7 @@ from wazo_provd_client import Client as ProvdClient
 from wazo_provd_client.exceptions import ProvdError
 
 
-class ProvdHelper(object):
+class ProvdHelper:
 
     DOCKER_PROVD_IMAGE = "wazopbx/xivo-provd"
 

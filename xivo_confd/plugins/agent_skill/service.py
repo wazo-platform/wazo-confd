@@ -9,7 +9,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class AgentMemberService(object):
+class AgentMemberService:
 
     def __init__(self, agent_dao, skill_dao, validator, notifier):
         self.agent_dao = agent_dao

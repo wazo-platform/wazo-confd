@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao
@@ -20,7 +20,7 @@ from .resource import (
 from .service import build_service, build_user_funckey_template_service
 
 
-class Plugin(object):
+class Plugin:
 
     def load(self, dependencies):
         api = dependencies['api']

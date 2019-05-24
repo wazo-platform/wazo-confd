@@ -6,7 +6,7 @@ from .resource import HEPGeneralList
 from .service import build_service
 
 
-class Plugin(object):
+class Plugin:
 
     def load(self, dependencies):
         api = dependencies['api']

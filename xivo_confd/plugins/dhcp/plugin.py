@@ -9,7 +9,7 @@ from .resource import DHCPResource
 from .service import DHCPService
 
 
-class Plugin(object):
+class Plugin:
 
     def load(self, dependencies):
         api = dependencies['api']

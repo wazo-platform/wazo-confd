@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .notifier import build_notifier
 from .validator import build_validator
 
 
-class ContextContextService(object):
+class ContextContextService:
 
     def __init__(self, context_dao, notifier, validator):
         self.context_dao = context_dao

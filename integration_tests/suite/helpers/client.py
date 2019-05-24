@@ -29,7 +29,7 @@ requests.packages.urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
 
-class ConfdClient(object):
+class ConfdClient:
 
     DEFAULT_HEADERS = {'Accept': 'application/json',
                        'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in wazo-auth-mock
@@ -157,7 +157,7 @@ class RestUrlClient(UrlFragment):
         return url
 
 
-class Response(object):
+class Response:
 
     STATUS_OK = (200, 201, 204)
 

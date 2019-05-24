@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class HAService(object):
+class HAService:
 
     def __init__(self, notifier, sysconfd):
         self.notifier = notifier

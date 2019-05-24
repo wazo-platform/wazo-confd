@@ -7,7 +7,7 @@ from xivo_bus.resources.iax_callnumberlimits.event import EditIAXCallNumberLimit
 from xivo_confd import bus, sysconfd
 
 
-class IAXCallNumberLimitsNotifier(object):
+class IAXCallNumberLimitsNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

@@ -110,7 +110,7 @@ class IntegrationTest(BaseIntegrationTest):
         cls.bus = cls.create_bus()
 
 
-class mocks(object):
+class mocks:
     @classmethod
     class sysconfd(IsolatedAction):
 

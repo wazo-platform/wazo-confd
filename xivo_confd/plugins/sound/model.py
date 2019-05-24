@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class SoundCategory(object):
+class SoundCategory:
 
     has_tenant_uuid = True
 
@@ -27,7 +27,7 @@ class SoundCategory(object):
                         file_count=len(self.files)))
 
 
-class SoundFile(object):
+class SoundFile:
 
     has_tenant_uuid = True
 
@@ -52,7 +52,7 @@ class SoundFile(object):
         self.formats = self.formats + new_formats
 
 
-class SoundFormat(object):
+class SoundFormat:
 
     has_tenant_uuid = True
 

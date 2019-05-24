@@ -7,7 +7,7 @@ from xivo_bus.resources.queue_general.event import EditQueueGeneralEvent
 from xivo_confd import bus, sysconfd
 
 
-class QueueGeneralNotifier(object):
+class QueueGeneralNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

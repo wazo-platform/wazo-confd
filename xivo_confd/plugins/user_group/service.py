@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao_module
@@ -8,7 +8,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class UserGroupService(object):
+class UserGroupService:
 
     def __init__(self, user_dao, notifier, validator):
         self.user_dao = user_dao

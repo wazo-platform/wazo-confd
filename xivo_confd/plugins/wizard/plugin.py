@@ -15,7 +15,7 @@ from .service import build_service
 logger = logging.getLogger(__name__)
 
 
-class Plugin(object):
+class Plugin:
 
     def load(self, dependencies):
         api = dependencies['api']

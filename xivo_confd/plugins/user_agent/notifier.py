@@ -10,7 +10,7 @@ from xivo_bus.resources.user_agent.event import (
 from xivo_confd import bus
 
 
-class UserAgentNotifier(object):
+class UserAgentNotifier:
 
     def __init__(self, bus):
         self.bus = bus

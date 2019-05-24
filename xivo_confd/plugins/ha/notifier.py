@@ -7,7 +7,7 @@ from xivo_bus.resources.ha.event import (
 )
 
 
-class HANotifier(object):
+class HANotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

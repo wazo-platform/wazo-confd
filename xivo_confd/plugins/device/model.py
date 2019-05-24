@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class Device(object):
+class Device:
 
     @classmethod
     def from_args(cls, **kwargs):

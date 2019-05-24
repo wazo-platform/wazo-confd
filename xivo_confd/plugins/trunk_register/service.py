@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.trunk import dao as trunk_dao_module
@@ -8,7 +8,7 @@ from .notifier import build_notifier_iax, build_notifier_sip
 from .validator import build_validator_iax, build_validator_sip
 
 
-class TrunkRegisterService(object):
+class TrunkRegisterService:
 
     def __init__(self, trunk_dao, validator, notifier):
         self.trunk_dao = trunk_dao

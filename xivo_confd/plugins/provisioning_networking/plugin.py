@@ -9,7 +9,7 @@ from .resource import ProvisioningNetworkingResource
 from .service import ProvisioningNetworkingService
 
 
-class Plugin(object):
+class Plugin:
 
     def load(self, dependencies):
         api = dependencies['api']

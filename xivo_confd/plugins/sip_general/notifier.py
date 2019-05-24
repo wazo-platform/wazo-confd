@@ -7,7 +7,7 @@ from xivo_bus.resources.sip_general.event import EditSIPGeneralEvent
 from xivo_confd import bus, sysconfd
 
 
-class SIPGeneralNotifier(object):
+class SIPGeneralNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

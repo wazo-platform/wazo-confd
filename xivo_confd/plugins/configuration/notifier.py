@@ -7,7 +7,7 @@ from xivo_bus.resources.configuration.event import LiveReloadEditedEvent
 from xivo_confd import bus
 
 
-class LiveReloadNotifier(object):
+class LiveReloadNotifier:
 
     def __init__(self, bus):
         self.bus = bus

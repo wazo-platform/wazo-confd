@@ -20,7 +20,7 @@ from .service_discovery import self_check
 logger = logging.getLogger(__name__)
 
 
-class Controller(object):
+class Controller:
 
     def __init__(self, config):
         self.config = config

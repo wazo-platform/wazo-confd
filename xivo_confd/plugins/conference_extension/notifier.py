@@ -10,7 +10,7 @@ from xivo_bus.resources.conference_extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class ConferenceExtensionNotifier(object):
+class ConferenceExtensionNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

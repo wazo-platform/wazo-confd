@@ -12,7 +12,7 @@ from xivo_bus.resources.call_pickup_member.event import (
 from xivo_confd import bus, sysconfd
 
 
-class CallPickupMemberNotifier(object):
+class CallPickupMemberNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

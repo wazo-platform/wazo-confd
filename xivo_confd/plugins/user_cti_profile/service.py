@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -8,7 +8,7 @@ from . import validator as validator_module
 from .notifier import build_notifier
 
 
-class UserCTIProfileService(object):
+class UserCTIProfileService:
 
     def __init__(self, validator, notifier):
         self.validator = validator

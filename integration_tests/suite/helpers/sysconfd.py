@@ -17,7 +17,7 @@ from hamcrest import (
 )
 
 
-class SysconfdMock(object):
+class SysconfdMock:
 
     def __init__(self, url):
         self.base_url = url

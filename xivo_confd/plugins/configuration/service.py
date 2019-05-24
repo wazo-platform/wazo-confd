@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016 Avencall
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.configuration import dao as configuration_dao
@@ -7,7 +7,7 @@ from xivo_dao.resources.configuration import dao as configuration_dao
 from xivo_confd.plugins.configuration.notifier import build_notifier
 
 
-class LiveReloadService(object):
+class LiveReloadService:
 
     def __init__(self, dao, notifier):
         self.dao = dao

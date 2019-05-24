@@ -5,7 +5,7 @@
 import os
 
 
-class FileSystemClient(object):
+class FileSystemClient:
 
     def __init__(self, execute, base_path):
         self.base_path = base_path
@@ -30,7 +30,7 @@ class FileSystemClient(object):
         self.execute(['chmod', mode, os.path.join(self.base_path, name)])
 
 
-class TenantFileSystemClient(object):
+class TenantFileSystemClient:
 
     def __init__(self, execute, base_path):
         self.base_path = base_path

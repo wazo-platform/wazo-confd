@@ -82,7 +82,7 @@ def load_uuid():
         app.config['uuid'] = info_dao.get().uuid
 
 
-class HTTPServer(object):
+class HTTPServer:
 
     def __init__(self, global_config):
         self.config = global_config['rest_api']

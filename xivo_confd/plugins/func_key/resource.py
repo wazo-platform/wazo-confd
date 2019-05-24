@@ -60,7 +60,7 @@ def _create_funckey_model(funckey):
     return FuncKeyMapping(**funckey)
 
 
-class FindUpdateFieldsMixin(object):
+class FindUpdateFieldsMixin:
 
     def find_updated_fields_position(self, model, form):
         updated_fields = []

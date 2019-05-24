@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.sip_general import dao as sip_general_dao
@@ -7,7 +7,7 @@ from xivo_dao.resources.sip_general import dao as sip_general_dao
 from .notifier import build_notifier
 
 
-class SIPGeneralService(object):
+class SIPGeneralService:
 
     def __init__(self, dao, notifier):
         self.dao = dao

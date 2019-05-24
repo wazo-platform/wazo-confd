@@ -11,7 +11,7 @@ from xivo_bus.resources.agent.event import (
 from xivo_confd import bus, sysconfd
 
 
-class AgentNotifier(object):
+class AgentNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

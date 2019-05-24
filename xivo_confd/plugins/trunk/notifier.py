@@ -11,7 +11,7 @@ from xivo_bus.resources.trunk.event import (
 from xivo_confd import bus, sysconfd
 
 
-class TrunkNotifier(object):
+class TrunkNotifier:
 
     _IPBX_COMMANDS = {
         'sip': ['module reload res_pjsip.so'],

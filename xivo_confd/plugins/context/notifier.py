@@ -20,7 +20,7 @@ CONTEXT_FIELDS = [
 ]
 
 
-class ContextNotifier(object):
+class ContextNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

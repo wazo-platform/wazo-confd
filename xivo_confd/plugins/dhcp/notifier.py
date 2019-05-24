@@ -7,7 +7,7 @@ from xivo_bus.resources.dhcp.event import (
 )
 
 
-class DHCPNotifier(object):
+class DHCPNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

@@ -6,7 +6,7 @@ from ..client import ConfdClient
 from ..database import create_helper as db_create_helper
 
 
-class NewClientWrapper(object):
+class NewClientWrapper:
 
     def __init__(self):
         self.host = None
@@ -32,7 +32,7 @@ class NewClientWrapper(object):
                                         encoder=self.encoder)
 
 
-class DatabaseWrapper(object):
+class DatabaseWrapper:
 
     def __init__(self):
         self.host = None
@@ -45,7 +45,7 @@ class DatabaseWrapper(object):
         return getattr(self._db, attr)
 
 
-class ProvdWrapper(object):
+class ProvdWrapper:
 
     def __init__(self):
         self.host = None

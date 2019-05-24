@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.trunk import dao as trunk_dao_module
@@ -9,7 +9,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class TrunkEndpointService(object):
+class TrunkEndpointService:
 
     def __init__(self, endpoint, trunk_dao, endpoint_dao, validator, notifier):
         self.endpoint = endpoint

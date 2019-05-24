@@ -63,7 +63,7 @@ class AsteriskConfigurationList(ConfdResource):
         return '', 204
 
 
-class AsteriskConfigurationService(object):
+class AsteriskConfigurationService:
 
     file_name = None
 

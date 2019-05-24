@@ -10,7 +10,7 @@ from xivo_bus.resources.rtp.event import (
 from xivo_confd import bus, sysconfd
 
 
-class RTPConfigurationNotifier(object):
+class RTPConfigurationNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

@@ -12,7 +12,7 @@ from xivo_confd import bus, sysconfd
 from xivo_confd.database import device as device_db_module
 
 
-class FuncKeyTemplateNotifier(object):
+class FuncKeyTemplateNotifier:
 
     def __init__(self, bus, sysconfd, device_db):
         self.bus = bus

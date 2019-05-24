@@ -10,7 +10,7 @@ from xivo_bus.resources.confbridge.event import (
 from xivo_confd import bus, sysconfd
 
 
-class ConfBridgeConfigurationNotifier(object):
+class ConfBridgeConfigurationNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

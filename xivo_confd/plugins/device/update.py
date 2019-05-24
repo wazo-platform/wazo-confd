@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class DeviceUpdater(object):
+class DeviceUpdater:
 
     def __init__(self, user_dao, line_dao, user_line_dao, line_extension_dao, func_key_template_db, provd_updater):
         self.user_dao = user_dao
@@ -59,7 +59,7 @@ class DeviceUpdater(object):
         self.provd_updater.update(device.id, tenant_uuid=tenant_uuid)
 
 
-class ProvdUpdater(object):
+class ProvdUpdater:
 
     def __init__(self, dao, config_generator, line_dao):
         self.dao = dao

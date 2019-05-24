@@ -49,7 +49,7 @@ class DeviceService(CRUDService):
         self.notifier.deleted(resource)
 
 
-class SearchEngine(object):
+class SearchEngine:
 
     PROVD_DEVICE_KEYS = [
         'id',

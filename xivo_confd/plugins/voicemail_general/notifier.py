@@ -7,7 +7,7 @@ from xivo_bus.resources.voicemail_general.event import EditVoicemailGeneralEvent
 from xivo_confd import bus, sysconfd
 
 
-class VoicemailGeneralNotifier(object):
+class VoicemailGeneralNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

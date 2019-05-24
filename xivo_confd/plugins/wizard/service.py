@@ -41,7 +41,7 @@ password = {password}
 logger = logging.getLogger(__name__)
 
 
-class WizardService(object):
+class WizardService:
 
     def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, sysconfd):
         self.validator = validator

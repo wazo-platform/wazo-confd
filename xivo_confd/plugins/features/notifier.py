@@ -11,7 +11,7 @@ from xivo_bus.resources.features.event import (
 from xivo_confd import bus, sysconfd
 
 
-class FeaturesConfigurationNotifier(object):
+class FeaturesConfigurationNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

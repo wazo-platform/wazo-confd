@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -556,7 +556,7 @@ class OptionalGetSkillRuleFromActionArg2Resource(Validator):
             raise errors.param_not_found('skill_rule_id', 'SkillRule', **metadata)
 
 
-class DestinationValidator(object):
+class DestinationValidator:
 
     _VALIDATORS = {
         'application:callbackdisa': [],
