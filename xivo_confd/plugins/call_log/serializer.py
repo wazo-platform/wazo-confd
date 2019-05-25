@@ -3,7 +3,6 @@
 
 import csv
 from io import StringIO
-from xivo.unicode_csv import UnicodeDictWriter
 
 CSV_HEADERS = ['Call Date',
                'Caller',
@@ -25,6 +24,6 @@ def write_headers(csv_file, headers):
 
 
 def write_body(csv_file, headers, call_logs):
-    writer = UnicodeDictWriter(csv_file, CSV_HEADERS)
+    writer = csv.DictWriter(csv_file, CSV_HEADERS)
     for call_log in call_logs:
         writer.writerow(call_log)
