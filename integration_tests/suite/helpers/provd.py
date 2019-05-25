@@ -148,7 +148,7 @@ class ProvdHelper:
         for container in client.containers(filters={'status': 'running'}):
             info = client.inspect_container(container['Id'])
             if info['Config']['Image'] == self.DOCKER_PROVD_IMAGE:
-                return client.logs(container['Id'], since=timestamp)
+                return client.logs(container['Id'], since=timestamp).decode('utf-8')
 
 
 def create_helper(host='localhost', port='8666', token='valid-token-multitenant'):

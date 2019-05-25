@@ -52,7 +52,7 @@ def generate_autoprov():
     mac, ip = generate_mac_and_ip()
     autoprov_id = 'autoprov{}'.format(randint(100000000, 9999999999))
     sip_username = "".join(choice(string.ascii_letters) for _ in range(20))
-    random_id = hashlib.md5(str(random())).hexdigest()
+    random_id = hashlib.md5(str(random()).encode('utf-8')).hexdigest()
 
     device = {
         'added': 'auto',

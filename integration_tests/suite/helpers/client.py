@@ -6,7 +6,7 @@ import json
 import logging
 import pprint
 import requests
-from io import BytesIO
+from io import StringIO
 from hamcrest import (
     assert_that,
     contains_string,
@@ -200,11 +200,10 @@ class Response:
     def csv(self):
         self.assert_ok()
         lines = []
-        content = BytesIO(self.response.content)
+        content = StringIO(self.response.content.decode('utf-8'))
         reader = csv.DictReader(content)
         for row in reader:
-            lines.append({key.decode('utf8'): value.decode('utf8')
-                          for key, value in row.items()})
+            lines.append({key: value for key, value in row.items()})
         return lines
 
     def assert_status(self, *statuses):
