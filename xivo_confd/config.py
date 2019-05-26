@@ -85,7 +85,6 @@ DEFAULT_CONFIG = {
         'configuration': True,
         'context': True,
         'context_context': True,
-        'cti_profile': True,
         'device': True,
         'dhcp': True,
         'endpoint_custom': True,

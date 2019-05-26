@@ -40,7 +40,6 @@ setup(
             'configuration = xivo_confd.plugins.configuration.plugin:Plugin',
             'context = xivo_confd.plugins.context.plugin:Plugin',
             'context_context = xivo_confd.plugins.context_context.plugin:Plugin',
-            'cti_profile = xivo_confd.plugins.cti_profile.plugin:Plugin',
             'device = xivo_confd.plugins.device.plugin:Plugin',
             'dhcp = xivo_confd.plugins.dhcp.plugin:Plugin',
             'endpoint_custom = xivo_confd.plugins.endpoint_custom.plugin:Plugin',
