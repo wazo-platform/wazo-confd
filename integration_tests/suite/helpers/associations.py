@@ -21,13 +21,6 @@ def user_voicemail(user, voicemail, check=True):
 
 
 @contextmanager
-def user_cti_profile(user, cti_profile, **kwargs):
-    h.user_cti_profile.associate(user['id'], cti_profile['id'], **kwargs)
-    yield
-    h.user_cti_profile.dissociate(user['id'], cti_profile['id'], **kwargs)
-
-
-@contextmanager
 def line_extension(line, extension, check=True):
     h.line_extension.associate(line['id'], extension['id'], check)
     yield

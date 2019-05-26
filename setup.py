@@ -107,7 +107,6 @@ setup(
             'user = xivo_confd.plugins.user.plugin:Plugin',
             'user_agent = xivo_confd.plugins.user_agent.plugin:Plugin',
             'user_call_permission = xivo_confd.plugins.user_call_permission.plugin:Plugin',
-            'user_cti_profile = xivo_confd.plugins.user_cti_profile.plugin:Plugin',
             'user_fallback = xivo_confd.plugins.user_fallback.plugin:Plugin',
             'user_group = xivo_confd.plugins.user_group.plugin:Plugin',
             'user_import = xivo_confd.plugins.user_import.plugin:Plugin',

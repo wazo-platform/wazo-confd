@@ -152,7 +152,6 @@ DEFAULT_CONFIG = {
         'user': True,
         'user_agent': True,
         'user_call_permission': True,
-        'user_cti_profile': True,
         'user_fallback': True,
         'user_group': True,
         'user_import': True,

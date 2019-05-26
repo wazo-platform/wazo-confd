@@ -164,7 +164,6 @@ from . import trunk_register_sip
 from . import user
 from . import user_agent
 from . import user_call_permission
-from . import user_cti_profile
 from . import user_funckey_template
 from . import user_import
 from . import user_line
@@ -254,7 +253,6 @@ __all__ = [
     'user',
     'user_agent',
     'user_call_permission',
-    'user_cti_profile',
     'user_funckey_template',
     'user_import',
     'user_line',
