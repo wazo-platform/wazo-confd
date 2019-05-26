@@ -390,7 +390,6 @@ definitions:
           description: The UUID of the tenant
           readOnly: true
     - $ref: '#/definitions/UserRelationAgent'
-    - $ref: '#/definitions/UserRelationCtiProfile'
     - $ref: '#/definitions/UserRelationFallbacks'
     - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationGroups'
@@ -414,11 +413,6 @@ definitions:
       lastname:
         type: string
         description: User lastname
-  UserRelationCtiProfile:
-    properties:
-      cti_profile:
-        readOnly: true
-        $ref: '#/definitions/CtiProfileRelationBase'
   UserRelationGroups:
     properties:
       groups:
