@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,5 +11,5 @@ def get():
 
 def update(dhcp_form):
     dhcp = Session.query(Dhcp).first()
-    for name, value in dhcp_form.iteritems():
+    for name, value in dhcp_form.items():
         setattr(dhcp, name, value)

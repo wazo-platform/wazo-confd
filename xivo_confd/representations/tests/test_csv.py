@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -21,7 +20,7 @@ class TestCSVRepresentation(TestCase):
     def test_csv_empty(self):
         result = output_csv({'headers': [], 'content': []}, SOME_STATUS_CODE)
 
-        assert_that(result.data, equal_to('\r\n'))
+        assert_that(result.data, equal_to('\r\n'.encode('utf-8')))
 
     def test_csv_strings(self):
         body = [
@@ -34,15 +33,15 @@ class TestCSVRepresentation(TestCase):
         ]
         result = output_csv({'headers': ['a', 'b', 'c'], 'content': body}, SOME_STATUS_CODE)
 
-        assert_that(result.data, equal_to('a,b,c\r\n1,2,3\r\n4,5,6\r\n'))
+        assert_that(result.data, equal_to('a,b,c\r\n1,2,3\r\n4,5,6\r\n'.encode('utf-8')))
 
     def test_csv_non_ascii(self):
         body = [
-            {'a': u'é'},
+            {'a': 'é'},
         ]
         result = output_csv({'headers': ['a'], 'content': body}, SOME_STATUS_CODE)
 
-        assert_that(result.data, equal_to(u'a\r\né\r\n'.encode('utf-8')))
+        assert_that(result.data, equal_to('a\r\né\r\n'.encode('utf-8')))
 
     def test_csv_integers(self):
         body = [
@@ -50,7 +49,7 @@ class TestCSVRepresentation(TestCase):
         ]
         result = output_csv({'headers': ['a'], 'content': body}, SOME_STATUS_CODE)
 
-        assert_that(result.data, equal_to('a\r\n1\r\n'))
+        assert_that(result.data, equal_to('a\r\n1\r\n'.encode('utf-8')))
 
     def test_csv_other_args(self):
         result = output_csv(SOME_INPUT, 200, {'my-header': 'my-value'})

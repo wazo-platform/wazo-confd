@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import unicode_literals
 
 import unittest
 import uuid
@@ -1429,7 +1426,7 @@ def test_given_each_field_updated_individually_then_entry_updated(entry, call_pe
         "password": "secret"
     }
 
-    for name, value in fields.iteritems():
+    for name, value in fields.items():
         yield update_csv_field, entry['user_uuid'], name, value
 
 

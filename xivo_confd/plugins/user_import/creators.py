@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -24,9 +23,7 @@ from xivo_confd.plugins.voicemail.schema import VoicemailSchema
 from .wazo_user_schema import WazoUserSchema
 
 
-class Creator(object):
-
-    __metaclass__ = abc.ABCMeta
+class Creator(metaclass=abc.ABCMeta):
 
     def __init__(self, service):
         self.service = service
@@ -47,7 +44,7 @@ class Creator(object):
         self.service.edit(model)
 
     def update_model(self, fields, model):
-        for key, value in fields.iteritems():
+        for key, value in fields.items():
             setattr(model, key, value)
 
 

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -55,13 +54,13 @@ class IncallItem(ItemResource):
         if 'destination' in form:
             form['destination'] = Dialaction(**form['destination'])
 
-        for name, value in form.iteritems():
+        for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, updated_fields)
 
     def find_updated_fields(self, model, form):
         updated_fields = []
-        for name, value in form.iteritems():
+        for name, value in form.items():
             try:
                 if isinstance(value, dict):
                     if self.find_updated_fields(getattr(model, name), value):

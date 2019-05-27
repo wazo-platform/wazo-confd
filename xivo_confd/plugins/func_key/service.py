@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,7 +11,7 @@ from .notifier import build_notifier
 from .validator import build_validator, build_validator_bsfilter
 
 
-class TemplateService(object):
+class TemplateService:
 
     DESTINATION_BLFS = (
         'agent',
@@ -79,7 +78,7 @@ class TemplateService(object):
         self.edit_funckey(funckey, template, position)
 
     def edit_user_template(self, user, template, updated_fields):
-        for funckey in template.keys.itervalues():
+        for funckey in template.keys.values():
             self.validator_bsfilter.validate(user, funckey)
         self.edit(template, updated_fields)
 
@@ -119,7 +118,7 @@ def build_service(provd_client):
                            device_updater)
 
 
-class UserFuncKeyTemplateService(object):
+class UserFuncKeyTemplateService:
 
     def __init__(self, user_dao, validator, notifier, device_updater):
         self.user_dao = user_dao

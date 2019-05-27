@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,7 +12,7 @@ from xivo_confd.plugins.device.model import Device
 logger = logging.getLogger(__name__)
 
 
-class DeviceDao(object):
+class DeviceDao:
 
     def __init__(self, client):
         self.client = client

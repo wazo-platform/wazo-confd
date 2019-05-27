@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 
 
-class Entry(object):
+class Entry:
 
     def __init__(self, number, entry_dict):
         self.number = number
@@ -73,7 +72,7 @@ class Entry(object):
         return getattr(self, resource, None)
 
 
-class EntryCreator(object):
+class EntryCreator:
 
     def __init__(self, creators):
         self.creators = creators
@@ -101,7 +100,7 @@ class EntryCreator(object):
             entry.find_or_create('sccp', self.creators['sccp'], tenant_uuid)
 
 
-class EntryAssociator(object):
+class EntryAssociator:
 
     def __init__(self, associators):
         self.associators = associators
@@ -111,7 +110,7 @@ class EntryAssociator(object):
             associator.associate(entry)
 
 
-class EntryFinder(object):
+class EntryFinder:
 
     def __init__(self, user_dao, voicemail_dao, user_voicemail_dao,
                  line_dao, user_line_dao, line_extension_dao,
@@ -179,7 +178,7 @@ class EntryFinder(object):
             entry.sccp = self.sccp_dao.get(entry.line.endpoint_id)
 
 
-class EntryUpdater(object):
+class EntryUpdater:
 
     def __init__(self, creators, associators, finder):
         self.creators = creators
@@ -214,5 +213,5 @@ class EntryUpdater(object):
             associator.update(entry)
 
     def update_resources(self, entry):
-        for resource, creator in self.creators.iteritems():
+        for resource, creator in self.creators.items():
             entry.update(resource, creator)

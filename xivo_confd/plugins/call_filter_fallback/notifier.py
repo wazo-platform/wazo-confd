@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.call_filter.event import EditCallFilterFallbackEvent
@@ -7,7 +6,7 @@ from xivo_bus.resources.call_filter.event import EditCallFilterFallbackEvent
 from xivo_confd import bus
 
 
-class CallFilterFallbackNotifier(object):
+class CallFilterFallbackNotifier:
 
     def __init__(self, bus):
         self.bus = bus

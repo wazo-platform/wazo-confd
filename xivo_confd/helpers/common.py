@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -39,10 +38,10 @@ def handle_api_exception(func):
             rollback()
             if error.status_code >= 500:
                 logger.error("%s: %s", error, error.details, exc_info=True)
-            return [error.message], error.status_code
+            return [str(error)], error.status_code
         except ProvdError as error:
             rollback()
-            return 'Provd client error: {}'.format(error.message), error.status_code
+            return 'Provd client error: {}'.format(error), error.status_code
         except HTTPException as error:
             rollback()
             messages, code = extract_http_messages(error)
@@ -51,7 +50,7 @@ def handle_api_exception(func):
         except Exception as error:
             rollback()
             message = decode_and_log_error(error, exc_info=True)
-            return [u'Unexpected error: {}'.format(message)], 500
+            return ['Unexpected error: {}'.format(message)], 500
     return wrapper
 
 
@@ -68,10 +67,7 @@ def rollback():
 
 
 def decode_and_log_error(error, exc_info=False):
-    try:
-        error_message = unicode(error)
-    except UnicodeDecodeError:
-        error_message = str(error).decode('utf-8', errors='replace')
+    error_message = str(error)
     logger.error(error_message, exc_info=exc_info)
     return error_message
 
@@ -81,13 +77,17 @@ def extract_http_messages(error):
     # but flask-restful's error handling isn't flexible
     # enough to allow us to reformat its error messages.
     # So we attempt to extract the errors from the exception
+
+    # The `data` property is added by flask-restful
+    # It contains all kwargs passed to the `abort` command
+    # (e.i. abort(400, message={'key': 'value'})
     data = getattr(error, 'data', {})
     message = data.get('message', None)
     if isinstance(message, dict):
         code = error.code
-        messages = [u"Input Error - {}: {}".format(key, value)
-                    for key, value in message.iteritems()]
-    elif isinstance(message, unicode):
+        messages = ["Input Error - {}: {}".format(key, value)
+                    for key, value in message.items()]
+    elif isinstance(message, str):
         code = error.code
         messages = [message]
     else:

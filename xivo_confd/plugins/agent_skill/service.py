@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,7 +8,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class AgentMemberService(object):
+class AgentMemberService:
 
     def __init__(self, agent_dao, skill_dao, validator, notifier):
         self.agent_dao = agent_dao

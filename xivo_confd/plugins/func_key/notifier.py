@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,7 +11,7 @@ from xivo_confd import bus, sysconfd
 from xivo_confd.database import device as device_db_module
 
 
-class FuncKeyTemplateNotifier(object):
+class FuncKeyTemplateNotifier:
 
     def __init__(self, bus, sysconfd, device_db):
         self.bus = bus

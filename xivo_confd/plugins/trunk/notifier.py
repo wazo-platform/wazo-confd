@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,7 +10,7 @@ from xivo_bus.resources.trunk.event import (
 from xivo_confd import bus, sysconfd
 
 
-class TrunkNotifier(object):
+class TrunkNotifier:
 
     _IPBX_COMMANDS = {
         'sip': ['module reload res_pjsip.so'],

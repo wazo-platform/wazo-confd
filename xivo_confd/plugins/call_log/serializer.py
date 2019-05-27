@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-# Copyright (C) 2012-2016 Avencall
+# Copyright 2012-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
-from StringIO import StringIO
-from xivo.unicode_csv import UnicodeDictWriter
+from io import StringIO
 
 CSV_HEADERS = ['Call Date',
                'Caller',
@@ -26,6 +24,6 @@ def write_headers(csv_file, headers):
 
 
 def write_body(csv_file, headers, call_logs):
-    writer = UnicodeDictWriter(csv_file, CSV_HEADERS)
+    writer = csv.DictWriter(csv_file, CSV_HEADERS)
     for call_log in call_logs:
         writer.writerow(call_log)

@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class HAService(object):
+class HAService:
 
     def __init__(self, notifier, sysconfd):
         self.notifier = notifier

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -44,7 +43,7 @@ class BaseDestinationSchema(Schema):
     def get_parameters(self):
         parameters = []
         exclude_fields = ['href', 'type']
-        for field_name, field_obj in self.declared_fields.iteritems():
+        for field_name, field_obj in self.declared_fields.items():
             if field_name is None or field_name in exclude_fields or field_obj.dump_only:
                 continue
 
@@ -253,7 +252,7 @@ class FuncKeyPositionField(fields.Field):
             raise ValidationError('FuncKey must be a dictionary')
 
         template = {}
-        for raw_position, raw_funckey in value.iteritems():
+        for raw_position, raw_funckey in value.items():
             position = self.key_field.deserialize(raw_position, attr, data)
             self.nested_field.schema.context = self.context
             try:
@@ -266,7 +265,7 @@ class FuncKeyPositionField(fields.Field):
 
     def _serialize(self, value, attr, obj):
         template = {}
-        for raw_position, raw_funckey in value.iteritems():
+        for raw_position, raw_funckey in value.items():
             position = self.key_field._serialize(raw_position, attr, obj)
             funckey = self.nested_field.serialize(raw_position, self.get_value(attr, obj))
             template[position] = funckey

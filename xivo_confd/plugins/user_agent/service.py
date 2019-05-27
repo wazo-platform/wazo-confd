@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -8,7 +7,7 @@ from xivo_confd.plugins.user_agent.notifier import build_notifier
 from xivo_confd.plugins.user_agent.validator import build_validator
 
 
-class UserAgentService(object):
+class UserAgentService:
 
     def __init__(self, dao, validator, notifier):
         self.dao = dao

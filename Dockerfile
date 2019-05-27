@@ -1,6 +1,6 @@
 ## Image to build from sources
 
-FROM python:2.7.13-stretch
+FROM python:3.5-stretch
 MAINTAINER Wazo Maintainers <dev@wazo.community>
 
 # Configure environment

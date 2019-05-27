@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -49,7 +48,7 @@ class DeviceService(CRUDService):
         self.notifier.deleted(resource)
 
 
-class SearchEngine(object):
+class SearchEngine:
 
     PROVD_DEVICE_KEYS = [
         'id',
@@ -98,7 +97,7 @@ class SearchEngine(object):
                 raise errors.invalid_ordering(parameters['order'], self.PROVD_DEVICE_KEYS)
 
     def find_all_devices(self, parameters, tenant_uuid=None):
-        query = {key: value for key, value in parameters.iteritems()
+        query = {key: value for key, value in parameters.items()
                  if key in self.PROVD_DEVICE_KEYS}
         order = parameters.get('order', self.DEFAULT_ORDER)
         direction = parameters.get('direction', self.DEFAULT_DIRECTION)
@@ -116,7 +115,7 @@ class SearchEngine(object):
 
     def _matches_search(self, device, search_lowered):
         for key in self.PROVD_DEVICE_KEYS:
-            if key in device and search_lowered in unicode(device[key]).lower():
+            if key in device and search_lowered in str(device[key]).lower():
                 return True
         return False
 

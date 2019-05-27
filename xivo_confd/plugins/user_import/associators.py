@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -8,9 +7,7 @@ from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.helpers.exception import NotFoundError
 
 
-class Associator(object):
-
-    __metaclass__ = abc.ABCMeta
+class Associator(metaclass=abc.ABCMeta):
 
     def __init__(self, service):
         self.service = service

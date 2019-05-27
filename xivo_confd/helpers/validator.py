@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,9 +11,7 @@ EXTEN_OUTCALL_REGEX = r'^_?\+?[*#0-9_XxZzNn\[\].!-]*$'
 LANGUAGE_REGEX = r"^[a-z]{2}_[A-Z]{2}$"
 
 
-class Validator(object):
-
-    __metaclass__ = abc.ABCMeta
+class Validator(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def validate(self, model):
@@ -24,9 +21,7 @@ class Validator(object):
         self.validate(model)
 
 
-class ValidatorAssociation(object):
-
-    __metaclass__ = abc.ABCMeta
+class ValidatorAssociation(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def validate(self, model1, model2):
@@ -150,7 +145,7 @@ class MemberOfSequence(Validator):
             raise errors.param_not_found(self.field, self.resource, **metadata)
 
 
-class ValidationGroup(object):
+class ValidationGroup:
 
     def __init__(self, common=None, create=None, edit=None, delete=None):
         self.common = common or []
@@ -177,7 +172,7 @@ class ValidationGroup(object):
             validator.validate_with_tenant_uuids(model, tenant_uuids)
 
 
-class ValidationAssociation(object):
+class ValidationAssociation:
 
     def __init__(self, common=None, association=None, dissociation=None):
         self.common = common or []
@@ -193,7 +188,7 @@ class ValidationAssociation(object):
             validator.validate(*models)
 
 
-class BaseExtensionRangeMixin(object):
+class BaseExtensionRangeMixin:
 
     def _exten_in_range(self, exten, context_ranges):
         return any(context_range.in_range(exten)

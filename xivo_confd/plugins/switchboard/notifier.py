@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import ArbitraryEvent
@@ -9,7 +8,7 @@ from xivo_confd import bus
 from .schema import SwitchboardSchema
 
 
-class SwitchboardNotifier(object):
+class SwitchboardNotifier:
 
     def __init__(self, bus):
         self.bus = bus

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import inspect
@@ -7,7 +6,7 @@ import inspect
 from functools import wraps
 
 
-class IsolatedAction(object):
+class IsolatedAction:
     """
     Utility for automatically creating and deleting
     a resource needed by a test. Can be used for managing test

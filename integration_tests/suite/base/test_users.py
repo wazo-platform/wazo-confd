@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import unicode_literals
 
 from hamcrest import (
     all_of,
@@ -272,9 +269,9 @@ def test_delete_errors(user):
     yield s.check_resource_not_found, user_url.get, 'User'
 
 
-@fixtures.user(firstname=u'ÉricDir')
+@fixtures.user(firstname='ÉricDir')
 def test_that_the_directory_view_works_with_unicode_characters(user):
-    response = confd.users.get(view='directory', search=u'éricdir')
+    response = confd.users.get(view='directory', search='éricdir')
     response.assert_ok()
 
     assert_that(response.items[0]['id'], equal_to(user['id']))

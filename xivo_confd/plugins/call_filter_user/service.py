@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.call_filter import dao as call_filter_dao_module
@@ -11,7 +10,7 @@ from .validator import (
 )
 
 
-class CallFilterUserService(object):
+class CallFilterUserService:
 
     def __init__(self, call_filter_dao, notifier, validator_recipient_user, validator_surrogate_user):
         self.call_filter_dao = call_filter_dao

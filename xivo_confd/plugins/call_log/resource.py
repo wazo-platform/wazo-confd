@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, Response
@@ -46,7 +45,7 @@ class CallLog(ConfdResource):
         else:
             call_logs = self.service.find_all_in_period(period['start_date'], period['end_date'])
 
-        mapped_call_logs = map(self.mapper.to_api, call_logs)
+        mapped_call_logs = list(map(self.mapper.to_api, call_logs))
         response = self.serializer.encode_list(mapped_call_logs)
         return Response(response=response,
                         status=200,

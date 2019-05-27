@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -18,7 +17,7 @@ from .converter import convert_ari_sounds_to_model
 logger = logging.getLogger(__name__)
 
 
-class SoundService(object):
+class SoundService:
 
     def __init__(self, ari_client, storage, asterisk_storage, validator, validator_file, notifier):
         self._ari_client = ari_client

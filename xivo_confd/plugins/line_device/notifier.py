@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -24,7 +23,7 @@ DEVICE_FIELDS = [
 ]
 
 
-class LineDeviceNotifier(object):
+class LineDeviceNotifier:
 
     REQUEST_HANDLERS = {
         'ipbx': ['module reload chan_sccp.so'],

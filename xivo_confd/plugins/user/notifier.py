@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,7 +12,7 @@ from xivo_bus.resources.user.event import (
 from xivo_confd import bus, sysconfd
 
 
-class UserNotifier(object):
+class UserNotifier:
 
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd
@@ -69,7 +68,7 @@ def build_notifier():
     return UserNotifier(sysconfd, bus)
 
 
-class UserServiceNotifier(object):
+class UserServiceNotifier:
 
     def __init__(self, bus):
         self.bus = bus
@@ -86,7 +85,7 @@ def build_notifier_service():
     return UserServiceNotifier(bus)
 
 
-class UserForwardNotifier(object):
+class UserForwardNotifier:
 
     def __init__(self, bus):
         self.bus = bus

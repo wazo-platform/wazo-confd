@@ -1,22 +1,13 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from __future__ import unicode_literals
-
 import csv
-from io import BytesIO
+from io import StringIO
 
 from .. import config
 from . import words
 from . import voicemail, extension, call_permission
 from . import new_client
-
-import sys
-if sys.version_info[0] == 2:
-    text_type = unicode
-else:
-    text_type = str
 
 
 def csv_client():
@@ -29,19 +20,18 @@ def csv_client():
 def generate_csv(rows):
     header = set()
     for row in rows:
-        keys = set(key.encode("utf8") for key in row.keys())
+        keys = set(key for key in row.keys())
         header.update(keys)
 
-    output = BytesIO()
+    output = StringIO()
     writer = csv.DictWriter(output, header)
     writer.writeheader()
 
     for row in rows:
-        row = {key.encode("utf8"): text_type(value).encode("utf8")
-               for key, value in row.items()}
+        row = {key: str(value) for key, value in row.items()}
         writer.writerow(row)
 
-    return output.getvalue()
+    return output.getvalue().encode('utf-8')
 
 
 def generate_entry(**params):

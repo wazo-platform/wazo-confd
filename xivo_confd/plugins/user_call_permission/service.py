@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
@@ -8,7 +7,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class UserCallPermissionService(object):
+class UserCallPermissionService:
 
     def __init__(self, dao, notifier, validator):
         self.dao = dao

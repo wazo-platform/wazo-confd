@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,7 +10,7 @@ from xivo_bus.resources.endpoint_sip.event import (
 from xivo_confd import bus, sysconfd
 
 
-class SipEndpointNotifier(object):
+class SipEndpointNotifier:
 
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd

@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -9,7 +8,7 @@ from xivo_confd.plugins.line.service import build_service as build_line_service
 from .validator import build_validator
 
 
-class LineEndpointService(object):
+class LineEndpointService:
 
     def __init__(self, endpoint, line_service, endpoint_service, validator):
         self.endpoint = endpoint

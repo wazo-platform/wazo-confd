@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -14,7 +13,7 @@ from xivo_confd.helpers.restful import ConfdResource
 from .schema import GroupUsersSchema, GroupExtensionsSchema
 
 
-class Extension(object):
+class Extension:
 
     def __init__(self, exten=None, context=None):
         self.exten = exten

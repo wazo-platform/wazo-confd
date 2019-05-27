@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -9,7 +8,7 @@ from xivo_bus.resources.line_extension.event import (
 from xivo_confd import bus, sysconfd
 
 
-class LineExtensionNotifier(object):
+class LineExtensionNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

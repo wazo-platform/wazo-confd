@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -35,7 +34,7 @@ class TestLineDeviceNotifier(unittest.TestCase):
             endpoint_sccp=None,
             endpoint_custom=None,
         )
-        self.line.name = u'limitation of mock instantiation with name ...'
+        self.line.name = 'limitation of mock instantiation with name ...'
         self.device = Mock(Device, id='custom-id')
         self.bus = Mock()
         self.notifier = LineDeviceNotifier(self.bus, self.sysconfd)

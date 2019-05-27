@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -27,7 +26,7 @@ class UserSubResource(ConfdResource):
 
     def parse_and_update(self, model):
         form = self.schema().load(request.get_json()).data
-        for name, value in form.iteritems():
+        for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, self.schema())
 
@@ -57,8 +56,8 @@ class ServicesSchema(BaseSchema):
     @post_load
     def remove_envelope(self, data):
         result = {}
-        for service in data.itervalues():
-            for key, value in service.iteritems():
+        for service in data.values():
+            for key, value in service.items():
                 result[key] = value
         return result
 
@@ -137,8 +136,8 @@ class ForwardsSchema(BaseSchema):
     @post_load
     def remove_envelope(self, data):
         result = {}
-        for forward in data.itervalues():
-            for key, value in forward.iteritems():
+        for forward in data.values():
+            for key, value in forward.items():
                 result[key] = value
         return result
 

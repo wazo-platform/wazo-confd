@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -25,7 +24,7 @@ def tearDownModule():
     BaseIntegrationTest.tearDownClass()
 
 
-class mocks(object):
+class mocks:
     @classmethod
     class provd(IsolatedAction):
 
@@ -37,7 +36,7 @@ class mocks(object):
         actions = {'generate': BaseIntegrationTest.setup_sysconfd}
 
 
-class SingletonProxy(object):
+class SingletonProxy:
 
     def __init__(self, func, *args, **kwargs):
         self.func = func

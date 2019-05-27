@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -152,13 +151,13 @@ class ItemResource(ConfdResource):
     def parse_and_update(self, model, **kwargs):
         form = self.schema().load(request.get_json(), partial=True).data
         updated_fields = self.find_updated_fields(model, form)
-        for name, value in form.iteritems():
+        for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, updated_fields=updated_fields, **kwargs)
 
     def find_updated_fields(self, model, form):
         updated_fields = []
-        for name, value in form.iteritems():
+        for name, value in form.items():
             try:
                 if getattr(model, name) != value:
                     updated_fields.append(name)

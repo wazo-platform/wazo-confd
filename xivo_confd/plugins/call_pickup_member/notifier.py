@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -12,7 +11,7 @@ from xivo_bus.resources.call_pickup_member.event import (
 from xivo_confd import bus, sysconfd
 
 
-class CallPickupMemberNotifier(object):
+class CallPickupMemberNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

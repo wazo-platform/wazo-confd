@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -20,7 +19,7 @@ def reset(db):
     return decorated
 
 
-class DbHelper(object):
+class DbHelper:
 
     TEMPLATE = "xivotemplate"
 
@@ -72,7 +71,7 @@ class DbHelper(object):
             yield DatabaseQueries(connection)
 
 
-class DatabaseQueries(object):
+class DatabaseQueries:
 
     def __init__(self, connection):
         self.connection = connection

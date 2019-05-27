@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -82,7 +81,7 @@ def load_uuid():
         app.config['uuid'] = info_dao.get().uuid
 
 
-class HTTPServer(object):
+class HTTPServer:
 
     def __init__(self, global_config):
         self.config = global_config['rest_api']

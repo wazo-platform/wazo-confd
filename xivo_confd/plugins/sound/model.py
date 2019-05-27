@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class SoundCategory(object):
+class SoundCategory:
 
     has_tenant_uuid = True
 
@@ -27,7 +26,7 @@ class SoundCategory(object):
                         file_count=len(self.files)))
 
 
-class SoundFile(object):
+class SoundFile:
 
     has_tenant_uuid = True
 
@@ -52,14 +51,14 @@ class SoundFile(object):
         self.formats = self.formats + new_formats
 
 
-class SoundFormat(object):
+class SoundFormat:
 
     has_tenant_uuid = True
 
     extension_map = {
         'wav': 'slin',
     }
-    format_map = {v: k for k, v in extension_map.iteritems()}
+    format_map = {v: k for k, v in extension_map.items()}
 
     def __init__(self, format_=None, language=None, text=None, path=None, extension=None, tenant_uuid=None):
         if format_ is not None:

@@ -1,5 +1,7 @@
 FROM wazopbx/xivo-confd
 
+ENV PYTHONDONTWRITEBYTECODE='true'
+
 RUN true && \
     install -dm775 -o www-data -g www-data /var/lib/wazo/sounds/tenants && \
     install -dm777 /usr/share/asterisk/sounds && \

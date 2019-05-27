@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -31,7 +30,7 @@ class TestUserLineNotifier(unittest.TestCase):
             endpoint_sccp=None,
             endpoint_custom=None,
         )
-        self.line.name = u'limitation of mock instantiation with name ...'
+        self.line.name = 'limitation of mock instantiation with name ...'
         self.user_line = Mock(
             user=self.user,
             line=self.line,

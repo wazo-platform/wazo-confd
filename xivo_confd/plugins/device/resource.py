@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -13,7 +12,7 @@ from xivo_dao.helpers import errors
 from .schema import DeviceSchema
 
 
-class SingleTenantMixin(object):
+class SingleTenantMixin:
 
     def _add_tenant_uuid(self):
         tenant_uuid = Tenant.autodetect().uuid

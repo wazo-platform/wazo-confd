@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -41,7 +40,7 @@ password = {password}
 logger = logging.getLogger(__name__)
 
 
-class WizardService(object):
+class WizardService:
 
     def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, sysconfd):
         self.validator = validator
@@ -153,30 +152,30 @@ class WizardService(object):
                        'raw_config': {'ntp_enabled': True,
                                       'ntp_ip': address,
                                       'X_xivo_phonebook_ip': address}}
-        device_config = {u'X_type': u'device',
-                         u'deletable': False,
-                         u'id': u'defaultconfigdevice',
-                         u'label': u'Default config device',
-                         u'parent_ids': [],
-                         u'raw_config': {u'ntp_enabled': True,
-                                         u'ntp_ip': address,
-                                         u'sip_dtmf_mode': u'RTP-out-of-band',
-                                         u'admin_username': 'admin',
-                                         u'admin_password': self._generate_phone_password(length=16),
-                                         u'user_username': 'user',
-                                         u'user_password': self._generate_phone_password(length=16)}}
-        autoprov_config = {u'X_type': u'internal',
-                           u'deletable': False,
-                           u'id': u'autoprov',
-                           u'parent_ids': [u'base', u'defaultconfigdevice'],
-                           u'raw_config': {u'sccp_call_managers': {u'1': {u'ip': address}},
-                                           u'sip_lines': {u'1': {u'display_name': u'Autoprov',
-                                                                 u'number': u'autoprov',
-                                                                 u'password': autoprov_password,
-                                                                 u'proxy_ip': address,
-                                                                 u'registrar_ip': address,
-                                                                 u'username': autoprov_username}}},
-                           u'role': u'autocreate'}
+        device_config = {'X_type': 'device',
+                         'deletable': False,
+                         'id': 'defaultconfigdevice',
+                         'label': 'Default config device',
+                         'parent_ids': [],
+                         'raw_config': {'ntp_enabled': True,
+                                         'ntp_ip': address,
+                                         'sip_dtmf_mode': 'RTP-out-of-band',
+                                         'admin_username': 'admin',
+                                         'admin_password': self._generate_phone_password(length=16),
+                                         'user_username': 'user',
+                                         'user_password': self._generate_phone_password(length=16)}}
+        autoprov_config = {'X_type': 'internal',
+                           'deletable': False,
+                           'id': 'autoprov',
+                           'parent_ids': ['base', 'defaultconfigdevice'],
+                           'raw_config': {'sccp_call_managers': {'1': {'ip': address}},
+                                           'sip_lines': {'1': {'display_name': 'Autoprov',
+                                                                 'number': 'autoprov',
+                                                                 'password': autoprov_password,
+                                                                 'proxy_ip': address,
+                                                                 'registrar_ip': address,
+                                                                 'username': autoprov_username}}},
+                           'role': 'autocreate'}
 
         self.provd_client.configs.create(base_config)
         self.provd_client.configs.create(default_config)
@@ -189,7 +188,7 @@ class WizardService(object):
 
     def _generate_phone_password(self, length):
         chars = string.ascii_letters + string.digits
-        return "".join(chars[ord(c) % len(chars)] for c in urandom(length))
+        return "".join(chars[c % len(chars)] for c in urandom(length))
 
     def get_interfaces(self):
         result = []

@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class Device(object):
+class Device:
 
     @classmethod
     def from_args(cls, **kwargs):
         device = cls({}, {'parent_ids': []})
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             setattr(device, key, value)
         return device
 

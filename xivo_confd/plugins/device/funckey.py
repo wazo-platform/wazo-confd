@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -36,9 +35,7 @@ def build_converters():
     }
 
 
-class FuncKeyConverter(object):
-
-    __metaclass__ = abc.ABCMeta
+class FuncKeyConverter(metaclass=abc.ABCMeta):
 
     INVALID_CHARS = "\n\r\t;"
 

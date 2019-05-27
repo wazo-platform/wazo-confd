@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -48,7 +47,7 @@ class FuncKeyMappingValidator(Validator):
         self.funckey_validator = funckey_validator
 
     def validate(self, template):
-        for pos, funckey in template.keys.iteritems():
+        for pos, funckey in template.keys.items():
             self.funckey_validator.validate(funckey)
 
 

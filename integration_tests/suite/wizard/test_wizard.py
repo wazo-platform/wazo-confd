@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -110,7 +109,7 @@ class IntegrationTest(BaseIntegrationTest):
         cls.bus = cls.create_bus()
 
 
-class mocks(object):
+class mocks:
     @classmethod
     class sysconfd(IsolatedAction):
 
@@ -382,26 +381,26 @@ class TestWizard(IntegrationTest):
             configs,
             contains_inanyorder(
                 has_entries(
-                    X_type=u'registrar',
+                    X_type='registrar',
                     deletable=False,
-                    displayname=u'local',
-                    id=u'default',
+                    displayname='local',
+                    id='default',
                     parent_ids=[],
                     proxy_main=ip_address,
-                    raw_config={u'X_key': u'xivo'},
+                    raw_config={'X_key': 'xivo'},
                     registrar_main=ip_address,
                 ),
                 has_entries(
-                    X_type=u'internal',
+                    X_type='internal',
                     deletable=False,
-                    id=u'autoprov',
-                    parent_ids=[u'base', u'defaultconfigdevice'],
+                    id='autoprov',
+                    parent_ids=['base', 'defaultconfigdevice'],
                     raw_config=has_entries(
-                        sccp_call_managers={u'1': {u'ip': ip_address}},
+                        sccp_call_managers={'1': {'ip': ip_address}},
                         sip_lines=has_entries(
                             '1', has_entries(
-                                display_name=u'Autoprov',
-                                number=u'autoprov',
+                                display_name='Autoprov',
+                                number='autoprov',
                                 password=has_length(8),
                                 proxy_ip=ip_address,
                                 registrar_ip=ip_address,
@@ -409,29 +408,29 @@ class TestWizard(IntegrationTest):
                             )
                         )
                     ),
-                    role=u'autocreate',
+                    role='autocreate',
                 ),
                 has_entries(
-                    X_type=u'internal',
+                    X_type='internal',
                     deletable=False,
-                    id=u'base',
+                    id='base',
                     parent_ids=[],
                     raw_config={
-                        u'X_xivo_phonebook_ip': ip_address,
-                        u'ntp_enabled': True,
-                        u'ntp_ip': ip_address,
+                        'X_xivo_phonebook_ip': ip_address,
+                        'ntp_enabled': True,
+                        'ntp_ip': ip_address,
                     },
                 ),
                 has_entries(
-                    X_type=u'device',
+                    X_type='device',
                     deletable=False,
-                    id=u'defaultconfigdevice',
-                    label=u'Default config device',
+                    id='defaultconfigdevice',
+                    label='Default config device',
                     parent_ids=[],
                     raw_config=has_entries(
                         ntp_enabled=True,
                         ntp_ip=ip_address,
-                        sip_dtmf_mode=u'RTP-out-of-band',
+                        sip_dtmf_mode='RTP-out-of-band',
                         admin_username='admin',
                         admin_password=has_length(16),
                         user_username='user',

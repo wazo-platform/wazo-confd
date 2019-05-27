@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -10,7 +9,7 @@ from xivo_bus import Marshaler, Publisher
 logger = logging.getLogger(__name__)
 
 
-class BusPublisher(object):
+class BusPublisher:
 
     @classmethod
     def from_config(cls, config):

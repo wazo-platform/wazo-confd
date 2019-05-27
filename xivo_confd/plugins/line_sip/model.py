@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
-class LineSip(object):
+class LineSip:
 
     def __init__(self,
                  context,

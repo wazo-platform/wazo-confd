@@ -1,17 +1,12 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import unicode_literals
 
 import csv
 import json
 import logging
 import pprint
 import requests
-import sys
-
-from io import BytesIO
+from io import StringIO
 from hamcrest import (
     assert_that,
     contains_string,
@@ -33,7 +28,7 @@ requests.packages.urllib3.disable_warnings()
 logger = logging.getLogger(__name__)
 
 
-class ConfdClient(object):
+class ConfdClient:
 
     DEFAULT_HEADERS = {'Accept': 'application/json',
                        'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in wazo-auth-mock
@@ -64,8 +59,6 @@ class ConfdClient(object):
         return Response(response)
 
     def log_request(self, method, url, parameters, data):
-        if sys.version_info[0] == 2:
-            data = unicode(data, encoding='utf8') if data is not None else data
         logger.info('%s %s params: %s body: %s', method, url, parameters, data)
 
     def head(self, url, **parameters):
@@ -163,7 +156,7 @@ class RestUrlClient(UrlFragment):
         return url
 
 
-class Response(object):
+class Response:
 
     STATUS_OK = (200, 201, 204)
 
@@ -207,11 +200,10 @@ class Response(object):
     def csv(self):
         self.assert_ok()
         lines = []
-        content = BytesIO(self.response.content)
+        content = StringIO(self.response.content.decode('utf-8'))
         reader = csv.DictReader(content)
         for row in reader:
-            lines.append({key.decode('utf8'): value.decode('utf8')
-                          for key, value in row.items()})
+            lines.append({key: value for key, value in row.items()})
         return lines
 
     def assert_status(self, *statuses):

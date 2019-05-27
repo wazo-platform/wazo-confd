@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .auth_client import auth_client
 
 
-class WazoUserService(object):
+class WazoUserService:
 
     def __init__(self, auth_client):
         self._auth_client = auth_client

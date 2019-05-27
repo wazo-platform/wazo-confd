@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-class ConfigGenerator(object):
+class ConfigGenerator:
 
     def __init__(self, raw_generator):
         self.raw_generator = raw_generator
@@ -21,7 +20,7 @@ class ConfigGenerator(object):
         return config
 
 
-class RawConfigGenerator(object):
+class RawConfigGenerator:
 
     def __init__(self, generators):
         self.generators = generators
@@ -38,7 +37,7 @@ class RawConfigGenerator(object):
         return raw_config
 
 
-class UserGenerator(object):
+class UserGenerator:
 
     def __init__(self, device_db):
         self.device_db = device_db
@@ -50,7 +49,7 @@ class UserGenerator(object):
                     'X_xivo_phonebook_profile': row.context}
 
 
-class ExtensionGenerator(object):
+class ExtensionGenerator:
 
     def __init__(self, extension_dao):
         self.extension_dao = extension_dao
@@ -74,7 +73,7 @@ class ExtensionGenerator(object):
             return extension.clean_exten()
 
 
-class FuncKeyGenerator(object):
+class FuncKeyGenerator:
 
     def __init__(self, user_dao, line_dao, user_line_dao, template_dao, device_dao, converters):
         self.user_dao = user_dao
@@ -113,13 +112,13 @@ class FuncKeyGenerator(object):
 
     def convert_funckeys(self, user, line, template):
         funckeys = {}
-        for pos, funckey in template.keys.iteritems():
+        for pos, funckey in template.keys.items():
             converter = self.converters[funckey.destination.type]
             funckeys.update(converter.build(user, line, pos, funckey))
         return funckeys
 
 
-class SipGenerator(object):
+class SipGenerator:
 
     def __init__(self, device_dao, device_db):
         self.device_dao = device_dao
@@ -157,7 +156,7 @@ class SipGenerator(object):
         return config
 
 
-class SccpGenerator(object):
+class SccpGenerator:
 
     def __init__(self, device_dao, line_dao):
         self.device_dao = device_dao

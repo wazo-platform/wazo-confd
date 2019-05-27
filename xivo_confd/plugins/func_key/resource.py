@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -60,11 +59,11 @@ def _create_funckey_model(funckey):
     return FuncKeyMapping(**funckey)
 
 
-class FindUpdateFieldsMixin(object):
+class FindUpdateFieldsMixin:
 
     def find_updated_fields_position(self, model, form):
         updated_fields = []
-        for position, funckey in form.iteritems():
+        for position, funckey in form.items():
             funckey_model = model.get(position, FuncKeyMapping())
             if self.find_updated_fields_funkey(funckey_model, funckey):
                 updated_fields.append(position)
@@ -72,7 +71,7 @@ class FindUpdateFieldsMixin(object):
 
     def find_updated_fields_funkey(self, model, form):
         updated_fields = []
-        for name, value in form.iteritems():
+        for name, value in form.items():
             try:
                 if isinstance(value, dict):
                     if self.find_updated_fields_funkey(getattr(model, name), value):
@@ -91,7 +90,7 @@ class FuncKeyDestination(ConfdResource):
     def get(self):
         return [{'type': type_,
                  'parameters': funckey().get_parameters()}
-                for type_, funckey in FuncKeyDestinationField.destination_schemas.iteritems()]
+                for type_, funckey in FuncKeyDestinationField.destination_schemas.items()]
 
 
 class FuncKeyTemplateList(ListResource):
@@ -119,7 +118,7 @@ class FuncKeyTemplateList(ListResource):
         return schema.dump(model).data, 201, self.build_headers(model)
 
     def _create_template_model(self, template):
-        for position, funckey in template.get('keys', {}).iteritems():
+        for position, funckey in template.get('keys', {}).items():
             template['keys'][position] = _create_funckey_model(funckey)
         return self.model(**template)
 
@@ -144,7 +143,7 @@ class FuncKeyTemplateItem(ConfdResource, FindUpdateFieldsMixin):
         template_form = self.schema().load(request.get_json()).data
         updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
 
-        for position, funckey in template_form.get('keys', {}).iteritems():
+        for position, funckey in template_form.get('keys', {}).items():
             template_form['keys'][position] = _create_funckey_model(funckey)
 
         template.keys = template_form.get('keys', {})
@@ -213,7 +212,7 @@ class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
         template_form = self.schema().load(request.get_json()).data
         updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
 
-        for position, funckey in template_form.get('keys', {}).iteritems():
+        for position, funckey in template_form.get('keys', {}).items():
             template_form['keys'][position] = _create_funckey_model(funckey)
 
         template.keys = template_form.get('keys', {})

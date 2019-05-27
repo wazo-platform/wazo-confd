@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.call_permission.event import (
@@ -11,7 +10,7 @@ from xivo_bus.resources.call_permission.event import (
 from xivo_confd import bus
 
 
-class CallPermissionNotifier(object):
+class CallPermissionNotifier:
 
     def __init__(self, bus):
         self.bus = bus

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -17,7 +16,7 @@ from hamcrest import (
 )
 
 
-class SysconfdMock(object):
+class SysconfdMock:
 
     def __init__(self, url):
         self.base_url = url

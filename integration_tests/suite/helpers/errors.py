@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from functools import partial
@@ -8,7 +7,7 @@ from hamcrest import assert_that, has_items, has_entries, instance_of, contains_
 import re
 
 
-class RegexError(object):
+class RegexError:
 
     NO_ERROR_FOUND = "{} did not match on {}"
     NO_MATCH = "{} not found in error {}"

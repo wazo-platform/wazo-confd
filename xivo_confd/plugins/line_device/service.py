@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -11,7 +10,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class LineDevice(object):
+class LineDevice:
 
     @classmethod
     def from_line(cls, line):
@@ -22,7 +21,7 @@ class LineDevice(object):
         self.device_id = device_id
 
 
-class LineDeviceService(object):
+class LineDeviceService:
 
     def __init__(self, validator, line_dao, notifier, device_updater):
         self.validator = validator

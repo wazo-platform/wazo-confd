@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -10,7 +9,7 @@ from xivo_bus.resources.group_member.event import (
 from xivo_confd import bus, sysconfd
 
 
-class GroupMemberNotifier(object):
+class GroupMemberNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

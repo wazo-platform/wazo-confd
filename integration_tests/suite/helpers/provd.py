@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-from __future__ import unicode_literals
 
 import docker
 
@@ -13,7 +10,7 @@ from wazo_provd_client import Client as ProvdClient
 from wazo_provd_client.exceptions import ProvdError
 
 
-class ProvdHelper(object):
+class ProvdHelper:
 
     DOCKER_PROVD_IMAGE = "wazopbx/xivo-provd"
 
@@ -151,7 +148,7 @@ class ProvdHelper(object):
         for container in client.containers(filters={'status': 'running'}):
             info = client.inspect_container(container['Id'])
             if info['Config']['Image'] == self.DOCKER_PROVD_IMAGE:
-                return client.logs(container['Id'], since=timestamp)
+                return client.logs(container['Id'], since=timestamp).decode('utf-8')
 
 
 def create_helper(host='localhost', port='8666', token='valid-token-multitenant'):

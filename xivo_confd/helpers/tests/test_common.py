@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -24,8 +23,8 @@ class TestCommon(unittest.TestCase):
     def assertResponse(self, response, expected_code, result):
         data, status_code = response
 
-        self.assertEquals(status_code, expected_code)
-        self.assertEquals(data, result)
+        self.assertEqual(status_code, expected_code)
+        self.assertEqual(data, result)
 
 
 class TestHandleError(TestCommon):
@@ -83,19 +82,10 @@ class TestHandleError(TestCommon):
 
         self.assertResponse(response, expected_status_code, expected_message)
 
-    def test_when_generic_exception_is_raised_str(self):
-        expected_status_code = 500
-        expected_message = [u"Unexpected error: error message. not ascii: é, not utf-8: \ufffd"]
-        exception = Exception("error message. not ascii: é, not utf-8: \xc9")
-
-        response = handle_api_exception(lambda: self.raise_(exception))()
-
-        self.assertResponse(response, expected_status_code, expected_message)
-
     def test_when_generic_exception_is_raised_unicode(self):
         expected_status_code = 500
-        expected_message = [u"Unexpected error: error message. not ascii: é"]
-        exception = Exception(u"error message. not ascii: é")
+        expected_message = ["Unexpected error: error message. not ascii: é"]
+        exception = Exception("error message. not ascii: é")
 
         response = handle_api_exception(lambda: self.raise_(exception))()
 

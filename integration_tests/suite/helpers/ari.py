@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
 
 
-class ARIClient(object):
+class ARIClient:
 
     def __init__(self, host, port):
         self.host = host

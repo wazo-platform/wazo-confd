@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -46,7 +45,7 @@ class TestCallLogs(unittest.TestCase):
         date=datetime(2013, 1, 30, 8, 46, 20),
         date_answer=datetime(2013, 1, 30, 8, 46, 20),
         date_end=datetime(2013, 1, 30, 8, 46, 23),
-        source_name=u'Père Noël',
+        source_name='Père Noël',
         source_exten='1009',
         destination_exten='1001',
     )
@@ -65,7 +64,7 @@ class TestCallLogs(unittest.TestCase):
         source_name='Bob Marley',
         source_exten='1002',
         destination_exten='4185550155',
-        user_field=u'Père Noël',
+        user_field='Père Noël',
     )
     def test_list_call_logs(self, *_):
         response = self.client.call_logs.get()
@@ -74,7 +73,7 @@ class TestCallLogs(unittest.TestCase):
             contains(
                 {
                     'Call Date': '2013-01-30T08:46:20',
-                    'Caller': u'Père Noël (1009)',
+                    'Caller': 'Père Noël (1009)',
                     'Called': '1001',
                     'Period': '3',
                     'user Field': '',
@@ -91,7 +90,7 @@ class TestCallLogs(unittest.TestCase):
                     'Caller': 'Bob Marley (1002)',
                     'Called': '4185550155',
                     'Period': '3',
-                    'user Field': u'Père Noël',
+                    'user Field': 'Père Noël',
                 },
             )
         )
@@ -100,7 +99,7 @@ class TestCallLogs(unittest.TestCase):
         date=datetime(2013, 1, 30, 8, 46, 20),
         date_answer=datetime(2013, 1, 30, 8, 46, 20),
         date_end=datetime(2013, 1, 30, 8, 46, 23),
-        source_name=u'Père, Noël',
+        source_name='Père, Noël',
         source_exten='1009',
         destination_exten='1001',
     )
@@ -111,7 +110,7 @@ class TestCallLogs(unittest.TestCase):
             contains(
                 {
                     'Call Date': '2013-01-30T08:46:20',
-                    'Caller': u'Père, Noël (1009)',
+                    'Caller': 'Père, Noël (1009)',
                     'Called': '1001',
                     'Period': '3',
                     'user Field': '',
@@ -123,7 +122,7 @@ class TestCallLogs(unittest.TestCase):
         date=datetime(2013, 1, 30, 8, 46, 20),
         date_answer=datetime(2013, 1, 30, 8, 46, 20),
         date_end=datetime(2013, 1, 30, 8, 46, 23),
-        source_name=u'Père, Noël',
+        source_name='Père, Noël',
         source_exten='1009',
         destination_exten='1001',
     )
@@ -139,7 +138,7 @@ class TestCallLogs(unittest.TestCase):
         date=datetime(2013, 1, 29, 8, 46, 20),
         date_answer=datetime(2013, 1, 29, 8, 46, 20),
         date_end=datetime(2013, 1, 29, 8, 46, 23),
-        source_name=u'Père Noël',
+        source_name='Père Noël',
         source_exten='1009',
         destination_exten='1001',
     )
@@ -158,7 +157,7 @@ class TestCallLogs(unittest.TestCase):
         source_name='Bob Marley',
         source_exten='1002',
         destination_exten='4185550155',
-        user_field=u'Père Noël',
+        user_field='Père Noël',
     )
     def test_when_list_in_period_then_call_logs_are_filtered(self, *_):
         response = self.client.call_logs.get(

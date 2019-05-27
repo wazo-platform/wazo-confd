@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -17,7 +16,7 @@ class AsteriskUnauthorized(HTTPError):
     pass
 
 
-class Client(object):
+class Client:
 
     def __init__(self, host='localhost', port=5039, https=False, username=None, password=None):
         self._host = host

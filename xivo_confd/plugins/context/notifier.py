@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -20,7 +19,7 @@ CONTEXT_FIELDS = [
 ]
 
 
-class ContextNotifier(object):
+class ContextNotifier:
 
     def __init__(self, bus, sysconfd):
         self.bus = bus

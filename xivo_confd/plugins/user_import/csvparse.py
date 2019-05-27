@@ -1,41 +1,40 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import csv
 import time
 
 from collections import namedtuple
 from flask import request
 
-from xivo.unicode_csv import UnicodeDictReader
 from xivo_dao.helpers import errors
 
 
 ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])
 
 
-class CsvParser(object):
+class CsvParser:
 
-    def __init__(self, lines, encoding):
-        self.reader = UnicodeDictReader(lines, encoding=encoding)
+    def __init__(self, lines):
+        self.reader = csv.DictReader(lines)
 
     def __iter__(self):
         return CsvIterator(self.reader)
 
 
-class CsvIterator(object):
+class CsvIterator:
 
     def __init__(self, reader):
         self.reader = reader
         self.position = 0
 
-    def next(self):
+    def __next__(self):
         row = next(self.reader)
         self.position += 1
         return CsvRow(row, self.position)
 
 
-class Rule(object):
+class Rule:
 
     def __init__(self, csv_name, name):
         self.csv_name = csv_name
@@ -83,7 +82,7 @@ class ColonListRule(Rule):
         return value.split(";")
 
 
-class CsvRow(object):
+class CsvRow:
 
     USER_RULES = (
         UnicodeRule('uuid', 'uuid'),
@@ -180,7 +179,7 @@ class CsvRow(object):
         return entry
 
     def format_error(self, exc):
-        return {'message': unicode(exc),
+        return {'message': str(exc),
                 'timestamp': int(time.time()),
                 'details': {'row': self.fields,
                             'row_number': self.position}}
@@ -188,5 +187,6 @@ class CsvRow(object):
 
 def parse():
     charset = request.mimetype_params.get('charset', 'utf-8')
-    lines = request.data.split("\n")
-    return CsvParser(lines, charset)
+    lines = request.data.decode(charset)
+    lines = lines.split('\n')
+    return CsvParser(lines)
