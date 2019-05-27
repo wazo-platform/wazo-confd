@@ -547,8 +547,8 @@ def test_update_wazo_auth_is_resynchronise_after_error_and_update(entry1, entry2
 
 def test_given_csv_has_error_then_wazo_user_deleted():
     unique_firstname = uuid.uuid4()
-    csv = [{"firstname": unique_firstname},
-           {"firstname": ""}]
+    csv = [{"firstname": unique_firstname, 'lastname': ""},
+           {"firstname": "", 'lastname': ""}]
 
     response = client.post("/users/import", csv)
     assert_error(response, has_error_field('firstname', row_number=2))
