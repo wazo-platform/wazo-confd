@@ -1,7 +1,7 @@
 Changelog
 =========
 
-18.08
+19.08
 -----
 
 * Due to the removal of the Wazo Client QT, the following endpoints has been deleted:
