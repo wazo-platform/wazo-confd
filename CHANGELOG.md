@@ -1,6 +1,17 @@
 Changelog
 =========
 
+19.08
+-----
+
+* Due to the removal of the Wazo Client QT, the following endpoints has been deleted:
+  * GET `/1.1/cti_profiles`
+  * GET `/1.1/cti_profiles/<cti_profile_id>`
+  * GET `/1.1/users/<user_uuid>/cti`
+  * PUT `/1.1/users/<user_uuid>/cti`
+  Also note that endpoints `/users` don't have `cti_profile` parameter anymore.
+
+
 19.07
 -----
 

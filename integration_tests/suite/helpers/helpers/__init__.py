@@ -103,7 +103,6 @@ from . import call_pickup_target_user
 from . import conference
 from . import conference_extension
 from . import context_context
-from . import cti_profile
 from . import device
 from . import endpoint_custom
 from . import endpoint_iax
@@ -164,7 +163,6 @@ from . import trunk_register_sip
 from . import user
 from . import user_agent
 from . import user_call_permission
-from . import user_cti_profile
 from . import user_funckey_template
 from . import user_import
 from . import user_line
@@ -193,7 +191,6 @@ __all__ = [
     'conference',
     'conference_extension',
     'context_context',
-    'cti_profile',
     'device',
     'endpoint_custom',
     'endpoint_iax',
@@ -254,7 +251,6 @@ __all__ = [
     'user',
     'user_agent',
     'user_call_permission',
-    'user_cti_profile',
     'user_funckey_template',
     'user_import',
     'user_line',

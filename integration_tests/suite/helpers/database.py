@@ -394,22 +394,6 @@ class DatabaseQueries:
         query = text("DELETE FROM context WHERE name = :name")
         self.connection.execute(query, name=name)
 
-    def insert_cti_profile(self, name):
-        query = text("""
-                     INSERT INTO cti_profile(name) VALUES (:name) RETURNING id
-                     """)
-
-        cti_profile_id = self.connection.execute(query, name=name).scalar()
-        return cti_profile_id
-
-    def delete_cti_profile(self, cti_profile_id):
-        query = text("DELETE FROM cti_profile WHERE id = :cti_profile_id")
-        self.connection.execute(query, cti_profile_id=cti_profile_id)
-
-    def dissociate_cti_profile(self, cti_profile_id):
-        query = text("UPDATE userfeatures SET cti_profile_id = NULL WHERE cti_profile_id = :cti_profile_id")
-        self.connection.execute(query, cti_profile_id=cti_profile_id)
-
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")
         self.connection.execute(query, device_id=device_id, line_id=line_id)

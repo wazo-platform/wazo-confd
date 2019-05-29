@@ -50,11 +50,6 @@ class UserSchema(BaseSchema):
                                 'number',
                                 'links'],
                           dump_only=True)
-    cti_profile = fields.Nested('CtiProfileSchema',
-                                only=['id',
-                                      'name',
-                                      'links'],
-                                dump_only=True)
     call_permissions = fields.Nested('CallPermissionSchema',
                                      only=['id', 'name', 'links'],
                                      many=True,
