@@ -20,5 +20,5 @@ class HASchema(BaseSchema):
         if data['node_type'] == 'disabled':
             return
 
-        if not data['remote_address']:
+        if not data.get('remote_address'):
             raise ValidationError('remote_address cannot be empty')

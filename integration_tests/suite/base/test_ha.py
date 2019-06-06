@@ -53,3 +53,11 @@ def test_put_errors():
     }
     result = confd.ha.put(body)
     result.assert_match(400, re.compile(re.escape('remote_address')))
+
+    # null keys
+    body = {
+        'node_type': 'master',
+        'remote_address': None,
+    }
+    result = confd.ha.put(body)
+    result.assert_match(400, re.compile(re.escape('remote_address')))
