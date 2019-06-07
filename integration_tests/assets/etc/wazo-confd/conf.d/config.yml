@@ -4,7 +4,7 @@
 
 # Extra configuration directory where the config files overriding this file
 # should be.
-extra_config_files: /etc/xivo-confd/conf.d/
+extra_config_files: /etc/wazo-confd/conf.d/
 
 # Change the log level to debug level.
 debug: false
@@ -13,10 +13,10 @@ debug: false
 log_level: info
 
 # Log file.
-log_filename: /var/log/xivo-confd.log
+log_filename: /var/log/wazo-confd.log
 
 # PID file.
-pid_filename: /var/run/xivo-confd/xivo-confd.pid
+pid_filename: /var/run/wazo-confd/wazo-confd.pid
 
 db_uri: postgresql://asterisk:proformatique@postgres/asterisk
 
