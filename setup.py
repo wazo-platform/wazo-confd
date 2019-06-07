@@ -20,7 +20,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'xivo-confd=wazo_confd.main:main',
+            'wazo-confd=wazo_confd.main:main',
         ],
         'wazo_confd.plugins': [
             'agent = wazo_confd.plugins.agent.plugin:Plugin',
