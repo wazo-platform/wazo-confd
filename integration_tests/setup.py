@@ -6,16 +6,16 @@ from setuptools import setup
 
 
 setup(
-    name='xivo_confd_test_helpers',
+    name='wazo_confd_test_helpers',
     version='1.0.0',
 
     description='Wazo confd test helpers',
 
     author='Wazo Authors',
     author_email='dev@wazo.community',
-    packages=['xivo_confd_test_helpers', 'xivo_confd_test_helpers.helpers'],
+    packages=['wazo_confd_test_helpers', 'wazo_confd_test_helpers.helpers'],
     package_dir={
-        'xivo_confd_test_helpers': 'suite/helpers',
-        'xivo_confd_test_helpers.helpers': 'suite/helpers/helpers',
+        'wazo_confd_test_helpers': 'suite/helpers',
+        'wazo_confd_test_helpers.helpers': 'suite/helpers/helpers',
     }
 )
