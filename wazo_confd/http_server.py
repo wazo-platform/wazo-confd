@@ -131,7 +131,7 @@ class HTTPServer:
         try:
             self.server.start()
         except KeyboardInterrupt:
-            logger.warning('Stopping xivo-confd: KeyboardInterrupt')
+            logger.warning('Stopping wazo-confd: KeyboardInterrupt')
             self.server.stop()
 
     def stop(self):

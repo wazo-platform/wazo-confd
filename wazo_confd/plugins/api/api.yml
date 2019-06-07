@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  title: xivo-confd
+  title: wazo-confd
   description: "Confd exposes an API for managing core resources on a Wazo server\
     \ such as users, extensions, devices, voicemails, queues, etc. Resources can be\
     \ associated together to provide additional functionality. For example: By associating\

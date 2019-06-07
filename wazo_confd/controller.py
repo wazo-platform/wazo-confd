@@ -24,7 +24,7 @@ class Controller:
     def __init__(self, config):
         self.config = config
         self._service_discovery_args = [
-            'xivo-confd',
+            'wazo-confd',
             config['uuid'],
             config['consul'],
             config['service_discovery'],
@@ -48,7 +48,7 @@ class Controller:
         )
 
     def run(self):
-        logger.info('xivo-confd running...')
+        logger.info('wazo-confd running...')
         xivo_dao.init_db_from_config(self.config)
         signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
 
@@ -57,7 +57,7 @@ class Controller:
                 self.http_server.run()
 
     def stop(self, reason):
-        logger.warning('Stopping xivo-confd: %s', reason)
+        logger.warning('Stopping wazo-confd: %s', reason)
         self.http_server.stop()
 
 
