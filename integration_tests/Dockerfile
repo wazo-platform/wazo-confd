@@ -1,4 +1,4 @@
-FROM wazopbx/xivo-confd
+FROM wazopbx/wazo-confd
 
 ENV PYTHONDONTWRITEBYTECODE='true'
 
@@ -7,6 +7,6 @@ RUN true && \
     install -dm777 /usr/share/asterisk/sounds && \
     true
 
-COPY . /usr/src/xivo-confd
-WORKDIR /usr/src/xivo-confd
+COPY . /usr/src/wazo-confd
+WORKDIR /usr/src/wazo-confd
 RUN python setup.py develop

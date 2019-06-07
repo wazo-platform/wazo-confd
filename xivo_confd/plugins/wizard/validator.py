@@ -1,8 +1,0 @@
-# Copyright (C) 2016 Avencall
-# SPDX-License-Identifier: GPL-3.0-or-later
-
-from xivo_confd.helpers.validator import ValidationGroup
-
-
-def build_validator():
-    return ValidationGroup()

@@ -1,0 +1,584 @@
+swagger: '2.0'
+info:
+  title: wazo-confd
+  description: "Confd exposes an API for managing core resources on a Wazo server\
+    \ such as users, extensions, devices, voicemails, queues, etc. Resources can be\
+    \ associated together to provide additional functionality. For example: By associating\
+    \ a voicemail with a user, calls will automatically fallback on to the voicemail\
+    \ when the user cannot answer.\n\nImplementation notes\n====================\n\
+    \nErrors\n------\n\nResponses containing errors will have a status code in the\
+    \ 400 or 500 class. A list of error messages will be returned in the body of the\
+    \ response as a JSON-encoded array:\n\n~~~\n[\n    \"Input error - User not found\"\
+    ,\n    \"Resource error - User not associated to a line\"\n]\n~~~\n\n\nUpdating\
+    \ resources via PUT\n--------------------------\n\nWhen updating a resource, all\
+    \ fields become optional. In other words, only values that have been changed need\
+    \ to be sent to the server. Please note that this behavior may change in future\
+    \ versions of the API."
+  version: '1.1'
+  license:
+    name: GPL v3
+    url: http://www.gnu.org/licenses/gpl.txt
+  contact:
+    name: Dev Team
+    url: http://wazo.community
+    email: dev@wazo.community
+schemes:
+- https
+basePath: /1.1
+consumes:
+- application/json
+produces:
+- application/json
+x-xivo-port: 9486
+x-xivo-name: confd
+tags:
+- name: funckeys
+  externalDocs:
+    url: http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
+    description: Documentation on function key models
+securityDefinitions:
+  wazo_auth_token:
+    type: apiKey
+    name: X-Auth-Token
+    in: header
+security:
+- wazo_auth_token: []
+parameters:
+  agentid:
+    required: true
+    type: integer
+    name: agent_id
+    in: path
+    description: Agent’s ID
+  direction:
+    required: false
+    name: direction
+    in: query
+    type: string
+    enum:
+    - asc
+    - desc
+    description: Sort list of items in 'asc' (ascending) or 'desc' (descending) order
+  enddate:
+    name: end_date
+    description: filter before end date. Format YYYY-MM-DDTHH:MM:SS. Empty means 'until
+      the current time'.
+    in: query
+    type: string
+    format: date-time
+    required: false
+  limit:
+    required: false
+    name: limit
+    in: query
+    type: integer
+    description: Maximum number of items to return in the list
+  offset:
+    required: false
+    name: offset
+    in: query
+    type: integer
+    description: Number of items to skip over in the list. Useful for pagination.
+  order:
+    required: false
+    name: order
+    in: query
+    type: string
+    description: Name of the field to use for sorting the list of items returned.
+  queueid:
+    required: true
+    name: queue_id
+    type: integer
+    in: path
+    description: Queue’s ID
+  recurse:
+    name: recurse
+    in: query
+    type: boolean
+    description: Should the query include sub-tenants
+    default: false
+    required: false
+  search:
+    required: false
+    name: search
+    in: query
+    type: string
+    description: Search term for filtering a list of items. Only items with a field
+      containing the search term will be returned.
+  startdate:
+    name: start_date
+    description: filter after start date. Format YYYY-MM-DDTHH:MM:SS. Empty means
+      'since the earliest'.
+    in: query
+    type: string
+    format: date-time
+    required: false
+  tenantuuid:
+    name: Wazo-Tenant
+    type: string
+    in: header
+    description: "The tenant's UUID, defining the ownership of a given resource."
+    required: false
+  view:
+    required: false
+    name: view
+    in: query
+    type: string
+    enum:
+    - directory
+    - summary
+    description: Different view of the list of users.
+responses:
+  AlreadyConfiguredError:
+    description: The Wazo must not be configured
+    schema:
+      $ref: '#/definitions/Error'
+  GenericError:
+    description: An error occurred during the operation
+    schema:
+      $ref: '#/definitions/Error'
+  CreateError:
+    description: An error occurred when creating the resource
+    schema:
+      $ref: '#/definitions/Error'
+  UpdateError:
+    description: An error occurred when updating the resource
+    schema:
+      $ref: '#/definitions/Error'
+  DeleteError:
+    description: An error occurred when deleting the resource
+    schema:
+      $ref: '#/definitions/Error'
+  NotFoundError:
+    description: The resource requested was not found on the server
+    schema:
+      $ref: '#/definitions/Error'
+  ResourceUpdated:
+    description: Resource was updated successfully
+  ResourceDeleted:
+    description: Resource was deleted successfully
+definitions:
+  DestinationType:
+    title: DestinationType
+    properties:
+      application:
+        $ref: '#/definitions/DestinationApplicationApplication'
+      conference:
+        $ref: '#/definitions/DestinationConference'
+      custom:
+        $ref: '#/definitions/DestinationCustom'
+      extension:
+        $ref: '#/definitions/DestinationExtension'
+      group:
+        $ref: '#/definitions/DestinationGroup'
+      hangup:
+        $ref: '#/definitions/DestinationHangupCause'
+      ivr:
+        $ref: '#/definitions/DestinationIVR'
+      meetme:
+        $ref: '#/definitions/DestinationMeetme'
+      none:
+        $ref: '#/definitions/DestinationNone'
+      outcall:
+        $ref: '#/definitions/DestinationOutcall'
+      queue:
+        $ref: '#/definitions/DestinationQueue'
+      sound:
+        $ref: '#/definitions/DestinationSound'
+      switchboard:
+        $ref: '#/definitions/DestinationSwitchboard'
+      user:
+        $ref: '#/definitions/DestinationUser'
+      voicemail:
+        $ref: '#/definitions/DestinationVoicemail'
+  DestinationApplicationApplication:
+    title: DestinationApplicationApplication
+    properties:
+      callback_disa:
+        $ref: '#/definitions/DestinationApplicationCallbackDISA'
+      custom:
+        $ref: '#/definitions/DestinationApplicationCustom'
+      directory:
+        $ref: '#/definitions/DestinationApplicationDirectory'
+      disa:
+        $ref: '#/definitions/DestinationApplicationDISA'
+      fax_to_mail:
+        $ref: '#/definitions/DestinationApplicationFaxToMail'
+      voicemail:
+        $ref: '#/definitions/DestinationApplicationVoicemail'
+  DestinationApplication:
+    title: DestinationApplication
+    properties:
+      type:
+        type: string
+        description: MUST be 'application'
+    required:
+    - type
+  DestinationApplicationCallbackDISA:
+    title: DestinationApplicationCallbackDISA
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'callback_disa'
+        context:
+          type: integer
+          description: The context of the application
+        pin:
+          type: string
+          description: the pin of the application
+    required:
+    - application
+    - context
+  DestinationApplicationCustom:
+    title: DestinationApplicationCustom
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'custom'
+        application_uuid:
+          type: string
+          description: The UUID of the application.
+    required:
+    - application
+    - application_uuid
+  DestinationApplicationDirectory:
+    title: DestinationApplicationDirectory
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'directory'
+        context:
+          type: integer
+          description: The context of the application
+    required:
+    - application
+    - context
+  DestinationApplicationDISA:
+    title: DestinationApplicationDISA
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'disa'
+        context:
+          type: integer
+          description: The context of the application
+        pin:
+          type: string
+          description: the pin of the application
+    required:
+    - application
+    - context
+  DestinationApplicationFaxToMail:
+    title: DestinationApplicationFaxToMail
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'fax_to_mail'
+        email:
+          type: string
+          description: The email of the application
+    required:
+    - application
+    - email
+  DestinationApplicationVoicemail:
+    title: DestinationApplicationVoicemail
+    allOf:
+    - $ref: '#/definitions/DestinationApplication'
+    - properties:
+        application:
+          type: string
+          description: MUST be 'voicemail'
+        context:
+          type: integer
+          description: The context of the application
+    required:
+    - application
+    - context
+  DestinationMeetme:
+    title: DestinationMeetme
+    properties:
+      type:
+        type: string
+        description: MUST be 'meetme'
+      conference_id:
+        type: integer
+        description: The id of the conference
+    required:
+    - type
+    - conference_id
+  DestinationConference:
+    title: DestinationConference
+    properties:
+      type:
+        type: string
+        description: MUST be 'conference'
+      conference_id:
+        type: integer
+        description: The id of the conference
+    required:
+    - type
+    - conference_id
+  DestinationCustom:
+    title: DestinationCustom
+    properties:
+      type:
+        type: string
+        description: MUST be 'custom'
+      command:
+        type: string
+        description: The command to execute
+    required:
+    - type
+    - command
+  DestinationExtension:
+    title: DestinationExtension
+    properties:
+      type:
+        type: string
+        description: MUST be 'extension'
+      exten:
+        type: string
+      context:
+        type: string
+        description: Context of the extension
+    required:
+    - type
+    - exten
+    - context
+  DestinationGroup:
+    title: DestinationGroup
+    properties:
+      type:
+        type: string
+        description: MUST be 'group'
+      group_id:
+        type: integer
+        description: The id of the group
+      ring_time:
+        type: number
+        format: float
+    required:
+    - type
+    - group_id
+  DestinationHangupCause:
+    title: DestinationHangupCause
+    properties:
+      busy:
+        $ref: '#/definitions/DestinationHangupBusy'
+      congestion:
+        $ref: '#/definitions/DestinationHangupCongestion'
+      normal:
+        $ref: '#/definitions/DestinationHangupNormal'
+  DestinationHangup:
+    title: DestinationHangup
+    properties:
+      type:
+        type: string
+        description: MUST be 'hangup'
+    required:
+    - type
+  DestinationHangupBusy:
+    title: DestinationHangupBusy
+    allOf:
+    - $ref: '#/definitions/DestinationHangup'
+    - properties:
+        cause:
+          type: string
+          description: MUST be 'busy'
+        timeout:
+          type: integer
+          description: The timeout of the hangup
+    required:
+    - cause
+  DestinationHangupCongestion:
+    title: DestinationHangupCongestion
+    allOf:
+    - $ref: '#/definitions/DestinationHangup'
+    - properties:
+        cause:
+          type: string
+          description: MUST be 'congestion'
+        timeout:
+          type: integer
+          description: The timeout of the hangup
+    required:
+    - cause
+  DestinationHangupNormal:
+    title: DestinationHangupNormal
+    allOf:
+    - $ref: '#/definitions/DestinationHangup'
+    - properties:
+        cause:
+          type: string
+          description: MUST be 'normal'
+    required:
+    - cause
+  DestinationIVR:
+    title: DestinationIVR
+    properties:
+      type:
+        type: string
+        description: MUST be 'ivr'
+      ivr_id:
+        type: integer
+        description: The id of the IVR
+    required:
+    - type
+    - ivr_id
+  DestinationNone:
+    title: DestinationNone
+    properties:
+      type:
+        type: string
+        description: MUST be 'none'
+    required:
+    - type
+  DestinationOutcall:
+    title: DestinationOutcall
+    properties:
+      type:
+        type: string
+        description: MUST be 'outcall'
+      exten:
+        type: string
+      outcall_id:
+        type: integer
+        description: The id of the outcall
+    required:
+    - type
+    - exten
+    - outcall_id
+  DestinationQueue:
+    title: DestinationQueue
+    properties:
+      type:
+        type: string
+        description: MUST be 'queue'
+      queue_id:
+        type: integer
+        description: The id of the queue
+      ring_time:
+        type: number
+        format: float
+      skill_rule_id:
+        type: integer
+        description: The id of the skill rule
+      skill_rule_variables:
+        type: object
+        description: key-value where key represents the variable of the skill rule and value represents a value
+    required:
+    - type
+    - queue_id
+  DestinationSound:
+    title: DestinationSound
+    properties:
+      type:
+        type: string
+        description: MUST be 'sound'
+      filename:
+        type: string
+        description: The filename of the sound. The file MUST be imported by to webi
+          in the playback directory. The extension of file SHOULD be not present.
+      skip:
+        type: boolean
+        description: Do not play this sound if the call is not answered
+      no_answer:
+        type: boolean
+        description: Play this sound without answering the call
+    required:
+    - type
+    - filename
+  DestinationSwitchboard:
+    title: DestinationSwitchboard
+    properties:
+      type:
+        type: string
+        description: MUST be 'switchboard'
+      switchboard_uuid:
+        type: string
+        description: The UUID of the switchboard.
+    required:
+    - type
+    - switchboard_uuid
+  DestinationUser:
+    title: DestinationUser
+    properties:
+      type:
+        type: string
+        description: MUST be 'user'
+      user_id:
+        type: integer
+        description: The id of the user
+      ring_time:
+        type: number
+        format: float
+    required:
+    - type
+    - user_id
+  DestinationVoicemail:
+    title: DestinationVoicemail
+    properties:
+      type:
+        type: string
+        description: MUST be 'voicemail'
+      voicemail_id:
+        type: integer
+        description: The id of the voicemail
+      skip_instructions:
+        type: boolean
+        description: Skip the playback of instructions for leaving a message
+      greeting:
+        type: string
+        enum:
+        - busy
+        - unavailable
+        description: Play the specified greeting
+    required:
+    - type
+    - voicemail_id
+  EndpointRelationTrunk:
+    properties:
+      trunk:
+        $ref: '#/definitions/TrunkRelationBase'
+        readOnly: true
+  EndpointRelationLine:
+    properties:
+      line:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/LineRelationBase'
+  Error:
+    type: array
+    items:
+      type: string
+  UsersUuid:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/UserUuid'
+        type: array
+  UserUuid:
+    properties:
+      uuid:
+        type: string
+  GroupID:
+    properties:
+      id:
+        type: integer
+  GroupsID:
+    properties:
+      groups:
+        items:
+          $ref: '#/definitions/GroupID'
+        type: array

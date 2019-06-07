@@ -1,7 +1,7 @@
 Format: http://dep.debian.net/deps/dep5
-Upstream-Name: xivo-confd
-Source: https://github.com/wazo-pbx/xivo-confd.git
+Upstream-Name: wazo-confd
+Source: https://github.com/wazo-pbx/wazo-confd.git
 
 Files: *
-Copyright: 2012-2018 The Wazo Authors
+Copyright: 2012-2019 The Wazo Authors
 License: GPL-3.0+

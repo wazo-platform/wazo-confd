@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
-export PYBUILD_NAME=xivo-confd
+export PYBUILD_NAME=wazo-confd
 export PYBUILD_DISABLE=test
 
 %:
