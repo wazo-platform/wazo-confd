@@ -1,14 +1,14 @@
-XiVO confd
+wazo-confd
 ==========
 
-[![Build Status](https://jenkins.wazo.community/buildStatus/icon?job=xivo-confd)](https://jenkins.wazo.community/job/xivo-confd)
+[![Build Status](https://jenkins.wazo.community/buildStatus/icon?job=wazo-confd)](https://jenkins.wazo.community/job/wazo-confd)
 
 XiVO CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
 service for configuring and managing a Wazo server. Further details on how to use the API can be found on
 the [Wazo API web site](http://api.wazo.community)
 
 
-Installing xivo-confd
+Installing wazo-confd
 ---------------------
 
 The server is already provided as a part of [Wazo](http://documentation.wazo.community).
@@ -61,7 +61,7 @@ You need the repos xivo-provisioning up-to-date.
 
 ### Mounting libraries
 
-In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the xivo-confd container:
+In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the wazo-confd container:
 
 1. Uncomment the confd volumes in ```integration_tests/assets/docker-compose.yml```
 2. Set the environment variable: ```export LOCAL_GIT_REPOS=/parent/directory/to/all/git/repos```
