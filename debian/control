@@ -1,4 +1,4 @@
-Source: xivo-confd
+Source: wazo-confd
 Section: python
 Priority: extra
 Maintainer: Wazo Maintainers <dev@wazo.community>
@@ -6,11 +6,11 @@ Build-Depends: debhelper (>= 9), dh-python, dh-systemd (>= 1.5), python3-all, py
 Standards-Version: 3.9.6
 X-Python-Version: >= 3.5
 
-Package: xivo-confd
+Package: wazo-confd
 Architecture: all
-Provides: xivo-restapi, xivo-librestapi, xivo-libconfd
-Conflicts: xivo-restapi, xivo-librestapi, xivo-libconfd
-Replaces: xivo-restapi, xivo-librestapi, xivo-libconfd
+Provides: xivo-confd
+Conflicts: xivo-confd
+Replaces: xivo-confd
 Depends: ${python3:Depends},
          ${misc:Depends},
          wazo-auth-client-python3,
@@ -27,8 +27,9 @@ Depends: ${python3:Depends},
          python3-requests (>= 2.4.3),
          python3-netifaces,
          python3-marshmallow,
-         python3-tz
-Description: Wazo confd server
+         python3-tz,
+         rename
+Description: Wazo configuration server
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
  .

@@ -1,3 +1,9 @@
+wazo-confd (19.09~20161123.212314) wazo-dev-stretch; urgency=medium
+
+  * rename xivo-confd to wazo_confd
+
+ -- Wazo Maintainers <dev+pkg@wazo.community>  Fri, 07 Jun 2019 10:59:33 -0400
+
 xivo-confd (16.16~20161123.212314.24c5023) wazo-dev; urgency=medium
 
   * update distribution

@@ -1,14 +1,26 @@
 #!/bin/bash
-# postinst script for xivo-confd
+# postinst script for wazo-confd
 #
 # see: dh_installdeb(1)
 
-DAEMONNAME='xivo-confd'
-LOG_FILENAME='/var/log/xivo-confd.log'
+DAEMONNAME='wazo-confd'
+LOG_FILENAME='/var/log/wazo-confd.log'
 
 case "$1" in
     configure)
         previous_version="$2"
+
+        # move files from xivo-confd
+        rm -f /etc/nginx/locations/https-enabled/xivo-confd
+        if [ -f /var/log/xivo-confd.log ] ; then
+            rename 's/xivo-confd/wazo-confd/g' /var/log/xivo-confd.log*
+        fi
+        rm -rf /var/run/xivo-confd
+        if [ -d /etc/xivo-confd/conf.d ] ; then
+            find /etc/xivo-confd/conf.d/ -mindepth 1 -exec mv {} /etc/wazo-confd/conf.d/ \;
+            rmdir --ignore-fail-on-non-empty -p /etc/xivo-confd/conf.d
+        fi
+        # End of move files from xivo-confd
 
         if [ ! -e "$LOG_FILENAME" ]; then
             touch "$LOG_FILENAME"

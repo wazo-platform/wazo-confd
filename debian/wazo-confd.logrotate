@@ -1,4 +1,4 @@
-/var/log/xivo-confd.log {
+/var/log/wazo-confd.log {
     daily
     rotate 15
     compress

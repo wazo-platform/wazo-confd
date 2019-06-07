@@ -1,2 +1,2 @@
 etc/nginx/locations/https-enabled
-etc/xivo-confd/conf.d
+etc/wazo-confd/conf.d
