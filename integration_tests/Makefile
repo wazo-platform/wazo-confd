@@ -26,7 +26,7 @@ build-provd:
 	docker build -t wazopbx/xivo-provd $(PROVD_DIR)
 
 test:
-	nosetests
+	nosetests -x
 
 egg-info:
 	cd .. && python setup.py egg_info
