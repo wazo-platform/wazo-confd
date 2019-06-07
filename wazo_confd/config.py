@@ -15,10 +15,10 @@ DEFAULT_CONFIG = {
     'debug': False,
     'user': 'www-data',
     'log_level': 'info',
-    'config_file': '/etc/xivo-confd/config.yml',
-    'extra_config_files': '/etc/xivo-confd/conf.d/',
-    'log_filename': '/var/log/xivo-confd.log',
-    'pid_filename': '/var/run/xivo-confd/xivo-confd.pid',
+    'config_file': '/etc/wazo-confd/config.yml',
+    'extra_config_files': '/etc/wazo-confd/conf.d/',
+    'log_filename': '/var/log/wazo-confd.log',
+    'pid_filename': '/var/run/wazo-confd/wazo-confd.pid',
     'rest_api': {
         'profile': None,
         'listen': '0.0.0.0',
@@ -34,7 +34,7 @@ DEFAULT_CONFIG = {
         'host': 'localhost',
         'port': 9497,
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
-        'key_file': '/var/lib/wazo-auth-keys/xivo-confd-key.yml',
+        'key_file': '/var/lib/wazo-auth-keys/wazo-confd-key.yml',
     },
     'ari': {
         'host': 'localhost',
