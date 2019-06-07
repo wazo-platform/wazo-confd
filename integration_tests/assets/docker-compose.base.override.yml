@@ -14,7 +14,7 @@ services:
 
   confd:
     volumes:
-      - "./etc/xivo-confd/conf.d/ari.yml:/etc/xivo-confd/conf.d/ari.yml"
+      - "./etc/wazo-confd/conf.d/ari.yml:/etc/wazo-confd/conf.d/ari.yml"
 
   ari:
     image: p0bailey/docker-flask

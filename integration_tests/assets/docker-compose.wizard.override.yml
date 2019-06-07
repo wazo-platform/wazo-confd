@@ -17,5 +17,5 @@ services:
   confd:
     volumes:
       - "./etc/timezone:/etc/timezone"
-      - "./etc/xivo-confd/conf.d/wizard.yml:/etc/xivo-confd/conf.d/wizard.yml"
+      - "./etc/wazo-confd/conf.d/wizard.yml:/etc/wazo-confd/conf.d/wizard.yml"
     domainname: example.com

@@ -45,21 +45,21 @@ services:
     command: "python /tmp/sysconfd.py"
 
   confd:
-    image: xivo-confd-test
+    image: wazo-confd-test
     ports:
       - "9486"
-    command: "xivo-confd -d"
+    command: "wazo-confd -d"
     volumes:
-      - "../..:/usr/src/xivo-confd"
-      - "./etc/xivo-confd/conf.d/uuid.yml:/etc/xivo-confd/conf.d/uuid.yml"
-      - "./etc/xivo-confd/conf.d/debug.yml:/etc/xivo-confd/conf.d/debug.yml"
-      - "./etc/xivo-confd/conf.d/postgres.yml:/etc/xivo-confd/conf.d/postgres.yml"
-      - "./etc/xivo-confd/conf.d/auth.yml:/etc/xivo-confd/conf.d/auth.yml"
-      - "./etc/xivo-confd/conf.d/rabbitmq.yml:/etc/xivo-confd/conf.d/rabbitmq.yml"
-      - "./etc/xivo-confd/conf.d/provd.yml:/etc/xivo-confd/conf.d/provd.yml"
-      - "./etc/xivo-confd/conf.d/sysconfd.yml:/etc/xivo-confd/conf.d/sysconfd.yml"
-      - "./etc/xivo-confd/conf.d/disable_service_discovery.yml:/etc/xivo-confd/conf.d/disable_service_discovery.yml"
-      - "./keys/xivo-confd-key.yml:/var/lib/wazo-auth-keys/xivo-confd-key.yml"
+      - "../..:/usr/src/wazo-confd"
+      - "./etc/wazo-confd/conf.d/uuid.yml:/etc/wazo-confd/conf.d/uuid.yml"
+      - "./etc/wazo-confd/conf.d/debug.yml:/etc/wazo-confd/conf.d/debug.yml"
+      - "./etc/wazo-confd/conf.d/postgres.yml:/etc/wazo-confd/conf.d/postgres.yml"
+      - "./etc/wazo-confd/conf.d/auth.yml:/etc/wazo-confd/conf.d/auth.yml"
+      - "./etc/wazo-confd/conf.d/rabbitmq.yml:/etc/wazo-confd/conf.d/rabbitmq.yml"
+      - "./etc/wazo-confd/conf.d/provd.yml:/etc/wazo-confd/conf.d/provd.yml"
+      - "./etc/wazo-confd/conf.d/sysconfd.yml:/etc/wazo-confd/conf.d/sysconfd.yml"
+      - "./etc/wazo-confd/conf.d/disable_service_discovery.yml:/etc/wazo-confd/conf.d/disable_service_discovery.yml"
+      - "./keys/wazo-confd-key.yml:/var/lib/wazo-auth-keys/wazo-confd-key.yml"
 
       - "./etc/ssl:/usr/share/xivo-certs"
       # - "${LOCAL_GIT_REPOS}/wazo-auth-client/wazo_auth_client:/usr/local/lib/python3.5/site-packages/wazo_auth_client"

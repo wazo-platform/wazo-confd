@@ -16,8 +16,8 @@ test-setup: egg-info build-confd
 	docker pull swaggerapi/swagger-validator
 
 build-confd:
-	docker build -t wazopbx/xivo-confd ..
-	docker build --no-cache -t xivo-confd-test -f Dockerfile ..
+	docker build -t wazopbx/wazo-confd ..
+	docker build --no-cache -t wazo-confd-test -f Dockerfile ..
 
 update-db:
 	docker build --no-cache -t wazopbx/postgres-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
