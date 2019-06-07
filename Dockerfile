@@ -1,15 +1,13 @@
-## Image to build from sources
-
 FROM python:3.5-stretch
 MAINTAINER Wazo Maintainers <dev@wazo.community>
 
 # Configure environment
 RUN true && \
-    mkdir -p /etc/xivo-confd/conf.d && \
-    touch /var/log/xivo-confd.log && \
-    chown www-data /var/log/xivo-confd.log && \
-    mkdir -p /var/run/xivo-confd /var/lib/asterisk/moh && \
-    chown www-data /var/run/xivo-confd /var/lib/asterisk/moh && \
+    mkdir -p /etc/wazo-confd/conf.d && \
+    touch /var/log/wazo-confd.log && \
+    chown www-data /var/log/wazo-confd.log && \
+    mkdir -p /var/run/wazo-confd /var/lib/asterisk/moh && \
+    chown www-data /var/run/wazo-confd /var/lib/asterisk/moh && \
     true
 
 # Add certificates
@@ -18,15 +16,15 @@ WORKDIR /usr/share/xivo-certs
 RUN openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -config openssl.cfg -days 3650
 RUN chown -R www-data /usr/share/xivo-certs
 
-# Install xivo-confd
-ADD . /usr/src/xivo-confd
-WORKDIR /usr/src/xivo-confd
+# Install wazo-confd
+ADD . /usr/src/wazo-confd
+WORKDIR /usr/src/wazo-confd
 RUN true && \
     pip install -r requirements.txt && \
     python setup.py install && \
-    cp -av etc/xivo-confd /etc && \
+    cp -av etc/wazo-confd /etc && \
     true
 
 EXPOSE 9486
 
-CMD ["xivo-confd", "-d"]
+CMD ["wazo-confd", "-d"]
