@@ -1,12 +1,12 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
 
 from xivo_dao.alchemy.voicemail import Voicemail
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 from .schema import VoicemailSchema
 

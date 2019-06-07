@@ -6,8 +6,8 @@ from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Regexp, Range
 
 from xivo_dao.alchemy.schedule_time import ScheduleTime
-from xivo_confd.helpers.destination import DestinationField
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.destination import DestinationField
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 
 HOUR_REGEX = r"^([0,1][0-9]|2[0-3]):[0-5][0-9]$"

@@ -5,7 +5,7 @@ import logging
 
 from xivo_bus.resources.common.event import ArbitraryEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 logger = logging.getLogger(__name__)
 

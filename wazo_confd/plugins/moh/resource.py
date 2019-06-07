@@ -1,12 +1,12 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
 
 from xivo_dao.alchemy.moh import MOH
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
 from .schema import MohSchema, MohSchemaPUT
 

@@ -1,11 +1,11 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp
 
-from xivo_confd.plugins.user.schema import USERNAME_REGEX, PASSWORD_REGEX
-from xivo_confd.helpers.mallow import BaseSchema
+from wazo_confd.plugins.user.schema import USERNAME_REGEX, PASSWORD_REGEX
+from wazo_confd.helpers.mallow import BaseSchema
 
 
 class WazoUserSchema(BaseSchema):

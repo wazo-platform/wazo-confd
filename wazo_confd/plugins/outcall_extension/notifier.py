@@ -6,7 +6,7 @@ from xivo_bus.resources.outcall_extension.event import (
     OutcallExtensionDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class OutcallExtensionNotifier:

@@ -6,7 +6,7 @@ from xivo_bus.resources.group_schedule.event import (
     GroupScheduleDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class GroupScheduleNotifier:

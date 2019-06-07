@@ -7,9 +7,9 @@ from marshmallow.validate import Length, Range, Regexp
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.ivr_choice import IVRChoice
 
-from xivo_confd.helpers.destination import DestinationField
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-from xivo_confd.helpers.validator import EXTEN_REGEX
+from wazo_confd.helpers.destination import DestinationField
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.validator import EXTEN_REGEX
 
 
 class IvrChoiceSchema(BaseSchema):

@@ -3,7 +3,7 @@
 
 from xivo_dao.resources.configuration import dao as configuration_dao
 
-from xivo_confd.plugins.configuration.notifier import build_notifier
+from wazo_confd.plugins.configuration.notifier import build_notifier
 
 
 class LiveReloadService:

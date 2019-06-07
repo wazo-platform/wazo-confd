@@ -6,7 +6,7 @@ from xivo_bus.resources.incall_extension.event import (
     IncallExtensionDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class IncallExtensionNotifier:

@@ -4,7 +4,7 @@
 from xivo_dao.resources.line import dao as line_dao
 from wazo_provd_client import Client as ProvdClient
 
-from xivo_confd.plugins.device.builder import build_dao as build_device_dao, build_device_updater
+from wazo_confd.plugins.device.builder import build_dao as build_device_dao, build_device_updater
 
 from .resource import (
     LineDeviceAssociation,

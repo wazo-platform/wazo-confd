@@ -13,7 +13,7 @@ from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.parking_lot import dao as parking_lot_dao_module
 
 
-from xivo_confd.helpers.validator import (
+from wazo_confd.helpers.validator import (
     EXTEN_REGEX,
     EXTEN_OUTCALL_REGEX,
     BaseExtensionRangeMixin,

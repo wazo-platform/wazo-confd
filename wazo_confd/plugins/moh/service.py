@@ -1,9 +1,9 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.moh import dao as moh_dao
 
-from xivo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.resource import CRUDService
 from .notifier import build_notifier
 from .storage import build_storage
 from .validator import build_validator

@@ -38,7 +38,7 @@ class Controller:
         self.http_server = HTTPServer(config)
 
         plugin_helpers.load(
-            namespace='xivo_confd.plugins',
+            namespace='wazo_confd.plugins',
             names=config['enabled_plugins'],
             dependencies={
                 'api': api,

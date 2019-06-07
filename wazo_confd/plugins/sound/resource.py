@@ -4,8 +4,8 @@
 from flask import request, url_for
 from xivo.tenant_flask_helpers import Tenant
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
 from .model import SoundCategory, SoundFile, SoundFormat
 from .schema import SoundSchema, SoundQueryParametersSchema

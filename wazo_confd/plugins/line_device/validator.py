@@ -6,7 +6,7 @@ from xivo_dao.resources.line import dao as line_dao_module
 from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.user_line import dao as user_line_dao_module
 
-from xivo_confd.helpers.validator import (
+from wazo_confd.helpers.validator import (
     ValidationAssociation,
     Validator,
     ValidatorAssociation,

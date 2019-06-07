@@ -7,7 +7,7 @@ from xivo_bus.resources.call_pickup.event import (
     EditCallPickupEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class CallPickupNotifier:

@@ -7,7 +7,7 @@ from xivo_bus.resources.conference.event import (
     EditConferenceEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ConferenceNotifier:

@@ -1,8 +1,8 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.asterisk import AsteriskConfigurationList
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.asterisk import AsteriskConfigurationList
 
 
 class HEPGeneralList(AsteriskConfigurationList):

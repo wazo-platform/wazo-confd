@@ -7,7 +7,7 @@ from xivo_bus.resources.queue.event import (
     DeleteQueueEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class QueueNotifier:

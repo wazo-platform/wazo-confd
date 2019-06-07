@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.queue_general.event import EditQueueGeneralEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class QueueGeneralNotifier:

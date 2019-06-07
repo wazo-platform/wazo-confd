@@ -7,7 +7,7 @@ from xivo_dao.helpers import errors
 
 from wazo_provd_client.exceptions import ProvdError
 
-from xivo_confd.plugins.device.model import Device
+from wazo_confd.plugins.device.model import Device
 
 logger = logging.getLogger(__name__)
 

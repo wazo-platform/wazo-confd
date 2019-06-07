@@ -5,7 +5,7 @@ from marshmallow import fields, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import OneOf
 
-from xivo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema
 
 
 class HASchema(BaseSchema):

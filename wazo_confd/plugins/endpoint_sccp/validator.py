@@ -1,7 +1,7 @@
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_confd.helpers.validator import ValidationGroup
+from wazo_confd.helpers.validator import ValidationGroup
 
 
 def build_validator():

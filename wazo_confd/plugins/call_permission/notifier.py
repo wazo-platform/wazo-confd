@@ -7,7 +7,7 @@ from xivo_bus.resources.call_permission.event import (
     EditCallPermissionEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class CallPermissionNotifier:

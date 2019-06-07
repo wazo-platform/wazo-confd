@@ -24,7 +24,7 @@ from .helpers.converter import FilenameConverter
 from .helpers.restful import auth_verifier
 
 logger = logging.getLogger(__name__)
-app = Flask('xivo_confd')
+app = Flask('wazo_confd')
 api = Api(app, prefix="/1.1")
 _do_not_log_data_endpoints = []
 

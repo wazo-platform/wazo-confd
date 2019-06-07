@@ -4,7 +4,7 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao_module
 
-from xivo_confd.helpers.validator import (
+from wazo_confd.helpers.validator import (
     BaseExtensionRangeMixin,
     ValidatorAssociation,
     ValidationAssociation,

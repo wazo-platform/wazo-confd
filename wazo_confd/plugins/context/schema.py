@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load
@@ -6,7 +6,7 @@ from marshmallow.validate import Length, Range, Predicate, OneOf
 
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
 
 class RangeSchema(BaseSchema):

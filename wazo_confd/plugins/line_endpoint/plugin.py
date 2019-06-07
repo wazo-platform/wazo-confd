@@ -8,9 +8,9 @@ from xivo_dao.resources.line import dao as line_dao
 
 from wazo_provd_client import Client as ProvdClient
 
-from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
-from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
-from xivo_confd.plugins.endpoint_custom.service import build_service as build_custom_service
+from wazo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
+from wazo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
+from wazo_confd.plugins.endpoint_custom.service import build_service as build_custom_service
 
 from .resource import (
     LineEndpointAssociationSip,

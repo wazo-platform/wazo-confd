@@ -7,7 +7,7 @@ from xivo_bus.resources.device.event import (
     EditDeviceEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class DeviceNotifier:

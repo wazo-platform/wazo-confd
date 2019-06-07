@@ -10,7 +10,7 @@ from xivo.tenant_flask_helpers import get_auth_client, get_token, Tenant
 from xivo_dao import tenant_dao
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.common import handle_api_exception
+from wazo_confd.helpers.common import handle_api_exception
 
 auth_verifier = AuthVerifier()
 

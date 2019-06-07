@@ -4,9 +4,9 @@
 from flask import request, url_for
 from xivo.tenant_flask_helpers import Tenant
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
-from xivo_confd.plugins.device.model import Device
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
+from wazo_confd.plugins.device.model import Device
 from xivo_dao.helpers import errors
 
 from .schema import DeviceSchema

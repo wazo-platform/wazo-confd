@@ -7,7 +7,7 @@ from xivo_bus.resources.ivr.event import (
     EditIvrEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class IvrNotifier:

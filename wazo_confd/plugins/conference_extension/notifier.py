@@ -6,7 +6,7 @@ from xivo_bus.resources.conference_extension.event import (
     ConferenceExtensionDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ConferenceExtensionNotifier:

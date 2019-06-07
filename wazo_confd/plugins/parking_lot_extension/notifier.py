@@ -6,7 +6,7 @@ from xivo_bus.resources.parking_lot_extension.event import (
     ParkingLotExtensionDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ParkingLotExtensionNotifier:

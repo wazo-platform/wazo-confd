@@ -13,7 +13,7 @@ from xivo_bus.resources.line_device.event import (
 )
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
-from xivo_confd.plugins.device.model import Device
+from wazo_confd.plugins.device.model import Device
 
 from ..notifier import LineDeviceNotifier
 

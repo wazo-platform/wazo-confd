@@ -9,7 +9,7 @@ from xivo_bus.resources.user.event import (
     EditUserServiceEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class UserNotifier:

@@ -7,7 +7,7 @@ from xivo_bus.resources.outcall.event import (
     EditOutcallEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class OutcallNotifier:

@@ -6,7 +6,7 @@ from xivo_bus.resources.group_extension.event import (
     GroupExtensionDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class GroupExtensionNotifier:

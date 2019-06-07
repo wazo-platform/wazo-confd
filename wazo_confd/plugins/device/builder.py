@@ -8,13 +8,13 @@ from xivo_dao.resources.line_extension import dao as line_extension_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 
-from xivo_confd import bus, sysconfd
-from xivo_confd.database import (
+from wazo_confd import bus, sysconfd
+from wazo_confd.database import (
     device as device_db,
     func_key_template as func_key_template_db,
 )
-from xivo_confd.plugins.device.funckey import build_converters
-from xivo_confd.plugins.device.generators import (
+from wazo_confd.plugins.device.funckey import build_converters
+from wazo_confd.plugins.device.generators import (
     ConfigGenerator,
     ExtensionGenerator,
     FuncKeyGenerator,
@@ -23,18 +23,18 @@ from xivo_confd.plugins.device.generators import (
     SipGenerator,
     UserGenerator,
 )
-from xivo_confd.plugins.device.service import (
+from wazo_confd.plugins.device.service import (
     DeviceService,
     SearchEngine,
 )
-from xivo_confd.plugins.device.update import (
+from wazo_confd.plugins.device.update import (
     DeviceUpdater,
     ProvdUpdater,
 )
 
-from xivo_confd.plugins.line_device.service import LineDeviceService
-from xivo_confd.plugins.line_device.validator import build_validator as build_line_device_validator
-from xivo_confd.plugins.line_device.notifier import LineDeviceNotifier
+from wazo_confd.plugins.line_device.service import LineDeviceService
+from wazo_confd.plugins.line_device.validator import build_validator as build_line_device_validator
+from wazo_confd.plugins.line_device.notifier import LineDeviceNotifier
 
 from .dao import DeviceDao
 from .notifier import DeviceNotifier

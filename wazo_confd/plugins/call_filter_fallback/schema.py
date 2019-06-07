@@ -4,8 +4,8 @@
 from marshmallow import post_load
 
 from xivo_dao.alchemy.dialaction import Dialaction
-from xivo_confd.helpers.mallow import BaseSchema
-from xivo_confd.helpers.destination import DestinationField
+from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.destination import DestinationField
 
 
 class CallFilterFallbackSchema(BaseSchema):

@@ -7,7 +7,7 @@ from xivo_bus.resources.skill.event import (
     EditSkillEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class SkillNotifier:

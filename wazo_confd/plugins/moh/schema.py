@@ -1,10 +1,10 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, OneOf
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, AsteriskSection
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, AsteriskSection
 
 # the regex is more restrictive since the name is used both for the Asterisk
 # section and the directory on the file system

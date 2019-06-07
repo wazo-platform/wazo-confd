@@ -6,7 +6,7 @@ from xivo_bus.resources.group_call_permission.event import (
     GroupCallPermissionDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class GroupCallPermissionNotifier:

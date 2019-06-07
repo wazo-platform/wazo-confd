@@ -6,7 +6,7 @@ from xivo_bus.resources.outcall_schedule.event import (
     OutcallScheduleDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class OutcallScheduleNotifier:

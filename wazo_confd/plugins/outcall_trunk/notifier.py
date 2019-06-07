@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.outcall_trunk.event import OutcallTrunksAssociatedEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class OutcallTrunkNotifier:

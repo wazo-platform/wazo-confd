@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.call_filter.event import EditCallFilterFallbackEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class CallFilterFallbackNotifier:

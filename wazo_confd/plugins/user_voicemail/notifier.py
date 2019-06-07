@@ -5,7 +5,7 @@ from xivo_bus.resources.user_voicemail.event import (
     UserVoicemailAssociatedEvent,
     UserVoicemailDissociatedEvent,
 )
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class UserVoicemailNotifier:

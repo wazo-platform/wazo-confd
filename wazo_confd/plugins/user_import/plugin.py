@@ -17,22 +17,22 @@ from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 from wazo_provd_client import Client as ProvdClient
 
-from xivo_confd.database import user_export as user_export_dao
-from xivo_confd.plugins.call_permission.service import build_service as build_call_permission_service
-from xivo_confd.plugins.context.service import build_service as build_context_service
-from xivo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
-from xivo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
-from xivo_confd.plugins.extension.service import build_service as build_extension_service
-from xivo_confd.plugins.incall.service import build_service as build_incall_service
-from xivo_confd.plugins.incall_extension.service import build_service as build_incall_extension_service
-from xivo_confd.plugins.line.service import build_service as build_line_service
-from xivo_confd.plugins.line_endpoint.service import build_service as build_le_service
-from xivo_confd.plugins.line_extension.service import build_service as build_line_extension_service
-from xivo_confd.plugins.user.service import build_service as build_user_service
-from xivo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
-from xivo_confd.plugins.user_line.service import build_service as build_ul_service
-from xivo_confd.plugins.user_voicemail.service import build_service as build_uv_service
-from xivo_confd.plugins.voicemail.service import build_service as build_voicemail_service
+from wazo_confd.database import user_export as user_export_dao
+from wazo_confd.plugins.call_permission.service import build_service as build_call_permission_service
+from wazo_confd.plugins.context.service import build_service as build_context_service
+from wazo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
+from wazo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
+from wazo_confd.plugins.extension.service import build_service as build_extension_service
+from wazo_confd.plugins.incall.service import build_service as build_incall_service
+from wazo_confd.plugins.incall_extension.service import build_service as build_incall_extension_service
+from wazo_confd.plugins.line.service import build_service as build_line_service
+from wazo_confd.plugins.line_endpoint.service import build_service as build_le_service
+from wazo_confd.plugins.line_extension.service import build_service as build_line_extension_service
+from wazo_confd.plugins.user.service import build_service as build_user_service
+from wazo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
+from wazo_confd.plugins.user_line.service import build_service as build_ul_service
+from wazo_confd.plugins.user_voicemail.service import build_service as build_uv_service
+from wazo_confd.plugins.voicemail.service import build_service as build_voicemail_service
 
 from .associators import (
     CallPermissionAssociator,

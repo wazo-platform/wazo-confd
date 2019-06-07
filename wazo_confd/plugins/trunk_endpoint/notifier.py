@@ -6,7 +6,7 @@ from xivo_bus.resources.trunk_endpoint.event import (
     TrunkEndpointDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class TrunkEndpointNotifier:

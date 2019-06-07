@@ -4,10 +4,10 @@
 from xivo.tenant_flask_helpers import Tenant
 from xivo_dao.helpers.db_manager import Session
 
-from xivo_confd import sysconfd, bus
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.representations.csv_ import output_csv
+from wazo_confd import sysconfd, bus
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.representations.csv_ import output_csv
 
 from . import csvparse
 from .auth_client import auth_client

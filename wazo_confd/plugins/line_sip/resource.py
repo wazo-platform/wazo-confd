@@ -5,10 +5,10 @@ from flask import url_for
 from marshmallow import fields
 from marshmallow.validate import Length, Predicate, Range, Regexp
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_confd.plugins.line_sip.model import LineSip
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.plugins.line_sip.model import LineSip
 
 
 USERNAME_REGEX = r'^[a-zA-Z0-9]+$'

@@ -7,7 +7,7 @@ from xivo_bus.resources.incall.event import (
     EditIncallEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class IncallNotifier:

@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.queue.event import EditQueueFallbackEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class QueueFallbackNotifier:

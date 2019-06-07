@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.common.event import ArbitraryEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 from .schema import SwitchboardSchema
 

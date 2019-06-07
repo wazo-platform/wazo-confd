@@ -4,10 +4,10 @@
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.line import dao as line_dao_module
 
-from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.device import builder as device_builder
-from xivo_confd.plugins.line_device.service import build_service as line_device_build_service
-from xivo_confd.plugins.user_line.service import build_service as user_line_build_service
+from wazo_confd.helpers.resource import CRUDService
+from wazo_confd.plugins.device import builder as device_builder
+from wazo_confd.plugins.line_device.service import build_service as line_device_build_service
+from wazo_confd.plugins.user_line.service import build_service as user_line_build_service
 
 from .notifier import build_notifier
 from .validator import build_validator

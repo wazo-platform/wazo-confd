@@ -1,4 +1,4 @@
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -7,7 +7,7 @@ from mock import Mock, sentinel
 
 from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
-from xivo_confd.helpers.validator import (GetResource,
+from wazo_confd.helpers.validator import (GetResource,
                                           MemberOfSequence,
                                           Optional,
                                           ResourceExists,

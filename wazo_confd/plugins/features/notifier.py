@@ -7,7 +7,7 @@ from xivo_bus.resources.features.event import (
     EditFeaturesGeneralEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class FeaturesConfigurationNotifier:

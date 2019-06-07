@@ -6,7 +6,7 @@ import unittest
 from hamcrest import assert_that, calling, equal_to, raises
 from werkzeug.routing import ValidationError
 
-from xivo_confd.helpers.converter import FilenameConverter
+from wazo_confd.helpers.converter import FilenameConverter
 
 
 class TestFilenameConverter(unittest.TestCase):

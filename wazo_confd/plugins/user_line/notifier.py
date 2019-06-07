@@ -6,9 +6,9 @@ from xivo_bus.resources.user_line.event import (
     UserLineDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
-from xivo_confd.plugins.line.schema import LineSchema
-from xivo_confd.plugins.user.schema import UserSchema
+from wazo_confd import bus, sysconfd
+from wazo_confd.plugins.line.schema import LineSchema
+from wazo_confd.plugins.user.schema import UserSchema
 
 USER_FIELDS = [
     'id',

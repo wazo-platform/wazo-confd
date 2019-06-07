@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask_restful import abort
-from xivo_confd.database import wizard as wizard_db
+from wazo_confd.database import wizard as wizard_db
 
 
 def xivo_unconfigured(func):

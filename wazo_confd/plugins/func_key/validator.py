@@ -13,7 +13,7 @@ from xivo_dao.resources.paging import dao as paging_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.helpers.validator import (
+from wazo_confd.helpers.validator import (
     Validator,
     GetResource,
     ResourceExists,

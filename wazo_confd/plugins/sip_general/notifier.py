@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.sip_general.event import EditSIPGeneralEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class SIPGeneralNotifier:

@@ -6,7 +6,7 @@ from xivo_bus.resources.paging_user.event import (
     PagingCallerUsersAssociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class PagingUserNotifier:

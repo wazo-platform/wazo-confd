@@ -21,8 +21,8 @@ from xivo_dao.resources.switchboard import dao as switchboard_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
-from xivo_confd.helpers.mallow import StrictBoolean
-from xivo_confd.helpers.validator import GetResource, ResourceExists, Validator
+from wazo_confd.helpers.mallow import StrictBoolean
+from wazo_confd.helpers.validator import GetResource, ResourceExists, Validator
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
 CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,39}$'

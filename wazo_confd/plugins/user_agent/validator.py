@@ -3,7 +3,7 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
+from wazo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 
 
 class UserAgentAssociationValidator(ValidatorAssociation):

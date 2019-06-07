@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.wizard.event import CreateWizardEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class WizardNotifier:

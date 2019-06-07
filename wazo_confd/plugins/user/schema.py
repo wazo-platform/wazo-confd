@@ -4,8 +4,8 @@
 from marshmallow import fields
 from marshmallow.validate import Length, Range, Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
-from xivo_confd.helpers.validator import LANGUAGE_REGEX
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'

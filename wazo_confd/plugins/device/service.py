@@ -4,7 +4,7 @@
 from xivo_dao.resources.utils.search import SearchResult
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.resource import CRUDService
 from xivo_dao.helpers.db_manager import Session
 
 

@@ -9,8 +9,8 @@ from marshmallow.validate import Length
 from xivo_dao.alchemy.asterisk_file_variable import AsteriskFileVariable
 from xivo_dao.helpers import errors
 
-from xivo_confd.helpers.mallow import BaseSchema
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class AsteriskOptionSchema(BaseSchema):

@@ -6,7 +6,7 @@ from xivo_bus.resources.sound.event import (
     DeleteSoundEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class SoundNotifier:

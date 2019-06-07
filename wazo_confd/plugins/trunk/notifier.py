@@ -7,7 +7,7 @@ from xivo_bus.resources.trunk.event import (
     EditTrunkEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class TrunkNotifier:

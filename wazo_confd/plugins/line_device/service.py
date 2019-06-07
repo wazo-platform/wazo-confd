@@ -4,7 +4,7 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.line import dao as line_dao_module
 
-from xivo_confd.database import device as device_db
+from wazo_confd.database import device as device_db
 
 from .notifier import build_notifier
 from .validator import build_validator

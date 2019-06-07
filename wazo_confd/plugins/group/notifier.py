@@ -7,7 +7,7 @@ from xivo_bus.resources.group.event import (
     DeleteGroupEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class GroupNotifier:

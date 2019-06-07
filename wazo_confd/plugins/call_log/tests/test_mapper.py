@@ -1,11 +1,11 @@
-# Copyright 2012-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from datetime import datetime
 from hamcrest import assert_that, has_entries, has_entry
 from mock import Mock
 from unittest import TestCase
-from xivo_confd.plugins.call_log import mapper
+from wazo_confd.plugins.call_log import mapper
 
 
 class TestCallLogsMapper(TestCase):

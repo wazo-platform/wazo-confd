@@ -7,7 +7,7 @@ from xivo_bus.resources.endpoint_sip.event import (
     EditSipEndpointEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class SipEndpointNotifier:

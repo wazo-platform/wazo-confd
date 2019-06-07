@@ -6,7 +6,7 @@ from xivo_bus.resources.user_call_permission.event import (
     UserCallPermissionDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class UserCallPermissionNotifier:

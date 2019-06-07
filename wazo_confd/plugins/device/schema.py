@@ -4,7 +4,7 @@
 from marshmallow import fields
 from marshmallow.validate import Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
 
 IP_REGEX = r'(1?\d{1,2}|2([0-4][0-9]|5[0-5]))(\.(1?\d{1,2}|2([0-4][0-9]|5[0-5]))){3}$'

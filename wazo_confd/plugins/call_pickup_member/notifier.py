@@ -8,7 +8,7 @@ from xivo_bus.resources.call_pickup_member.event import (
     CallPickupTargetUsersAssociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class CallPickupMemberNotifier:

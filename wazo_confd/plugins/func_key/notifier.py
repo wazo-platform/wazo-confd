@@ -7,8 +7,8 @@ from xivo_bus.resources.func_key.event import (
     EditFuncKeyTemplateEvent,
 )
 
-from xivo_confd import bus, sysconfd
-from xivo_confd.database import device as device_db_module
+from wazo_confd import bus, sysconfd
+from wazo_confd.database import device as device_db_module
 
 
 class FuncKeyTemplateNotifier:

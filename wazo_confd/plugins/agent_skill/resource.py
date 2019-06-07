@@ -7,9 +7,9 @@ from marshmallow.validate import Range
 
 from xivo_dao.alchemy.agentqueueskill import AgentQueueSkill
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.helpers.mallow import BaseSchema
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.helpers.mallow import BaseSchema
 
 
 class AgentSkillSchema(BaseSchema):

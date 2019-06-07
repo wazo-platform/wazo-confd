@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.voicemail_zonemessages.event import EditVoicemailZoneMessagesEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class VoicemailZoneMessagesNotifier:

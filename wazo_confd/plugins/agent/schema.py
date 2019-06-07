@@ -4,7 +4,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 NUMBER_REGEX = r"^[0-9\*#]{1,40}$"
 

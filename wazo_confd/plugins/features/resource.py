@@ -10,9 +10,9 @@ from marshmallow.exceptions import ValidationError
 from xivo_dao.alchemy.features import Features
 from xivo_dao.resources.features.search import PARKING_OPTIONS, FUNC_KEY_FEATUREMAP_FOREIGN_KEY
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 PARKING_ERROR = "The parking options can only be defined with the parkinglots API"
 

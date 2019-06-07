@@ -1,10 +1,10 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import OneOf, Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
 NAME_REGEX = r'^[a-z0-9_-]{1,128}$'
 PASSWORD_REGEX = r'^[0-9#\*]{1,40}$'

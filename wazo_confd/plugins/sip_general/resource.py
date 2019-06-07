@@ -8,9 +8,9 @@ from marshmallow.validate import Length, NoneOf
 
 from xivo_dao.alchemy.staticsip import StaticSIP
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 REGISTER_ERROR = "The 'register' key can only be defined in trunk options"
 

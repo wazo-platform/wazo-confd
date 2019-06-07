@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.user_group.event import UserGroupsAssociatedEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class UserGroupNotifier:

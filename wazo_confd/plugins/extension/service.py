@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -6,8 +6,8 @@ import logging
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.extension import dao as extension_dao_module
 
-from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.plugins.device import builder as device_builder
+from wazo_confd.helpers.resource import CRUDService
+from wazo_confd.plugins.device import builder as device_builder
 
 from .notifier import build_notifier
 from .validator import build_validator

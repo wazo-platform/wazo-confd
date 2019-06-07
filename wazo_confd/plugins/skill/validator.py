@@ -3,7 +3,7 @@
 
 from xivo_dao.resources.skill import dao as skill_dao
 
-from xivo_confd.helpers.validator import (
+from wazo_confd.helpers.validator import (
     UniqueField,
     UniqueFieldChanged,
     ValidationGroup,

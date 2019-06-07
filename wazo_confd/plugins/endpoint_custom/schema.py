@@ -1,10 +1,10 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
 INTERFACE_REGEX = r"^[a-zA-Z0-9#*./_@:-]{1,128}$"
 

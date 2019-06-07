@@ -10,9 +10,9 @@ from marshmallow.validate import Range, Regexp
 
 from xivo_dao.alchemy.staticiax import StaticIAX
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
-from xivo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 REGISTER_REGEX = re.compile(
     r'''^

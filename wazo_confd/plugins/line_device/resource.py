@@ -8,9 +8,9 @@ from requests.exceptions import HTTPError
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class LineDeviceSchema(BaseSchema):

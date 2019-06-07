@@ -6,7 +6,7 @@ from xivo_bus.resources.call_filter_user.event import (
     CallFilterSurrogateUsersAssociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class CallFilterUserNotifier:

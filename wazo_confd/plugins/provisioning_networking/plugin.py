@@ -1,7 +1,7 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 from .notifier import ProvisioningNetworkingNotifier
 from .resource import ProvisioningNetworkingResource

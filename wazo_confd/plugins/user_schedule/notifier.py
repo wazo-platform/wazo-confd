@@ -6,7 +6,7 @@ from xivo_bus.resources.user_schedule.event import (
     UserScheduleDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class UserScheduleNotifier:

@@ -7,7 +7,7 @@ from xivo_bus.resources.schedule.event import (
     EditScheduleEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class ScheduleNotifier:

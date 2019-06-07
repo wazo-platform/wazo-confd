@@ -7,7 +7,7 @@ from xivo_bus.resources.context.event import (
     EditContextEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 from .schema import ContextSchema
 

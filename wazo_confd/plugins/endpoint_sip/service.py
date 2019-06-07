@@ -1,10 +1,10 @@
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao_module
 
-from xivo_confd.plugins.device import builder as device_builder
-from xivo_confd.helpers.resource import CRUDService
+from wazo_confd.plugins.device import builder as device_builder
+from wazo_confd.helpers.resource import CRUDService
 
 from .notifier import build_notifier
 from .validator import build_validator

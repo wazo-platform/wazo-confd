@@ -7,7 +7,7 @@ from xivo_bus.resources.endpoint_custom.event import (
     EditCustomEndpointEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class CustomEndpointNotifier:

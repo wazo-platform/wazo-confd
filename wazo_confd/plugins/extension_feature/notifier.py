@@ -5,7 +5,7 @@ from xivo_bus.resources.extension_feature.event import (
     EditExtensionFeatureEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ExtensionFeatureNotifier:

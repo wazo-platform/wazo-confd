@@ -3,7 +3,7 @@
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.plugins.line.service import build_service as build_line_service
+from wazo_confd.plugins.line.service import build_service as build_line_service
 
 from .validator import build_validator
 

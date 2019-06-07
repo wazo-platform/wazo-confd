@@ -1,13 +1,13 @@
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ListResource, ItemResource
-from xivo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
 
 
 class LineList(ListResource):

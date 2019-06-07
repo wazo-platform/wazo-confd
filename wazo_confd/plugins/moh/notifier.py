@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.common.event import ArbitraryEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class MohNotifier:

@@ -1,4 +1,4 @@
-# Copyright (C) 2015 Avencall
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -7,7 +7,7 @@ from mock import Mock
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.helpers.exception import ResourceError
 
-from xivo_confd.plugins.line.validator import ProvCodeAvailable, ProvCodeChanged
+from wazo_confd.plugins.line.validator import ProvCodeAvailable, ProvCodeChanged
 
 
 class TestProvCodeAvailble(unittest.TestCase):

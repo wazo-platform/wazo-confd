@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.iax_callnumberlimits.event import EditIAXCallNumberLimitsEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class IAXCallNumberLimitsNotifier:

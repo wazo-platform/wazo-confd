@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -7,8 +7,8 @@ from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMemb
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource
 
 from .schema import (
     CallFilterRecipientUsersSchema,

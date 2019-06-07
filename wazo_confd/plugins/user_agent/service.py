@@ -3,8 +3,8 @@
 
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.plugins.user_agent.notifier import build_notifier
-from xivo_confd.plugins.user_agent.validator import build_validator
+from wazo_confd.plugins.user_agent.notifier import build_notifier
+from wazo_confd.plugins.user_agent.validator import build_validator
 
 
 class UserAgentService:

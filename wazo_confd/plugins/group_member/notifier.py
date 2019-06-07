@@ -6,7 +6,7 @@ from xivo_bus.resources.group_member.event import (
     GroupMemberExtensionsAssociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class GroupMemberNotifier:

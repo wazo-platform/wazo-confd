@@ -6,8 +6,8 @@ from flask import url_for, request
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.incall import Incall
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 from .schema import IncallSchema
 

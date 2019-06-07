@@ -15,10 +15,10 @@ from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.extension import dao as extension_dao
 
-from xivo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
-from xivo_confd.plugins.extension.schema import ExtensionSchema
-from xivo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
-from xivo_confd.plugins.voicemail.schema import VoicemailSchema
+from wazo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
+from wazo_confd.plugins.extension.schema import ExtensionSchema
+from wazo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
+from wazo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from .wazo_user_schema import WazoUserSchema
 

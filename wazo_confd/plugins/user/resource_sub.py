@@ -5,9 +5,9 @@ from flask import request
 from marshmallow import fields, pre_dump, post_load
 from marshmallow.validate import Length
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class UserSubResource(ConfdResource):

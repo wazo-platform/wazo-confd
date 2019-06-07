@@ -3,7 +3,7 @@
 
 import requests
 
-from xivo_confd.config import API_VERSION
+from wazo_confd.config import API_VERSION
 
 
 # this function is not executed from the main thread

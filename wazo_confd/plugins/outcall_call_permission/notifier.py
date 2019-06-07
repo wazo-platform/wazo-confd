@@ -6,7 +6,7 @@ from xivo_bus.resources.outcall_call_permission.event import (
     OutcallCallPermissionDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class OutcallCallPermissionNotifier:

@@ -5,7 +5,7 @@ from xivo_bus.resources.line_extension.event import (
     LineExtensionAssociatedEvent,
     LineExtensionDissociatedEvent,
 )
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class LineExtensionNotifier:

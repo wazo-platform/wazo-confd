@@ -1,11 +1,11 @@
-# Copyright 2013-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao
 
-from xivo_confd.helpers.resource import CRUDService
-from xivo_confd.helpers.validator import ValidationGroup
-from xivo_confd.plugins.device.builder import build_device_updater
+from wazo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.validator import ValidationGroup
+from wazo_confd.plugins.device.builder import build_device_updater
 
 from .validator import build_validator, build_validator_forward
 from .notifier import build_notifier, build_notifier_service, build_notifier_forward

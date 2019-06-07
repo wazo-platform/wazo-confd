@@ -7,7 +7,7 @@ from xivo_bus.resources.paging.event import (
     EditPagingEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class PagingNotifier:

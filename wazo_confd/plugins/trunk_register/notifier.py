@@ -8,7 +8,7 @@ from xivo_bus.resources.trunk_register.event import (
     TrunkRegisterSIPDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class TrunkRegisterIAXNotifier:

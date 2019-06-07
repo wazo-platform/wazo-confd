@@ -3,7 +3,7 @@
 
 from marshmallow import fields
 
-from xivo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema
 
 
 class ProvisioningNetworkingSchema(BaseSchema):

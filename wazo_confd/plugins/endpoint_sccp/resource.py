@@ -1,4 +1,4 @@
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -7,9 +7,9 @@ from marshmallow.validate import Length
 
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
-from xivo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 
 class SccpSchema(BaseSchema):

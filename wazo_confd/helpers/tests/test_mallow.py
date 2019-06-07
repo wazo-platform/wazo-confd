@@ -1,4 +1,4 @@
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,7 +6,7 @@ import unittest
 from mock import Mock
 from hamcrest import assert_that, calling, equal_to, raises
 from marshmallow import ValidationError, fields
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, AsteriskSection
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, AsteriskSection
 
 
 class TestStrictBolean(unittest.TestCase):

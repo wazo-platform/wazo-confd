@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -8,12 +8,12 @@ from xivo_dao.resources.sip_general import dao as sip_general_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.resources.voicemail import dao as voicemail_dao_module
 
-from xivo_confd.helpers.validator import (
+from wazo_confd.helpers.validator import (
     UniqueField,
     Validator,
     ValidationGroup,
 )
-from xivo_confd.database import agent_status_login as agent_login_status_dao_module
+from wazo_confd.database import agent_status_login as agent_login_status_dao_module
 
 
 class ContextDeleteValidator(Validator):

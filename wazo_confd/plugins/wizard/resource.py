@@ -5,8 +5,8 @@ from flask import request
 from marshmallow import fields
 from marshmallow.validate import Equal, Regexp, Length, OneOf
 
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean
-from xivo_confd.helpers.restful import ErrorCatchingResource
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from wazo_confd.helpers.restful import ErrorCatchingResource
 from .access_restriction import xivo_unconfigured
 
 ADMIN_PASSWORD_REGEX = r'^[a-zA-Z0-9\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'

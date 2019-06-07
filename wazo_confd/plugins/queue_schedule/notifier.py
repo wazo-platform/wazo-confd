@@ -6,7 +6,7 @@ from xivo_bus.resources.queue_schedule.event import (
     QueueScheduleDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class QueueScheduleNotifier:

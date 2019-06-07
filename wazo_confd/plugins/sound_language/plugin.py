@@ -1,7 +1,7 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_confd.helpers.ari import Client as ARIClient
+from wazo_confd.helpers.ari import Client as ARIClient
 
 from .resource import SoundLanguageList
 from .service import build_service

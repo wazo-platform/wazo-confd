@@ -1,11 +1,11 @@
-# Copyright (C) 2012-2016 Avencall
+# Copyright 2012-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to
 import textwrap
 from unittest import TestCase
-from xivo_confd.plugins.call_log import serializer
-from xivo_confd.plugins.call_log.serializer import CSV_HEADERS
+from wazo_confd.plugins.call_log import serializer
+from wazo_confd.plugins.call_log.serializer import CSV_HEADERS
 
 
 class TestCallLogsSerializer(TestCase):

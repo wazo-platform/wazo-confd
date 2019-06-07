@@ -6,7 +6,7 @@ from xivo_bus.resources.agent_skill.event import (
     AgentSkillDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class AgentSkillNotifier:

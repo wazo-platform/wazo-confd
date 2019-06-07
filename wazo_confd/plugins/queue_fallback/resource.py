@@ -3,8 +3,8 @@
 
 from flask import request
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource
 
 from .schema import QueueFallbackSchema
 

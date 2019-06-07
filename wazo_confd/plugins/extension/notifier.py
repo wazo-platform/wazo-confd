@@ -7,7 +7,7 @@ from xivo_bus.resources.extension.event import (
     EditExtensionEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ExtensionNotifier:

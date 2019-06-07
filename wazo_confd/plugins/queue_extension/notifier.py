@@ -6,7 +6,7 @@ from xivo_bus.resources.queue_extension.event import (
     QueueExtensionDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class QueueExtensionNotifier:

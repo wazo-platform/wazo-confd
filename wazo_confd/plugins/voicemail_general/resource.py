@@ -8,9 +8,9 @@ from marshmallow.validate import Length
 
 from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class VoicemailGeneralOption(BaseSchema):

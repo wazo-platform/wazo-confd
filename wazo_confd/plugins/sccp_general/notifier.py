@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.sccp_general.event import EditSCCPGeneralEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class SCCPGeneralNotifier:

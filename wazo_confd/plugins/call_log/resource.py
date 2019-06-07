@@ -6,9 +6,9 @@ from marshmallow import fields, validates_schema
 
 from xivo_dao.helpers import errors
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema
-from xivo_confd.helpers.restful import ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class PeriodSchema(BaseSchema):

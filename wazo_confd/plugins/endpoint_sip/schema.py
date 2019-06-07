@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -7,7 +7,7 @@ import string
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp, OneOf
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 USERNAME_REGEX = r"^[a-zA-Z0-9_-]{1,40}$"
 SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))

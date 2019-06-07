@@ -7,7 +7,7 @@ from xivo_bus.resources.application.event import (
     EditApplicationEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class ApplicationNotifier:

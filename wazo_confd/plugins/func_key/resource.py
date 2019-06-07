@@ -23,8 +23,8 @@ from xivo_dao.alchemy.func_key_dest_user import FuncKeyDestUser
 from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping
 from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
 
 from .schema import (
     FuncKeyDestinationField,

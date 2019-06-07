@@ -5,8 +5,8 @@ from flask import url_for
 
 from xivo_dao.alchemy.queueskill import QueueSkill
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 from .schema import SkillSchema
 

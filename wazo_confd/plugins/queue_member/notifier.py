@@ -8,7 +8,7 @@ from xivo_bus.resources.queue_member.event import (
     QueueMemberUserDissociatedEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class QueueMemberNotifier:

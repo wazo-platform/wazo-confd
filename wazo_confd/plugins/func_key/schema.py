@@ -6,7 +6,7 @@ from marshmallow import Schema, fields, validates, post_dump
 from marshmallow.validate import OneOf, Regexp, Range, Length
 from marshmallow.exceptions import ValidationError
 
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
 EXTEN_REGEX = r'[A-Z0-9+*]+'
 

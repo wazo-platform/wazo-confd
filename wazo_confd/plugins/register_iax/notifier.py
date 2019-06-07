@@ -7,7 +7,7 @@ from xivo_bus.resources.register.event import (
     EditRegisterIAXEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class RegisterIAXNotifier:

@@ -6,7 +6,7 @@ from xivo_bus.resources.incall_schedule.event import (
     IncallScheduleDissociatedEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class IncallScheduleNotifier:

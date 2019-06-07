@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.user.event import EditUserFallbackEvent
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class UserFallbackNotifier:

@@ -7,7 +7,7 @@ from xivo_bus.resources.line.event import (
     EditLineEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class LineNotifier:

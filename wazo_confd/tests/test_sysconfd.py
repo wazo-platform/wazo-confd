@@ -20,7 +20,7 @@ class TestSysconfdClient(TestCase):
         self.dao = Mock()
         self.url = "http://localhost:8668"
         self.client = SysconfdPublisher(self.url, self.dao)
-        session_init_patch = patch('xivo_confd._sysconfd.requests.Session')
+        session_init_patch = patch('wazo_confd._sysconfd.requests.Session')
         session_init = session_init_patch.start()
         self.session = session_init.return_value
         self.addCleanup(session_init.stop)

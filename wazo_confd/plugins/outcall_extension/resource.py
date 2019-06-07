@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -6,9 +6,9 @@ from flask import request
 from marshmallow import fields
 from marshmallow.validate import Length, Range, Regexp
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.restful import ConfdResource
-from xivo_confd.helpers.mallow import BaseSchema
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.helpers.mallow import BaseSchema
 
 
 EXTERNAL_PREFIX_REGEX = r'^\+|\+?[0-9#*]+$'

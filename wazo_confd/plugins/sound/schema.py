@@ -4,7 +4,7 @@
 from marshmallow import fields
 from marshmallow.validate import Length, NoneOf, Regexp
 
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 from .storage import RESERVED_DIRECTORIES
 

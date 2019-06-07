@@ -16,7 +16,7 @@ class TestWizardService(unittest.TestCase):
     def setUp(self):
         self.service = WizardService(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
 
-    @patch('xivo_confd.plugins.wizard.service.netifaces')
+    @patch('wazo_confd.plugins.wizard.service.netifaces')
     def test_get_interfaces(self, netifaces):
         netifaces.interfaces.return_value = ['eth0']
         netifaces.AF_INET = 4
@@ -29,7 +29,7 @@ class TestWizardService(unittest.TestCase):
 
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.netifaces')
+    @patch('wazo_confd.plugins.wizard.service.netifaces')
     def test_get_interfaces_do_not_return_lo_interface(self, netifaces):
         netifaces.interfaces.return_value = ['eth0', 'lo']
         netifaces.AF_INET = 4
@@ -42,7 +42,7 @@ class TestWizardService(unittest.TestCase):
 
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.netifaces')
+    @patch('wazo_confd.plugins.wizard.service.netifaces')
     def test_get_interfaces_return_empty_list_when_no_ip_address(self, netifaces):
         netifaces.interfaces.return_value = ['eth0']
         netifaces.AF_INET = 4
@@ -52,7 +52,7 @@ class TestWizardService(unittest.TestCase):
 
         assert_that(result, empty())
 
-    @patch('xivo_confd.plugins.wizard.service.netifaces')
+    @patch('wazo_confd.plugins.wizard.service.netifaces')
     def test_get_gateways(self, netifaces):
         netifaces.AF_INET = 4
         netifaces.gateways.return_value = {4: [('192.168.2.0', 'eth0'), ('192.168.32.0', 'eth1')]}
@@ -64,7 +64,7 @@ class TestWizardService(unittest.TestCase):
 
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.netifaces')
+    @patch('wazo_confd.plugins.wizard.service.netifaces')
     def test_get_gateways_return_empty_list_when_no_gateways(self, netifaces):
         netifaces.AF_INET = 4
         netifaces.gateways.return_value = {}
@@ -75,13 +75,13 @@ class TestWizardService(unittest.TestCase):
         assert_that(result, equal_to(expected_result))
 
     def test_get_timezone(self):
-        with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data='America/Montreal'), create=True) as mopen:
+        with patch('wazo_confd.plugins.wizard.service.open', mock_open(read_data='America/Montreal'), create=True) as mopen:
             result = self.service.get_timezone()
 
         mopen.assert_called_once_with('/etc/timezone', 'r')
         assert_that(result, equal_to('America/Montreal'))
 
-    @patch('xivo_confd.plugins.wizard.service.open', create=True)
+    @patch('wazo_confd.plugins.wizard.service.open', create=True)
     def test_get_timezone_return_none_if_no_file(self, mopen):
         mopen.side_effect = IOError()
         result = self.service.get_timezone()
@@ -94,20 +94,20 @@ class TestWizardService(unittest.TestCase):
             nameserver 192.168.2.0
             nameserver 192.168.2.1''')
         expected_result = ['192.168.2.0', '192.168.2.1']
-        with patch('xivo_confd.plugins.wizard.service.open', mock_open(read_data=resolv_conf), create=True) as mopen:
+        with patch('wazo_confd.plugins.wizard.service.open', mock_open(read_data=resolv_conf), create=True) as mopen:
             result = self.service.get_nameservers()
 
         mopen.assert_called_once_with('/etc/resolv.conf', 'r')
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.open', create=True)
+    @patch('wazo_confd.plugins.wizard.service.open', create=True)
     def test_get_nameservers_return_none_if_no_file(self, mopen):
         mopen.side_effect = IOError()
         result = self.service.get_nameservers()
 
         assert_that(result, empty())
 
-    @patch('xivo_confd.plugins.wizard.service.socket')
+    @patch('wazo_confd.plugins.wizard.service.socket')
     def test_get_hostname(self, socket):
         socket.gethostname.return_value = 'confd'
         expected_result = 'confd'
@@ -115,7 +115,7 @@ class TestWizardService(unittest.TestCase):
         result = self.service.get_hostname()
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.socket')
+    @patch('wazo_confd.plugins.wizard.service.socket')
     def test_get_hostname_return_only_hostname_when_fqdn(self, socket):
         socket.gethostname.return_value = 'confd.example.com'
         expected_result = 'confd'
@@ -123,7 +123,7 @@ class TestWizardService(unittest.TestCase):
         result = self.service.get_hostname()
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.socket')
+    @patch('wazo_confd.plugins.wizard.service.socket')
     def test_get_domain(self, socket):
         socket.getfqdn.return_value = 'confd.example.com'
         expected_result = 'example.com'
@@ -131,7 +131,7 @@ class TestWizardService(unittest.TestCase):
         result = self.service.get_domain()
         assert_that(result, equal_to(expected_result))
 
-    @patch('xivo_confd.plugins.wizard.service.socket')
+    @patch('wazo_confd.plugins.wizard.service.socket')
     def test_get_domain_return_none_when_no_domain(self, socket):
         socket.getfqdn.return_value = 'confd'
 

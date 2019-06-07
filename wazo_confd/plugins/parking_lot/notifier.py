@@ -7,7 +7,7 @@ from xivo_bus.resources.parking_lot.event import (
     EditParkingLotEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ParkingLotNotifier:

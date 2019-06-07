@@ -11,8 +11,8 @@ import string
 from os import urandom
 from xivo_dao.helpers.db_utils import session_scope
 
-from xivo_confd import sysconfd
-from xivo_confd.database import wizard as wizard_db
+from wazo_confd import sysconfd
+from wazo_confd.database import wizard as wizard_db
 
 from .notifier import build_notifier
 from .validator import build_validator

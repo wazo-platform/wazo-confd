@@ -7,7 +7,7 @@ from xivo_bus.resources.agent.event import (
     EditAgentEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class AgentNotifier:

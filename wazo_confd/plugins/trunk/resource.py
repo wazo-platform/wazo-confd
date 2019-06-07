@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -6,9 +6,9 @@ from marshmallow import fields
 
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 
-from xivo_confd.auth import required_acl
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
-from xivo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 
 class TrunkSchema(BaseSchema):

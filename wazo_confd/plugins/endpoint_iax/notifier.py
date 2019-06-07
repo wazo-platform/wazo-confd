@@ -7,7 +7,7 @@ from xivo_bus.resources.endpoint_iax.event import (
     EditIAXEndpointEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class IAXEndpointNotifier:

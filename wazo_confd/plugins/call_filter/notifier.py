@@ -7,7 +7,7 @@ from xivo_bus.resources.call_filter.event import (
     EditCallFilterEvent,
 )
 
-from xivo_confd import bus
+from wazo_confd import bus
 
 
 class CallFilterNotifier:

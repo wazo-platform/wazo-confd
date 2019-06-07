@@ -6,7 +6,7 @@ from xivo_bus.resources.rtp.event import (
     EditRTPIceHostCandidatesEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class RTPConfigurationNotifier:

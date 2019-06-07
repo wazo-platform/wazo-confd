@@ -8,7 +8,7 @@ from xivo_bus.resources.voicemail.event import (
     EditVoicemailEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class VoicemailNotifier:

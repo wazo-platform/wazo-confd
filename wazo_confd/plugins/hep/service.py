@@ -3,7 +3,7 @@
 
 from xivo_dao.resources.asterisk_file import dao as asterisk_file_dao
 
-from xivo_confd.helpers.asterisk import AsteriskConfigurationService
+from wazo_confd.helpers.asterisk import AsteriskConfigurationService
 
 from .notifier import build_notifier
 

@@ -7,7 +7,7 @@ from xivo_bus.resources.endpoint_sccp.event import (
     EditSccpEndpointEvent,
 )
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class SccpEndpointNotifier:

@@ -4,7 +4,7 @@
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.skill import dao as skill_dao
 
-from xivo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.resource import CRUDService
 
 from .notifier import build_notifier
 from .validator import build_validator

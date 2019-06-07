@@ -6,7 +6,7 @@ import socket
 from marshmallow import fields, post_load, pre_dump, validates_schema
 from marshmallow.exceptions import ValidationError
 
-from xivo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema
 
 
 class DHCPSchema(BaseSchema):

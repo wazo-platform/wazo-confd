@@ -4,7 +4,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import OneOf, Length, Range
 
-from xivo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
 
 class CallFilterRecipientsSchema(BaseSchema):

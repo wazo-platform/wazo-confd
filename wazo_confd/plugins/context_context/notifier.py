@@ -3,7 +3,7 @@
 
 from xivo_bus.resources.context_context.event import ContextContextsAssociatedEvent
 
-from xivo_confd import bus, sysconfd
+from wazo_confd import bus, sysconfd
 
 
 class ContextContextNotifier:

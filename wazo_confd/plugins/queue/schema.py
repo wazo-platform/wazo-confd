@@ -5,8 +5,8 @@ from marshmallow import fields, post_load, post_dump
 from marshmallow.validate import Length, NoneOf, OneOf, Range, Regexp
 
 from xivo_dao.alchemy.dialaction import Dialaction
-from xivo_confd.helpers.destination import DestinationField
-from xivo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.destination import DestinationField
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
 NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
