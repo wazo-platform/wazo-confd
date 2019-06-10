@@ -228,9 +228,9 @@ definitions:
         pin:
           type: string
           description: the pin of the application
-    required:
-    - application
-    - context
+      required:
+      - application
+      - context
   DestinationApplicationCustom:
     title: DestinationApplicationCustom
     allOf:
@@ -256,9 +256,9 @@ definitions:
         context:
           type: integer
           description: The context of the application
-    required:
-    - application
-    - context
+      required:
+      - application
+      - context
   DestinationApplicationDISA:
     title: DestinationApplicationDISA
     allOf:
@@ -273,9 +273,9 @@ definitions:
         pin:
           type: string
           description: the pin of the application
-    required:
-    - application
-    - context
+      required:
+      - application
+      - context
   DestinationApplicationFaxToMail:
     title: DestinationApplicationFaxToMail
     allOf:
@@ -301,9 +301,9 @@ definitions:
         context:
           type: integer
           description: The context of the application
-    required:
-    - application
-    - context
+      required:
+      - application
+      - context
   DestinationMeetme:
     title: DestinationMeetme
     properties:

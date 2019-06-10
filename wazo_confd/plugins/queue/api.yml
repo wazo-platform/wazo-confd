@@ -262,8 +262,8 @@ definitions:
           readOnly: true
     - $ref: '#/definitions/QueueRelationSchedules'
     - $ref: '#/definitions/QueueRelationMembers'
-    required:
-    - name
+    - required:
+      - name
   QueueRelationBase:
     properties:
       id:

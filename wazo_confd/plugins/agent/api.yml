@@ -127,8 +127,8 @@ definitions:
           readOnly: true
     - $ref: '#/definitions/AgentRelationQueues'
     - $ref: '#/definitions/AgentRelationUsers'
-    required:
-    - number
+    - required:
+      - number
   AgentRelationBase:
     properties:
       id:

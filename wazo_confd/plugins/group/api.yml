@@ -160,8 +160,8 @@ definitions:
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
     - $ref: '#/definitions/GroupRelationMembers'
-    required:
-    - name
+    - required:
+      - name
   GroupRelationBase:
     properties:
       id:

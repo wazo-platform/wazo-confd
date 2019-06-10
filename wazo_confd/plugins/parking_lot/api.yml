@@ -125,9 +125,9 @@ definitions:
           description: Name of the MOH category to use for music on hold
           default: 'default'
     - $ref: '#/definitions/GroupRelationExtensions'
-    required:
-    - slots_start
-    - slots_end
+    - required:
+      - slots_start
+      - slots_end
   ParkingLotRelationBase:
     properties:
       id:

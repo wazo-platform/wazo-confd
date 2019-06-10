@@ -154,11 +154,11 @@ definitions:
         registrar:
           type: string
           description: Name of the template line used by the device
+      required:
+      - context
     - $ref: '#/definitions/LineRelationEndpoints'
     - $ref: '#/definitions/LineRelationExtensions'
     - $ref: '#/definitions/LineRelationUsers'
-    required:
-    - context
   LineRelationBase:
     properties:
       id:

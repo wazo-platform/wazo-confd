@@ -115,8 +115,8 @@ definitions:
           description: The category of the skill
         description:
           type: string
-    required:
-    - name
+    - required:
+      - name
   SkillRelationBase:
     properties:
       id:

@@ -130,8 +130,8 @@ definitions:
           readOnly: true
     - $ref: '#/definitions/OutcallRelationTrunks'
     - $ref: '#/definitions/OutcallRelationExtensions'
-    required:
-    - name
+    - required:
+      - name
   OutcallRelationBase:
     properties:
       id:
