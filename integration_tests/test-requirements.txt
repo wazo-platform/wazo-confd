@@ -2,11 +2,12 @@ git+https://github.com/wazo-pbx/wazo-auth-client.git
 git+https://github.com/wazo-pbx/wazo-provd-client.git
 git+https://github.com/wazo-pbx/xivo-lib-rest-client.git
 git+https://github.com/wazo-pbx/xivo-test-helpers.git
-docker-compose
 docker
+docker-compose
+kombu
 nose
-pyhamcrest
+openapi-spec-validator
 psycopg2-binary  # sqlalchemy engine
+pyhamcrest
 requests
 sqlalchemy
-kombu

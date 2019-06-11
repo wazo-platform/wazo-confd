@@ -124,8 +124,8 @@ definitions:
         callback_context:
           type: string
           description: The callback context to use for the register
-    required:
-      - remote_host
+      required:
+        - remote_host
   RegisterIAXRelationBase:
     properties:
       id:

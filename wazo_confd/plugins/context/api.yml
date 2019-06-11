@@ -147,8 +147,8 @@ definitions:
           description: The UUID of the tenant
           readOnly: true
     - $ref: '#/definitions/ContextRelationContexts'
-    required:
-    - name
+    - required:
+      - name
   ContextRelationBase:
     properties:
       id:

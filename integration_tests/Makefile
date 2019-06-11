@@ -13,7 +13,6 @@ test-setup: egg-info build-confd
 	docker pull wazopbx/wazo-auth-mock
 	docker pull wazopbx/xivo-provd
 	docker pull p0bailey/docker-flask
-	docker pull swaggerapi/swagger-validator
 
 build-confd:
 	docker build -t wazopbx/wazo-confd ..

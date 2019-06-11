@@ -399,8 +399,8 @@ definitions:
     - $ref: '#/definitions/UserRelationSwitchboards'
     - $ref: '#/definitions/UserRelationVoicemail'
     - $ref: '#/definitions/UserRelationQueues'
-    required:
-    - firstname
+    - required:
+      - firstname
   UserRelationBase:
     properties:
       uuid:

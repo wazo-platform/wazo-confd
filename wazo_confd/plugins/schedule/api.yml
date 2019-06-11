@@ -124,13 +124,13 @@ definitions:
         enabled:
           type: boolean
           default: true
+      required:
+      - closed_destination
     - $ref: '#/definitions/ScheduleRelationIncalls'
     - $ref: '#/definitions/ScheduleRelationGroups'
     - $ref: '#/definitions/ScheduleRelationQueues'
     - $ref: '#/definitions/ScheduleRelationUsers'
     - $ref: '#/definitions/ScheduleRelationOutcalls'
-    required:
-    - closed_destination
   ScheduleRelationBase:
     properties:
       id:

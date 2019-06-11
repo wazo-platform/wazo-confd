@@ -155,9 +155,9 @@ definitions:
           items:
             $ref: '#/definitions/IvrChoice'
     - $ref: '#/definitions/IvrRelationIncalls'
-    required:
-    - name
-    - menu_sound
+    - required:
+      - name
+      - menu_sound
     example:
       name: ivr1
       description: My IVR

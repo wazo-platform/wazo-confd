@@ -135,9 +135,9 @@ definitions:
         expiration:
           type: integer
           description: Expiration time for registration in seconds
-    required:
-      - sip_username
-      - remote_host
+      required:
+        - sip_username
+        - remote_host
   RegisterSIPRelationBase:
     properties:
       id:

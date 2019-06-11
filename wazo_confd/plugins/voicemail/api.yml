@@ -181,10 +181,10 @@ definitions:
           items:
             $ref: '#/definitions/KeyValueOption'
     - $ref: '#/definitions/VoicemailRelationUsers'
-    required:
-    - name
-    - number
-    - context
+    - required:
+      - name
+      - number
+      - context
   VoicemailRelationBase:
     properties:
         id:

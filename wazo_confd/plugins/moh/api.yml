@@ -204,9 +204,9 @@ definitions:
           description: The audio files
           items:
             $ref: '#/definitions/MohFile'
-    required:
-    - name
-    - mode
+    - required:
+      - name
+      - mode
   MohFile:
     properties:
       name:

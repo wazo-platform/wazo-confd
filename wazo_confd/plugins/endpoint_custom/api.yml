@@ -123,8 +123,8 @@ definitions:
           default: true
     - $ref: '#/definitions/EndpointRelationTrunk'
     - $ref: '#/definitions/EndpointRelationLine'
-    required:
-    - interface
+    - required:
+      - interface
   EndpointCustomRelationBase:
     properties:
       id:

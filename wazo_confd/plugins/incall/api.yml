@@ -133,8 +133,8 @@ definitions:
           $ref: '#/definitions/DestinationType'
     - $ref: '#/definitions/IncallRelationExtensions'
     - $ref: '#/definitions/IncallRelationSchedules'
-    required:
-    - destination
+    - required:
+      - destination
     example:
       id: 1
       preprocess_subroutine: subroutine

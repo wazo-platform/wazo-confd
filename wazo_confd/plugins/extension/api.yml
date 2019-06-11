@@ -162,9 +162,9 @@ definitions:
     - $ref: '#/definitions/ExtensionRelationOutcall'
     - $ref: '#/definitions/ExtensionRelationParkingLot'
     - $ref: '#/definitions/ExtensionRelationQueue'
-    required:
-    - context
-    - exten
+    - required:
+      - context
+      - exten
   ExtensionRelationBase:
     properties:
       id:
