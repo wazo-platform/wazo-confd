@@ -1,0 +1,92 @@
+paths:
+  /registrars:
+    get:
+      operationId: get_registrars
+      summary: Get registrars
+      description: '**Required ACL:** `confd.registrars.read`'
+      tags:
+      - registrars
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Registrar list
+          schema:
+            $ref: '#/definitions/RegistrarItems'
+    post:
+      operationId: create_registrar
+      summary: Create registrar
+      description: '**Required ACL:** `confd.registrars.create`'
+      tags:
+      - registrars
+      parameters:
+      - name: body
+        in: body
+        description: Registrar to create
+        required: true
+        schema:
+          $ref: '#/definitions/Registrar'
+      responses:
+        '201':
+          description: Registrar created
+          schema:
+            $ref: '#/definitions/Registrar'
+        '400':
+          $ref: '#/responses/CreateError'
+
+definitions:
+  Registrar:
+    title: Registrar
+    properties:
+      id:
+        type: string
+        description: Registrar identifier
+      name:
+        type: string
+        description: Display name of the registrar
+      main_host:
+        type: string
+        description: Registrar host
+      main_port:
+        type: integer
+        description: Registrar port
+      backup_host:
+        type: string
+        description: Backup registrar host
+      backup_port:
+        type: integer
+        description: Backup registrar port
+      proxy_main_host:
+        type: string
+        description: Proxy host
+      proxy_main_port:
+        type: integer
+        description: Proxy port
+      proxy_backup_host:
+        type: string
+        description: Backup proxy host
+      proxy_backup_port:
+        type: integer
+        description: Backup proxy port
+      outbound_proxy_host:
+        type: string
+        description: Outbound proxy host
+      outbound_proxy_port:
+        type: integer
+        description: Outbound proxy port
+
+  RegistrarItems:
+    title: RegistrarItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Registrar'
+      total:
+        type: integer
+    required:
+    - total
