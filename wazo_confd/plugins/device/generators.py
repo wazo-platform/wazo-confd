@@ -148,10 +148,21 @@ class SipGenerator:
                   'registrar_ip': registrar['registrar_main'],
                   'proxy_ip': registrar['proxy_main']}
 
-        proxy_backup = registrar.get('proxy_backup', '')
-        if proxy_backup:
-            config['backup_proxy_ip'] = proxy_backup
-            config['backup_registrar_ip'] = registrar['registrar_backup']
+        optional_keys = {
+            'registrar_port': 'registrar_main_port',
+            'proxy_port': 'proxy_main_port',
+            'backup_proxy_ip': 'proxy_backup',
+            'backup_proxy_port': 'proxy_backup_port',
+            'backup_registrar_ip': 'registrar_backup',
+            'backup_registrar_port': 'registrar_backup_port',
+            'outbound_proxy_ip': 'proxy_outbound',
+            'outbound_proxy_port': 'proxy_outbound_port',
+        }
+
+        for real_key, registrar_key in optional_keys.items():
+            value = registrar.get(registrar_key)
+            if value:
+                config[real_key] = value
 
         return config
 
