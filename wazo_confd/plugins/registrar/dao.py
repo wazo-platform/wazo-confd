@@ -42,3 +42,9 @@ class RegistrarDao:
         registrars = self._find_registrars(**criteria)
         if registrars:
             return [Registrar(registrar) for registrar in registrars]
+
+    def edit(self, new_registrar):
+        self.client.configs.update(new_registrar.registrar)
+
+    def delete(self, registrar):
+        self.client.configs.delete(registrar.id)

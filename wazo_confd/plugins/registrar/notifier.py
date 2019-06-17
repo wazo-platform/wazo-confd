@@ -3,6 +3,8 @@
 
 from xivo_bus.resources.registrar.event import (
     CreateRegistrarEvent,
+    EditRegistrarEvent,
+    DeleteRegistrarEvent,
 )
 
 
@@ -13,4 +15,12 @@ class RegistrarNotifier:
 
     def created(self, registrar):
         event = CreateRegistrarEvent(registrar.registrar)
+        self.bus.send_bus_event(event)
+
+    def edited(self, registrar):
+        event = EditRegistrarEvent(registrar.registrar)
+        self.bus.send_bus_event(event)
+
+    def deleted(self, registrar):
+        event = DeleteRegistrarEvent(registrar.registrar)
         self.bus.send_bus_event(event)

@@ -8,15 +8,20 @@ from .notifier import RegistrarNotifier
 from .service import RegistrarService, SearchEngine
 from .validator import build_validator
 
+from ..line.service import build_service as build_line_service
+
 
 def build_dao(provd_client):
     return RegistrarDao(provd_client)
 
 
-def build_service(registrar_dao):
+def build_service(registrar_dao, provd_client):
     search_engine = SearchEngine(registrar_dao)
     validator = build_validator()
     notifier = RegistrarNotifier(bus)
+    line_service = build_line_service(provd_client)
 
-    registrar_service = RegistrarService(registrar_dao, validator, notifier, search_engine)
+    registrar_service = RegistrarService(
+        registrar_dao, validator, notifier, search_engine, line_service, provd_client
+    )
     return registrar_service

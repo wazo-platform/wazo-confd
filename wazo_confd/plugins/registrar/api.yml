@@ -38,6 +38,65 @@ paths:
         '400':
           $ref: '#/responses/CreateError'
 
+  /registrars/{registrar_id}:
+    get:
+      operationId: get_registrar
+      summary: Get registrar
+      description: '**Required ACL:** `confd.registrars.{registrar_id}.read`'
+      tags:
+      - registrars
+      parameters:
+      - $ref: '#/parameters/registrar_id'
+      responses:
+        '200':
+          description: Registrar
+          schema:
+            $ref: '#/definitions/Registrar'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_registrar
+      summary: Update registrar
+      description: '**Required ACL:** `confd.registrars.{registrar_id}.update`'
+      tags:
+      - registrars
+      parameters:
+      - $ref: '#/parameters/registrar_id'
+      - name: body
+        in: body
+        description: Registrar body
+        required: true
+        schema:
+          $ref: '#/definitions/Registrar'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+    delete:
+      operationId: delete_registrar
+      summary: Delete registrar
+      description: '**Required ACL:** `confd.registrars.{registrar_id}.delete`'
+      tags:
+      - registrars
+      parameters:
+      - $ref: '#/parameters/registrar_id'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  registrar_id:
+    required: true
+    type: string
+    name: registrar_id
+    in: path
+    description: Registrar ID
+
 definitions:
   Registrar:
     title: Registrar

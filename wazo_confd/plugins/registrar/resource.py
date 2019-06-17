@@ -3,7 +3,7 @@
 
 from flask import url_for
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource
+from wazo_confd.helpers.restful import ListResource, ItemResource
 
 from .model import Registrar
 from .schema import RegistrarSchema
@@ -24,3 +24,20 @@ class RegistrarList(ListResource):
     @required_acl('confd.registrars.create')
     def post(self):
         return super(RegistrarList, self).post()
+
+
+class RegistrarItem(ItemResource):
+
+    schema = RegistrarSchema
+
+    @required_acl('confd.registrars.{id}.read')
+    def get(self, id):
+        return super(RegistrarItem, self).get(id)
+
+    @required_acl('confd.registrars.{id}.update')
+    def put(self, id):
+        return super(RegistrarItem, self).put(id)
+
+    @required_acl('confd.registrars.{id}.delete')
+    def delete(self, id):
+        return super(RegistrarItem, self).delete(id)
