@@ -167,6 +167,18 @@ definitions:
           description: The UUID of the tenant
           readOnly: true
     - $ref: '#/definitions/GroupRelationExtensions'
+    - $ref: '#/definitions/ConferenceRelationIncalls'
+  ConferenceRelationIncalls:
+    properties:
+      incalls:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ConferenceRelationIncall'
+  ConferenceRelationIncall:
+    allOf:
+      - $ref: '#/definitions/IncallRelationBase'
+      - $ref: '#/definitions/IncallRelationExtensions'
   ConferenceRelationBase:
     properties:
       id:
