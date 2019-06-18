@@ -166,7 +166,7 @@ definitions:
           type: string
           description: The UUID of the tenant
           readOnly: true
-    - $ref: '#/definitions/GroupRelationExtensions'
+    - $ref: '#/definitions/ConferenceRelationExtensions'
     - $ref: '#/definitions/ConferenceRelationIncalls'
   ConferenceRelationIncalls:
     properties:
