@@ -124,13 +124,16 @@ definitions:
         enum:
         - node
       destination_options:
-        $ref: '#/definitions/ApplicationDestination'
-  ApplicationDestination:
+        $ref: '#/definitions/ApplicationDestinationNode'
+  ApplicationDestinationNode:
     type: object
     properties:
       music_on_hold:
         type: string
         description: Name of the MOH category to use for music on hold
+      answer:
+        type: boolean
+        description: Answer the call when the call go to the destination
       type:
         type: string
         description: type of the default node

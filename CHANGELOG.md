@@ -1,6 +1,15 @@
 Changelog
 =========
 
+19.10
+-----
+
+* Default behavior for new created applications resource has changed to do not answer the call. A
+  new `destination_options` parameter has been added to configure it:
+
+  * `answer`
+
+
 19.08
 -----
 
