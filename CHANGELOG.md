@@ -1,6 +1,14 @@
 Changelog
 =========
 
+19.10
+-----
+
+* For newly created applications with `node` destination, calls are not
+  automatically answered anymore. A new `answer` parameter has been
+  added in `destination_options` to configure the answer behavior of the node.
+
+
 19.08
 -----
 

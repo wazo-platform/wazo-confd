@@ -18,6 +18,7 @@ class NodeApplicationDestinationOptionsSchema(BaseSchema):
         missing='holding',
     )
     music_on_hold = fields.String(validate=Length(max=128), allow_none=True, missing=None)
+    answer = fields.Boolean(missing=False)
 
 
 class ApplicationDestinationOptionsField(fields.Field):

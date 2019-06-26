@@ -155,6 +155,24 @@ def test_create_minimal_parameters():
     confd.applications(response.item['uuid']).delete().assert_deleted()
 
 
+def test_create_minimal_node_parameters():
+    response = confd.applications.post(destination='node', destination_options={'type': 'holding'})
+    response.assert_created('applications')
+
+    assert_that(response.item, has_entries(
+        uuid=not_none(),
+        tenant_uuid=MAIN_TENANT,
+        destination='node',
+        destination_options=has_entries(
+            type='holding',
+            music_on_hold=None,
+            answer=False,
+        )
+    ))
+
+    confd.applications(response.item['uuid']).delete().assert_deleted()
+
+
 def test_create_all_parameters():
     parameters = {
         'name': 'MyApplication',
@@ -162,6 +180,7 @@ def test_create_all_parameters():
         'destination_options': {
             'type': 'holding',
             'music_on_hold': 'default',
+            'answer': True,
         }
     }
 
@@ -188,6 +207,7 @@ def test_edit_all_parameters(application):
         'destination_options': {
             'type': 'holding',
             'music_on_hold': 'updated_moh',
+            'answer': True,
         }
     }
 
