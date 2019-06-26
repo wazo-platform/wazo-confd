@@ -133,7 +133,7 @@ definitions:
         description: Name of the MOH category to use for music on hold
       answer:
         type: boolean
-        description: Answer the call when the call go to the destination
+        description: Automatically answer the call when the call enters the destination node
       type:
         type: string
         description: type of the default node
