@@ -1,6 +1,12 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from hamcrest import (
+    assert_that,
+    contains,
+    has_entries,
+)
+
 from . import confd
 from ..helpers import (
     associations as a,
@@ -114,6 +120,34 @@ def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_app, sub_app):
 
     response = confd.lines(sub_line['id']).applications(main_app['uuid']).delete(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Application'))
+
+
+@fixtures.line()
+@fixtures.application()
+def test_get_line_relation(line, application):
+    with a.line_application(line, application):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries(
+            application=has_entries(
+                uuid=application['uuid'],
+                name=application['name'],
+            )
+        ))
+
+
+@fixtures.application()
+@fixtures.line()
+def test_get_application_relation(application, line):
+    with a.line_application(line, application):
+        response = confd.applications(application['uuid']).get()
+        assert_that(response.item, has_entries(
+            lines=contains(
+                has_entries(
+                    id=line['id'],
+                    name=line['name'],
+                )
+            )
+        ))
 
 
 @fixtures.line()

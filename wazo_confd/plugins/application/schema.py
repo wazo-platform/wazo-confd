@@ -54,6 +54,13 @@ class ApplicationSchema(BaseSchema):
     destination_options = ApplicationDestinationOptionsField(default={})
     links = ListLink(Link('applications', field='uuid', target='application_uuid'))
 
+    lines = fields.Nested(
+        'LineSchema',
+        only=['id', 'name', 'links'],
+        many=True,
+        dump_only=True,
+    )
+
     @pre_dump
     def map_destination(self, obj):
         if obj.dest_node:
