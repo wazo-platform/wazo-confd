@@ -3,7 +3,10 @@ paths:
     put:
       operationId: associate_line_application
       summary: Associate line and application
-      description: '**Required ACL:** `confd.lines.{line_id}.applications.{application_uuid}.update`'
+      description: |
+        '**Required ACL:** `confd.lines.{line_id}.applications.{application_uuid}.update`'
+
+        **WARNING**: Association will disable the effect of the line `context` field
       tags:
       - lines
       - applications
