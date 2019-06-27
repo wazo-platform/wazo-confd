@@ -4,6 +4,11 @@ Changelog
 19.10
 -----
 
+* A new API for associating a line with an application has been added:
+
+  * PUT `/1.1/lines/<line_id>/applications/<application_id>`
+  * DELETE `/1.1/lines/<line_id>/applications/<application_id>`
+
 * For newly created applications with `node` destination, calls are not
   automatically answered anymore. A new `answer` parameter has been
   added in `destination_options` to configure the answer behavior of the node.
