@@ -123,6 +123,7 @@ from . import incall_schedule
 from . import incall_user
 from . import ivr
 from . import line
+from . import line_application
 from . import line_device
 from . import line_endpoint_custom
 from . import line_endpoint_sccp
@@ -211,6 +212,7 @@ __all__ = [
     'incall_user',
     'ivr',
     'line',
+    'line_application',
     'line_device',
     'line_endpoint_custom',
     'line_endpoint_sccp',

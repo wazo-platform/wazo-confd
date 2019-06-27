@@ -66,6 +66,7 @@ setup(
             'info = wazo_confd.plugins.info.plugin:Plugin',
             'ivr = wazo_confd.plugins.ivr.plugin:Plugin',
             'line = wazo_confd.plugins.line.plugin:Plugin',
+            'line_application = wazo_confd.plugins.line_application.plugin:Plugin',
             'line_device = wazo_confd.plugins.line_device.plugin:Plugin',
             'line_endpoint = wazo_confd.plugins.line_endpoint.plugin:Plugin',
             'line_extension = wazo_confd.plugins.line_extension.plugin:Plugin',

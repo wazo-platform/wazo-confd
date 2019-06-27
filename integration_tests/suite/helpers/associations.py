@@ -21,6 +21,13 @@ def user_voicemail(user, voicemail, check=True):
 
 
 @contextmanager
+def line_application(line, application, check=True):
+    h.line_application.associate(line['id'], application['uuid'], check)
+    yield
+    h.line_application.dissociate(line['id'], application['uuid'], check)
+
+
+@contextmanager
 def line_extension(line, extension, check=True):
     h.line_extension.associate(line['id'], extension['id'], check)
     yield
