@@ -1,31 +1,44 @@
-from hamcrest import ( 
+from hamcrest import (
     assert_that,
-    is_ 
+    calling,
+    not_,
+    raises,
 )
 import unittest
 
-def validate_extension_range(extensionRange):
-    return extensionRange.start < extensionRange.end
+from marshmallow.exceptions import ValidationError
 
-class TestContextNotifier(unittest.TestCase):
+from ..schema import RangeSchema
+
+
+class TestRangeValidator(unittest.TestCase):
+
+    def setUp(self):
+        self.range_schema = RangeSchema()
 
     def test_start_cant_be_higher_than_end(self):
-        extensionRange = {'start': 10, 'end': 5}
-        
-        validation = validate_extension_range(extensionRange)
+        start = 20
+        end = 10
 
-        assert_that(validation, is_(False))
+        assert_that(
+            calling(self.range_schema.validate_range).with_args(start, end),
+            raises(ValidationError, pattern='Start of range')
+        )
 
     def test_start_can_be_equal_to_end(self):
-        extensionRange = {'start': 0, 'end': 0}
+        start = 10
+        end = 10
 
-        validation = validate_extension_range(extensionRange)
-
-        assert_that(validation, is_(True))
+        assert_that(
+            calling(self.range_schema.validate_range).with_args(start, end),
+            not_(raises(ValidationError, pattern='Start of range'))
+        )
 
     def test_start_can_be_lower_than_end(self):
-        extensionRange = {'start': 5, 'end': 10}
+        start = 10
+        end = 20
 
-        validation = validate_extension_range(extensionRange)
-
-        assert_that(validation, is_(True))
+        assert_that(
+            calling(self.range_schema.validate_range).with_args(start, end),
+            not_(raises(ValidationError, pattern='Start of range'))
+        )
