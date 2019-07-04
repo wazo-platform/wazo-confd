@@ -106,25 +106,30 @@ parameters:
 definitions:
   Application:
     type: object
+    allOf:
+    - $ref: '#/definitions/ApplicationRelationBase'
+    - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
+        destination:
+          type: string
+          description: Destination where the call entering in the application will be sent
+          enum:
+          - node
+        destination_options:
+          $ref: '#/definitions/ApplicationDestinationNode'
+    - $ref: '#/definitions/ApplicationRelationLines'
+  ApplicationRelationBase:
     properties:
       uuid:
         type: string
         description: Application UUID
         readOnly: true
-      tenant_uuid:
-        type: string
-        description: The UUID of the tenant
-        readOnly: true
       name:
         type: string
         description: Application name
-      destination:
-        type: string
-        description: Destination where the call entering in the application will be sent
-        enum:
-        - node
-      destination_options:
-        $ref: '#/definitions/ApplicationDestinationNode'
   ApplicationDestinationNode:
     type: object
     properties:
@@ -140,6 +145,13 @@ definitions:
         enum:
         - mixing
         - holding
+  ApplicationRelationLines:
+    properties:
+      lines:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/LineRelationBase'
   ApplicationItems:
     type: object
     properties:

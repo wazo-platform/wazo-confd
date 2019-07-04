@@ -111,6 +111,7 @@ DEFAULT_CONFIG = {
         'info': True,
         'ivr': True,
         'line': True,
+        'line_application': True,
         'line_device': True,
         'line_endpoint': True,
         'line_extension': True,

@@ -1,0 +1,41 @@
+paths:
+  /lines/{line_id}/applications/{application_uuid}:
+    put:
+      operationId: associate_line_application
+      summary: Associate line and application
+      description: |
+        '**Required ACL:** `confd.lines.{line_id}.applications.{application_uuid}.update`'
+
+        **WARNING**: Association will disable the effect of the line `context` field
+      tags:
+      - lines
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/application_uuid'
+      responses:
+        '204':
+          description: Line and application associated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: dissociate_line_application
+      summary: Dissociate line and application
+      description: '**Required ACL:** `confd.lines.{line_id}.applications.{application_uuid}.delete`'
+      tags:
+      - lines
+      - applications
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/lineid'
+      - $ref: '#/parameters/application_uuid'
+      responses:
+        '204':
+          description: Line and application dissociated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'

@@ -118,6 +118,10 @@ definitions:
     allOf:
     - $ref: '#/definitions/LineRelationBase'
     - properties:
+        tenant_uuid:
+          type: string
+          description: The UUID of the tenant
+          readOnly: true
         context:
           type: string
           description: The name of an internal context
@@ -156,6 +160,7 @@ definitions:
           description: Name of the template line used by the device
       required:
       - context
+    - $ref: '#/definitions/LineRelationApplication'
     - $ref: '#/definitions/LineRelationEndpoints'
     - $ref: '#/definitions/LineRelationExtensions'
     - $ref: '#/definitions/LineRelationUsers'
@@ -169,10 +174,10 @@ definitions:
         type: string
         description: The name of the line
         readOnly: true
-      tenant_uuid:
-        type: string
-        description: The UUID of the tenant
-        readOnly: true
+  LineRelationApplication:
+    properties:
+      application:
+        $ref: '#/definitions/ApplicationRelationBase'
   LineRelationEndpoints:
     properties:
       endpoint_sip:
