@@ -42,7 +42,7 @@ class TestLineApplicationNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
 
     def test_dissociate_then_pjsip_reloaded(self):
-        self.line.endpoint = "sccp"
+        self.line.endpoint = 'sccp'
         self.notifier.dissociated(self.line, self.application)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
