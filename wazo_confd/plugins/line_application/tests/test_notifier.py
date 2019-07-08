@@ -9,8 +9,8 @@ from xivo_bus.resources.line_application.event import (
     LineApplicationAssociatedEvent,
     LineApplicationDissociatedEvent,
 )
-from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.application import Application
+from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from ..notifier import LineApplicationNotifier
 
@@ -42,7 +42,6 @@ class TestLineApplicationNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
 
     def test_dissociate_then_pjsip_reloaded(self):
-        self.line.endpoint = 'sccp'
         self.notifier.dissociated(self.line, self.application)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
