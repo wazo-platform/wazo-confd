@@ -1,7 +1,8 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_load
+from marshmallow import fields, post_load, validates_schema
+from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Predicate, OneOf
 
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
@@ -12,6 +13,19 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 class RangeSchema(BaseSchema):
     start = fields.String(validate=(Predicate('isdigit'), Length(max=16)), required=True)
     end = fields.String(validate=(Predicate('isdigit'), Length(max=16)))
+
+    def validate_range(self, start, end):
+        if start > end:
+            raise ValidationError('Start of range must be lower than or equal to the end')
+
+    @validates_schema
+    def validate_schema(self, data, **kwargs):
+        if data.get('start') and data.get('end'):
+            start = data.get('start')
+            end = data.get('end')
+            if len(start) != len(end):
+                raise ValidationError('Start and end must be of the same length')
+            self.validate_range(int(start), int(end))
 
 
 class IncallRangeSchema(RangeSchema):

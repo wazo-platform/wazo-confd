@@ -86,6 +86,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'user_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': None}]
+    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': '60', 'end': '50'}]
+    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': '50', 'end': '060'}]
     yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'group_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'group_ranges', 'invalid'
@@ -95,6 +97,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'group_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': None}]
+    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': '60', 'end': '50'}]
+    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': '50', 'end': '060'}]
     yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', 'invalid'
@@ -104,6 +108,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': None}]
+    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': '60', 'end': '50'}]
+    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': '50', 'end': '060'}]
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', 'invalid'
@@ -113,6 +119,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': None}]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': '60', 'end': '50'}]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': '50', 'end': '060'}]
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', 'invalid'
@@ -122,6 +130,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': None}]
+    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '60', 'end': '50'}]
+    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '50', 'end': '060'}]
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '123', 'did_length': None}]
 
