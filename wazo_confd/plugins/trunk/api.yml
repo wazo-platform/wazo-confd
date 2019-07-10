@@ -129,6 +129,9 @@ definitions:
       endpoint_sip:
         readOnly: true
         $ref: '#/definitions/EndpointSipRelationBase'
+      endpoint_iax:
+        readOnly: true
+        $ref: '#/definitions/EndpointIAXRelationBase'
       endpoint_custom:
         readOnly: true
         $ref: '#/definitions/EndpointCustomRelationBase'
