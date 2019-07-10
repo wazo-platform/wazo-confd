@@ -21,7 +21,11 @@ class RangeSchema(BaseSchema):
     @validates_schema
     def validate_schema(self, data, **kwargs):
         if data.get('start') and data.get('end'):
-            self.validate_range(int(data['start']), int(data['end']))
+            start = data.get('start')
+            end = data.get('end')
+            if len(start) != len(end):
+                raise ValidationError('Start and end must be of the same length')
+            self.validate_range(int(start), int(end))
 
 
 class IncallRangeSchema(RangeSchema):
