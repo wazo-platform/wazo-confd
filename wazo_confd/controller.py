@@ -43,8 +43,13 @@ class Controller:
             dependencies={
                 'api': api,
                 'config': config,
-                'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
+                'token_changed_subscribe': self._token_changed_subscribe,
             }
+        )
+
+    def _token_changed_subscribe(self, callback):
+        self.token_renewer.subscribe_to_token_change(
+            lambda token: callback(token['token'])
         )
 
     def run(self):
