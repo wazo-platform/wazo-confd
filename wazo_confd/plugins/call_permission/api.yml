@@ -107,41 +107,45 @@ parameters:
     description: Call Permission's ID
 definitions:
   CallPermission:
-    title: CallPermission
+    allOf:
+      - $ref: '#/definitions/CallPermissionRelationBase'
+      - title: CallPermission
+        properties:
+          tenant_uuid:
+            type: string
+            description: The UUID of the tenant
+            readOnly: true
+          password:
+            type: string
+            description: The password to be able to call extensions
+          mode:
+            type: string
+            enum:
+            - allow
+            - deny
+            default: deny
+            description: Determine how the call permission are applied
+          enabled:
+            type: boolean
+            default: true
+            description: Disable or enable the call permission
+          description:
+            type: string
+            description: Additional information about the call permission
+          extensions:
+            type: array
+            items:
+              type: string
+            description: Extensions to apply the call permission
+  CallPermissionRelationBase:
     properties:
       id:
         type: integer
         readOnly: true
         description: The id of the call permission
-      tenant_uuid:
-        type: string
-        description: The UUID of the tenant
-        readOnly: true
       name:
         type: string
         description: The name of the call permission
-      password:
-        type: string
-        description: The password to be able to call extensions
-      mode:
-        type: string
-        enum:
-        - allow
-        - deny
-        default: deny
-        description: Determine how the call permission are applied
-      enabled:
-        type: boolean
-        default: true
-        description: Disable or enable the call permission
-      description:
-        type: string
-        description: Additional information about the call permission
-      extensions:
-        type: array
-        items:
-          type: string
-        description: Extensions to apply the call permission
     required:
     - name
   CallPermissionItems:

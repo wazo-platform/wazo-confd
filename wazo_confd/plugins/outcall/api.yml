@@ -130,6 +130,8 @@ definitions:
           readOnly: true
     - $ref: '#/definitions/OutcallRelationTrunks'
     - $ref: '#/definitions/OutcallRelationExtensions'
+    - $ref: '#/definitions/OutcallRelationSchedules'
+    - $ref: '#/definitions/OutcallRelationCallPermissions'
     - required:
       - name
   OutcallRelationBase:
@@ -174,6 +176,26 @@ definitions:
         strip_digits:
           type: integer
           description: The number of leading digits to strip
+  OutcallRelationSchedules:
+    properties:
+      schedules:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/OutcallRelationSchedule'
+  OutcallRelationSchedule:
+    allOf:
+    - $ref: '#/definitions/ScheduleRelationBase'
+  OutcallRelationCallPermissions:
+    properties:
+      call_permissions:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/OutcallRelationCallPermission'
+  OutcallRelationCallPermission:
+    allOf:
+    - $ref: '#/definitions/CallPermissionRelationBase'
   OutcallItems:
     title: OutcallItems
     properties:

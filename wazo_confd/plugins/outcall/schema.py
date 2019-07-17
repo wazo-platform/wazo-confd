@@ -27,7 +27,7 @@ class OutcallSchema(BaseSchema):
                                many=True,
                                dump_only=True)
     schedules = fields.Nested('ScheduleSchema',
-                              only=['id', 'name', 'links'],
+                              only=['tenant_uuid', 'id', 'name', 'links'],
                               many=True,
                               dump_only=True)
     call_permissions = fields.Nested('CallPermissionSchema',
