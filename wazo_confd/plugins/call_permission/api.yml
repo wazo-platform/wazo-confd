@@ -107,7 +107,33 @@ parameters:
     description: Call Permission's ID
 definitions:
   CallPermission:
-    title: CallPermission
+    allOf:
+      - $ref: '#/definitions/CallPermissionRelationBase'
+      - title: CallPermission
+        properties:
+          password:
+            type: string
+            description: The password to be able to call extensions
+          mode:
+            type: string
+            enum:
+            - allow
+            - deny
+            default: deny
+            description: Determine how the call permission are applied
+          enabled:
+            type: boolean
+            default: true
+            description: Disable or enable the call permission
+          description:
+            type: string
+            description: Additional information about the call permission
+          extensions:
+            type: array
+            items:
+              type: string
+            description: Extensions to apply the call permission
+  CallPermissionRelationBase:
     properties:
       id:
         type: integer
@@ -120,28 +146,6 @@ definitions:
       name:
         type: string
         description: The name of the call permission
-      password:
-        type: string
-        description: The password to be able to call extensions
-      mode:
-        type: string
-        enum:
-        - allow
-        - deny
-        default: deny
-        description: Determine how the call permission are applied
-      enabled:
-        type: boolean
-        default: true
-        description: Disable or enable the call permission
-      description:
-        type: string
-        description: Additional information about the call permission
-      extensions:
-        type: array
-        items:
-          type: string
-        description: Extensions to apply the call permission
     required:
     - name
   CallPermissionItems:

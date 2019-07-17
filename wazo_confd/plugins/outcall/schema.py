@@ -19,7 +19,7 @@ class OutcallSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('outcalls'))
     trunks = fields.Nested('TrunkSchema',
-                           only=['id', 'endpoint_sip', 'endpoint_custom', 'links'],
+                           only=['tenant_uuid', 'id', 'endpoint_sip', 'endpoint_custom', 'links'],
                            many=True,
                            dump_only=True)
     extensions = fields.Nested('DialPatternSchema',
@@ -27,11 +27,11 @@ class OutcallSchema(BaseSchema):
                                many=True,
                                dump_only=True)
     schedules = fields.Nested('ScheduleSchema',
-                              only=['id', 'name', 'links'],
+                              only=['tenant_uuid', 'id', 'name', 'links'],
                               many=True,
                               dump_only=True)
     call_permissions = fields.Nested('CallPermissionSchema',
-                                     only=['id', 'name', 'links'],
+                                     only=['tenant_uuid', 'id', 'name', 'links'],
                                      many=True,
                                      dump_only=True)
 
