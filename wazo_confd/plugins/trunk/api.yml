@@ -106,10 +106,6 @@ definitions:
     allOf:
     - $ref: '#/definitions/TrunkRelationBase'
     - properties:
-        tenant_uuid:
-          type: string
-          description: The UUID of the tenant
-          readOnly: true
         context:
           type: string
           description: The context of the trunk
@@ -124,6 +120,10 @@ definitions:
         type: integer
         readOnly: true
         description: The id of the trunk
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
   TrunkRelationEndpoints:
     properties:
       endpoint_sip:
