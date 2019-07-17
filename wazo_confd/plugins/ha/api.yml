@@ -40,6 +40,6 @@ definitions:
         - slave
       remote_address:
         type: string
-        description: The remote host of the other machine in the HA cluster.
+        description: The remote IP address of the other machine in the HA cluster. Must be an IP address, a hostname is invalid.
     required:
       - node_type
