@@ -127,6 +127,7 @@ definitions:
           readOnly: true
     - $ref: '#/definitions/AgentRelationQueues'
     - $ref: '#/definitions/AgentRelationUsers'
+    - $ref: '#/definitions/AgentRelationSkills'
     - required:
       - number
   AgentRelationBase:
@@ -163,6 +164,17 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/AgentRelationUser'
+  AgentRelationSkills:
+    properties:
+      skills:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/AgentRelationSkill'
+  AgentRelationSkill:
+    allOf:
+    - $ref: '#/definitions/SkillRelationBase'
+    - $ref: '#/definitions/AgentSkillRelationBase'
   AgentRelationUser:
     allOf:
     - $ref: '#/definitions/UserRelationBase'

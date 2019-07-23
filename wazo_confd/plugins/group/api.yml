@@ -160,6 +160,8 @@ definitions:
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
     - $ref: '#/definitions/GroupRelationMembers'
+    - $ref: '#/definitions/GroupRelationSchedules'
+    - $ref: '#/definitions/GroupRelationCallPermissions'
     - required:
       - name
   GroupRelationBase:
@@ -206,6 +208,20 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/UserRelationBase'
+  GroupRelationSchedules:
+    properties:
+      schedules:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/ScheduleRelationBase'
+  GroupRelationCallPermissions:
+    properties:
+      call_permissions:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/CallPermissionRelationBase'
   GroupItems:
     title: GroupItems
     properties:

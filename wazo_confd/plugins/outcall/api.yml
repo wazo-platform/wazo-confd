@@ -192,10 +192,7 @@ definitions:
         type: array
         readOnly: true
         items:
-          $ref: '#/definitions/OutcallRelationCallPermission'
-  OutcallRelationCallPermission:
-    allOf:
-    - $ref: '#/definitions/CallPermissionRelationBase'
+          $ref: '#/definitions/CallPermissionRelationBase'
   OutcallItems:
     title: OutcallItems
     properties:
