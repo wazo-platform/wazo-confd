@@ -115,6 +115,7 @@ definitions:
           description: The category of the skill
         description:
           type: string
+    - $ref: '#/definitions/SkillRelationAgents'
     - required:
       - name
   SkillRelationBase:
@@ -129,6 +130,17 @@ definitions:
       name:
         type: string
         description: The name to identify the skill
+  SkillRelationAgents:
+    properties:
+      agents:
+        type: array
+        readOnly: true
+        items:
+          $ref: '#/definitions/SkillRelationAgent'
+  SkillRelationAgent:
+    allOf:
+    - $ref: '#/definitions/AgentRelationBase'
+    - $ref: '#/definitions/AgentSkillRelationBase'
   SkillItems:
     title: SkillItems
     properties:
