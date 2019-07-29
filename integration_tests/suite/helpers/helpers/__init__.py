@@ -149,6 +149,7 @@ from . import queue_member_user
 from . import queue_schedule
 from . import register_iax
 from . import register_sip
+from . import registrar
 from . import sound
 from . import schedule
 from . import skill

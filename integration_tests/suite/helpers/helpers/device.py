@@ -93,27 +93,3 @@ def _random_ip(ips):
     while ip in ips:
         ip = '.'.join(str(randrange(256)) for i in range(4))
     return ip
-
-
-def generate_registrar(**params):
-    name = "".join(choice(string.ascii_letters) for _ in range(20))
-    ip = generate_ip()
-    registrar = {
-        'X_type': 'registrar',
-        'deletable': True,
-        'displayname': name,
-        'id': name,
-        'parent_ids': [],
-        'proxy_main': ip,
-        'proxy_backup': ip,
-        'registrar_main': ip,
-        'raw_config': {'X_key': 'xivo'},
-        'registrar_backup': ip,
-    }
-    registrar.update(params)
-    provd.configs.create(registrar)
-    return registrar
-
-
-def delete_registrar(registrar_id, check=False):
-    provd.configs.delete(registrar_id)

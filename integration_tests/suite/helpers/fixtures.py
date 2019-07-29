@@ -78,8 +78,8 @@ class custom(IsolatedAction):
 
 class registrar(IsolatedAction):
 
-    actions = {'generate': h.device.generate_registrar,
-               'delete': h.device.delete_registrar}
+    actions = {'generate': h.registrar.generate_registrar,
+               'delete': h.registrar.delete_registrar}
 
 
 class call_permission(IsolatedAction):
