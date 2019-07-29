@@ -29,7 +29,7 @@ class Registrar:
 
     @property
     def displayname(self):
-        return self.registrar['displayname']
+        return self.registrar.get('displayname')
 
     @displayname.setter
     def displayname(self, value):

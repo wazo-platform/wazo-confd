@@ -3,13 +3,13 @@
 
 from marshmallow import fields
 
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 
 class RegistrarSchema(BaseSchema):
 
     id = fields.String()
-    name = fields.String(attribute='displayname')
+    name = fields.String(attribute='displayname', allow_none=True)
     main_host = fields.String(attribute='registrar_main')
     main_port = fields.Integer(attribute='registrar_main_port', allow_none=True)
     backup_host = fields.String(attribute='registrar_backup', allow_none=True)
@@ -20,3 +20,4 @@ class RegistrarSchema(BaseSchema):
     proxy_backup_port = fields.Integer(attribute='proxy_backup_port', allow_none=True)
     outbound_proxy_host = fields.String(attribute='proxy_outbound', allow_none=True)
     outbound_proxy_port = fields.Integer(attribute='proxy_outbound_port', allow_none=True)
+    links = ListLink(Link('registrars'))
