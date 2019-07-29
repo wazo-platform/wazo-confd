@@ -30,7 +30,7 @@ class CallFilterRecipientUserList(ConfdResource):
     def put(self, call_filter_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             recipients = []
             for user_form in form['users']:
@@ -63,7 +63,7 @@ class CallFilterSurrogateUserList(ConfdResource):
     def put(self, call_filter_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             surrogates = []
             for user_form in form['users']:

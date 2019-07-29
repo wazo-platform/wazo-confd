@@ -50,7 +50,7 @@ class UserAgentList(ConfdResource):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         item = self.service.find_by_user_id(user.id, tenant_uuids=tenant_uuids)
-        return self.schema().dump(item).data
+        return self.schema().dump(item)
 
     @required_acl('confd.users.{user_id}.agents.delete')
     def delete(self, user_id):

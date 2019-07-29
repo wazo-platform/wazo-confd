@@ -59,7 +59,7 @@ class UserVoicemailList(UserVoicemailResource):
 
         user = self.get_user(user_id, tenant_uuids=tenant_uuids)
         user_voicemail = self.service.get_by(user_id=user.id)
-        return self.schema().dump(user_voicemail).data
+        return self.schema().dump(user_voicemail)
 
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
@@ -81,7 +81,7 @@ class VoicemailUserList(UserVoicemailResource):
 
         items = self.service.find_all_by(voicemail_id=voicemail.id)
         return {'total': len(items),
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True)}
 
 
 class UserVoicemailLegacy(UserVoicemailResource):
@@ -93,7 +93,7 @@ class UserVoicemailLegacy(UserVoicemailResource):
         user = self.get_user(user_id, tenant_uuids=tenant_uuids)
 
         user_voicemail = self.service.get_by(user_id=user.id)
-        return self.schema().dump(user_voicemail).data
+        return self.schema().dump(user_voicemail)
 
     @required_acl('confd.users.{user_id}.voicemail.create')
     def post(self, user_id):
@@ -103,7 +103,7 @@ class UserVoicemailLegacy(UserVoicemailResource):
         voicemail = self.get_voicemail_or_fail(tenant_uuids=tenant_uuids)
 
         user_voicemail = self.service.associate(user, voicemail)
-        return self.schema().dump(user_voicemail).data, 201, self.build_headers(user_voicemail)
+        return self.schema().dump(user_voicemail), 201, self.build_headers(user_voicemail)
 
     @required_acl('confd.users.{user_id}.voicemail.delete')
     def delete(self, user_id):
@@ -124,7 +124,7 @@ class UserVoicemailLegacy(UserVoicemailResource):
         return {'Location': url}
 
     def get_voicemail_or_fail(self, tenant_uuids=None):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             return self.voicemail_dao.get(form['voicemail_id'], tenant_uuids=tenant_uuids)
         except NotFoundError:

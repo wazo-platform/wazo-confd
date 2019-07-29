@@ -1,7 +1,11 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_load
+from marshmallow import (
+    EXCLUDE,
+    fields,
+    post_load,
+)
 from marshmallow.validate import Range
 
 from wazo_confd.helpers.mallow import BaseSchema
@@ -18,7 +22,8 @@ class CallFilterRecipientUserSchema(BaseSchema):
 
 
 class CallFilterRecipientUsersSchema(BaseSchema):
-    users = fields.Nested(CallFilterRecipientUserSchema, many=True, required=True)
+    users = fields.Nested(CallFilterRecipientUserSchema, many=True,
+                          required=True, unknown=EXCLUDE)
 
 
 class CallFilterSurrogateUserSchema(BaseSchema):
@@ -31,4 +36,5 @@ class CallFilterSurrogateUserSchema(BaseSchema):
 
 
 class CallFilterSurrogateUsersSchema(BaseSchema):
-    users = fields.Nested(CallFilterSurrogateUserSchema, many=True, required=True)
+    users = fields.Nested(CallFilterSurrogateUserSchema, many=True,
+                          required=True, unknown=EXCLUDE)

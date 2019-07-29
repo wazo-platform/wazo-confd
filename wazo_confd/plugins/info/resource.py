@@ -24,4 +24,4 @@ class Info(ConfdResource):
     @required_acl('confd.infos.read')
     def get(self):
         info = self.service.get()
-        return self.schema().dump(info).data
+        return self.schema().dump(info)

@@ -6,7 +6,7 @@ import logging
 
 from flask import url_for
 from flask_restful import abort
-from marshmallow import Schema, fields, pre_load
+from marshmallow import EXCLUDE, Schema, fields, pre_load
 from marshmallow.exceptions import RegistryError, ValidationError
 
 logger = logging.getLogger(__name__)
@@ -54,6 +54,7 @@ class BaseSchema(Schema):
 
     class Meta:
         ordered = True
+        unknown = EXCLUDE
 
 
 class UserSchemaUUIDLoad(BaseSchema):
@@ -61,7 +62,10 @@ class UserSchemaUUIDLoad(BaseSchema):
 
 
 class UsersUUIDSchema(BaseSchema):
-    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
+    users = fields.Nested(
+        UserSchemaUUIDLoad,
+        many=True, required=True, unknown=EXCLUDE
+    )
 
 
 class StrictBoolean(fields.Boolean):

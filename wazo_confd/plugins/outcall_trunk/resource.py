@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import fields
+from marshmallow import (
+    EXCLUDE,
+    fields,
+)
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -17,7 +20,10 @@ class TrunkSchemaIDLoad(BaseSchema):
 
 
 class TrunksSchema(BaseSchema):
-    trunks = fields.Nested(TrunkSchemaIDLoad, many=True, required=True)
+    trunks = fields.Nested(
+        TrunkSchemaIDLoad,
+        many=True, required=True, unknown=EXCLUDE
+    )
 
 
 class OutcallTrunkList(ConfdResource):
@@ -35,7 +41,7 @@ class OutcallTrunkList(ConfdResource):
     def put(self, outcall_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             trunks = [self.trunk_dao.get(trunk['id'], tenant_uuids=tenant_uuids) for trunk in form['trunks']]
         except NotFoundError as e:

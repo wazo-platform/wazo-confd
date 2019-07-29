@@ -107,15 +107,15 @@ class FuncKeyTemplateList(ListResource):
         params = self.search_params()
         result = self.service.search(params)
         return {'total': result.total,
-                'items': [self.schema(context=self.context).dump(item).data for item in result.items]}
+                'items': [self.schema(context=self.context).dump(item) for item in result.items]}
 
     @required_acl('confd.funckeys.templates.create')
     def post(self):
         schema = self.schema(context=self.context)
-        template = schema.load(request.get_json()).data
+        template = schema.load(request.get_json())
         template_model = self._create_template_model(template)
         model = self.service.create(template_model)
-        return schema.dump(model).data, 201, self.build_headers(model)
+        return schema.dump(model), 201, self.build_headers(model)
 
     def _create_template_model(self, template):
         for position, funckey in template.get('keys', {}).items():
@@ -135,12 +135,12 @@ class FuncKeyTemplateItem(ConfdResource, FindUpdateFieldsMixin):
     @required_acl('confd.funckeys.templates.{id}.read')
     def get(self, id):
         template = self.service.get(id)
-        return self.schema(context=self.context).dump(template).data
+        return self.schema(context=self.context).dump(template)
 
     @required_acl('confd.funckeys.templates.{id}.update')
     def put(self, id):
         template = self.service.get(id)
-        template_form = self.schema().load(request.get_json()).data
+        template_form = self.schema().load(request.get_json())
         updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
 
         for position, funckey in template_form.get('keys', {}).items():
@@ -167,12 +167,12 @@ class FuncKeyTemplateItemPosition(ItemResource):
     @required_acl('confd.funckeys.templates.{id}.{position}.read')
     def get(self, id, position):
         funckey = self.service.get(id).get(position)
-        return self.schema(context=self.context).dump(funckey).data
+        return self.schema(context=self.context).dump(funckey)
 
     @required_acl('confd.funckeys.templates.{id}.{position}.update')
     def put(self, id, position):
         template = self.service.get(id)
-        funckey = self.schema(context=self.context).load(request.get_json()).data
+        funckey = self.schema(context=self.context).load(request.get_json())
         funckey_model = _create_funckey_model(funckey)
         self.service.edit_funckey(funckey_model, template, position)
         return '', 204
@@ -203,13 +203,13 @@ class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
     @required_acl('confd.users.{user_id}.funckeys.read')
     def get(self, user_id):
         template = self.service.get_unified_template(user_id)
-        return self.schema().dump(template).data
+        return self.schema().dump(template)
 
     @required_acl('confd.users.{user_id}.funckeys.update')
     def put(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
         template = self.template_dao.get(user.private_template_id)
-        template_form = self.schema().load(request.get_json()).data
+        template_form = self.schema().load(request.get_json())
         updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
 
         for position, funckey in template_form.get('keys', {}).items():
@@ -230,7 +230,7 @@ class UserFuncKeyItemPosition(UserFuncKey):
     def put(self, user_id, position):
         user = self.user_dao.get_by_id_uuid(user_id)
         template = self.template_dao.get(user.private_template_id)
-        funckey = self.schema().load(request.get_json()).data
+        funckey = self.schema().load(request.get_json())
         funckey_model = _create_funckey_model(funckey)
         self.service.edit_user_funckey(user, funckey_model, template, position)
         return '', 204
@@ -246,7 +246,7 @@ class UserFuncKeyItemPosition(UserFuncKey):
     def get(self, user_id, position):
         template = self.service.get_unified_template(user_id)
         funckey = template.get(position)
-        return self.schema().dump(funckey).data
+        return self.schema().dump(funckey)
 
 
 class UserFuncKeyTemplate(ConfdResource):
@@ -287,7 +287,7 @@ class UserFuncKeyTemplateGet(UserFuncKeyTemplate):
         user = self.get_user(user_id)
         result = self.service.find_all_by_user_id(user.id)
         return {'total': len(result),
-                'items': [self.schema().dump(item).data for item in result]}
+                'items': [self.schema().dump(item) for item in result]}
 
 
 class FuncKeyTemplateUserGet(UserFuncKeyTemplate):
@@ -299,4 +299,4 @@ class FuncKeyTemplateUserGet(UserFuncKeyTemplate):
         template = self.template_dao.get(template_id)
         result = self.service.find_all_by_template_id(template.id)
         return {'total': len(result),
-                'items': [self.schema().dump(item).data for item in result]}
+                'items': [self.schema().dump(item) for item in result]}

@@ -93,14 +93,14 @@ class RegisterSIPList(ListResource):
 
     @required_acl('confd.registers.create')
     def post(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         model = self.model(filename='sip.conf',
                            category='general',
                            var_name='register',
                            var_val=form['var_val'],
                            enabled=form['enabled'])
         model = self.service.create(model)
-        return self.schema().dump(model).data, 201, self.build_headers(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.registers.read')
     def get(self):
@@ -118,12 +118,12 @@ class RegisterSIPItem(ItemResource):
     @required_acl('confd.registers.{id}.update')
     def put(self, id):
         model = self.service.get(id)
-        form = self.schema().load(request.get_json(), partial=True).data
+        form = self.schema().load(request.get_json(), partial=True)
 
-        model_json = self.schema().dump(model).data
+        model_json = self.schema().dump(model)
         for name, value in form.items():
             model_json[name] = value
-        model_json = self.schema().load(model_json).data  # update var_val
+        model_json = self.schema().load(model_json)  # update var_val
 
         model.var_val = model_json['var_val']
         model.enabled = model_json['enabled']

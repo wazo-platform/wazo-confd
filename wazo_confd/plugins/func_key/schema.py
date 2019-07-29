@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
-from marshmallow import Schema, fields, validates, post_dump
+from marshmallow import EXCLUDE, Schema, fields, validates, post_dump
 from marshmallow.validate import OneOf, Regexp, Range, Length
 from marshmallow.exceptions import ValidationError
 
@@ -222,14 +222,20 @@ class FuncKeyDestinationField(fields.Nested):
         'user': UserDestinationSchema,
     }
 
+    def __init__(self, *args, **kwargs):
+        kwargs['unknown'] = EXCLUDE
+        super(FuncKeyDestinationField, self).__init__(*args, **kwargs)
+
     def _deserialize(self, value, attr, data):
         self.schema.context = self.context
         base = super(FuncKeyDestinationField, self)._deserialize(value, attr, data)
-        return fields.Nested(self.destination_schemas[base['type']])._deserialize(value, attr, data)
+        return fields.Nested(self.destination_schemas[base['type']],
+                             unknown=self.unknown)._deserialize(value, attr, data)
 
     def _serialize(self, nested_obj, attr, obj):
         base = super(FuncKeyDestinationField, self)._serialize(nested_obj, attr, obj)
-        return fields.Nested(self.destination_schemas[base['type']])._serialize(nested_obj, attr, obj)
+        return fields.Nested(self.destination_schemas[base['type']],
+                             unknown=self.unknown)._serialize(nested_obj, attr, obj)
 
 
 class FuncKeySchema(BaseSchema):
@@ -267,7 +273,8 @@ class FuncKeyPositionField(fields.Field):
         template = {}
         for raw_position, raw_funckey in value.items():
             position = self.key_field._serialize(raw_position, attr, obj)
-            funckey = self.nested_field.serialize(raw_position, self.get_value(attr, obj))
+            funckey = self.nested_field.serialize(raw_position,
+                                                  getattr(obj, attr))
             template[position] = funckey
         return template
 
@@ -277,7 +284,7 @@ class FuncKeyTemplateSchema(BaseSchema):
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
-        fields.Nested(FuncKeySchema, required=True),
+        fields.Nested(FuncKeySchema, required=True, unknown=EXCLUDE),
     )
     links = ListLink(Link('func_keys_templates'))
 
@@ -287,7 +294,7 @@ class FuncKeyUnifiedTemplateSchema(BaseSchema):
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
-        fields.Nested(FuncKeySchema, required=True),
+        fields.Nested(FuncKeySchema, required=True, unknown=EXCLUDE),
     )
 
 

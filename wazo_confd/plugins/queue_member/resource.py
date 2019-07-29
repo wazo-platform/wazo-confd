@@ -44,7 +44,7 @@ class QueueMemberAgentItem(ConfdResource):
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
         agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         member = self.service.get_member_agent(queue, agent)
-        return QueueMemberAgentLegacySchema().dump(member).data
+        return QueueMemberAgentLegacySchema().dump(member)
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.update')
     def put(self, queue_id, agent_id):
@@ -52,7 +52,7 @@ class QueueMemberAgentItem(ConfdResource):
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
         agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, agent)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         member.penalty = form['penalty']
         member.priority = form['priority']
         self.service.associate_member_agent(queue, member)
@@ -91,7 +91,7 @@ class QueueMemberUserItem(ConfdResource):
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
         user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, user)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         setattr(member, 'priority', form['priority'])
         self.service.associate_member_user(queue, member)
         return '', 204
@@ -133,12 +133,12 @@ class QueueMemberAgentListLegacy(ConfdResource):
     def post(self, queue_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         agent = self.service.get_agent(form['agent']['id'], tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, agent)
         member.penalty = form['penalty']
         self.service.associate_legacy(queue, member)
-        return self.schema().dump(member).data, 201, self.build_headers(member)
+        return self.schema().dump(member), 201, self.build_headers(member)
 
     def _find_or_create_member(self, queue, agent):
         member = self.service.find_member_agent(queue, agent)

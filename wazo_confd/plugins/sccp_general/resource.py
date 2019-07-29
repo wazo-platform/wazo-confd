@@ -52,11 +52,11 @@ class SCCPGeneralList(ConfdResource):
     @required_acl('confd.asterisk.sccp.general.get')
     def get(self):
         options = self.service.list()
-        return self.schema().dump({'options': options}).data
+        return self.schema().dump({'options': options})
 
     @required_acl('confd.asterisk.sccp.general.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         sccp_general = [self.model(**option) for option in form['options']]
         self.service.edit(sccp_general)
         return '', 204

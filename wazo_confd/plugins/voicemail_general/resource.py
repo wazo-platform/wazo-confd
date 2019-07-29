@@ -51,11 +51,11 @@ class VoicemailGeneralList(ConfdResource):
     @required_acl('confd.asterisk.voicemail.general.get')
     def get(self):
         options = self.service.list()
-        return self.schema().dump({'options': options}).data
+        return self.schema().dump({'options': options})
 
     @required_acl('confd.asterisk.voicemail.general.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         voicemail_general = [StaticVoicemail(**option) for option in form['options']]
         self.service.edit(voicemail_general)
         return '', 204

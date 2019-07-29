@@ -26,7 +26,7 @@ class SwitchboardMemberUserItem(ConfdResource):
     def put(self, switchboard_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         switchboard = self.switchboard_dao.get(switchboard_uuid, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             users = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
                      for user in form['users']]

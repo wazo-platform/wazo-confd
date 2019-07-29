@@ -19,10 +19,10 @@ class HAResource(ConfdResource):
     @required_acl('confd.ha.read')
     def get(self):
         model = self.service.get()
-        return self.schema().dump(model).data
+        return self.schema().dump(model)
 
     @required_acl('confd.ha.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         self.service.edit(form)
         return '', 204

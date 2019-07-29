@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import fields
+from marshmallow import (
+    EXCLUDE,
+    fields,
+)
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -17,7 +20,10 @@ class GroupSchemaIDLoad(BaseSchema):
 
 
 class GroupsIDSchema(BaseSchema):
-    groups = fields.Nested(GroupSchemaIDLoad, many=True, required=True)
+    groups = fields.Nested(
+        GroupSchemaIDLoad,
+        many=True, required=True, unknown=EXCLUDE
+    )
 
 
 class UserGroupItem(ConfdResource):
@@ -33,7 +39,7 @@ class UserGroupItem(ConfdResource):
     @required_acl('confd.users.{user_id}.groups.update')
     def put(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             groups = [self.group_dao.get_by(id=group['id']) for group in form['groups']]
         except NotFoundError as e:

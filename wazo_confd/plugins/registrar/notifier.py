@@ -17,13 +17,13 @@ class RegistrarNotifier:
         self.bus = bus
 
     def created(self, registrar):
-        event = CreateRegistrarEvent(self.schema.dump(registrar).data)
+        event = CreateRegistrarEvent(self.schema.dump(registrar))
         self.bus.send_bus_event(event)
 
     def edited(self, registrar):
-        event = EditRegistrarEvent(self.schema.dump(registrar).data)
+        event = EditRegistrarEvent(self.schema.dump(registrar))
         self.bus.send_bus_event(event)
 
     def deleted(self, registrar):
-        event = DeleteRegistrarEvent(self.schema.dump(registrar).data)
+        event = DeleteRegistrarEvent(self.schema.dump(registrar))
         self.bus.send_bus_event(event)

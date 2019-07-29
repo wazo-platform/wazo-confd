@@ -4,11 +4,15 @@
 import unittest
 from mock import Mock
 from hamcrest import (
+    calling,
     assert_that,
     equal_to,
     has_entries,
     has_key,
+    has_property,
 )
+from marshmallow import ValidationError
+from xivo_test_helpers.hamcrest.raises import raises
 
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
 
@@ -18,13 +22,14 @@ from ..resource import RegisterIAXSchema
 class TestRegisterIAXSchema(unittest.TestCase):
 
     def setUp(self):
-        self.schema = RegisterIAXSchema(handle_error=False, exclude=('links',))
+        self.schema = RegisterIAXSchema(handle_error=False, exclude=('links', 'trunk'))
 
     def test_dump(self):
         register = Mock(var_val='auth_username:auth_password@'
-                                'remote_host:6666/callback_extension?callback_context')
+                                'remote_host:6666/callback_extension?callback_context',
+                        id=1)
 
-        result = self.schema.dump(register).data
+        result = self.schema.dump(register)
         assert_that(
             result,
             has_entries(
@@ -38,9 +43,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
         )
 
     def test_dump_only_required(self):
-        register = Mock(var_val='remote_host')
+        register = Mock(var_val='remote_host',
+                        id=1)
 
-        result = self.schema.dump(register).data
+        result = self.schema.dump(register)
         assert_that(
             result,
             has_entries(
@@ -54,9 +60,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
         )
 
     def test_dump_without_auth_username(self):
-        register = Mock(var_val='remote_host:6666/callback_extension?callback_context')
+        register = Mock(var_val='remote_host:6666/callback_extension?callback_context',
+                        id=1)
 
-        result = self.schema.dump(register).data
+        result = self.schema.dump(register)
         assert_that(
             result,
             has_entries(
@@ -71,9 +78,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
     def test_dump_without_auth_password(self):
         register = Mock(var_val='auth_username@'
-                                'remote_host:6666/callback_extension?callback_context')
+                                'remote_host:6666/callback_extension?callback_context',
+                        id=1)
 
-        result = self.schema.dump(register).data
+        result = self.schema.dump(register)
         assert_that(
             result,
             has_entries(
@@ -88,9 +96,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
     def test_dump_without_remote_port(self):
         register = Mock(var_val='auth_username:auth_password@'
-                                'remote_host/callback_extension?callback_context')
+                                'remote_host/callback_extension?callback_context',
+                        id=1)
 
-        result = self.schema.dump(register).data
+        result = self.schema.dump(register)
         assert_that(
             result,
             has_entries(
@@ -105,9 +114,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
     def test_dump_without_callback_extension(self):
         register = Mock(var_val='auth_username:auth_password@'
-                                'remote_host:6666?callback_context')
+                                'remote_host:6666?callback_context',
+                        id=1)
 
-        result = self.schema.dump(register).data
+        result = self.schema.dump(register)
         assert_that(
             result,
             has_entries(
@@ -130,7 +140,7 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'callback_context': 'callback_context',
         }
 
-        result = self.schema.load(body).data
+        result = self.schema.load(body)
 
         assert_that(
             result['var_val'],
@@ -141,7 +151,7 @@ class TestRegisterIAXSchema(unittest.TestCase):
     def test_load_only_required(self):
         body = {'remote_host': 'remote_host'}
 
-        result = self.schema.load(body).data
+        result = self.schema.load(body)
 
         assert_that(result['var_val'], equal_to('remote_host'))
 
@@ -153,7 +163,7 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'callback_context': 'callback_context',
         }
 
-        result = self.schema.load(body).data
+        result = self.schema.load(body)
 
         assert_that(result['var_val'], equal_to('remote_host:6666/callback_extension?callback_context'))
 
@@ -166,7 +176,7 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'callback_context': 'callback_context',
         }
 
-        result = self.schema.load(body).data
+        result = self.schema.load(body)
 
         assert_that(
             result['var_val'],
@@ -183,7 +193,7 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'callback_context': 'callback_context',
         }
 
-        result = self.schema.load(body).data
+        result = self.schema.load(body)
 
         assert_that(
             result['var_val'],
@@ -200,8 +210,12 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'callback_extension': 'callback_extension_really_really_really_really_really_long_string',
         }
 
-        result = self.schema.load(body).errors
-        assert_that(result, has_key('_schema'))
+        assert_that(
+            calling(self.schema.load).with_args(body),
+            raises(ValidationError, has_property(
+                'messages', has_key('_schema')
+            ))
+        )
 
     def test_validate_auth_username(self):
         body = {
@@ -209,8 +223,12 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'remote_host': 'remote_host',
         }
 
-        result = self.schema.load(body).errors
-        assert_that(result, has_key('auth_username'))
+        assert_that(
+            calling(self.schema.load).with_args(body),
+            raises(ValidationError, has_property(
+                'messages', has_key('auth_username')
+            ))
+        )
 
     def test_validate_callback_context(self):
         body = {
@@ -218,5 +236,9 @@ class TestRegisterIAXSchema(unittest.TestCase):
             'remote_host': 'remote_host',
         }
 
-        result = self.schema.load(body).errors
-        assert_that(result, has_key('callback_context'))
+        assert_that(
+            calling(self.schema.load).with_args(body),
+            raises(ValidationError, has_property(
+                'messages', has_key('callback_context')
+            ))
+        )

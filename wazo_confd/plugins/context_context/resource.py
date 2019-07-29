@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import fields
+from marshmallow import (
+    EXCLUDE,
+    fields,
+)
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -17,7 +20,10 @@ class ContextSchemaIDLoad(BaseSchema):
 
 
 class ContextsSchema(BaseSchema):
-    contexts = fields.Nested(ContextSchemaIDLoad, many=True, required=True)
+    contexts = fields.Nested(
+        ContextSchemaIDLoad,
+        many=True, required=True, unknown=EXCLUDE
+    )
 
 
 class ContextContextList(ConfdResource):
@@ -32,7 +38,7 @@ class ContextContextList(ConfdResource):
     @required_acl('confd.contexts.{context_id}.contexts.update')
     def put(self, context_id):
         context = self.context_dao.get(context_id)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             contexts = [self.context_dao.get(c['id']) for c in form['contexts']]
         except NotFoundError as e:

@@ -35,6 +35,8 @@ class ApplicationDestinationOptionsField(fields.Field):
         return concrete_options._deserialize(value, attr, data)
 
     def _serialize(self, value, attr, obj):
+        if not obj.dest_node:
+            return {}
         destination = obj.destination
         concrete_options = self._options.get(destination)
         if not concrete_options:
@@ -66,6 +68,7 @@ class ApplicationSchema(BaseSchema):
         if obj.dest_node:
             obj.destination = 'node'
             obj.destination_options = obj.dest_node
+        return obj
 
     @post_load
     def create_objects(self, data):
@@ -74,3 +77,4 @@ class ApplicationSchema(BaseSchema):
         data['dest_node'] = None
         if dest == 'node':
             data['dest_node'] = ApplicationDestNode(**dest_options)
+        return data

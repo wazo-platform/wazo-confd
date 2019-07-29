@@ -26,17 +26,17 @@ class ApplicationNotifier:
         self.bus = bus
 
     def created(self, application):
-        app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application).data
+        app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = CreateApplicationEvent(app_serialized)
         self.bus.send_bus_event(event)
 
     def edited(self, application):
-        app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application).data
+        app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = EditApplicationEvent(app_serialized)
         self.bus.send_bus_event(event)
 
     def deleted(self, application):
-        app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application).data
+        app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = DeleteApplicationEvent(app_serialized)
         self.bus.send_bus_event(event)
 

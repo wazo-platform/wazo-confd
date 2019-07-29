@@ -55,3 +55,4 @@ class IvrSchema(BaseSchema):
                 IVRChoice(exten=choice['exten'], destination=Dialaction(**choice['destination']))
                 for choice in data['choices']
             ]
+        return data

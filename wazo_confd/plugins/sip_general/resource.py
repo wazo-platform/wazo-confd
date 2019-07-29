@@ -30,6 +30,7 @@ class SIPGeneralOrderedOption(SIPGeneralOption):
     def add_envelope(self, data):
         if isinstance(data, list) and len(data) == 2:
             return {'key': data[0], 'value': data[1]}
+        return data
 
     @post_dump
     def remove_envelope(self, data):
@@ -88,11 +89,11 @@ class SIPGeneralList(ConfdResource):
     @required_acl('confd.asterisk.sip.general.get')
     def get(self):
         options = self.service.list()
-        return self.schema().dump(options).data
+        return self.schema().dump(options)
 
     @required_acl('confd.asterisk.sip.general.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         sip_general = [self.model(**option) for option in form]
         self.service.edit(sip_general)
         return '', 204

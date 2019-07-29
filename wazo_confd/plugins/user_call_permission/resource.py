@@ -58,7 +58,7 @@ class UserCallPermissionGet(UserCallPermission):
         user = self.user_dao.get_by_id_uuid(user_id)
         user_call_permissions = self.service.find_all_by(user_id=user.id)
         return {'total': len(user_call_permissions),
-                'items': self.schema().dump(user_call_permissions, many=True).data}
+                'items': self.schema().dump(user_call_permissions, many=True)}
 
 
 class CallPermissionUserGet(UserCallPermission):
@@ -70,4 +70,4 @@ class CallPermissionUserGet(UserCallPermission):
         call_permission = self.call_permission_dao.get(call_permission_id)
         user_call_permissions = self.service.find_all_by(call_permission_id=call_permission.id)
         return {'total': len(user_call_permissions),
-                'items': self.schema().dump(user_call_permissions, many=True).data}
+                'items': self.schema().dump(user_call_permissions, many=True)}

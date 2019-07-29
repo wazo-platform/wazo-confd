@@ -58,11 +58,11 @@ class VoicemailZoneMessagesList(ConfdResource):
     @required_acl('confd.asterisk.voicemail.zonemessages.get')
     def get(self):
         options = self.service.list()
-        return self.schema().dump(options).data
+        return self.schema().dump(options)
 
     @required_acl('confd.asterisk.voicemail.zonemessages.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         voicemail_zonemessages = [StaticVoicemail(**option) for option in form]
         self.service.edit(voicemail_zonemessages)
         return '', 204

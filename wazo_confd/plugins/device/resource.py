@@ -42,15 +42,15 @@ class DeviceList(SingleTenantMixin, ListResource):
 
         total, items = self.service.search(params, tenant_uuid=tenant_uuid)
         return {'total': total,
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.devices.create')
     def post(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         model = self.model(**form)
         kwargs = self._add_tenant_uuid()
         model = self.service.create(model, tenant_uuid=kwargs['tenant_uuid'])
-        return self.schema().dump(model).data, 201, self.build_headers(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
 
 class UnallocatedDeviceList(ListResource):
@@ -65,7 +65,7 @@ class UnallocatedDeviceList(ListResource):
 
         total, items = self.service.search(params)
         return {'total': total,
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True)}
 
 
 class UnallocatedDeviceItem(SingleTenantConfdResource):

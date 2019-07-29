@@ -31,7 +31,7 @@ class CallPickupInterceptorGroupList(ConfdResource):
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             interceptors = [self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
                             for group in form['groups']]
@@ -56,7 +56,7 @@ class CallPickupTargetGroupList(ConfdResource):
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             targets = [self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
                        for group in form['groups']]
@@ -81,7 +81,7 @@ class CallPickupInterceptorUserList(ConfdResource):
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             interceptors = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
                             for user in form['users']]
@@ -106,7 +106,7 @@ class CallPickupTargetUserList(ConfdResource):
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             targets = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
                        for user in form['users']]

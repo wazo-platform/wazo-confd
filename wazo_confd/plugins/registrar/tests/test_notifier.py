@@ -24,21 +24,21 @@ class TestRegistrarNotifier(unittest.TestCase):
         self.notifier = RegistrarNotifier(self.bus)
 
     def test_when_registrar_created_then_event_sent_on_bus(self):
-        expected_event = CreateRegistrarEvent(self.schema.dump(self.registrar).data)
+        expected_event = CreateRegistrarEvent(self.schema.dump(self.registrar))
 
         self.notifier.created(self.registrar)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_registrar_edited_then_event_sent_on_bus(self):
-        expected_event = EditRegistrarEvent(self.schema.dump(self.registrar).data)
+        expected_event = EditRegistrarEvent(self.schema.dump(self.registrar))
 
         self.notifier.edited(self.registrar)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_registrar_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteRegistrarEvent(self.schema.dump(self.registrar).data)
+        expected_event = DeleteRegistrarEvent(self.schema.dump(self.registrar))
 
         self.notifier.deleted(self.registrar)
 

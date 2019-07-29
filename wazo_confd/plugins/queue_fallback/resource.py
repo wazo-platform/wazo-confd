@@ -23,12 +23,12 @@ class QueueFallbackList(ConfdResource):
     def get(self, queue_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
-        return self.schema().dump(queue.fallbacks).data
+        return self.schema().dump(queue.fallbacks)
 
     @required_acl('confd.queues.{queue_id}.fallbacks.update')
     def put(self, queue_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
-        fallbacks = self.schema().load(request.get_json()).data
+        fallbacks = self.schema().load(request.get_json())
         self.service.edit(queue, fallbacks)
         return '', 204

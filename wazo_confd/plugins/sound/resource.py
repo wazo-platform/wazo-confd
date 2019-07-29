@@ -38,7 +38,7 @@ class SoundItem(ItemResource):
     def get(self, category):
         tenant = Tenant.autodetect()
         model = self.service.get(tenant.uuid, category)
-        return self.schema().dump(model).data
+        return self.schema().dump(model)
 
     @required_acl('confd.sounds.{category}.delete')
     def delete(self, category):
@@ -61,7 +61,7 @@ class SoundFileItem(ConfdResource):
     @required_acl('confd.sounds.{category}.files.{filename}.read')
     def get(self, category, filename):
         tenant = Tenant.autodetect()
-        parameters = SoundQueryParametersSchema().load(request.args).data
+        parameters = SoundQueryParametersSchema().load(request.args)
         parameters['file_name'] = filename
         sound = self.service.get(tenant.uuid, category, parameters)
         response = self.service.load_first_file(sound)
@@ -70,7 +70,7 @@ class SoundFileItem(ConfdResource):
     @required_acl('confd.sounds.{category}.files.{filename}.update')
     def put(self, category, filename):
         tenant = Tenant.autodetect()
-        parameters = SoundQueryParametersSchema().load(request.args).data
+        parameters = SoundQueryParametersSchema().load(request.args)
         sound = self.service.get(tenant.uuid, category, with_files=False)
         sound_file = SoundFile(
             name=filename,
@@ -83,7 +83,7 @@ class SoundFileItem(ConfdResource):
     @required_acl('confd.sounds.{category}.files.{filename}.delete')
     def delete(self, category, filename):
         tenant = Tenant.autodetect()
-        parameters = SoundQueryParametersSchema().load(request.args).data
+        parameters = SoundQueryParametersSchema().load(request.args)
         parameters['file_name'] = filename
         sound = self.service.get(tenant.uuid, category, parameters)
         self.service.delete_files(sound)

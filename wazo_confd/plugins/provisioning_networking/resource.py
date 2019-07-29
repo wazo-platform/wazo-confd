@@ -19,12 +19,12 @@ class ProvisioningNetworkingResource(ConfdResource):
     @required_acl('confd.provisioning.networking.read')
     def get(self):
         model = self.service.get()
-        return self.schema().dump(model).data
+        return self.schema().dump(model)
 
     @required_acl('confd.provisioning.networking.update')
     def put(self):
         model = self.service.get()
-        form = self.schema().load(request.get_json(), partial=True).data
+        form = self.schema().load(request.get_json(), partial=True)
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model)

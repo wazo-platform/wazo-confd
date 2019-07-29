@@ -68,14 +68,14 @@ class TrunkEndpointGet(TrunkEndpoint):
 
     def get(self, trunk_id):
         trunk_endpoint = self.service.get_association_from_trunk(trunk_id)
-        return self.schema().dump(trunk_endpoint).data
+        return self.schema().dump(trunk_endpoint)
 
 
 class EndpointTrunkGet(TrunkEndpoint):
 
     def get(self, endpoint_id):
         trunk_endpoint = self.service.get_association_from_endpoint(endpoint_id)
-        return self.schema().dump(trunk_endpoint).data
+        return self.schema().dump(trunk_endpoint)
 
 
 class TrunkEndpointAssociationSip(TrunkEndpointAssociation):

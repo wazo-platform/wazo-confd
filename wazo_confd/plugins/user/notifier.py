@@ -74,7 +74,7 @@ class UserServiceNotifier:
         self.bus = bus
 
     def edited(self, user, schema):
-        services = schema.dump(user).data
+        services = schema.dump(user)
         for type_ in schema.types:
             service = services.get(type_, services)
             event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
@@ -91,7 +91,7 @@ class UserForwardNotifier:
         self.bus = bus
 
     def edited(self, user, schema):
-        forwards = schema.dump(user).data
+        forwards = schema.dump(user)
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
             event = EditUserForwardEvent(user.uuid, type_, forward['enabled'], forward['destination'])

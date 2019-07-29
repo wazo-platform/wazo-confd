@@ -2,7 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
-from marshmallow import fields
+from marshmallow import (
+    EXCLUDE,
+    fields,
+)
 
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
@@ -32,7 +35,10 @@ class LineSchemaIDLoad(BaseSchema):
 
 
 class LinesIDSchema(BaseSchema):
-    lines = fields.Nested(LineSchemaIDLoad, many=True, required=True)
+    lines = fields.Nested(
+        LineSchemaIDLoad,
+        many=True, required=True, unknown=EXCLUDE
+    )
 
 
 class UserLineResource(ConfdResource):
@@ -57,12 +63,12 @@ class UserLineList(UserLineResource):
         user = self.get_user(user_id)
         items = self.service.find_all_by(user_id=user.id)
         return {'total': len(items),
-                'items': self.deprecated_schema().dump(items, many=True).data}
+                'items': self.deprecated_schema().dump(items, many=True)}
 
     @required_acl('confd.users.{user_id}.lines.update')
     def put(self, user_id):
         user = self.get_user(user_id)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             lines = [self.line_dao.get(line['id']) for line in form['lines']]
         except NotFoundError as e:
@@ -79,10 +85,10 @@ class UserLineList(UserLineResource):
         user = self.get_user(user_id)
         line = self.get_line_or_fail()
         user_line = self.service.associate(user, line)
-        return self.deprecated_schema().dump(user_line).data, 201, self.build_headers(user_line)
+        return self.deprecated_schema().dump(user_line), 201, self.build_headers(user_line)
 
     def get_line_or_fail(self):
-        form = self.deprecated_schema().load(request.get_json()).data
+        form = self.deprecated_schema().load(request.get_json())
         try:
             return self.line_dao.get(form['line_id'])
         except NotFoundError:
@@ -130,4 +136,4 @@ class LineUserList(UserLineResource):
         line = self.line_dao.get(line_id)
         items = self.service.find_all_by(line_id=line.id)
         return {'total': len(items),
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True)}
