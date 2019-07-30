@@ -223,40 +223,6 @@ def test_get_line_associated_to_a_device_from_sub_tenant_errors():
         response.assert_status(404)
 
 
-def test_registrar_addresses_without_backup_on_sip_device():
-    provd.reset()
-    registrar = provd.configs.get('default')
-
-    with line_and_device('sip') as (line, device), a.line_device(line, device):
-        config = provd.configs.get(device['id'])
-        sip_config = config['raw_config']['sip_lines']['1']
-
-        assert_that(sip_config, has_entries(
-            proxy_ip=registrar['proxy_main'],
-            registrar_ip=registrar['registrar_main']
-        ))
-
-        assert_that(sip_config, is_not(has_key('backup_proxy_ip')))
-        assert_that(sip_config, is_not(has_key('backup_registrar_ip')))
-
-
-def check_registrar_addresses_without_backup_on_sccp_device():
-    provd.reset()
-    registrar = provd.configs.get('default')
-
-    with line_and_device('sccp') as (line, device), a.line_device(line, device):
-        config = provd.configs.get(device['id'])
-        sccp_config = config['raw_config']['sccp_call_managers']
-
-        assert_that(sccp_config, has_entries(
-            {'1': has_entries(
-                ip=registrar['proxy_main']
-            )}
-        ))
-
-        assert_that(sccp_config, is_not(has_key('2')))
-
-
 def assert_provd_config(user, line, provd_config):
     assert_that(provd_config, has_entries(
         id=is_not(starts_with('autoprov')),

@@ -8,6 +8,7 @@ from hamcrest import (
     has_entries,
     has_entry,
     has_item,
+    has_key,
     is_not,
     none,
 )
@@ -417,6 +418,40 @@ def test_edit_registrar_updates_sccp_device(registrar):
                 ip=new_registrar_body['proxy_backup_host']
             )
         }))
+
+
+def test_registrar_addresses_without_backup_on_sip_device():
+    provd.reset()
+    registrar = confd.registrars('default').get().item
+
+    with line_device('sip') as (line, device):
+        config = provd.configs.get(device['id'])
+        sip_config = config['raw_config']['sip_lines']['1']
+
+        assert_that(sip_config, has_entries(
+            proxy_ip=registrar['proxy_main_host'],
+            registrar_ip=registrar['main_host']
+        ))
+
+        assert_that(sip_config, is_not(has_key('backup_proxy_ip')))
+        assert_that(sip_config, is_not(has_key('backup_registrar_ip')))
+
+
+def check_registrar_addresses_without_backup_on_sccp_device():
+    provd.reset()
+    registrar = confd.registrars('default').get().item
+
+    with line_device('sccp') as (line, device):
+        config = provd.configs.get(device['id'])
+        sccp_config = config['raw_config']['sccp_call_managers']
+
+        assert_that(sccp_config, has_entries(
+            {'1': has_entries(
+                ip=registrar['proxy_main_host']
+            )}
+        ))
+
+        assert_that(sccp_config, is_not(has_key('2')))
 
 
 @fixtures.registrar()
