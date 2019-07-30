@@ -30,14 +30,6 @@ class BaseSchema(Schema):
             self.handle_error = handle_error_fn
 
     def on_bind_field(self, field_name, field_obj):
-        if isinstance(field_obj, fields.Nested) and not self._nested_field_is_loaded(field_obj):
-            logger.warning('"%s": No such schema. Removing attribute "%s.%s". Some API models will be incomplete.',
-                           field_obj.nested,
-                           self.__class__.__name__,
-                           field_name)
-            self.declared_fields.pop(field_name, None)
-            return
-
         # Without this, the nested schema handle error and abort. So the error
         # message will not include parent key and the rest of the parent schema
         # will not be validated

@@ -3,10 +3,9 @@
 
 import unittest
 
-from mock import Mock
 from hamcrest import assert_that, calling, equal_to, raises
-from marshmallow import ValidationError, fields
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, AsteriskSection
+from marshmallow import ValidationError
+from wazo_confd.helpers.mallow import StrictBoolean, AsteriskSection
 
 
 class TestStrictBolean(unittest.TestCase):
@@ -18,18 +17,6 @@ class TestStrictBolean(unittest.TestCase):
     def test_that_strict_boolean_pass(self):
         strict = StrictBoolean()._deserialize
         self.assertEqual(strict(True, None, None), True)
-
-
-class TestBaseSchema(unittest.TestCase):
-
-    def test_that_schema_reference_unloaded_plugin_does_not_raise(self):
-        class FakeSchema(BaseSchema):
-            uuid = fields.String()
-            unloaded = fields.Nested('UnloadedSchema')
-
-        fake = Mock(uuid='abcd-1234', unloaded=Mock(uuid='efgh-5678'))
-        data = FakeSchema().dump(fake).data
-        assert_that(data, equal_to({'uuid': 'abcd-1234'}))
 
 
 class TestAsteriskSection(unittest.TestCase):
