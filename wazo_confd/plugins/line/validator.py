@@ -7,7 +7,6 @@ from xivo_dao.resources.line import dao as line_dao
 
 from wazo_confd.helpers.validator import (
     GetResource,
-    MemberOfSequence,
     Optional,
     ValidationGroup,
     Validator,
@@ -33,7 +32,16 @@ class ProvCodeChanged(ProvCodeAvailable):
             super(ProvCodeChanged, self).validate(line)
 
 
-def build_validator(device_dao):
+class RegistrarExists(Validator):
+
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, line):
+        self.dao.get_by(id=line.registrar)
+
+
+def build_validator(registrar_dao):
     return ValidationGroup(
         create=[
             Optional(
@@ -42,12 +50,12 @@ def build_validator(device_dao):
             ),
             Optional(
                 'registrar',
-                MemberOfSequence('registrar', device_dao.registrars, 'Registrar')
+                RegistrarExists(registrar_dao)
             ),
             GetResource('context', context_dao.get_by_name, 'Context'),
         ],
         edit=[
             ProvCodeChanged(line_dao),
-            MemberOfSequence('registrar', device_dao.registrars, 'Registrar'),
+            RegistrarExists(registrar_dao),
             GetResource('context', context_dao.get_by_name, 'Context'),
         ])
