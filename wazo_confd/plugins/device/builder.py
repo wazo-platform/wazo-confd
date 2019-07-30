@@ -36,6 +36,8 @@ from wazo_confd.plugins.line_device.service import LineDeviceService
 from wazo_confd.plugins.line_device.validator import build_validator as build_line_device_validator
 from wazo_confd.plugins.line_device.notifier import LineDeviceNotifier
 
+from wazo_confd.plugins.registrar.dao import RegistrarDao
+
 from .dao import DeviceDao
 from .notifier import DeviceNotifier
 from .validator import build_validator
@@ -65,7 +67,8 @@ def build_service(device_dao, provd_client):
 
 def build_device_updater(provd_client):
     device_dao = build_dao(provd_client)
-    generator = build_generators(device_dao)
+    registrar_dao = RegistrarDao(provd_client)
+    generator = build_generators(device_dao, registrar_dao)
     provd_updater = ProvdUpdater(device_dao, generator, line_dao)
     return DeviceUpdater(user_dao,
                          line_dao,
@@ -75,7 +78,7 @@ def build_device_updater(provd_client):
                          provd_updater)
 
 
-def build_generators(device_dao):
+def build_generators(device_dao, registrar_dao):
     converters = build_converters()
     funckey_generator = FuncKeyGenerator(user_dao,
                                          line_dao,
@@ -84,10 +87,10 @@ def build_generators(device_dao):
                                          device_dao,
                                          converters)
 
-    sip_generator = SipGenerator(device_dao,
+    sip_generator = SipGenerator(registrar_dao,
                                  device_db)
 
-    sccp_generator = SccpGenerator(device_dao,
+    sccp_generator = SccpGenerator(registrar_dao,
                                    line_dao)
 
     user_generator = UserGenerator(device_db)
