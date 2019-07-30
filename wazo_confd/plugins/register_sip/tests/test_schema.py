@@ -10,6 +10,8 @@ from hamcrest import (
     has_key,
 )
 
+from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
+
 from ..resource import RegisterSIPSchema
 
 

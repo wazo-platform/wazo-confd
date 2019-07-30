@@ -9,6 +9,11 @@ from xivo_bus.resources.user_line.event import UserLineAssociatedEvent, UserLine
 
 from ..notifier import UserLineNotifier
 
+from wazo_confd.plugins.endpoint_custom.schema import CustomSchema  # noqa
+from wazo_confd.plugins.endpoint_sccp.resource import SccpSchema  # noqa
+from wazo_confd.plugins.endpoint_sip.schema import SipSchema  # noqa
+
+
 EXPECTED_SYSCONFD_HANDLERS = {
     'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
     'agentbus': []
