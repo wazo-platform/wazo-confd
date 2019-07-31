@@ -196,10 +196,15 @@ def test_create_registrar_minimal_parameters():
 
 def test_create_registrar_null_parameters():
     response = confd.registrars.post(
-        main_host='1.2.3.4',
-        proxy_main_host='1.2.3.4',
-        main_port=None,
         name=None,
+        main_host='1.2.3.4',
+        main_port=None,
+        backup_host=None,
+        backup_port=None,
+        proxy_main_host='1.2.3.4',
+        proxy_main_port=None,
+        proxy_backup_host=None,
+        proxy_backup_port=None,
         outbound_proxy_host=None,
         outbound_proxy_port=None,
     )
@@ -271,19 +276,28 @@ def test_edit_registrar_all_parameters(registrar):
 
 
 @fixtures.registrar(
-    main_host='1.2.3.4',
-    proxy_main_host='1.2.3.4',
-    main_port=5060,
     name='TestRegistrar',
-    outbound_proxy_host='1.2.3.5',
-    outbound_proxy_port=5061,
+    main_host='1.2.3.4',
+    main_port=5060,
+    backup_host='1.2.3.5',
+    backup_port=5061,
+    proxy_main_host='1.2.3.6',
+    proxy_main_port=5062,
+    proxy_backup_host='1.2.3.7',
+    outbound_proxy_host='1.2.3.8',
+    outbound_proxy_port=5063,
 )
 def test_edit_registrar_null_parameters(registrar):
     response = confd.registrars(registrar['id']).put(
-        main_host='1.2.3.4',
-        proxy_main_host='1.2.3.4',
-        main_port=None,
         name=None,
+        main_host='1.2.3.4',
+        main_port=None,
+        backup_host=None,
+        backup_port=None,
+        proxy_main_host='1.2.3.5',
+        proxy_main_port=None,
+        proxy_backup_host=None,
+        proxy_backup_port=None,
         outbound_proxy_host=None,
         outbound_proxy_port=None,
     )
@@ -298,7 +312,7 @@ def test_edit_registrar_null_parameters(registrar):
             main_port=none(),
             backup_host=none(),
             backup_port=none(),
-            proxy_main_host='1.2.3.4',
+            proxy_main_host='1.2.3.5',
             proxy_main_port=none(),
             proxy_backup_host=none(),
             proxy_backup_port=none(),
