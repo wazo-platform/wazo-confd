@@ -1,6 +1,8 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
+
 from contextlib import contextmanager
 
 from hamcrest import (
@@ -228,6 +230,14 @@ def test_create_registrar_null_parameters():
     )
 
 
+def test_create_registrar_no_parameters():
+    response = confd.registrars.post()
+    response.assert_match(
+        400,
+        re.compile(re.escape('main_host')) and re.compile(re.escape('proxy_main_host'))
+    )
+
+
 def test_create_registrar_all_parameters():
 
     parameters = {
@@ -320,6 +330,33 @@ def test_edit_registrar_null_parameters(registrar):
             outbound_proxy_port=none(),
         )
     )
+
+
+def test_edit_registrar_no_parameters():
+
+    parameters = {
+        'name': 'TestRegistrar',
+        'main_host': '1.2.3.4',
+        'main_port': 5060,
+        'backup_host': '1.2.3.5',
+        'backup_port': 5061,
+        'proxy_main_host': '1.2.3.6',
+        'proxy_main_port': 5062,
+        'proxy_backup_host': '1.2.3.7',
+        'proxy_backup_port': 5063,
+        'outbound_proxy_host': '1.2.3.8',
+        'outbound_proxy_port': 5064,
+    }
+
+    response = confd.registrars.post(**parameters)
+    response.assert_created('registrars')
+
+    id_registrar = response.item['id']
+    response = confd.registrars(id_registrar).put({})
+    response.assert_updated()
+
+    response = confd.registrars(id_registrar).get()
+    assert_that(response.item, has_entries(parameters))
 
 
 @fixtures.registrar(
