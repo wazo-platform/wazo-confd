@@ -15,15 +15,15 @@ class RegistrarService(CRUDService):
     def search(self, parameters):
         return self.dao.search(**parameters)
 
-    def create(self, resource):
-        self.validator.validate_create(resource)
-        created_resource = self.dao.create(resource)
+    def create(self, registrar):
+        self.validator.validate_create(registrar)
+        created_resource = self.dao.create(registrar)
         self.notifier.created(created_resource)
         return created_resource
 
-    def edit(self, resource, updated_fields=None):
-        super(RegistrarService, self).edit(resource, updated_fields=updated_fields)
-        lines = self.line_service.find_all_by(registrar=resource.id)
+    def edit(self, registrar, updated_fields=None):
+        super(RegistrarService, self).edit(registrar, updated_fields=updated_fields)
+        lines = self.line_service.find_all_by(registrar=registrar.id)
         devices_updated = set()
         # Update all affected devices
         for line in lines:
@@ -34,14 +34,14 @@ class RegistrarService(CRUDService):
         # Update default autoprov config
         autoprov_config = self.provd_client.configs.get('autoprov')
         autoprov_sip_line = autoprov_config['raw_config']['sip_lines']['1']
-        self._update_sip(resource.registrar, autoprov_sip_line)
+        self._update_sip(registrar, autoprov_sip_line)
         autoprov_sccp_lines = autoprov_config['raw_config']['sccp_call_managers']
-        self._update_sccp(resource.registrar, autoprov_sccp_lines)
+        self._update_sccp(registrar, autoprov_sccp_lines)
         self.provd_client.configs.update(autoprov_config)
 
     def _update_sip(self, registrar, config):
-        config['registrar_ip'] = registrar['registrar_main']
-        config['proxy_ip'] = registrar['proxy_main']
+        config['registrar_ip'] = registrar.registrar_main
+        config['proxy_ip'] = registrar.proxy_main
         optional_keys = {
             'registrar_port': 'registrar_main_port',
             'proxy_port': 'proxy_main_port',
@@ -54,14 +54,16 @@ class RegistrarService(CRUDService):
         }
 
         for real_key, registrar_key in optional_keys.items():
-            value = registrar.get(registrar_key)
-            if value:
-                config[real_key] = value
+            try:
+                value = getattr(registrar, registrar_key)
+            except AttributeError:
+                continue
+            config[real_key] = value
 
     def _update_sccp(self, registrar, config):
         main = config.get('1')
         backup = config.get('2')
         if main:
-            main['ip'] = registrar['proxy_main']
+            main['ip'] = registrar.proxy_main
         if backup:
-            backup['ip'] = registrar['proxy_backup']
+            backup['ip'] = registrar.proxy_backup
