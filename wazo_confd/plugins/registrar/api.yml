@@ -137,13 +137,15 @@ definitions:
       outbound_proxy_port:
         type: integer
         description: Outbound proxy port
-
+    required:
+    - main_host
+    - proxy_main_host
   RegistrarItems:
     title: RegistrarItems
     properties:
       items:
-        type: array
         items:
           $ref: '#/definitions/Registrar'
+        type: array
       total:
         type: integer
