@@ -446,3 +446,11 @@ def check_registrar_addresses_without_backup_on_sccp_device():
 def test_delete_registrar(registrar):
     response = confd.registrars(registrar['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.registrar()
+def test_bus_events(registrar):
+    body = {'name': 'a', 'main_host': '1.2.3.4', 'proxy_main_host': '1.2.3.4'}
+    yield s.check_bus_event, 'config.registrar.created', confd.registrars.post, body
+    yield s.check_bus_event, 'config.registrar.edited', confd.registrars(registrar['id']).put
+    yield s.check_bus_event, 'config.registrar.deleted', confd.registrars(registrar['id']).delete
