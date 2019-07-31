@@ -10,11 +10,11 @@ class RegistrarSchema(BaseSchema):
 
     id = fields.String()
     name = fields.String(attribute='displayname', allow_none=True)
-    main_host = fields.String(attribute='registrar_main')
+    main_host = fields.String(attribute='registrar_main', required=True)
     main_port = fields.Integer(attribute='registrar_main_port', allow_none=True)
     backup_host = fields.String(attribute='registrar_backup', allow_none=True)
     backup_port = fields.Integer(attribute='registrar_backup_port', allow_none=True)
-    proxy_main_host = fields.String(attribute='proxy_main')
+    proxy_main_host = fields.String(attribute='proxy_main', required=True)
     proxy_main_port = fields.Integer(attribute='proxy_main_port', allow_none=True)
     proxy_backup_host = fields.String(attribute='proxy_backup', allow_none=True)
     proxy_backup_port = fields.Integer(attribute='proxy_backup_port', allow_none=True)
