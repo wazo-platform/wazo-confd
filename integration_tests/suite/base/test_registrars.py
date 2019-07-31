@@ -243,23 +243,8 @@ def test_create_registrar_all_parameters():
     response.assert_created('registrars')
     assert_that(response.item, has_entries(parameters))
 
-    registrar = confd.registrars(response.item['id']).get()
-    assert_that(
-        registrar.item,
-        has_entries({
-            'name': 'TestRegistrar',
-            'main_host': '1.2.3.4',
-            'main_port': 5060,
-            'backup_host': '1.2.3.5',
-            'backup_port': 5061,
-            'proxy_main_host': '1.2.3.6',
-            'proxy_main_port': 5062,
-            'proxy_backup_host': '1.2.3.7',
-            'proxy_backup_port': 5063,
-            'outbound_proxy_host': '1.2.3.8',
-            'outbound_proxy_port': 5064,
-        })
-    )
+    response = confd.registrars(response.item['id']).get()
+    assert_that(response.item, has_entries(parameters))
 
 
 @fixtures.registrar(main_host='1.2.3.4', proxy_main_host='1.2.3.4')
@@ -294,8 +279,7 @@ def test_edit_registrar_all_parameters(registrar):
     outbound_proxy_port=5061,
 )
 def test_edit_registrar_null_parameters(registrar):
-    url = confd.registrars(registrar['id'])
-    response = url.put(
+    response = confd.registrars(registrar['id']).put(
         main_host='1.2.3.4',
         proxy_main_host='1.2.3.4',
         main_port=None,
@@ -333,9 +317,9 @@ def test_edit_registrar_null_parameters(registrar):
     outbound_proxy_port=5061,
 )
 def test_edit_registrar_updates_autoprov(registrar):
-    url = confd.registrars(registrar['id'])
-    response = url.put(proxy_main_host='2.3.4.5')
+    response = confd.registrars(registrar['id']).put(proxy_main_host='2.3.4.5')
     response.assert_updated()
+
     autoprov_sip_config = provd.configs.get('autoprov')['raw_config']['sip_lines']['1']
     assert_that(
         autoprov_sip_config, has_entries(
@@ -370,8 +354,10 @@ def test_edit_registrar_updates_sip_device(registrar):
             'proxy_backup_host': '7.8.9.90',
             'proxy_backup_port': 7777,
         }
+
         response = confd.registrars(registrar['id']).put(**new_registrar_body)
         response.assert_updated()
+
         config = provd.configs.get(device['id'])['raw_config']['sip_lines']
         assert_that(config, has_entries({
             '1': has_entries(
@@ -407,8 +393,10 @@ def test_edit_registrar_updates_sccp_device(registrar):
             'proxy_backup_host': '7.8.9.91',
             'proxy_backup_port': 7778,
         }
+
         response = confd.registrars(registrar['id']).put(**new_registrar_body)
         response.assert_updated()
+
         config = provd.configs.get(device['id'])['raw_config']['sccp_call_managers']
         assert_that(config, has_entries({
             '1': has_entries(
