@@ -22,43 +22,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-
-
-@contextmanager
-def line_fellowship(endpoint_type='sip', registrar=None):
-    context = h.context.generate_context()
-    user = h.user.generate_user(context=context['name'])
-    line = h.line.generate_line(
-        context=context['name'],
-        registrar=registrar,
-    )
-    extension = h.extension.generate_extension(context=context['name'])
-
-    if endpoint_type == 'sip':
-        endpoint = h.endpoint_sip.generate_sip()
-        line_endpoint = h.line_endpoint_sip
-    else:
-        endpoint = h.endpoint_sccp.generate_sccp()
-        line_endpoint = h.line_endpoint_sccp
-
-    line_endpoint.associate(line['id'], endpoint['id'])
-    h.user_line.associate(user['id'], line['id'])
-    h.line_extension.associate(line['id'], extension['id'])
-
-    yield user, line, extension, endpoint
-
-    h.line_extension.dissociate(line['id'], extension['id'], False)
-    h.user_line.dissociate(user['id'], line['id'], False)
-    line_endpoint.dissociate(line['id'], endpoint['id'], False)
-
-    if endpoint_type == 'sip':
-        h.endpoint_sip.delete_sip(endpoint['id'])
-    else:
-        h.endpoint_sccp.delete_sccp(endpoint['id'])
-
-    h.user.delete_user(user['id'])
-    h.line.delete_line(line['id'])
-    h.extension.delete_extension(extension['id'])
+from ..helpers.helpers.line_fellowship import line_fellowship
 
 
 @contextmanager

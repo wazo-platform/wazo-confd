@@ -129,6 +129,7 @@ from . import line_endpoint_custom
 from . import line_endpoint_sccp
 from . import line_endpoint_sip
 from . import line_extension
+from . import line_fellowship
 from . import line_sip
 from . import meetme
 from . import moh
@@ -219,6 +220,7 @@ __all__ = [
     'line_endpoint_sccp',
     'line_endpoint_sip',
     'line_extension',
+    'line_fellowship',
     'line_sip',
     'meetme',
     'moh',
