@@ -40,17 +40,17 @@ class RegistrarService(CRUDService):
         self.provd_client.configs.update(autoprov_config)
 
     def _update_sip(self, registrar, config):
-        config['registrar_ip'] = registrar.registrar_main
-        config['proxy_ip'] = registrar.proxy_main
+        config['registrar_ip'] = registrar.main_host
+        config['proxy_ip'] = registrar.proxy_main_host
         optional_keys = {
-            'registrar_port': 'registrar_main_port',
+            'registrar_port': 'main_port',
             'proxy_port': 'proxy_main_port',
-            'backup_proxy_ip': 'proxy_backup',
+            'backup_proxy_ip': 'proxy_backup_host',
             'backup_proxy_port': 'proxy_backup_port',
-            'backup_registrar_ip': 'registrar_backup',
-            'backup_registrar_port': 'registrar_backup_port',
-            'outbound_proxy_ip': 'proxy_outbound',
-            'outbound_proxy_port': 'proxy_outbound_port',
+            'backup_registrar_ip': 'backup_host',
+            'backup_registrar_port': 'backup_port',
+            'outbound_proxy_ip': 'outbound_proxy_host',
+            'outbound_proxy_port': 'outbound_proxy_port',
         }
 
         for real_key, registrar_key in optional_keys.items():
@@ -64,6 +64,6 @@ class RegistrarService(CRUDService):
         main = config.get('1')
         backup = config.get('2')
         if main:
-            main['ip'] = registrar.proxy_main
+            main['ip'] = registrar.proxy_main_host
         if backup:
-            backup['ip'] = registrar.proxy_backup
+            backup['ip'] = registrar.proxy_backup_host

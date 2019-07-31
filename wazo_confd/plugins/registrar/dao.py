@@ -33,7 +33,7 @@ class RegistrarDao:
         self.client = client
 
     def create(self, registrar):
-        result = self.client.configs.create(registrar.registrar)
+        result = self.client.configs.create(registrar.as_dict())
         registrar = self.get(result['id'])
         return registrar
 
@@ -73,11 +73,9 @@ class RegistrarDao:
             search_text = search.pop('search')
             registrars = [registrar for registrar in registrars
                           if self._matches_text_search(registrar, search_text)]
-
         if search:
             registrars = [registrar for registrar in registrars
                           if self._matches_search(registrar, search)]
-
         return registrars
 
     def _matches_search(self, registrar, search):
@@ -128,11 +126,11 @@ class RegistrarDao:
         else:
             registrars = []
             total = 0
-
+        registrars = [Registrar(result) for result in registrars]
         return SearchResult(total=total, items=registrars)
 
     def edit(self, new_registrar):
-        self.client.configs.update(new_registrar.registrar)
+        self.client.configs.update(new_registrar.as_dict())
 
     def delete(self, registrar):
         self.client.configs.delete(registrar.id)

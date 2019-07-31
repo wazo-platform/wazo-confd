@@ -145,18 +145,18 @@ class SipGenerator:
                   'password': sip.secret,
                   'display_name': line.caller_id_name,
                   'number': extension.exten,
-                  'registrar_ip': registrar.registrar_main,
-                  'proxy_ip': registrar.proxy_main}
+                  'registrar_ip': registrar.main_host,
+                  'proxy_ip': registrar.proxy_main_host}
 
         optional_keys = {
-            'registrar_port': 'registrar_main_port',
+            'registrar_port': 'main_port',
             'proxy_port': 'proxy_main_port',
-            'backup_proxy_ip': 'proxy_backup',
+            'backup_proxy_ip': 'proxy_backup_host',
             'backup_proxy_port': 'proxy_backup_port',
-            'backup_registrar_ip': 'registrar_backup',
-            'backup_registrar_port': 'registrar_backup_port',
-            'outbound_proxy_ip': 'proxy_outbound',
-            'outbound_proxy_port': 'proxy_outbound_port',
+            'backup_registrar_ip': 'backup_host',
+            'backup_registrar_port': 'backup_port',
+            'outbound_proxy_ip': 'outbound_proxy_host',
+            'outbound_proxy_port': 'outbound_proxy_port',
         }
 
         for real_key, registrar_key in optional_keys.items():
@@ -179,9 +179,9 @@ class SccpGenerator:
         line = self.line_dao.find_by(device=device.id, protocol='sccp')
         if line:
             registrar = self.registrar_dao.get(line.configregistrar)
-            proxy_backup = registrar.proxy_backup
+            proxy_backup = registrar.proxy_backup_host
 
-            call_managers['1'] = {'ip': registrar.proxy_main}
+            call_managers['1'] = {'ip': registrar.proxy_main_host}
             if proxy_backup:
                 call_managers['2'] = {'ip': proxy_backup}
 
