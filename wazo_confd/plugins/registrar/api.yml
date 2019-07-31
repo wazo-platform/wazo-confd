@@ -147,5 +147,3 @@ definitions:
           $ref: '#/definitions/Registrar'
       total:
         type: integer
-    required:
-    - total
