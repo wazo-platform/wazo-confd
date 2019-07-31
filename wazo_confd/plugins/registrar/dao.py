@@ -44,7 +44,7 @@ class RegistrarDao:
         }
 
         resources = self.client.configs.list(parameters)['configs']
-        if len(resources) == 0:
+        if not resources:
             raise errors.not_found('Registrar', id=registrar_id)
 
         return Registrar(resources[0])
