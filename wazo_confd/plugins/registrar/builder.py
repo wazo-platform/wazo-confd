@@ -2,14 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd import bus
+from wazo_confd.plugins.device.builder import build_device_updater
+from wazo_confd.plugins.line.service import build_service as build_line_service
 
 from .dao import RegistrarDao
 from .notifier import RegistrarNotifier
 from .service import RegistrarService
 from .validator import build_validator
-
-from ..device.builder import build_device_updater
-from ..line.service import build_service as build_line_service
 
 
 def build_dao(provd_client):
