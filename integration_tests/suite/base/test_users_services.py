@@ -17,26 +17,27 @@ VALID_SERVICES = ['dnd',
                   'incallfilter']
 
 
-@fixtures.user()
-def test_get_users_services(user):
-    response = confd.users(user['uuid']).services.get()
-    for service in VALID_SERVICES:
-        assert_that(response.item, has_key(service))
+def test_get_users_services():
+    with fixtures.user() as user:
+        response = confd.users(user['uuid']).services.get()
+        for service in VALID_SERVICES:
+            assert_that(response.item, has_key(service))
 
 
-@fixtures.user()
-def test_get_value_for_each_user_service(user):
-    for service in VALID_SERVICES:
-        service_url = confd.users(user['uuid']).services(service)
-        _read_service(service_url, False)
+
+def test_get_value_for_each_user_service():
+    with fixtures.user() as user:
+        for service in VALID_SERVICES:
+            service_url = confd.users(user['uuid']).services(service)
+            _read_service(service_url, False)
 
 
-@fixtures.user()
-def test_put_value_for_each_user_service(user):
-    for service in VALID_SERVICES:
-        service_url = confd.users(user['uuid']).services(service)
-        _update_service(service_url, False)
-        _update_service(service_url, True)
+def test_put_value_for_each_user_service():
+    with fixtures.user() as user:
+        for service in VALID_SERVICES:
+            service_url = confd.users(user['uuid']).services(service)
+            _update_service(service_url, False)
+            _update_service(service_url, True)
 
 
 def _update_service(service_url, value):
@@ -50,10 +51,11 @@ def _read_service(service_url, value):
     assert_that(response.item, has_entry('enabled', value))
 
 
-@fixtures.user()
-def test_put_services(user):
-    services_url = confd.users(user['uuid']).services
-    _update_services(services_url, {'enabled': True}, {'enabled': False})
+def test_put_services():
+    with fixtures.user() as user:
+        services_url = confd.users(user['uuid']).services
+        _update_services(services_url, {'enabled': True}, {'enabled': False})
+
 
 
 def _update_services(services_url, dnd={}, incallfilter={}):
@@ -64,20 +66,22 @@ def _update_services(services_url, dnd={}, incallfilter={}):
     assert_that(response.item, equal_to({'dnd': dnd, 'incallfilter': incallfilter}))
 
 
-@fixtures.user()
-def test_put_error(user):
-    service_url = confd.users(user['uuid']).services('dnd').put
-    s.check_bogus_field_returns_error(service_url, 'enabled', 'string')
-    s.check_bogus_field_returns_error(service_url, 'enabled', None)
-    s.check_bogus_field_returns_error(service_url, 'enabled', 123)
-    s.check_bogus_field_returns_error(service_url, 'enabled', [])
-    s.check_bogus_field_returns_error(service_url, 'enabled', {})
+def test_put_error():
+    with fixtures.user() as user:
+        service_url = confd.users(user['uuid']).services('dnd').put
+        s.check_bogus_field_returns_error(service_url, 'enabled', 'string')
+        s.check_bogus_field_returns_error(service_url, 'enabled', None)
+        s.check_bogus_field_returns_error(service_url, 'enabled', 123)
+        s.check_bogus_field_returns_error(service_url, 'enabled', [])
+        s.check_bogus_field_returns_error(service_url, 'enabled', {})
 
 
-@fixtures.user(services={'dnd': {'enabled': True}, 'incallfilter': {'enabled': True}})
-def test_get_services_relation(user):
-    response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(
-        services={'dnd': {'enabled': True},
-                  'incallfilter': {'enabled': True}}
-    ))
+
+def test_get_services_relation():
+    with fixtures.user(services={'dnd': {'enabled': True}, 'incallfilter': {'enabled': True}}) as user:
+        response = confd.users(user['uuid']).get()
+        assert_that(response.item, has_entries(
+            services={'dnd': {'enabled': True},
+                      'incallfilter': {'enabled': True}}
+        ))
+

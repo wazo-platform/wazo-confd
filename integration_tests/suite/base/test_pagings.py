@@ -40,10 +40,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.paging()
-def test_put_errors(paging):
-    url = confd.pagings(paging['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.paging() as paging:
+        url = confd.pagings(paging['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -85,23 +86,24 @@ def error_checks(url):
     unique_error_checks(url)
 
 
-@fixtures.paging(number='123')
-def unique_error_checks(url, paging):
-    s.check_bogus_field_returns_error(url, 'number', paging['number'])
+def unique_error_checks(url):
+    with fixtures.paging(number='123') as paging:
+        s.check_bogus_field_returns_error(url, 'number', paging['number'])
 
 
-@fixtures.paging(name='search', number='123', announce_sound='search')
-@fixtures.paging(name='hidden', number='456', announce_sound='hidden')
-def test_search(paging, hidden):
-    url = confd.pagings
-    searches = {
-        'name': 'search',
-        'number': '123',
-        'announce_sound': 'search',
-    }
 
-    for field, term in searches.items():
-        check_search(url, paging, hidden, field, term)
+def test_search():
+    with fixtures.paging(name='search', number='123', announce_sound='search') as paging, fixtures.paging(name='hidden', number='456', announce_sound='hidden') as hidden:
+        url = confd.pagings
+        searches = {
+            'name': 'search',
+            'number': '123',
+            'announce_sound': 'search',
+        }
+
+        for field, term in searches.items():
+            check_search(url, paging, hidden, field, term)
+
 
 
 def check_search(url, paging, hidden, field, term):
@@ -114,65 +116,66 @@ def check_search(url, paging, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.paging(name='sort1')
-@fixtures.paging(name='sort2')
-def test_sort_offset_limit(paging1, paging2):
-    url = confd.pagings.get
-    s.check_sorting(url, paging1, paging2, 'name', 'sort')
+def test_sort_offset_limit():
+    with fixtures.paging(name='sort1') as paging1, fixtures.paging(name='sort2') as paging2:
+        url = confd.pagings.get
+        s.check_sorting(url, paging1, paging2, 'name', 'sort')
 
-    s.check_offset(url, paging1, paging2, 'name', 'sort')
-    s.check_offset_legacy(url, paging1, paging2, 'name', 'sort')
+        s.check_offset(url, paging1, paging2, 'name', 'sort')
+        s.check_offset_legacy(url, paging1, paging2, 'name', 'sort')
 
-    s.check_limit(url, paging1, paging2, 'name', 'sort')
-
-
-@fixtures.paging(wazo_tenant=MAIN_TENANT)
-@fixtures.paging(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.pagings.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
-
-    response = confd.pagings.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
-
-    response = confd.pagings.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        s.check_limit(url, paging1, paging2, 'name', 'sort')
 
 
-@fixtures.paging()
-def test_get(paging):
-    response = confd.pagings(paging['id']).get()
-    assert_that(response.item, has_entries(
-        id=paging['id'],
-        name=paging['name'],
-        number=paging['number'],
-        announce_caller=paging['announce_caller'],
-        announce_sound=paging['announce_sound'],
-        caller_notification=paging['caller_notification'],
-        duplex=paging['duplex'],
-        ignore_forward=paging['ignore_forward'],
-        record=paging['record'],
-        enabled=paging['enabled'],
-    ))
+
+def test_list_multi_tenant():
+    with fixtures.paging(wazo_tenant=MAIN_TENANT) as main, fixtures.paging(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.pagings.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
+
+        response = confd.pagings.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
+
+        response = confd.pagings.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.paging(wazo_tenant=MAIN_TENANT)
-@fixtures.paging(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.pagings(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Paging'))
 
-    response = confd.pagings(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.paging() as paging:
+        response = confd.pagings(paging['id']).get()
+        assert_that(response.item, has_entries(
+            id=paging['id'],
+            name=paging['name'],
+            number=paging['number'],
+            announce_caller=paging['announce_caller'],
+            announce_sound=paging['announce_sound'],
+            caller_notification=paging['caller_notification'],
+            duplex=paging['duplex'],
+            ignore_forward=paging['ignore_forward'],
+            record=paging['record'],
+            enabled=paging['enabled'],
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.paging(wazo_tenant=MAIN_TENANT) as main, fixtures.paging(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.pagings(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Paging'))
+
+        response = confd.pagings(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -209,63 +212,67 @@ def test_create_all_parameters():
     confd.pagings(response.item['id']).delete().assert_deleted()
 
 
-@fixtures.paging()
-def test_edit_minimal_parameters(paging):
-    response = confd.pagings(paging['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.paging() as paging:
+        response = confd.pagings(paging['id']).put()
+        response.assert_updated()
 
 
-@fixtures.paging()
-def test_edit_all_parameters(paging):
-    parameters = {
-        'name': 'MyPaging',
-        'number': '123',
-        'announce_caller': False,
-        'announce_sound': 'sound',
-        'caller_notification': True,
-        'duplex': True,
-        'ignore_forward': True,
-        'record': True,
-        'enabled': False,
-    }
 
-    response = confd.pagings(paging['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.paging() as paging:
+        parameters = {
+            'name': 'MyPaging',
+            'number': '123',
+            'announce_caller': False,
+            'announce_sound': 'sound',
+            'caller_notification': True,
+            'duplex': True,
+            'ignore_forward': True,
+            'record': True,
+            'enabled': False,
+        }
 
-    response = confd.pagings(paging['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.pagings(paging['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.paging(wazo_tenant=MAIN_TENANT)
-@fixtures.paging(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.pagings(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Paging'))
-
-    response = confd.pagings(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+        response = confd.pagings(paging['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.paging()
-def test_delete(paging):
-    response = confd.pagings(paging['id']).delete()
-    response.assert_deleted()
-    response = confd.pagings(paging['id']).get()
-    response.assert_match(404, e.not_found(resource='Paging'))
+
+def test_edit_multi_tenant():
+    with fixtures.paging(wazo_tenant=MAIN_TENANT) as main, fixtures.paging(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.pagings(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Paging'))
+
+        response = confd.pagings(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.paging(wazo_tenant=MAIN_TENANT)
-@fixtures.paging(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.pagings(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Paging'))
 
-    response = confd.pagings(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.paging() as paging:
+        response = confd.pagings(paging['id']).delete()
+        response.assert_deleted()
+        response = confd.pagings(paging['id']).get()
+        response.assert_match(404, e.not_found(resource='Paging'))
 
 
-@fixtures.paging()
-def test_bus_events(paging):
-    s.check_bus_event('config.pagings.created', confd.pagings.post, {'number': '666'})
-    s.check_bus_event('config.pagings.edited', confd.pagings(paging['id']).put)
-    s.check_bus_event('config.pagings.deleted', confd.pagings(paging['id']).delete)
+
+def test_delete_multi_tenant():
+    with fixtures.paging(wazo_tenant=MAIN_TENANT) as main, fixtures.paging(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.pagings(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Paging'))
+
+        response = confd.pagings(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.paging() as paging:
+        s.check_bus_event('config.pagings.created', confd.pagings.post, {'number': '666'})
+        s.check_bus_event('config.pagings.edited', confd.pagings(paging['id']).put)
+        s.check_bus_event('config.pagings.deleted', confd.pagings(paging['id']).delete)
+

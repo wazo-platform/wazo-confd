@@ -22,133 +22,119 @@ from ..helpers.config import (
 FAKE_ID = 999999999
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_associate_errors(group, schedule):
-    fake_group = confd.groups(FAKE_ID).schedules(schedule['id']).put
-    fake_schedule = confd.groups(group['id']).schedules(FAKE_ID).put
+def test_associate_errors():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        fake_group = confd.groups(FAKE_ID).schedules(schedule['id']).put
+        fake_schedule = confd.groups(group['id']).schedules(FAKE_ID).put
 
-    s.check_resource_not_found(fake_group, 'Group')
-    s.check_resource_not_found(fake_schedule, 'Schedule')
-
-
-@fixtures.group()
-@fixtures.schedule()
-def test_dissociate_errors(group, schedule):
-    fake_group = confd.groups(FAKE_ID).schedules(schedule['id']).delete
-    fake_schedule = confd.groups(group['id']).schedules(FAKE_ID).delete
-
-    s.check_resource_not_found(fake_group, 'Group')
-    s.check_resource_not_found(fake_schedule, 'Schedule')
+        s.check_resource_not_found(fake_group, 'Group')
+        s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_associate(group, schedule):
-    response = confd.groups(group['id']).schedules(schedule['id']).put()
-    response.assert_updated()
+
+def test_dissociate_errors():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        fake_group = confd.groups(FAKE_ID).schedules(schedule['id']).delete
+        fake_schedule = confd.groups(group['id']).schedules(FAKE_ID).delete
+
+        s.check_resource_not_found(fake_group, 'Group')
+        s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_associate_already_associated(group, schedule):
-    with a.group_schedule(group, schedule):
+
+def test_associate():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
         response = confd.groups(group['id']).schedules(schedule['id']).put()
         response.assert_updated()
 
 
-@fixtures.group()
-@fixtures.schedule()
-@fixtures.schedule()
-def test_associate_multiple_schedules_to_group(group, schedule1, schedule2):
-    with a.group_schedule(group, schedule1):
-        response = confd.groups(group['id']).schedules(schedule2['id']).put()
-        response.assert_match(400, e.resource_associated('Group', 'Schedule'))
+
+def test_associate_already_associated():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        with a.group_schedule(group, schedule):
+            response = confd.groups(group['id']).schedules(schedule['id']).put()
+            response.assert_updated()
 
 
-@fixtures.group()
-@fixtures.group()
-@fixtures.schedule()
-def test_associate_multiple_groups_to_schedule(group1, group2, schedule):
-    with a.group_schedule(group1, schedule):
-        response = confd.groups(group2['id']).schedules(schedule['id']).put()
-        response.assert_updated()
+def test_associate_multiple_schedules_to_group():
+    with fixtures.group() as group, fixtures.schedule() as schedule1, fixtures.schedule() as schedule2:
+        with a.group_schedule(group, schedule1):
+            response = confd.groups(group['id']).schedules(schedule2['id']).put()
+            response.assert_match(400, e.resource_associated('Group', 'Schedule'))
 
 
-@fixtures.group(wazo_tenant=MAIN_TENANT)
-@fixtures.group(wazo_tenant=SUB_TENANT)
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(main_group, sub_group, main_schedule, sub_schedule):
-    response = confd.groups(main_group['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Group'))
-
-    response = confd.groups(sub_group['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Schedule'))
-
-    response = confd.groups(main_group['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_match(400, e.different_tenant())
+def test_associate_multiple_groups_to_schedule():
+    with fixtures.group() as group1, fixtures.group() as group2, fixtures.schedule() as schedule:
+        with a.group_schedule(group1, schedule):
+            response = confd.groups(group2['id']).schedules(schedule['id']).put()
+            response.assert_updated()
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_dissociate(group, schedule):
-    with a.group_schedule(group, schedule, check=False):
+def test_associate_multi_tenant():
+    with fixtures.group(wazo_tenant=MAIN_TENANT) as main_group, fixtures.group(wazo_tenant=SUB_TENANT) as sub_group, fixtures.schedule(wazo_tenant=MAIN_TENANT) as main_schedule, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub_schedule:
+        response = confd.groups(main_group['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Group'))
+
+        response = confd.groups(sub_group['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Schedule'))
+
+        response = confd.groups(main_group['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+
+
+
+def test_dissociate():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        with a.group_schedule(group, schedule, check=False):
+            response = confd.groups(group['id']).schedules(schedule['id']).delete()
+            response.assert_deleted()
+
+
+def test_dissociate_not_associated():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
         response = confd.groups(group['id']).schedules(schedule['id']).delete()
         response.assert_deleted()
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_dissociate_not_associated(group, schedule):
-    response = confd.groups(group['id']).schedules(schedule['id']).delete()
-    response.assert_deleted()
+
+def test_dissociate_multi_tenant():
+    with fixtures.group(wazo_tenant=MAIN_TENANT) as main_group, fixtures.group(wazo_tenant=SUB_TENANT) as sub_group, fixtures.schedule(wazo_tenant=MAIN_TENANT) as main_schedule, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub_schedule:
+        response = confd.groups(main_group['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Group'))
+
+        response = confd.groups(sub_group['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Schedule'))
 
 
-@fixtures.group(wazo_tenant=MAIN_TENANT)
-@fixtures.group(wazo_tenant=SUB_TENANT)
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_group, sub_group, main_schedule, sub_schedule):
-    response = confd.groups(main_group['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Group'))
 
-    response = confd.groups(sub_group['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Schedule'))
-
-
-@fixtures.group()
-@fixtures.schedule()
-def test_get_group_relation(group, schedule):
-    with a.group_schedule(group, schedule):
-        response = confd.groups(group['id']).get()
-        assert_that(response.item, has_entries(
-            schedules=contains(has_entries(id=schedule['id'],
-                                           name=schedule['name']))
-        ))
+def test_get_group_relation():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        with a.group_schedule(group, schedule):
+            response = confd.groups(group['id']).get()
+            assert_that(response.item, has_entries(
+                schedules=contains(has_entries(id=schedule['id'],
+                                               name=schedule['name']))
+            ))
 
 
-@fixtures.schedule()
-@fixtures.group()
-def test_get_schedule_relation(schedule, group):
-    with a.group_schedule(group, schedule):
-        response = confd.schedules(schedule['id']).get()
-        assert_that(response.item, has_entries(
-            groups=contains(has_entries(id=group['id']))
-        ))
+def test_get_schedule_relation():
+    with fixtures.schedule() as schedule, fixtures.group() as group:
+        with a.group_schedule(group, schedule):
+            response = confd.schedules(schedule['id']).get()
+            assert_that(response.item, has_entries(
+                groups=contains(has_entries(id=group['id']))
+            ))
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_delete_group_when_group_and_schedule_associated(group, schedule):
-    with a.group_schedule(group, schedule, check=False):
-        response = confd.groups(group['id']).delete()
-        response.assert_deleted()
+def test_delete_group_when_group_and_schedule_associated():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        with a.group_schedule(group, schedule, check=False):
+            response = confd.groups(group['id']).delete()
+            response.assert_deleted()
 
 
-@fixtures.group()
-@fixtures.schedule()
-def test_delete_schedule_when_group_and_schedule_associated(group, schedule):
-    with a.group_schedule(group, schedule, check=False):
-        response = confd.schedules(schedule['id']).delete()
-        response.assert_deleted()
+def test_delete_schedule_when_group_and_schedule_associated():
+    with fixtures.group() as group, fixtures.schedule() as schedule:
+        with a.group_schedule(group, schedule, check=False):
+            response = confd.schedules(schedule['id']).delete()
+            response.assert_deleted()

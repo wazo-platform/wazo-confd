@@ -40,10 +40,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.parking_lot()
-def test_put_errors(parking_lot):
-    url = confd.parkinglots(parking_lot['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.parking_lot() as parking_lot:
+        url = confd.parkinglots(parking_lot['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -75,20 +76,20 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'music_on_hold', {})
 
 
-@fixtures.parking_lot(name='search', slots_start='701', slots_end='750', music_on_hold='search', timeout=100)
-@fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850', music_on_hold='hidden', timeout=None)
-def test_search(parking_lot, hidden):
-    url = confd.parkinglots
-    searches = {
-        'name': 'search',
-        'slots_start': '701',
-        'slots_end': '750',
-        'music_on_hold': 'search',
-        'timeout': 100,
-    }
+def test_search():
+    with fixtures.parking_lot(name='search', slots_start='701', slots_end='750', music_on_hold='search', timeout=100) as parking_lot, fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850', music_on_hold='hidden', timeout=None) as hidden:
+        url = confd.parkinglots
+        searches = {
+            'name': 'search',
+            'slots_start': '701',
+            'slots_end': '750',
+            'music_on_hold': 'search',
+            'timeout': 100,
+        }
 
-    for field, term in searches.items():
-        check_search(url, parking_lot, hidden, field, term)
+        for field, term in searches.items():
+            check_search(url, parking_lot, hidden, field, term)
+
 
 
 def check_search(url, parking_lot, hidden, field, term):
@@ -101,62 +102,63 @@ def check_search(url, parking_lot, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.parking_lot(name='sort1')
-@fixtures.parking_lot(name='sort2')
-def test_sorting_offset_limit(parking_lot1, parking_lot2):
-    url = confd.parkinglots.get
-    s.check_sorting(url, parking_lot1, parking_lot2, 'name', 'sort')
+def test_sorting_offset_limit():
+    with fixtures.parking_lot(name='sort1') as parking_lot1, fixtures.parking_lot(name='sort2') as parking_lot2:
+        url = confd.parkinglots.get
+        s.check_sorting(url, parking_lot1, parking_lot2, 'name', 'sort')
 
-    s.check_offset(url, parking_lot1, parking_lot2, 'name', 'sort')
-    s.check_offset_legacy(url, parking_lot1, parking_lot2, 'name', 'sort')
+        s.check_offset(url, parking_lot1, parking_lot2, 'name', 'sort')
+        s.check_offset_legacy(url, parking_lot1, parking_lot2, 'name', 'sort')
 
-    s.check_limit(url, parking_lot1, parking_lot2, 'name', 'sort')
-
-
-@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
-@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.parkinglots.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
-
-    response = confd.parkinglots.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
-
-    response = confd.parkinglots.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        s.check_limit(url, parking_lot1, parking_lot2, 'name', 'sort')
 
 
-@fixtures.parking_lot()
-def test_get(parking_lot):
-    response = confd.parkinglots(parking_lot['id']).get()
-    assert_that(response.item, has_entries(
-        id=parking_lot['id'],
-        name=parking_lot['name'],
-        slots_start=parking_lot['slots_start'],
-        slots_end=parking_lot['slots_end'],
-        timeout=parking_lot['timeout'],
-        music_on_hold=parking_lot['music_on_hold'],
-        extensions=empty(),
-    ))
+
+def test_list_multi_tenant():
+    with fixtures.parking_lot(wazo_tenant=MAIN_TENANT) as main, fixtures.parking_lot(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.parkinglots.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
+
+        response = confd.parkinglots.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
+
+        response = confd.parkinglots.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
-@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.parkinglots(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='ParkingLot'))
 
-    response = confd.parkinglots(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.parking_lot() as parking_lot:
+        response = confd.parkinglots(parking_lot['id']).get()
+        assert_that(response.item, has_entries(
+            id=parking_lot['id'],
+            name=parking_lot['name'],
+            slots_start=parking_lot['slots_start'],
+            slots_end=parking_lot['slots_end'],
+            timeout=parking_lot['timeout'],
+            music_on_hold=parking_lot['music_on_hold'],
+            extensions=empty(),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.parking_lot(wazo_tenant=MAIN_TENANT) as main, fixtures.parking_lot(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.parkinglots(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='ParkingLot'))
+
+        response = confd.parkinglots(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -188,69 +190,74 @@ def test_create_all_parameters():
     confd.parkinglots(response.item['id']).delete().assert_deleted()
 
 
-@fixtures.parking_lot()
-def test_edit_minimal_parameters(parking_lot):
-    response = confd.parkinglots(parking_lot['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.parking_lot() as parking_lot:
+        response = confd.parkinglots(parking_lot['id']).put()
+        response.assert_updated()
 
 
-@fixtures.parking_lot()
-def test_edit_all_parameters(parking_lot):
-    parameters = {
-        'name': 'MyParkingLot',
-        'slots_start': '801',
-        'slots_end': '850',
-        'timeout': None,
-        'music_on_hold': 'music',
-    }
 
-    response = confd.parkinglots(parking_lot['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.parking_lot() as parking_lot:
+        parameters = {
+            'name': 'MyParkingLot',
+            'slots_start': '801',
+            'slots_end': '850',
+            'timeout': None,
+            'music_on_hold': 'music',
+        }
 
-    response = confd.parkinglots(parking_lot['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.parkinglots(parking_lot['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.parking_lot()
-def test_edit_invalid_range(parking_lot):
-    response = confd.parkinglots(parking_lot['id']).put(slots_start='700', slots_end='650')
-    response.assert_status(400)
+        response = confd.parkinglots(parking_lot['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
-@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.parkinglots(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='ParkingLot'))
 
-    response = confd.parkinglots(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+def test_edit_invalid_range():
+    with fixtures.parking_lot() as parking_lot:
+        response = confd.parkinglots(parking_lot['id']).put(slots_start='700', slots_end='650')
+        response.assert_status(400)
 
 
-@fixtures.parking_lot()
-def test_delete(parking_lot):
-    response = confd.parkinglots(parking_lot['id']).delete()
-    response.assert_deleted()
-    response = confd.parkinglots(parking_lot['id']).get()
-    response.assert_match(404, e.not_found(resource='ParkingLot'))
+
+def test_edit_multi_tenant():
+    with fixtures.parking_lot(wazo_tenant=MAIN_TENANT) as main, fixtures.parking_lot(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.parkinglots(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='ParkingLot'))
+
+        response = confd.parkinglots(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
-@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.parkinglots(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='ParkingLot'))
 
-    response = confd.parkinglots(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.parking_lot() as parking_lot:
+        response = confd.parkinglots(parking_lot['id']).delete()
+        response.assert_deleted()
+        response = confd.parkinglots(parking_lot['id']).get()
+        response.assert_match(404, e.not_found(resource='ParkingLot'))
 
 
-@fixtures.parking_lot()
-def test_bus_events(parking_lot):
-    s.check_bus_event(
-        'config.parkinglots.created',
-        confd.parkinglots.post,
-        {'slots_start': '999', 'slots_end': '999'}
-    )
-    s.check_bus_event('config.parkinglots.edited', confd.parkinglots(parking_lot['id']).put)
-    s.check_bus_event('config.parkinglots.deleted', confd.parkinglots(parking_lot['id']).delete)
+
+def test_delete_multi_tenant():
+    with fixtures.parking_lot(wazo_tenant=MAIN_TENANT) as main, fixtures.parking_lot(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.parkinglots(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='ParkingLot'))
+
+        response = confd.parkinglots(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.parking_lot() as parking_lot:
+        s.check_bus_event(
+            'config.parkinglots.created',
+            confd.parkinglots.post,
+            {'slots_start': '999', 'slots_end': '999'}
+        )
+        s.check_bus_event('config.parkinglots.edited', confd.parkinglots(parking_lot['id']).put)
+        s.check_bus_event('config.parkinglots.deleted', confd.parkinglots(parking_lot['id']).delete)
+

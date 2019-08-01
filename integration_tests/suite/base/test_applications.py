@@ -42,10 +42,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.application()
-def test_put_errors(application):
-    url = confd.applications(application['uuid']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.application() as application:
+        url = confd.applications(application['uuid']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -61,16 +62,16 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'destination', {})
 
 
-@fixtures.application(name='search')
-@fixtures.application(name='hidden')
-def test_search(application, hidden):
-    url = confd.applications
-    searches = {
-        'name': 'search',
-    }
+def test_search():
+    with fixtures.application(name='search') as application, fixtures.application(name='hidden') as hidden:
+        url = confd.applications
+        searches = {
+            'name': 'search',
+        }
 
-    for field, term in searches.items():
-        check_search(url, application, hidden, field, term)
+        for field, term in searches.items():
+            check_search(url, application, hidden, field, term)
+
 
 
 def check_search(url, application, hidden, field, term):
@@ -83,60 +84,61 @@ def check_search(url, application, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
-@fixtures.application(name='sort1')
-@fixtures.application(name='sort2')
-def test_sort_offset_limit(application1, application2):
-    url = confd.applications.get
-    id_field = 'uuid'
-    s.check_sorting(url, application1, application2, 'name', 'sort', id_field)
+def test_sort_offset_limit():
+    with fixtures.application(name='sort1') as application1, fixtures.application(name='sort2') as application2:
+        url = confd.applications.get
+        id_field = 'uuid'
+        s.check_sorting(url, application1, application2, 'name', 'sort', id_field)
 
-    s.check_offset(url, application1, application2, 'name', 'sort', id_field)
-    s.check_offset_legacy(url, application1, application2, 'name', 'sort', id_field)
+        s.check_offset(url, application1, application2, 'name', 'sort', id_field)
+        s.check_offset_legacy(url, application1, application2, 'name', 'sort', id_field)
 
-    s.check_limit(url, application1, application2, 'name', 'sort', id_field)
-
-
-@fixtures.application(wazo_tenant=MAIN_TENANT)
-@fixtures.application(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.applications.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
-
-    response = confd.applications.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
-
-    response = confd.applications.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        s.check_limit(url, application1, application2, 'name', 'sort', id_field)
 
 
-@fixtures.application()
-def test_get(application):
-    response = confd.applications(application['uuid']).get()
-    assert_that(response.item, has_entries(
-        uuid=application['uuid'],
-        name=application['name'],
-        destination=application['destination'],
-        destination_options=application['destination_options'],
-    ))
+
+def test_list_multi_tenant():
+    with fixtures.application(wazo_tenant=MAIN_TENANT) as main, fixtures.application(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.applications.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
+
+        response = confd.applications.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
+
+        response = confd.applications.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.application(wazo_tenant=MAIN_TENANT)
-@fixtures.application(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.applications(main['uuid']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Application'))
 
-    response = confd.applications(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.application() as application:
+        response = confd.applications(application['uuid']).get()
+        assert_that(response.item, has_entries(
+            uuid=application['uuid'],
+            name=application['name'],
+            destination=application['destination'],
+            destination_options=application['destination_options'],
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.application(wazo_tenant=MAIN_TENANT) as main, fixtures.application(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.applications(main['uuid']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Application'))
+
+        response = confd.applications(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -191,75 +193,80 @@ def test_create_all_parameters():
     confd.applications(response.item['uuid']).delete().assert_deleted()
 
 
-@fixtures.application()
-def test_edit_minimal_parameters(application):
-    response = confd.applications(application['uuid']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.application() as application:
+        response = confd.applications(application['uuid']).put()
+        response.assert_updated()
 
 
-@fixtures.application()
-def test_edit_all_parameters(application):
-    parameters = {
-        'name': 'UpdatedApplication',
-        'destination': 'node',
-        'destination_options': {
-            'type': 'holding',
-            'music_on_hold': 'updated_moh',
-            'answer': True,
+
+def test_edit_all_parameters():
+    with fixtures.application() as application:
+        parameters = {
+            'name': 'UpdatedApplication',
+            'destination': 'node',
+            'destination_options': {
+                'type': 'holding',
+                'music_on_hold': 'updated_moh',
+                'answer': True,
+            }
         }
-    }
 
-    response = confd.applications(application['uuid']).put(**parameters)
-    response.assert_updated()
+        response = confd.applications(application['uuid']).put(**parameters)
+        response.assert_updated()
 
-    response = confd.applications(application['uuid']).get()
-    assert_that(response.item, has_entries(parameters))
-
-
-@fixtures.application(destination='node', destination_options={'type': 'holding'})
-def test_edit_remove_destination(application):
-    parameters = {
-        'destination': None,
-        'destination_options': {},
-    }
-
-    response = confd.applications(application['uuid']).put(**parameters)
-    response.assert_updated()
-
-    response = confd.applications(application['uuid']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.applications(application['uuid']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.application(wazo_tenant=MAIN_TENANT)
-@fixtures.application(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.applications(main['uuid']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Application'))
 
-    response = confd.applications(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+def test_edit_remove_destination():
+    with fixtures.application(destination='node', destination_options={'type': 'holding'}) as application:
+        parameters = {
+            'destination': None,
+            'destination_options': {},
+        }
 
+        response = confd.applications(application['uuid']).put(**parameters)
+        response.assert_updated()
 
-@fixtures.application()
-def test_delete(application):
-    response = confd.applications(application['uuid']).delete()
-    response.assert_deleted()
-    response = confd.applications(application['uuid']).get()
-    response.assert_match(404, e.not_found(resource='Application'))
+        response = confd.applications(application['uuid']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.application(wazo_tenant=MAIN_TENANT)
-@fixtures.application(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.applications(main['uuid']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Application'))
 
-    response = confd.applications(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_edit_multi_tenant():
+    with fixtures.application(wazo_tenant=MAIN_TENANT) as main, fixtures.application(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.applications(main['uuid']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Application'))
+
+        response = confd.applications(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.application()
-def test_bus_events(application):
-    s.check_bus_event('config.applications.created', confd.applications.post)
-    s.check_bus_event('config.applications.edited', confd.applications(application['uuid']).put)
-    s.check_bus_event('config.applications.deleted', confd.applications(application['uuid']).delete)
+
+def test_delete():
+    with fixtures.application() as application:
+        response = confd.applications(application['uuid']).delete()
+        response.assert_deleted()
+        response = confd.applications(application['uuid']).get()
+        response.assert_match(404, e.not_found(resource='Application'))
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.application(wazo_tenant=MAIN_TENANT) as main, fixtures.application(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.applications(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Application'))
+
+        response = confd.applications(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.application() as application:
+        s.check_bus_event('config.applications.created', confd.applications.post)
+        s.check_bus_event('config.applications.edited', confd.applications(application['uuid']).put)
+        s.check_bus_event('config.applications.deleted', confd.applications(application['uuid']).delete)
+

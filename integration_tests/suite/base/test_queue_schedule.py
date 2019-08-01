@@ -22,143 +22,129 @@ from ..helpers.config import (
 FAKE_ID = 999999999
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_associate_errors(queue, schedule):
-    fake_queue = confd.queues(FAKE_ID).schedules(schedule['id']).put
-    fake_schedule = confd.queues(queue['id']).schedules(FAKE_ID).put
+def test_associate_errors():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        fake_queue = confd.queues(FAKE_ID).schedules(schedule['id']).put
+        fake_schedule = confd.queues(queue['id']).schedules(FAKE_ID).put
 
-    s.check_resource_not_found(fake_queue, 'Queue')
-    s.check_resource_not_found(fake_schedule, 'Schedule')
-
-
-@fixtures.queue()
-@fixtures.schedule()
-def test_dissociate_errors(queue, schedule):
-    fake_queue = confd.queues(FAKE_ID).schedules(schedule['id']).delete
-    fake_schedule = confd.queues(queue['id']).schedules(FAKE_ID).delete
-
-    s.check_resource_not_found(fake_queue, 'Queue')
-    s.check_resource_not_found(fake_schedule, 'Schedule')
+        s.check_resource_not_found(fake_queue, 'Queue')
+        s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_associate(queue, schedule):
-    response = confd.queues(queue['id']).schedules(schedule['id']).put()
-    response.assert_updated()
+
+def test_dissociate_errors():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        fake_queue = confd.queues(FAKE_ID).schedules(schedule['id']).delete
+        fake_schedule = confd.queues(queue['id']).schedules(FAKE_ID).delete
+
+        s.check_resource_not_found(fake_queue, 'Queue')
+        s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_associate_already_associated(queue, schedule):
-    with a.queue_schedule(queue, schedule):
+
+def test_associate():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
         response = confd.queues(queue['id']).schedules(schedule['id']).put()
         response.assert_updated()
 
 
-@fixtures.queue()
-@fixtures.schedule()
-@fixtures.schedule()
-def test_associate_multiple_schedules_to_queue(queue, schedule1, schedule2):
-    with a.queue_schedule(queue, schedule1):
-        response = confd.queues(queue['id']).schedules(schedule2['id']).put()
-        response.assert_match(400, e.resource_associated('Queue', 'Schedule'))
+
+def test_associate_already_associated():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        with a.queue_schedule(queue, schedule):
+            response = confd.queues(queue['id']).schedules(schedule['id']).put()
+            response.assert_updated()
 
 
-@fixtures.queue()
-@fixtures.queue()
-@fixtures.schedule()
-def test_associate_multiple_queues_to_schedule(queue1, queue2, schedule):
-    with a.queue_schedule(queue1, schedule):
-        response = confd.queues(queue2['id']).schedules(schedule['id']).put()
-        response.assert_updated()
+def test_associate_multiple_schedules_to_queue():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule1, fixtures.schedule() as schedule2:
+        with a.queue_schedule(queue, schedule1):
+            response = confd.queues(queue['id']).schedules(schedule2['id']).put()
+            response.assert_match(400, e.resource_associated('Queue', 'Schedule'))
 
 
-@fixtures.queue(wazo_tenant=MAIN_TENANT)
-@fixtures.queue(wazo_tenant=SUB_TENANT)
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(main_queue, sub_queue, main_schedule, sub_schedule):
-    response = confd.queues(main_queue['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Queue'))
-
-    response = confd.queues(sub_queue['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Schedule'))
-
-    response = confd.queues(main_queue['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_match(400, e.different_tenant())
+def test_associate_multiple_queues_to_schedule():
+    with fixtures.queue() as queue1, fixtures.queue() as queue2, fixtures.schedule() as schedule:
+        with a.queue_schedule(queue1, schedule):
+            response = confd.queues(queue2['id']).schedules(schedule['id']).put()
+            response.assert_updated()
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_dissociate(queue, schedule):
-    with a.queue_schedule(queue, schedule, check=False):
+def test_associate_multi_tenant():
+    with fixtures.queue(wazo_tenant=MAIN_TENANT) as main_queue, fixtures.queue(wazo_tenant=SUB_TENANT) as sub_queue, fixtures.schedule(wazo_tenant=MAIN_TENANT) as main_schedule, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub_schedule:
+        response = confd.queues(main_queue['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Queue'))
+
+        response = confd.queues(sub_queue['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Schedule'))
+
+        response = confd.queues(main_queue['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+
+
+
+def test_dissociate():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        with a.queue_schedule(queue, schedule, check=False):
+            response = confd.queues(queue['id']).schedules(schedule['id']).delete()
+            response.assert_deleted()
+
+
+def test_dissociate_not_associated():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
         response = confd.queues(queue['id']).schedules(schedule['id']).delete()
         response.assert_deleted()
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_dissociate_not_associated(queue, schedule):
-    response = confd.queues(queue['id']).schedules(schedule['id']).delete()
-    response.assert_deleted()
+
+def test_dissociate_multi_tenant():
+    with fixtures.queue(wazo_tenant=MAIN_TENANT) as main_queue, fixtures.queue(wazo_tenant=SUB_TENANT) as sub_queue, fixtures.schedule(wazo_tenant=MAIN_TENANT) as main_schedule, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub_schedule:
+        response = confd.queues(main_queue['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Queue'))
+
+        response = confd.queues(sub_queue['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Schedule'))
 
 
-@fixtures.queue(wazo_tenant=MAIN_TENANT)
-@fixtures.queue(wazo_tenant=SUB_TENANT)
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_queue, sub_queue, main_schedule, sub_schedule):
-    response = confd.queues(main_queue['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Queue'))
 
-    response = confd.queues(sub_queue['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Schedule'))
-
-
-@fixtures.queue()
-@fixtures.schedule()
-def test_get_queue_relation(queue, schedule):
-    with a.queue_schedule(queue, schedule):
-        response = confd.queues(queue['id']).get()
-        assert_that(response.item, has_entries(
-            schedules=contains(
-                has_entries(
-                    id=schedule['id'],
-                    name=schedule['name'],
+def test_get_queue_relation():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        with a.queue_schedule(queue, schedule):
+            response = confd.queues(queue['id']).get()
+            assert_that(response.item, has_entries(
+                schedules=contains(
+                    has_entries(
+                        id=schedule['id'],
+                        name=schedule['name'],
+                    )
                 )
-            )
-        ))
+            ))
 
 
-@fixtures.schedule()
-@fixtures.queue()
-def test_get_schedule_relation(schedule, queue):
-    with a.queue_schedule(queue, schedule):
-        response = confd.schedules(schedule['id']).get()
-        assert_that(response.item, has_entries(
-            queues=contains(
-                has_entries(
-                    id=queue['id'],
-                    name=queue['name'],
-                    label=queue['label'],
+def test_get_schedule_relation():
+    with fixtures.schedule() as schedule, fixtures.queue() as queue:
+        with a.queue_schedule(queue, schedule):
+            response = confd.schedules(schedule['id']).get()
+            assert_that(response.item, has_entries(
+                queues=contains(
+                    has_entries(
+                        id=queue['id'],
+                        name=queue['name'],
+                        label=queue['label'],
+                    )
                 )
-            )
-        ))
+            ))
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_delete_queue_when_queue_and_schedule_associated(queue, schedule):
-    with a.queue_schedule(queue, schedule, check=False):
-        response = confd.queues(queue['id']).delete()
-        response.assert_deleted()
+def test_delete_queue_when_queue_and_schedule_associated():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        with a.queue_schedule(queue, schedule, check=False):
+            response = confd.queues(queue['id']).delete()
+            response.assert_deleted()
 
 
-@fixtures.queue()
-@fixtures.schedule()
-def test_delete_schedule_when_queue_and_schedule_associated(queue, schedule):
-    with a.queue_schedule(queue, schedule, check=False):
-        response = confd.schedules(schedule['id']).delete()
-        response.assert_deleted()
+def test_delete_schedule_when_queue_and_schedule_associated():
+    with fixtures.queue() as queue, fixtures.schedule() as schedule:
+        with a.queue_schedule(queue, schedule, check=False):
+            response = confd.schedules(schedule['id']).delete()
+            response.assert_deleted()

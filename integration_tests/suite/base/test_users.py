@@ -232,23 +232,24 @@ def put_error_checks(url):
     s.check_bogus_field_returns_error(url, 'enabled', None)
 
 
-@fixtures.user()
-def test_put_errors(user):
-    user_put = confd.users(user['id']).put
+def test_put_errors():
+    with fixtures.user() as user:
+        user_put = confd.users(user['id']).put
 
-    error_checks(user_put)
-    put_error_checks(user_put)
+        error_checks(user_put)
+        put_error_checks(user_put)
 
 
-@fixtures.user(firstname='user1', username='unique_username', email='unique@email.com')
-@fixtures.user()
-def test_unique_errors(user1, user2):
-    url = confd.users(user2['id']).put
-    unique_error_checks(url, user1)
 
-    required_body = {'firstname': 'user2'}
-    url = confd.users.post
-    unique_error_checks(url, user1, required_body)
+def test_unique_errors():
+    with fixtures.user(firstname='user1', username='unique_username', email='unique@email.com') as user1, fixtures.user() as user2:
+        url = confd.users(user2['id']).put
+        unique_error_checks(url, user1)
+
+        required_body = {'firstname': 'user2'}
+        url = confd.users.post
+        unique_error_checks(url, user1, required_body)
+
 
 
 def unique_error_checks(url, existing_resource, required_body=None):
@@ -256,81 +257,94 @@ def unique_error_checks(url, existing_resource, required_body=None):
     s.check_bogus_field_returns_error(url, 'email', existing_resource['email'], required_body)
 
 
-@fixtures.user()
-def test_delete_errors(user):
-    user_url = confd.users(user['id'])
-    user_url.delete()
-    s.check_resource_not_found(user_url.get, 'User')
+def test_delete_errors():
+    with fixtures.user() as user:
+        user_url = confd.users(user['id'])
+        user_url.delete()
+        s.check_resource_not_found(user_url.get, 'User')
 
 
-@fixtures.user(firstname='ÉricDir')
-def test_that_the_directory_view_works_with_unicode_characters(user):
-    response = confd.users.get(view='directory', search='éricdir')
-    response.assert_ok()
 
-    assert_that(response.items[0]['id'], equal_to(user['id']))
+def test_that_the_directory_view_works_with_unicode_characters():
+    with fixtures.user(firstname='ÉricDir') as user:
+        response = confd.users.get(view='directory', search='éricdir')
+        response.assert_ok()
+
+        assert_that(response.items[0]['id'], equal_to(user['id']))
 
 
-@fixtures.user()
-@fixtures.line()
-@fixtures.sip()
-@fixtures.extension()
-def test_summary_view_on_sip_endpoint(user, line, sip, extension):
-    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), \
+
+def test_summary_view_on_sip_endpoint():
+    with fixtures.user() as user, fixtures.line() as line, fixtures.sip() as sip, fixtures.extension() as extension:
+        with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), \
             a.user_line(user, line):
 
-        response = confd.users.get(view='summary', id=user['id'])
-        assert_that(
-            response.items,
-            contains(has_entries(
-                id=user['id'],
-                uuid=user['uuid'],
-                firstname=user['firstname'],
-                lastname=user['lastname'],
-                email=user['email'],
-                provisioning_code=line['provisioning_code'],
-                extension=extension['exten'],
-                context=extension['context'],
-                enabled=True,
-                protocol='sip',
-            ))
-        )
+            response = confd.users.get(view='summary', id=user['id'])
+            assert_that(
+                response.items,
+                contains(has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=line['provisioning_code'],
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='sip',
+                ))
+            )
 
 
-@fixtures.user()
-@fixtures.line()
-@fixtures.sccp()
-@fixtures.extension()
-def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
-    with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), \
+def test_summary_view_on_sccp_endpoint():
+    with fixtures.user() as user, fixtures.line() as line, fixtures.sccp() as sccp, fixtures.extension() as extension:
+        with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), \
             a.user_line(user, line):
 
-        response = confd.users.get(view='summary', id=user['id'])
-        assert_that(
-            response.items,
-            contains(has_entries(
-                id=user['id'],
-                uuid=user['uuid'],
-                firstname=user['firstname'],
-                lastname=user['lastname'],
-                email=user['email'],
-                provisioning_code=line['provisioning_code'],
-                extension=extension['exten'],
-                context=extension['context'],
-                enabled=True,
-                protocol='sccp',
-            ))
-        )
+            response = confd.users.get(view='summary', id=user['id'])
+            assert_that(
+                response.items,
+                contains(has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=line['provisioning_code'],
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='sccp',
+                ))
+            )
 
 
-@fixtures.user()
-@fixtures.line()
-@fixtures.custom()
-@fixtures.extension()
-def test_summary_view_on_custom_endpoint(user, line, custom, extension):
-    with a.line_endpoint_custom(line, custom), a.line_extension(line, extension), \
+def test_summary_view_on_custom_endpoint():
+    with fixtures.user() as user, fixtures.line() as line, fixtures.custom() as custom, fixtures.extension() as extension:
+        with a.line_endpoint_custom(line, custom), a.line_extension(line, extension), \
             a.user_line(user, line):
 
+            response = confd.users.get(view='summary', id=user['id'])
+            assert_that(
+                response.items,
+                contains(has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=none(),
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='custom',
+                ))
+            )
+
+
+def test_summary_view_on_user_without_line():
+    with fixtures.user() as user:
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
@@ -341,43 +355,25 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
                 lastname=user['lastname'],
                 email=user['email'],
                 provisioning_code=none(),
-                extension=extension['exten'],
-                context=extension['context'],
+                extension=none(),
+                context=none(),
                 enabled=True,
-                protocol='custom',
+                protocol=none(),
             ))
         )
 
 
-@fixtures.user()
-def test_summary_view_on_user_without_line(user):
-    response = confd.users.get(view='summary', id=user['id'])
-    assert_that(
-        response.items,
-        contains(has_entries(
-            id=user['id'],
-            uuid=user['uuid'],
-            firstname=user['firstname'],
-            lastname=user['lastname'],
-            email=user['email'],
-            provisioning_code=none(),
-            extension=none(),
-            context=none(),
-            enabled=True,
-            protocol=none(),
-        ))
-    )
+
+def test_search_using_legacy_parameter():
+    with fixtures.user(firstname="Lègacy", lastname="Usér") as user1, fixtures.user(firstname="Hîde", lastname="Mé") as user2:
+        response = confd.users.get(q="lègacy usér")
+        assert_that(response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér")))
+        assert_that(response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé"))))
 
 
-@fixtures.user(firstname="Lègacy", lastname="Usér")
-@fixtures.user(firstname="Hîde", lastname="Mé")
-def test_search_using_legacy_parameter(user1, user2):
-    response = confd.users.get(q="lègacy usér")
-    assert_that(response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér")))
-    assert_that(response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé"))))
 
-
-@fixtures.user(
+def test_search_on_user_view():
+    with fixtures.user(
     firstname="Léeroy",
     lastname="Jénkins",
     email="jenkins@leeroy.com",
@@ -389,87 +385,82 @@ def test_search_using_legacy_parameter(user1, user2):
     description="Léeroy Jénkin's bio",
     enabled=False,
     preprocess_subroutine="leeroy_preprocess",
-)
-def test_search_on_user_view(user):
-    url = confd.users
-    searches = {
-        'firstname': 'léeroy',
-        'lastname': 'jénkins',
-        'email': 'jenkins@',
-        'music_on_hold': 'leeroy_music',
-        'outgoing_caller_id': '5551234567',
-        'mobile_phone_number': '2423232',
-        'userfield': 'jenkins userfield',
-        'description': "jénkin's bio",
-        'preprocess_subroutine': 'roy_preprocess',
-    }
+) as user:
+        url = confd.users
+        searches = {
+            'firstname': 'léeroy',
+            'lastname': 'jénkins',
+            'email': 'jenkins@',
+            'music_on_hold': 'leeroy_music',
+            'outgoing_caller_id': '5551234567',
+            'mobile_phone_number': '2423232',
+            'userfield': 'jenkins userfield',
+            'description': "jénkin's bio",
+            'preprocess_subroutine': 'roy_preprocess',
+        }
 
-    for field, term in searches.items():
-        check_search(url, field, term, user[field])
+        for field, term in searches.items():
+            check_search(url, field, term, user[field])
 
 
-@fixtures.user(
+
+def test_search_on_directory_view():
+    with fixtures.user(
     firstname="Môustapha",
     lastname="Bângoura",
     email="moustapha@bangoura.com",
     mobile_phone_number="+5559284759",
     userfield="Moustapha userfield",
     description="Moustapha the greatest dancer",
-)
-def test_search_on_directory_view(user):
-    url = confd.users(view='directory')
+) as user:
+        url = confd.users(view='directory')
 
-    searches = {
-        'firstname': 'môustapha',
-        'lastname': 'bângoura',
-        'email': 'moustapha@',
-        'mobile_phone_number': '928475',
-        'userfield': 'moustapha userfield',
-        'description': "greatest dancer",
-    }
+        searches = {
+            'firstname': 'môustapha',
+            'lastname': 'bângoura',
+            'email': 'moustapha@',
+            'mobile_phone_number': '928475',
+            'userfield': 'moustapha userfield',
+            'description': "greatest dancer",
+        }
 
-    for field, term in searches.items():
-        check_search(url, field, term, user[field])
-
-
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension()
-def test_search_on_users_extension(user, line, extension):
-    with a.user_line(user, line), a.line_extension(line, extension):
-        response = confd.users.get(search=extension['exten'], view='directory')
-        assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
+        for field, term in searches.items():
+            check_search(url, field, term, user[field])
 
 
-@fixtures.user(firstname='context-filter')
-@fixtures.line_sip()
-@fixtures.extension()
-def test_search_on_users_with_context_filter(user, line, extension):
-    with a.user_line(user, line), a.line_extension(line, extension):
-        response = confd.users.get(firstname='context-filter', view='directory', context='default')
-        assert_that(response.total, equal_to(1))
-        assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
 
-        response = confd.users.get(firstname='context-filter', view='directory', context='other')
-        assert_that(response.total, equal_to(0))
+def test_search_on_users_extension():
+    with fixtures.user() as user, fixtures.line_sip() as line, fixtures.extension() as extension:
+        with a.user_line(user, line), a.line_extension(line, extension):
+            response = confd.users.get(search=extension['exten'], view='directory')
+            assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
 
 
-@fixtures.user(
+def test_search_on_users_with_context_filter():
+    with fixtures.user(firstname='context-filter') as user, fixtures.line_sip() as line, fixtures.extension() as extension:
+        with a.user_line(user, line), a.line_extension(line, extension):
+            response = confd.users.get(firstname='context-filter', view='directory', context='default')
+            assert_that(response.total, equal_to(1))
+            assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
+
+            response = confd.users.get(firstname='context-filter', view='directory', context='other')
+            assert_that(response.total, equal_to(0))
+
+
+def test_search_on_summary_view():
+    with fixtures.user(
     firstname="Âboubacar",
     lastname="Manè",
     description="Âboubacar le grand danseur",
-)
-@fixtures.line()
-@fixtures.sip()
-@fixtures.extension()
-def test_search_on_summary_view(user, line, sip, extension):
-    url = confd.users(view='summary')
+) as user, fixtures.line() as line, fixtures.sip() as sip, fixtures.extension() as extension:
+        url = confd.users(view='summary')
 
-    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
-        check_search(url, 'firstname', 'âbou', user['firstname'])
-        check_search(url, 'lastname', 'man', user['lastname'])
-        check_search(url, 'provisioning_code', line['provisioning_code'], line['provisioning_code'])
-        check_search(url, 'extension', extension['exten'], extension['exten'])
+        with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
+            check_search(url, 'firstname', 'âbou', user['firstname'])
+            check_search(url, 'lastname', 'man', user['lastname'])
+            check_search(url, 'provisioning_code', line['provisioning_code'], line['provisioning_code'])
+            check_search(url, 'extension', extension['exten'], extension['exten'])
+
 
 
 def check_search(url, field, term, value):
@@ -477,110 +468,112 @@ def check_search(url, field, term, value):
     assert_that(response.items, has_item(has_entry(field, value)))
 
 
-@fixtures.user(wazo_tenant=MAIN_TENANT)
-@fixtures.user(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.users.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+def test_list_multi_tenant():
+    with fixtures.user(wazo_tenant=MAIN_TENANT) as main, fixtures.user(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.users.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
 
-    response = confd.users.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+        response = confd.users.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
 
-    response = confd.users.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        response = confd.users.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.user(
+
+def test_sorting_offset_limit():
+    with fixtures.user(
     firstname="firstname1",
     lastname="lastname1",
     email="email1@example.com",
     mobile_phone_number="+5551",
     userfield="sort userfield1",
     description="description1",
-)
-@fixtures.user(
+) as user1, fixtures.user(
     firstname="firstname2",
     lastname="lastname2",
     email="email2@example.com",
     mobile_phone_number="+5552",
     userfield="sort userfield2",
     description="description2",
-)
-def test_sorting_offset_limit(user1, user2):
-    url = confd.users.get
-    s.check_sorting(url, user1, user2, 'firstname', 'firstname')
-    s.check_sorting(url, user1, user2, 'lastname', 'lastname')
-    s.check_sorting(url, user1, user2, 'email', 'email')
-    s.check_sorting(url, user1, user2, 'mobile_phone_number', '+555')
-    s.check_sorting(url, user1, user2, 'userfield', 'sort userfield')
-    s.check_sorting(url, user1, user2, 'description', 'description')
+) as user2:
+        url = confd.users.get
+        s.check_sorting(url, user1, user2, 'firstname', 'firstname')
+        s.check_sorting(url, user1, user2, 'lastname', 'lastname')
+        s.check_sorting(url, user1, user2, 'email', 'email')
+        s.check_sorting(url, user1, user2, 'mobile_phone_number', '+555')
+        s.check_sorting(url, user1, user2, 'userfield', 'sort userfield')
+        s.check_sorting(url, user1, user2, 'description', 'description')
 
-    s.check_offset(url, user1, user2, 'firstname', 'firstname')
-    s.check_offset_legacy(url, user1, user2, 'firstname', 'firstname')
+        s.check_offset(url, user1, user2, 'firstname', 'firstname')
+        s.check_offset_legacy(url, user1, user2, 'firstname', 'firstname')
 
-    s.check_limit(url, user1, user2, 'firstname', 'firstname')
-
-
-@fixtures.user()
-def test_head_user(user):
-    response = confd.users(user['uuid']).head()
-    response.assert_ok()
+        s.check_limit(url, user1, user2, 'firstname', 'firstname')
 
 
-@fixtures.user(**FULL_USER)
-def test_get_user(user):
-    response = confd.users(user['id']).get()
-    assert_that(response.item, has_entries(FULL_USER))
-    assert_that(
-        response.item,
-        has_entries(
-            agent=none(),
-            call_permissions=empty(),
-            incalls=empty(),
-            lines=empty(),
-            groups=empty(),
-            forwards={
-                'busy': {'destination': None, 'enabled': False},
-                'noanswer': {'destination': None, 'enabled': False},
-                'unconditional': {'destination': None, 'enabled': False},
-            },
-            services={
-                'dnd': {'enabled': False},
-                'incallfilter': {'enabled': False},
-            },
-            voicemail=none(),
-            queues=empty(),
+
+def test_head_user():
+    with fixtures.user() as user:
+        response = confd.users(user['uuid']).head()
+        response.assert_ok()
+
+
+
+def test_get_user():
+    with fixtures.user(**FULL_USER) as user:
+        response = confd.users(user['id']).get()
+        assert_that(response.item, has_entries(FULL_USER))
+        assert_that(
+            response.item,
+            has_entries(
+                agent=none(),
+                call_permissions=empty(),
+                incalls=empty(),
+                lines=empty(),
+                groups=empty(),
+                forwards={
+                    'busy': {'destination': None, 'enabled': False},
+                    'noanswer': {'destination': None, 'enabled': False},
+                    'unconditional': {'destination': None, 'enabled': False},
+                },
+                services={
+                    'dnd': {'enabled': False},
+                    'incallfilter': {'enabled': False},
+                },
+                voicemail=none(),
+                queues=empty(),
+            )
         )
-    )
 
 
-@fixtures.user(firstname="Snôm", lastname="Whîte")
-@fixtures.user()
-@fixtures.user()
-def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
-    result = confd.users(user_1['uuid']).get()
 
-    assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
+def test_that_get_works_with_a_uuid():
+    with fixtures.user(firstname="Snôm", lastname="Whîte") as user_1, fixtures.user() as user_2_, fixtures.user() as user_3:
+        result = confd.users(user_1['uuid']).get()
+
+        assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
 
 
-@fixtures.user(firstname="Snôw", lastname="Whîte", username='snow.white+dwarves@disney.example.com')
-def test_that_the_username_can_be_an_email(user):
-    result = confd.users(user['id']).get()
 
-    assert_that(result.item, has_entries(
-        firstname='Snôw',
-        lastname='Whîte',
-        username='snow.white+dwarves@disney.example.com',
-    ))
+def test_that_the_username_can_be_an_email():
+    with fixtures.user(firstname="Snôw", lastname="Whîte", username='snow.white+dwarves@disney.example.com') as user:
+        result = confd.users(user['id']).get()
+
+        assert_that(result.item, has_entries(
+            firstname='Snôw',
+            lastname='Whîte',
+            username='snow.white+dwarves@disney.example.com',
+        ))
+
 
 
 def test_create_minimal_parameters():
@@ -630,7 +623,8 @@ def test_create_user_generates_appropriate_caller_id():
     assert_that(response.item['caller_id'], equal_to('"Jôhn Doe"'))
 
 
-@fixtures.user(
+def test_update_user_with_all_parameters():
+    with fixtures.user(
     firstname="Léeroy",
     lastname="Jénkins",
     email="leeroy@jenkins.com",
@@ -641,53 +635,58 @@ def test_create_user_generates_appropriate_caller_id():
     userfield="leeroy jenkins userfield",
     description="Léeroy Jénkin's bio",
     preprocess_subroutine="leeroy_preprocess",
-)
-def test_update_user_with_all_parameters(user):
-    user_url = confd.users(user['id'])
+) as user:
+        user_url = confd.users(user['id'])
 
-    response = user_url.put(**FULL_USER)
-    response.assert_updated()
+        response = user_url.put(**FULL_USER)
+        response.assert_updated()
 
-    response = user_url.get()
-    assert_that(response.item, has_entries(FULL_USER))
-
-
-@fixtures.user()
-def test_update_user_with_all_parameters_null(user):
-    response = confd.users(user['id']).put(**NULL_USER)
-    response.assert_updated()
-
-    response = confd.users(user['id']).get()
-    assert_that(response.item, has_entries(**NULL_USER))
+        response = user_url.get()
+        assert_that(response.item, has_entries(FULL_USER))
 
 
-@fixtures.user()
-def test_that_users_can_be_edited_by_uuid(user):
-    response = confd.users(user['uuid']).put({'firstname': 'Fôo', 'lastname': 'Bâr'})
-    response.assert_updated()
 
-    response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
+def test_update_user_with_all_parameters_null():
+    with fixtures.user() as user:
+        response = confd.users(user['id']).put(**NULL_USER)
+        response.assert_updated()
 
-
-@fixtures.user()
-def test_delete(user):
-    response = confd.users(user['id']).delete()
-    response.assert_deleted()
+        response = confd.users(user['id']).get()
+        assert_that(response.item, has_entries(**NULL_USER))
 
 
-@fixtures.user()
-def test_that_users_can_be_deleted_by_uuid(user):
-    response = confd.users(user['uuid']).delete()
-    response.assert_deleted()
 
-    response = confd.users(user['uuid']).get()
-    response.assert_status(404)
+def test_that_users_can_be_edited_by_uuid():
+    with fixtures.user() as user:
+        response = confd.users(user['uuid']).put({'firstname': 'Fôo', 'lastname': 'Bâr'})
+        response.assert_updated()
+
+        response = confd.users(user['uuid']).get()
+        assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
 
 
-@fixtures.user()
-def test_bus_events(user):
-    required_body = {'firstname': 'test-event-user'}
-    s.check_bus_event('config.user.created', confd.users.post, required_body)
-    s.check_bus_event('config.user.edited', confd.users(user['id']).put)
-    s.check_bus_event('config.user.deleted', confd.users(user['id']).delete)
+
+def test_delete():
+    with fixtures.user() as user:
+        response = confd.users(user['id']).delete()
+        response.assert_deleted()
+
+
+
+def test_that_users_can_be_deleted_by_uuid():
+    with fixtures.user() as user:
+        response = confd.users(user['uuid']).delete()
+        response.assert_deleted()
+
+        response = confd.users(user['uuid']).get()
+        response.assert_status(404)
+
+
+
+def test_bus_events():
+    with fixtures.user() as user:
+        required_body = {'firstname': 'test-event-user'}
+        s.check_bus_event('config.user.created', confd.users.post, required_body)
+        s.check_bus_event('config.user.edited', confd.users(user['id']).put)
+        s.check_bus_event('config.user.deleted', confd.users(user['id']).delete)
+

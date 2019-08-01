@@ -45,24 +45,22 @@ def line_and_device(endpoint_type='sip', wazo_tenant=None):
     h.device.delete_device(device)
 
 
-@fixtures.line()
-@fixtures.device()
-def test_associate_errors(line, device):
-    fake_line = confd.lines(999999999).devices(device['id']).put
-    fake_device = confd.lines(line['id']).devices(999999999).put
+def test_associate_errors():
+    with fixtures.line() as line, fixtures.device() as device:
+        fake_line = confd.lines(999999999).devices(device['id']).put
+        fake_device = confd.lines(line['id']).devices(999999999).put
 
-    s.check_resource_not_found(fake_line, 'Line')
-    s.check_resource_not_found(fake_device, 'Device')
+        s.check_resource_not_found(fake_line, 'Line')
+        s.check_resource_not_found(fake_device, 'Device')
 
 
-@fixtures.line()
-@fixtures.device()
-def test_dissociate_errors(line, device):
-    fake_line = confd.lines(999999999).devices(device['id']).delete
-    fake_device = confd.lines(line['id']).devices(999999999).delete
+def test_dissociate_errors():
+    with fixtures.line() as line, fixtures.device() as device:
+        fake_line = confd.lines(999999999).devices(device['id']).delete
+        fake_device = confd.lines(line['id']).devices(999999999).delete
 
-    s.check_resource_not_found(fake_line, 'Line')
-    s.check_resource_not_found(fake_device, 'Device')
+        s.check_resource_not_found(fake_line, 'Line')
+        s.check_resource_not_found(fake_device, 'Device')
 
 
 def test_get_errors():
@@ -73,11 +71,10 @@ def test_get_errors():
     s.check_resource_not_found(fake_device, 'Device')
 
 
-@fixtures.sip()
-@fixtures.sccp()
-def test_associate_without_required_resources_raises_error(sip, sccp):
-    check_associate_without_required_resources(sip, a.line_endpoint_sip)
-    check_associate_without_required_resources(sccp, a.line_endpoint_sccp)
+def test_associate_without_required_resources_raises_error():
+    with fixtures.sip() as sip, fixtures.sccp() as sccp:
+        check_associate_without_required_resources(sip, a.line_endpoint_sip)
+        check_associate_without_required_resources(sccp, a.line_endpoint_sccp)
 
 
 def check_associate_without_required_resources(endpoint, line_endpoint):
@@ -99,13 +96,13 @@ def check_associate_without_required_resources(endpoint, line_endpoint):
                     url.delete()
 
 
-@fixtures.line(position=1)
-def test_associate_2_lines_with_same_position_raises_error(extra_line):
-    with line_and_device('sip') as (line, device):
-        check_2_lines_with_same_position_raises_error(line, extra_line, device)
+def test_associate_2_lines_with_same_position_raises_error():
+    with fixtures.line(position=1) as extra_line:
+        with line_and_device('sip') as (line, device):
+            check_2_lines_with_same_position_raises_error(line, extra_line, device)
 
-    with line_and_device('sccp') as (line, device):
-        check_2_lines_with_same_position_raises_error(line, extra_line, device)
+        with line_and_device('sccp') as (line, device):
+            check_2_lines_with_same_position_raises_error(line, extra_line, device)
 
 
 def check_2_lines_with_same_position_raises_error(line, extra_line, device):
@@ -252,98 +249,98 @@ def assert_sccp_config(provd_config):
     ))
 
 
-@fixtures.device()
-def test_associate_sip_line(device):
-    registrar = confd.registrars('default').get().item
-    registrar['proxy_backup_host'] = '127.0.0.2'
-    registrar['backup_host'] = '127.0.0.2'
-    confd.registrars(registrar['id']).put(registrar)
+def test_associate_sip_line():
+    with fixtures.device() as device:
+        registrar = confd.registrars('default').get().item
+        registrar['proxy_backup_host'] = '127.0.0.2'
+        registrar['backup_host'] = '127.0.0.2'
+        confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sip') as (user, line, extension, sip):
-        response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_updated()
+        with line_fellowship('sip') as (user, line, extension, sip):
+            response = confd.lines(line['id']).devices(device['id']).put()
+            response.assert_updated()
 
-        device_config = provd.devices.get(device['id'])
-        assert_that(device_config['config'], is_not(starts_with('autoprov')))
+            device_config = provd.devices.get(device['id'])
+            assert_that(device_config['config'], is_not(starts_with('autoprov')))
 
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user, line, provd_config)
-        assert_sip_config(user, sip, extension, provd_config)
-
-
-@fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
-def test_associate_sip_line_change_tenant(device):
-    registrar = confd.registrars('default').get().item
-    registrar['proxy_backup_host'] = '127.0.0.2'
-    registrar['backup_host'] = '127.0.0.2'
-    confd.registrars(registrar['id']).put(registrar)
-
-    with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, line, extension, sip):
-        response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_updated()
-
-        device_config = provd.devices.get(device['id'])
-        assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
+            provd_config = provd.configs.get(device['id'])
+            assert_provd_config(user, line, provd_config)
+            assert_sip_config(user, sip, extension, provd_config)
 
 
-@fixtures.device()
-def test_associate_2_sip_lines(device):
-    registrar = confd.registrars('default').get().item
-    registrar['proxy_backup_host'] = '127.0.0.2'
-    registrar['backup_host'] = '127.0.0.2'
-    confd.registrars(registrar['id']).put(registrar)
+def test_associate_sip_line_change_tenant():
+    with fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT) as device:
+        registrar = confd.registrars('default').get().item
+        registrar['proxy_backup_host'] = '127.0.0.2'
+        registrar['backup_host'] = '127.0.0.2'
+        confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sip') as (user1, line1, extension1, sip1), \
-            line_fellowship('sip') as (user2, line2, extension2, sip2):
+        with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, line, extension, sip):
+            response = confd.lines(line['id']).devices(device['id']).put()
+            response.assert_updated()
 
-        confd.lines(line2['id']).put(position=2).assert_updated()
-        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
-        confd.lines(line2['id']).devices(device['id']).put().assert_updated()
-
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user1, line1, provd_config)
-        assert_sip_config(user1, sip1, extension1, provd_config, position=1)
-        assert_sip_config(user2, sip2, extension2, provd_config, position=2)
+            device_config = provd.devices.get(device['id'])
+            assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
 
 
-@fixtures.device(wazo_tenant=MAIN_TENANT)
-@fixtures.device(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(main_device, sub_device):
-    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
-        response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=SUB_TENANT)
-        response.assert_match(404, e.not_found('Line'))
+def test_associate_2_sip_lines():
+    with fixtures.device() as device:
+        registrar = confd.registrars('default').get().item
+        registrar['proxy_backup_host'] = '127.0.0.2'
+        registrar['backup_host'] = '127.0.0.2'
+        confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, sub_line, extension, sip):
-        response = confd.lines(sub_line['id']).devices(main_device['id']).put(wazo_tenant=SUB_TENANT)
-        response.assert_match(404, e.not_found('Device'))
+        with line_fellowship('sip') as (user1, line1, extension1, sip1), \
+                line_fellowship('sip') as (user2, line2, extension2, sip2):
 
-    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
-        response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=MAIN_TENANT)
-        response.assert_match(400, e.different_tenant())
+            confd.lines(line2['id']).put(position=2).assert_updated()
+            confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+            confd.lines(line2['id']).devices(device['id']).put().assert_updated()
 
-
-@fixtures.device()
-def test_associate_2_sccp_lines(device):
-    with line_fellowship('sccp') as (user1, line1, extension1, sccp1), \
-            line_fellowship('sccp') as (user2, line2, extension2, sccp2):
-
-        confd.lines(line2['id']).put(position=2).assert_updated()
-        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
-
-        response = confd.lines(line2['id']).devices(device['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
+            provd_config = provd.configs.get(device['id'])
+            assert_provd_config(user1, line1, provd_config)
+            assert_sip_config(user1, sip1, extension1, provd_config, position=1)
+            assert_sip_config(user2, sip2, extension2, provd_config, position=2)
 
 
-@fixtures.device()
-def test_associate_lines_with_different_endpoints(device):
-    with line_fellowship('sip') as (user1, line1, extension1, sip), \
-            line_fellowship('sccp') as (user2, line2, extension2, sccp):
+def test_associate_multi_tenant():
+    with fixtures.device(wazo_tenant=MAIN_TENANT) as main_device, \
+            fixtures.device(wazo_tenant=SUB_TENANT) as sub_device:
+        with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
+            response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found('Line'))
 
-        confd.lines(line2['id']).put(position=2).assert_updated()
-        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+        with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, sub_line, extension, sip):
+            response = confd.lines(sub_line['id']).devices(main_device['id']).put(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found('Device'))
 
-        response = confd.lines(line2['id']).devices(device['id']).put()
-        response.assert_match(400, e.resource_associated('Line', 'Device'))
+        with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (user, main_line, extension, sip):
+            response = confd.lines(main_line['id']).devices(sub_device['id']).put(wazo_tenant=MAIN_TENANT)
+            response.assert_match(400, e.different_tenant())
+
+
+def test_associate_2_sccp_lines():
+    with fixtures.device() as device:
+        with line_fellowship('sccp') as (user1, line1, extension1, sccp1), \
+                line_fellowship('sccp') as (user2, line2, extension2, sccp2):
+
+            confd.lines(line2['id']).put(position=2).assert_updated()
+            confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+
+            response = confd.lines(line2['id']).devices(device['id']).put()
+            response.assert_match(400, e.resource_associated('Line', 'Device'))
+
+
+def test_associate_lines_with_different_endpoints():
+    with fixtures.device() as device:
+        with line_fellowship('sip') as (user1, line1, extension1, sip), \
+                line_fellowship('sccp') as (user2, line2, extension2, sccp):
+
+            confd.lines(line2['id']).put(position=2).assert_updated()
+            confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+
+            response = confd.lines(line2['id']).devices(device['id']).put()
+            response.assert_match(400, e.resource_associated('Line', 'Device'))
 
 
 def assert_sccp_in_db(line, device):
@@ -352,37 +349,37 @@ def assert_sccp_in_db(line, device):
         assert_that(q.line_has_sccp_device(line['id'], sccp_device))
 
 
-@fixtures.device()
-def test_associate_sccp_line(device):
-    registrar = confd.registrars('default').get().item
-    registrar['proxy_backup_host'] = '127.0.0.2'
-    confd.registrars(registrar['id']).put(registrar)
+def test_associate_sccp_line():
+    with fixtures.device() as device:
+        registrar = confd.registrars('default').get().item
+        registrar['proxy_backup_host'] = '127.0.0.2'
+        confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sccp') as (user, line, extension, sccp):
-        response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_updated()
+        with line_fellowship('sccp') as (user, line, extension, sccp):
+            response = confd.lines(line['id']).devices(device['id']).put()
+            response.assert_updated()
 
-        device_config = provd.devices.get(device['id'])
-        assert_that(device_config['config'], is_not(starts_with('autoprov')))
+            device_config = provd.devices.get(device['id'])
+            assert_that(device_config['config'], is_not(starts_with('autoprov')))
 
-        provd_config = provd.configs.get(device['id'])
-        assert_provd_config(user, line, provd_config)
-        assert_sccp_config(provd_config)
-        assert_sccp_in_db(line, device)
+            provd_config = provd.configs.get(device['id'])
+            assert_provd_config(user, line, provd_config)
+            assert_sccp_config(provd_config)
+            assert_sccp_in_db(line, device)
 
 
-@fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
-def test_associate_sccp_line_change_tenant(device):
-    registrar = confd.registrars('default').get().item
-    registrar['proxy_backup_host'] = '127.0.0.2'
-    confd.registrars(registrar['id']).put(registrar)
+def test_associate_sccp_line_change_tenant():
+    with fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT) as device:
+        registrar = confd.registrars('default').get().item
+        registrar['proxy_backup_host'] = '127.0.0.2'
+        confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sccp', wazo_tenant=SUB_TENANT) as (user, line, extension, sccp):
-        response = confd.lines(line['id']).devices(device['id']).put()
-        response.assert_updated()
+        with line_fellowship('sccp', wazo_tenant=SUB_TENANT) as (user, line, extension, sccp):
+            response = confd.lines(line['id']).devices(device['id']).put()
+            response.assert_updated()
 
-        device_config = provd.devices.get(device['id'], wazo_tenant=SUB_TENANT)
-        assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
+            device_config = provd.devices.get(device['id'], wazo_tenant=SUB_TENANT)
+            assert_that(device_config['tenant_uuid'], is_(SUB_TENANT))
 
 
 def test_associate_when_device_already_associated():
@@ -452,16 +449,16 @@ def check_sccp_reset_to_autoprov(device):
         assert_that(q.sccp_device_exists(sccp_device), equal_to(False))
 
 
-@fixtures.device(wazo_tenant=MAIN_TENANT)
-@fixtures.device(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_device, sub_device):
-    with line_and_device('sip', wazo_tenant=MAIN_TENANT) as (main_line, main_device), \
-            line_and_device('sip', wazo_tenant=SUB_TENANT) as (sub_line, sub_device):
-        response = confd.lines(main_line['id']).devices(sub_device['id']).delete(wazo_tenant=SUB_TENANT)
-        response.assert_match(404, e.not_found('Line'))
+def test_dissociate_multi_tenant():
+    with fixtures.device(wazo_tenant=MAIN_TENANT) as main_device,  \
+            fixtures.device(wazo_tenant=SUB_TENANT) as sub_device:
+        with line_and_device('sip', wazo_tenant=MAIN_TENANT) as (main_line, main_device), \
+                line_and_device('sip', wazo_tenant=SUB_TENANT) as (sub_line, sub_device):
+            response = confd.lines(main_line['id']).devices(sub_device['id']).delete(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found('Line'))
 
-        response = confd.lines(sub_line['id']).devices(main_device['id']).delete(wazo_tenant=SUB_TENANT)
-        response.assert_match(404, e.not_found('Device'))
+            response = confd.lines(sub_line['id']).devices(main_device['id']).delete(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found('Device'))
 
 
 def test_dissociate_when_not_associated():
@@ -490,13 +487,13 @@ def check_dissociate_when_not_associated(line1, device1, line2, device2):
         assert_that(response.item, has_entries(device_id=device2['id']))
 
 
-@fixtures.device()
-def test_bus_events(device):
-    with line_fellowship('sip') as (user, line, extension, sip):
-        associate_url = confd.lines(line['id']).devices(device['id']).put
-        routing_key = 'config.lines.{}.devices.{}.updated'.format(line['id'], device['id'])
-        s.check_bus_event(routing_key, associate_url)
+def test_bus_events():
+    with fixtures.device() as device:
+        with line_fellowship('sip') as (user, line, extension, sip):
+            associate_url = confd.lines(line['id']).devices(device['id']).put
+            routing_key = 'config.lines.{}.devices.{}.updated'.format(line['id'], device['id'])
+            s.check_bus_event(routing_key, associate_url)
 
-        dissociate_url = confd.lines(line['id']).devices(device['id']).delete
-        routing_key = 'config.lines.{}.devices.{}.deleted'.format(line['id'], device['id'])
-        s.check_bus_event(routing_key, dissociate_url)
+            dissociate_url = confd.lines(line['id']).devices(device['id']).delete
+            routing_key = 'config.lines.{}.devices.{}.deleted'.format(line['id'], device['id'])
+            s.check_bus_event(routing_key, dissociate_url)

@@ -41,10 +41,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.trunk()
-def test_put_errors(trunk):
-    url = confd.trunks(trunk['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.trunk() as trunk:
+        url = confd.trunks(trunk['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -57,16 +58,14 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'twilio_incoming', {})
 
 
-@fixtures.context(name='search')
-@fixtures.context(name='hidden')
-@fixtures.trunk(context='search')
-@fixtures.trunk(context='hidden')
-def test_search(_, __, trunk, hidden):
-    url = confd.trunks
-    searches = {'context': 'search'}
+def test_search():
+    with fixtures.context(name='search') as _, fixtures.context(name='hidden') as __, fixtures.trunk(context='search') as trunk, fixtures.trunk(context='hidden') as hidden:
+        url = confd.trunks
+        searches = {'context': 'search'}
 
-    for field, term in searches.items():
-        check_search(url, trunk, hidden, field, term)
+        for field, term in searches.items():
+            check_search(url, trunk, hidden, field, term)
+
 
 
 def check_search(url, trunk, hidden, field, term):
@@ -79,66 +78,65 @@ def check_search(url, trunk, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.context(name='sort1')
-@fixtures.context(name='sort2')
-@fixtures.trunk(context='sort1')
-@fixtures.trunk(context='sort2')
-def test_sorting_offset_limit(_, __, trunk1, trunk2):
-    url = confd.trunks.get
-    s.check_sorting(url, trunk1, trunk2, 'context', 'sort')
+def test_sorting_offset_limit():
+    with fixtures.context(name='sort1') as _, fixtures.context(name='sort2') as __, fixtures.trunk(context='sort1') as trunk1, fixtures.trunk(context='sort2') as trunk2:
+        url = confd.trunks.get
+        s.check_sorting(url, trunk1, trunk2, 'context', 'sort')
 
-    s.check_offset(url, trunk1, trunk2, 'context', 'sort')
-    s.check_offset_legacy(url, trunk1, trunk2, 'context', 'sort')
+        s.check_offset(url, trunk1, trunk2, 'context', 'sort')
+        s.check_offset_legacy(url, trunk1, trunk2, 'context', 'sort')
 
-    s.check_limit(url, trunk1, trunk2, 'context', 'sort')
+        s.check_limit(url, trunk1, trunk2, 'context', 'sort')
 
 
-@fixtures.trunk(wazo_tenant=MAIN_TENANT)
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.trunks.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
 
-    response = confd.trunks.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+def test_list_multi_tenant():
+    with fixtures.trunk(wazo_tenant=MAIN_TENANT) as main, fixtures.trunk(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.trunks.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
 
-    response = confd.trunks.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        response = confd.trunks.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
 
-
-@fixtures.trunk()
-def test_get(trunk):
-    response = confd.trunks(trunk['id']).get()
-    assert_that(response.item, has_entries(
-        id=trunk['id'],
-        context=trunk['context'],
-        twilio_incoming=trunk['twilio_incoming'],
-        endpoint_sip=none(),
-        endpoint_custom=none(),
-        endpoint_iax=none(),
-        outcalls=empty(),
-        register_iax=none(),
-        register_sip=none(),
-    ))
+        response = confd.trunks.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.trunk(wazo_tenant=MAIN_TENANT)
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.trunks(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Trunk'))
 
-    response = confd.trunks(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.trunk() as trunk:
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(
+            id=trunk['id'],
+            context=trunk['context'],
+            twilio_incoming=trunk['twilio_incoming'],
+            endpoint_sip=none(),
+            endpoint_custom=none(),
+            endpoint_iax=none(),
+            outcalls=empty(),
+            register_iax=none(),
+            register_sip=none(),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.trunk(wazo_tenant=MAIN_TENANT) as main, fixtures.trunk(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.trunks(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Trunk'))
+
+        response = confd.trunks(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -148,72 +146,75 @@ def test_create_minimal_parameters():
     assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
 
-@fixtures.context()
-def test_create_all_parameters(context):
-    parameters = {
-        'context': context['name'],
-        'twilio_incoming': True,
-    }
-    response = confd.trunks.post(**parameters)
-    response.assert_created('trunks')
+def test_create_all_parameters():
+    with fixtures.context() as context:
+        parameters = {
+            'context': context['name'],
+            'twilio_incoming': True,
+        }
+        response = confd.trunks.post(**parameters)
+        response.assert_created('trunks')
 
-    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
-
-
-@fixtures.context(wazo_tenant=MAIN_TENANT)
-def test_create_multi_tenant(context):
-    response = confd.trunks.post(context=context['name'], wazo_tenant=SUB_TENANT)
-    response.assert_match(400, e.different_tenant())
+        assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
 
-@fixtures.trunk()
-def test_edit_minimal_parameters(trunk):
-    parameters = {}
 
-    response = confd.trunks(trunk['id']).put(**parameters)
-    response.assert_updated()
-
-
-@fixtures.context(name='not_default')
-@fixtures.trunk()
-def test_edit_all_parameters(context, trunk):
-    parameters = {
-        'context': context['name'],
-        'twilio_incoming': True,
-    }
-
-    response = confd.trunks(trunk['id']).put(**parameters)
-    response.assert_updated()
-
-    response = confd.trunks(trunk['id']).get()
-    assert_that(response.item, has_entries(parameters))
+def test_create_multi_tenant():
+    with fixtures.context(wazo_tenant=MAIN_TENANT) as context:
+        response = confd.trunks.post(context=context['name'], wazo_tenant=SUB_TENANT)
+        response.assert_match(400, e.different_tenant())
 
 
-@fixtures.context()
-@fixtures.trunk(wazo_tenant=MAIN_TENANT)
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(context, main, sub):
-    response = confd.trunks(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Trunk'))
 
-    response = confd.trunks(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.trunk() as trunk:
+        parameters = {}
 
-    response = confd.trunks(sub['id']).put(context=context['name'], wazo_tenant=MAIN_TENANT)
-    response.assert_match(400, e.different_tenant())
+        response = confd.trunks(trunk['id']).put(**parameters)
+        response.assert_updated()
 
 
-@fixtures.trunk()
-def test_delete(trunk):
-    response = confd.trunks(trunk['id']).delete()
-    response.assert_deleted()
+
+def test_edit_all_parameters():
+    with fixtures.context(name='not_default') as context, fixtures.trunk() as trunk:
+        parameters = {
+            'context': context['name'],
+            'twilio_incoming': True,
+        }
+
+        response = confd.trunks(trunk['id']).put(**parameters)
+        response.assert_updated()
+
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.trunk(wazo_tenant=MAIN_TENANT)
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.trunks(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Trunk'))
 
-    response = confd.trunks(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_edit_multi_tenant():
+    with fixtures.context() as context, fixtures.trunk(wazo_tenant=MAIN_TENANT) as main, fixtures.trunk(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.trunks(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Trunk'))
+
+        response = confd.trunks(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
+
+        response = confd.trunks(sub['id']).put(context=context['name'], wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+
+
+
+def test_delete():
+    with fixtures.trunk() as trunk:
+        response = confd.trunks(trunk['id']).delete()
+        response.assert_deleted()
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.trunk(wazo_tenant=MAIN_TENANT) as main, fixtures.trunk(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.trunks(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Trunk'))
+
+        response = confd.trunks(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+

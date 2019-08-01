@@ -51,10 +51,11 @@ def test_post_errors():
     unique_error_checks(url)
 
 
-@fixtures.agent()
-def test_put_errors(agent):
-    url = confd.agents(agent['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.agent() as agent:
+        url = confd.agents(agent['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -89,23 +90,24 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
 
 
-@fixtures.agent(number='1234')
-def unique_error_checks(url, agent):
-    s.check_bogus_field_returns_error(url, 'number', agent['number'])
+def unique_error_checks(url):
+    with fixtures.agent(number='1234') as agent:
+        s.check_bogus_field_returns_error(url, 'number', agent['number'])
 
 
-@fixtures.agent(firstname='hidden', lastname='hidden', preprocess_subroutine='hidden')
-@fixtures.agent(firstname='search', lastname='search', preprocess_subroutine='search')
-def test_search(hidden, agent):
-    url = confd.agents
-    searches = {
-        'firstname': 'search',
-        'lastname': 'search',
-        'preprocess_subroutine': 'search',
-    }
 
-    for field, term in searches.items():
-        check_search(url, agent, hidden, field, term)
+def test_search():
+    with fixtures.agent(firstname='hidden', lastname='hidden', preprocess_subroutine='hidden') as hidden, fixtures.agent(firstname='search', lastname='search', preprocess_subroutine='search') as agent:
+        url = confd.agents
+        searches = {
+            'firstname': 'search',
+            'lastname': 'search',
+            'preprocess_subroutine': 'search',
+        }
+
+        for field, term in searches.items():
+            check_search(url, agent, hidden, field, term)
+
 
 
 def check_search(url, agent, hidden, field, term):
@@ -118,58 +120,59 @@ def check_search(url, agent, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.agent(wazo_tenant=MAIN_TENANT)
-@fixtures.agent(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.agents.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
+def test_list_multi_tenant():
+    with fixtures.agent(wazo_tenant=MAIN_TENANT) as main, fixtures.agent(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents.get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
-    response = confd.agents.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
+        response = confd.agents.get(wazo_tenant=SUB_TENANT)
+        assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
-    response = confd.agents.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(main, sub))
-
-
-@fixtures.agent(firstname='sort1', lastname='sort1', preprocess_subroutine='sort1')
-@fixtures.agent(firstname='sort2', lastname='sort2', preprocess_subroutine='sort2')
-def test_sorting_offset_limit(agent1, agent2):
-    url = confd.agents.get
-    s.check_sorting(url, agent1, agent2, 'firstname', 'sort')
-    s.check_sorting(url, agent1, agent2, 'lastname', 'sort')
-    s.check_sorting(url, agent1, agent2, 'preprocess_subroutine', 'sort')
-
-    s.check_offset(url, agent1, agent2, 'firstname', 'sort')
-
-    s.check_limit(url, agent1, agent2, 'firstname', 'sort')
+        response = confd.agents.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(response.items, has_items(main, sub))
 
 
-@fixtures.agent()
-def test_get(agent):
-    response = confd.agents(agent['id']).get()
-    assert_that(response.item, has_entries(
-        id=agent['id'],
-        number=agent['number'],
-        firstname=agent['firstname'],
-        lastname=agent['lastname'],
-        password=agent['password'],
-        preprocess_subroutine=agent['preprocess_subroutine'],
-        description=agent['description'],
 
-        queues=empty(),
-        skills=empty(),
-        users=empty(),
-    ))
+def test_sorting_offset_limit():
+    with fixtures.agent(firstname='sort1', lastname='sort1', preprocess_subroutine='sort1') as agent1, fixtures.agent(firstname='sort2', lastname='sort2', preprocess_subroutine='sort2') as agent2:
+        url = confd.agents.get
+        s.check_sorting(url, agent1, agent2, 'firstname', 'sort')
+        s.check_sorting(url, agent1, agent2, 'lastname', 'sort')
+        s.check_sorting(url, agent1, agent2, 'preprocess_subroutine', 'sort')
+
+        s.check_offset(url, agent1, agent2, 'firstname', 'sort')
+
+        s.check_limit(url, agent1, agent2, 'firstname', 'sort')
 
 
-@fixtures.agent(wazo_tenant=MAIN_TENANT)
-@fixtures.agent(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.agents(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Agent'))
 
-    response = confd.agents(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.agent() as agent:
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(
+            id=agent['id'],
+            number=agent['number'],
+            firstname=agent['firstname'],
+            lastname=agent['lastname'],
+            password=agent['password'],
+            preprocess_subroutine=agent['preprocess_subroutine'],
+            description=agent['description'],
+
+            queues=empty(),
+            skills=empty(),
+            users=empty(),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.agent(wazo_tenant=MAIN_TENANT) as main, fixtures.agent(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Agent'))
+
+        response = confd.agents(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -214,69 +217,74 @@ def test_create_multi_tenant():
     assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
-@fixtures.agent()
-def test_edit_minimal_parameters(agent):
-    response = confd.agents(agent['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.agent() as agent:
+        response = confd.agents(agent['id']).put()
+        response.assert_updated()
 
 
-@fixtures.agent()
-def test_edit_all_parameters(agent):
-    parameters = {
-        'firstname': 'Firstname',
-        'lastname': 'Lastname',
-        'password': '5678',
-        'preprocess_subroutine': 'subroutine',
-        'description': 'description',
-    }
 
-    response = confd.agents(agent['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.agent() as agent:
+        parameters = {
+            'firstname': 'Firstname',
+            'lastname': 'Lastname',
+            'password': '5678',
+            'preprocess_subroutine': 'subroutine',
+            'description': 'description',
+        }
 
-    response = confd.agents(agent['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.agents(agent['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.agent(number='1234')
-def test_edit_number_unavailable(agent):
-    response = confd.agents(agent['id']).put(number='4567')
-    response.assert_updated()
-
-    response = confd.agents(agent['id']).get()
-    assert_that(response.item, has_entries(number=agent['number']))
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.agent(wazo_tenant=MAIN_TENANT)
-@fixtures.agent(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.agents(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Agent'))
 
-    response = confd.agents(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+def test_edit_number_unavailable():
+    with fixtures.agent(number='1234') as agent:
+        response = confd.agents(agent['id']).put(number='4567')
+        response.assert_updated()
 
-
-@fixtures.agent()
-def test_delete(agent):
-    response = confd.agents(agent['id']).delete()
-    response.assert_deleted()
-
-    response = confd.agents(agent['id']).get()
-    response.assert_match(404, e.not_found(resource='Agent'))
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item, has_entries(number=agent['number']))
 
 
-@fixtures.agent(wazo_tenant=MAIN_TENANT)
-@fixtures.agent(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.agents(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Agent'))
 
-    response = confd.agents(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_edit_multi_tenant():
+    with fixtures.agent(wazo_tenant=MAIN_TENANT) as main, fixtures.agent(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Agent'))
+
+        response = confd.agents(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.agent()
-def test_bus_events(agent):
-    s.check_bus_event('config.agent.created', confd.agents.post, {'number': '123456789123456789'})
-    s.check_bus_event('config.agent.edited', confd.agents(agent['id']).put)
-    s.check_bus_event('config.agent.deleted', confd.agents(agent['id']).delete)
+
+def test_delete():
+    with fixtures.agent() as agent:
+        response = confd.agents(agent['id']).delete()
+        response.assert_deleted()
+
+        response = confd.agents(agent['id']).get()
+        response.assert_match(404, e.not_found(resource='Agent'))
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.agent(wazo_tenant=MAIN_TENANT) as main, fixtures.agent(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Agent'))
+
+        response = confd.agents(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.agent() as agent:
+        s.check_bus_event('config.agent.created', confd.agents.post, {'number': '123456789123456789'})
+        s.check_bus_event('config.agent.edited', confd.agents(agent['id']).put)
+        s.check_bus_event('config.agent.deleted', confd.agents(agent['id']).delete)
+

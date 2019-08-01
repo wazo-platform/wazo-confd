@@ -36,10 +36,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.call_filter()
-def test_put_errors(call_filter):
-    url = confd.callfilters(call_filter['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.call_filter() as call_filter:
+        url = confd.callfilters(call_filter['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -86,22 +87,23 @@ def error_checks(url):
     unique_error_checks(url)
 
 
-@fixtures.call_filter(name='unique')
-def unique_error_checks(url, call_filter):
-    s.check_bogus_field_returns_error(url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'})
+def unique_error_checks(url):
+    with fixtures.call_filter(name='unique') as call_filter:
+        s.check_bogus_field_returns_error(url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'})
 
 
-@fixtures.call_filter(name="search", description="SearchDesc")
-@fixtures.call_filter(name="hidden", description="HiddenDesc")
-def test_search(call_filter, hidden):
-    url = confd.callfilters
-    searches = {
-        'name': 'search',
-        'description': 'Search',
-    }
 
-    for field, term in searches.items():
-        check_search(url, call_filter, hidden, field, term)
+def test_search():
+    with fixtures.call_filter(name="search", description="SearchDesc") as call_filter, fixtures.call_filter(name="hidden", description="HiddenDesc") as hidden:
+        url = confd.callfilters
+        searches = {
+            'name': 'search',
+            'description': 'Search',
+        }
+
+        for field, term in searches.items():
+            check_search(url, call_filter, hidden, field, term)
+
 
 
 def check_search(url, call_filter, hidden, field, term):
@@ -114,73 +116,74 @@ def check_search(url, call_filter, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.call_filter(name="sort1", description="Sort 1")
-@fixtures.call_filter(name="sort2", description="Sort 2")
-def test_sorting_offset_limit(call_filter1, call_filter2):
-    url = confd.callfilters.get
-    s.check_sorting(url, call_filter1, call_filter2, 'name', 'sort')
-    s.check_sorting(url, call_filter1, call_filter2, 'description', 'Sort')
+def test_sorting_offset_limit():
+    with fixtures.call_filter(name="sort1", description="Sort 1") as call_filter1, fixtures.call_filter(name="sort2", description="Sort 2") as call_filter2:
+        url = confd.callfilters.get
+        s.check_sorting(url, call_filter1, call_filter2, 'name', 'sort')
+        s.check_sorting(url, call_filter1, call_filter2, 'description', 'Sort')
 
-    s.check_offset(url, call_filter1, call_filter2, 'name', 'sort')
-    s.check_offset_legacy(url, call_filter1, call_filter2, 'name', 'sort')
+        s.check_offset(url, call_filter1, call_filter2, 'name', 'sort')
+        s.check_offset_legacy(url, call_filter1, call_filter2, 'name', 'sort')
 
-    s.check_limit(url, call_filter1, call_filter2, 'name', 'sort')
-
-
-@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
-@fixtures.call_filter(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.callfilters.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
-
-    response = confd.callfilters.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
-
-    response = confd.callfilters.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        s.check_limit(url, call_filter1, call_filter2, 'name', 'sort')
 
 
-@fixtures.call_filter()
-def test_get(call_filter):
-    response = confd.callfilters(call_filter['id']).get()
-    assert_that(response.item, has_entries(
-        name=call_filter['name'],
-        source=call_filter['source'],
-        caller_id_mode=none(),
-        caller_id_name=none(),
-        strategy=call_filter['strategy'],
-        surrogates_timeout=none(),
-        description=none(),
-        enabled=True,
-        recipients=has_entries(
-            users=empty()
-        ),
-        surrogates=has_entries(
-            users=empty()
-        ),
-        fallbacks=has_entries(
-            noanswer_destination=none()
-        ),
-    ))
+
+def test_list_multi_tenant():
+    with fixtures.call_filter(wazo_tenant=MAIN_TENANT) as main, fixtures.call_filter(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callfilters.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
+
+        response = confd.callfilters.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
+
+        response = confd.callfilters.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
-@fixtures.call_filter(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.callfilters(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='CallFilter'))
 
-    response = confd.callfilters(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.call_filter() as call_filter:
+        response = confd.callfilters(call_filter['id']).get()
+        assert_that(response.item, has_entries(
+            name=call_filter['name'],
+            source=call_filter['source'],
+            caller_id_mode=none(),
+            caller_id_name=none(),
+            strategy=call_filter['strategy'],
+            surrogates_timeout=none(),
+            description=none(),
+            enabled=True,
+            recipients=has_entries(
+                users=empty()
+            ),
+            surrogates=has_entries(
+                users=empty()
+            ),
+            fallbacks=has_entries(
+                noanswer_destination=none()
+            ),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.call_filter(wazo_tenant=MAIN_TENANT) as main, fixtures.call_filter(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callfilters(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='CallFilter'))
+
+        response = confd.callfilters(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -217,19 +220,29 @@ def test_create_all_parameters():
     confd.callfilters(response.item['id']).delete().assert_deleted()
 
 
-@fixtures.call_filter(strategy='all-recipients-then-linear-surrogates')
-@fixtures.call_filter(strategy='all-recipients-then-all-surrogates')
-@fixtures.call_filter(strategy='all-surrogates-then-all-recipients')
-@fixtures.call_filter(strategy='linear-surrogates-then-all-recipients')
-@fixtures.call_filter(strategy='all')
-@fixtures.call_filter(source='external')
-@fixtures.call_filter(source='internal')
-@fixtures.call_filter(source='all')
-@fixtures.call_filter(caller_id_mode='prepend')
-@fixtures.call_filter(caller_id_mode='append')
-@fixtures.call_filter(caller_id_mode='overwrite')
-def test_create_with_every_enum(self, *call_filters):
-    pass
+def test_create_with_every_enum():
+    with fixtures.call_filter(strategy='all-recipients-then-linear-surrogates'):
+        pass
+    with fixtures.call_filter(strategy='all-recipients-then-all-surrogates'):
+        pass
+    with fixtures.call_filter(strategy='all-surrogates-then-all-recipients'):
+        pass
+    with fixtures.call_filter(strategy='linear-surrogates-then-all-recipients'):
+        pass
+    with fixtures.call_filter(strategy='all'):
+        pass
+    with fixtures.call_filter(source='external'):
+        pass
+    with fixtures.call_filter(source='internal'):
+        pass
+    with fixtures.call_filter(source='all'):
+        pass
+    with fixtures.call_filter(caller_id_mode='prepend'):
+        pass
+    with fixtures.call_filter(caller_id_mode='append'):
+        pass
+    with fixtures.call_filter(caller_id_mode='overwrite'):
+        pass
 
 
 def test_create_without_name():
@@ -237,54 +250,57 @@ def test_create_without_name():
     response.assert_status(400)
 
 
-@fixtures.call_filter()
-def test_edit_minimal_parameters(call_filter):
-    response = confd.callfilters(call_filter['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.call_filter() as call_filter:
+        response = confd.callfilters(call_filter['id']).put()
+        response.assert_updated()
 
 
-@fixtures.call_filter()
-def test_edit_all_parameters(call_filter):
-    parameters = {
-        'name': 'editallparameter',
-        'source': 'all',
-        'strategy': 'all',
-        'surrogates_timeout': 10,
-        'caller_id_mode': 'prepend',
-        'caller_id_name': 'callidname',
-        'description': 'Create description',
-        'enabled': False,
-    }
 
-    response = confd.callfilters(call_filter['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.call_filter() as call_filter:
+        parameters = {
+            'name': 'editallparameter',
+            'source': 'all',
+            'strategy': 'all',
+            'surrogates_timeout': 10,
+            'caller_id_mode': 'prepend',
+            'caller_id_name': 'callidname',
+            'description': 'Create description',
+            'enabled': False,
+        }
 
-    response = confd.callfilters(call_filter['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.callfilters(call_filter['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
-@fixtures.call_filter(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.callfilters(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='CallFilter'))
-
-    response = confd.callfilters(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+        response = confd.callfilters(call_filter['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.call_filter()
-def test_delete(call_filter):
-    response = confd.callfilters(call_filter['id']).delete()
-    response.assert_deleted()
-    confd.callfilters(call_filter['id']).get().assert_status(404)
+
+def test_edit_multi_tenant():
+    with fixtures.call_filter(wazo_tenant=MAIN_TENANT) as main, fixtures.call_filter(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callfilters(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='CallFilter'))
+
+        response = confd.callfilters(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.call_filter(wazo_tenant=MAIN_TENANT)
-@fixtures.call_filter(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.callfilters(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='CallFilter'))
 
-    response = confd.callfilters(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.call_filter() as call_filter:
+        response = confd.callfilters(call_filter['id']).delete()
+        response.assert_deleted()
+        confd.callfilters(call_filter['id']).get().assert_status(404)
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.call_filter(wazo_tenant=MAIN_TENANT) as main, fixtures.call_filter(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callfilters(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='CallFilter'))
+
+        response = confd.callfilters(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+

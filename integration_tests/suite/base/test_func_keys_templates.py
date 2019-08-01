@@ -41,10 +41,10 @@ def test_post_errors():
         s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': {'destination': destination}}, regex)
 
 
-@fixtures.funckey_template()
-def test_get_position_errors(funckey_template):
-    fake_get = confd.funckeys.templates(funckey_template['id'])(1).get
-    s.check_resource_not_found(fake_get, 'FuncKey')
+def test_get_position_errors():
+    with fixtures.funckey_template() as funckey_template:
+        fake_get = confd.funckeys.templates(funckey_template['id'])(1).get
+        s.check_resource_not_found(fake_get, 'FuncKey')
 
 
 # Should raise an error
@@ -54,23 +54,25 @@ def test_get_position_errors(funckey_template):
 #     s.check_resource_not_found(fake_delete, 'FuncKey')
 
 
-@fixtures.funckey_template()
-def test_put_position_errors(funckey_template):
-    url = confd.funckeys.templates(funckey_template['id'])(1).put
-    error_funckey_checks(url)
 
-    for destination in invalid_template_destinations:
-        s.check_bogus_field_returns_error(url, 'destination', destination)
+def test_put_position_errors():
+    with fixtures.funckey_template() as funckey_template:
+        url = confd.funckeys.templates(funckey_template['id'])(1).put
+        error_funckey_checks(url)
+
+        for destination in invalid_template_destinations:
+            s.check_bogus_field_returns_error(url, 'destination', destination)
 
 
-@fixtures.funckey_template(name="search")
-@fixtures.funckey_template(name="hidden")
-def test_search_on_funckey_template(funckey_template, hidden):
-    url = confd.funckeys.templates
-    searches = {'name': 'search'}
 
-    for field, term in searches.items():
-        check_search(url, funckey_template, hidden, field, term)
+def test_search_on_funckey_template():
+    with fixtures.funckey_template(name="search") as funckey_template, fixtures.funckey_template(name="hidden") as hidden:
+        url = confd.funckeys.templates
+        searches = {'name': 'search'}
+
+        for field, term in searches.items():
+            check_search(url, funckey_template, hidden, field, term)
+
 
 
 def check_search(url, funckey_template, hidden, field, term):
@@ -79,10 +81,10 @@ def check_search(url, funckey_template, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
 
-@fixtures.funckey_template(name='sort1')
-@fixtures.funckey_template(name='sort2')
-def test_funckey_template_sorting(funckey_template1, funckey_template2):
-    check_funckey_template_sorting(funckey_template1, funckey_template2, 'name', 'sort')
+def test_funckey_template_sorting():
+    with fixtures.funckey_template(name='sort1') as funckey_template1, fixtures.funckey_template(name='sort2') as funckey_template2:
+        check_funckey_template_sorting(funckey_template1, funckey_template2, 'name', 'sort')
+
 
 
 def check_funckey_template_sorting(funckey_template1, funckey_template2, field, search):
@@ -95,32 +97,36 @@ def check_funckey_template_sorting(funckey_template1, funckey_template2, field, 
                                          has_entries(id=funckey_template1['id'])))
 
 
-@fixtures.funckey_template(name='template')
-def test_get(funckey_template):
-    response = confd.funckeys.templates(funckey_template['id']).get()
-    assert_that(response.item, has_entries(name='template'))
+def test_get():
+    with fixtures.funckey_template(name='template') as funckey_template:
+        response = confd.funckeys.templates(funckey_template['id']).get()
+        assert_that(response.item, has_entries(name='template'))
 
 
-@fixtures.funckey_template(keys={'3': {'destination': {'type': 'custom', 'exten': '123'}}})
-def test_get_position(funckey_template):
-    response = confd.funckeys.templates(funckey_template['id'])(3).get()
-    assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
+
+def test_get_position():
+    with fixtures.funckey_template(keys={'3': {'destination': {'type': 'custom', 'exten': '123'}}}) as funckey_template:
+        response = confd.funckeys.templates(funckey_template['id'])(3).get()
+        assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
 
 
-@fixtures.funckey_template()
-def test_delete(funckey_template):
-    response = confd.funckeys.templates(funckey_template['id']).delete()
-    response.assert_deleted()
-    url_get = confd.funckeys.templates(funckey_template['id']).get
-    s.check_resource_not_found(url_get, 'FuncKeyTemplate')
+
+def test_delete():
+    with fixtures.funckey_template() as funckey_template:
+        response = confd.funckeys.templates(funckey_template['id']).delete()
+        response.assert_deleted()
+        url_get = confd.funckeys.templates(funckey_template['id']).get
+        s.check_resource_not_found(url_get, 'FuncKeyTemplate')
 
 
-@fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}})
-def test_delete_position(funckey_template):
-    response = confd.funckeys.templates(funckey_template['id'])(1).delete()
-    response.assert_deleted()
-    url_get = confd.funckeys.templates(funckey_template['id'])(1).get
-    s.check_resource_not_found(url_get, 'FuncKey')
+
+def test_delete_position():
+    with fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}) as funckey_template:
+        response = confd.funckeys.templates(funckey_template['id'])(1).delete()
+        response.assert_deleted()
+        url_get = confd.funckeys.templates(funckey_template['id'])(1).get
+        s.check_resource_not_found(url_get, 'FuncKey')
+
 
 
 def test_create_funckey_template_minimal_parameters():
@@ -140,12 +146,13 @@ def test_post_error_on_duplicate_destination():
     response.assert_status(400)
 
 
-@fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}})
-def test_put_error_on_duplicate_destination(funckey_template):
-    destination = {'destination': {'type': 'custom', 'exten': '123'}}
+def test_put_error_on_duplicate_destination():
+    with fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}) as funckey_template:
+        destination = {'destination': {'type': 'custom', 'exten': '123'}}
 
-    response = confd.funckeys.templates(funckey_template['id'])(2).put(destination)
-    response.assert_status(400)
+        response = confd.funckeys.templates(funckey_template['id'])(2).put(destination)
+        response.assert_status(400)
+
 
 
 def test_create_funckey_template_all_parameters():

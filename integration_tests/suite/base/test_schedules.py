@@ -42,10 +42,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.schedule()
-def test_put_errors(schedule):
-    url = confd.schedules(schedule['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.schedule() as schedule:
+        url = confd.schedules(schedule['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -125,39 +126,39 @@ def error_checks(url):
         s.check_bogus_field_returns_error_matching_regex(url, 'exceptional_periods', body, regex)
 
 
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.schedules.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+def test_list_multi_tenant():
+    with fixtures.schedule(wazo_tenant=MAIN_TENANT) as main, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.schedules.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
 
-    response = confd.schedules.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+        response = confd.schedules.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
 
-    response = confd.schedules.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        response = confd.schedules.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.schedule(name='search', timezone='search')
-@fixtures.schedule(name='hidden', timezone='hidden')
-def test_search(schedule, hidden):
-    url = confd.schedules
-    searches = {
-        'name': 'search',
-        'timezone': 'search',
-    }
 
-    for field, term in searches.items():
-        check_search(url, schedule, hidden, field, term)
+def test_search():
+    with fixtures.schedule(name='search', timezone='search') as schedule, fixtures.schedule(name='hidden', timezone='hidden') as hidden:
+        url = confd.schedules
+        searches = {
+            'name': 'search',
+            'timezone': 'search',
+        }
+
+        for field, term in searches.items():
+            check_search(url, schedule, hidden, field, term)
+
 
 
 def check_search(url, schedule, hidden, field, term):
@@ -170,46 +171,47 @@ def check_search(url, schedule, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.schedule(name='sort1')
-@fixtures.schedule(name='sort2')
-def test_sort_offset_limit(schedule1, schedule2):
-    url = confd.schedules.get
-    s.check_sorting(url, schedule1, schedule2, 'name', 'sort')
+def test_sort_offset_limit():
+    with fixtures.schedule(name='sort1') as schedule1, fixtures.schedule(name='sort2') as schedule2:
+        url = confd.schedules.get
+        s.check_sorting(url, schedule1, schedule2, 'name', 'sort')
 
-    s.check_offset(url, schedule1, schedule2, 'name', 'sort')
-    s.check_offset_legacy(url, schedule1, schedule2, 'name', 'sort')
+        s.check_offset(url, schedule1, schedule2, 'name', 'sort')
+        s.check_offset_legacy(url, schedule1, schedule2, 'name', 'sort')
 
-    s.check_limit(url, schedule1, schedule2, 'name', 'sort')
-
-
-@fixtures.schedule()
-def test_get(schedule):
-    response = confd.schedules(schedule['id']).get()
-    assert_that(response.item, has_entries(
-        id=schedule['id'],
-        name=schedule['name'],
-        timezone=schedule['timezone'],
-        closed_destination=schedule['closed_destination'],
-        open_periods=schedule['open_periods'],
-        exceptional_periods=schedule['exceptional_periods'],
-        enabled=schedule['enabled'],
-
-        groups=empty(),
-        incalls=empty(),
-        outcalls=empty(),
-        queues=empty(),
-        users=empty(),
-    ))
+        s.check_limit(url, schedule1, schedule2, 'name', 'sort')
 
 
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.schedules(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Schedule'))
 
-    response = confd.schedules(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.schedule() as schedule:
+        response = confd.schedules(schedule['id']).get()
+        assert_that(response.item, has_entries(
+            id=schedule['id'],
+            name=schedule['name'],
+            timezone=schedule['timezone'],
+            closed_destination=schedule['closed_destination'],
+            open_periods=schedule['open_periods'],
+            exceptional_periods=schedule['exceptional_periods'],
+            enabled=schedule['enabled'],
+
+            groups=empty(),
+            incalls=empty(),
+            outcalls=empty(),
+            queues=empty(),
+            users=empty(),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.schedule(wazo_tenant=MAIN_TENANT) as main, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.schedules(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Schedule'))
+
+        response = confd.schedules(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -314,67 +316,73 @@ def test_create_exceptional_periods_default_values():
     confd.schedules(response.item['id']).delete().assert_deleted()
 
 
-@fixtures.schedule()
-def test_edit_minimal_parameters(schedule):
-    response = confd.schedules(schedule['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.schedule() as schedule:
+        response = confd.schedules(schedule['id']).put()
+        response.assert_updated()
 
 
-@fixtures.schedule()
-def test_edit_all_parameters(schedule):
-    parameters = {
-        'name': 'MySchedule',
-        'timezone': 'American/Toronto',
-        'closed_destination': {
-            'type': 'hangup',
-            'cause': 'busy',
-            'timeout': 25
-        },
-        'open_periods': [{
-            'hours_start': '07:15',
-            'hours_end': '08:15',
-            'week_days': [1, 2, 3, 4, 5],
-            'month_days': [1, 15, 30],
-            'months': [1, 6, 12]
-        }],
-        'exceptional_periods': [{
-            'hours_start': '07:25',
-            'hours_end': '07:35',
-            'week_days': [1, 2, 3, 4, 5],
-            'month_days': [1, 30],
-            'months': [1, 12],
-            'destination': {
+
+def test_edit_all_parameters():
+    with fixtures.schedule() as schedule:
+        parameters = {
+            'name': 'MySchedule',
+            'timezone': 'American/Toronto',
+            'closed_destination': {
                 'type': 'hangup',
-                'cause': 'congestion',
-                'timeout': 30
-            }
-        }],
-        'enabled': False
-    }
+                'cause': 'busy',
+                'timeout': 25
+            },
+            'open_periods': [{
+                'hours_start': '07:15',
+                'hours_end': '08:15',
+                'week_days': [1, 2, 3, 4, 5],
+                'month_days': [1, 15, 30],
+                'months': [1, 6, 12]
+            }],
+            'exceptional_periods': [{
+                'hours_start': '07:25',
+                'hours_end': '07:35',
+                'week_days': [1, 2, 3, 4, 5],
+                'month_days': [1, 30],
+                'months': [1, 12],
+                'destination': {
+                    'type': 'hangup',
+                    'cause': 'congestion',
+                    'timeout': 30
+                }
+            }],
+            'enabled': False
+        }
 
-    response = confd.schedules(schedule['id']).put(**parameters)
-    response.assert_updated()
+        response = confd.schedules(schedule['id']).put(**parameters)
+        response.assert_updated()
 
-    response = confd.schedules(schedule['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.schedules(schedule['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.schedule()
-@fixtures.meetme()
-@fixtures.ivr()
-@fixtures.group()
-@fixtures.outcall()
-@fixtures.queue()
-@fixtures.switchboard()
-@fixtures.user()
-@fixtures.voicemail()
-@fixtures.conference()
-@fixtures.skill_rule()
-@fixtures.application()
-def test_valid_destinations(schedule, *destinations):
-    for destination in valid_destinations(*destinations):
-        create_schedule_with_destination(destination)
-        update_schedule_with_destination(schedule['id'], destination)
+
+def test_valid_destinations():
+    with fixtures.schedule() as schedule, \
+            fixtures.meetme() as meetme, \
+            fixtures.ivr() as ivr, \
+            fixtures.group() as group, \
+            fixtures.outcall() as outcall, \
+            fixtures.queue() as queue, \
+            fixtures.switchboard() as switchboard, \
+            fixtures.user() as user, \
+            fixtures.voicemail() as voicemail, \
+            fixtures.conference() as conference, \
+            fixtures.skill_rule() as skill_rule, \
+            fixtures.application() as application:
+
+        destinations = (meetme, ivr, group, outcall, queue, switchboard, user,
+                        voicemail, conference, skill_rule, application)
+
+        for destination in valid_destinations(*destinations):
+            create_schedule_with_destination(destination)
+            update_schedule_with_destination(schedule['id'], destination)
 
 
 def create_schedule_with_destination(destination):
@@ -412,37 +420,39 @@ def update_schedule_with_destination(schedule_id, destination):
     ))
 
 
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.schedules(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Schedule'))
+def test_edit_multi_tenant():
+    with fixtures.schedule(wazo_tenant=MAIN_TENANT) as main, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.schedules(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Schedule'))
 
-    response = confd.schedules(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
-
-
-@fixtures.schedule()
-def test_delete(schedule):
-    response = confd.schedules(schedule['id']).delete()
-    response.assert_deleted()
-    response = confd.schedules(schedule['id']).get()
-    response.assert_match(404, e.not_found(resource='Schedule'))
+        response = confd.schedules(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.schedules(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Schedule'))
 
-    response = confd.schedules(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.schedule() as schedule:
+        response = confd.schedules(schedule['id']).delete()
+        response.assert_deleted()
+        response = confd.schedules(schedule['id']).get()
+        response.assert_match(404, e.not_found(resource='Schedule'))
 
 
-@fixtures.schedule()
-def test_bus_events(schedule):
-    required_body = {'closed_destination': {'type': 'none'}}
-    s.check_bus_event('config.schedules.created', confd.schedules.post, required_body)
-    s.check_bus_event('config.schedules.edited', confd.schedules(schedule['id']).put)
-    s.check_bus_event('config.schedules.deleted', confd.schedules(schedule['id']).delete)
+
+def test_delete_multi_tenant():
+    with fixtures.schedule(wazo_tenant=MAIN_TENANT) as main, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.schedules(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Schedule'))
+
+        response = confd.schedules(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.schedule() as schedule:
+        required_body = {'closed_destination': {'type': 'none'}}
+        s.check_bus_event('config.schedules.created', confd.schedules.post, required_body)
+        s.check_bus_event('config.schedules.edited', confd.schedules(schedule['id']).put)
+        s.check_bus_event('config.schedules.deleted', confd.schedules(schedule['id']).delete)
+

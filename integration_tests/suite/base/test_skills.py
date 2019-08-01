@@ -41,10 +41,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.skill()
-def test_put_errors(skill):
-    url = confd.agents.skills(skill['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.skill() as skill:
+        url = confd.agents.skills(skill['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -67,21 +68,22 @@ def error_checks(url):
     unique_error_checks(url)
 
 
-@fixtures.skill(name='unique')
-def unique_error_checks(url, skill):
-    s.check_bogus_field_returns_error(url, 'name', skill['name'])
+def unique_error_checks(url):
+    with fixtures.skill(name='unique') as skill:
+        s.check_bogus_field_returns_error(url, 'name', skill['name'])
 
 
-@fixtures.skill(name='search', category='search', description='search')
-@fixtures.skill(name='hidden', category='hidden', description='hidden')
-def test_search(skill, hidden):
-    url = confd.agents.skills
-    searches = {'name': 'search',
-                'category': 'search',
-                'description': 'search'}
 
-    for field, term in searches.items():
-        check_search(url, skill, hidden, field, term)
+def test_search():
+    with fixtures.skill(name='search', category='search', description='search') as skill, fixtures.skill(name='hidden', category='hidden', description='hidden') as hidden:
+        url = confd.agents.skills
+        searches = {'name': 'search',
+                    'category': 'search',
+                    'description': 'search'}
+
+        for field, term in searches.items():
+            check_search(url, skill, hidden, field, term)
+
 
 
 def check_search(url, skill, hidden, field, term):
@@ -94,70 +96,71 @@ def check_search(url, skill, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.skill(wazo_tenant=MAIN_TENANT)
-@fixtures.skill(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.agents.skills.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(
-            has_item(has_entry('id', main['id'])),
-            not_(has_item(has_entry('id', sub['id']))),
+def test_list_multi_tenant():
+    with fixtures.skill(wazo_tenant=MAIN_TENANT) as main, fixtures.skill(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents.skills.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(
+                has_item(has_entry('id', main['id'])),
+                not_(has_item(has_entry('id', sub['id']))),
+            )
         )
-    )
 
-    response = confd.agents.skills.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(
-            has_item(has_entry('id', sub['id'])),
-            not_(has_item(has_entry('id', main['id']))),
+        response = confd.agents.skills.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(
+                has_item(has_entry('id', sub['id'])),
+                not_(has_item(has_entry('id', main['id']))),
+            )
         )
-    )
 
-    response = confd.agents.skills.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(
-            has_entry('id', main['id']),
-            has_entry('id', sub['id']),
+        response = confd.agents.skills.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(
+                has_entry('id', main['id']),
+                has_entry('id', sub['id']),
+            )
         )
-    )
 
 
-@fixtures.skill(name='sort1')
-@fixtures.skill(name='sort2')
-def test_sort_offset_limit(skill1, skill2):
-    url = confd.agents.skills.get
-    s.check_sorting(url, skill1, skill2, 'name', 'sort')
 
-    s.check_offset(url, skill1, skill2, 'name', 'sort')
-    s.check_offset_legacy(url, skill1, skill2, 'name', 'sort')
+def test_sort_offset_limit():
+    with fixtures.skill(name='sort1') as skill1, fixtures.skill(name='sort2') as skill2:
+        url = confd.agents.skills.get
+        s.check_sorting(url, skill1, skill2, 'name', 'sort')
 
-    s.check_limit(url, skill1, skill2, 'name', 'sort')
+        s.check_offset(url, skill1, skill2, 'name', 'sort')
+        s.check_offset_legacy(url, skill1, skill2, 'name', 'sort')
 
-
-@fixtures.skill()
-def test_get(skill):
-    response = confd.agents.skills(skill['id']).get()
-    assert_that(response.item, has_entries(
-        id=skill['id'],
-        name=skill['name'],
-        category=skill['category'],
-        description=skill['description'],
-
-        agents=empty(),
-    ))
+        s.check_limit(url, skill1, skill2, 'name', 'sort')
 
 
-@fixtures.skill(wazo_tenant=MAIN_TENANT)
-@fixtures.skill(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.agents.skills(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Skill'))
 
-    response = confd.agents.skills(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(id=sub['id']))
+def test_get():
+    with fixtures.skill() as skill:
+        response = confd.agents.skills(skill['id']).get()
+        assert_that(response.item, has_entries(
+            id=skill['id'],
+            name=skill['name'],
+            category=skill['category'],
+            description=skill['description'],
+
+            agents=empty(),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.skill(wazo_tenant=MAIN_TENANT) as main, fixtures.skill(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents.skills(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Skill'))
+
+        response = confd.agents.skills(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(id=sub['id']))
+
 
 
 def test_create_minimal_parameters():
@@ -192,58 +195,62 @@ def test_create_multi_tenant():
     assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
-@fixtures.skill()
-def test_edit_minimal_parameters(skill):
-    response = confd.agents.skills(skill['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.skill() as skill:
+        response = confd.agents.skills(skill['id']).put()
+        response.assert_updated()
 
 
-@fixtures.skill()
-def test_edit_all_parameters(skill):
-    parameters = {
-        'name': 'UpdatedSkill',
-        'category': 'UpdatedCategory',
-        'description': 'UpdatedDescription',
-    }
 
-    response = confd.agents.skills(skill['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.skill() as skill:
+        parameters = {
+            'name': 'UpdatedSkill',
+            'category': 'UpdatedCategory',
+            'description': 'UpdatedDescription',
+        }
 
-    response = confd.agents.skills(skill['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.agents.skills(skill['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.skill(wazo_tenant=MAIN_TENANT)
-@fixtures.skill(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.agents.skills(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Skill'))
-
-    response = confd.agents.skills(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+        response = confd.agents.skills(skill['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.skill()
-def test_delete(skill):
-    response = confd.agents.skills(skill['id']).delete()
-    response.assert_deleted()
-    response = confd.agents.skills(skill['id']).get()
-    response.assert_match(404, e.not_found(resource='Skill'))
+
+def test_edit_multi_tenant():
+    with fixtures.skill(wazo_tenant=MAIN_TENANT) as main, fixtures.skill(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents.skills(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Skill'))
+
+        response = confd.agents.skills(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.skill(wazo_tenant=MAIN_TENANT)
-@fixtures.skill(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.agents.skills(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Skill'))
 
-    response = confd.agents.skills(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.skill() as skill:
+        response = confd.agents.skills(skill['id']).delete()
+        response.assert_deleted()
+        response = confd.agents.skills(skill['id']).get()
+        response.assert_match(404, e.not_found(resource='Skill'))
 
 
-@fixtures.skill()
-def test_bus_events(skill):
-    required_body = {'name': 'Skill'}
-    s.check_bus_event('config.agents.skills.created', confd.agents.skills.post, required_body)
-    s.check_bus_event('config.agents.skills.edited', confd.agents.skills(skill['id']).put)
-    s.check_bus_event('config.agents.skills.deleted', confd.agents.skills(skill['id']).delete)
+
+def test_delete_multi_tenant():
+    with fixtures.skill(wazo_tenant=MAIN_TENANT) as main, fixtures.skill(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.agents.skills(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Skill'))
+
+        response = confd.agents.skills(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.skill() as skill:
+        required_body = {'name': 'Skill'}
+        s.check_bus_event('config.agents.skills.created', confd.agents.skills.post, required_body)
+        s.check_bus_event('config.agents.skills.edited', confd.agents.skills(skill['id']).put)
+        s.check_bus_event('config.agents.skills.deleted', confd.agents.skills(skill['id']).delete)
+

@@ -41,55 +41,58 @@ def test_post_errors():
     s.check_bogus_field_returns_error(line_post, 'username', [{}])
 
 
-@fixtures.line_sip()
-def test_put_errors(line):
-    line_put = confd.lines_sip(line['id']).put
+def test_put_errors():
+    with fixtures.line_sip() as line:
+        line_put = confd.lines_sip(line['id']).put
 
-    s.check_missing_required_field_returns_error(line_put, 'context')
-    s.check_bogus_field_returns_error(line_put, 'context', 123)
-    s.check_bogus_field_returns_error(line_put, 'device_slot', 'invalid')
-    s.check_bogus_field_returns_error(line_put, 'callerid', 'invalidcallerid')
-    s.check_bogus_field_returns_error(line_put, 'secret', 123)
-    s.check_bogus_field_returns_error(line_put, 'username', 123)
-
-
-@fixtures.line_sip()
-def test_delete_errors(line):
-    line_url = confd.lines_sip(line['id'])
-    line_url.delete()
-    s.check_resource_not_found(line_url.get, 'Line')
+        s.check_missing_required_field_returns_error(line_put, 'context')
+        s.check_bogus_field_returns_error(line_put, 'context', 123)
+        s.check_bogus_field_returns_error(line_put, 'device_slot', 'invalid')
+        s.check_bogus_field_returns_error(line_put, 'callerid', 'invalidcallerid')
+        s.check_bogus_field_returns_error(line_put, 'secret', 123)
+        s.check_bogus_field_returns_error(line_put, 'username', 123)
 
 
-@fixtures.line_sip(context=config.CONTEXT)
-def test_get(line):
-    response = confd.lines_sip(line['id']).get()
-    assert_that(
-        response.item,
-        has_entries(
-            username=has_length(8),
-            secret=has_length(8),
-            context=config.CONTEXT,
-            device_slot=1,
-            provisioning_extension=has_length(6),
-            callerid=none(),
+
+def test_delete_errors():
+    with fixtures.line_sip() as line:
+        line_url = confd.lines_sip(line['id'])
+        line_url.delete()
+        s.check_resource_not_found(line_url.get, 'Line')
+
+
+
+def test_get():
+    with fixtures.line_sip(context=config.CONTEXT) as line:
+        response = confd.lines_sip(line['id']).get()
+        assert_that(
+            response.item,
+            has_entries(
+                username=has_length(8),
+                secret=has_length(8),
+                context=config.CONTEXT,
+                device_slot=1,
+                provisioning_extension=has_length(6),
+                callerid=none(),
+            )
         )
-    )
 
 
-@fixtures.line_sip()
-@fixtures.line_sip()
-def test_list(line1, line2):
-    response = confd.lines_sip.get()
-    assert_that(
-        response.items,
-        has_items(
-            has_entry('id', line1['id']),
-            has_entry('id', line2['id']),
+
+def test_list():
+    with fixtures.line_sip() as line1, fixtures.line_sip() as line2:
+        response = confd.lines_sip.get()
+        assert_that(
+            response.items,
+            has_items(
+                has_entry('id', line1['id']),
+                has_entry('id', line2['id']),
+            )
         )
-    )
 
-    response = confd.lines_sip.get(search=line1['provisioning_extension'])
-    assert_that(response.items, contains(has_entry('id', line1['id'])))
+        response = confd.lines_sip.get(search=line1['provisioning_extension'])
+        assert_that(response.items, contains(has_entry('id', line1['id'])))
+
 
 
 def test_create_line_with_fake_context():
@@ -137,58 +140,62 @@ def test_create_line_with_all_parameters():
     )
 
 
-@fixtures.line_sip(provisioning_extension="123456")
-def test_create_line_with_provisioning_code_already_taken(line):
-    response = confd.lines_sip.post(context=config.CONTEXT, provisioning_extension="123456")
-    response.assert_match(400, re.compile("provisioning_code"))
+def test_create_line_with_provisioning_code_already_taken():
+    with fixtures.line_sip(provisioning_extension="123456") as line:
+        response = confd.lines_sip.post(context=config.CONTEXT, provisioning_extension="123456")
+        response.assert_match(400, re.compile("provisioning_code"))
 
 
-@fixtures.line_sip()
-def test_update_line_with_fake_context(line):
-    response = confd.lines_sip(line['id']).put(context='fakecontext')
-    response.assert_match(400, e.not_found('Context'))
+
+def test_update_line_with_fake_context():
+    with fixtures.line_sip() as line:
+        response = confd.lines_sip(line['id']).put(context='fakecontext')
+        response.assert_match(400, e.not_found('Context'))
 
 
-@fixtures.line_sip(callerid='"Fodé Sanderson" <1000>"')
-@fixtures.context()
-def test_update_all_parameters_on_line(line, context):
-    url = confd.lines_sip(line['id'])
-    response = url.put(
-        context=context['name'],
-        device_slot=2,
-        callerid='"Mamàsta Michel" <2000>',
-        provisioning_extension='234567',
-        secret='newsecret',
-        username='newusername',
-    )
-    response.assert_updated()
 
-    response = url.get()
-    assert_that(
-        response.item,
-        has_entries(
+def test_update_all_parameters_on_line():
+    with fixtures.line_sip(callerid='"Fodé Sanderson" <1000>"') as line, fixtures.context() as context:
+        url = confd.lines_sip(line['id'])
+        response = url.put(
             context=context['name'],
             device_slot=2,
             callerid='"Mamàsta Michel" <2000>',
             provisioning_extension='234567',
             secret='newsecret',
-            username='newusername'
+            username='newusername',
         )
-    )
+        response.assert_updated()
+
+        response = url.get()
+        assert_that(
+            response.item,
+            has_entries(
+                context=context['name'],
+                device_slot=2,
+                callerid='"Mamàsta Michel" <2000>',
+                provisioning_extension='234567',
+                secret='newsecret',
+                username='newusername'
+            )
+        )
 
 
-@fixtures.line_sip(callerid='"Fodé Sanderson" <1000>"')
-def test_update_null_parameters(line):
-    url = confd.lines_sip(line['id'])
 
-    response = url.put(callerid=None)
-    response.assert_updated()
+def test_update_null_parameters():
+    with fixtures.line_sip(callerid='"Fodé Sanderson" <1000>"') as line:
+        url = confd.lines_sip(line['id'])
 
-    response = url.get()
-    assert_that(response.item['callerid'], none())
+        response = url.put(callerid=None)
+        response.assert_updated()
+
+        response = url.get()
+        assert_that(response.item['callerid'], none())
 
 
-@fixtures.line_sip()
-def test_delete_line(line):
-    response = confd.lines_sip(line['id']).delete()
-    response.assert_deleted()
+
+def test_delete_line():
+    with fixtures.line_sip() as line:
+        response = confd.lines_sip(line['id']).delete()
+        response.assert_deleted()
+

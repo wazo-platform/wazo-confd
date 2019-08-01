@@ -28,19 +28,19 @@ def generate_extension():
     return extension
 
 
-class extension(wrappers.IsolatedAction):
+class ExtensionFixture(wrappers.IsolatedAction):
 
     actions = {'generate': generate_extension}
 
 
-@fixtures.group()
-@extension()
-def test_associate_errors(group, extension):
-    response = confd.groups(FAKE_ID).members.extensions.put(extensions=[extension])
-    response.assert_status(404)
+def test_associate_errors():
+    with fixtures.group() as group, ExtensionFixture() as extension:
+        response = confd.groups(FAKE_ID).members.extensions.put(extensions=[extension])
+        response.assert_status(404)
 
-    url = confd.groups(group['id']).members.extensions.put
-    error_checks(url)
+        url = confd.groups(group['id']).members.extensions.put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -73,76 +73,68 @@ def error_checks(url):
     s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'context': {}}], regex)
 
 
-@fixtures.group()
-@extension()
-def test_associate(group, extension):
-    response = confd.groups(group['id']).members.extensions.put(extensions=[extension])
-    response.assert_updated()
+def test_associate():
+    with fixtures.group() as group, ExtensionFixture() as extension:
+        response = confd.groups(group['id']).members.extensions.put(extensions=[extension])
+        response.assert_updated()
 
 
-@fixtures.group()
-@extension()
-@extension()
-@extension()
-def test_associate_multiple_with_priority(group, extension1, extension2, extension3):
-    extension1['priority'], extension2['priority'], extension3['priority'] = 4, 1, 2
-    response = confd.groups(group['id']).members.extensions.put(extensions=[extension1, extension2, extension3])
-    response.assert_updated()
 
-    response = confd.groups(group['id']).get()
-    assert_that(response.item, has_entries(
-        members=has_entries(extensions=contains(
-            has_entries(exten=extension2['exten'], context=extension2['context'], priority=1),
-            has_entries(exten=extension3['exten'], context=extension3['context'], priority=2),
-            has_entries(exten=extension1['exten'], context=extension1['context'], priority=4),
-        ))
-    ))
+def test_associate_multiple_with_priority():
+    with fixtures.group() as group, ExtensionFixture() as extension1, ExtensionFixture() as extension2, ExtensionFixture() as extension3:
+        extension1['priority'], extension2['priority'], extension3['priority'] = 4, 1, 2
+        response = confd.groups(group['id']).members.extensions.put(extensions=[extension1, extension2, extension3])
+        response.assert_updated()
 
-
-@fixtures.group()
-@extension()
-def test_associate_same_extension(group, extension):
-    response = confd.groups(group['id']).members.extensions.put(extensions=[extension, extension])
-    response.assert_status(400)
-
-
-@fixtures.group()
-@extension()
-@extension()
-def test_get_extensions_associated_to_group(group, extension1, extension2):
-    with a.group_member_extension(group, extension2, extension1):
         response = confd.groups(group['id']).get()
         assert_that(response.item, has_entries(
             members=has_entries(extensions=contains(
-                has_entries(exten=extension2['exten'], context=extension2['context']),
-                has_entries(exten=extension1['exten'], context=extension1['context']),
+                has_entries(exten=extension2['exten'], context=extension2['context'], priority=1),
+                has_entries(exten=extension3['exten'], context=extension3['context'], priority=2),
+                has_entries(exten=extension1['exten'], context=extension1['context'], priority=4),
             ))
         ))
 
 
-@fixtures.group()
-@extension()
-@extension()
-def test_dissociate(group, extension1, extension2):
-    with a.group_member_extension(group, extension1, extension2):
-        response = confd.groups(group['id']).members.extensions.put(extensions=[])
-        response.assert_updated()
+
+def test_associate_same_ExtensionFixture():
+    with fixtures.group() as group, ExtensionFixture() as extension:
+        response = confd.groups(group['id']).members.extensions.put(extensions=[extension, extension])
+        response.assert_status(400)
 
 
-@fixtures.group()
-@extension()
-@extension()
-def test_delete_group_when_group_and_extension_associated(group, extension1, extension2):
-    with a.group_member_extension(group, extension1, extension2, check=False):
-        confd.groups(group['id']).delete().assert_deleted()
 
-        deleted_group = confd.groups(group['id']).get
-        s.check_resource_not_found(deleted_group, 'Group')
+def test_get_extensions_associated_to_group():
+    with fixtures.group() as group, ExtensionFixture() as extension1, ExtensionFixture() as extension2:
+        with a.group_member_extension(group, extension2, extension1):
+            response = confd.groups(group['id']).get()
+            assert_that(response.item, has_entries(
+                members=has_entries(extensions=contains(
+                    has_entries(exten=extension2['exten'], context=extension2['context']),
+                    has_entries(exten=extension1['exten'], context=extension1['context']),
+                ))
+            ))
 
 
-@fixtures.group()
-@extension()
-def test_bus_events(group, extension):
-    url = confd.groups(group['id']).members.extensions.put
-    body = {'extensions': [extension]}
-    s.check_bus_event('config.groups.members.extensions.updated', url, body)
+def test_dissociate():
+    with fixtures.group() as group, ExtensionFixture() as extension1, ExtensionFixture() as extension2:
+        with a.group_member_extension(group, extension1, extension2):
+            response = confd.groups(group['id']).members.extensions.put(extensions=[])
+            response.assert_updated()
+
+
+def test_delete_group_when_group_and_extension_associated():
+    with fixtures.group() as group, ExtensionFixture() as extension1, ExtensionFixture() as extension2:
+        with a.group_member_extension(group, extension1, extension2, check=False):
+            confd.groups(group['id']).delete().assert_deleted()
+
+            deleted_group = confd.groups(group['id']).get
+            s.check_resource_not_found(deleted_group, 'Group')
+
+
+def test_bus_events():
+    with fixtures.group() as group, ExtensionFixture() as extension:
+        url = confd.groups(group['id']).members.extensions.put
+        body = {'extensions': [extension]}
+        s.check_bus_event('config.groups.members.extensions.updated', url, body)
+

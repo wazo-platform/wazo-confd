@@ -108,16 +108,17 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.sip()
-def test_put_errors(sip):
-    url = confd.endpoints.sip(sip['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.sip() as sip:
+        url = confd.endpoints.sip(sip['id']).put
+        error_checks(url)
 
-    s.check_bogus_field_returns_error(url, 'username', None)
-    s.check_bogus_field_returns_error(url, 'secret', None)
-    s.check_bogus_field_returns_error(url, 'type', None)
-    s.check_bogus_field_returns_error(url, 'host', None)
-    s.check_bogus_field_returns_error(url, 'options', None)
+        s.check_bogus_field_returns_error(url, 'username', None)
+        s.check_bogus_field_returns_error(url, 'secret', None)
+        s.check_bogus_field_returns_error(url, 'type', None)
+        s.check_bogus_field_returns_error(url, 'host', None)
+        s.check_bogus_field_returns_error(url, 'options', None)
+
 
 
 def error_checks(url):
@@ -156,70 +157,72 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'options', [['none_value', None]])
 
 
-@fixtures.sip()
-def test_delete_errors(sip):
-    url = confd.endpoints.sip(sip['id'])
-    url.delete()
-    s.check_resource_not_found(url.get, 'SIPEndpoint')
+def test_delete_errors():
+    with fixtures.sip() as sip:
+        url = confd.endpoints.sip(sip['id'])
+        url.delete()
+        s.check_resource_not_found(url.get, 'SIPEndpoint')
 
 
-@fixtures.sip(wazo_tenant=MAIN_TENANT)
-@fixtures.sip(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(main)), not_(has_items(sub)),
-    )
 
-    response = confd.endpoints.sip.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(sub), not_(has_items(main))),
-    )
+def test_list_multi_tenant():
+    with fixtures.sip(wazo_tenant=MAIN_TENANT) as main, fixtures.sip(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_items(main)), not_(has_items(sub)),
+        )
 
-    response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        response = confd.endpoints.sip.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_items(sub), not_(has_items(main))),
+        )
 
-
-@fixtures.sip()
-def test_get(sip):
-    response = confd.endpoints.sip(sip['id']).get()
-    assert_that(response.item, has_entries({
-        'username': has_length(8),
-        'secret': has_length(8),
-        'type': 'friend',
-        'host': 'dynamic',
-        'options': instance_of(list),
-        'trunk': None,
-        'line': None,
-    }))
+        response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.sip()
-@fixtures.sip()
-def test_list(sip1, sip2):
-    response = confd.endpoints.sip.get()
-    assert_that(response.items, has_items(
-        has_entry('id', sip1['id']),
-        has_entry('id', sip2['id']),
-    ))
 
-    response = confd.endpoints.sip.get(search=sip1['username'])
-    assert_that(response.items, contains(has_entry('id', sip1['id'])))
+def test_get():
+    with fixtures.sip() as sip:
+        response = confd.endpoints.sip(sip['id']).get()
+        assert_that(response.item, has_entries({
+            'username': has_length(8),
+            'secret': has_length(8),
+            'type': 'friend',
+            'host': 'dynamic',
+            'options': instance_of(list),
+            'trunk': None,
+            'line': None,
+        }))
 
 
-@fixtures.sip(wazo_tenant=MAIN_TENANT)
-@fixtures.sip(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.endpoints.sip(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
 
-    response = confd.endpoints.sip(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_list():
+    with fixtures.sip() as sip1, fixtures.sip() as sip2:
+        response = confd.endpoints.sip.get()
+        assert_that(response.items, has_items(
+            has_entry('id', sip1['id']),
+            has_entry('id', sip2['id']),
+        ))
+
+        response = confd.endpoints.sip.get(search=sip1['username'])
+        assert_that(response.items, contains(has_entry('id', sip1['id'])))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.sip(wazo_tenant=MAIN_TENANT) as main, fixtures.sip(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sip(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+
+        response = confd.endpoints.sip(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -265,98 +268,104 @@ def test_create_additional_options():
     assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.sip(username="dupusername")
-def test_create_username_already_taken(sip):
-    response = confd.endpoints.sip.post(username="dupusername")
-    response.assert_match(400, e.resource_exists('SIPEndpoint'))
+def test_create_username_already_taken():
+    with fixtures.sip(username="dupusername") as sip:
+        response = confd.endpoints.sip.post(username="dupusername")
+        response.assert_match(400, e.resource_exists('SIPEndpoint'))
 
 
-@fixtures.sip()
-def test_update_required_parameters(sip):
-    url = confd.endpoints.sip(sip['id'])
 
-    response = url.put(username="updatedusername",
-                       secret="updatedsecret",
-                       type="peer",
-                       host="127.0.0.1")
-    response.assert_updated()
+def test_update_required_parameters():
+    with fixtures.sip() as sip:
+        url = confd.endpoints.sip(sip['id'])
 
-    response = url.get()
-    assert_that(response.item, has_entries({
-        'username': 'updatedusername',
-        'secret': 'updatedsecret',
-        'type': 'peer',
-        'host': '127.0.0.1',
-    }))
+        response = url.put(username="updatedusername",
+                           secret="updatedsecret",
+                           type="peer",
+                           host="127.0.0.1")
+        response.assert_updated()
 
-
-@fixtures.sip(options=[["allow", "gsm"], ["nat", "force_rport,comedia"]])
-def test_update_options(sip):
-    options = [
-        ["allow", "g723"],
-        ["insecure", "port"]
-    ]
-
-    url = confd.endpoints.sip(sip['id'])
-    response = url.put(options=options)
-    response.assert_updated()
-
-    response = url.get()
-    assert_that(response.item['options'], has_items(*options))
+        response = url.get()
+        assert_that(response.item, has_entries({
+            'username': 'updatedusername',
+            'secret': 'updatedsecret',
+            'type': 'peer',
+            'host': '127.0.0.1',
+        }))
 
 
-@fixtures.sip(options=[
+
+def test_update_options():
+    with fixtures.sip(options=[["allow", "gsm"], ["nat", "force_rport,comedia"]]) as sip:
+        options = [
+            ["allow", "g723"],
+            ["insecure", "port"]
+        ]
+
+        url = confd.endpoints.sip(sip['id'])
+        response = url.put(options=options)
+        response.assert_updated()
+
+        response = url.get()
+        assert_that(response.item['options'], has_items(*options))
+
+
+
+def test_update_additional_options():
+    with fixtures.sip(options=[
     ["allow", "gsm"],
     ["foo", "bar"],
     ["foo", "baz"],
     ["spam", "eggs"]
-])
-def test_update_additional_options(sip):
-    options = [
-        ["allow", "g723"],
-        ["foo", "newbar"],
-        ["foo", "newbaz"],
-        ["spam", "neweggs"]
-    ]
+]) as sip:
+        options = [
+            ["allow", "g723"],
+            ["foo", "newbar"],
+            ["foo", "newbaz"],
+            ["spam", "neweggs"]
+        ]
 
-    url = confd.endpoints.sip(sip['id'])
-    response = url.put(options=options)
-    response.assert_updated()
+        url = confd.endpoints.sip(sip['id'])
+        response = url.put(options=options)
+        response.assert_updated()
 
-    response = url.get()
-    assert_that(response.item['options'], has_items(*options))
-
-
-@fixtures.sip(host="static")
-def test_update_values_other_than_host_does_not_touch_it(sip):
-    response = confd.endpoints.sip(sip['id']).put(username="testhost")
-    response.assert_ok()
-
-    response = confd.endpoints.sip(sip['id']).get()
-    assert_that(response.item, has_entries(host="static"))
+        response = url.get()
+        assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.sip(wazo_tenant=MAIN_TENANT)
-@fixtures.sip(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.endpoints.sip(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
 
-    response = confd.endpoints.sip(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+def test_update_values_other_than_host_does_not_touch_it():
+    with fixtures.sip(host="static") as sip:
+        response = confd.endpoints.sip(sip['id']).put(username="testhost")
+        response.assert_ok()
 
-
-@fixtures.sip()
-def test_delete(sip):
-    response = confd.endpoints.sip(sip['id']).delete()
-    response.assert_deleted()
+        response = confd.endpoints.sip(sip['id']).get()
+        assert_that(response.item, has_entries(host="static"))
 
 
-@fixtures.sip(wazo_tenant=MAIN_TENANT)
-@fixtures.sip(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.endpoints.sip(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
 
-    response = confd.endpoints.sip(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_edit_multi_tenant():
+    with fixtures.sip(wazo_tenant=MAIN_TENANT) as main, fixtures.sip(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sip(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+
+        response = confd.endpoints.sip(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
+
+
+
+def test_delete():
+    with fixtures.sip() as sip:
+        response = confd.endpoints.sip(sip['id']).delete()
+        response.assert_deleted()
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.sip(wazo_tenant=MAIN_TENANT) as main, fixtures.sip(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sip(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+
+        response = confd.endpoints.sip(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+

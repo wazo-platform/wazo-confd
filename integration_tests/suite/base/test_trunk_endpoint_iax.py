@@ -23,158 +23,142 @@ from ..helpers.config import (
 FAKE_ID = 999999999
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_associate_errors(trunk, iax):
-    fake_trunk = confd.trunks(FAKE_ID).endpoints.iax(iax['id']).put
-    fake_iax = confd.trunks(trunk['id']).endpoints.iax(FAKE_ID).put
+def test_associate_errors():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        fake_trunk = confd.trunks(FAKE_ID).endpoints.iax(iax['id']).put
+        fake_iax = confd.trunks(trunk['id']).endpoints.iax(FAKE_ID).put
 
-    s.check_resource_not_found(fake_trunk, 'Trunk')
-    s.check_resource_not_found(fake_iax, 'IAXEndpoint')
-
-
-@fixtures.trunk()
-@fixtures.iax()
-def test_dissociate_errors(trunk, iax):
-    fake_trunk = confd.trunks(FAKE_ID).endpoints.iax(iax['id']).delete
-    fake_iax = confd.trunks(trunk['id']).endpoints.iax(FAKE_ID).delete
-
-    s.check_resource_not_found(fake_trunk, 'Trunk')
-    s.check_resource_not_found(fake_iax, 'IAXEndpoint')
+        s.check_resource_not_found(fake_trunk, 'Trunk')
+        s.check_resource_not_found(fake_iax, 'IAXEndpoint')
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_associate(trunk, iax):
-    response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
-    response.assert_updated()
+
+def test_dissociate_errors():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        fake_trunk = confd.trunks(FAKE_ID).endpoints.iax(iax['id']).delete
+        fake_iax = confd.trunks(trunk['id']).endpoints.iax(FAKE_ID).delete
+
+        s.check_resource_not_found(fake_trunk, 'Trunk')
+        s.check_resource_not_found(fake_iax, 'IAXEndpoint')
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_associate_already_associated(trunk, iax):
-    with a.trunk_endpoint_iax(trunk, iax):
+
+def test_associate():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
         response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
         response.assert_updated()
 
 
-@fixtures.trunk()
-@fixtures.iax()
-@fixtures.iax()
-def test_associate_multiple_iax_to_trunk(trunk, iax1, iax2):
-    with a.trunk_endpoint_iax(trunk, iax1):
-        response = confd.trunks(trunk['id']).endpoints.iax(iax2['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+
+def test_associate_already_associated():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk, iax):
+            response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
+            response.assert_updated()
 
 
-@fixtures.trunk()
-@fixtures.trunk()
-@fixtures.iax()
-def test_associate_multiple_trunks_to_iax(trunk1, trunk2, iax):
-    with a.trunk_endpoint_iax(trunk1, iax):
-        response = confd.trunks(trunk2['id']).endpoints.iax(iax['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
+def test_associate_multiple_iax_to_trunk():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax1, fixtures.iax() as iax2:
+        with a.trunk_endpoint_iax(trunk, iax1):
+            response = confd.trunks(trunk['id']).endpoints.iax(iax2['id']).put()
+            response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
-@fixtures.trunk()
-@fixtures.iax()
-@fixtures.register_sip()
-def test_associate_when_register_sip(trunk, iax, register):
-    with a.trunk_register_sip(trunk, register):
-        response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
+def test_associate_multiple_trunks_to_iax():
+    with fixtures.trunk() as trunk1, fixtures.trunk() as trunk2, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk1, iax):
+            response = confd.trunks(trunk2['id']).endpoints.iax(iax['id']).put()
+            response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
-@fixtures.trunk(wazo_tenant=MAIN_TENANT)
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-@fixtures.iax(wazo_tenant=MAIN_TENANT)
-@fixtures.iax(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(main_trunk, sub_trunk, main_iax, sub_iax):
-    response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Trunk'))
-
-    response = confd.trunks(sub_trunk['id']).endpoints.iax(main_iax['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('IAXEndpoint'))
-
-    response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_match(400, e.different_tenant())
+def test_associate_when_register_sip():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax, fixtures.register_sip() as register:
+        with a.trunk_register_sip(trunk, register):
+            response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
+            response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_dissociate(trunk, iax):
-    with a.trunk_endpoint_iax(trunk, iax, check=False):
+def test_associate_multi_tenant():
+    with fixtures.trunk(wazo_tenant=MAIN_TENANT) as main_trunk, fixtures.trunk(wazo_tenant=SUB_TENANT) as sub_trunk, fixtures.iax(wazo_tenant=MAIN_TENANT) as main_iax, fixtures.iax(wazo_tenant=SUB_TENANT) as sub_iax:
+        response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Trunk'))
+
+        response = confd.trunks(sub_trunk['id']).endpoints.iax(main_iax['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('IAXEndpoint'))
+
+        response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+
+
+
+def test_dissociate():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk, iax, check=False):
+            response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).delete()
+            response.assert_deleted()
+
+
+def test_dissociate_not_associated():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
         response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).delete()
         response.assert_deleted()
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_dissociate_not_associated(trunk, iax):
-    response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).delete()
-    response.assert_deleted()
+
+def test_dissociate_multi_tenant():
+    with fixtures.trunk(wazo_tenant=MAIN_TENANT) as main_trunk, fixtures.trunk(wazo_tenant=SUB_TENANT) as sub_trunk, fixtures.iax(wazo_tenant=MAIN_TENANT) as main_iax, fixtures.iax(wazo_tenant=SUB_TENANT) as sub_iax:
+        response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Trunk'))
+
+        response = confd.trunks(sub_trunk['id']).endpoints.iax(main_iax['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('IAXEndpoint'))
 
 
-@fixtures.trunk(wazo_tenant=MAIN_TENANT)
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-@fixtures.iax(wazo_tenant=MAIN_TENANT)
-@fixtures.iax(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_iax, sub_iax):
-    response = confd.trunks(main_trunk['id']).endpoints.iax(sub_iax['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Trunk'))
 
-    response = confd.trunks(sub_trunk['id']).endpoints.iax(main_iax['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('IAXEndpoint'))
-
-
-@fixtures.trunk()
-@fixtures.iax()
-def test_get_endpoint_iax_relation(trunk, iax):
-    with a.trunk_endpoint_iax(trunk, iax):
-        response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, has_entries(
-            endpoint_iax=has_entries(id=iax['id'],
-                                     name=iax['name'])
-        ))
+def test_get_endpoint_iax_relation():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk, iax):
+            response = confd.trunks(trunk['id']).get()
+            assert_that(response.item, has_entries(
+                endpoint_iax=has_entries(id=iax['id'],
+                                         name=iax['name'])
+            ))
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_get_trunk_relation(trunk, iax):
-    with a.trunk_endpoint_iax(trunk, iax):
-        response = confd.endpoints.iax(iax['id']).get()
-        assert_that(response.item, has_entries(
-            trunk=has_entries(id=trunk['id'])
-        ))
+def test_get_trunk_relation():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk, iax):
+            response = confd.endpoints.iax(iax['id']).get()
+            assert_that(response.item, has_entries(
+                trunk=has_entries(id=trunk['id'])
+            ))
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, iax):
-    with a.trunk_endpoint_iax(trunk, iax, check=False):
-        confd.trunks(trunk['id']).delete().assert_deleted()
+def test_delete_trunk_when_trunk_and_endpoint_associated():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk, iax, check=False):
+            confd.trunks(trunk['id']).delete().assert_deleted()
 
-        deleted_trunk = confd.trunks(trunk['id']).get
-        deleted_iax = confd.endpoints.iax(iax['id']).get
-        s.check_resource_not_found(deleted_trunk, 'Trunk')
-        s.check_resource_not_found(deleted_iax, 'IAXEndpoint')
-
-
-@fixtures.trunk()
-@fixtures.iax()
-def test_delete_iax_when_trunk_and_iax_associated(trunk, iax):
-    with a.trunk_endpoint_iax(trunk, iax, check=False):
-        confd.endpoints.iax(iax['id']).delete().assert_deleted()
-
-        response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, has_entries(
-            endpoint_iax=none()
-        ))
+            deleted_trunk = confd.trunks(trunk['id']).get
+            deleted_iax = confd.endpoints.iax(iax['id']).get
+            s.check_resource_not_found(deleted_trunk, 'Trunk')
+            s.check_resource_not_found(deleted_iax, 'IAXEndpoint')
 
 
-@fixtures.trunk()
-@fixtures.iax()
-def test_bus_events(trunk, iax):
-    url = confd.trunks(trunk['id']).endpoints.iax(iax['id'])
-    s.check_bus_event('config.trunks.endpoints.updated', url.put)
-    s.check_bus_event('config.trunks.endpoints.deleted', url.delete)
+def test_delete_iax_when_trunk_and_iax_associated():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        with a.trunk_endpoint_iax(trunk, iax, check=False):
+            confd.endpoints.iax(iax['id']).delete().assert_deleted()
+
+            response = confd.trunks(trunk['id']).get()
+            assert_that(response.item, has_entries(
+                endpoint_iax=none()
+            ))
+
+
+def test_bus_events():
+    with fixtures.trunk() as trunk, fixtures.iax() as iax:
+        url = confd.trunks(trunk['id']).endpoints.iax(iax['id'])
+        s.check_bus_event('config.trunks.endpoints.updated', url.put)
+        s.check_bus_event('config.trunks.endpoints.deleted', url.delete)
+

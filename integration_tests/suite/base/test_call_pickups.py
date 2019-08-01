@@ -36,10 +36,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.call_pickup()
-def test_put_errors(call_pickup):
-    url = confd.callpickups(call_pickup['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.call_pickup() as call_pickup:
+        url = confd.callpickups(call_pickup['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -61,44 +62,45 @@ def error_checks(url):
     unique_error_checks(url)
 
 
-@fixtures.call_pickup(name='unique')
-def unique_error_checks(url, call_pickup):
-    s.check_bogus_field_returns_error(url, 'name', call_pickup['name'])
+def unique_error_checks(url):
+    with fixtures.call_pickup(name='unique') as call_pickup:
+        s.check_bogus_field_returns_error(url, 'name', call_pickup['name'])
 
 
-@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
-@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.callpickups.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
 
-    response = confd.callpickups.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+def test_list_multi_tenant():
+    with fixtures.call_pickup(wazo_tenant=MAIN_TENANT) as main, fixtures.call_pickup(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callpickups.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(main)), not_(has_item(sub)),
+        )
 
-    response = confd.callpickups.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        response = confd.callpickups.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_item(sub), not_(has_item(main))),
+        )
+
+        response = confd.callpickups.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.call_pickup(name="search", description="SearchDesc")
-@fixtures.call_pickup(name="hidden", description="HiddenDesc")
-def test_search(call_pickup, hidden):
-    url = confd.callpickups
-    searches = {
-        'name': 'search',
-        'description': 'Search',
-    }
 
-    for field, term in searches.items():
-        check_search(url, call_pickup, hidden, field, term)
+def test_search():
+    with fixtures.call_pickup(name="search", description="SearchDesc") as call_pickup, fixtures.call_pickup(name="hidden", description="HiddenDesc") as hidden:
+        url = confd.callpickups
+        searches = {
+            'name': 'search',
+            'description': 'Search',
+        }
+
+        for field, term in searches.items():
+            check_search(url, call_pickup, hidden, field, term)
+
 
 
 def check_search(url, call_pickup, hidden, field, term):
@@ -112,45 +114,46 @@ def check_search(url, call_pickup, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.call_pickup(name="sort1", description="Sort 1")
-@fixtures.call_pickup(name="sort2", description="Sort 2")
-def test_sorting_offset_limit(call_pickup1, call_pickup2):
-    url = confd.callpickups.get
-    s.check_sorting(url, call_pickup1, call_pickup2, 'name', 'sort')
-    s.check_sorting(url, call_pickup1, call_pickup2, 'description', 'Sort')
+def test_sorting_offset_limit():
+    with fixtures.call_pickup(name="sort1", description="Sort 1") as call_pickup1, fixtures.call_pickup(name="sort2", description="Sort 2") as call_pickup2:
+        url = confd.callpickups.get
+        s.check_sorting(url, call_pickup1, call_pickup2, 'name', 'sort')
+        s.check_sorting(url, call_pickup1, call_pickup2, 'description', 'Sort')
 
-    s.check_offset(url, call_pickup1, call_pickup2, 'name', 'sort')
-    s.check_offset_legacy(url, call_pickup1, call_pickup2, 'name', 'sort')
+        s.check_offset(url, call_pickup1, call_pickup2, 'name', 'sort')
+        s.check_offset_legacy(url, call_pickup1, call_pickup2, 'name', 'sort')
 
-    s.check_limit(url, call_pickup1, call_pickup2, 'name', 'sort')
-
-
-@fixtures.call_pickup()
-def test_get(call_pickup):
-    response = confd.callpickups(call_pickup['id']).get()
-    assert_that(response.item, has_entries(
-        name=call_pickup['name'],
-        description=none(),
-        enabled=True,
-        interceptors=has_entries(
-            groups=empty(),
-            users=empty(),
-        ),
-        targets=has_entries(
-            groups=empty(),
-            users=empty(),
-        ),
-    ))
+        s.check_limit(url, call_pickup1, call_pickup2, 'name', 'sort')
 
 
-@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
-@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.callpickups(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='CallPickup'))
 
-    response = confd.callpickups(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get():
+    with fixtures.call_pickup() as call_pickup:
+        response = confd.callpickups(call_pickup['id']).get()
+        assert_that(response.item, has_entries(
+            name=call_pickup['name'],
+            description=none(),
+            enabled=True,
+            interceptors=has_entries(
+                groups=empty(),
+                users=empty(),
+            ),
+            targets=has_entries(
+                groups=empty(),
+                users=empty(),
+            ),
+        ))
+
+
+
+def test_get_multi_tenant():
+    with fixtures.call_pickup(wazo_tenant=MAIN_TENANT) as main, fixtures.call_pickup(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callpickups(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='CallPickup'))
+
+        response = confd.callpickups(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -182,49 +185,52 @@ def test_create_without_name():
     response.assert_status(400)
 
 
-@fixtures.call_pickup()
-def test_edit_minimal_parameters(call_pickup):
-    response = confd.callpickups(call_pickup['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.call_pickup() as call_pickup:
+        response = confd.callpickups(call_pickup['id']).put()
+        response.assert_updated()
 
 
-@fixtures.call_pickup()
-def test_edit_all_parameters(call_pickup):
-    parameters = {
-        'name': 'editallparameter',
-        'description': 'Create description',
-        'enabled': False,
-    }
 
-    response = confd.callpickups(call_pickup['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.call_pickup() as call_pickup:
+        parameters = {
+            'name': 'editallparameter',
+            'description': 'Create description',
+            'enabled': False,
+        }
 
-    response = confd.callpickups(call_pickup['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.callpickups(call_pickup['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
-@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.callpickups(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='CallPickup'))
-
-    response = confd.callpickups(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+        response = confd.callpickups(call_pickup['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.call_pickup()
-def test_delete(call_pickup):
-    response = confd.callpickups(call_pickup['id']).delete()
-    response.assert_deleted()
-    confd.callpickups(call_pickup['id']).get().assert_status(404)
+
+def test_edit_multi_tenant():
+    with fixtures.call_pickup(wazo_tenant=MAIN_TENANT) as main, fixtures.call_pickup(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callpickups(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='CallPickup'))
+
+        response = confd.callpickups(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
-@fixtures.call_pickup(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.callpickups(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='CallPickup'))
 
-    response = confd.callpickups(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.call_pickup() as call_pickup:
+        response = confd.callpickups(call_pickup['id']).delete()
+        response.assert_deleted()
+        confd.callpickups(call_pickup['id']).get().assert_status(404)
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.call_pickup(wazo_tenant=MAIN_TENANT) as main, fixtures.call_pickup(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.callpickups(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='CallPickup'))
+
+        response = confd.callpickups(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+

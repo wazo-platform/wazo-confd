@@ -21,132 +21,118 @@ from ..helpers.config import (
 FAKE_ID = 999999999
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_associate_errors(outcall, schedule):
-    fake_outcall = confd.outcalls(FAKE_ID).schedules(schedule['id']).put
-    fake_schedule = confd.outcalls(outcall['id']).schedules(FAKE_ID).put
+def test_associate_errors():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        fake_outcall = confd.outcalls(FAKE_ID).schedules(schedule['id']).put
+        fake_schedule = confd.outcalls(outcall['id']).schedules(FAKE_ID).put
 
-    s.check_resource_not_found(fake_outcall, 'Outcall')
-    s.check_resource_not_found(fake_schedule, 'Schedule')
-
-
-@fixtures.outcall()
-@fixtures.schedule()
-def test_dissociate_errors(outcall, schedule):
-    fake_outcall = confd.outcalls(FAKE_ID).schedules(schedule['id']).delete
-    fake_schedule = confd.outcalls(outcall['id']).schedules(FAKE_ID).delete
-
-    s.check_resource_not_found(fake_outcall, 'Outcall')
-    s.check_resource_not_found(fake_schedule, 'Schedule')
+        s.check_resource_not_found(fake_outcall, 'Outcall')
+        s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_associate(outcall, schedule):
-    response = confd.outcalls(outcall['id']).schedules(schedule['id']).put()
-    response.assert_updated()
+
+def test_dissociate_errors():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        fake_outcall = confd.outcalls(FAKE_ID).schedules(schedule['id']).delete
+        fake_schedule = confd.outcalls(outcall['id']).schedules(FAKE_ID).delete
+
+        s.check_resource_not_found(fake_outcall, 'Outcall')
+        s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_associate_already_associated(outcall, schedule):
-    with a.outcall_schedule(outcall, schedule):
+
+def test_associate():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
         response = confd.outcalls(outcall['id']).schedules(schedule['id']).put()
         response.assert_updated()
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-@fixtures.schedule()
-def test_associate_multiple_schedules_to_outcall(outcall, schedule1, schedule2):
-    with a.outcall_schedule(outcall, schedule1):
-        response = confd.outcalls(outcall['id']).schedules(schedule2['id']).put()
-        response.assert_match(400, e.resource_associated('Outcall', 'Schedule'))
+
+def test_associate_already_associated():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        with a.outcall_schedule(outcall, schedule):
+            response = confd.outcalls(outcall['id']).schedules(schedule['id']).put()
+            response.assert_updated()
 
 
-@fixtures.outcall()
-@fixtures.outcall()
-@fixtures.schedule()
-def test_associate_multiple_outcalls_to_schedule(outcall1, outcall2, schedule):
-    with a.outcall_schedule(outcall1, schedule):
-        response = confd.outcalls(outcall2['id']).schedules(schedule['id']).put()
-        response.assert_updated()
+def test_associate_multiple_schedules_to_outcall():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule1, fixtures.schedule() as schedule2:
+        with a.outcall_schedule(outcall, schedule1):
+            response = confd.outcalls(outcall['id']).schedules(schedule2['id']).put()
+            response.assert_match(400, e.resource_associated('Outcall', 'Schedule'))
 
 
-@fixtures.outcall(wazo_tenant=MAIN_TENANT)
-@fixtures.outcall(wazo_tenant=SUB_TENANT)
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(main_outcall, sub_outcall, main_schedule, sub_schedule):
-    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Outcall'))
-
-    response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Schedule'))
-
-    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_match(400, e.different_tenant())
+def test_associate_multiple_outcalls_to_schedule():
+    with fixtures.outcall() as outcall1, fixtures.outcall() as outcall2, fixtures.schedule() as schedule:
+        with a.outcall_schedule(outcall1, schedule):
+            response = confd.outcalls(outcall2['id']).schedules(schedule['id']).put()
+            response.assert_updated()
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_dissociate(outcall, schedule):
-    with a.outcall_schedule(outcall, schedule, check=False):
+def test_associate_multi_tenant():
+    with fixtures.outcall(wazo_tenant=MAIN_TENANT) as main_outcall, fixtures.outcall(wazo_tenant=SUB_TENANT) as sub_outcall, fixtures.schedule(wazo_tenant=MAIN_TENANT) as main_schedule, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub_schedule:
+        response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Outcall'))
+
+        response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Schedule'))
+
+        response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+
+
+
+def test_dissociate():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        with a.outcall_schedule(outcall, schedule, check=False):
+            response = confd.outcalls(outcall['id']).schedules(schedule['id']).delete()
+            response.assert_deleted()
+
+
+def test_dissociate_not_associated():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
         response = confd.outcalls(outcall['id']).schedules(schedule['id']).delete()
         response.assert_deleted()
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_dissociate_not_associated(outcall, schedule):
-    response = confd.outcalls(outcall['id']).schedules(schedule['id']).delete()
-    response.assert_deleted()
+
+def test_dissociate_multi_tenant():
+    with fixtures.outcall(wazo_tenant=MAIN_TENANT) as main_outcall, fixtures.outcall(wazo_tenant=SUB_TENANT) as sub_outcall, fixtures.schedule(wazo_tenant=MAIN_TENANT) as main_schedule, fixtures.schedule(wazo_tenant=SUB_TENANT) as sub_schedule:
+        response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Outcall'))
+
+        response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Schedule'))
 
 
-@fixtures.outcall(wazo_tenant=MAIN_TENANT)
-@fixtures.outcall(wazo_tenant=SUB_TENANT)
-@fixtures.schedule(wazo_tenant=MAIN_TENANT)
-@fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_outcall, sub_outcall, main_schedule, sub_schedule):
-    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Outcall'))
 
-    response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Schedule'))
+def test_get_outcall_relation():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        with a.outcall_schedule(outcall, schedule):
+            response = confd.outcalls(outcall['id']).get()
+            assert_that(response.item, has_entries(
+                schedules=contains(has_entries(id=schedule['id'], name=schedule['name']))
+            ))
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_get_outcall_relation(outcall, schedule):
-    with a.outcall_schedule(outcall, schedule):
-        response = confd.outcalls(outcall['id']).get()
-        assert_that(response.item, has_entries(
-            schedules=contains(has_entries(id=schedule['id'], name=schedule['name']))
-        ))
+def test_get_schedule_relation():
+    with fixtures.schedule() as schedule, fixtures.outcall() as outcall:
+        with a.outcall_schedule(outcall, schedule):
+            response = confd.schedules(schedule['id']).get()
+            assert_that(response.item, has_entries(
+                outcalls=contains(has_entries(id=outcall['id']))
+            ))
 
 
-@fixtures.schedule()
-@fixtures.outcall()
-def test_get_schedule_relation(schedule, outcall):
-    with a.outcall_schedule(outcall, schedule):
-        response = confd.schedules(schedule['id']).get()
-        assert_that(response.item, has_entries(
-            outcalls=contains(has_entries(id=outcall['id']))
-        ))
+def test_delete_outcall_when_outcall_and_schedule_associated():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        with a.outcall_schedule(outcall, schedule, check=False):
+            response = confd.outcalls(outcall['id']).delete()
+            response.assert_deleted()
 
 
-@fixtures.outcall()
-@fixtures.schedule()
-def test_delete_outcall_when_outcall_and_schedule_associated(outcall, schedule):
-    with a.outcall_schedule(outcall, schedule, check=False):
-        response = confd.outcalls(outcall['id']).delete()
-        response.assert_deleted()
-
-
-@fixtures.outcall()
-@fixtures.schedule()
-def test_delete_schedule_when_outcall_and_schedule_associated(outcall, schedule):
-    with a.outcall_schedule(outcall, schedule, check=False):
-        response = confd.schedules(schedule['id']).delete()
-        response.assert_deleted()
+def test_delete_schedule_when_outcall_and_schedule_associated():
+    with fixtures.outcall() as outcall, fixtures.schedule() as schedule:
+        with a.outcall_schedule(outcall, schedule, check=False):
+            response = confd.schedules(schedule['id']).delete()
+            response.assert_deleted()

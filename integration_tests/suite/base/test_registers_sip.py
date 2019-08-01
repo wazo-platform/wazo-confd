@@ -29,10 +29,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.register_sip()
-def test_put_errors(register_sip):
-    url = confd.registers.sip(register_sip['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.register_sip() as register_sip:
+        url = confd.registers.sip(register_sip['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -88,22 +89,23 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'enabled', [])
 
 
-@fixtures.register_sip()
-def test_get(register_sip):
-    response = confd.registers.sip(register_sip['id']).get()
-    assert_that(response.item, has_entries(
-        id=register_sip['id'],
-        transport=none(),
-        sip_username=register_sip['sip_username'],
-        auth_password=none(),
-        auth_username=none(),
-        remote_host=register_sip['remote_host'],
-        remote_port=none(),
-        callback_extension=none(),
-        expiration=none(),
-        enabled=True,
-        trunk=none(),
-    ))
+def test_get():
+    with fixtures.register_sip() as register_sip:
+        response = confd.registers.sip(register_sip['id']).get()
+        assert_that(response.item, has_entries(
+            id=register_sip['id'],
+            transport=none(),
+            sip_username=register_sip['sip_username'],
+            auth_password=none(),
+            auth_username=none(),
+            remote_host=register_sip['remote_host'],
+            remote_port=none(),
+            callback_extension=none(),
+            expiration=none(),
+            enabled=True,
+            trunk=none(),
+        ))
+
 
 
 def test_create_minimal_parameters():
@@ -135,47 +137,51 @@ def test_create_all_parameters():
     assert_that(response.item, has_entries(id=not_(empty()), **parameters))
 
 
-@fixtures.register_sip()
-def test_edit_minimal_parameters(register_sip):
-    parameters = {}
+def test_edit_minimal_parameters():
+    with fixtures.register_sip() as register_sip:
+        parameters = {}
 
-    response = confd.registers.sip(register_sip['id']).put(**parameters)
-    response.assert_updated()
-
-
-@fixtures.register_sip()
-def test_edit_all_parameters(register_sip):
-    parameters = dict(
-        transport='tcp',
-        sip_username='sip-username',
-        auth_password='auth-password',
-        auth_username='auth-username',
-        remote_host='remote-host',
-        remote_port=1234,
-        callback_extension='callback-extension',
-        expiration=1000,
-        enabled=False
-    )
-
-    response = confd.registers.sip(register_sip['id']).put(**parameters)
-    response.assert_updated()
-
-    response = confd.registers.sip(register_sip['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.registers.sip(register_sip['id']).put(**parameters)
+        response.assert_updated()
 
 
-@fixtures.register_sip()
-def test_delete(register_sip):
-    response = confd.registers.sip(register_sip['id']).delete()
-    response.assert_deleted()
+
+def test_edit_all_parameters():
+    with fixtures.register_sip() as register_sip:
+        parameters = dict(
+            transport='tcp',
+            sip_username='sip-username',
+            auth_password='auth-password',
+            auth_username='auth-username',
+            remote_host='remote-host',
+            remote_port=1234,
+            callback_extension='callback-extension',
+            expiration=1000,
+            enabled=False
+        )
+
+        response = confd.registers.sip(register_sip['id']).put(**parameters)
+        response.assert_updated()
+
+        response = confd.registers.sip(register_sip['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.register_sip()
-def test_bus_events(register_sip):
-    s.check_bus_event(
-        'config.register.sip.created',
-        confd.registers.sip.post,
-        {'sip_username': 'bus-event', 'remote_host': 'bus-event'}
-    )
-    s.check_bus_event('config.register.sip.edited', confd.registers.sip(register_sip['id']).put)
-    s.check_bus_event('config.register.sip.deleted', confd.registers.sip(register_sip['id']).delete)
+
+def test_delete():
+    with fixtures.register_sip() as register_sip:
+        response = confd.registers.sip(register_sip['id']).delete()
+        response.assert_deleted()
+
+
+
+def test_bus_events():
+    with fixtures.register_sip() as register_sip:
+        s.check_bus_event(
+            'config.register.sip.created',
+            confd.registers.sip.post,
+            {'sip_username': 'bus-event', 'remote_host': 'bus-event'}
+        )
+        s.check_bus_event('config.register.sip.edited', confd.registers.sip(register_sip['id']).put)
+        s.check_bus_event('config.register.sip.deleted', confd.registers.sip(register_sip['id']).delete)
+

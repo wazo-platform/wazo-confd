@@ -46,10 +46,11 @@ def test_post_errors():
     error_checks(url)
 
 
-@fixtures.sccp()
-def test_put_errors(sccp):
-    url = confd.endpoints.sccp(sccp['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.sccp() as sccp:
+        url = confd.endpoints.sccp(sccp['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -69,54 +70,55 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'options', [['none_value', None]])
 
 
-@fixtures.sccp()
-def test_get(sccp):
-    response = confd.endpoints.sccp(sccp['id']).get()
-    assert_that(response.item, has_entries(
-        line=none(),
-    ))
+def test_get():
+    with fixtures.sccp() as sccp:
+        response = confd.endpoints.sccp(sccp['id']).get()
+        assert_that(response.item, has_entries(
+            line=none(),
+        ))
 
 
-@fixtures.sccp()
-@fixtures.sccp()
-def test_list(sccp1, sccp2):
-    response = confd.endpoints.sccp.get()
-    assert_that(response.items, has_items(
-        has_entry('id', sccp1['id']),
-        has_entry('id', sccp2['id']),
-    ))
+
+def test_list():
+    with fixtures.sccp() as sccp1, fixtures.sccp() as sccp2:
+        response = confd.endpoints.sccp.get()
+        assert_that(response.items, has_items(
+            has_entry('id', sccp1['id']),
+            has_entry('id', sccp2['id']),
+        ))
 
 
-@fixtures.sccp(wazo_tenant=MAIN_TENANT)
-@fixtures.sccp(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.endpoints.sccp.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(main)), not_(has_items(sub)),
-    )
 
-    response = confd.endpoints.sccp.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(sub), not_(has_items(main))),
-    )
+def test_list_multi_tenant():
+    with fixtures.sccp(wazo_tenant=MAIN_TENANT) as main, fixtures.sccp(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sccp.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_items(main)), not_(has_items(sub)),
+        )
 
-    response = confd.endpoints.sccp.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+        response = confd.endpoints.sccp.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(has_items(sub), not_(has_items(main))),
+        )
+
+        response = confd.endpoints.sccp.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(
+            response.items,
+            has_items(main, sub),
+        )
 
 
-@fixtures.sccp(wazo_tenant=MAIN_TENANT)
-@fixtures.sccp(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
-    response = confd.endpoints.sccp(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
 
-    response = confd.endpoints.sccp(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+def test_get_multi_tenant():
+    with fixtures.sccp(wazo_tenant=MAIN_TENANT) as main, fixtures.sccp(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sccp(main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
+
+        response = confd.endpoints.sccp(sub['id']).get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.item, has_entries(**sub))
+
 
 
 def test_create_minimal_parameters():
@@ -138,41 +140,43 @@ def test_create_all_parameters():
     ))
 
 
-@fixtures.sccp(options=[["allow", "alaw"], ["disallow", "all"]])
-def test_update_options(sccp):
-    options = [
-        ["allow", "g723"],
-        ["disallow", "opus"]
-    ]
+def test_update_options():
+    with fixtures.sccp(options=[["allow", "alaw"], ["disallow", "all"]]) as sccp:
+        options = [
+            ["allow", "g723"],
+            ["disallow", "opus"]
+        ]
 
-    response = confd.endpoints.sccp(sccp['id']).put(options=options)
-    response.assert_updated()
+        response = confd.endpoints.sccp(sccp['id']).put(options=options)
+        response.assert_updated()
 
-    response = confd.endpoints.sccp(sccp['id']).get()
-    assert_that(response.item['options'], has_items(*options))
-
-
-@fixtures.sccp(wazo_tenant=MAIN_TENANT)
-@fixtures.sccp(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
-    response = confd.endpoints.sccp(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
-
-    response = confd.endpoints.sccp(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+        response = confd.endpoints.sccp(sccp['id']).get()
+        assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.sccp()
-def test_delete(sccp):
-    response = confd.endpoints.sccp(sccp['id']).delete()
-    response.assert_deleted()
+
+def test_edit_multi_tenant():
+    with fixtures.sccp(wazo_tenant=MAIN_TENANT) as main, fixtures.sccp(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sccp(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
+
+        response = confd.endpoints.sccp(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
 
-@fixtures.sccp(wazo_tenant=MAIN_TENANT)
-@fixtures.sccp(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.endpoints.sccp(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
 
-    response = confd.endpoints.sccp(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+def test_delete():
+    with fixtures.sccp() as sccp:
+        response = confd.endpoints.sccp(sccp['id']).delete()
+        response.assert_deleted()
+
+
+
+def test_delete_multi_tenant():
+    with fixtures.sccp(wazo_tenant=MAIN_TENANT) as main, fixtures.sccp(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.endpoints.sccp(main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='SCCPEndpoint'))
+
+        response = confd.endpoints.sccp(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+        response.assert_deleted()
+

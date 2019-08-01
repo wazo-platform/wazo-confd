@@ -50,10 +50,11 @@ def test_post_errors():
     unique_error_checks(url)
 
 
-@fixtures.context()
-def test_put_errors(context):
-    url = confd.contexts(context['id']).put
-    error_checks(url)
+def test_put_errors():
+    with fixtures.context() as context:
+        url = confd.contexts(context['id']).put
+        error_checks(url)
+
 
 
 def error_checks(url):
@@ -133,23 +134,24 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'incall_ranges', [{'start': '123', 'did_length': None}])
 
 
-@fixtures.context(name='unique')
-def unique_error_checks(url, context):
-    s.check_bogus_field_returns_error(url, 'name', context['name'])
+def unique_error_checks(url):
+    with fixtures.context(name='unique') as context:
+        s.check_bogus_field_returns_error(url, 'name', context['name'])
 
 
-@fixtures.context(name='search', type='internal', description='desc_search')
-@fixtures.context(name='hidden', type='incall', description='hidden')
-def test_search(context, hidden):
-    url = confd.contexts
-    searches = {
-        'name': 'search',
-        'type': 'internal',
-        'description': 'desc_search',
-    }
 
-    for field, term in searches.items():
-        check_search(url, context, hidden, field, term)
+def test_search():
+    with fixtures.context(name='search', type='internal', description='desc_search') as context, fixtures.context(name='hidden', type='incall', description='hidden') as hidden:
+        url = confd.contexts
+        searches = {
+            'name': 'search',
+            'type': 'internal',
+            'description': 'desc_search',
+        }
+
+        for field, term in searches.items():
+            check_search(url, context, hidden, field, term)
+
 
 
 def check_search(url, context, hidden, field, term):
@@ -162,50 +164,51 @@ def check_search(url, context, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT)
-@fixtures.context(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
-    response = confd.contexts.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
+def test_list_multi_tenant():
+    with fixtures.context(wazo_tenant=MAIN_TENANT) as main, fixtures.context(wazo_tenant=SUB_TENANT) as sub:
+        response = confd.contexts.get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
-    response = confd.contexts.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
+        response = confd.contexts.get(wazo_tenant=SUB_TENANT)
+        assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
-    response = confd.contexts.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(main, sub))
-
-
-@fixtures.context(name='sort1', description='sort1')
-@fixtures.context(name='sort2', description='sort2')
-def test_sorting_offset_limit(context1, context2):
-    url = confd.contexts.get
-    s.check_sorting(url, context1, context2, 'name', 'sort')
-    s.check_sorting(url, context1, context2, 'description', 'sort')
-
-    s.check_offset(url, context1, context2, 'name', 'sort')
-    s.check_offset_legacy(url, context1, context2, 'name', 'sort')
-
-    s.check_limit(url, context1, context2, 'name', 'sort')
+        response = confd.contexts.get(wazo_tenant=MAIN_TENANT, recurse=True)
+        assert_that(response.items, has_items(main, sub))
 
 
-@fixtures.context()
-def test_get(context):
-    response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(
-        id=context['id'],
-        name=context['name'],
-        label=context['label'],
-        type=context['type'],
-        user_ranges=context['user_ranges'],
-        group_ranges=context['group_ranges'],
-        queue_ranges=context['queue_ranges'],
-        conference_room_ranges=context['conference_room_ranges'],
-        incall_ranges=context['incall_ranges'],
-        description=context['description'],
-        enabled=context['enabled'],
-        tenant_uuid=uuid_(),
-        contexts=empty(),
-    ))
+
+def test_sorting_offset_limit():
+    with fixtures.context(name='sort1', description='sort1') as context1, fixtures.context(name='sort2', description='sort2') as context2:
+        url = confd.contexts.get
+        s.check_sorting(url, context1, context2, 'name', 'sort')
+        s.check_sorting(url, context1, context2, 'description', 'sort')
+
+        s.check_offset(url, context1, context2, 'name', 'sort')
+        s.check_offset_legacy(url, context1, context2, 'name', 'sort')
+
+        s.check_limit(url, context1, context2, 'name', 'sort')
+
+
+
+def test_get():
+    with fixtures.context() as context:
+        response = confd.contexts(context['id']).get()
+        assert_that(response.item, has_entries(
+            id=context['id'],
+            name=context['name'],
+            label=context['label'],
+            type=context['type'],
+            user_ranges=context['user_ranges'],
+            group_ranges=context['group_ranges'],
+            queue_ranges=context['queue_ranges'],
+            conference_room_ranges=context['conference_room_ranges'],
+            incall_ranges=context['incall_ranges'],
+            description=context['description'],
+            enabled=context['enabled'],
+            tenant_uuid=uuid_(),
+            contexts=empty(),
+        ))
+
 
 
 def test_create_minimal_parameters():
@@ -251,89 +254,95 @@ def test_create_all_parameters():
     confd.contexts(response.item['id']).delete().assert_deleted()
 
 
-@fixtures.context()
-def test_edit_minimal_parameters(context):
-    response = confd.contexts(context['id']).put()
-    response.assert_updated()
+def test_edit_minimal_parameters():
+    with fixtures.context() as context:
+        response = confd.contexts(context['id']).put()
+        response.assert_updated()
 
 
-@fixtures.context()
-def test_edit_all_parameters(context):
-    parameters = {
-        'label': 'Context Power',
-        'type': 'outcall',
-        'user_ranges': [{'start': '1000', 'end': '1999'}],
-        'group_ranges': [{'start': '2000', 'end': '2999'}],
-        'queue_ranges': [{'start': '3000', 'end': '3999'}],
-        'conference_room_ranges': [{'start': '4000', 'end': '4999'}],
-        'incall_ranges': [{'start': '1000', 'end': '4999', 'did_length': 2}],
-        'description': 'context description',
-        'enabled': False,
-    }
 
-    response = confd.contexts(context['id']).put(**parameters)
-    response.assert_updated()
+def test_edit_all_parameters():
+    with fixtures.context() as context:
+        parameters = {
+            'label': 'Context Power',
+            'type': 'outcall',
+            'user_ranges': [{'start': '1000', 'end': '1999'}],
+            'group_ranges': [{'start': '2000', 'end': '2999'}],
+            'queue_ranges': [{'start': '3000', 'end': '3999'}],
+            'conference_room_ranges': [{'start': '4000', 'end': '4999'}],
+            'incall_ranges': [{'start': '1000', 'end': '4999', 'did_length': 2}],
+            'description': 'context description',
+            'enabled': False,
+        }
 
-    response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(parameters))
+        response = confd.contexts(context['id']).put(**parameters)
+        response.assert_updated()
 
-
-@fixtures.context(name='OriginalName')
-def test_edit_name_unavailable(context):
-    response = confd.contexts(context['id']).put(name='ModifiedName')
-    response.assert_updated()
-
-    response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(name=context['name']))
+        response = confd.contexts(context['id']).get()
+        assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.context()
-def test_delete(context):
-    response = confd.contexts(context['id']).delete()
-    response.assert_deleted()
-    response = confd.contexts(context['id']).get()
-    response.assert_match(404, e.not_found(resource='Context'))
+
+def test_edit_name_unavailable():
+    with fixtures.context(name='OriginalName') as context:
+        response = confd.contexts(context['id']).put(name='ModifiedName')
+        response.assert_updated()
+
+        response = confd.contexts(context['id']).get()
+        assert_that(response.item, has_entries(name=context['name']))
 
 
-@fixtures.context(name='error')
-@fixtures.extension(context='error')
-def test_delete_when_extension_associated(context, extension):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Extension'))
+
+def test_delete():
+    with fixtures.context() as context:
+        response = confd.contexts(context['id']).delete()
+        response.assert_deleted()
+        response = confd.contexts(context['id']).get()
+        response.assert_match(404, e.not_found(resource='Context'))
 
 
-@fixtures.context(name='error')
-@fixtures.trunk(context='error')
-def test_delete_when_trunk_associated(context, trunk):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Trunk'))
+
+def test_delete_when_extension_associated():
+    with fixtures.context(name='error') as context, fixtures.extension(context='error') as extension:
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'Extension'))
 
 
-@fixtures.context(name='error')
-@fixtures.voicemail(context='error')
-def test_delete_when_voicemail_associated(context, voicemail):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Voicemail'))
+
+def test_delete_when_trunk_associated():
+    with fixtures.context(name='error') as context, fixtures.trunk(context='error') as trunk:
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'Trunk'))
 
 
-@fixtures.context(name='error')
-@fixtures.agent_login_status(context='error')
-def test_delete_when_agent_is_logged(context, agent_login_status):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'AgentLoginStatus'))
+
+def test_delete_when_voicemail_associated():
+    with fixtures.context(name='error') as context, fixtures.voicemail(context='error') as voicemail:
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'Voicemail'))
 
 
-@fixtures.context()
-def test_delete_when_sip_general_option_associated(context):
-    parameters = {'ordered_options': [], 'options': {'context': context['name']}}
-    confd.asterisk.sip.general.put(**parameters).assert_updated()
 
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'SIP General'))
+def test_delete_when_agent_is_logged():
+    with fixtures.context(name='error') as context, fixtures.agent_login_status(context='error') as agent_login_status:
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'AgentLoginStatus'))
 
 
-@fixtures.context()
-def test_bus_events(context):
-    s.check_bus_event('config.contexts.created', confd.contexts.post, {'name': 'bus_event'})
-    s.check_bus_event('config.contexts.edited', confd.contexts(context['id']).put)
-    s.check_bus_event('config.contexts.deleted', confd.contexts(context['id']).delete)
+
+def test_delete_when_sip_general_option_associated():
+    with fixtures.context() as context:
+        parameters = {'ordered_options': [], 'options': {'context': context['name']}}
+        confd.asterisk.sip.general.put(**parameters).assert_updated()
+
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'SIP General'))
+
+
+
+def test_bus_events():
+    with fixtures.context() as context:
+        s.check_bus_event('config.contexts.created', confd.contexts.post, {'name': 'bus_event'})
+        s.check_bus_event('config.contexts.edited', confd.contexts(context['id']).put)
+        s.check_bus_event('config.contexts.deleted', confd.contexts(context['id']).delete)
+

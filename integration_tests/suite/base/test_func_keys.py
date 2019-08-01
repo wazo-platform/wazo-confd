@@ -539,84 +539,82 @@ class TestTemplateAssociation(BaseTestFuncKey):
         assert_that(response.items, empty())
 
 
-@fixtures.user()
-@fixtures.funckey_template()
-def test_dissociate_not_associated(user, funckey_template):
-    response = confd.users(user['id']).funckeys.templates(funckey_template['id']).delete()
-    response.assert_deleted()
+def test_dissociate_not_associated():
+    with fixtures.user() as user, fixtures.funckey_template() as funckey_template:
+        response = confd.users(user['id']).funckeys.templates(funckey_template['id']).delete()
+        response.assert_deleted()
 
 
-@fixtures.user()
-@fixtures.funckey_template()
-def test_delete_funckey_template_when_user_and_funckey_template_associated(user, funckey_template):
-    with a.user_funckey_template(user, funckey_template, check=False):
-        response = confd.users(user['id']).funckeys.templates.get()
-        assert_that(response.items, not_(empty()))
-        confd.funckeys.templates(funckey_template['id']).delete().assert_deleted()
-        response = confd.users(user['id']).funckeys.templates.get()
-        assert_that(response.items, empty())
+
+def test_delete_funckey_template_when_user_and_funckey_template_associated():
+    with fixtures.user() as user, fixtures.funckey_template() as funckey_template:
+        with a.user_funckey_template(user, funckey_template, check=False):
+            response = confd.users(user['id']).funckeys.templates.get()
+            assert_that(response.items, not_(empty()))
+            confd.funckeys.templates(funckey_template['id']).delete().assert_deleted()
+            response = confd.users(user['id']).funckeys.templates.get()
+            assert_that(response.items, empty())
 
 
-@fixtures.user()
-@fixtures.funckey_template()
-def test_delete_user_when_user_and_funckey_template_associated(user, funckey_template):
-    with a.user_funckey_template(user, funckey_template, check=False):
-        response = confd.funckeys.templates(funckey_template['id']).users.get()
-        assert_that(response.items, not_(empty()))
-        confd.users(user['id']).delete().assert_deleted()
-        response = confd.funckeys.templates(funckey_template['id']).users.get()
-        assert_that(response.items, empty())
+def test_delete_user_when_user_and_funckey_template_associated():
+    with fixtures.user() as user, fixtures.funckey_template() as funckey_template:
+        with a.user_funckey_template(user, funckey_template, check=False):
+            response = confd.funckeys.templates(funckey_template['id']).users.get()
+            assert_that(response.items, not_(empty()))
+            confd.users(user['id']).delete().assert_deleted()
+            response = confd.funckeys.templates(funckey_template['id']).users.get()
+            assert_that(response.items, empty())
 
 
-@fixtures.user()
-def test_get_user_destination_relation(user):
-    destination = {'type': 'user', 'user_id': user['id']}
-    response = confd.users(user['id']).funckeys(1).put(destination=destination)
-    response.assert_updated()
-
-    response = confd.users(user['id']).funckeys(1).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(
-            user_id=user['id'],
-            user_firstname=user['firstname'],
-            user_lastname=user['lastname'],
-        )
-    ))
-
-
-@fixtures.call_filter()
-@fixtures.user()
-def test_get_bsfilter_destination_relation(call_filter, user):
-    with a.call_filter_surrogate_user(call_filter, user):
-        user_member = confd.callfilters(call_filter['id']).get().item['surrogates']['users'][0]
-        destination = {'type': 'bsfilter', 'filter_member_id': user_member['member_id']}
+def test_get_user_destination_relation():
+    with fixtures.user() as user:
+        destination = {'type': 'user', 'user_id': user['id']}
         response = confd.users(user['id']).funckeys(1).put(destination=destination)
         response.assert_updated()
 
         response = confd.users(user['id']).funckeys(1).get()
         assert_that(response.item, has_entries(
             destination=has_entries(
-                filter_member_id=user_member['member_id'],
-                filter_member_firstname=user['firstname'],
-                filter_member_lastname=user['lastname'],
+                user_id=user['id'],
+                user_firstname=user['firstname'],
+                user_lastname=user['lastname'],
             )
         ))
 
 
-@fixtures.user()
-@fixtures.group()
-def test_get_group_destination_relation(user, group):
-    destination = {'type': 'group', 'group_id': group['id']}
-    response = confd.users(user['id']).funckeys(1).put(destination=destination)
-    response.assert_updated()
 
-    response = confd.users(user['id']).funckeys(1).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(
-            group_id=group['id'],
-            group_name=group['name'],
-        )
-    ))
+def test_get_bsfilter_destination_relation():
+    with fixtures.call_filter() as call_filter, fixtures.user() as user:
+        with a.call_filter_surrogate_user(call_filter, user):
+            user_member = confd.callfilters(call_filter['id']).get().item['surrogates']['users'][0]
+            destination = {'type': 'bsfilter', 'filter_member_id': user_member['member_id']}
+            response = confd.users(user['id']).funckeys(1).put(destination=destination)
+            response.assert_updated()
+
+            response = confd.users(user['id']).funckeys(1).get()
+            assert_that(response.item, has_entries(
+                destination=has_entries(
+                    filter_member_id=user_member['member_id'],
+                    filter_member_firstname=user['firstname'],
+                    filter_member_lastname=user['lastname'],
+                )
+            ))
+
+
+def test_get_group_destination_relation():
+    with fixtures.user() as user, fixtures.group() as group:
+        destination = {'type': 'group', 'group_id': group['id']}
+        response = confd.users(user['id']).funckeys(1).put(destination=destination)
+        response.assert_updated()
+
+        response = confd.users(user['id']).funckeys(1).get()
+        assert_that(response.item, has_entries(
+            destination=has_entries(
+                group_id=group['id'],
+                group_name=group['name'],
+            )
+        ))
+
 
 
 class TestBlfFuncKeys(BaseTestFuncKey):
