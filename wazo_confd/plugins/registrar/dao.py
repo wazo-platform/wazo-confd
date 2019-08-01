@@ -37,7 +37,7 @@ class RegistrarDao:
         registrar = self.get(result['id'])
         return registrar
 
-    def get(self, registrar_id):
+    def get(self, registrar_id, tenant_uuids=None):
         parameters = {
             'X_type': 'registrar',
             'id': registrar_id,
