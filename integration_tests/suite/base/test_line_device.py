@@ -42,7 +42,7 @@ def line_and_device(endpoint_type='sip', wazo_tenant=None):
     with line_etc as (user, line, extension, endpoint):
         yield line, device
 
-    h.device.delete_device(device)
+    h.device.delete_device(device['id'])
 
 
 @fixtures.line()
