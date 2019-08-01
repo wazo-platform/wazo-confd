@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -31,8 +31,8 @@ def test_associate_errors(conference, extension):
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_conference, 'Conference'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_conference, 'Conference')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.conference()
@@ -41,8 +41,8 @@ def test_dissociate_errors(conference, extension):
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_conference, 'Conference'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_conference, 'Conference')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.conference()

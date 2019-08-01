@@ -27,8 +27,8 @@ def test_associate_errors(trunk, custom):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom(custom['id']).put
     fake_custom = confd.trunks(trunk['id']).endpoints.custom(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.trunk()
@@ -37,16 +37,16 @@ def test_dissociate_errors(trunk, custom):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom(custom['id']).delete
     fake_custom = confd.trunks(trunk['id']).endpoints.custom(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 def test_get_errors():
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom.get
     fake_custom = confd.endpoints.custom(FAKE_ID).trunks.get
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.trunk()
@@ -224,8 +224,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, custom):
 
         deleted_trunk = confd.trunks(custom['id']).endpoints.custom.get
         deleted_custom = confd.endpoints.custom(custom['id']).trunks.get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_custom, 'CustomEndpoint'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_custom, 'CustomEndpoint')
 
 
 @fixtures.trunk()
@@ -242,5 +242,5 @@ def test_delete_custom_when_trunk_and_custom_associated(trunk, custom):
 @fixtures.custom()
 def test_bus_events(trunk, custom):
     url = confd.trunks(trunk['id']).endpoints.custom(custom['id'])
-    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
-    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete
+    s.check_bus_event('config.trunks.endpoints.updated', url.put)
+    s.check_bus_event('config.trunks.endpoints.deleted', url.delete)

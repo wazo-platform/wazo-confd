@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -30,8 +30,8 @@ def test_associate_errors(parking_lot, extension):
     fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_parking_lot, 'ParkingLot')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.parking_lot()
@@ -40,8 +40,8 @@ def test_dissociate_errors(parking_lot, extension):
     fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_parking_lot, 'ParkingLot')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.parking_lot()

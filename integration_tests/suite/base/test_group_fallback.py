@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -18,22 +18,21 @@ FAKE_ID = 999999999
 
 def test_get_errors():
     fake_group = confd.groups(FAKE_ID).fallbacks.get
-    yield s.check_resource_not_found, fake_group, 'Group'
+    s.check_resource_not_found(fake_group, 'Group')
 
 
 @fixtures.group()
 def test_put_errors(group):
     fake_group = confd.groups(FAKE_ID).fallbacks.put
-    yield s.check_resource_not_found, fake_group, 'Group'
+    s.check_resource_not_found(fake_group, 'Group')
 
     url = confd.groups(group['id']).fallbacks.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+        s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
 
 
 @fixtures.group()
@@ -89,7 +88,7 @@ def test_edit_to_none(group):
 @fixtures.application()
 def test_valid_destinations(group, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_group_fallbacks_with_destination, group['id'], destination
+        _update_group_fallbacks_with_destination(group['id'], destination)
 
 
 def _update_group_fallbacks_with_destination(group_id, destination):
@@ -114,10 +113,10 @@ def test_nonexistent_destinations(group):
                                    'user',
                                    'voicemail',
                                    'conference'):
-            yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
+            _update_user_fallbacks_with_nonexistent_destination(group['id'], destination)
 
         if destination['type'] == 'application' and destination['application'] == 'custom':
-            yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
+            _update_user_fallbacks_with_nonexistent_destination(group['id'], destination)
 
 
 def _update_user_fallbacks_with_nonexistent_destination(group_id, destination):
@@ -128,7 +127,7 @@ def _update_user_fallbacks_with_nonexistent_destination(group_id, destination):
 @fixtures.group()
 def test_bus_events(group):
     url = confd.groups(group['id']).fallbacks.put
-    yield s.check_bus_event, 'config.groups.fallbacks.edited', url
+    s.check_bus_event('config.groups.fallbacks.edited', url)
 
 
 @fixtures.group()

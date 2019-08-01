@@ -29,102 +29,100 @@ from ..helpers.helpers.destination import invalid_destinations, valid_destinatio
 
 def test_get_errors():
     fake_schedule = confd.schedules(999999).get
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 def test_delete_errors():
     fake_schedule = confd.schedules(999999).delete
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 def test_post_errors():
     url = confd.schedules.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.schedule()
 def test_put_errors(schedule):
     url = confd.schedules(schedule['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'timezone', True
-    yield s.check_bogus_field_returns_error, url, 'timezone', 1234
-    yield s.check_bogus_field_returns_error, url, 'timezone', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'timezone', []
-    yield s.check_bogus_field_returns_error, url, 'timezone', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'open_periods', True
-    yield s.check_bogus_field_returns_error, url, 'open_periods', 1234
-    yield s.check_bogus_field_returns_error, url, 'open_periods', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'open_periods', {}
-    yield s.check_bogus_field_returns_error, url, 'exceptional_periods', True
-    yield s.check_bogus_field_returns_error, url, 'exceptional_periods', None
-    yield s.check_bogus_field_returns_error, url, 'exceptional_periods', 1234
-    yield s.check_bogus_field_returns_error, url, 'exceptional_periods', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'exceptional_periods', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'timezone', True)
+    s.check_bogus_field_returns_error(url, 'timezone', 1234)
+    s.check_bogus_field_returns_error(url, 'timezone', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'timezone', [])
+    s.check_bogus_field_returns_error(url, 'timezone', {})
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'open_periods', True)
+    s.check_bogus_field_returns_error(url, 'open_periods', 1234)
+    s.check_bogus_field_returns_error(url, 'open_periods', 'invalid')
+    s.check_bogus_field_returns_error(url, 'open_periods', {})
+    s.check_bogus_field_returns_error(url, 'exceptional_periods', True)
+    s.check_bogus_field_returns_error(url, 'exceptional_periods', None)
+    s.check_bogus_field_returns_error(url, 'exceptional_periods', 1234)
+    s.check_bogus_field_returns_error(url, 'exceptional_periods', 'invalid')
+    s.check_bogus_field_returns_error(url, 'exceptional_periods', {})
 
     for key in ('open_periods', 'exceptional_periods'):
         regex = r'{}.*0.*hours_start'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': 7}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': '7:15'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': 'abcd'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': '24:00'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': '10:60'}], regex
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_start': 7}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_start': '7:15'}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_start': 'abcd'}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_start': None}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_start': '24:00'}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_start': '10:60'}], regex)
 
         regex = r'{}.*0.*hours_end'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': 8}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': '8:15'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': 'abcd'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': '24:00'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': '10:60'}], regex
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_end': 8}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_end': '8:15'}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_end': 'abcd'}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_end': None}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_end': '24:00'}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'hours_end': '10:60'}], regex)
 
         regex = r'{}.*0.*week_days'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': 1}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': []}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': ['1-2']}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': [None]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': [-1]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': [8]}], regex
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': None}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': 1}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': []}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': ['1-2']}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': [None]}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': [-1]}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'week_days': [8]}], regex)
 
         regex = r'{}.*0.*month_days'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': 1}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': []}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': ['1-2']}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': [None]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': [-1]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': [32]}], regex
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': None}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': 1}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': []}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': ['1-2']}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': [None]}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': [-1]}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'month_days': [32]}], regex)
 
         regex = r'{}.*0.*months'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': 1}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': []}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': ['1-2']}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': [None]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': [-1]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': [13]}], regex
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': None}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': 1}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': []}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': ['1-2']}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': [None]}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': [-1]}], regex)
+        s.check_bogus_field_returns_error_matching_regex(url, key, [{'months': [13]}], regex)
 
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'closed_destination', destination
+        s.check_bogus_field_returns_error(url, 'closed_destination', destination)
     for destination in invalid_destinations():
         regex = r'exceptional_periods.*0.*destination'
         body = [{'destination': destination}]
-        yield s.check_bogus_field_returns_error_matching_regex, url, 'exceptional_periods', body, regex
+        s.check_bogus_field_returns_error_matching_regex(url, 'exceptional_periods', body, regex)
 
 
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
@@ -159,7 +157,7 @@ def test_search(schedule, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, schedule, hidden, field, term
+        check_search(url, schedule, hidden, field, term)
 
 
 def check_search(url, schedule, hidden, field, term):
@@ -176,12 +174,12 @@ def check_search(url, schedule, hidden, field, term):
 @fixtures.schedule(name='sort2')
 def test_sort_offset_limit(schedule1, schedule2):
     url = confd.schedules.get
-    yield s.check_sorting, url, schedule1, schedule2, 'name', 'sort'
+    s.check_sorting(url, schedule1, schedule2, 'name', 'sort')
 
-    yield s.check_offset, url, schedule1, schedule2, 'name', 'sort'
-    yield s.check_offset_legacy, url, schedule1, schedule2, 'name', 'sort'
+    s.check_offset(url, schedule1, schedule2, 'name', 'sort')
+    s.check_offset_legacy(url, schedule1, schedule2, 'name', 'sort')
 
-    yield s.check_limit, url, schedule1, schedule2, 'name', 'sort'
+    s.check_limit(url, schedule1, schedule2, 'name', 'sort')
 
 
 @fixtures.schedule()
@@ -375,8 +373,8 @@ def test_edit_all_parameters(schedule):
 @fixtures.application()
 def test_valid_destinations(schedule, *destinations):
     for destination in valid_destinations(*destinations):
-        yield create_schedule_with_destination, destination
-        yield update_schedule_with_destination, schedule['id'], destination
+        create_schedule_with_destination(destination)
+        update_schedule_with_destination(schedule['id'], destination)
 
 
 def create_schedule_with_destination(destination):
@@ -445,6 +443,6 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.schedule()
 def test_bus_events(schedule):
     required_body = {'closed_destination': {'type': 'none'}}
-    yield s.check_bus_event, 'config.schedules.created', confd.schedules.post, required_body
-    yield s.check_bus_event, 'config.schedules.edited', confd.schedules(schedule['id']).put
-    yield s.check_bus_event, 'config.schedules.deleted', confd.schedules(schedule['id']).delete
+    s.check_bus_event('config.schedules.created', confd.schedules.post, required_body)
+    s.check_bus_event('config.schedules.edited', confd.schedules(schedule['id']).put)
+    s.check_bus_event('config.schedules.deleted', confd.schedules(schedule['id']).delete)

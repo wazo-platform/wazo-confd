@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers import scenarios as s
@@ -9,36 +9,35 @@ from . import confd
 
 def test_put_errors():
     url = confd.asterisk.voicemail.zonemessages.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'items', 123
-    yield s.check_bogus_field_returns_error, url, 'items', None
-    yield s.check_bogus_field_returns_error, url, 'items', {}
-    yield s.check_bogus_field_returns_error, url, 'items', 'string'
-    yield s.check_bogus_field_returns_error, url, 'items', ['string']
-    yield s.check_bogus_field_returns_error, url, 'items', [{'key': 'value'}]
+    s.check_bogus_field_returns_error(url, 'items', 123)
+    s.check_bogus_field_returns_error(url, 'items', None)
+    s.check_bogus_field_returns_error(url, 'items', {})
+    s.check_bogus_field_returns_error(url, 'items', 'string')
+    s.check_bogus_field_returns_error(url, 'items', ['string'])
+    s.check_bogus_field_returns_error(url, 'items', [{'key': 'value'}])
 
     regex = r'items.*name'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'name': 123}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'name': True}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'name': None}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'name': {}}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'name': []}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'name': 123}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'name': True}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'name': None}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'name': {}}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'name': []}], regex)
     regex = r'items.*timezone'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'timezone': 123}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'timezone': True}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'timezone': None}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'timezone': {}}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'timezone': []}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'timezone': 123}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'timezone': True}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'timezone': None}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'timezone': {}}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'timezone': []}], regex)
 
     regex = r'items.*message'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'message': 123}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'message': True}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'message': {}}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'items', [{'message': []}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'message': 123}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'message': True}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'message': {}}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'items', [{'message': []}], regex)
 
 
 def test_get():
@@ -81,4 +80,4 @@ def test_edit_voicemail_zonemessages_with_none_message():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.voicemail.zonemessages
-    yield s.check_bus_event, 'config.voicemail_zonemessages.edited', url.put, {'items': []}
+    s.check_bus_event('config.voicemail_zonemessages.edited', url.put, {'items': []})

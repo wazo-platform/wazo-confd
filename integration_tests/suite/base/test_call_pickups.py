@@ -28,45 +28,42 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_get = confd.callpickups(999999).get
-    yield s.check_resource_not_found, fake_get, 'CallPickup'
+    s.check_resource_not_found(fake_get, 'CallPickup')
 
 
 def test_post_errors():
     url = confd.callpickups.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.call_pickup()
 def test_put_errors(call_pickup):
     url = confd.callpickups(call_pickup['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'description', 123
-    yield s.check_bogus_field_returns_error, url, 'description', True
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'description', 123)
+    s.check_bogus_field_returns_error(url, 'description', True)
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.call_pickup(name='unique')
 def unique_error_checks(url, call_pickup):
-    yield s.check_bogus_field_returns_error, url, 'name', call_pickup['name']
+    s.check_bogus_field_returns_error(url, 'name', call_pickup['name'])
 
 
 @fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
@@ -101,7 +98,7 @@ def test_search(call_pickup, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, call_pickup, hidden, field, term
+        check_search(url, call_pickup, hidden, field, term)
 
 
 def check_search(url, call_pickup, hidden, field, term):
@@ -119,13 +116,13 @@ def check_search(url, call_pickup, hidden, field, term):
 @fixtures.call_pickup(name="sort2", description="Sort 2")
 def test_sorting_offset_limit(call_pickup1, call_pickup2):
     url = confd.callpickups.get
-    yield s.check_sorting, url, call_pickup1, call_pickup2, 'name', 'sort'
-    yield s.check_sorting, url, call_pickup1, call_pickup2, 'description', 'Sort'
+    s.check_sorting(url, call_pickup1, call_pickup2, 'name', 'sort')
+    s.check_sorting(url, call_pickup1, call_pickup2, 'description', 'Sort')
 
-    yield s.check_offset, url, call_pickup1, call_pickup2, 'name', 'sort'
-    yield s.check_offset_legacy, url, call_pickup1, call_pickup2, 'name', 'sort'
+    s.check_offset(url, call_pickup1, call_pickup2, 'name', 'sort')
+    s.check_offset_legacy(url, call_pickup1, call_pickup2, 'name', 'sort')
 
-    yield s.check_limit, url, call_pickup1, call_pickup2, 'name', 'sort'
+    s.check_limit(url, call_pickup1, call_pickup2, 'name', 'sort')
 
 
 @fixtures.call_pickup()

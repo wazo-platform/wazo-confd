@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -25,43 +25,41 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_custom_get = confd.endpoints.custom(999999).get
-    yield s.check_resource_not_found, fake_custom_get, 'CustomEndpoint'
+    s.check_resource_not_found(fake_custom_get, 'CustomEndpoint')
 
 
 def test_delete_errors():
     fake_custom = confd.endpoints.custom(999999).delete
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 def test_post_errors():
     url = confd.endpoints.custom.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.custom()
 def test_put_errors(custom):
     url = confd.endpoints.custom(custom['id']).put
 
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'interface', None
-    yield s.check_bogus_field_returns_error, url, 'interface', True
-    yield s.check_bogus_field_returns_error, url, 'interface', 'custom/&&&~~~'
-    yield s.check_bogus_field_returns_error, url, 'interface', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'interface', []
-    yield s.check_bogus_field_returns_error, url, 'interface', {}
-    yield s.check_bogus_field_returns_error, url, 'interface_suffix', True
-    yield s.check_bogus_field_returns_error, url, 'interface_suffix', s.random_string(33)
-    yield s.check_bogus_field_returns_error, url, 'interface_suffix', []
-    yield s.check_bogus_field_returns_error, url, 'interface_suffix', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'string'
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    s.check_bogus_field_returns_error(url, 'interface', None)
+    s.check_bogus_field_returns_error(url, 'interface', True)
+    s.check_bogus_field_returns_error(url, 'interface', 'custom/&&&~~~')
+    s.check_bogus_field_returns_error(url, 'interface', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'interface', [])
+    s.check_bogus_field_returns_error(url, 'interface', {})
+    s.check_bogus_field_returns_error(url, 'interface_suffix', True)
+    s.check_bogus_field_returns_error(url, 'interface_suffix', s.random_string(33))
+    s.check_bogus_field_returns_error(url, 'interface_suffix', [])
+    s.check_bogus_field_returns_error(url, 'interface_suffix', {})
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', 'string')
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
 
 
 @fixtures.custom()

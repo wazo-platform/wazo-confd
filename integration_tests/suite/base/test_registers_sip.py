@@ -1,4 +1,4 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -16,78 +16,76 @@ from . import confd
 
 def test_get_errors():
     fake_register_sip = confd.registers.sip(999999).get
-    yield s.check_resource_not_found, fake_register_sip, 'SIPRegister'
+    s.check_resource_not_found(fake_register_sip, 'SIPRegister')
 
 
 def test_delete_errors():
     fake_register_sip = confd.registers.sip(999999).delete
-    yield s.check_resource_not_found, fake_register_sip, 'SIPRegister'
+    s.check_resource_not_found(fake_register_sip, 'SIPRegister')
 
 
 def test_post_errors():
     url = confd.registers.sip.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.register_sip()
 def test_put_errors(register_sip):
     url = confd.registers.sip(register_sip['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'transport', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'transport', 123
-    yield s.check_bogus_field_returns_error, url, 'transport', True
-    yield s.check_bogus_field_returns_error, url, 'transport', []
-    yield s.check_bogus_field_returns_error, url, 'transport', {}
-    yield s.check_bogus_field_returns_error, url, 'sip_username', ':'
-    yield s.check_bogus_field_returns_error, url, 'sip_username', '/'
-    yield s.check_bogus_field_returns_error, url, 'sip_username', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'sip_username', 123
-    yield s.check_bogus_field_returns_error, url, 'sip_username', True
-    yield s.check_bogus_field_returns_error, url, 'sip_username', []
-    yield s.check_bogus_field_returns_error, url, 'sip_username', {}
-    yield s.check_bogus_field_returns_error, url, 'auth_password', ':'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', '/'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', 123
-    yield s.check_bogus_field_returns_error, url, 'auth_password', True
-    yield s.check_bogus_field_returns_error, url, 'auth_password', []
-    yield s.check_bogus_field_returns_error, url, 'auth_password', {}
-    yield s.check_bogus_field_returns_error, url, 'auth_username', ':'
-    yield s.check_bogus_field_returns_error, url, 'auth_username', '/'
-    yield s.check_bogus_field_returns_error, url, 'auth_username', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'auth_username', 123
-    yield s.check_bogus_field_returns_error, url, 'auth_username', True
-    yield s.check_bogus_field_returns_error, url, 'auth_username', []
-    yield s.check_bogus_field_returns_error, url, 'auth_username', {}
-    yield s.check_bogus_field_returns_error, url, 'remote_host', ':'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', '/'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', '~'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', 123
-    yield s.check_bogus_field_returns_error, url, 'remote_host', True
-    yield s.check_bogus_field_returns_error, url, 'remote_host', []
-    yield s.check_bogus_field_returns_error, url, 'remote_host', {}
-    yield s.check_bogus_field_returns_error, url, 'remote_port', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'remote_port', []
-    yield s.check_bogus_field_returns_error, url, 'remote_port', {}
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', '~'
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', 123
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', True
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', []
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', {}
-    yield s.check_bogus_field_returns_error, url, 'expiration', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'expiration', []
-    yield s.check_bogus_field_returns_error, url, 'expiration', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'string'
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'transport', 'invalid')
+    s.check_bogus_field_returns_error(url, 'transport', 123)
+    s.check_bogus_field_returns_error(url, 'transport', True)
+    s.check_bogus_field_returns_error(url, 'transport', [])
+    s.check_bogus_field_returns_error(url, 'transport', {})
+    s.check_bogus_field_returns_error(url, 'sip_username', ':')
+    s.check_bogus_field_returns_error(url, 'sip_username', '/')
+    s.check_bogus_field_returns_error(url, 'sip_username', 'value with space')
+    s.check_bogus_field_returns_error(url, 'sip_username', 123)
+    s.check_bogus_field_returns_error(url, 'sip_username', True)
+    s.check_bogus_field_returns_error(url, 'sip_username', [])
+    s.check_bogus_field_returns_error(url, 'sip_username', {})
+    s.check_bogus_field_returns_error(url, 'auth_password', ':')
+    s.check_bogus_field_returns_error(url, 'auth_password', '/')
+    s.check_bogus_field_returns_error(url, 'auth_password', 'value with space')
+    s.check_bogus_field_returns_error(url, 'auth_password', 123)
+    s.check_bogus_field_returns_error(url, 'auth_password', True)
+    s.check_bogus_field_returns_error(url, 'auth_password', [])
+    s.check_bogus_field_returns_error(url, 'auth_password', {})
+    s.check_bogus_field_returns_error(url, 'auth_username', ':')
+    s.check_bogus_field_returns_error(url, 'auth_username', '/')
+    s.check_bogus_field_returns_error(url, 'auth_username', 'value with space')
+    s.check_bogus_field_returns_error(url, 'auth_username', 123)
+    s.check_bogus_field_returns_error(url, 'auth_username', True)
+    s.check_bogus_field_returns_error(url, 'auth_username', [])
+    s.check_bogus_field_returns_error(url, 'auth_username', {})
+    s.check_bogus_field_returns_error(url, 'remote_host', ':')
+    s.check_bogus_field_returns_error(url, 'remote_host', '/')
+    s.check_bogus_field_returns_error(url, 'remote_host', '~')
+    s.check_bogus_field_returns_error(url, 'remote_host', 'value with space')
+    s.check_bogus_field_returns_error(url, 'remote_host', 123)
+    s.check_bogus_field_returns_error(url, 'remote_host', True)
+    s.check_bogus_field_returns_error(url, 'remote_host', [])
+    s.check_bogus_field_returns_error(url, 'remote_host', {})
+    s.check_bogus_field_returns_error(url, 'remote_port', 'invalid')
+    s.check_bogus_field_returns_error(url, 'remote_port', [])
+    s.check_bogus_field_returns_error(url, 'remote_port', {})
+    s.check_bogus_field_returns_error(url, 'callback_extension', '~')
+    s.check_bogus_field_returns_error(url, 'callback_extension', 'value with space')
+    s.check_bogus_field_returns_error(url, 'callback_extension', 123)
+    s.check_bogus_field_returns_error(url, 'callback_extension', True)
+    s.check_bogus_field_returns_error(url, 'callback_extension', [])
+    s.check_bogus_field_returns_error(url, 'callback_extension', {})
+    s.check_bogus_field_returns_error(url, 'expiration', 'invalid')
+    s.check_bogus_field_returns_error(url, 'expiration', [])
+    s.check_bogus_field_returns_error(url, 'expiration', {})
+    s.check_bogus_field_returns_error(url, 'enabled', 'string')
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
 
 @fixtures.register_sip()
@@ -174,7 +172,10 @@ def test_delete(register_sip):
 
 @fixtures.register_sip()
 def test_bus_events(register_sip):
-    yield s.check_bus_event, 'config.register.sip.created', confd.registers.sip.post, {'sip_username': 'bus-event',
-                                                                                       'remote_host': 'bus-event'}
-    yield s.check_bus_event, 'config.register.sip.edited', confd.registers.sip(register_sip['id']).put
-    yield s.check_bus_event, 'config.register.sip.deleted', confd.registers.sip(register_sip['id']).delete
+    s.check_bus_event(
+        'config.register.sip.created',
+        confd.registers.sip.post,
+        {'sip_username': 'bus-event', 'remote_host': 'bus-event'}
+    )
+    s.check_bus_event('config.register.sip.edited', confd.registers.sip(register_sip['id']).put)
+    s.check_bus_event('config.register.sip.deleted', confd.registers.sip(register_sip['id']).delete)

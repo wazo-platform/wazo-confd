@@ -1,4 +1,4 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -29,8 +29,8 @@ def test_associate_errors(outcall, call_permission):
     fake_outcall = confd.outcalls(FAKE_ID).callpermissions(call_permission['id']).put
     fake_call_permission = confd.outcalls(outcall['id']).callpermissions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.outcall()
@@ -39,8 +39,8 @@ def test_dissociate_errors(outcall, call_permission):
     fake_outcall = confd.outcalls(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.outcalls(outcall['id']).callpermissions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.outcall()

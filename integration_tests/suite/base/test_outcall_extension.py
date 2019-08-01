@@ -30,35 +30,34 @@ def test_associate_errors(outcall, extension):
     fake_outcall = confd.outcalls(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.outcalls(outcall['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
     url = confd.outcalls(outcall['id']).extensions(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'caller_id', 123
-    yield s.check_bogus_field_returns_error, url, 'caller_id', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'external_prefix', s.random_string(65)
-    yield s.check_bogus_field_returns_error, url, 'external_prefix', 'invalid_regex'
-    yield s.check_bogus_field_returns_error, url, 'external_prefix', True
-    yield s.check_bogus_field_returns_error, url, 'external_prefix', []
-    yield s.check_bogus_field_returns_error, url, 'external_prefix', {}
-    yield s.check_bogus_field_returns_error, url, 'prefix', s.random_string(33)
-    yield s.check_bogus_field_returns_error, url, 'prefix', 'invalid_regex'
-    yield s.check_bogus_field_returns_error, url, 'prefix', True
-    yield s.check_bogus_field_returns_error, url, 'prefix', []
-    yield s.check_bogus_field_returns_error, url, 'prefix', {}
-    yield s.check_bogus_field_returns_error, url, 'strip_digits', None
-    yield s.check_bogus_field_returns_error, url, 'strip_digits', 'string'
-    yield s.check_bogus_field_returns_error, url, 'strip_digits', -1
-    yield s.check_bogus_field_returns_error, url, 'strip_digits', []
-    yield s.check_bogus_field_returns_error, url, 'strip_digits', {}
+    s.check_bogus_field_returns_error(url, 'caller_id', 123)
+    s.check_bogus_field_returns_error(url, 'caller_id', True)
+    s.check_bogus_field_returns_error(url, 'caller_id', {})
+    s.check_bogus_field_returns_error(url, 'caller_id', [])
+    s.check_bogus_field_returns_error(url, 'caller_id', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'external_prefix', s.random_string(65))
+    s.check_bogus_field_returns_error(url, 'external_prefix', 'invalid_regex')
+    s.check_bogus_field_returns_error(url, 'external_prefix', True)
+    s.check_bogus_field_returns_error(url, 'external_prefix', [])
+    s.check_bogus_field_returns_error(url, 'external_prefix', {})
+    s.check_bogus_field_returns_error(url, 'prefix', s.random_string(33))
+    s.check_bogus_field_returns_error(url, 'prefix', 'invalid_regex')
+    s.check_bogus_field_returns_error(url, 'prefix', True)
+    s.check_bogus_field_returns_error(url, 'prefix', [])
+    s.check_bogus_field_returns_error(url, 'prefix', {})
+    s.check_bogus_field_returns_error(url, 'strip_digits', None)
+    s.check_bogus_field_returns_error(url, 'strip_digits', 'string')
+    s.check_bogus_field_returns_error(url, 'strip_digits', -1)
+    s.check_bogus_field_returns_error(url, 'strip_digits', [])
+    s.check_bogus_field_returns_error(url, 'strip_digits', {})
 
 
 @fixtures.outcall()
@@ -67,8 +66,8 @@ def test_dissociate_errors(outcall, extension):
     fake_outcall = confd.outcalls(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.outcalls(outcall['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.outcall()

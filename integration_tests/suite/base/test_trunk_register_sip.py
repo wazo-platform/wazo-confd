@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -24,8 +24,8 @@ def test_associate_errors(trunk, register):
     fake_trunk = confd.trunks(FAKE_ID).registers.sip(register['id']).put
     fake_register = confd.trunks(trunk['id']).registers.sip(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_register, 'SIPRegister'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_register, 'SIPRegister')
 
 
 @fixtures.trunk()
@@ -34,8 +34,8 @@ def test_dissociate_errors(trunk, register):
     fake_trunk = confd.trunks(FAKE_ID).registers.sip(register['id']).delete
     fake_register = confd.trunks(trunk['id']).registers.sip(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_register, 'SIPRegister'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_register, 'SIPRegister')
 
 
 @fixtures.trunk()
@@ -132,8 +132,8 @@ def test_delete_trunk_when_trunk_and_register_associated(trunk, register):
 
         deleted_trunk = confd.trunks(trunk['id']).get
         deleted_register = confd.registers.sip(register['id']).get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_register, 'SIPRegister'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_register, 'SIPRegister')
 
 
 @fixtures.trunk()
@@ -152,5 +152,5 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, register):
 @fixtures.register_sip()
 def test_bus_events(trunk, register):
     url = confd.trunks(trunk['id']).registers.sip(register['id'])
-    yield s.check_bus_event, 'config.trunks.registers.sip.updated', url.put
-    yield s.check_bus_event, 'config.trunks.registers.sip.deleted', url.delete
+    s.check_bus_event('config.trunks.registers.sip.updated', url.put)
+    s.check_bus_event('config.trunks.registers.sip.deleted', url.delete)

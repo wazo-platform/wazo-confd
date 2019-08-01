@@ -38,14 +38,14 @@ def test_associate_errors(user, line):
     fake_user = confd.users(FAKE_ID).lines(line_id=line['id']).post
     fake_line = confd.users(user['id']).lines(line_id=FAKE_ID).post
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_bogus_field_returns_error, fake_line, 'line_id', FAKE_ID
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_bogus_field_returns_error(fake_line, 'line_id', FAKE_ID)
 
     fake_user = confd.users(FAKE_ID).lines(line['id']).put
     fake_line = confd.users(user['id']).lines(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 @fixtures.user()
@@ -54,16 +54,16 @@ def test_dissociate_errors(user, line):
     fake_user = confd.users(FAKE_ID).lines(line['id']).delete
     fake_line = confd.users(user['id']).lines(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 def test_get_errors():
     fake_user = confd.users(FAKE_ID).lines.get
     fake_line = confd.lines(FAKE_ID).users.get
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 @fixtures.user()
@@ -507,13 +507,11 @@ def test_delete_user_when_user_and_line_associated(user, line):
 @fixtures.user()
 @fixtures.line_sip()
 def test_bus_events(user, line):
-    yield (
-        s.check_bus_event,
+    s.check_bus_event(
         'config.users.{}.lines.{}.updated'.format(user['uuid'], line['id']),
         confd.users(user['uuid']).lines(line['id']).put
     )
-    yield (
-        s.check_bus_event,
+    s.check_bus_event(
         'config.users.{}.lines.{}.deleted'.format(user['uuid'], line['id']),
         confd.users(user['uuid']).lines(line['id']).delete
     )

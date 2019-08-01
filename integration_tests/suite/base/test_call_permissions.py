@@ -29,52 +29,50 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_get = confd.callpermissions(999999).get
-    yield s.check_resource_not_found, fake_get, 'CallPermission'
+    s.check_resource_not_found(fake_get, 'CallPermission')
 
 
 def test_post_errors():
     url = confd.callpermissions.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.call_permission()
 def test_put_errors(call_permission):
     url = confd.callpermissions(call_permission['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid_régèx!'
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'password', 123
-    yield s.check_bogus_field_returns_error, url, 'password', True
-    yield s.check_bogus_field_returns_error, url, 'password', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'password', {}
-    yield s.check_bogus_field_returns_error, url, 'password', []
-    yield s.check_bogus_field_returns_error, url, 'description', 123
-    yield s.check_bogus_field_returns_error, url, 'description', True
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'mode', 123
-    yield s.check_bogus_field_returns_error, url, 'mode', None
-    yield s.check_bogus_field_returns_error, url, 'mode', False
-    yield s.check_bogus_field_returns_error, url, 'mode', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'extensions', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'extensions', 123
-    yield s.check_bogus_field_returns_error, url, 'extensions', True
-    yield s.check_bogus_field_returns_error, url, 'extensions', None
-    yield s.check_bogus_field_returns_error, url, 'extensions', {}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 'invalid_régèx!')
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'password', 123)
+    s.check_bogus_field_returns_error(url, 'password', True)
+    s.check_bogus_field_returns_error(url, 'password', 'invalid')
+    s.check_bogus_field_returns_error(url, 'password', {})
+    s.check_bogus_field_returns_error(url, 'password', [])
+    s.check_bogus_field_returns_error(url, 'description', 123)
+    s.check_bogus_field_returns_error(url, 'description', True)
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'mode', 123)
+    s.check_bogus_field_returns_error(url, 'mode', None)
+    s.check_bogus_field_returns_error(url, 'mode', False)
+    s.check_bogus_field_returns_error(url, 'mode', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'extensions', 'invalid')
+    s.check_bogus_field_returns_error(url, 'extensions', 123)
+    s.check_bogus_field_returns_error(url, 'extensions', True)
+    s.check_bogus_field_returns_error(url, 'extensions', None)
+    s.check_bogus_field_returns_error(url, 'extensions', {})
 
 
 @fixtures.call_permission(name="search", password="123", description="SearchDesc", mode='deny', enabled=True)
@@ -89,20 +87,20 @@ def test_search(call_permission, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, call_permission, hidden, field, term
+        check_search(url, call_permission, hidden, field, term)
 
 
 @fixtures.call_permission(name="sort1", description="Sort 1")
 @fixtures.call_permission(name="sort2", description="Sort 2")
 def test_sorting_offset_limit(call_permission1, call_permission2):
     url = confd.callpermissions.get
-    yield s.check_sorting, url, call_permission1, call_permission2, 'name', 'sort'
-    yield s.check_sorting, url, call_permission1, call_permission2, 'description', 'Sort'
+    s.check_sorting(url, call_permission1, call_permission2, 'name', 'sort')
+    s.check_sorting(url, call_permission1, call_permission2, 'description', 'Sort')
 
-    yield s.check_offset, url, call_permission1, call_permission2, 'name', 'sort'
-    yield s.check_offset_legacy, url, call_permission1, call_permission2, 'name', 'sort'
+    s.check_offset(url, call_permission1, call_permission2, 'name', 'sort')
+    s.check_offset_legacy(url, call_permission1, call_permission2, 'name', 'sort')
 
-    yield s.check_limit, url, call_permission1, call_permission2, 'name', 'sort'
+    s.check_limit(url, call_permission1, call_permission2, 'name', 'sort')
 
 
 def check_search(url, call_permission, hidden, field, term):

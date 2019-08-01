@@ -1,4 +1,4 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import string
@@ -40,38 +40,37 @@ def test_associate_errors(group, extension):
     response.assert_status(404)
 
     url = confd.groups(group['id']).members.extensions.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'extensions', 123
-    yield s.check_bogus_field_returns_error, url, 'extensions', None
-    yield s.check_bogus_field_returns_error, url, 'extensions', True
-    yield s.check_bogus_field_returns_error, url, 'extensions', 'string'
-    yield s.check_bogus_field_returns_error, url, 'extensions', [123]
-    yield s.check_bogus_field_returns_error, url, 'extensions', [None]
-    yield s.check_bogus_field_returns_error, url, 'extensions', ['string']
-    yield s.check_bogus_field_returns_error, url, 'extensions', [{}]
+    s.check_bogus_field_returns_error(url, 'extensions', 123)
+    s.check_bogus_field_returns_error(url, 'extensions', None)
+    s.check_bogus_field_returns_error(url, 'extensions', True)
+    s.check_bogus_field_returns_error(url, 'extensions', 'string')
+    s.check_bogus_field_returns_error(url, 'extensions', [123])
+    s.check_bogus_field_returns_error(url, 'extensions', [None])
+    s.check_bogus_field_returns_error(url, 'extensions', ['string'])
+    s.check_bogus_field_returns_error(url, 'extensions', [{}])
 
     regex = r'extensions.*priority'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': None}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': 'string'}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': -1}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': []}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'priority': {}}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'priority': None}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'priority': 'string'}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'priority': -1}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'priority': []}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'priority': {}}], regex)
 
     regex = r'extensions.*exten'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'exten': None}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'exten': 123}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'exten': []}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'exten': {}}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'exten': None}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'exten': 123}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'exten': []}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'exten': {}}], regex)
 
     regex = r'extensions.*context'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'context': None}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'context': 123}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'context': []}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'extensions', [{'context': {}}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'context': None}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'context': 123}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'context': []}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'extensions', [{'context': {}}], regex)
 
 
 @fixtures.group()
@@ -138,7 +137,7 @@ def test_delete_group_when_group_and_extension_associated(group, extension1, ext
         confd.groups(group['id']).delete().assert_deleted()
 
         deleted_group = confd.groups(group['id']).get
-        yield s.check_resource_not_found, deleted_group, 'Group'
+        s.check_resource_not_found(deleted_group, 'Group')
 
 
 @fixtures.group()
@@ -146,4 +145,4 @@ def test_delete_group_when_group_and_extension_associated(group, extension1, ext
 def test_bus_events(group, extension):
     url = confd.groups(group['id']).members.extensions.put
     body = {'extensions': [extension]}
-    yield s.check_bus_event, 'config.groups.members.extensions.updated', url, body
+    s.check_bus_event('config.groups.members.extensions.updated', url, body)

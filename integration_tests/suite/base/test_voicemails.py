@@ -33,96 +33,91 @@ from ..helpers.config import (
 
 def test_search_errors():
     url = confd.voicemails.get
-    for check in s.search_error_checks(url):
-        yield check
+    s.search_error_checks(url)
 
 
 def test_get_errors():
     fake_get = confd.voicemails(999999).get
-    yield s.check_resource_not_found, fake_get, 'Voicemail'
+    s.check_resource_not_found(fake_get, 'Voicemail')
 
 
 def test_post_errors():
     url = confd.voicemails.post
-    for check in error_checks(url):
-        yield check
-
-    for check in error_required_checks(url):
-        yield check
+    error_checks(url)
+    error_required_checks(url)
 
 
 @fixtures.voicemail()
 def test_put_errors(voicemail):
     fake_put = confd.voicemails(9999999).put
-    yield s.check_resource_not_found, fake_put, 'Voicemail'
+    s.check_resource_not_found(fake_put, 'Voicemail')
 
     url = confd.voicemails(voicemail['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'number', 123
-    yield s.check_bogus_field_returns_error, url, 'number', None
-    yield s.check_bogus_field_returns_error, url, 'number', 'one'
-    yield s.check_bogus_field_returns_error, url, 'number', '#1234'
-    yield s.check_bogus_field_returns_error, url, 'number', '*1234'
-    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(0)
-    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(41)
-    yield s.check_bogus_field_returns_error, url, 'context', 123
-    yield s.check_bogus_field_returns_error, url, 'context', None
-    yield s.check_bogus_field_returns_error, url, 'context', True
-    yield s.check_bogus_field_returns_error, url, 'password', 123
-    yield s.check_bogus_field_returns_error, url, 'password', True
-    yield s.check_bogus_field_returns_error, url, 'password', 'one'
-    yield s.check_bogus_field_returns_error, url, 'password', '#1234'
-    yield s.check_bogus_field_returns_error, url, 'password', '*1234'
-    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(0)
-    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'email', 123
-    yield s.check_bogus_field_returns_error, url, 'email', True
-    yield s.check_bogus_field_returns_error, url, 'email', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'language', 123
-    yield s.check_bogus_field_returns_error, url, 'language', True
-    yield s.check_bogus_field_returns_error, url, 'timezone', 123
-    yield s.check_bogus_field_returns_error, url, 'timezone', True
-    yield s.check_bogus_field_returns_error, url, 'max_messages', 'string'
-    yield s.check_bogus_field_returns_error, url, 'max_messages', -1
-    yield s.check_bogus_field_returns_error, url, 'max_messages', {}
-    yield s.check_bogus_field_returns_error, url, 'max_messages', []
-    yield s.check_bogus_field_returns_error, url, 'attach_audio', 'false'
-    yield s.check_bogus_field_returns_error, url, 'attach_audio', {}
-    yield s.check_bogus_field_returns_error, url, 'attach_audio', []
-    yield s.check_bogus_field_returns_error, url, 'delete_messages', 'true'
-    yield s.check_bogus_field_returns_error, url, 'delete_messages', None
-    yield s.check_bogus_field_returns_error, url, 'delete_messages', {}
-    yield s.check_bogus_field_returns_error, url, 'delete_messages', []
-    yield s.check_bogus_field_returns_error, url, 'ask_password', 'false'
-    yield s.check_bogus_field_returns_error, url, 'ask_password', None
-    yield s.check_bogus_field_returns_error, url, 'ask_password', {}
-    yield s.check_bogus_field_returns_error, url, 'ask_password', []
-    yield s.check_bogus_field_returns_error, url, 'options', 'string'
-    yield s.check_bogus_field_returns_error, url, 'options', 1234
-    yield s.check_bogus_field_returns_error, url, 'options', True
-    yield s.check_bogus_field_returns_error, url, 'options', None
-    yield s.check_bogus_field_returns_error, url, 'options', {}
-    yield s.check_bogus_field_returns_error, url, 'options', ['string']
-    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
-    yield s.check_bogus_field_returns_error, url, 'options', [{'string': 'string'}]
-    yield s.check_bogus_field_returns_error, url, 'options', [['string']]
-    yield s.check_bogus_field_returns_error, url, 'options', [[None, None]]
-    yield s.check_bogus_field_returns_error, url, 'options', [['string', 'string', 'string']]
-    yield s.check_bogus_field_returns_error, url, 'options', [['string', 'string'], ['string']]
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'number', 123)
+    s.check_bogus_field_returns_error(url, 'number', None)
+    s.check_bogus_field_returns_error(url, 'number', 'one')
+    s.check_bogus_field_returns_error(url, 'number', '#1234')
+    s.check_bogus_field_returns_error(url, 'number', '*1234')
+    s.check_bogus_field_returns_error(url, 'number', s.random_string(0))
+    s.check_bogus_field_returns_error(url, 'number', s.random_string(41))
+    s.check_bogus_field_returns_error(url, 'context', 123)
+    s.check_bogus_field_returns_error(url, 'context', None)
+    s.check_bogus_field_returns_error(url, 'context', True)
+    s.check_bogus_field_returns_error(url, 'password', 123)
+    s.check_bogus_field_returns_error(url, 'password', True)
+    s.check_bogus_field_returns_error(url, 'password', 'one')
+    s.check_bogus_field_returns_error(url, 'password', '#1234')
+    s.check_bogus_field_returns_error(url, 'password', '*1234')
+    s.check_bogus_field_returns_error(url, 'password', s.random_string(0))
+    s.check_bogus_field_returns_error(url, 'password', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'email', 123)
+    s.check_bogus_field_returns_error(url, 'email', True)
+    s.check_bogus_field_returns_error(url, 'email', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'language', 123)
+    s.check_bogus_field_returns_error(url, 'language', True)
+    s.check_bogus_field_returns_error(url, 'timezone', 123)
+    s.check_bogus_field_returns_error(url, 'timezone', True)
+    s.check_bogus_field_returns_error(url, 'max_messages', 'string')
+    s.check_bogus_field_returns_error(url, 'max_messages', -1)
+    s.check_bogus_field_returns_error(url, 'max_messages', {})
+    s.check_bogus_field_returns_error(url, 'max_messages', [])
+    s.check_bogus_field_returns_error(url, 'attach_audio', 'false')
+    s.check_bogus_field_returns_error(url, 'attach_audio', {})
+    s.check_bogus_field_returns_error(url, 'attach_audio', [])
+    s.check_bogus_field_returns_error(url, 'delete_messages', 'true')
+    s.check_bogus_field_returns_error(url, 'delete_messages', None)
+    s.check_bogus_field_returns_error(url, 'delete_messages', {})
+    s.check_bogus_field_returns_error(url, 'delete_messages', [])
+    s.check_bogus_field_returns_error(url, 'ask_password', 'false')
+    s.check_bogus_field_returns_error(url, 'ask_password', None)
+    s.check_bogus_field_returns_error(url, 'ask_password', {})
+    s.check_bogus_field_returns_error(url, 'ask_password', [])
+    s.check_bogus_field_returns_error(url, 'options', 'string')
+    s.check_bogus_field_returns_error(url, 'options', 1234)
+    s.check_bogus_field_returns_error(url, 'options', True)
+    s.check_bogus_field_returns_error(url, 'options', None)
+    s.check_bogus_field_returns_error(url, 'options', {})
+    s.check_bogus_field_returns_error(url, 'options', ['string'])
+    s.check_bogus_field_returns_error(url, 'options', ['string', 'string'])
+    s.check_bogus_field_returns_error(url, 'options', [{'string': 'string'}])
+    s.check_bogus_field_returns_error(url, 'options', [['string']])
+    s.check_bogus_field_returns_error(url, 'options', [[None, None]])
+    s.check_bogus_field_returns_error(url, 'options', [['string', 'string', 'string']])
+    s.check_bogus_field_returns_error(url, 'options', [['string', 'string'], ['string']])
 
 
 def error_required_checks(url):
-    yield s.check_missing_required_field_returns_error, url, 'name'
-    yield s.check_missing_required_field_returns_error, url, 'number'
-    yield s.check_missing_required_field_returns_error, url, 'context'
+    s.check_missing_required_field_returns_error(url, 'name')
+    s.check_missing_required_field_returns_error(url, 'number')
+    s.check_missing_required_field_returns_error(url, 'context')
 
 
 @fixtures.voicemail
@@ -142,7 +137,7 @@ def test_fake_fields(voicemail):
             fields = _generate_fields()
             fields[field] = value
             response = request(fields)
-            yield response.assert_match, 400, e.not_found(error_field)
+            response.assert_match(400, e.not_found(error_field))
 
 
 def _generate_fields():
@@ -197,7 +192,7 @@ def test_search(voicemail, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, voicemail, hidden, field, term
+        check_search(url, voicemail, hidden, field, term)
 
 
 def check_search(url, voicemail, hidden, field, term):
@@ -248,15 +243,15 @@ def test_list_multi_tenant(_, __, main, sub):
 )
 def test_sorting_offset_limit(voicemail1, voicemail2):
     url = confd.voicemails.get
-    yield s.check_sorting, url, voicemail1, voicemail2, 'name', 'sort'
-    yield s.check_sorting, url, voicemail1, voicemail2, 'number', '800'
-    yield s.check_sorting, url, voicemail1, voicemail2, 'email', 'sort'
-    yield s.check_sorting, url, voicemail1, voicemail2, 'pager', 'sort'
+    s.check_sorting(url, voicemail1, voicemail2, 'name', 'sort')
+    s.check_sorting(url, voicemail1, voicemail2, 'number', '800')
+    s.check_sorting(url, voicemail1, voicemail2, 'email', 'sort')
+    s.check_sorting(url, voicemail1, voicemail2, 'pager', 'sort')
 
-    yield s.check_offset, url, voicemail1, voicemail2, 'name', 'sort'
-    yield s.check_offset_legacy, url, voicemail1, voicemail2, 'name', 'sort'
+    s.check_offset(url, voicemail1, voicemail2, 'name', 'sort')
+    s.check_offset_legacy(url, voicemail1, voicemail2, 'name', 'sort')
 
-    yield s.check_limit, url, voicemail1, voicemail2, 'name', 'sort'
+    s.check_limit(url, voicemail1, voicemail2, 'name', 'sort')
 
 
 @fixtures.voicemail()
@@ -526,4 +521,4 @@ def test_update_fields_with_null_value(voicemail, _):
 def test_user_voicemail_edited_bus_event(user, voicemail):
     with a.user_voicemail(user, voicemail):
         routing_key = 'config.users.{}.voicemails.edited'.format(user['uuid'])
-        yield s.check_bus_event, routing_key, confd.voicemails(voicemail['id']).put, {'name': 'bostwana'}
+        s.check_bus_event(routing_key, confd.voicemails(voicemail['id']).put, {'name': 'bostwana'})

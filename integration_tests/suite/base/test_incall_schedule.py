@@ -27,8 +27,8 @@ def test_associate_errors(incall, schedule):
     fake_incall = confd.incalls(FAKE_ID).schedules(schedule['id']).put
     fake_schedule = confd.incalls(incall['id']).schedules(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_incall, 'Incall'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_incall, 'Incall')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.incall()
@@ -37,8 +37,8 @@ def test_dissociate_errors(incall, schedule):
     fake_incall = confd.incalls(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.incalls(incall['id']).schedules(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_incall, 'Incall'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_incall, 'Incall')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.incall()

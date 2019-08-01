@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that
@@ -10,16 +10,15 @@ from ..helpers import scenarios as s
 def test_put_errors():
     url = confd.configuration.live_reload.put
 
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'enabled', 1
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'string'
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    s.check_bogus_field_returns_error(url, 'enabled', 1)
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', 'string')
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
 
 
 def test_live_reload_true():

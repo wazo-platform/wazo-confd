@@ -28,8 +28,8 @@ def test_associate_errors(queue, schedule):
     fake_queue = confd.queues(FAKE_ID).schedules(schedule['id']).put
     fake_schedule = confd.queues(queue['id']).schedules(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.queue()
@@ -38,8 +38,8 @@ def test_dissociate_errors(queue, schedule):
     fake_queue = confd.queues(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.queues(queue['id']).schedules(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.queue()

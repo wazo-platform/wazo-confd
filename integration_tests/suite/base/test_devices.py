@@ -59,38 +59,35 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
 
 def test_search_errors():
     url = confd.devices.get
-    for check in s.search_error_checks(url):
-        yield check
+    s.search_error_checks(url)
 
 
 def test_get_errors():
     fake_get = confd.devices(999999).get
-    yield s.check_resource_not_found, fake_get, 'Device'
+    s.check_resource_not_found(fake_get, 'Device')
 
 
 def test_post_errors():
     url = confd.devices.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.device()
 def test_put_errors(device):
     url = confd.devices(device['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'ip', 123
-    yield s.check_bogus_field_returns_error, url, 'ip', 'abcd1234'
-    yield s.check_bogus_field_returns_error, url, 'mac', 123
-    yield s.check_bogus_field_returns_error, url, 'mac', 'abcd1234'
-    yield s.check_bogus_field_returns_error, url, 'mac', 'abcd1234'
-    yield s.check_bogus_field_returns_error, url, 'plugin', 'invalidplugin'
-    yield s.check_bogus_field_returns_error, url, 'template_id', 'invalidtemplateid'
-    yield s.check_bogus_field_returns_error, url, 'options', 'invalidoption'
-    yield s.check_bogus_field_returns_error, url, 'options', {'switchboard': 'yes'}
+    s.check_bogus_field_returns_error(url, 'ip', 123)
+    s.check_bogus_field_returns_error(url, 'ip', 'abcd1234')
+    s.check_bogus_field_returns_error(url, 'mac', 123)
+    s.check_bogus_field_returns_error(url, 'mac', 'abcd1234')
+    s.check_bogus_field_returns_error(url, 'mac', 'abcd1234')
+    s.check_bogus_field_returns_error(url, 'plugin', 'invalidplugin')
+    s.check_bogus_field_returns_error(url, 'template_id', 'invalidtemplateid')
+    s.check_bogus_field_returns_error(url, 'options', 'invalidoption')
+    s.check_bogus_field_returns_error(url, 'options', {'switchboard': 'yes'})
 
 
 @fixtures.device(
@@ -127,7 +124,7 @@ def test_search(device, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, device, hidden, field, term
+        check_search(url, device, hidden, field, term)
 
 
 def check_search(url, device, hidden, field, term):
@@ -198,17 +195,17 @@ def test_list_unallocated(main, sub):
 )
 def test_sorting_offset_limit(device1, device2):
     url = confd.devices.get
-    yield s.check_sorting, url, device1, device2, 'ip', '99.'
-    yield s.check_sorting, url, device1, device2, 'model', 'SortModel'
-    yield s.check_sorting, url, device1, device2, 'sn', 'SortSn'
-    yield s.check_sorting, url, device1, device2, 'vendor', 'SortVendor'
-    yield s.check_sorting, url, device1, device2, 'version', '1.'
-    yield s.check_sorting, url, device1, device2, 'description', 'SortDesc'
+    s.check_sorting(url, device1, device2, 'ip', '99.')
+    s.check_sorting(url, device1, device2, 'model', 'SortModel')
+    s.check_sorting(url, device1, device2, 'sn', 'SortSn')
+    s.check_sorting(url, device1, device2, 'vendor', 'SortVendor')
+    s.check_sorting(url, device1, device2, 'version', '1.')
+    s.check_sorting(url, device1, device2, 'description', 'SortDesc')
 
-    yield s.check_offset, url, device1, device2, 'mac', 'aa:bb'
-    yield s.check_offset_legacy, url, device1, device2, 'mac', 'aa:bb'
+    s.check_offset(url, device1, device2, 'mac', 'aa:bb')
+    s.check_offset_legacy(url, device1, device2, 'mac', 'aa:bb')
 
-    yield s.check_limit, url, device1, device2, 'mac', 'aa:bb'
+    s.check_limit(url, device1, device2, 'mac', 'aa:bb')
 
 
 @fixtures.device()

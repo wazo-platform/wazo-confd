@@ -28,20 +28,19 @@ def test_associate_errors(agent, skill):
     fake_agent = confd.agents(FAKE_ID).skills(skill['id']).put
     fake_skill = confd.agents(agent['id']).skills(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_agent, 'Agent'
-    yield s.check_resource_not_found, fake_skill, 'Skill'
+    s.check_resource_not_found(fake_agent, 'Agent')
+    s.check_resource_not_found(fake_skill, 'Skill')
 
     url = confd.agents(agent['id']).skills(skill['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', -1
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', None
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', 'string'
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', []
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', {}
+    s.check_bogus_field_returns_error(url, 'skill_weight', -1)
+    s.check_bogus_field_returns_error(url, 'skill_weight', None)
+    s.check_bogus_field_returns_error(url, 'skill_weight', 'string')
+    s.check_bogus_field_returns_error(url, 'skill_weight', [])
+    s.check_bogus_field_returns_error(url, 'skill_weight', {})
 
 
 @fixtures.agent()
@@ -50,8 +49,8 @@ def test_dissociate_errors(agent, skill):
     fake_agent = confd.agents(FAKE_ID).skills(skill['id']).delete
     fake_skill = confd.agents(agent['id']).skills(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_agent, 'Agent'
-    yield s.check_resource_not_found, fake_skill, 'Skill'
+    s.check_resource_not_found(fake_agent, 'Agent')
+    s.check_resource_not_found(fake_skill, 'Skill')
 
 
 @fixtures.agent()
@@ -218,5 +217,5 @@ def test_delete_skill_when_agent_and_skill_associated(agent, skill):
 @fixtures.skill()
 def test_bus_events(agent, skill):
     url = confd.agents(agent['id']).skills(skill['id'])
-    yield s.check_bus_event, 'config.agents.skills.updated', url.put
-    yield s.check_bus_event, 'config.agents.skills.deleted', url.delete
+    s.check_bus_event('config.agents.skills.updated', url.put)
+    s.check_bus_event('config.agents.skills.deleted', url.delete)

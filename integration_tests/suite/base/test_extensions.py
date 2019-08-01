@@ -48,48 +48,45 @@ FAKE_ID = 999999999
 
 def test_search_errors():
     url = confd.extensions.get
-    for check in s.search_error_checks(url):
-        yield check
+    s.search_error_checks(url)
 
 
 def test_get_errors():
     url = confd.extensions(FAKE_ID).get
-    yield s.check_resource_not_found, url, 'Extension'
+    s.check_resource_not_found(url, 'Extension')
 
 
 @fixtures.extension()
 def test_post_errors(extension):
     url = confd.extensions.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.extension()
 def test_put_errors(extension):
     url = confd.extensions(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def test_delete_errors():
     url = confd.extensions(FAKE_ID).delete
-    yield s.check_resource_not_found, url, 'Extension'
+    s.check_resource_not_found(url, 'Extension')
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'exten', None
-    yield s.check_bogus_field_returns_error, url, 'exten', True
-    yield s.check_bogus_field_returns_error, url, 'exten', {}
-    yield s.check_bogus_field_returns_error, url, 'exten', []
-    yield s.check_bogus_field_returns_error, url, 'exten', '01234567890123456789012345678901234567890'
-    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123', {'context': CONTEXT}
-    yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX', {'context': CONTEXT}
-    yield s.check_bogus_field_returns_error, url, 'exten', '_+111', {'context': CONTEXT}
-    yield s.check_bogus_field_returns_error, url, 'exten', '_1+111', {'context': 'to-extern'}
-    yield s.check_bogus_field_returns_error, url, 'context', None
-    yield s.check_bogus_field_returns_error, url, 'context', True
-    yield s.check_bogus_field_returns_error, url, 'context', {}
-    yield s.check_bogus_field_returns_error, url, 'context', []
+    s.check_bogus_field_returns_error(url, 'exten', None)
+    s.check_bogus_field_returns_error(url, 'exten', True)
+    s.check_bogus_field_returns_error(url, 'exten', {})
+    s.check_bogus_field_returns_error(url, 'exten', [])
+    s.check_bogus_field_returns_error(url, 'exten', '01234567890123456789012345678901234567890')
+    s.check_bogus_field_returns_error(url, 'exten', 'ABC123', {'context': CONTEXT})
+    s.check_bogus_field_returns_error(url, 'exten', 'XXXX', {'context': CONTEXT})
+    s.check_bogus_field_returns_error(url, 'exten', '_+111', {'context': CONTEXT})
+    s.check_bogus_field_returns_error(url, 'exten', '_1+111', {'context': 'to-extern'})
+    s.check_bogus_field_returns_error(url, 'context', None)
+    s.check_bogus_field_returns_error(url, 'context', True)
+    s.check_bogus_field_returns_error(url, 'context', {})
+    s.check_bogus_field_returns_error(url, 'context', [])
 
 
 @fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
@@ -150,15 +147,15 @@ def test_create_with_enabled_parameter():
 
 def test_create_extension_in_different_ranges():
     # user range
-    yield create_in_range, '1100', 'default'
+    create_in_range('1100', 'default')
     # group range
-    yield create_in_range, '2000', 'default'
+    create_in_range('2000', 'default')
     # queue range
-    yield create_in_range, '3000', 'default'
+    create_in_range('3000', 'default')
     # conference range
-    yield create_in_range, '4000', 'default'
+    create_in_range('4000', 'default')
     # incall range
-    yield create_in_range, '3954', 'from-extern'
+    create_in_range('3954', 'from-extern')
 
 
 def create_in_range(exten, context):
@@ -407,7 +404,7 @@ def test_search(extension, hidden):
                 'context': 'fault'}
 
     for field, term in searches.items():
-        yield check_search, url, extension, hidden, field, term
+        check_search(url, extension, hidden, field, term)
 
 
 def check_search(url, extension, hidden, field, term):
@@ -457,13 +454,13 @@ def test_search_multi_tenant(*_):
 @fixtures.extension(exten='9999', context='to-extern')
 def test_sorting_offset_limit(extension1, extension2):
     url = confd.extensions.get
-    yield s.check_sorting, url, extension1, extension2, 'exten', '999'
-    yield s.check_sorting, url, extension1, extension2, 'context', 'extern'
+    s.check_sorting(url, extension1, extension2, 'exten', '999')
+    s.check_sorting(url, extension1, extension2, 'context', 'extern')
 
-    yield s.check_offset, url, extension1, extension2, 'exten', '999'
-    yield s.check_offset_legacy, url, extension1, extension2, 'exten', '999'
+    s.check_offset(url, extension1, extension2, 'exten', '999')
+    s.check_offset_legacy(url, extension1, extension2, 'exten', '999')
 
-    yield s.check_limit, url, extension1, extension2, 'exten', '999'
+    s.check_limit(url, extension1, extension2, 'exten', '999')
 
 
 def test_search_extensions_in_context():

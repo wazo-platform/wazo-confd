@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -19,22 +19,21 @@ FAKE_ID = 999999999
 
 def test_get_errors():
     fake_queue = confd.queues(FAKE_ID).fallbacks.get
-    yield s.check_resource_not_found, fake_queue, 'Queue'
+    s.check_resource_not_found(fake_queue, 'Queue')
 
 
 @fixtures.queue()
 def test_put_errors(queue):
     fake_queue = confd.queues(FAKE_ID).fallbacks.put
-    yield s.check_resource_not_found, fake_queue, 'Queue'
+    s.check_resource_not_found(fake_queue, 'Queue')
 
     url = confd.queues(queue['id']).fallbacks.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+        s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
 
 
 @fixtures.queue()
@@ -115,7 +114,7 @@ def test_edit_to_none(queue):
 @fixtures.application()
 def test_valid_destinations(queue, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_queue_fallbacks_with_destination, queue['id'], destination
+        _update_queue_fallbacks_with_destination(queue['id'], destination)
 
 
 def _update_queue_fallbacks_with_destination(queue_id, destination):
@@ -140,10 +139,10 @@ def test_nonexistent_destinations(queue):
                                    'user',
                                    'voicemail',
                                    'conference'):
-            yield _update_user_fallbacks_with_nonexistent_destination, queue['id'], destination
+            _update_user_fallbacks_with_nonexistent_destination(queue['id'], destination)
 
         if destination['type'] == 'application' and destination['application'] == 'custom':
-            yield _update_user_fallbacks_with_nonexistent_destination, queue['id'], destination
+            _update_user_fallbacks_with_nonexistent_destination(queue['id'], destination)
 
 
 def _update_user_fallbacks_with_nonexistent_destination(queue_id, destination):
@@ -154,4 +153,4 @@ def _update_user_fallbacks_with_nonexistent_destination(queue_id, destination):
 @fixtures.queue()
 def test_bus_events(queue):
     url = confd.queues(queue['id']).fallbacks.put
-    yield s.check_bus_event, 'config.queues.fallbacks.edited', url
+    s.check_bus_event('config.queues.fallbacks.edited', url)

@@ -1,8 +1,6 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import inspect
-
 from functools import wraps
 
 
@@ -53,33 +51,14 @@ class IsolatedAction:
 
     def __call__(self, func):
         # This function is called when using the IsolatedAction as a decorator
-
-        if inspect.isgeneratorfunction(func):
-            # This is a hack in order to make sure
-            # that test generators still work with nosetest.
-            # A function must have a "yield" inside the function body
-            # so that nose can see the test function as a generator.
-            # Therefore, we decorate by using a function that
-            # will also appear as a generator
-            @wraps(func)
-            def generator_decorated(*args, **kwargs):
-                resource = self.__enter__()
-                # Pass the resource as an argument to the test function
-                new_args = list(args) + [resource]
-                for result in func(*new_args, **kwargs):
-                    yield result
-                self.__exit__()
-            return generator_decorated
-        else:
-            @wraps(func)
-            def decorated(*args, **kwargs):
-                resource = self.__enter__()
+        @wraps(func)
+        def decorated(*args, **kwargs):
+            with self as resource:
                 # Pass the resource as an argument to the test function
                 new_args = list(args) + [resource]
                 result = func(*new_args, **kwargs)
-                self.__exit__()
                 return result
-            return decorated
+        return decorated
 
     def __enter__(self):
         # This function is called when using the IsolatedAction as a

@@ -807,15 +807,15 @@ def test_given_field_group_is_empty_then_resource_is_not_created():
              "voicemail_attach_audio": "",
              "voicemail_delete_messages": "",
              "voicemail_ask_password": ""}
-    yield import_empty_group, group, 'voicemail_id'
+    import_empty_group(group, 'voicemail_id')
 
     group = {"line_protocol": ""}
-    yield import_empty_group, group, 'line_id'
+    import_empty_group(group, 'line_id')
 
     group = {"line_protocol": "sip",
              "exten": "",
              "context": ""}
-    yield import_empty_group, group, 'extension_id'
+    import_empty_group(group, 'extension_id')
 
     exten = h.extension.find_available_exten(config.CONTEXT)
     group = {"line_protocol": "sip",
@@ -823,10 +823,10 @@ def test_given_field_group_is_empty_then_resource_is_not_created():
              "context": config.CONTEXT,
              "incall_exten": "",
              "incall_context": ""}
-    yield import_empty_group, group, 'incall_extension_id'
+    import_empty_group(group, 'incall_extension_id')
 
     group = {"call_permissions": ""}
-    yield import_empty_group, group, 'call_permission_ids', []
+    import_empty_group(group, 'call_permission_ids', [])
 
 
 def import_empty_group(fields, parameter, expected=None):
@@ -1211,9 +1211,9 @@ def check_error_on_update(entry, fields, error):
 @unittest.skip('PUT has been disabled')
 def test_given_csv_has_errors_then_errors_returned():
     with fixtures.csv_entry(voicemail=True, incall=True, line_protocol="sip") as entry:
-        yield check_error_on_update, entry, {'firstname': ''}, 'firstname'
-        yield check_error_on_update, entry, {'voicemail_number': '^]'}, 'number'
-        yield check_error_on_update, entry, {'sip_username': '^]'}, 'name'
+        check_error_on_update(entry, {'firstname': ''}, 'firstname')
+        check_error_on_update(entry, {'voicemail_number': '^]'}, 'number')
+        check_error_on_update(entry, {'sip_username': '^]'}, 'name')
 
 
 @unittest.skip('PUT has been disabled')
@@ -1427,7 +1427,7 @@ def test_given_each_field_updated_individually_then_entry_updated(entry, call_pe
     }
 
     for name, value in fields.items():
-        yield update_csv_field, entry['user_uuid'], name, value
+        update_csv_field(entry['user_uuid'], name, value)
 
 
 def update_csv_field(uuid, field, value):

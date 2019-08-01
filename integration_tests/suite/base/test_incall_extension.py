@@ -30,8 +30,8 @@ def test_associate_errors(incall, extension):
     fake_incall = confd.incalls(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.incalls(incall['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_incall, 'Incall'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_incall, 'Incall')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.incall()
@@ -40,8 +40,8 @@ def test_dissociate_errors(incall, extension):
     fake_incall = confd.incalls(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.incalls(incall['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_incall, 'Incall'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_incall, 'Incall')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.incall()

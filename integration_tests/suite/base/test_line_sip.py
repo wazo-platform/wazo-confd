@@ -25,39 +25,39 @@ from ..helpers import (
 
 def test_get_errors():
     fake_line_get = confd.lines_sip(999999).get
-    yield s.check_resource_not_found, fake_line_get, 'Line'
+    s.check_resource_not_found(fake_line_get, 'Line')
 
 
 def test_post_errors():
     empty_post = confd.lines_sip.post
     line_post = confd.lines_sip(context=config.CONTEXT, device_slot=1).post
 
-    yield s.check_missing_required_field_returns_error, empty_post, 'context'
+    s.check_missing_required_field_returns_error(empty_post, 'context')
 
-    yield s.check_bogus_field_returns_error, line_post, 'context', 123
-    yield s.check_bogus_field_returns_error, line_post, 'device_slot', 'slot'
-    yield s.check_bogus_field_returns_error, line_post, 'callerid', 'invalidcallerid'
-    yield s.check_bogus_field_returns_error, line_post, 'secret', [{}]
-    yield s.check_bogus_field_returns_error, line_post, 'username', [{}]
+    s.check_bogus_field_returns_error(line_post, 'context', 123)
+    s.check_bogus_field_returns_error(line_post, 'device_slot', 'slot')
+    s.check_bogus_field_returns_error(line_post, 'callerid', 'invalidcallerid')
+    s.check_bogus_field_returns_error(line_post, 'secret', [{}])
+    s.check_bogus_field_returns_error(line_post, 'username', [{}])
 
 
 @fixtures.line_sip()
 def test_put_errors(line):
     line_put = confd.lines_sip(line['id']).put
 
-    yield s.check_missing_required_field_returns_error, line_put, 'context'
-    yield s.check_bogus_field_returns_error, line_put, 'context', 123
-    yield s.check_bogus_field_returns_error, line_put, 'device_slot', 'invalid'
-    yield s.check_bogus_field_returns_error, line_put, 'callerid', 'invalidcallerid'
-    yield s.check_bogus_field_returns_error, line_put, 'secret', 123
-    yield s.check_bogus_field_returns_error, line_put, 'username', 123
+    s.check_missing_required_field_returns_error(line_put, 'context')
+    s.check_bogus_field_returns_error(line_put, 'context', 123)
+    s.check_bogus_field_returns_error(line_put, 'device_slot', 'invalid')
+    s.check_bogus_field_returns_error(line_put, 'callerid', 'invalidcallerid')
+    s.check_bogus_field_returns_error(line_put, 'secret', 123)
+    s.check_bogus_field_returns_error(line_put, 'username', 123)
 
 
 @fixtures.line_sip()
 def test_delete_errors(line):
     line_url = confd.lines_sip(line['id'])
     line_url.delete()
-    yield s.check_resource_not_found, line_url.get, 'Line'
+    s.check_resource_not_found(line_url.get, 'Line')
 
 
 @fixtures.line_sip(context=config.CONTEXT)

@@ -74,149 +74,146 @@ ALL_OPTIONS = [
 
 def test_get_errors():
     fake_queue = confd.queues(999999).get
-    yield s.check_resource_not_found, fake_queue, 'Queue'
+    s.check_resource_not_found(fake_queue, 'Queue')
 
 
 def test_delete_errors():
     fake_queue = confd.queues(999999).delete
-    yield s.check_resource_not_found, fake_queue, 'Queue'
+    s.check_resource_not_found(fake_queue, 'Queue')
 
 
 def test_post_errors():
     url = confd.queues.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
-    yield s.check_bogus_field_returns_error, url, 'name', 'general'
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', 'invalid regex')
+    s.check_bogus_field_returns_error(url, 'name', 'general')
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.queue()
 def test_put_errors(queue):
     url = confd.queues(queue['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'label', 123
-    yield s.check_bogus_field_returns_error, url, 'label', True
-    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'label', []
-    yield s.check_bogus_field_returns_error, url, 'label', {}
-    yield s.check_bogus_field_returns_error, url, 'data_quality', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'data_quality', 123
-    yield s.check_bogus_field_returns_error, url, 'data_quality', {}
-    yield s.check_bogus_field_returns_error, url, 'data_quality', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_callee_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_callee_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_callee_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_callee_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_caller_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_caller_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_caller_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_caller_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_callee_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_callee_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_callee_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_callee_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_caller_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_caller_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_caller_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_transfer_caller_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_callee_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_callee_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_callee_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_callee_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_caller_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_caller_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_caller_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_record_caller_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'retry_on_timeout', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'retry_on_timeout', 123
-    yield s.check_bogus_field_returns_error, url, 'retry_on_timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'retry_on_timeout', []
-    yield s.check_bogus_field_returns_error, url, 'ring_on_hold', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'ring_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'ring_on_hold', {}
-    yield s.check_bogus_field_returns_error, url, 'ring_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'announce_hold_time_on_entry', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'announce_hold_time_on_entry', 123
-    yield s.check_bogus_field_returns_error, url, 'announce_hold_time_on_entry', {}
-    yield s.check_bogus_field_returns_error, url, 'announce_hold_time_on_entry', []
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', 123
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', {}
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', {}
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', []
-    yield s.check_bogus_field_returns_error, url, 'wait_time_threshold', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'wait_time_threshold', -1
-    yield s.check_bogus_field_returns_error, url, 'wait_time_threshold', {}
-    yield s.check_bogus_field_returns_error, url, 'wait_time_threshold', []
-    yield s.check_bogus_field_returns_error, url, 'wait_ratio_threshold', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'wait_ratio_threshold', -1
-    yield s.check_bogus_field_returns_error, url, 'wait_ratio_threshold', {}
-    yield s.check_bogus_field_returns_error, url, 'wait_ratio_threshold', []
-    yield s.check_bogus_field_returns_error, url, 'options', 123
-    yield s.check_bogus_field_returns_error, url, 'options', None
-    yield s.check_bogus_field_returns_error, url, 'options', {}
-    yield s.check_bogus_field_returns_error, url, 'options', 'string'
-    yield s.check_bogus_field_returns_error, url, 'options', [None]
-    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
-    yield s.check_bogus_field_returns_error, url, 'options', [123, 123]
-    yield s.check_bogus_field_returns_error, url, 'options', ['string', 123]
-    yield s.check_bogus_field_returns_error, url, 'options', [[]]
-    yield s.check_bogus_field_returns_error, url, 'options', [{'key': 'value'}]
-    yield s.check_bogus_field_returns_error, url, 'options', [['missing_value']]
-    yield s.check_bogus_field_returns_error, url, 'options', [['too', 'much', 'value']]
-    yield s.check_bogus_field_returns_error, url, 'options', [['wrong_value', 1234]]
-    yield s.check_bogus_field_returns_error, url, 'options', [['none_value', None]]
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'label', 123)
+    s.check_bogus_field_returns_error(url, 'label', True)
+    s.check_bogus_field_returns_error(url, 'label', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'label', [])
+    s.check_bogus_field_returns_error(url, 'label', {})
+    s.check_bogus_field_returns_error(url, 'data_quality', 'yeah')
+    s.check_bogus_field_returns_error(url, 'data_quality', 123)
+    s.check_bogus_field_returns_error(url, 'data_quality', {})
+    s.check_bogus_field_returns_error(url, 'data_quality', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_callee_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_callee_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_callee_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_callee_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_caller_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_caller_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_caller_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_caller_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_callee_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_callee_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_callee_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_callee_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_caller_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_caller_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_caller_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_transfer_caller_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_record_callee_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_record_callee_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_record_callee_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_record_callee_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', [])
+    s.check_bogus_field_returns_error(url, 'retry_on_timeout', 'yeah')
+    s.check_bogus_field_returns_error(url, 'retry_on_timeout', 123)
+    s.check_bogus_field_returns_error(url, 'retry_on_timeout', {})
+    s.check_bogus_field_returns_error(url, 'retry_on_timeout', [])
+    s.check_bogus_field_returns_error(url, 'ring_on_hold', 'yeah')
+    s.check_bogus_field_returns_error(url, 'ring_on_hold', 123)
+    s.check_bogus_field_returns_error(url, 'ring_on_hold', {})
+    s.check_bogus_field_returns_error(url, 'ring_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'announce_hold_time_on_entry', 'yeah')
+    s.check_bogus_field_returns_error(url, 'announce_hold_time_on_entry', 123)
+    s.check_bogus_field_returns_error(url, 'announce_hold_time_on_entry', {})
+    s.check_bogus_field_returns_error(url, 'announce_hold_time_on_entry', [])
+    s.check_bogus_field_returns_error(url, 'ignore_forward', 'yeah')
+    s.check_bogus_field_returns_error(url, 'ignore_forward', 123)
+    s.check_bogus_field_returns_error(url, 'ignore_forward', {})
+    s.check_bogus_field_returns_error(url, 'ignore_forward', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', 123)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', s.random_string(40))
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 'invalid')
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_name', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'caller_id_name', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_name', {})
+    s.check_bogus_field_returns_error(url, 'music_on_hold', 123)
+    s.check_bogus_field_returns_error(url, 'music_on_hold', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'music_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'music_on_hold', {})
+    s.check_bogus_field_returns_error(url, 'timeout', 'ten')
+    s.check_bogus_field_returns_error(url, 'timeout', -1)
+    s.check_bogus_field_returns_error(url, 'timeout', {})
+    s.check_bogus_field_returns_error(url, 'timeout', [])
+    s.check_bogus_field_returns_error(url, 'wait_time_threshold', 'ten')
+    s.check_bogus_field_returns_error(url, 'wait_time_threshold', -1)
+    s.check_bogus_field_returns_error(url, 'wait_time_threshold', {})
+    s.check_bogus_field_returns_error(url, 'wait_time_threshold', [])
+    s.check_bogus_field_returns_error(url, 'wait_ratio_threshold', 'ten')
+    s.check_bogus_field_returns_error(url, 'wait_ratio_threshold', -1)
+    s.check_bogus_field_returns_error(url, 'wait_ratio_threshold', {})
+    s.check_bogus_field_returns_error(url, 'wait_ratio_threshold', [])
+    s.check_bogus_field_returns_error(url, 'options', 123)
+    s.check_bogus_field_returns_error(url, 'options', None)
+    s.check_bogus_field_returns_error(url, 'options', {})
+    s.check_bogus_field_returns_error(url, 'options', 'string')
+    s.check_bogus_field_returns_error(url, 'options', [None])
+    s.check_bogus_field_returns_error(url, 'options', ['string', 'string'])
+    s.check_bogus_field_returns_error(url, 'options', [123, 123])
+    s.check_bogus_field_returns_error(url, 'options', ['string', 123])
+    s.check_bogus_field_returns_error(url, 'options', [[]])
+    s.check_bogus_field_returns_error(url, 'options', [{'key': 'value'}])
+    s.check_bogus_field_returns_error(url, 'options', [['missing_value']])
+    s.check_bogus_field_returns_error(url, 'options', [['too', 'much', 'value']])
+    s.check_bogus_field_returns_error(url, 'options', [['wrong_value', 1234]])
+    s.check_bogus_field_returns_error(url, 'options', [['none_value', None]])
+    s.check_bogus_field_returns_error(url, 'enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'wait_time_destination', destination
+        s.check_bogus_field_returns_error(url, 'wait_time_destination', destination)
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', destination
+        s.check_bogus_field_returns_error(url, 'wait_ratio_destination', destination)
 
 
 @fixtures.queue(name='unique')
 @fixtures.group(name='queue_name')
 def unique_error_checks(url, queue, group):
-    yield s.check_bogus_field_returns_error, url, 'name', queue['name']
-    yield s.check_bogus_field_returns_error, url, 'name', group['name']
+    s.check_bogus_field_returns_error(url, 'name', queue['name'])
+    s.check_bogus_field_returns_error(url, 'name', group['name'])
 
 
 @fixtures.queue(name='hidden', label='hidden', preprocess_subroutine='hidden')
@@ -230,7 +227,7 @@ def test_search(hidden, queue):
     }
 
     for field, term in searches.items():
-        yield check_search, url, queue, hidden, field, term
+        check_search(url, queue, hidden, field, term)
 
 
 def check_search(url, queue, hidden, field, term):
@@ -275,13 +272,13 @@ def test_list_multi_tenant(main, sub):
 @fixtures.queue(name='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(queue1, queue2):
     url = confd.queues.get
-    yield s.check_sorting, url, queue1, queue2, 'name', 'sort'
-    yield s.check_sorting, url, queue1, queue2, 'preprocess_subroutine', 'sort'
+    s.check_sorting(url, queue1, queue2, 'name', 'sort')
+    s.check_sorting(url, queue1, queue2, 'preprocess_subroutine', 'sort')
 
-    yield s.check_offset, url, queue1, queue2, 'name', 'sort'
-    yield s.check_offset_legacy, url, queue1, queue2, 'name', 'sort'
+    s.check_offset(url, queue1, queue2, 'name', 'sort')
+    s.check_offset_legacy(url, queue1, queue2, 'name', 'sort')
 
-    yield s.check_limit, url, queue1, queue2, 'name', 'sort'
+    s.check_limit(url, queue1, queue2, 'name', 'sort')
 
 
 @fixtures.queue()
@@ -404,8 +401,8 @@ def test_create_multi_tenant():
 @fixtures.application()
 def test_valid_destinations(queue, *destinations):
     for destination in valid_destinations(*destinations):
-        yield create_queue_with_destination, destination
-        yield update_queue_with_destination, queue['id'], destination
+        create_queue_with_destination(destination)
+        update_queue_with_destination(queue['id'], destination)
 
 
 def create_queue_with_destination(destination):
@@ -506,6 +503,6 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.queue()
 def test_bus_events(queue):
-    yield s.check_bus_event, 'config.queue.created', confd.queues.post, {'name': 'queue_bus_event'}
-    yield s.check_bus_event, 'config.queue.edited', confd.queues(queue['id']).put
-    yield s.check_bus_event, 'config.queue.deleted', confd.queues(queue['id']).delete
+    s.check_bus_event('config.queue.created', confd.queues.post, {'name': 'queue_bus_event'})
+    s.check_bus_event('config.queue.edited', confd.queues(queue['id']).put)
+    s.check_bus_event('config.queue.deleted', confd.queues(queue['id']).delete)

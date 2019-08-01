@@ -27,58 +27,56 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_parking_lot = confd.parkinglots(999999).get
-    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
+    s.check_resource_not_found(fake_parking_lot, 'ParkingLot')
 
 
 def test_delete_errors():
     fake_parking_lot = confd.parkinglots(999999).delete
-    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
+    s.check_resource_not_found(fake_parking_lot, 'ParkingLot')
 
 
 def test_post_errors():
     url = confd.parkinglots.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.parking_lot()
 def test_put_errors(parking_lot):
     url = confd.parkinglots(parking_lot['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'slots_start', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'slots_start', '-1'
-    yield s.check_bogus_field_returns_error, url, 'slots_start', True
-    yield s.check_bogus_field_returns_error, url, 'slots_start', None
-    yield s.check_bogus_field_returns_error, url, 'slots_start', []
-    yield s.check_bogus_field_returns_error, url, 'slots_start', {}
-    yield s.check_bogus_field_returns_error, url, 'slots_end', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'slots_end', '-1'
-    yield s.check_bogus_field_returns_error, url, 'slots_end', True
-    yield s.check_bogus_field_returns_error, url, 'slots_end', None
-    yield s.check_bogus_field_returns_error, url, 'slots_end', []
-    yield s.check_bogus_field_returns_error, url, 'slots_end', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', 'string'
-    yield s.check_bogus_field_returns_error, url, 'timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'timeout', []
-    yield s.check_bogus_field_returns_error, url, 'timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 1234
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', True
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'slots_start', 'invalid')
+    s.check_bogus_field_returns_error(url, 'slots_start', '-1')
+    s.check_bogus_field_returns_error(url, 'slots_start', True)
+    s.check_bogus_field_returns_error(url, 'slots_start', None)
+    s.check_bogus_field_returns_error(url, 'slots_start', [])
+    s.check_bogus_field_returns_error(url, 'slots_start', {})
+    s.check_bogus_field_returns_error(url, 'slots_end', 'invalid')
+    s.check_bogus_field_returns_error(url, 'slots_end', '-1')
+    s.check_bogus_field_returns_error(url, 'slots_end', True)
+    s.check_bogus_field_returns_error(url, 'slots_end', None)
+    s.check_bogus_field_returns_error(url, 'slots_end', [])
+    s.check_bogus_field_returns_error(url, 'slots_end', {})
+    s.check_bogus_field_returns_error(url, 'timeout', 'string')
+    s.check_bogus_field_returns_error(url, 'timeout', -1)
+    s.check_bogus_field_returns_error(url, 'timeout', [])
+    s.check_bogus_field_returns_error(url, 'timeout', {})
+    s.check_bogus_field_returns_error(url, 'music_on_hold', 1234)
+    s.check_bogus_field_returns_error(url, 'music_on_hold', True)
+    s.check_bogus_field_returns_error(url, 'music_on_hold', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'music_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'music_on_hold', {})
 
 
 @fixtures.parking_lot(name='search', slots_start='701', slots_end='750', music_on_hold='search', timeout=100)
-@fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850',  music_on_hold='hidden', timeout=None)
+@fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850', music_on_hold='hidden', timeout=None)
 def test_search(parking_lot, hidden):
     url = confd.parkinglots
     searches = {
@@ -90,7 +88,7 @@ def test_search(parking_lot, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, parking_lot, hidden, field, term
+        check_search(url, parking_lot, hidden, field, term)
 
 
 def check_search(url, parking_lot, hidden, field, term):
@@ -107,12 +105,12 @@ def check_search(url, parking_lot, hidden, field, term):
 @fixtures.parking_lot(name='sort2')
 def test_sorting_offset_limit(parking_lot1, parking_lot2):
     url = confd.parkinglots.get
-    yield s.check_sorting, url, parking_lot1, parking_lot2, 'name', 'sort'
+    s.check_sorting(url, parking_lot1, parking_lot2, 'name', 'sort')
 
-    yield s.check_offset, url, parking_lot1, parking_lot2, 'name', 'sort'
-    yield s.check_offset_legacy, url, parking_lot1, parking_lot2, 'name', 'sort'
+    s.check_offset(url, parking_lot1, parking_lot2, 'name', 'sort')
+    s.check_offset_legacy(url, parking_lot1, parking_lot2, 'name', 'sort')
 
-    yield s.check_limit, url, parking_lot1, parking_lot2, 'name', 'sort'
+    s.check_limit(url, parking_lot1, parking_lot2, 'name', 'sort')
 
 
 @fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
@@ -249,7 +247,10 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.parking_lot()
 def test_bus_events(parking_lot):
-    yield s.check_bus_event, 'config.parkinglots.created', confd.parkinglots.post, {'slots_start': '999',
-                                                                                    'slots_end': '999'}
-    yield s.check_bus_event, 'config.parkinglots.edited', confd.parkinglots(parking_lot['id']).put
-    yield s.check_bus_event, 'config.parkinglots.deleted', confd.parkinglots(parking_lot['id']).delete
+    s.check_bus_event(
+        'config.parkinglots.created',
+        confd.parkinglots.post,
+        {'slots_start': '999', 'slots_end': '999'}
+    )
+    s.check_bus_event('config.parkinglots.edited', confd.parkinglots(parking_lot['id']).put)
+    s.check_bus_event('config.parkinglots.deleted', confd.parkinglots(parking_lot['id']).delete)

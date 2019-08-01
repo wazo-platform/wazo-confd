@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -34,30 +34,29 @@ def test_associate_errors(group, user):
     response.assert_status(404)
 
     url = confd.groups(group['id']).members.users.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'users', 123
-    yield s.check_bogus_field_returns_error, url, 'users', None
-    yield s.check_bogus_field_returns_error, url, 'users', True
-    yield s.check_bogus_field_returns_error, url, 'users', 'string'
-    yield s.check_bogus_field_returns_error, url, 'users', [123]
-    yield s.check_bogus_field_returns_error, url, 'users', [None]
-    yield s.check_bogus_field_returns_error, url, 'users', ['string']
-    yield s.check_bogus_field_returns_error, url, 'users', [{}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
+    s.check_bogus_field_returns_error(url, 'users', 123)
+    s.check_bogus_field_returns_error(url, 'users', None)
+    s.check_bogus_field_returns_error(url, 'users', True)
+    s.check_bogus_field_returns_error(url, 'users', 'string')
+    s.check_bogus_field_returns_error(url, 'users', [123])
+    s.check_bogus_field_returns_error(url, 'users', [None])
+    s.check_bogus_field_returns_error(url, 'users', ['string'])
+    s.check_bogus_field_returns_error(url, 'users', [{}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': 1}, {'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'not_uuid': 123}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': FAKE_UUID}])
 
     regex = r'users.*priority'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': None}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': 'string'}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': -1}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': []}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [{'priority': {}}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'users', [{'priority': None}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'users', [{'priority': 'string'}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'users', [{'priority': -1}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'users', [{'priority': []}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'users', [{'priority': {}}], regex)
 
 
 @fixtures.group()
@@ -197,13 +196,13 @@ def test_delete_group_when_group_and_user_associated(group, user1, user2, line1,
         confd.groups(group['id']).delete().assert_deleted()
 
         deleted_group = confd.groups(group['id']).get
-        yield s.check_resource_not_found, deleted_group, 'Group'
+        s.check_resource_not_found(deleted_group, 'Group')
 
         response = confd.users(user1['uuid']).get()
-        yield assert_that, response.item['groups'], empty()
+        assert_that(response.item['groups'], empty())
 
         response = confd.users(user2['uuid']).get()
-        yield assert_that, response.item['groups'], empty()
+        assert_that(response.item['groups'], empty())
 
 
 @fixtures.group()
@@ -218,13 +217,13 @@ def test_delete_user_when_group_and_user_associated(group1, group2, user, line):
         confd.users(user['uuid']).delete().assert_deleted()
 
         deleted_user = confd.users(user['uuid']).get
-        yield s.check_resource_not_found, deleted_user, 'User'
+        s.check_resource_not_found(deleted_user, 'User')
 
         response = confd.groups(group1['id']).get()
-        yield assert_that, response.item['members']['users'], empty()
+        assert_that(response.item['members']['users'], empty())
 
         response = confd.groups(group2['id']).get()
-        yield assert_that, response.item['members']['users'], empty()
+        assert_that(response.item['members']['users'], empty())
 
 
 @fixtures.group()
@@ -234,4 +233,4 @@ def test_bus_events(group, user, line):
     with a.user_line(user, line):
         url = confd.groups(group['id']).members.users.put
         body = {'users': [user]}
-        yield s.check_bus_event, 'config.groups.members.users.updated', url, body
+        s.check_bus_event('config.groups.members.users.updated', url, body)

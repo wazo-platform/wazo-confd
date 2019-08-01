@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -13,25 +13,24 @@ FAKE_ID = 999999999
 
 def test_get_errors():
     fake_user = confd.users(FAKE_ID).fallbacks.get
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.user()
 def test_put_errors(user):
     fake_user = confd.users(FAKE_ID).fallbacks.put
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
     url = confd.users(user['uuid']).fallbacks.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
-        yield s.check_bogus_field_returns_error, url, 'busy_destination', destination
-        yield s.check_bogus_field_returns_error, url, 'congestion_destination', destination
-        yield s.check_bogus_field_returns_error, url, 'fail_destination', destination
+        s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
+        s.check_bogus_field_returns_error(url, 'busy_destination', destination)
+        s.check_bogus_field_returns_error(url, 'congestion_destination', destination)
+        s.check_bogus_field_returns_error(url, 'fail_destination', destination)
 
 
 @fixtures.user()
@@ -103,7 +102,7 @@ def test_edit_to_none(user):
 @fixtures.application()
 def test_valid_destinations(user, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_user_fallbacks_with_destination, user['uuid'], destination
+        _update_user_fallbacks_with_destination(user['uuid'], destination)
 
 
 def _update_user_fallbacks_with_destination(user_id, destination):
@@ -134,10 +133,10 @@ def test_nonexistent_destinations(user):
                                    'user',
                                    'voicemail',
                                    'conference'):
-            yield _update_user_fallbacks_with_nonexistent_destination, user['uuid'], destination
+            _update_user_fallbacks_with_nonexistent_destination(user['uuid'], destination)
 
         if destination['type'] == 'application' and destination['application'] == 'custom':
-            yield _update_user_fallbacks_with_nonexistent_destination, user['uuid'], destination
+            _update_user_fallbacks_with_nonexistent_destination(user['uuid'], destination)
 
 
 def _update_user_fallbacks_with_nonexistent_destination(user_id, destination):
@@ -151,7 +150,7 @@ def _update_user_fallbacks_with_nonexistent_destination(user_id, destination):
 @fixtures.user()
 def test_bus_events(user):
     url = confd.users(user['uuid']).fallbacks.put
-    yield s.check_bus_event, 'config.users.fallbacks.edited', url
+    s.check_bus_event('config.users.fallbacks.edited', url)
 
 
 @fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},

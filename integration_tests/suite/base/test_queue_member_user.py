@@ -31,20 +31,19 @@ def test_associate_errors(queue, user):
     fake_queue = confd.queues(FAKE_ID).members.users(user['id']).put
     fake_user = confd.queues(queue['id']).members.users(FAKE_UUID).put
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_user, 'User')
 
     url = confd.queues(queue['id']).members.users(user['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'priority', -1
-    yield s.check_bogus_field_returns_error, url, 'priority', None
-    yield s.check_bogus_field_returns_error, url, 'priority', 'string'
-    yield s.check_bogus_field_returns_error, url, 'priority', []
-    yield s.check_bogus_field_returns_error, url, 'priority', {}
+    s.check_bogus_field_returns_error(url, 'priority', -1)
+    s.check_bogus_field_returns_error(url, 'priority', None)
+    s.check_bogus_field_returns_error(url, 'priority', 'string')
+    s.check_bogus_field_returns_error(url, 'priority', [])
+    s.check_bogus_field_returns_error(url, 'priority', {})
 
 
 @fixtures.queue()
@@ -53,8 +52,8 @@ def test_dissociate_errors(queue, user):
     fake_queue = confd.queues(FAKE_ID).members.users(user['id']).delete
     fake_user = confd.queues(queue['id']).members.users(FAKE_UUID).delete
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.queue()
@@ -240,5 +239,5 @@ def test_delete_user_when_queue_and_user_associated(queue, user, line):
 def test_bus_events(queue, user, line):
     with a.user_line(user, line):
         url = confd.queues(queue['id']).members.users(user['uuid'])
-        yield s.check_bus_event, 'config.user_queue_association.created', url.put
-        yield s.check_bus_event, 'config.user_queue_association.deleted', url.delete
+        s.check_bus_event('config.user_queue_association.created', url.put)
+        s.check_bus_event('config.user_queue_association.deleted', url.delete)

@@ -26,8 +26,8 @@ def test_associate_errors(line, custom):
     fake_line = confd.lines(999999999).endpoints.custom(custom['id']).put
     fake_custom = confd.lines(line['id']).endpoints.custom(999999999).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.line()
@@ -36,16 +36,16 @@ def test_dissociate_errors(line, custom):
     fake_line = confd.lines(999999999).endpoints.custom(custom['id']).delete
     fake_custom = confd.lines(line['id']).endpoints.custom(999999999).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 def test_get_errors():
     fake_line = confd.lines(999999999).endpoints.custom.get
     fake_custom = confd.endpoints.custom(999999999).lines.get
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.line()

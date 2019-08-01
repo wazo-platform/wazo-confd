@@ -1,4 +1,4 @@
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -28,13 +28,13 @@ def test_associate_errors(user, voicemail):
 @fixtures.voicemail()
 def test_dissociate_errors(user, voicemail):
     fake_user = confd.users(FAKE_ID).voicemail.delete
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.user()
 def test_get_errors(user):
     fake_user = confd.users(FAKE_ID).voicemail.get
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.user()

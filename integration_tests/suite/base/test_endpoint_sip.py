@@ -1,4 +1,4 @@
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -100,69 +100,67 @@ ALL_OPTIONS = [
 
 def test_get_errors():
     fake_sip_get = confd.endpoints.sip(999999).get
-    yield s.check_resource_not_found, fake_sip_get, 'SIPEndpoint'
+    s.check_resource_not_found(fake_sip_get, 'SIPEndpoint')
 
 
 def test_post_errors():
     url = confd.endpoints.sip.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.sip()
 def test_put_errors(sip):
     url = confd.endpoints.sip(sip['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'username', None
-    yield s.check_bogus_field_returns_error, url, 'secret', None
-    yield s.check_bogus_field_returns_error, url, 'type', None
-    yield s.check_bogus_field_returns_error, url, 'host', None
-    yield s.check_bogus_field_returns_error, url, 'options', None
+    s.check_bogus_field_returns_error(url, 'username', None)
+    s.check_bogus_field_returns_error(url, 'secret', None)
+    s.check_bogus_field_returns_error(url, 'type', None)
+    s.check_bogus_field_returns_error(url, 'host', None)
+    s.check_bogus_field_returns_error(url, 'options', None)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'username', 123
-    yield s.check_bogus_field_returns_error, url, 'username', ']^',
-    yield s.check_bogus_field_returns_error, url, 'username', 'ûsername'
-    yield s.check_bogus_field_returns_error, url, 'username', [],
-    yield s.check_bogus_field_returns_error, url, 'username', {},
-    yield s.check_bogus_field_returns_error, url, 'secret', 'pâssword'
-    yield s.check_bogus_field_returns_error, url, 'secret', 123
-    yield s.check_bogus_field_returns_error, url, 'secret', True
-    yield s.check_bogus_field_returns_error, url, 'secret', []
-    yield s.check_bogus_field_returns_error, url, 'secret', {}
-    yield s.check_bogus_field_returns_error, url, 'type', 123
-    yield s.check_bogus_field_returns_error, url, 'type', 'invalid_choice'
-    yield s.check_bogus_field_returns_error, url, 'type', True
-    yield s.check_bogus_field_returns_error, url, 'type', []
-    yield s.check_bogus_field_returns_error, url, 'type', {}
-    yield s.check_bogus_field_returns_error, url, 'host', 123
-    yield s.check_bogus_field_returns_error, url, 'host', True
-    yield s.check_bogus_field_returns_error, url, 'host', []
-    yield s.check_bogus_field_returns_error, url, 'host', {}
-    yield s.check_bogus_field_returns_error, url, 'options', 123
-    yield s.check_bogus_field_returns_error, url, 'options', None
-    yield s.check_bogus_field_returns_error, url, 'options', {}
-    yield s.check_bogus_field_returns_error, url, 'options', 'string'
-    yield s.check_bogus_field_returns_error, url, 'options', [None]
-    yield s.check_bogus_field_returns_error, url, 'options', ['string', 'string']
-    yield s.check_bogus_field_returns_error, url, 'options', [123, 123]
-    yield s.check_bogus_field_returns_error, url, 'options', ['string', 123]
-    yield s.check_bogus_field_returns_error, url, 'options', [[]]
-    yield s.check_bogus_field_returns_error, url, 'options', [{'key': 'value'}]
-    yield s.check_bogus_field_returns_error, url, 'options', [['missing_value']]
-    yield s.check_bogus_field_returns_error, url, 'options', [['too', 'much', 'value']]
-    yield s.check_bogus_field_returns_error, url, 'options', [['wrong_value', 1234]]
-    yield s.check_bogus_field_returns_error, url, 'options', [['none_value', None]]
+    s.check_bogus_field_returns_error(url, 'username', 123)
+    s.check_bogus_field_returns_error(url, 'username', ']^',)
+    s.check_bogus_field_returns_error(url, 'username', 'ûsername')
+    s.check_bogus_field_returns_error(url, 'username', [],)
+    s.check_bogus_field_returns_error(url, 'username', {},)
+    s.check_bogus_field_returns_error(url, 'secret', 'pâssword')
+    s.check_bogus_field_returns_error(url, 'secret', 123)
+    s.check_bogus_field_returns_error(url, 'secret', True)
+    s.check_bogus_field_returns_error(url, 'secret', [])
+    s.check_bogus_field_returns_error(url, 'secret', {})
+    s.check_bogus_field_returns_error(url, 'type', 123)
+    s.check_bogus_field_returns_error(url, 'type', 'invalid_choice')
+    s.check_bogus_field_returns_error(url, 'type', True)
+    s.check_bogus_field_returns_error(url, 'type', [])
+    s.check_bogus_field_returns_error(url, 'type', {})
+    s.check_bogus_field_returns_error(url, 'host', 123)
+    s.check_bogus_field_returns_error(url, 'host', True)
+    s.check_bogus_field_returns_error(url, 'host', [])
+    s.check_bogus_field_returns_error(url, 'host', {})
+    s.check_bogus_field_returns_error(url, 'options', 123)
+    s.check_bogus_field_returns_error(url, 'options', None)
+    s.check_bogus_field_returns_error(url, 'options', {})
+    s.check_bogus_field_returns_error(url, 'options', 'string')
+    s.check_bogus_field_returns_error(url, 'options', [None])
+    s.check_bogus_field_returns_error(url, 'options', ['string', 'string'])
+    s.check_bogus_field_returns_error(url, 'options', [123, 123])
+    s.check_bogus_field_returns_error(url, 'options', ['string', 123])
+    s.check_bogus_field_returns_error(url, 'options', [[]])
+    s.check_bogus_field_returns_error(url, 'options', [{'key': 'value'}])
+    s.check_bogus_field_returns_error(url, 'options', [['missing_value']])
+    s.check_bogus_field_returns_error(url, 'options', [['too', 'much', 'value']])
+    s.check_bogus_field_returns_error(url, 'options', [['wrong_value', 1234]])
+    s.check_bogus_field_returns_error(url, 'options', [['none_value', None]])
 
 
 @fixtures.sip()
 def test_delete_errors(sip):
     url = confd.endpoints.sip(sip['id'])
     url.delete()
-    yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+    s.check_resource_not_found(url.get, 'SIPEndpoint')
 
 
 @fixtures.sip(wazo_tenant=MAIN_TENANT)

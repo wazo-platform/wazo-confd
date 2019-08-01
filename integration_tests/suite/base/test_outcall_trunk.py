@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -31,24 +31,23 @@ def test_associate_errors(outcall, trunk):
     response.assert_status(404)
 
     url = confd.outcalls(outcall['id']).trunks().put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'trunks', 123
-    yield s.check_bogus_field_returns_error, url, 'trunks', None
-    yield s.check_bogus_field_returns_error, url, 'trunks', True
-    yield s.check_bogus_field_returns_error, url, 'trunks', 'string'
-    yield s.check_bogus_field_returns_error, url, 'trunks', [123]
-    yield s.check_bogus_field_returns_error, url, 'trunks', [None]
-    yield s.check_bogus_field_returns_error, url, 'trunks', ['string']
-    yield s.check_bogus_field_returns_error, url, 'trunks', [{}]
-    yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': None}]
-    yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': 'string'}]
-    yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': 1}, {'id': None}]
-    yield s.check_bogus_field_returns_error, url, 'trunks', [{'not_id': 123}]
-    yield s.check_bogus_field_returns_error, url, 'trunks', [{'id': FAKE_ID}]
+    s.check_bogus_field_returns_error(url, 'trunks', 123)
+    s.check_bogus_field_returns_error(url, 'trunks', None)
+    s.check_bogus_field_returns_error(url, 'trunks', True)
+    s.check_bogus_field_returns_error(url, 'trunks', 'string')
+    s.check_bogus_field_returns_error(url, 'trunks', [123])
+    s.check_bogus_field_returns_error(url, 'trunks', [None])
+    s.check_bogus_field_returns_error(url, 'trunks', ['string'])
+    s.check_bogus_field_returns_error(url, 'trunks', [{}])
+    s.check_bogus_field_returns_error(url, 'trunks', [{'id': None}])
+    s.check_bogus_field_returns_error(url, 'trunks', [{'id': 'string'}])
+    s.check_bogus_field_returns_error(url, 'trunks', [{'id': 1}, {'id': None}])
+    s.check_bogus_field_returns_error(url, 'trunks', [{'not_id': 123}])
+    s.check_bogus_field_returns_error(url, 'trunks', [{'id': FAKE_ID}])
 
 
 @fixtures.outcall()
@@ -153,13 +152,13 @@ def test_delete_outcall_when_outcall_and_trunk_associated(outcall, trunk1, trunk
         confd.outcalls(outcall['id']).delete().assert_deleted()
 
         deleted_outcall = confd.outcalls(outcall['id']).get
-        yield s.check_resource_not_found, deleted_outcall, 'Outcall'
+        s.check_resource_not_found(deleted_outcall, 'Outcall')
 
         response = confd.trunks(trunk1['id']).get()
-        yield assert_that, response.item['outcalls'], empty()
+        assert_that(response.item['outcalls'], empty())
 
         response = confd.trunks(trunk2['id']).get()
-        yield assert_that, response.item['outcalls'], empty()
+        assert_that(response.item['outcalls'], empty())
 
 
 @fixtures.outcall()
@@ -170,10 +169,10 @@ def test_delete_trunk_when_outcall_and_trunk_associated(outcall1, outcall2, trun
         confd.trunks(trunk['id']).delete().assert_deleted()
 
         deleted_trunk = confd.trunks(trunk['id']).get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
 
         response = confd.outcalls(outcall1['id']).get()
-        yield assert_that, response.item['trunks'], empty()
+        assert_that(response.item['trunks'], empty())
 
         response = confd.outcalls(outcall2['id']).get()
-        yield assert_that, response.item['trunks'], empty()
+        assert_that(response.item['trunks'], empty())

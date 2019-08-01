@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -24,24 +24,23 @@ def test_associate_errors(context):
     response.assert_status(404)
 
     url = confd.contexts(context['id']).contexts().put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'contexts', 123
-    yield s.check_bogus_field_returns_error, url, 'contexts', None
-    yield s.check_bogus_field_returns_error, url, 'contexts', True
-    yield s.check_bogus_field_returns_error, url, 'contexts', 'string'
-    yield s.check_bogus_field_returns_error, url, 'contexts', [123]
-    yield s.check_bogus_field_returns_error, url, 'contexts', [None]
-    yield s.check_bogus_field_returns_error, url, 'contexts', ['string']
-    yield s.check_bogus_field_returns_error, url, 'contexts', [{}]
-    yield s.check_bogus_field_returns_error, url, 'contexts', [{'id': None}]
-    yield s.check_bogus_field_returns_error, url, 'contexts', [{'id': 'string'}]
-    yield s.check_bogus_field_returns_error, url, 'contexts', [{'id': 1}, {'id': None}]
-    yield s.check_bogus_field_returns_error, url, 'contexts', [{'not_id': 123}]
-    yield s.check_bogus_field_returns_error, url, 'contexts', [{'id': FAKE_ID}]
+    s.check_bogus_field_returns_error(url, 'contexts', 123)
+    s.check_bogus_field_returns_error(url, 'contexts', None)
+    s.check_bogus_field_returns_error(url, 'contexts', True)
+    s.check_bogus_field_returns_error(url, 'contexts', 'string')
+    s.check_bogus_field_returns_error(url, 'contexts', [123])
+    s.check_bogus_field_returns_error(url, 'contexts', [None])
+    s.check_bogus_field_returns_error(url, 'contexts', ['string'])
+    s.check_bogus_field_returns_error(url, 'contexts', [{}])
+    s.check_bogus_field_returns_error(url, 'contexts', [{'id': None}])
+    s.check_bogus_field_returns_error(url, 'contexts', [{'id': 'string'}])
+    s.check_bogus_field_returns_error(url, 'contexts', [{'id': 1}, {'id': None}])
+    s.check_bogus_field_returns_error(url, 'contexts', [{'not_id': 123}])
+    s.check_bogus_field_returns_error(url, 'contexts', [{'id': FAKE_ID}])
 
 
 @fixtures.context()
@@ -125,7 +124,7 @@ def test_delete_context_when_context_and_sub_context_associated(context, sub_con
         confd.contexts(context['id']).delete().assert_deleted()
 
         deleted_context = confd.contexts(context['id']).get
-        yield s.check_resource_not_found, deleted_context, 'Context'
+        s.check_resource_not_found(deleted_context, 'Context')
 
 
 @fixtures.context()
@@ -136,10 +135,10 @@ def test_delete_sub_context_when_context_and_sub_context_associated(context1, co
         confd.contexts(sub_context['id']).delete().assert_deleted()
 
         deleted_sub_context = confd.contexts(sub_context['id']).get
-        yield s.check_resource_not_found, deleted_sub_context, 'Context'
+        s.check_resource_not_found(deleted_sub_context, 'Context')
 
         response = confd.contexts(context1['id']).get()
-        yield assert_that, response.item['contexts'], empty()
+        assert_that(response.item['contexts'], empty())
 
         response = confd.contexts(context2['id']).get()
-        yield assert_that, response.item['contexts'], empty()
+        assert_that(response.item['contexts'], empty())

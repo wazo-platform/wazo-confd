@@ -29,8 +29,8 @@ def test_associate_errors(line, application):
     fake_line = confd.lines(FAKE_ID).applications(application['uuid']).put
     fake_application = confd.lines(line['id']).applications(FAKE_UUID).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_application, 'Application'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_application, 'Application')
 
 
 @fixtures.line()
@@ -39,8 +39,8 @@ def test_dissociate_errors(line, application):
     fake_line = confd.lines(FAKE_ID).applications(application['uuid']).delete
     fake_application = confd.lines(line['id']).applications(FAKE_UUID).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_application, 'Application'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_application, 'Application')
 
 
 @fixtures.line()
@@ -171,6 +171,6 @@ def test_delete_application_when_line_and_application_associated(line, applicati
 def test_bus_events(line, application):
     url = confd.lines(line['id']).applications(application['uuid'])
     routing_key = 'config.lines.{}.applications.{}.updated'.format(line['id'], application['uuid'])
-    yield s.check_bus_event, routing_key, url.put
+    s.check_bus_event(routing_key, url.put)
     routing_key = 'config.lines.{}.applications.{}.deleted'.format(line['id'], application['uuid'])
-    yield s.check_bus_event, routing_key, url.delete
+    s.check_bus_event(routing_key, url.delete)

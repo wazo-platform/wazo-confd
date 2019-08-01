@@ -28,12 +28,12 @@ def test_associate_errors(line, extension):
 @f.extension()
 def test_dissociate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extension.delete
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 def test_get_errors():
     fake_line = confd.lines(FAKE_ID).extension.get
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 @f.extension()

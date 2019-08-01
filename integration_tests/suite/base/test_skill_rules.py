@@ -28,46 +28,44 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_skill = confd.queues.skillrules(999999).get
-    yield s.check_resource_not_found, fake_skill, 'SkillRule'
+    s.check_resource_not_found(fake_skill, 'SkillRule')
 
 
 def test_delete_errors():
     fake_skill = confd.queues.skillrules(999999).delete
-    yield s.check_resource_not_found, fake_skill, 'SkillRule'
+    s.check_resource_not_found(fake_skill, 'SkillRule')
 
 
 def test_post_errors():
     url = confd.queues.skillrules.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.skill_rule()
 def test_put_errors(skill):
     url = confd.queues.skillrules(skill['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(65)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'rules', True
-    yield s.check_bogus_field_returns_error, url, 'rules', 1234
-    yield s.check_bogus_field_returns_error, url, 'rules', {}
-    yield s.check_bogus_field_returns_error, url, 'rules', 'string'
-    yield s.check_bogus_field_returns_error, url, 'rules', ['string']
-    yield s.check_bogus_field_returns_error, url, 'rules', [{}]
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(65))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'rules', True)
+    s.check_bogus_field_returns_error(url, 'rules', 1234)
+    s.check_bogus_field_returns_error(url, 'rules', {})
+    s.check_bogus_field_returns_error(url, 'rules', 'string')
+    s.check_bogus_field_returns_error(url, 'rules', ['string'])
+    s.check_bogus_field_returns_error(url, 'rules', [{}])
 
     regex = r'rules.*definition'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': True}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': 1234}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': []}], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'rules', [{'definition': {}}], regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'rules', [{'definition': True}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'rules', [{'definition': 1234}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'rules', [{'definition': []}], regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'rules', [{'definition': {}}], regex)
 
 
 @fixtures.skill_rule(name='search')
@@ -77,7 +75,7 @@ def test_search(skill, hidden):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, skill, hidden, field, term
+        check_search(url, skill, hidden, field, term)
 
 
 def check_search(url, skill, hidden, field, term):
@@ -121,12 +119,12 @@ def test_list_multi_tenant(main, sub):
 @fixtures.skill_rule(name='sort2')
 def test_sort_offset_limit(skill1, skill2):
     url = confd.queues.skillrules.get
-    yield s.check_sorting, url, skill1, skill2, 'name', 'sort'
+    s.check_sorting(url, skill1, skill2, 'name', 'sort')
 
-    yield s.check_offset, url, skill1, skill2, 'name', 'sort'
-    yield s.check_offset_legacy, url, skill1, skill2, 'name', 'sort'
+    s.check_offset(url, skill1, skill2, 'name', 'sort')
+    s.check_offset_legacy(url, skill1, skill2, 'name', 'sort')
 
-    yield s.check_limit, url, skill1, skill2, 'name', 'sort'
+    s.check_limit(url, skill1, skill2, 'name', 'sort')
 
 
 @fixtures.skill_rule()
@@ -231,6 +229,6 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.skill_rule()
 def test_bus_events(skill_rule):
     required_body = {'name': 'SkillRule'}
-    yield s.check_bus_event, 'config.queues.skillrules.created', confd.queues.skillrules.post, required_body
-    yield s.check_bus_event, 'config.queues.skillrules.edited', confd.queues.skillrules(skill_rule['id']).put
-    yield s.check_bus_event, 'config.queues.skillrules.deleted', confd.queues.skillrules(skill_rule['id']).delete
+    s.check_bus_event('config.queues.skillrules.created', confd.queues.skillrules.post, required_body)
+    s.check_bus_event('config.queues.skillrules.edited', confd.queues.skillrules(skill_rule['id']).put)
+    s.check_bus_event('config.queues.skillrules.deleted', confd.queues.skillrules(skill_rule['id']).delete)

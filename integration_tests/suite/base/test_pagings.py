@@ -27,70 +27,67 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_paging = confd.pagings(999999).get
-    yield s.check_resource_not_found, fake_paging, 'Paging'
+    s.check_resource_not_found(fake_paging, 'Paging')
 
 
 def test_delete_errors():
     fake_paging = confd.pagings(999999).delete
-    yield s.check_resource_not_found, fake_paging, 'Paging'
+    s.check_resource_not_found(fake_paging, 'Paging')
 
 
 def test_post_errors():
     url = confd.pagings.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.paging()
 def test_put_errors(paging):
     url = confd.pagings(paging['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'number', True
-    yield s.check_bogus_field_returns_error, url, 'number', 123
-    yield s.check_bogus_field_returns_error, url, 'number', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'number', []
-    yield s.check_bogus_field_returns_error, url, 'number', {}
-    yield s.check_bogus_field_returns_error, url, 'announce_caller', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'announce_caller', None
-    yield s.check_bogus_field_returns_error, url, 'announce_caller', []
-    yield s.check_bogus_field_returns_error, url, 'announce_caller', {}
-    yield s.check_bogus_field_returns_error, url, 'announce_sound', True
-    yield s.check_bogus_field_returns_error, url, 'announce_sound', 1234
-    yield s.check_bogus_field_returns_error, url, 'announce_sound', []
-    yield s.check_bogus_field_returns_error, url, 'announce_sound', {}
-    yield s.check_bogus_field_returns_error, url, 'duplex', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'duplex', None
-    yield s.check_bogus_field_returns_error, url, 'duplex', []
-    yield s.check_bogus_field_returns_error, url, 'duplex', {}
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', None
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', []
-    yield s.check_bogus_field_returns_error, url, 'ignore_forward', {}
-    yield s.check_bogus_field_returns_error, url, 'record', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'record', None
-    yield s.check_bogus_field_returns_error, url, 'record', []
-    yield s.check_bogus_field_returns_error, url, 'record', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'number', True)
+    s.check_bogus_field_returns_error(url, 'number', 123)
+    s.check_bogus_field_returns_error(url, 'number', 'invalid')
+    s.check_bogus_field_returns_error(url, 'number', [])
+    s.check_bogus_field_returns_error(url, 'number', {})
+    s.check_bogus_field_returns_error(url, 'announce_caller', 'invalid')
+    s.check_bogus_field_returns_error(url, 'announce_caller', None)
+    s.check_bogus_field_returns_error(url, 'announce_caller', [])
+    s.check_bogus_field_returns_error(url, 'announce_caller', {})
+    s.check_bogus_field_returns_error(url, 'announce_sound', True)
+    s.check_bogus_field_returns_error(url, 'announce_sound', 1234)
+    s.check_bogus_field_returns_error(url, 'announce_sound', [])
+    s.check_bogus_field_returns_error(url, 'announce_sound', {})
+    s.check_bogus_field_returns_error(url, 'duplex', 'invalid')
+    s.check_bogus_field_returns_error(url, 'duplex', None)
+    s.check_bogus_field_returns_error(url, 'duplex', [])
+    s.check_bogus_field_returns_error(url, 'duplex', {})
+    s.check_bogus_field_returns_error(url, 'ignore_forward', 'invalid')
+    s.check_bogus_field_returns_error(url, 'ignore_forward', None)
+    s.check_bogus_field_returns_error(url, 'ignore_forward', [])
+    s.check_bogus_field_returns_error(url, 'ignore_forward', {})
+    s.check_bogus_field_returns_error(url, 'record', 'invalid')
+    s.check_bogus_field_returns_error(url, 'record', None)
+    s.check_bogus_field_returns_error(url, 'record', [])
+    s.check_bogus_field_returns_error(url, 'record', {})
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.paging(number='123')
 def unique_error_checks(url, paging):
-    yield s.check_bogus_field_returns_error, url, 'number', paging['number']
+    s.check_bogus_field_returns_error(url, 'number', paging['number'])
 
 
 @fixtures.paging(name='search', number='123', announce_sound='search')
@@ -104,7 +101,7 @@ def test_search(paging, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, paging, hidden, field, term
+        check_search(url, paging, hidden, field, term)
 
 
 def check_search(url, paging, hidden, field, term):
@@ -121,12 +118,12 @@ def check_search(url, paging, hidden, field, term):
 @fixtures.paging(name='sort2')
 def test_sort_offset_limit(paging1, paging2):
     url = confd.pagings.get
-    yield s.check_sorting, url, paging1, paging2, 'name', 'sort'
+    s.check_sorting(url, paging1, paging2, 'name', 'sort')
 
-    yield s.check_offset, url, paging1, paging2, 'name', 'sort'
-    yield s.check_offset_legacy, url, paging1, paging2, 'name', 'sort'
+    s.check_offset(url, paging1, paging2, 'name', 'sort')
+    s.check_offset_legacy(url, paging1, paging2, 'name', 'sort')
 
-    yield s.check_limit, url, paging1, paging2, 'name', 'sort'
+    s.check_limit(url, paging1, paging2, 'name', 'sort')
 
 
 @fixtures.paging(wazo_tenant=MAIN_TENANT)
@@ -269,6 +266,6 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.paging()
 def test_bus_events(paging):
-    yield s.check_bus_event, 'config.pagings.created', confd.pagings.post, {'number': '666'}
-    yield s.check_bus_event, 'config.pagings.edited', confd.pagings(paging['id']).put
-    yield s.check_bus_event, 'config.pagings.deleted', confd.pagings(paging['id']).delete
+    s.check_bus_event('config.pagings.created', confd.pagings.post, {'number': '666'})
+    s.check_bus_event('config.pagings.edited', confd.pagings(paging['id']).put)
+    s.check_bus_event('config.pagings.deleted', confd.pagings(paging['id']).delete)

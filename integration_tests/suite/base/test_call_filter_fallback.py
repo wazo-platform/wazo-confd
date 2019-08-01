@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -24,22 +24,21 @@ FAKE_ID = 999999999
 
 def test_get_errors():
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.get
-    yield s.check_resource_not_found, fake_call_filter, 'CallFilter'
+    s.check_resource_not_found(fake_call_filter, 'CallFilter')
 
 
 @fixtures.call_filter()
 def test_put_errors(call_filter):
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.put
-    yield s.check_resource_not_found, fake_call_filter, 'CallFilter'
+    s.check_resource_not_found(fake_call_filter, 'CallFilter')
 
     url = confd.callfilters(call_filter['id']).fallbacks.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+        s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
 
 
 @fixtures.call_filter()
@@ -115,7 +114,7 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.application()
 def test_valid_destinations(call_filter, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_call_filter_fallbacks_with_destination, call_filter['id'], destination
+        _update_call_filter_fallbacks_with_destination(call_filter['id'], destination)
 
 
 def _update_call_filter_fallbacks_with_destination(call_filter_id, destination):
@@ -140,10 +139,10 @@ def test_nonexistent_destinations(call_filter):
                                    'user',
                                    'voicemail',
                                    'conference'):
-            yield _update_user_fallbacks_with_nonexistent_destination, call_filter['id'], destination
+            _update_user_fallbacks_with_nonexistent_destination(call_filter['id'], destination)
 
         if destination['type'] == 'application' and destination['application'] == 'custom':
-            yield _update_user_fallbacks_with_nonexistent_destination, call_filter['id'], destination
+            _update_user_fallbacks_with_nonexistent_destination(call_filter['id'], destination)
 
 
 def _update_user_fallbacks_with_nonexistent_destination(call_filter_id, destination):
@@ -154,7 +153,7 @@ def _update_user_fallbacks_with_nonexistent_destination(call_filter_id, destinat
 @fixtures.call_filter()
 def test_bus_events(call_filter):
     url = confd.callfilters(call_filter['id']).fallbacks.put
-    yield s.check_bus_event, 'config.callfilters.fallbacks.edited', url
+    s.check_bus_event('config.callfilters.fallbacks.edited', url)
 
 
 @fixtures.call_filter()

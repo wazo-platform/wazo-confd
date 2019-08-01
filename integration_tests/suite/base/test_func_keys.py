@@ -107,37 +107,37 @@ invalid_destinations = [
 
 
 def error_funckey_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'blf', 123
-    yield s.check_bogus_field_returns_error, url, 'blf', 'string'
-    yield s.check_bogus_field_returns_error, url, 'blf', None
-    yield s.check_bogus_field_returns_error, url, 'label', 1234
+    s.check_bogus_field_returns_error(url, 'blf', 123)
+    s.check_bogus_field_returns_error(url, 'blf', 'string')
+    s.check_bogus_field_returns_error(url, 'blf', None)
+    s.check_bogus_field_returns_error(url, 'label', 1234)
 
     for destination in invalid_destinations:
-        yield s.check_bogus_field_returns_error, url, 'destination', destination
+        s.check_bogus_field_returns_error(url, 'destination', destination)
 
 
 def error_funckeys_checks(url):
     valid_funckey = {'destination': {'type': 'custom', 'exten': '1234'}}
 
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'keys', True
-    yield s.check_bogus_field_returns_error, url, 'keys', None
-    yield s.check_bogus_field_returns_error, url, 'keys', 'string'
-    yield s.check_bogus_field_returns_error, url, 'keys', 1234
-    yield s.check_bogus_field_returns_error, url, 'keys', {'not_integer': valid_funckey}
-    yield s.check_bogus_field_returns_error, url, 'keys', {None: valid_funckey}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'keys', True)
+    s.check_bogus_field_returns_error(url, 'keys', None)
+    s.check_bogus_field_returns_error(url, 'keys', 'string')
+    s.check_bogus_field_returns_error(url, 'keys', 1234)
+    s.check_bogus_field_returns_error(url, 'keys', {'not_integer': valid_funckey})
+    s.check_bogus_field_returns_error(url, 'keys', {None: valid_funckey})
 
     regex = r'keys.*1.*destination'
     for destination in invalid_destinations:
-        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
+        s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': {'destination': destination}}, regex)
 
     regex = r'keys.*1'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 'string'}, regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': 1234}, regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': True}, regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': None}, regex
+    s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': 'string'}, regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': 1234}, regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': True}, regex)
+    s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': None}, regex)
 
 
 class BaseTestFuncKey(unittest.TestCase):

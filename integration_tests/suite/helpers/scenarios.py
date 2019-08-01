@@ -1,4 +1,4 @@
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -55,14 +55,14 @@ def check_bus_event(routing_key, url, body=None):
 
 
 def search_error_checks(url):
-    yield check_bogus_query_string_returns_error, url, 'order', 'invalid_column'
-    yield check_bogus_query_string_returns_error, url, 'direction', 'invalid'
-    yield check_bogus_query_string_returns_error, url, 'limit', -42
-    yield check_bogus_query_string_returns_error, url, 'limit', 'invalid'
-    yield check_bogus_query_string_returns_error, url, 'skip', -42
-    yield check_bogus_query_string_returns_error, url, 'skip', 'invalid'
-    yield check_bogus_query_string_returns_error, url, 'offset', -42
-    yield check_bogus_query_string_returns_error, url, 'offset', 'invalid'
+    check_bogus_query_string_returns_error(url, 'order', 'invalid_column')
+    check_bogus_query_string_returns_error(url, 'direction', 'invalid')
+    check_bogus_query_string_returns_error(url, 'limit', -42)
+    check_bogus_query_string_returns_error(url, 'limit', 'invalid')
+    check_bogus_query_string_returns_error(url, 'skip', -42)
+    check_bogus_query_string_returns_error(url, 'skip', 'invalid')
+    check_bogus_query_string_returns_error(url, 'offset', -42)
+    check_bogus_query_string_returns_error(url, 'offset', 'invalid')
 
 
 def check_bogus_query_string_returns_error(request, query_string, bogus):

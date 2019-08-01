@@ -29,40 +29,38 @@ invalid_template_destinations = [
 
 def test_get_errors():
     fake_get = confd.funckeys.templates(999999).get
-    yield s.check_resource_not_found, fake_get, 'FuncKeyTemplate'
+    s.check_resource_not_found(fake_get, 'FuncKeyTemplate')
 
 
 def test_post_errors():
     url = confd.funckeys.templates.post
-    for check in error_funckeys_checks(url):
-        yield check
+    error_funckeys_checks(url)
 
     regex = r'keys.*1.*destination.*type'
     for destination in invalid_template_destinations:
-        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
+        s.check_bogus_field_returns_error_matching_regex(url, 'keys', {'1': {'destination': destination}}, regex)
 
 
 @fixtures.funckey_template()
 def test_get_position_errors(funckey_template):
     fake_get = confd.funckeys.templates(funckey_template['id'])(1).get
-    yield s.check_resource_not_found, fake_get, 'FuncKey'
+    s.check_resource_not_found(fake_get, 'FuncKey')
 
 
 # Should raise an error
 # @fixtures.funckey_template()
 # def test_delete_position_errors(funckey_template):
 #     fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
-#     yield s.check_resource_not_found, fake_delete, 'FuncKey'
+#     s.check_resource_not_found(fake_delete, 'FuncKey')
 
 
 @fixtures.funckey_template()
 def test_put_position_errors(funckey_template):
     url = confd.funckeys.templates(funckey_template['id'])(1).put
-    for check in error_funckey_checks(url):
-        yield check
+    error_funckey_checks(url)
 
     for destination in invalid_template_destinations:
-        yield s.check_bogus_field_returns_error, url, 'destination', destination
+        s.check_bogus_field_returns_error(url, 'destination', destination)
 
 
 @fixtures.funckey_template(name="search")
@@ -72,7 +70,7 @@ def test_search_on_funckey_template(funckey_template, hidden):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, funckey_template, hidden, field, term
+        check_search(url, funckey_template, hidden, field, term)
 
 
 def check_search(url, funckey_template, hidden, field, term):
@@ -84,7 +82,7 @@ def check_search(url, funckey_template, hidden, field, term):
 @fixtures.funckey_template(name='sort1')
 @fixtures.funckey_template(name='sort2')
 def test_funckey_template_sorting(funckey_template1, funckey_template2):
-    yield check_funckey_template_sorting, funckey_template1, funckey_template2, 'name', 'sort'
+    check_funckey_template_sorting(funckey_template1, funckey_template2, 'name', 'sort')
 
 
 def check_funckey_template_sorting(funckey_template1, funckey_template2, field, search):

@@ -28,79 +28,77 @@ from ..helpers.helpers.destination import invalid_destinations, valid_destinatio
 
 def test_get_errors():
     fake_ivr = confd.ivr(999999).get
-    yield s.check_resource_not_found, fake_ivr, 'IVR'
+    s.check_resource_not_found(fake_ivr, 'IVR')
 
 
 def test_delete_errors():
     fake_ivr = confd.ivr(999999).delete
-    yield s.check_resource_not_found, fake_ivr, 'IVR'
+    s.check_resource_not_found(fake_ivr, 'IVR')
 
 
 def test_post_errors():
     url = confd.ivr.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.ivr()
 def test_put_errors(ivr):
     url = confd.ivr(ivr['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'abort_sound', True
-    yield s.check_bogus_field_returns_error, url, 'abort_sound', 123
-    yield s.check_bogus_field_returns_error, url, 'abort_sound', s.random_string(256)
-    yield s.check_bogus_field_returns_error, url, 'abort_sound', []
-    yield s.check_bogus_field_returns_error, url, 'abort_sound', {}
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', True
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', 123
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', s.random_string(256)
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', []
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', {}
-    yield s.check_bogus_field_returns_error, url, 'invalid_sound', True
-    yield s.check_bogus_field_returns_error, url, 'invalid_sound', 123
-    yield s.check_bogus_field_returns_error, url, 'invalid_sound', s.random_string(256)
-    yield s.check_bogus_field_returns_error, url, 'invalid_sound', []
-    yield s.check_bogus_field_returns_error, url, 'invalid_sound', {}
-    yield s.check_bogus_field_returns_error, url, 'menu_sound', True
-    yield s.check_bogus_field_returns_error, url, 'menu_sound', 123
-    yield s.check_bogus_field_returns_error, url, 'menu_sound', s.random_string(256)
-    yield s.check_bogus_field_returns_error, url, 'menu_sound', []
-    yield s.check_bogus_field_returns_error, url, 'menu_sound', {}
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'max_tries', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'max_tries', 0
-    yield s.check_bogus_field_returns_error, url, 'max_tries', []
-    yield s.check_bogus_field_returns_error, url, 'max_tries', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'timeout', []
-    yield s.check_bogus_field_returns_error, url, 'timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'description', 1234
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'choices', True
-    yield s.check_bogus_field_returns_error, url, 'choices', 123
-    yield s.check_bogus_field_returns_error, url, 'choices', {}
-    yield s.check_bogus_field_returns_error, url, 'choices', ['invalid']
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'destination': {'type': 'none'}}]
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': '1'}]
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': 123, 'destination': {'type': 'none'}}]
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': '1', 'destination': 'invalid'}]
+    s.check_bogus_field_returns_error(url, 'abort_sound', True)
+    s.check_bogus_field_returns_error(url, 'abort_sound', 123)
+    s.check_bogus_field_returns_error(url, 'abort_sound', s.random_string(256))
+    s.check_bogus_field_returns_error(url, 'abort_sound', [])
+    s.check_bogus_field_returns_error(url, 'abort_sound', {})
+    s.check_bogus_field_returns_error(url, 'greeting_sound', True)
+    s.check_bogus_field_returns_error(url, 'greeting_sound', 123)
+    s.check_bogus_field_returns_error(url, 'greeting_sound', s.random_string(256))
+    s.check_bogus_field_returns_error(url, 'greeting_sound', [])
+    s.check_bogus_field_returns_error(url, 'greeting_sound', {})
+    s.check_bogus_field_returns_error(url, 'invalid_sound', True)
+    s.check_bogus_field_returns_error(url, 'invalid_sound', 123)
+    s.check_bogus_field_returns_error(url, 'invalid_sound', s.random_string(256))
+    s.check_bogus_field_returns_error(url, 'invalid_sound', [])
+    s.check_bogus_field_returns_error(url, 'invalid_sound', {})
+    s.check_bogus_field_returns_error(url, 'menu_sound', True)
+    s.check_bogus_field_returns_error(url, 'menu_sound', 123)
+    s.check_bogus_field_returns_error(url, 'menu_sound', s.random_string(256))
+    s.check_bogus_field_returns_error(url, 'menu_sound', [])
+    s.check_bogus_field_returns_error(url, 'menu_sound', {})
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'max_tries', 'invalid')
+    s.check_bogus_field_returns_error(url, 'max_tries', 0)
+    s.check_bogus_field_returns_error(url, 'max_tries', [])
+    s.check_bogus_field_returns_error(url, 'max_tries', {})
+    s.check_bogus_field_returns_error(url, 'timeout', 'invalid')
+    s.check_bogus_field_returns_error(url, 'timeout', -1)
+    s.check_bogus_field_returns_error(url, 'timeout', [])
+    s.check_bogus_field_returns_error(url, 'timeout', {})
+    s.check_bogus_field_returns_error(url, 'description', 1234)
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'choices', True)
+    s.check_bogus_field_returns_error(url, 'choices', 123)
+    s.check_bogus_field_returns_error(url, 'choices', {})
+    s.check_bogus_field_returns_error(url, 'choices', ['invalid'])
+    s.check_bogus_field_returns_error(url, 'choices', [{'destination': {'type': 'none'}}])
+    s.check_bogus_field_returns_error(url, 'choices', [{'exten': '1'}])
+    s.check_bogus_field_returns_error(url, 'choices', [{'exten': 123, 'destination': {'type': 'none'}}])
+    s.check_bogus_field_returns_error(url, 'choices', [{'exten': '1', 'destination': 'invalid'}])
 
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'invalid_destination', destination
+        s.check_bogus_field_returns_error(url, 'invalid_destination', destination)
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'timeout_destination', destination
+        s.check_bogus_field_returns_error(url, 'timeout_destination', destination)
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'abort_destination', destination
+        s.check_bogus_field_returns_error(url, 'abort_destination', destination)
 
 
 @fixtures.ivr(wazo_tenant=MAIN_TENANT)
@@ -132,7 +130,7 @@ def test_search(ivr, hidden):
     searches = {'description': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, ivr, hidden, field, term
+        check_search(url, ivr, hidden, field, term)
 
 
 def check_search(url, ivr, hidden, field, term):
@@ -149,12 +147,12 @@ def check_search(url, ivr, hidden, field, term):
 @fixtures.ivr(description='sort2')
 def test_sorting_offset_limit(ivr1, ivr2):
     url = confd.ivr.get
-    yield s.check_sorting, url, ivr1, ivr2, 'description', 'sort'
+    s.check_sorting(url, ivr1, ivr2, 'description', 'sort')
 
-    yield s.check_offset, url, ivr1, ivr2, 'description', 'sort'
-    yield s.check_offset_legacy, url, ivr1, ivr2, 'description', 'sort'
+    s.check_offset(url, ivr1, ivr2, 'description', 'sort')
+    s.check_offset_legacy(url, ivr1, ivr2, 'description', 'sort')
 
-    yield s.check_limit, url, ivr1, ivr2, 'description', 'sort'
+    s.check_limit(url, ivr1, ivr2, 'description', 'sort')
 
 
 @fixtures.ivr()
@@ -277,8 +275,8 @@ def test_edit_all_parameters(ivr):
 @fixtures.application()
 def test_valid_destinations(ivr, *destinations):
     for destination in valid_destinations(*destinations):
-        yield create_ivr_with_destination, destination
-        yield update_ivr_with_destination, ivr['id'], destination
+        create_ivr_with_destination(destination)
+        update_ivr_with_destination(ivr['id'], destination)
 
 
 def create_ivr_with_destination(destination):
@@ -324,6 +322,6 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.ivr()
 def test_bus_events(ivr):
-    yield s.check_bus_event, 'config.ivr.created', confd.ivr.post, {'name': 'a', 'menu_sound': 'hello'}
-    yield s.check_bus_event, 'config.ivr.edited', confd.ivr(ivr['id']).put
-    yield s.check_bus_event, 'config.ivr.deleted', confd.ivr(ivr['id']).delete
+    s.check_bus_event('config.ivr.created', confd.ivr.post, {'name': 'a', 'menu_sound': 'hello'})
+    s.check_bus_event('config.ivr.edited', confd.ivr(ivr['id']).put)
+    s.check_bus_event('config.ivr.deleted', confd.ivr(ivr['id']).delete)

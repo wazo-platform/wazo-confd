@@ -27,8 +27,8 @@ def test_associate_errors(trunk, sip):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['id']).put
     fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.trunk()
@@ -37,16 +37,16 @@ def test_dissociate_errors(trunk, sip):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['id']).delete
     fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 def test_get_errors():
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip.get
     fake_sip = confd.endpoints.sip(FAKE_ID).trunks.get
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.trunk()
@@ -210,8 +210,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, sip):
 
         deleted_trunk = confd.trunks(trunk['id']).endpoints.sip.get
         deleted_sip = confd.endpoints.sip(sip['id']).trunks.get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_sip, 'SIPEndpoint'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_sip, 'SIPEndpoint')
 
 
 @fixtures.trunk()
@@ -228,5 +228,5 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
 @fixtures.sip()
 def test_bus_events(trunk, sip):
     url = confd.trunks(trunk['id']).endpoints.sip(sip['id'])
-    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
-    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete
+    s.check_bus_event('config.trunks.endpoints.updated', url.put)
+    s.check_bus_event('config.trunks.endpoints.deleted', url.delete)

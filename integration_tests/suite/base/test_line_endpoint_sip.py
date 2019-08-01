@@ -26,8 +26,8 @@ def test_associate_errors(line, sip):
     fake_line = confd.lines(999999999).endpoints.sip(sip['id']).put
     fake_sip = confd.lines(line['id']).endpoints.sip(999999999).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.line()
@@ -36,16 +36,16 @@ def test_dissociate_errors(line, sip):
     fake_line = confd.lines(999999999).endpoints.sip(sip['id']).delete
     fake_sip = confd.lines(line['id']).endpoints.sip(999999999).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 def test_get_errors():
     fake_line = confd.lines(999999999).endpoints.sip.get
     fake_sip = confd.endpoints.sip(999999999).lines.get
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.line()

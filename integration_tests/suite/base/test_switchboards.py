@@ -30,37 +30,35 @@ NOT_FOUND_SWITCHBOARD_UUID = 'uuid-not-found'
 
 def test_get_errors():
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).get
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
 
 def test_delete_errors():
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).delete
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
 
 def test_post_errors():
     url = confd.switchboards.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.switchboard()
 def test_put_errors(switchboard):
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
     url = confd.switchboards(switchboard['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
@@ -92,7 +90,7 @@ def test_search(hidden, switchboard):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, switchboard, hidden, field, term
+        check_search(url, switchboard, hidden, field, term)
 
 
 def check_search(url, switchboard, hidden, field, term):
@@ -108,7 +106,7 @@ def check_search(url, switchboard, hidden, field, term):
 @fixtures.switchboard(name='sort1')
 @fixtures.switchboard(name='sort2')
 def test_sorting(switchboard1, switchboard2):
-    yield check_sorting, switchboard1, switchboard2, 'name', 'sort'
+    check_sorting(switchboard1, switchboard2, 'name', 'sort')
 
 
 def check_sorting(switchboard1, switchboard2, field, search):
@@ -200,6 +198,6 @@ def test_bus_events(switchboard):
     routing_key_edit = 'config.switchboards.{uuid}.edited'.format(uuid=switchboard['uuid'])
     routing_key_delete = 'config.switchboards.{uuid}.deleted'.format(uuid=switchboard['uuid'])
 
-    yield s.check_bus_event, routing_key_create, confd.switchboards.post, {'name': 'bus_event'}
-    yield s.check_bus_event, routing_key_edit, confd.switchboards(switchboard['uuid']).put
-    yield s.check_bus_event, routing_key_delete, confd.switchboards(switchboard['uuid']).delete
+    s.check_bus_event(routing_key_create, confd.switchboards.post, {'name': 'bus_event'})
+    s.check_bus_event(routing_key_edit, confd.switchboards(switchboard['uuid']).put)
+    s.check_bus_event(routing_key_delete, confd.switchboards(switchboard['uuid']).delete)

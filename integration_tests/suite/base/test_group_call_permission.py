@@ -1,4 +1,4 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -29,8 +29,8 @@ def test_associate_errors(group, call_permission):
     fake_group = confd.groups(FAKE_ID).callpermissions(call_permission['id']).put
     fake_call_permission = confd.groups(group['id']).callpermissions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_group, 'Group'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_group, 'Group')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.group()
@@ -39,8 +39,8 @@ def test_dissociate_errors(group, call_permission):
     fake_group = confd.groups(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.groups(group['id']).callpermissions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_group, 'Group'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_group, 'Group')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.group()
@@ -154,9 +154,11 @@ def test_delete_call_permission_when_group_and_call_permission_associated(group,
 @fixtures.group()
 @fixtures.call_permission()
 def test_bus_events(group, call_permission):
-    yield (s.check_bus_event,
-           'config.groups.{}.callpermissions.updated'.format(group['id']),
-           confd.groups(group['id']).callpermissions(call_permission['id']).put)
-    yield (s.check_bus_event,
-           'config.groups.{}.callpermissions.deleted'.format(group['id']),
-           confd.groups(group['id']).callpermissions(call_permission['id']).delete)
+    s.check_bus_event(
+        'config.groups.{}.callpermissions.updated'.format(group['id']),
+        confd.groups(group['id']).callpermissions(call_permission['id']).put
+    )
+    s.check_bus_event(
+        'config.groups.{}.callpermissions.deleted'.format(group['id']),
+        confd.groups(group['id']).callpermissions(call_permission['id']).delete
+    )

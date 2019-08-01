@@ -51,8 +51,8 @@ def test_associate_errors(line, device):
     fake_line = confd.lines(999999999).devices(device['id']).put
     fake_device = confd.lines(line['id']).devices(999999999).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_device, 'Device'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_device, 'Device')
 
 
 @fixtures.line()
@@ -61,23 +61,23 @@ def test_dissociate_errors(line, device):
     fake_line = confd.lines(999999999).devices(device['id']).delete
     fake_device = confd.lines(line['id']).devices(999999999).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_device, 'Device'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_device, 'Device')
 
 
 def test_get_errors():
     fake_line = confd.lines(999999999).devices.get
     fake_device = confd.devices(999999999).lines.get
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_device, 'Device'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_device, 'Device')
 
 
 @fixtures.sip()
 @fixtures.sccp()
 def test_associate_without_required_resources_raises_error(sip, sccp):
-    yield check_associate_without_required_resources, sip, a.line_endpoint_sip
-    yield check_associate_without_required_resources, sccp, a.line_endpoint_sccp
+    check_associate_without_required_resources(sip, a.line_endpoint_sip)
+    check_associate_without_required_resources(sccp, a.line_endpoint_sccp)
 
 
 def check_associate_without_required_resources(endpoint, line_endpoint):
@@ -102,10 +102,10 @@ def check_associate_without_required_resources(endpoint, line_endpoint):
 @fixtures.line(position=1)
 def test_associate_2_lines_with_same_position_raises_error(extra_line):
     with line_and_device('sip') as (line, device):
-        yield check_2_lines_with_same_position_raises_error, line, extra_line, device
+        check_2_lines_with_same_position_raises_error(line, extra_line, device)
 
     with line_and_device('sccp') as (line, device):
-        yield check_2_lines_with_same_position_raises_error, line, extra_line, device
+        check_2_lines_with_same_position_raises_error(line, extra_line, device)
 
 
 def check_2_lines_with_same_position_raises_error(line, extra_line, device):
@@ -118,10 +118,10 @@ def check_2_lines_with_same_position_raises_error(line, extra_line, device):
 
 def test_get_device_associated_to_line():
     with line_and_device('sip') as (line, device):
-        yield check_get_device_associated_to_line, line, device
+        check_get_device_associated_to_line(line, device)
 
     with line_and_device('sccp') as (line, device):
-        yield check_get_device_associated_to_line, line, device
+        check_get_device_associated_to_line(line, device)
 
 
 def check_get_device_associated_to_line(line, device):
@@ -146,10 +146,10 @@ def test_get_device_associated_to_line_from_sub_tenant_errors():
 
 def test_get_device_after_dissociation():
     with line_and_device('sip') as (line, device):
-        yield check_get_device_after_dissociation, line, device
+        check_get_device_after_dissociation(line, device)
 
     with line_and_device('sccp') as (line, device):
-        yield check_get_device_after_dissociation, line, device
+        check_get_device_after_dissociation(line, device)
 
 
 def check_get_device_after_dissociation(line, device):
@@ -162,10 +162,10 @@ def check_get_device_after_dissociation(line, device):
 
 def test_get_line_associated_to_a_device():
     with line_and_device('sip') as (line, device):
-        yield check_get_line_associated_to_a_device, line, device
+        check_get_line_associated_to_a_device(line, device)
 
     with line_and_device('sccp') as (line, device):
-        yield check_get_line_associated_to_a_device, line, device
+        check_get_line_associated_to_a_device(line, device)
 
 
 def check_get_line_associated_to_a_device(line, device):
@@ -413,11 +413,11 @@ def test_associate_with_another_device_when_already_associated():
 
 def test_dissociate():
     with line_and_device('sip') as (line, device):
-        yield check_dissociate, line, device
+        check_dissociate(line, device)
 
     with line_and_device('sccp') as (line, device):
-        yield check_dissociate, line, device
-        yield check_dissociate_sccp, line, device
+        check_dissociate(line, device)
+        check_dissociate_sccp(line, device)
 
 
 def check_dissociate(line, device):
@@ -443,7 +443,7 @@ def test_reset_sccp_to_autoprov():
         confd.devices(device['id']).autoprov.get()
         provd_device = provd.devices.get(device['id'])
         assert_that(provd_device['config'], starts_with('autoprov'))
-        yield check_sccp_reset_to_autoprov, device
+        check_sccp_reset_to_autoprov(device)
 
 
 def check_sccp_reset_to_autoprov(device):
@@ -466,10 +466,10 @@ def test_dissociate_multi_tenant(main_device, sub_device):
 
 def test_dissociate_when_not_associated():
     with line_and_device('sip') as (line1, device1), line_and_device('sip') as (line2, device2):
-        yield check_dissociate_when_not_associated, line1, device1, line2, device2
+        check_dissociate_when_not_associated(line1, device1, line2, device2)
 
     with line_and_device('sccp') as (line1, device1), line_and_device('sccp') as (line2, device2):
-        yield check_dissociate_when_not_associated, line1, device1, line2, device2
+        check_dissociate_when_not_associated(line1, device1, line2, device2)
 
 
 def check_dissociate_when_not_associated(line1, device1, line2, device2):
@@ -495,8 +495,8 @@ def test_bus_events(device):
     with line_fellowship('sip') as (user, line, extension, sip):
         associate_url = confd.lines(line['id']).devices(device['id']).put
         routing_key = 'config.lines.{}.devices.{}.updated'.format(line['id'], device['id'])
-        yield s.check_bus_event, routing_key, associate_url
+        s.check_bus_event(routing_key, associate_url)
 
         dissociate_url = confd.lines(line['id']).devices(device['id']).delete
         routing_key = 'config.lines.{}.devices.{}.deleted'.format(line['id'], device['id'])
-        yield s.check_bus_event, routing_key, dissociate_url
+        s.check_bus_event(routing_key, dissociate_url)

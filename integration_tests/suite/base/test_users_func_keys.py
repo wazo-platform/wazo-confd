@@ -23,23 +23,21 @@ FAKE_ID = 999999999
 @fixtures.user()
 def test_put_errors(user):
     fake_user = confd.users(FAKE_ID).funckeys(1).put
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
     url = confd.users(user['uuid']).funckeys(1).put
-    for check in error_funckey_checks(url):
-        yield check
+    error_funckey_checks(url)
 
     fake_user = confd.users(FAKE_ID).funckeys.put
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
     url = confd.users(user['uuid']).funckeys.put
-    for check in error_funckeys_checks(url):
-        yield check
+    error_funckeys_checks(url)
 
 
 def test_delete_errors():
     fake_user = confd.users(FAKE_ID).funckeys(1).delete
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
     # This should raise an error
     # fake_funckey = confd.users(self.user['id']).funckeys(FAKE_ID).delete
@@ -52,9 +50,9 @@ def test_get_errors(user):
     fake_user_2 = confd.users(FAKE_ID).funckeys(1).get
     fake_funckey = confd.users(user['uuid']).funckeys(FAKE_ID).get
 
-    yield s.check_resource_not_found, fake_user_1, 'User'
-    yield s.check_resource_not_found, fake_user_2, 'User'
-    yield s.check_resource_not_found, fake_funckey, 'FuncKey'
+    s.check_resource_not_found(fake_user_1, 'User')
+    s.check_resource_not_found(fake_user_2, 'User')
+    s.check_resource_not_found(fake_funckey, 'FuncKey')
 
 
 @fixtures.user()

@@ -28,117 +28,114 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_context = confd.contexts(999999).get
-    yield s.check_resource_not_found, fake_context, 'Context'
+    s.check_resource_not_found(fake_context, 'Context')
 
 
 def test_delete_errors():
     fake_context = confd.contexts(999999).delete
-    yield s.check_resource_not_found, fake_context, 'Context'
+    s.check_resource_not_found(fake_context, 'Context')
 
 
 def test_post_errors():
     url = confd.contexts.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(40)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(40))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.context()
 def test_put_errors(context):
     url = confd.contexts(context['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'label', 123
-    yield s.check_bogus_field_returns_error, url, 'label', True
-    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'label', []
-    yield s.check_bogus_field_returns_error, url, 'label', {}
-    yield s.check_bogus_field_returns_error, url, 'type', 123
-    yield s.check_bogus_field_returns_error, url, 'type', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'type', True
-    yield s.check_bogus_field_returns_error, url, 'type', None
-    yield s.check_bogus_field_returns_error, url, 'type', []
-    yield s.check_bogus_field_returns_error, url, 'type', {}
-    yield s.check_bogus_field_returns_error, url, 'description', 1234
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', 123
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', True
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', None
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', {}
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', ['1234']
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'end': '1234'}]
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': 'invalid'}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', 123
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', True
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', None
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', {}
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', ['1234']
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'end': '1234'}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': 'invalid'}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', 123
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', True
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', None
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', {}
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', ['1234']
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'end': '1234'}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': 'invalid'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', 123
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', True
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', None
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', {}
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', ['1234']
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'end': '1234'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': 'invalid'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', 123
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', True
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', None
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', {}
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', ['1234']
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'end': '1234'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': 'invalid'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '123', 'did_length': None}]
+    s.check_bogus_field_returns_error(url, 'label', 123)
+    s.check_bogus_field_returns_error(url, 'label', True)
+    s.check_bogus_field_returns_error(url, 'label', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'label', [])
+    s.check_bogus_field_returns_error(url, 'label', {})
+    s.check_bogus_field_returns_error(url, 'type', 123)
+    s.check_bogus_field_returns_error(url, 'type', 'invalid')
+    s.check_bogus_field_returns_error(url, 'type', True)
+    s.check_bogus_field_returns_error(url, 'type', None)
+    s.check_bogus_field_returns_error(url, 'type', [])
+    s.check_bogus_field_returns_error(url, 'type', {})
+    s.check_bogus_field_returns_error(url, 'description', 1234)
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'user_ranges', 123)
+    s.check_bogus_field_returns_error(url, 'user_ranges', 'invalid')
+    s.check_bogus_field_returns_error(url, 'user_ranges', True)
+    s.check_bogus_field_returns_error(url, 'user_ranges', None)
+    s.check_bogus_field_returns_error(url, 'user_ranges', {})
+    s.check_bogus_field_returns_error(url, 'user_ranges', ['1234'])
+    s.check_bogus_field_returns_error(url, 'user_ranges', [{'end': '1234'}])
+    s.check_bogus_field_returns_error(url, 'user_ranges', [{'start': None}])
+    s.check_bogus_field_returns_error(url, 'user_ranges', [{'start': '60', 'end': '50'}])
+    s.check_bogus_field_returns_error(url, 'user_ranges', [{'start': '50', 'end': '060'}])
+    s.check_bogus_field_returns_error(url, 'user_ranges', [{'start': 'invalid'}])
+    s.check_bogus_field_returns_error(url, 'group_ranges', 123)
+    s.check_bogus_field_returns_error(url, 'group_ranges', 'invalid')
+    s.check_bogus_field_returns_error(url, 'group_ranges', True)
+    s.check_bogus_field_returns_error(url, 'group_ranges', None)
+    s.check_bogus_field_returns_error(url, 'group_ranges', {})
+    s.check_bogus_field_returns_error(url, 'group_ranges', ['1234'])
+    s.check_bogus_field_returns_error(url, 'group_ranges', [{'end': '1234'}])
+    s.check_bogus_field_returns_error(url, 'group_ranges', [{'start': None}])
+    s.check_bogus_field_returns_error(url, 'group_ranges', [{'start': '60', 'end': '50'}])
+    s.check_bogus_field_returns_error(url, 'group_ranges', [{'start': '50', 'end': '060'}])
+    s.check_bogus_field_returns_error(url, 'group_ranges', [{'start': 'invalid'}])
+    s.check_bogus_field_returns_error(url, 'queue_ranges', 123)
+    s.check_bogus_field_returns_error(url, 'queue_ranges', 'invalid')
+    s.check_bogus_field_returns_error(url, 'queue_ranges', True)
+    s.check_bogus_field_returns_error(url, 'queue_ranges', None)
+    s.check_bogus_field_returns_error(url, 'queue_ranges', {})
+    s.check_bogus_field_returns_error(url, 'queue_ranges', ['1234'])
+    s.check_bogus_field_returns_error(url, 'queue_ranges', [{'end': '1234'}])
+    s.check_bogus_field_returns_error(url, 'queue_ranges', [{'start': None}])
+    s.check_bogus_field_returns_error(url, 'queue_ranges', [{'start': '60', 'end': '50'}])
+    s.check_bogus_field_returns_error(url, 'queue_ranges', [{'start': '50', 'end': '060'}])
+    s.check_bogus_field_returns_error(url, 'queue_ranges', [{'start': 'invalid'}])
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', 123)
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', 'invalid')
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', True)
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', None)
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', {})
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', ['1234'])
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', [{'end': '1234'}])
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', [{'start': None}])
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', [{'start': '60', 'end': '50'}])
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', [{'start': '50', 'end': '060'}])
+    s.check_bogus_field_returns_error(url, 'conference_room_ranges', [{'start': 'invalid'}])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', 123)
+    s.check_bogus_field_returns_error(url, 'incall_ranges', 'invalid')
+    s.check_bogus_field_returns_error(url, 'incall_ranges', True)
+    s.check_bogus_field_returns_error(url, 'incall_ranges', None)
+    s.check_bogus_field_returns_error(url, 'incall_ranges', {})
+    s.check_bogus_field_returns_error(url, 'incall_ranges', ['1234'])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', [{'end': '1234'}])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', [{'start': None}])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', [{'start': '60', 'end': '50'}])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', [{'start': '50', 'end': '060'}])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', [{'start': 'invalid'}])
+    s.check_bogus_field_returns_error(url, 'incall_ranges', [{'start': '123', 'did_length': None}])
 
 
 @fixtures.context(name='unique')
 def unique_error_checks(url, context):
-    yield s.check_bogus_field_returns_error, url, 'name', context['name']
+    s.check_bogus_field_returns_error(url, 'name', context['name'])
 
 
 @fixtures.context(name='search', type='internal', description='desc_search')
@@ -152,7 +149,7 @@ def test_search(context, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, context, hidden, field, term
+        check_search(url, context, hidden, field, term)
 
 
 def check_search(url, context, hidden, field, term):
@@ -182,13 +179,13 @@ def test_list_multi_tenant(main, sub):
 @fixtures.context(name='sort2', description='sort2')
 def test_sorting_offset_limit(context1, context2):
     url = confd.contexts.get
-    yield s.check_sorting, url, context1, context2, 'name', 'sort'
-    yield s.check_sorting, url, context1, context2, 'description', 'sort'
+    s.check_sorting(url, context1, context2, 'name', 'sort')
+    s.check_sorting(url, context1, context2, 'description', 'sort')
 
-    yield s.check_offset, url, context1, context2, 'name', 'sort'
-    yield s.check_offset_legacy, url, context1, context2, 'name', 'sort'
+    s.check_offset(url, context1, context2, 'name', 'sort')
+    s.check_offset_legacy(url, context1, context2, 'name', 'sort')
 
-    yield s.check_limit, url, context1, context2, 'name', 'sort'
+    s.check_limit(url, context1, context2, 'name', 'sort')
 
 
 @fixtures.context()
@@ -337,6 +334,6 @@ def test_delete_when_sip_general_option_associated(context):
 
 @fixtures.context()
 def test_bus_events(context):
-    yield s.check_bus_event, 'config.contexts.created', confd.contexts.post, {'name': 'bus_event'}
-    yield s.check_bus_event, 'config.contexts.edited', confd.contexts(context['id']).put
-    yield s.check_bus_event, 'config.contexts.deleted', confd.contexts(context['id']).delete
+    s.check_bus_event('config.contexts.created', confd.contexts.post, {'name': 'bus_event'})
+    s.check_bus_event('config.contexts.edited', confd.contexts(context['id']).put)
+    s.check_bus_event('config.contexts.deleted', confd.contexts(context['id']).delete)

@@ -28,8 +28,8 @@ def test_associate_errors(user, schedule):
     fake_user = confd.users(FAKE_ID).schedules(schedule['id']).put
     fake_schedule = confd.users(user['uuid']).schedules(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.user()
@@ -38,8 +38,8 @@ def test_dissociate_errors(user, schedule):
     fake_user = confd.users(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.users(user['uuid']).schedules(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.user()

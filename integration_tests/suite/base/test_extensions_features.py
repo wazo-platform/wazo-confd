@@ -21,36 +21,34 @@ FAKE_ID = 999999999
 
 def test_search_errors():
     url = confd.extensions.features.get
-    for check in s.search_error_checks(url):
-        yield check
+    s.search_error_checks(url)
 
 
 def test_get_errors():
     url = confd.extensions.features(FAKE_ID).get
-    yield s.check_resource_not_found, url, 'Extension'
+    s.check_resource_not_found(url, 'Extension')
 
 
 @fixtures.extension_feature()
 def test_put_errors(extension):
     url = confd.extensions.features(FAKE_ID).put
-    yield s.check_resource_not_found, url, 'Extension'
+    s.check_resource_not_found(url, 'Extension')
 
     url = confd.extensions.features(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'exten', None
-    yield s.check_bogus_field_returns_error, url, 'exten', True
-    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123'
-    yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX'
-    yield s.check_bogus_field_returns_error, url, 'exten', {}
-    yield s.check_bogus_field_returns_error, url, 'exten', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    s.check_bogus_field_returns_error(url, 'exten', None)
+    s.check_bogus_field_returns_error(url, 'exten', True)
+    s.check_bogus_field_returns_error(url, 'exten', 'ABC123')
+    s.check_bogus_field_returns_error(url, 'exten', 'XXXX')
+    s.check_bogus_field_returns_error(url, 'exten', {})
+    s.check_bogus_field_returns_error(url, 'exten', [])
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
 
 
 def test_create_unimplemented():
@@ -74,7 +72,7 @@ def test_search(extension, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, extension, hidden, field, term
+        check_search(url, extension, hidden, field, term)
 
 
 def check_search(url, extension, hidden, field, term):
@@ -91,12 +89,12 @@ def check_search(url, extension, hidden, field, term):
 @fixtures.extension_feature(exten='9999')
 def test_sorting_offset_limit(extension1, extension2):
     url = confd.extensions.features.get
-    yield s.check_sorting, url, extension1, extension2, 'exten', '999'
+    s.check_sorting(url, extension1, extension2, 'exten', '999')
 
-    yield s.check_offset, url, extension1, extension2, 'exten', '999'
-    yield s.check_offset_legacy, url, extension1, extension2, 'exten', '999'
+    s.check_offset(url, extension1, extension2, 'exten', '999')
+    s.check_offset_legacy(url, extension1, extension2, 'exten', '999')
 
-    yield s.check_limit, url, extension1, extension2, 'exten', '999'
+    s.check_limit(url, extension1, extension2, 'exten', '999')
 
 
 @fixtures.extension_feature()
@@ -136,4 +134,4 @@ def test_edit_with_same_extension(extension1, extension2):
 
 @fixtures.extension_feature()
 def test_bus_events(extension):
-    yield s.check_bus_event, 'config.extension_feature.edited', confd.extensions.features(extension['id']).put
+    s.check_bus_event('config.extension_feature.edited', confd.extensions.features(extension['id']).put)

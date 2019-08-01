@@ -34,64 +34,62 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_line_get = confd.lines(999999).get
-    yield s.check_resource_not_found, fake_line_get, 'Line'
+    s.check_resource_not_found(fake_line_get, 'Line')
 
 
 def test_post_errors():
     url = confd.lines.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.line()
 def test_put_errors(line):
     url = confd.lines(line['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', None
-    yield s.check_bogus_field_returns_error, url, 'position', None
-    yield s.check_bogus_field_returns_error, url, 'registrar', None
-    yield s.check_bogus_field_returns_error, url, 'registrar', 'invalidregistrar'
+    s.check_bogus_field_returns_error(url, 'provisioning_code', None)
+    s.check_bogus_field_returns_error(url, 'position', None)
+    s.check_bogus_field_returns_error(url, 'registrar', None)
+    s.check_bogus_field_returns_error(url, 'registrar', 'invalidregistrar')
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'context', 123
-    yield s.check_bogus_field_returns_error, url, 'context', 'undefined'
-    yield s.check_bogus_field_returns_error, url, 'context', ''
-    yield s.check_bogus_field_returns_error, url, 'context', {}
-    yield s.check_bogus_field_returns_error, url, 'context', []
-    yield s.check_bogus_field_returns_error, url, 'context', None
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', 123456
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', 'number'
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', '123'
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', '1234567'
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', ''
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', {}
-    yield s.check_bogus_field_returns_error, url, 'provisioning_code', []
-    yield s.check_bogus_field_returns_error, url, 'position', 'one'
-    yield s.check_bogus_field_returns_error, url, 'position', ''
-    yield s.check_bogus_field_returns_error, url, 'position', 0
-    yield s.check_bogus_field_returns_error, url, 'position', {}
-    yield s.check_bogus_field_returns_error, url, 'position', []
-    yield s.check_bogus_field_returns_error, url, 'registrar', 123
-    yield s.check_bogus_field_returns_error, url, 'registrar', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'registrar', {}
-    yield s.check_bogus_field_returns_error, url, 'registrar', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', 123456
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_num', '123ABC'
-    yield s.check_bogus_field_returns_error, url, 'caller_id_num', ''
-    yield s.check_bogus_field_returns_error, url, 'caller_id_num', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_num', []
+    s.check_bogus_field_returns_error(url, 'context', 123)
+    s.check_bogus_field_returns_error(url, 'context', 'undefined')
+    s.check_bogus_field_returns_error(url, 'context', '')
+    s.check_bogus_field_returns_error(url, 'context', {})
+    s.check_bogus_field_returns_error(url, 'context', [])
+    s.check_bogus_field_returns_error(url, 'context', None)
+    s.check_bogus_field_returns_error(url, 'provisioning_code', 123456)
+    s.check_bogus_field_returns_error(url, 'provisioning_code', 'number')
+    s.check_bogus_field_returns_error(url, 'provisioning_code', '123')
+    s.check_bogus_field_returns_error(url, 'provisioning_code', '1234567')
+    s.check_bogus_field_returns_error(url, 'provisioning_code', '')
+    s.check_bogus_field_returns_error(url, 'provisioning_code', {})
+    s.check_bogus_field_returns_error(url, 'provisioning_code', [])
+    s.check_bogus_field_returns_error(url, 'position', 'one')
+    s.check_bogus_field_returns_error(url, 'position', '')
+    s.check_bogus_field_returns_error(url, 'position', 0)
+    s.check_bogus_field_returns_error(url, 'position', {})
+    s.check_bogus_field_returns_error(url, 'position', [])
+    s.check_bogus_field_returns_error(url, 'registrar', 123)
+    s.check_bogus_field_returns_error(url, 'registrar', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'registrar', {})
+    s.check_bogus_field_returns_error(url, 'registrar', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_name', 123456)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_name', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_num', '123ABC')
+    s.check_bogus_field_returns_error(url, 'caller_id_num', '')
+    s.check_bogus_field_returns_error(url, 'caller_id_num', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_num', [])
 
 
 @fixtures.line()
 def test_delete_errors(line):
     line_url = confd.lines(line['id'])
     line_url.delete()
-    yield s.check_resource_not_found, line_url.get, 'Line'
+    s.check_resource_not_found(line_url.get, 'Line')
 
 
 @fixtures.line(context=config.CONTEXT)

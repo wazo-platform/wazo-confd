@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -28,8 +28,8 @@ def test_associate_errors(user, voicemail):
     fake_user = confd.users(FAKE_ID).voicemails(voicemail['id']).put
     fake_voicemail = confd.users(user['id']).voicemails(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_voicemail, 'Voicemail'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_voicemail, 'Voicemail')
 
 
 @fixtures.user()
@@ -37,7 +37,7 @@ def test_associate_errors(user, voicemail):
 def test_dissociate_errors(user, voicemail):
     fake_user = confd.users(FAKE_ID).voicemails.delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.user()
@@ -45,8 +45,8 @@ def test_get_errors(user):
     fake_user = confd.users(FAKE_ID).voicemails.get
     fake_voicemail = confd.voicemails(FAKE_ID).users.get
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_voicemail, 'Voicemail'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_voicemail, 'Voicemail')
 
 
 @fixtures.user()
@@ -283,6 +283,6 @@ def test_dissociate_legacy_multi_tenant(user):
 @fixtures.voicemail()
 def test_bus_events(user, voicemail):
     url = confd.users(user['id']).voicemails(voicemail['id']).put
-    yield s.check_bus_event, 'config.users.{}.voicemails.updated'.format(user['uuid']), url
+    s.check_bus_event('config.users.{}.voicemails.updated'.format(user['uuid']), url)
     url = confd.users(user['id']).voicemails.delete
-    yield s.check_bus_event, 'config.users.{}.voicemails.deleted'.format(user['uuid']), url
+    s.check_bus_event('config.users.{}.voicemails.deleted'.format(user['uuid']), url)

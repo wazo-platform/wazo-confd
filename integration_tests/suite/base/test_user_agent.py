@@ -26,7 +26,7 @@ FAKE_ID = 999999999
 
 def test_get_errors():
     fake_user = confd.users(FAKE_ID).agents.get
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.agent()
@@ -35,15 +35,15 @@ def test_associate_errors(agent, user):
     fake_user = confd.users(FAKE_ID).agents(agent['id']).put
     fake_agent = confd.users(user['id']).agents(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_agent, 'Agent'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_agent, 'Agent')
 
 
 @fixtures.user()
 def test_dissociate_errors(user):
     fake_user = confd.users(FAKE_ID).agents().delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.agent()
@@ -181,6 +181,6 @@ def test_delete_user_when_user_and_agent_associated(agent, user):
 @fixtures.user()
 def test_bus_events(agent, user):
     url = confd.users(user['id']).agents(agent['id']).put
-    yield s.check_bus_event, 'config.users.{}.agents.updated'.format(user['uuid']), url
+    s.check_bus_event('config.users.{}.agents.updated'.format(user['uuid']), url)
     url = confd.users(user['id']).agents.delete
-    yield s.check_bus_event, 'config.users.{}.agents.deleted'.format(user['uuid']), url
+    s.check_bus_event('config.users.{}.agents.deleted'.format(user['uuid']), url)

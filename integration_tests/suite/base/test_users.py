@@ -82,8 +82,7 @@ NULL_USER = {
 
 def test_search_errors():
     url = confd.users.get
-    for check in s.search_error_checks(url):
-        yield check
+    s.search_error_checks(url)
 
 
 def test_head_errors():
@@ -93,180 +92,175 @@ def test_head_errors():
 
 def test_get_errors():
     fake_get = confd.users(999999).get
-    yield s.check_resource_not_found, fake_get, 'User'
+    s.check_resource_not_found(fake_get, 'User')
 
 
 def test_post_errors():
     empty_post = confd.users.post
     user_post = confd.users(firstname="Jôhn").post
 
-    yield s.check_missing_required_field_returns_error, empty_post, 'firstname'
-    for check in error_checks(user_post):
-        yield check
+    s.check_missing_required_field_returns_error(empty_post, 'firstname')
+    error_checks(user_post)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'firstname', 123
-    yield s.check_bogus_field_returns_error, url, 'firstname', None
-    yield s.check_bogus_field_returns_error, url, 'firstname', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'firstname', {}
-    yield s.check_bogus_field_returns_error, url, 'firstname', []
-    yield s.check_bogus_field_returns_error, url, 'lastname', 123
-    yield s.check_bogus_field_returns_error, url, 'lastname', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'lastname', {}
-    yield s.check_bogus_field_returns_error, url, 'lastname', []
-    yield s.check_bogus_field_returns_error, url, 'email', s.random_string(255)
-    yield s.check_bogus_field_returns_error, url, 'email', 123
-    yield s.check_bogus_field_returns_error, url, 'email', 'invalid_email'
-    yield s.check_bogus_field_returns_error, url, 'email', {}
-    yield s.check_bogus_field_returns_error, url, 'email', []
-    yield s.check_bogus_field_returns_error, url, 'timezone', 123
-    yield s.check_bogus_field_returns_error, url, 'timezone', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'timezone', {}
-    yield s.check_bogus_field_returns_error, url, 'timezone', []
-    yield s.check_bogus_field_returns_error, url, 'language', 123
-    yield s.check_bogus_field_returns_error, url, 'language', 'klingon'
-    yield s.check_bogus_field_returns_error, url, 'language', {}
-    yield s.check_bogus_field_returns_error, url, 'language', []
-    yield s.check_bogus_field_returns_error, url, 'description', 123
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id', 123
-    yield s.check_bogus_field_returns_error, url, 'caller_id', 'invalid_regex'
-    yield s.check_bogus_field_returns_error, url, 'caller_id', s.random_string(161)
-    yield s.check_bogus_field_returns_error, url, 'caller_id', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id', []
-    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', 123
-    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', {}
-    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', []
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 123
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 'invalid_regex'
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', {}
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', []
-    yield s.check_bogus_field_returns_error, url, 'username', 123
-    yield s.check_bogus_field_returns_error, url, 'username', 'invalid_régex'
-    yield s.check_bogus_field_returns_error, url, 'username', s.random_string(1)
-    yield s.check_bogus_field_returns_error, url, 'username', s.random_string(255)
-    yield s.check_bogus_field_returns_error, url, 'username', {}
-    yield s.check_bogus_field_returns_error, url, 'username', []
-    yield s.check_bogus_field_returns_error, url, 'password', 123
-    yield s.check_bogus_field_returns_error, url, 'password', 'invalid_régex'
-    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(3)
-    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(65)
-    yield s.check_bogus_field_returns_error, url, 'password', {}
-    yield s.check_bogus_field_returns_error, url, 'password', []
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
-    yield s.check_bogus_field_returns_error, url, 'userfield', 123
-    yield s.check_bogus_field_returns_error, url, 'userfield', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'userfield', {}
-    yield s.check_bogus_field_returns_error, url, 'userfield', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'caller_id', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id', s.random_string(161)
-    yield s.check_bogus_field_returns_error, url, 'caller_id', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id', []
-    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', []
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 'sixty'
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', -1
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', 21
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', {}
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', []
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', -1
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', 61
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', {}
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', []
-    yield s.check_bogus_field_returns_error, url, 'call_permission_password', 1234
-    yield s.check_bogus_field_returns_error, url, 'call_permission_password', 'invalid_char'
-    yield s.check_bogus_field_returns_error, url, 'call_permission_password', {}
-    yield s.check_bogus_field_returns_error, url, 'call_permission_password', []
-    yield s.check_bogus_field_returns_error, url, 'call_permission_password', s.random_string(17)
-    yield s.check_bogus_field_returns_error, url, 'subscription_type', 'one'
-    yield s.check_bogus_field_returns_error, url, 'subscription_type', -1
-    yield s.check_bogus_field_returns_error, url, 'subscription_type', 11
-    yield s.check_bogus_field_returns_error, url, 'subscription_type', {}
-    yield s.check_bogus_field_returns_error, url, 'subscription_type', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'firstname', 123)
+    s.check_bogus_field_returns_error(url, 'firstname', None)
+    s.check_bogus_field_returns_error(url, 'firstname', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'firstname', {})
+    s.check_bogus_field_returns_error(url, 'firstname', [])
+    s.check_bogus_field_returns_error(url, 'lastname', 123)
+    s.check_bogus_field_returns_error(url, 'lastname', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'lastname', {})
+    s.check_bogus_field_returns_error(url, 'lastname', [])
+    s.check_bogus_field_returns_error(url, 'email', s.random_string(255))
+    s.check_bogus_field_returns_error(url, 'email', 123)
+    s.check_bogus_field_returns_error(url, 'email', 'invalid_email')
+    s.check_bogus_field_returns_error(url, 'email', {})
+    s.check_bogus_field_returns_error(url, 'email', [])
+    s.check_bogus_field_returns_error(url, 'timezone', 123)
+    s.check_bogus_field_returns_error(url, 'timezone', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'timezone', {})
+    s.check_bogus_field_returns_error(url, 'timezone', [])
+    s.check_bogus_field_returns_error(url, 'language', 123)
+    s.check_bogus_field_returns_error(url, 'language', 'klingon')
+    s.check_bogus_field_returns_error(url, 'language', {})
+    s.check_bogus_field_returns_error(url, 'language', [])
+    s.check_bogus_field_returns_error(url, 'description', 123)
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'caller_id', 123)
+    s.check_bogus_field_returns_error(url, 'caller_id', 'invalid_regex')
+    s.check_bogus_field_returns_error(url, 'caller_id', s.random_string(161))
+    s.check_bogus_field_returns_error(url, 'caller_id', {})
+    s.check_bogus_field_returns_error(url, 'caller_id', [])
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', 123)
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', {})
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', [])
+    s.check_bogus_field_returns_error(url, 'mobile_phone_number', 123)
+    s.check_bogus_field_returns_error(url, 'mobile_phone_number', 'invalid_regex')
+    s.check_bogus_field_returns_error(url, 'mobile_phone_number', '123abcd')
+    s.check_bogus_field_returns_error(url, 'mobile_phone_number', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'mobile_phone_number', {})
+    s.check_bogus_field_returns_error(url, 'mobile_phone_number', [])
+    s.check_bogus_field_returns_error(url, 'username', 123)
+    s.check_bogus_field_returns_error(url, 'username', 'invalid_régex')
+    s.check_bogus_field_returns_error(url, 'username', s.random_string(1))
+    s.check_bogus_field_returns_error(url, 'username', s.random_string(255))
+    s.check_bogus_field_returns_error(url, 'username', {})
+    s.check_bogus_field_returns_error(url, 'username', [])
+    s.check_bogus_field_returns_error(url, 'password', 123)
+    s.check_bogus_field_returns_error(url, 'password', 'invalid_régex')
+    s.check_bogus_field_returns_error(url, 'password', s.random_string(3))
+    s.check_bogus_field_returns_error(url, 'password', s.random_string(65))
+    s.check_bogus_field_returns_error(url, 'password', {})
+    s.check_bogus_field_returns_error(url, 'password', [])
+    s.check_bogus_field_returns_error(url, 'music_on_hold', 123)
+    s.check_bogus_field_returns_error(url, 'music_on_hold', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'music_on_hold', {})
+    s.check_bogus_field_returns_error(url, 'music_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', 123)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', s.random_string(40))
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', [])
+    s.check_bogus_field_returns_error(url, 'userfield', 123)
+    s.check_bogus_field_returns_error(url, 'userfield', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'userfield', {})
+    s.check_bogus_field_returns_error(url, 'userfield', [])
+    s.check_bogus_field_returns_error(url, 'caller_id', 'invalid')
+    s.check_bogus_field_returns_error(url, 'caller_id', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id', s.random_string(161))
+    s.check_bogus_field_returns_error(url, 'caller_id', {})
+    s.check_bogus_field_returns_error(url, 'caller_id', [])
+    s.check_bogus_field_returns_error(url, 'call_transfer_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'call_transfer_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'call_transfer_enabled', {})
+    s.check_bogus_field_returns_error(url, 'call_transfer_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_enabled', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_enabled', [])
+    s.check_bogus_field_returns_error(url, 'call_record_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'call_record_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'call_record_enabled', {})
+    s.check_bogus_field_returns_error(url, 'call_record_enabled', [])
+    s.check_bogus_field_returns_error(url, 'online_call_record_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'online_call_record_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'online_call_record_enabled', {})
+    s.check_bogus_field_returns_error(url, 'online_call_record_enabled', [])
+    s.check_bogus_field_returns_error(url, 'supervision_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'supervision_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'supervision_enabled', {})
+    s.check_bogus_field_returns_error(url, 'supervision_enabled', [])
+    s.check_bogus_field_returns_error(url, 'simultaneous_calls', 'sixty')
+    s.check_bogus_field_returns_error(url, 'simultaneous_calls', -1)
+    s.check_bogus_field_returns_error(url, 'simultaneous_calls', 21)
+    s.check_bogus_field_returns_error(url, 'simultaneous_calls', {})
+    s.check_bogus_field_returns_error(url, 'simultaneous_calls', [])
+    s.check_bogus_field_returns_error(url, 'ring_seconds', 'ten')
+    s.check_bogus_field_returns_error(url, 'ring_seconds', -1)
+    s.check_bogus_field_returns_error(url, 'ring_seconds', 61)
+    s.check_bogus_field_returns_error(url, 'ring_seconds', {})
+    s.check_bogus_field_returns_error(url, 'ring_seconds', [])
+    s.check_bogus_field_returns_error(url, 'call_permission_password', 1234)
+    s.check_bogus_field_returns_error(url, 'call_permission_password', 'invalid_char')
+    s.check_bogus_field_returns_error(url, 'call_permission_password', {})
+    s.check_bogus_field_returns_error(url, 'call_permission_password', [])
+    s.check_bogus_field_returns_error(url, 'call_permission_password', s.random_string(17))
+    s.check_bogus_field_returns_error(url, 'subscription_type', 'one')
+    s.check_bogus_field_returns_error(url, 'subscription_type', -1)
+    s.check_bogus_field_returns_error(url, 'subscription_type', 11)
+    s.check_bogus_field_returns_error(url, 'subscription_type', {})
+    s.check_bogus_field_returns_error(url, 'subscription_type', [])
+    s.check_bogus_field_returns_error(url, 'enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
 
 def put_error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'caller_id', None
-    yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', None
-    yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', None
-    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', None
-    yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', None
-    yield s.check_bogus_field_returns_error, url, 'supervision_enabled', None
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
-    yield s.check_bogus_field_returns_error, url, 'simultaneous_calls', None
-    yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
+    s.check_bogus_field_returns_error(url, 'caller_id', None)
+    s.check_bogus_field_returns_error(url, 'call_transfer_enabled', None)
+    s.check_bogus_field_returns_error(url, 'dtmf_hangup_enabled', None)
+    s.check_bogus_field_returns_error(url, 'call_record_enabled', None)
+    s.check_bogus_field_returns_error(url, 'online_call_record_enabled', None)
+    s.check_bogus_field_returns_error(url, 'supervision_enabled', None)
+    s.check_bogus_field_returns_error(url, 'ring_seconds', None)
+    s.check_bogus_field_returns_error(url, 'simultaneous_calls', None)
+    s.check_bogus_field_returns_error(url, 'ring_seconds', None)
+    s.check_bogus_field_returns_error(url, 'enabled', None)
 
 
 @fixtures.user()
 def test_put_errors(user):
     user_put = confd.users(user['id']).put
 
-    for check in error_checks(user_put):
-        yield check
-    for check in put_error_checks(user_put):
-        yield check
+    error_checks(user_put)
+    put_error_checks(user_put)
 
 
 @fixtures.user(firstname='user1', username='unique_username', email='unique@email.com')
 @fixtures.user()
 def test_unique_errors(user1, user2):
     url = confd.users(user2['id']).put
-    for check in unique_error_checks(url, user1):
-        yield check
+    unique_error_checks(url, user1)
 
     required_body = {'firstname': 'user2'}
     url = confd.users.post
-    for check in unique_error_checks(url, user1, required_body):
-        yield check
+    unique_error_checks(url, user1, required_body)
 
 
 def unique_error_checks(url, existing_resource, required_body=None):
-    yield s.check_bogus_field_returns_error, url, 'username', existing_resource['username'], required_body
-    yield s.check_bogus_field_returns_error, url, 'email', existing_resource['email'], required_body
+    s.check_bogus_field_returns_error(url, 'username', existing_resource['username'], required_body)
+    s.check_bogus_field_returns_error(url, 'email', existing_resource['email'], required_body)
 
 
 @fixtures.user()
 def test_delete_errors(user):
     user_url = confd.users(user['id'])
     user_url.delete()
-    yield s.check_resource_not_found, user_url.get, 'User'
+    s.check_resource_not_found(user_url.get, 'User')
 
 
 @fixtures.user(firstname='ÉricDir')
@@ -411,7 +405,7 @@ def test_search_on_user_view(user):
     }
 
     for field, term in searches.items():
-        yield check_search, url, field, term, user[field]
+        check_search(url, field, term, user[field])
 
 
 @fixtures.user(
@@ -435,7 +429,7 @@ def test_search_on_directory_view(user):
     }
 
     for field, term in searches.items():
-        yield check_search, url, field, term, user[field]
+        check_search(url, field, term, user[field])
 
 
 @fixtures.user()
@@ -472,10 +466,10 @@ def test_search_on_summary_view(user, line, sip, extension):
     url = confd.users(view='summary')
 
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
-        yield check_search, url, 'firstname', 'âbou', user['firstname']
-        yield check_search, url, 'lastname', 'man', user['lastname']
-        yield check_search, url, 'provisioning_code', line['provisioning_code'], line['provisioning_code']
-        yield check_search, url, 'extension', extension['exten'], extension['exten']
+        check_search(url, 'firstname', 'âbou', user['firstname'])
+        check_search(url, 'lastname', 'man', user['lastname'])
+        check_search(url, 'provisioning_code', line['provisioning_code'], line['provisioning_code'])
+        check_search(url, 'extension', extension['exten'], extension['exten'])
 
 
 def check_search(url, field, term, value):
@@ -523,17 +517,17 @@ def test_list_multi_tenant(main, sub):
 )
 def test_sorting_offset_limit(user1, user2):
     url = confd.users.get
-    yield s.check_sorting, url, user1, user2, 'firstname', 'firstname'
-    yield s.check_sorting, url, user1, user2, 'lastname', 'lastname'
-    yield s.check_sorting, url, user1, user2, 'email', 'email'
-    yield s.check_sorting, url, user1, user2, 'mobile_phone_number', '+555'
-    yield s.check_sorting, url, user1, user2, 'userfield', 'sort userfield'
-    yield s.check_sorting, url, user1, user2, 'description', 'description'
+    s.check_sorting(url, user1, user2, 'firstname', 'firstname')
+    s.check_sorting(url, user1, user2, 'lastname', 'lastname')
+    s.check_sorting(url, user1, user2, 'email', 'email')
+    s.check_sorting(url, user1, user2, 'mobile_phone_number', '+555')
+    s.check_sorting(url, user1, user2, 'userfield', 'sort userfield')
+    s.check_sorting(url, user1, user2, 'description', 'description')
 
-    yield s.check_offset, url, user1, user2, 'firstname', 'firstname'
-    yield s.check_offset_legacy, url, user1, user2, 'firstname', 'firstname'
+    s.check_offset(url, user1, user2, 'firstname', 'firstname')
+    s.check_offset_legacy(url, user1, user2, 'firstname', 'firstname')
 
-    yield s.check_limit, url, user1, user2, 'firstname', 'firstname'
+    s.check_limit(url, user1, user2, 'firstname', 'firstname')
 
 
 @fixtures.user()
@@ -694,6 +688,6 @@ def test_that_users_can_be_deleted_by_uuid(user):
 @fixtures.user()
 def test_bus_events(user):
     required_body = {'firstname': 'test-event-user'}
-    yield s.check_bus_event, 'config.user.created', confd.users.post, required_body
-    yield s.check_bus_event, 'config.user.edited', confd.users(user['id']).put
-    yield s.check_bus_event, 'config.user.deleted', confd.users(user['id']).delete
+    s.check_bus_event('config.user.created', confd.users.post, required_body)
+    s.check_bus_event('config.user.edited', confd.users(user['id']).put)
+    s.check_bus_event('config.user.deleted', confd.users(user['id']).delete)

@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -31,8 +31,8 @@ def test_associate_errors(user, call_permission):
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).put
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.user()
@@ -41,16 +41,16 @@ def test_dissociate_errors(user, call_permission):
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 def test_get_errors():
     fake_user = confd.users(FAKE_ID).callpermissions.get
     fake_call_permission = confd.callpermissions(FAKE_ID).users.get
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.user()
@@ -222,7 +222,7 @@ def test_delete_user_when_user_and_call_permission_associated(user, call_permiss
         assert_that(response.items, not_(empty()))
         confd.users(user['id']).delete().assert_deleted()
         invalid_user = confd.users(user['id']).callpermissions.get
-        yield s.check_resource_not_found, invalid_user, 'User'
+        s.check_resource_not_found(invalid_user, 'User')
 
 
 @fixtures.user()

@@ -16,67 +16,65 @@ from ..helpers import scenarios as s
 
 def test_get_errors():
     fake_register_iax = confd.registers.iax(999999).get
-    yield s.check_resource_not_found, fake_register_iax, 'IAXRegister'
+    s.check_resource_not_found(fake_register_iax, 'IAXRegister')
 
 
 def test_delete_errors():
     fake_register_iax = confd.registers.iax(999999).delete
-    yield s.check_resource_not_found, fake_register_iax, 'IAXRegister'
+    s.check_resource_not_found(fake_register_iax, 'IAXRegister')
 
 
 def test_post_errors():
     url = confd.registers.iax.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.register_iax()
 def test_put_errors(register_iax):
     url = confd.registers.iax(register_iax['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'auth_username', ':'
-    yield s.check_bogus_field_returns_error, url, 'auth_username', '/'
-    yield s.check_bogus_field_returns_error, url, 'auth_username', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'auth_username', 123
-    yield s.check_bogus_field_returns_error, url, 'auth_username', True
-    yield s.check_bogus_field_returns_error, url, 'auth_username', []
-    yield s.check_bogus_field_returns_error, url, 'auth_username', {}
-    yield s.check_bogus_field_returns_error, url, 'auth_password', ':'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', '/'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'auth_password', 123
-    yield s.check_bogus_field_returns_error, url, 'auth_password', True
-    yield s.check_bogus_field_returns_error, url, 'auth_password', []
-    yield s.check_bogus_field_returns_error, url, 'auth_password', {}
-    yield s.check_bogus_field_returns_error, url, 'remote_host', ':'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', '/'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', '?'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'remote_host', 123
-    yield s.check_bogus_field_returns_error, url, 'remote_host', True
-    yield s.check_bogus_field_returns_error, url, 'remote_host', []
-    yield s.check_bogus_field_returns_error, url, 'remote_host', {}
-    yield s.check_bogus_field_returns_error, url, 'remote_port', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'remote_port', []
-    yield s.check_bogus_field_returns_error, url, 'remote_port', {}
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', '?'
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', 'value with space'
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', 123
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', True
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', []
-    yield s.check_bogus_field_returns_error, url, 'callback_extension', {}
-    yield s.check_bogus_field_returns_error, url, 'callback_context', 123
-    yield s.check_bogus_field_returns_error, url, 'callback_context', True
-    yield s.check_bogus_field_returns_error, url, 'callback_context', []
-    yield s.check_bogus_field_returns_error, url, 'callback_context', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'string'
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'auth_username', ':')
+    s.check_bogus_field_returns_error(url, 'auth_username', '/')
+    s.check_bogus_field_returns_error(url, 'auth_username', 'value with space')
+    s.check_bogus_field_returns_error(url, 'auth_username', 123)
+    s.check_bogus_field_returns_error(url, 'auth_username', True)
+    s.check_bogus_field_returns_error(url, 'auth_username', [])
+    s.check_bogus_field_returns_error(url, 'auth_username', {})
+    s.check_bogus_field_returns_error(url, 'auth_password', ':')
+    s.check_bogus_field_returns_error(url, 'auth_password', '/')
+    s.check_bogus_field_returns_error(url, 'auth_password', 'value with space')
+    s.check_bogus_field_returns_error(url, 'auth_password', 123)
+    s.check_bogus_field_returns_error(url, 'auth_password', True)
+    s.check_bogus_field_returns_error(url, 'auth_password', [])
+    s.check_bogus_field_returns_error(url, 'auth_password', {})
+    s.check_bogus_field_returns_error(url, 'remote_host', ':')
+    s.check_bogus_field_returns_error(url, 'remote_host', '/')
+    s.check_bogus_field_returns_error(url, 'remote_host', '?')
+    s.check_bogus_field_returns_error(url, 'remote_host', 'value with space')
+    s.check_bogus_field_returns_error(url, 'remote_host', 123)
+    s.check_bogus_field_returns_error(url, 'remote_host', True)
+    s.check_bogus_field_returns_error(url, 'remote_host', [])
+    s.check_bogus_field_returns_error(url, 'remote_host', {})
+    s.check_bogus_field_returns_error(url, 'remote_port', 'invalid')
+    s.check_bogus_field_returns_error(url, 'remote_port', [])
+    s.check_bogus_field_returns_error(url, 'remote_port', {})
+    s.check_bogus_field_returns_error(url, 'callback_extension', '?')
+    s.check_bogus_field_returns_error(url, 'callback_extension', 'value with space')
+    s.check_bogus_field_returns_error(url, 'callback_extension', 123)
+    s.check_bogus_field_returns_error(url, 'callback_extension', True)
+    s.check_bogus_field_returns_error(url, 'callback_extension', [])
+    s.check_bogus_field_returns_error(url, 'callback_extension', {})
+    s.check_bogus_field_returns_error(url, 'callback_context', 123)
+    s.check_bogus_field_returns_error(url, 'callback_context', True)
+    s.check_bogus_field_returns_error(url, 'callback_context', [])
+    s.check_bogus_field_returns_error(url, 'callback_context', {})
+    s.check_bogus_field_returns_error(url, 'enabled', 'string')
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
 
 @fixtures.register_iax()
@@ -156,6 +154,6 @@ def test_delete(register_iax):
 
 @fixtures.register_iax()
 def test_bus_events(register_iax):
-    yield s.check_bus_event, 'config.register.iax.created', confd.registers.iax.post, {'remote_host': 'bus-event'}
-    yield s.check_bus_event, 'config.register.iax.edited', confd.registers.iax(register_iax['id']).put
-    yield s.check_bus_event, 'config.register.iax.deleted', confd.registers.iax(register_iax['id']).delete
+    s.check_bus_event('config.register.iax.created', confd.registers.iax.post, {'remote_host': 'bus-event'})
+    s.check_bus_event('config.register.iax.edited', confd.registers.iax(register_iax['id']).put)
+    s.check_bus_event('config.register.iax.deleted', confd.registers.iax(register_iax['id']).delete)

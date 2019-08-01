@@ -28,70 +28,67 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_get = confd.callfilters(999999).get
-    yield s.check_resource_not_found, fake_get, 'CallFilter'
+    s.check_resource_not_found(fake_get, 'CallFilter')
 
 
 def test_post_errors():
     url = confd.callfilters.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.call_filter()
 def test_put_errors(call_filter):
     url = confd.callfilters(call_filter['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'source', 123
-    yield s.check_bogus_field_returns_error, url, 'source', True
-    yield s.check_bogus_field_returns_error, url, 'source', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'source', {}
-    yield s.check_bogus_field_returns_error, url, 'source', []
-    yield s.check_bogus_field_returns_error, url, 'strategy', 123
-    yield s.check_bogus_field_returns_error, url, 'strategy', None
-    yield s.check_bogus_field_returns_error, url, 'strategy', False
-    yield s.check_bogus_field_returns_error, url, 'strategy', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'strategy', {}
-    yield s.check_bogus_field_returns_error, url, 'strategy', []
-    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'surrogates_timeout', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', []
-    yield s.check_bogus_field_returns_error, url, 'description', 123
-    yield s.check_bogus_field_returns_error, url, 'description', True
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'source', 123)
+    s.check_bogus_field_returns_error(url, 'source', True)
+    s.check_bogus_field_returns_error(url, 'source', 'invalid')
+    s.check_bogus_field_returns_error(url, 'source', {})
+    s.check_bogus_field_returns_error(url, 'source', [])
+    s.check_bogus_field_returns_error(url, 'strategy', 123)
+    s.check_bogus_field_returns_error(url, 'strategy', None)
+    s.check_bogus_field_returns_error(url, 'strategy', False)
+    s.check_bogus_field_returns_error(url, 'strategy', 'invalid')
+    s.check_bogus_field_returns_error(url, 'strategy', {})
+    s.check_bogus_field_returns_error(url, 'strategy', [])
+    s.check_bogus_field_returns_error(url, 'surrogates_timeout', 'ten')
+    s.check_bogus_field_returns_error(url, 'surrogates_timeout', -1)
+    s.check_bogus_field_returns_error(url, 'surrogates_timeout', {})
+    s.check_bogus_field_returns_error(url, 'surrogates_timeout', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 'invalid')
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_name', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'caller_id_name', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_name', [])
+    s.check_bogus_field_returns_error(url, 'description', 123)
+    s.check_bogus_field_returns_error(url, 'description', True)
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.call_filter(name='unique')
 def unique_error_checks(url, call_filter):
-    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'}
+    s.check_bogus_field_returns_error(url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'})
 
 
 @fixtures.call_filter(name="search", description="SearchDesc")
@@ -104,7 +101,7 @@ def test_search(call_filter, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, call_filter, hidden, field, term
+        check_search(url, call_filter, hidden, field, term)
 
 
 def check_search(url, call_filter, hidden, field, term):
@@ -121,13 +118,13 @@ def check_search(url, call_filter, hidden, field, term):
 @fixtures.call_filter(name="sort2", description="Sort 2")
 def test_sorting_offset_limit(call_filter1, call_filter2):
     url = confd.callfilters.get
-    yield s.check_sorting, url, call_filter1, call_filter2, 'name', 'sort'
-    yield s.check_sorting, url, call_filter1, call_filter2, 'description', 'Sort'
+    s.check_sorting(url, call_filter1, call_filter2, 'name', 'sort')
+    s.check_sorting(url, call_filter1, call_filter2, 'description', 'Sort')
 
-    yield s.check_offset, url, call_filter1, call_filter2, 'name', 'sort'
-    yield s.check_offset_legacy, url, call_filter1, call_filter2, 'name', 'sort'
+    s.check_offset(url, call_filter1, call_filter2, 'name', 'sort')
+    s.check_offset_legacy(url, call_filter1, call_filter2, 'name', 'sort')
 
-    yield s.check_limit, url, call_filter1, call_filter2, 'name', 'sort'
+    s.check_limit(url, call_filter1, call_filter2, 'name', 'sort')
 
 
 @fixtures.call_filter(wazo_tenant=MAIN_TENANT)

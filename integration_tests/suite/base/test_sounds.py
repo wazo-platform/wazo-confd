@@ -34,7 +34,7 @@ def setup_module():
 
 def test_get_errors():
     fake_sound = confd.sounds('invalid').get
-    yield s.check_resource_not_found, fake_sound, 'Sound'
+    s.check_resource_not_found(fake_sound, 'Sound')
 
     for invalid_name in ['.foo', 'foo/bar', '../bar']:
         response = confd.sounds(invalid_name).get()
@@ -43,33 +43,30 @@ def test_get_errors():
 
 def test_delete_errors():
     fake_sound = confd.sounds('invalid').delete
-    yield s.check_resource_not_found, fake_sound, 'Sound'
+    s.check_resource_not_found(fake_sound, 'Sound')
 
 
 def test_post_errors():
     url = confd.sounds.post
-    for check in error_checks(url):
-        yield check
-
-    for check in unique_error_checks(url):
-        yield check
+    error_checks(url)
+    unique_error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(150)
-    yield s.check_bogus_field_returns_error, url, 'name', '.foo'
-    yield s.check_bogus_field_returns_error, url, 'name', 'foo\nbar'
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(150))
+    s.check_bogus_field_returns_error(url, 'name', '.foo')
+    s.check_bogus_field_returns_error(url, 'name', 'foo\nbar')
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
 
-    yield s.check_bogus_field_returns_error, url, 'name', 'system'
+    s.check_bogus_field_returns_error(url, 'name', 'system')
 
 
 @fixtures.sound(name='unique')
 def unique_error_checks(url, sound):
-    yield s.check_bogus_field_returns_error, url, 'name', sound['name']
+    s.check_bogus_field_returns_error(url, 'name', sound['name'])
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
@@ -622,5 +619,5 @@ def _new_sound_file_client():
 
 
 def test_bus_events():
-    yield s.check_bus_event, 'config.sounds.created', confd.sounds.post, {'name': 'bus_event'}
-    yield s.check_bus_event, 'config.sounds.deleted', confd.sounds('bus_event').delete
+    s.check_bus_event('config.sounds.created', confd.sounds.post, {'name': 'bus_event'})
+    s.check_bus_event('config.sounds.deleted', confd.sounds('bus_event').delete)

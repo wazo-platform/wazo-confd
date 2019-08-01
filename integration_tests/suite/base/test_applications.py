@@ -29,38 +29,36 @@ FAKE_UUID = '00000000-0000-0000-0000-000000000000'
 
 def test_get_errors():
     fake_application = confd.applications(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_application, 'Application'
+    s.check_resource_not_found(fake_application, 'Application')
 
 
 def test_delete_errors():
     fake_application = confd.applications(FAKE_UUID).delete
-    yield s.check_resource_not_found, fake_application, 'Application'
+    s.check_resource_not_found(fake_application, 'Application')
 
 
 def test_post_errors():
     url = confd.applications.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.application()
 def test_put_errors(application):
     url = confd.applications(application['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'destination', True
-    yield s.check_bogus_field_returns_error, url, 'destination', 1234
-    yield s.check_bogus_field_returns_error, url, 'destination', 'invalid choice'
-    yield s.check_bogus_field_returns_error, url, 'destination', []
-    yield s.check_bogus_field_returns_error, url, 'destination', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'destination', True)
+    s.check_bogus_field_returns_error(url, 'destination', 1234)
+    s.check_bogus_field_returns_error(url, 'destination', 'invalid choice')
+    s.check_bogus_field_returns_error(url, 'destination', [])
+    s.check_bogus_field_returns_error(url, 'destination', {})
 
 
 @fixtures.application(name='search')
@@ -72,7 +70,7 @@ def test_search(application, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, application, hidden, field, term
+        check_search(url, application, hidden, field, term)
 
 
 def check_search(url, application, hidden, field, term):
@@ -90,12 +88,12 @@ def check_search(url, application, hidden, field, term):
 def test_sort_offset_limit(application1, application2):
     url = confd.applications.get
     id_field = 'uuid'
-    yield s.check_sorting, url, application1, application2, 'name', 'sort', id_field
+    s.check_sorting(url, application1, application2, 'name', 'sort', id_field)
 
-    yield s.check_offset, url, application1, application2, 'name', 'sort', id_field
-    yield s.check_offset_legacy, url, application1, application2, 'name', 'sort', id_field
+    s.check_offset(url, application1, application2, 'name', 'sort', id_field)
+    s.check_offset_legacy(url, application1, application2, 'name', 'sort', id_field)
 
-    yield s.check_limit, url, application1, application2, 'name', 'sort', id_field
+    s.check_limit(url, application1, application2, 'name', 'sort', id_field)
 
 
 @fixtures.application(wazo_tenant=MAIN_TENANT)
@@ -262,6 +260,6 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.application()
 def test_bus_events(application):
-    yield s.check_bus_event, 'config.applications.created', confd.applications.post
-    yield s.check_bus_event, 'config.applications.edited', confd.applications(application['uuid']).put
-    yield s.check_bus_event, 'config.applications.deleted', confd.applications(application['uuid']).delete
+    s.check_bus_event('config.applications.created', confd.applications.post)
+    s.check_bus_event('config.applications.edited', confd.applications(application['uuid']).put)
+    s.check_bus_event('config.applications.deleted', confd.applications(application['uuid']).delete)

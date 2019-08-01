@@ -33,8 +33,8 @@ def test_associate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.lines(line['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
@@ -60,8 +60,8 @@ def test_dissociate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.lines(line['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
@@ -84,8 +84,8 @@ def test_get_errors():
     fake_line = confd.lines(FAKE_ID).extensions.get
     fake_extension = confd.extensions(FAKE_ID).lines.get
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.extension()
@@ -93,8 +93,8 @@ def test_get_errors_deprecated(extension):
     fake_extension_deprecated = confd.extensions(FAKE_ID).line.get
     not_associated_extension_deprecated = confd.extensions(extension['id']).line.get
 
-    yield s.check_resource_not_found, fake_extension_deprecated, 'Extension'
-    yield s.check_resource_not_found, not_associated_extension_deprecated, 'LineExtension'
+    s.check_resource_not_found(fake_extension_deprecated, 'Extension')
+    s.check_resource_not_found(not_associated_extension_deprecated, 'LineExtension')
 
 
 @fixtures.line_sip()

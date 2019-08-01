@@ -31,8 +31,8 @@ def test_associate_errors(extension, queue):
     fake_queue = confd.queues(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.queues(queue['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.extension(exten=gen_queue_exten())
@@ -41,8 +41,8 @@ def test_dissociate_errors(extension, queue):
     fake_queue = confd.queues(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.queues(queue['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.extension(exten=gen_queue_exten())
@@ -211,5 +211,5 @@ def test_delete_extension_associated_to_queue(extension, queue):
 @fixtures.queue()
 def test_bus_events(extension, queue):
     url = confd.queues(queue['id']).extensions(extension['id'])
-    yield s.check_bus_event, 'config.queues.extensions.updated', url.put
-    yield s.check_bus_event, 'config.queues.extensions.deleted', url.delete
+    s.check_bus_event('config.queues.extensions.updated', url.put)
+    s.check_bus_event('config.queues.extensions.deleted', url.delete)

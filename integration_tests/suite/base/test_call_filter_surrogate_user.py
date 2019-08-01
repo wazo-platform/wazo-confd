@@ -33,23 +33,22 @@ def test_associate_errors(call_filter, user):
     response.assert_status(404)
 
     url = confd.callfilters(call_filter['id']).surrogates.users.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'users', 123
-    yield s.check_bogus_field_returns_error, url, 'users', None
-    yield s.check_bogus_field_returns_error, url, 'users', True
-    yield s.check_bogus_field_returns_error, url, 'users', 'string'
-    yield s.check_bogus_field_returns_error, url, 'users', [123]
-    yield s.check_bogus_field_returns_error, url, 'users', [None]
-    yield s.check_bogus_field_returns_error, url, 'users', ['string']
-    yield s.check_bogus_field_returns_error, url, 'users', [{}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
+    s.check_bogus_field_returns_error(url, 'users', 123)
+    s.check_bogus_field_returns_error(url, 'users', None)
+    s.check_bogus_field_returns_error(url, 'users', True)
+    s.check_bogus_field_returns_error(url, 'users', 'string')
+    s.check_bogus_field_returns_error(url, 'users', [123])
+    s.check_bogus_field_returns_error(url, 'users', [None])
+    s.check_bogus_field_returns_error(url, 'users', ['string'])
+    s.check_bogus_field_returns_error(url, 'users', [{}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': 1}, {'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'not_uuid': 123}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': FAKE_UUID}])
 
 
 @fixtures.call_filter()
@@ -157,7 +156,7 @@ def test_delete_call_filter_when_call_filter_and_user_associated(call_filter, us
         confd.callfilters(call_filter['id']).delete().assert_deleted()
 
         deleted_call_filter = confd.callfilters(call_filter['id']).get
-        yield s.check_resource_not_found, deleted_call_filter, 'CallFilter'
+        s.check_resource_not_found(deleted_call_filter, 'CallFilter')
 
         # When the relation will be added,
         # we should check if users have the key.callfilters to empty
@@ -172,10 +171,10 @@ def test_delete_user_when_call_filter_and_user_associated(call_filter1, call_fil
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.callfilters(call_filter1['id']).get()
-        yield assert_that, response.item['surrogates']['users'], empty()
+        assert_that(response.item['surrogates']['users'], empty())
 
         response = confd.callfilters(call_filter2['id']).get()
-        yield assert_that, response.item['surrogates']['users'], empty()
+        assert_that(response.item['surrogates']['users'], empty())
 
 
 @fixtures.call_filter()
@@ -183,4 +182,4 @@ def test_delete_user_when_call_filter_and_user_associated(call_filter1, call_fil
 def test_bus_events(call_filter, user):
     url = confd.callfilters(call_filter['id']).surrogates.users.put
     body = {'users': [user]}
-    yield s.check_bus_event, 'config.callfilters.surrogates.users.updated', url, body
+    s.check_bus_event('config.callfilters.surrogates.users.updated', url, body)

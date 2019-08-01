@@ -30,23 +30,22 @@ def test_associate_errors(call_pickup, user):
     response.assert_status(404)
 
     url = confd.callpickups(call_pickup['id']).interceptors.users.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'users', 123
-    yield s.check_bogus_field_returns_error, url, 'users', None
-    yield s.check_bogus_field_returns_error, url, 'users', True
-    yield s.check_bogus_field_returns_error, url, 'users', 'string'
-    yield s.check_bogus_field_returns_error, url, 'users', [123]
-    yield s.check_bogus_field_returns_error, url, 'users', [None]
-    yield s.check_bogus_field_returns_error, url, 'users', ['string']
-    yield s.check_bogus_field_returns_error, url, 'users', [{}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
+    s.check_bogus_field_returns_error(url, 'users', 123)
+    s.check_bogus_field_returns_error(url, 'users', None)
+    s.check_bogus_field_returns_error(url, 'users', True)
+    s.check_bogus_field_returns_error(url, 'users', 'string')
+    s.check_bogus_field_returns_error(url, 'users', [123])
+    s.check_bogus_field_returns_error(url, 'users', [None])
+    s.check_bogus_field_returns_error(url, 'users', ['string'])
+    s.check_bogus_field_returns_error(url, 'users', [{}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': 1}, {'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'not_uuid': 123}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': FAKE_UUID}])
 
 
 @fixtures.call_pickup()
@@ -146,7 +145,7 @@ def test_delete_call_pickup_when_call_pickup_and_user_associated(call_pickup, us
         confd.callpickups(call_pickup['id']).delete().assert_deleted()
 
         deleted_call_pickup = confd.callpickups(call_pickup['id']).get
-        yield s.check_resource_not_found, deleted_call_pickup, 'CallPickup'
+        s.check_resource_not_found(deleted_call_pickup, 'CallPickup')
 
         # When the relation will be added,
         # we should check if users have the key.callpickups to empty
@@ -161,10 +160,10 @@ def test_delete_user_when_call_pickup_and_user_associated(call_pickup1, call_pic
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.callpickups(call_pickup1['id']).get()
-        yield assert_that, response.item['interceptors']['users'], empty()
+        assert_that(response.item['interceptors']['users'], empty())
 
         response = confd.callpickups(call_pickup2['id']).get()
-        yield assert_that, response.item['interceptors']['users'], empty()
+        assert_that(response.item['interceptors']['users'], empty())
 
 
 @fixtures.call_pickup()
@@ -172,4 +171,4 @@ def test_delete_user_when_call_pickup_and_user_associated(call_pickup1, call_pic
 def test_bus_events(call_pickup, user):
     url = confd.callpickups(call_pickup['id']).interceptors.users.put
     body = {'users': [user]}
-    yield s.check_bus_event, 'config.callpickups.interceptors.users.updated', url, body
+    s.check_bus_event('config.callpickups.interceptors.users.updated', url, body)
