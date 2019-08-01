@@ -7,6 +7,7 @@ from xivo_dao.resources.line import dao as line_dao_module
 from wazo_confd.helpers.resource import CRUDService
 from wazo_confd.plugins.device import builder as device_builder
 from wazo_confd.plugins.line_device.service import build_service as line_device_build_service
+from wazo_confd.plugins.registrar.dao import RegistrarDao
 from wazo_confd.plugins.user_line.service import build_service as user_line_build_service
 
 from .notifier import build_notifier
@@ -55,9 +56,10 @@ class LineService(CRUDService):
 def build_service(provd_client):
     device_dao = device_builder.build_dao(provd_client)
     device_updater = device_builder.build_device_updater(provd_client)
+    registrar_dao = RegistrarDao(provd_client)
 
     return LineService(line_dao_module,
-                       build_validator(device_dao),
+                       build_validator(registrar_dao),
                        build_notifier(),
                        device_updater,
                        device_dao,

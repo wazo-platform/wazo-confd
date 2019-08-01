@@ -1,6 +1,18 @@
 Changelog
 =========
 
+19.11
+-----
+
+* A new API for configuring the provisioning registrars has been added:
+
+  * GET `/1.1/registrars`
+  * POST `/1.1/registrars`
+  * GET `/1.1/registrars/<registrar_id>`
+  * PUT `/1.1/registrars/<registrar_id>`
+  * DELETE `/1.1/registrars/<registrar_id>`
+
+
 19.10
 -----
 

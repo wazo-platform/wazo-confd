@@ -120,8 +120,8 @@ class FuncKeyGenerator:
 
 class SipGenerator:
 
-    def __init__(self, device_dao, device_db):
-        self.device_dao = device_dao
+    def __init__(self, registrar_dao, device_db):
+        self.registrar_dao = registrar_dao
         self.device_db = device_db
 
     def generate(self, device):
@@ -138,28 +138,39 @@ class SipGenerator:
         line = row.LineFeatures
         sip = row.UserSIP
         extension = row.Extension
-        registrar = self.device_dao.get_registrar(line.configregistrar)
+        registrar = self.registrar_dao.get(line.configregistrar)
 
         config = {'auth_username': sip.name,
                   'username': sip.name,
                   'password': sip.secret,
                   'display_name': line.caller_id_name,
                   'number': extension.exten,
-                  'registrar_ip': registrar['registrar_main'],
-                  'proxy_ip': registrar['proxy_main']}
+                  'registrar_ip': registrar.main_host,
+                  'proxy_ip': registrar.proxy_main_host}
 
-        proxy_backup = registrar.get('proxy_backup', '')
-        if proxy_backup:
-            config['backup_proxy_ip'] = proxy_backup
-            config['backup_registrar_ip'] = registrar['registrar_backup']
+        optional_keys = {
+            'registrar_port': 'main_port',
+            'proxy_port': 'proxy_main_port',
+            'backup_proxy_ip': 'proxy_backup_host',
+            'backup_proxy_port': 'proxy_backup_port',
+            'backup_registrar_ip': 'backup_host',
+            'backup_registrar_port': 'backup_port',
+            'outbound_proxy_ip': 'outbound_proxy_host',
+            'outbound_proxy_port': 'outbound_proxy_port',
+        }
+
+        for real_key, registrar_key in optional_keys.items():
+            value = getattr(registrar, registrar_key, None)
+            if value:
+                config[real_key] = value
 
         return config
 
 
 class SccpGenerator:
 
-    def __init__(self, device_dao, line_dao):
-        self.device_dao = device_dao
+    def __init__(self, registrar_dao, line_dao):
+        self.registrar_dao = registrar_dao
         self.line_dao = line_dao
 
     def generate(self, device):
@@ -167,10 +178,10 @@ class SccpGenerator:
 
         line = self.line_dao.find_by(device=device.id, protocol='sccp')
         if line:
-            registrar = self.device_dao.get_registrar(line.configregistrar)
-            proxy_backup = registrar.get('proxy_backup')
+            registrar = self.registrar_dao.get(line.configregistrar)
+            proxy_backup = registrar.proxy_backup_host
 
-            call_managers['1'] = {'ip': registrar['proxy_main']}
+            call_managers['1'] = {'ip': registrar.proxy_main_host}
             if proxy_backup:
                 call_managers['2'] = {'ip': proxy_backup}
 

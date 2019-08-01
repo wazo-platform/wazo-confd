@@ -135,6 +135,7 @@ DEFAULT_CONFIG = {
         'queue_schedule': True,
         'register_iax': True,
         'register_sip': True,
+        'registrar': True,
         'rtp': True,
         'schedule': True,
         'sccp_general': True,

@@ -11,7 +11,6 @@ from hamcrest import (
     equal_to,
     has_entries,
     has_items,
-    has_key,
     is_,
     is_not,
     none,
@@ -32,40 +31,7 @@ from ..helpers.config import (
     MAIN_TENANT,
     SUB_TENANT,
 )
-
-
-@contextmanager
-def line_fellowship(endpoint_type='sip', wazo_tenant=None):
-    context = h.context.generate_context(wazo_tenant=wazo_tenant)
-    user = h.user.generate_user(wazo_tenant=wazo_tenant, context=context['name'])
-    line = h.line.generate_line(wazo_tenant=wazo_tenant, context=context['name'])
-    extension = h.extension.generate_extension(wazo_tenant=wazo_tenant, context=context['name'])
-
-    if endpoint_type == 'sip':
-        endpoint = h.endpoint_sip.generate_sip(wazo_tenant=wazo_tenant)
-        line_endpoint = h.line_endpoint_sip
-    else:
-        endpoint = h.endpoint_sccp.generate_sccp(wazo_tenant=wazo_tenant)
-        line_endpoint = h.line_endpoint_sccp
-
-    line_endpoint.associate(line['id'], endpoint['id'])
-    h.user_line.associate(user['id'], line['id'])
-    h.line_extension.associate(line['id'], extension['id'])
-
-    yield user, line, extension, endpoint
-
-    h.line_extension.dissociate(line['id'], extension['id'], False)
-    h.user_line.dissociate(user['id'], line['id'], False)
-    line_endpoint.dissociate(line['id'], endpoint['id'], False)
-
-    if endpoint_type == 'sip':
-        h.endpoint_sip.delete_sip(endpoint['id'])
-    else:
-        h.endpoint_sccp.delete_sccp(endpoint['id'])
-
-    h.user.delete_user(user['id'])
-    h.line.delete_line(line['id'])
-    h.extension.delete_extension(extension['id'])
+from ..helpers.helpers.line_fellowship import line_fellowship
 
 
 @contextmanager
@@ -223,40 +189,6 @@ def test_get_line_associated_to_a_device_from_sub_tenant_errors():
         response.assert_status(404)
 
 
-def test_registrar_addresses_without_backup_on_sip_device():
-    provd.reset()
-    registrar = provd.configs.get('default')
-
-    with line_and_device('sip') as (line, device), a.line_device(line, device):
-        config = provd.configs.get(device['id'])
-        sip_config = config['raw_config']['sip_lines']['1']
-
-        assert_that(sip_config, has_entries(
-            proxy_ip=registrar['proxy_main'],
-            registrar_ip=registrar['registrar_main']
-        ))
-
-        assert_that(sip_config, is_not(has_key('backup_proxy_ip')))
-        assert_that(sip_config, is_not(has_key('backup_registrar_ip')))
-
-
-def check_registrar_addresses_without_backup_on_sccp_device():
-    provd.reset()
-    registrar = provd.configs.get('default')
-
-    with line_and_device('sccp') as (line, device), a.line_device(line, device):
-        config = provd.configs.get(device['id'])
-        sccp_config = config['raw_config']['sccp_call_managers']
-
-        assert_that(sccp_config, has_entries(
-            {'1': has_entries(
-                ip=registrar['proxy_main']
-            )}
-        ))
-
-        assert_that(sccp_config, is_not(has_key('2')))
-
-
 def assert_provd_config(user, line, provd_config):
     assert_that(provd_config, has_entries(
         id=is_not(starts_with('autoprov')),
@@ -284,7 +216,7 @@ def assert_provd_config(user, line, provd_config):
 def assert_sip_config(user, sip, extension, provd_config, position=1):
     position = str(position)
     fullname = "{u[firstname]} {u[lastname]}".format(u=user)
-    registrar = provd.configs.get('default')
+    registrar = confd.registrars('default').get().item
 
     assert_that(provd_config['raw_config'], has_entries(
         protocol='SIP',
@@ -295,26 +227,26 @@ def assert_sip_config(user, sip, extension, provd_config, position=1):
                 password=sip['secret'],
                 display_name=fullname,
                 number=extension['exten'],
-                proxy_ip=registrar['proxy_main'],
-                registrar_ip=registrar['registrar_main'],
-                backup_proxy_ip=registrar['proxy_backup'],
-                backup_registrar_ip=registrar['registrar_backup']
+                proxy_ip=registrar['proxy_main_host'],
+                registrar_ip=registrar['main_host'],
+                backup_proxy_ip=registrar['proxy_backup_host'],
+                backup_registrar_ip=registrar['backup_host']
             )
         })
     ))
 
 
 def assert_sccp_config(provd_config):
-    registrar = provd.configs.get('default')
+    registrar = confd.registrars('default').get().item
 
     assert_that(provd_config['raw_config'], has_entries(
         protocol='SCCP',
         sccp_call_managers=has_entries({
             '1': has_entries(
-                ip=registrar['proxy_main']
+                ip=registrar['proxy_main_host']
             ),
             '2': has_entries(
-                ip=registrar['proxy_backup']
+                ip=registrar['proxy_backup_host']
             )
         })
     ))
@@ -322,10 +254,10 @@ def assert_sccp_config(provd_config):
 
 @fixtures.device()
 def test_associate_sip_line(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    registrar['registrar_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    registrar['backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar)
 
     with line_fellowship('sip') as (user, line, extension, sip):
         response = confd.lines(line['id']).devices(device['id']).put()
@@ -341,10 +273,10 @@ def test_associate_sip_line(device):
 
 @fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
 def test_associate_sip_line_change_tenant(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    registrar['registrar_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    registrar['backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar)
 
     with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, line, extension, sip):
         response = confd.lines(line['id']).devices(device['id']).put()
@@ -356,10 +288,10 @@ def test_associate_sip_line_change_tenant(device):
 
 @fixtures.device()
 def test_associate_2_sip_lines(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    registrar['registrar_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    registrar['backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar)
 
     with line_fellowship('sip') as (user1, line1, extension1, sip1), \
             line_fellowship('sip') as (user2, line2, extension2, sip2):
@@ -422,9 +354,9 @@ def assert_sccp_in_db(line, device):
 
 @fixtures.device()
 def test_associate_sccp_line(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar)
 
     with line_fellowship('sccp') as (user, line, extension, sccp):
         response = confd.lines(line['id']).devices(device['id']).put()
@@ -441,9 +373,9 @@ def test_associate_sccp_line(device):
 
 @fixtures.device(wazo_tenant=DEFAULT_DEVICE_TENANT)
 def test_associate_sccp_line_change_tenant(device):
-    registrar = provd.configs.get('default')
-    registrar['proxy_backup'] = '127.0.0.2'
-    provd.configs.update(registrar)
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar)
 
     with line_fellowship('sccp', wazo_tenant=SUB_TENANT) as (user, line, extension, sccp):
         response = confd.lines(line['id']).devices(device['id']).put()

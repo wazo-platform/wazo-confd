@@ -117,14 +117,3 @@ class DeviceDao:
     def device_templates(self):
         templates = self.configs.list({'X_type': 'device'})['configs']
         return [t['id'] for t in templates]
-
-    def get_registrar(self, registrar_id):
-        registrars = self.configs.list({'X_type': 'registrar',
-                                        'id': registrar_id})['configs']
-        if not registrars:
-            raise errors.not_found('Registrar', id=registrar_id)
-        return registrars[0]
-
-    def registrars(self):
-        registrars = self.configs.list({'X_type': 'registrar'})['configs']
-        return [r['id'] for r in registrars]
