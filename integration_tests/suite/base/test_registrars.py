@@ -37,7 +37,7 @@ def line_device(endpoint_type='sip', registrar=None):
         with a.line_device(line, device):
             yield line, device
 
-    h.device.delete_device(device)
+    h.device.delete_device(device['id'])
 
 
 def test_search_errors():
@@ -121,13 +121,13 @@ def check_search(url, registrar, hidden, field, term):
     main_port=5060,
 )
 @fixtures.registrar(
-    proxy_main_host="99.21.30.40",
+    proxy_main_host="99.20.30.50",
     name="SortRegistrar2",
     main_port=5061,
 )
 def test_sorting_offset_limit(registrar1, registrar2):
     url = confd.registrars.get
-    yield s.check_sorting, url, registrar1, registrar2, 'proxy_main_host', '99.'
+    yield s.check_sorting, url, registrar1, registrar2, 'proxy_main_host', '99.20.30.'
     yield s.check_sorting, url, registrar1, registrar2, 'name', 'SortRegistrar'
     yield s.check_sorting, url, registrar1, registrar2, 'main_port', 'SortRegistrar'
 
