@@ -23,12 +23,12 @@ class Plugin:
         api.add_resource(
             RegistrarList,
             '/registrars',
-            endpoint='registrars',
             resource_class_args=(service,)
         )
 
         api.add_resource(
             RegistrarItem,
             '/registrars/<id>',
+            endpoint='registrars',
             resource_class_args=(service,)
         )
