@@ -72,7 +72,6 @@ DEFAULT_CONFIG = {
         'agent_skill': True,
         'api': True,
         'application': True,
-        'call_log': True,
         'call_filter': True,
         'call_filter_fallback': True,
         'call_filter_user': True,

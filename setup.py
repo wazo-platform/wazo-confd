@@ -27,7 +27,6 @@ setup(
             'agent_skill = wazo_confd.plugins.agent_skill.plugin:Plugin',
             'api = wazo_confd.plugins.api.plugin:Plugin',
             'application = wazo_confd.plugins.application.plugin:Plugin',
-            'call_log = wazo_confd.plugins.call_log.plugin:Plugin',
             'call_filter = wazo_confd.plugins.call_filter.plugin:Plugin',
             'call_filter_fallback = wazo_confd.plugins.call_filter_fallback.plugin:Plugin',
             'call_filter_user = wazo_confd.plugins.call_filter_user.plugin:Plugin',
