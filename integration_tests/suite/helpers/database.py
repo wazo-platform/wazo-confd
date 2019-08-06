@@ -558,11 +558,12 @@ class DatabaseQueries:
 
         return count > 0
 
-    def insert_call_log(self, date, date_answer, date_end, source_name, source_exten, destination_exten, user_field):
+    def insert_call_log(self, tenant_uuid, date, date_answer, date_end, source_name, source_exten, destination_exten, user_field):
         query = text("""INSERT INTO call_log(date, date_answer, date_end, source_name, source_exten, destination_exten, user_field)
                         VALUES (:date, :date_answer, :date_end, :source_name, :source_exten, :destination_exten, :user_field)
                         RETURNING id""")
         return self.connection.execute(query,
+                                       tenant_uuid=tenant_uuid,
                                        date=date,
                                        date_answer=date_answer,
                                        date_end=date_end,
