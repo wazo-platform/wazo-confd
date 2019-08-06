@@ -17,6 +17,8 @@ from ..helpers import (
     fixtures,
 )
 
+TENANT_UUID = "93247011-726d-4407-9690-12ef087f1f92"
+
 
 class TestCallLogs(unittest.TestCase):
 
@@ -42,6 +44,7 @@ class TestCallLogs(unittest.TestCase):
         response.assert_match(400, e.missing_parameters(field='end_date', type='datetime'))
 
     @fixtures.call_log(
+        tenant_uuid=TENANT_UUID,
         date=datetime(2013, 1, 30, 8, 46, 20),
         date_answer=datetime(2013, 1, 30, 8, 46, 20),
         date_end=datetime(2013, 1, 30, 8, 46, 23),
@@ -50,6 +53,7 @@ class TestCallLogs(unittest.TestCase):
         destination_exten='1001',
     )
     @fixtures.call_log(
+        tenant_uuid=TENANT_UUID,
         date=datetime(2013, 1, 30, 11, 3, 47),
         date_answer=None,
         date_end=datetime(2013, 1, 30, 11, 3, 47),
@@ -58,6 +62,7 @@ class TestCallLogs(unittest.TestCase):
         destination_exten='4185550155',
     )
     @fixtures.call_log(
+        tenant_uuid=TENANT_UUID,
         date=datetime(2013, 1, 30, 11, 20, 8),
         date_answer=datetime(2013, 1, 30, 11, 20, 8),
         date_end=datetime(2013, 1, 30, 11, 20, 11),
@@ -77,6 +82,7 @@ class TestCallLogs(unittest.TestCase):
                     'Called': '1001',
                     'Period': '3',
                     'user Field': '',
+                    'tenant_uuid': TENANT_UUID,
                 },
                 {
                     'Call Date': '2013-01-30T11:03:47',
@@ -84,6 +90,7 @@ class TestCallLogs(unittest.TestCase):
                     'Called': '4185550155',
                     'Period': '0',
                     'user Field': '',
+                    'tenant_uuid': TENANT_UUID,
                 },
                 {
                     'Call Date': '2013-01-30T11:20:08',
@@ -91,11 +98,13 @@ class TestCallLogs(unittest.TestCase):
                     'Called': '4185550155',
                     'Period': '3',
                     'user Field': 'Père Noël',
+                    'tenant_uuid': TENANT_UUID,
                 },
             )
         )
 
     @fixtures.call_log(
+        tenant_uuid=TENANT_UUID,
         date=datetime(2013, 1, 30, 8, 46, 20),
         date_answer=datetime(2013, 1, 30, 8, 46, 20),
         date_end=datetime(2013, 1, 30, 8, 46, 23),
