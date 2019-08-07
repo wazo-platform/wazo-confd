@@ -93,7 +93,6 @@ from . import application
 from . import call_filter
 from . import call_filter_recipient_user
 from . import call_filter_surrogate_user
-from . import call_log
 from . import call_permission
 from . import call_pickup
 from . import call_pickup_interceptor_group
@@ -184,7 +183,6 @@ __all__ = [
     'call_filter',
     'call_filter_recipient_user',
     'call_filter_surrogate_user',
-    'call_log',
     'call_permission',
     'call_pickup',
     'call_pickup_interceptor_group',

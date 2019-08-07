@@ -558,25 +558,6 @@ class DatabaseQueries:
 
         return count > 0
 
-    def insert_call_log(self, tenant_uuid, date, date_answer, date_end, source_name, source_exten, destination_exten, user_field):
-        query = text("""INSERT INTO call_log(date, date_answer, date_end, source_name, source_exten, destination_exten, user_field)
-                        VALUES (:date, :date_answer, :date_end, :source_name, :source_exten, :destination_exten, :user_field)
-                        RETURNING id""")
-        return self.connection.execute(query,
-                                       tenant_uuid=tenant_uuid,
-                                       date=date,
-                                       date_answer=date_answer,
-                                       date_end=date_end,
-                                       source_name=source_name,
-                                       source_exten=source_exten,
-                                       destination_exten=destination_exten,
-                                       user_field=user_field).scalar()
-
-    def delete_call_log(self, call_log_id):
-        query = text("""DELETE from call_log
-                        WHERE id = :id""")
-        self.connection.execute(query, id=call_log_id)
-
 
 def create_helper(user='asterisk', password='proformatique', host='localhost', port=5432, db='asterisk'):
     return DbHelper.build(user, password, host, port, db)

@@ -118,12 +118,6 @@ class schedule(IsolatedAction):
                'delete': h.schedule.delete_schedule}
 
 
-class call_log(IsolatedAction):
-
-    actions = {'generate': h.call_log.generate_call_log,
-               'delete': h.call_log.delete_call_log}
-
-
 class queue(IsolatedAction):
 
     actions = {'generate': h.queue.generate_queue,
