@@ -203,7 +203,7 @@ definitions:
       provisioning:
         type: boolean
         default: true
-        description: Initialize xivo-provd database?
+        description: Initialize wazo-provd database?
       admin:
         type: boolean
         default: true

@@ -67,7 +67,7 @@ consul:
     port: 8500
     verify: /usr/share/xivo-certs/server.crt
 
-# xivo-provd connection information
+# wazo-provd connection information
 provd:
     host: localhost
     port: 8666

@@ -13,15 +13,15 @@ services:
       - ./ssl:/usr/local/share/ssl
 
   provd:
-    image: wazopbx/xivo-provd
+    image: wazopbx/wazo-provd
     ports:
       - "8666"
     volumes:
-      - "./etc/xivo-provd/config.yml:/etc/xivo-provd/config.yml"
-      - "./keys/xivo-provd-key.yml:/var/lib/wazo-auth-keys/xivo-provd-key.yml"
+      - "./etc/wazo-provd/config.yml:/etc/wazo-provd/config.yml"
+      - "./keys/wazo-provd-key.yml:/var/lib/wazo-auth-keys/wazo-provd-key.yml"
       - "./ssl:/usr/local/share/ssl"
-      - "./provd/null:/var/lib/xivo-provd/plugins/null"
-      - "./provd/zero:/var/lib/xivo-provd/plugins/zero"
+      - "./provd/null:/var/lib/wazo-provd/plugins/null"
+      - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
 
   postgres:
     image: wazopbx/postgres-test

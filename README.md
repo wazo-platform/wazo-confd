@@ -50,12 +50,12 @@ You need the repos xivo-manage-db up-to-date.
 3. Execute the steps above to run integration tests
 
 
-### Modified xivo-provisioning
+### Modified wazo-provd
 
-You need the repos xivo-provisioning up-to-date.
+You need the repos wazo-provd up-to-date.
 
-1. ```git clone https://github.com/wazo-pbx/xivo-provisioning```
-2. ```PROVD_DIR=../../xivo-provisioning make build-provd```
+1. ```git clone https://github.com/wazo-pbx/wazo-provd```
+2. ```PROVD_DIR=../../wazo-provd make build-provd```
 3. Execute the steps above to run integration tests
 
 
