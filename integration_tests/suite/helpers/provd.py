@@ -12,7 +12,7 @@ from wazo_provd_client.exceptions import ProvdError
 
 class ProvdHelper:
 
-    DOCKER_PROVD_IMAGE = "wazopbx/xivo-provd"
+    DOCKER_PROVD_IMAGE = "wazopbx/wazo-provd"
 
     DEFAULT_CONFIGS = [{'X_type': 'registrar',
                         'deletable': False,
@@ -118,7 +118,7 @@ class ProvdHelper:
         except ProvdError:
             return
         else:
-            raise AssertionError('config "{}" exists in xivo-provd'.format(config_id))
+            raise AssertionError('config "{}" exists in wazo-provd'.format(config_id))
 
     def assert_device_has_autoprov_config(self, device):
         assert_that(device['config'], starts_with('autoprov'))

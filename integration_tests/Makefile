@@ -11,7 +11,7 @@ test-setup: egg-info build-confd
 	docker pull wazopbx/postgres
 	docker pull wazopbx/postgres-test
 	docker pull wazopbx/wazo-auth-mock
-	docker pull wazopbx/xivo-provd
+	docker pull wazopbx/wazo-provd
 	docker pull p0bailey/docker-flask
 
 build-confd:
@@ -22,7 +22,7 @@ update-db:
 	docker build --no-cache -t wazopbx/postgres-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
-	docker build -t wazopbx/xivo-provd $(PROVD_DIR)
+	docker build -t wazopbx/wazo-provd $(PROVD_DIR)
 
 test:
 	nosetests -x

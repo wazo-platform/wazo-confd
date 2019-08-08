@@ -1,2 +1,2 @@
-service_id: xivo-provd
+service_id: wazo-provd
 service_key: a-very-secret-password

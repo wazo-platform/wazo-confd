@@ -78,7 +78,7 @@ class SysconfdPublisher:
         self.add_request('POST', url, json=data)
 
     def restart_provd(self):
-        self.service_action('xivo-provd', 'restart')
+        self.service_action('wazo-provd', 'restart')
 
     def dhcpd_update(self):
         url = "{}/dhcpd_update".format(self.base_url)

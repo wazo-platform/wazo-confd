@@ -52,7 +52,7 @@ bus:
     exchange_type: topic
     exchange_durable: True
 
-# xivo-provd connection informations.
+# wazo-provd connection informations.
 provd:
     host: provd
     port: 8666
