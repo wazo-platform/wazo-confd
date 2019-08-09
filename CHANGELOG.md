@@ -1,6 +1,11 @@
 Changelog
 =========
 
+19.12
+-----
+
+* The API `/1.1/call_logs` for call logs have been removed
+
 19.11
 -----
 
