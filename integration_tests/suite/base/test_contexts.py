@@ -44,6 +44,15 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', True
     yield s.check_bogus_field_returns_error, url, 'name', None
+    yield s.check_bogus_field_returns_error, url, 'name', 'with space'
+    yield s.check_bogus_field_returns_error, url, 'name', ''
+    yield s.check_bogus_field_returns_error, url, 'name', 'authentication'
+    yield s.check_bogus_field_returns_error, url, 'name', 'general'
+    yield s.check_bogus_field_returns_error, url, 'name', 'global'
+    yield s.check_bogus_field_returns_error, url, 'name', 'globals'
+    yield s.check_bogus_field_returns_error, url, 'name', 'parkedcalls'
+    yield s.check_bogus_field_returns_error, url, 'name', 'xivo-features'
+    yield s.check_bogus_field_returns_error, url, 'name', 'zonemessages'
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(40)
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}

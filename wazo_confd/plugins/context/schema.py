@@ -3,11 +3,20 @@
 
 from marshmallow import fields, post_load, validates_schema
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import Length, Range, Predicate, OneOf
+from marshmallow.validate import (
+    Length,
+    NoneOf,
+    OneOf,
+    Predicate,
+    Range,
+    Regexp,
+)
 
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+
+CONTEXT_REGEX = r"^[a-zA-Z0-9-_]*$"
 
 
 class RangeSchema(BaseSchema):
@@ -34,7 +43,22 @@ class IncallRangeSchema(RangeSchema):
 
 class ContextSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String(validate=Length(max=39), required=True)
+    name = fields.String(
+        validate=(
+            Regexp(CONTEXT_REGEX),
+            Length(min=1, max=39),
+            NoneOf([
+                'authentication',
+                'general',
+                'global',
+                'globals',
+                'parkedcalls',
+                'xivo-features',
+                'zonemessages',
+            ]),
+        ),
+        required=True,
+    )
     label = fields.String(validate=Length(max=128), allow_none=True)
     type = fields.String(validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others']))
     user_ranges = fields.Nested(RangeSchema, many=True)
