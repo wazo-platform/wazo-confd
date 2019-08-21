@@ -14,6 +14,6 @@ class Plugin:
 
         api.add_resource(
             UserLineAssociatedEndpointSipItem,
-            '/users/<uuid:user_uuid>/lines/<int:line_id>/associated/endpoints/sip',
+            '/users/<uuid:user_uuid>/lines/<line_id>/associated/endpoints/sip',
             resource_class_args=(user_dao, line_dao)
         )
