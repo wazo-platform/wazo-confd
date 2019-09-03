@@ -1,3 +1,4 @@
+https://github.com/wazo-pbx/xivo-test-helpers/archive/buster.zip
 nose
 mock>=1.3.0
 pyhamcrest

@@ -3,7 +3,7 @@
 
 import json
 
-from marshmallow import Schema, fields, pre_dump, post_load, post_dump, validates_schema, validates
+from marshmallow import EXCLUDE, Schema, fields, pre_dump, post_load, post_dump, validates_schema, validates
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 
@@ -31,6 +31,9 @@ SKILL_RULE_VARIABLE_REGEX = r'^[^[;\|]+$'
 
 
 class BaseDestinationSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
     type = fields.String(
         validate=OneOf([
             'application',
@@ -504,7 +507,11 @@ class DestinationField(fields.Nested):
     }
 
     def __init__(self, **kwargs):
-        super(DestinationField, self).__init__(BaseDestinationSchema, **kwargs)
+        # FIXME(sileht): I'm not sure validation works here...
+        # This of dynamic nesterd stuffs should not done like this.
+        self.kwargs = kwargs
+        self.kwargs["unknown"] = EXCLUDE
+        super(DestinationField, self).__init__(BaseDestinationSchema, **self.kwargs)
 
     def _deserialize(self, value, attr, data):
         self.schema.context = self.context
@@ -512,14 +519,14 @@ class DestinationField(fields.Nested):
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
-            base = fields.Nested(schema)._deserialize(value, attr, data)
+            base = fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
             schema = self.application_schemas[base['subtype']]
 
         if base['type'] == 'endcall':
-            base = fields.Nested(schema)._deserialize(value, attr, data)
+            base = fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
             schema = self.hangup_schemas[base['subtype']]
 
-        return fields.Nested(schema)._deserialize(value, attr, data)
+        return fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
 
     def _serialize(self, nested_obj, attr, obj):
         base = super(DestinationField, self)._serialize(nested_obj, attr, obj)
@@ -528,14 +535,14 @@ class DestinationField(fields.Nested):
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
-            base = fields.Nested(schema)._serialize(nested_obj, attr, obj)
+            base = fields.Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
             schema = self.application_schemas[base['application']]
 
         if base['type'] == 'hangup':
-            base = fields.Nested(schema)._serialize(nested_obj, attr, obj)
+            base = fields.Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
             schema = self.hangup_schemas[base['cause']]
 
-        return fields.Nested(schema)._serialize(nested_obj, attr, obj)
+        return fields.Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
 
 
 class OptionalGetSkillRuleFromActionArg2Resource(Validator):
@@ -544,7 +551,7 @@ class OptionalGetSkillRuleFromActionArg2Resource(Validator):
         self.dao_get = dao_get
 
     def validate(self, model):
-        destination, _ = QueueDestinationSchema().dump(model)
+        destination = QueueDestinationSchema().dump(model)
         skill_rule_id = destination.get('skill_rule_id', None)
         if not skill_rule_id:
             return

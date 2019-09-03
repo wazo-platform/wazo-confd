@@ -21,11 +21,11 @@ class GroupFallbackList(ConfdResource):
     @required_acl('confd.groups.{group_id}.fallbacks.read')
     def get(self, group_id):
         group = self.group_dao.get(group_id)
-        return self.schema().dump(group.fallbacks).data
+        return self.schema().dump(group.fallbacks)
 
     @required_acl('confd.groups.{group_id}.fallbacks.update')
     def put(self, group_id):
         group = self.group_dao.get(group_id)
-        fallbacks = self.schema().load(request.get_json()).data
+        fallbacks = self.schema().load(request.get_json())
         self.service.edit(group, fallbacks)
         return '', 204

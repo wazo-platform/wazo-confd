@@ -25,11 +25,11 @@ class ExtensionList(ListResource):
 
     @required_acl('confd.extensions.create')
     def post(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
         model = self.service.create(model, tenant_uuids)
-        return self.schema().dump(model).data, 201, self.build_headers(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     def _has_a_tenant_uuid(self):
         # The base function does not work because the tenant_uuid is not part

@@ -23,12 +23,12 @@ class IncallList(ListResource):
     @required_acl('confd.incalls.create')
     def post(self):
         schema = self.schema()
-        form = schema.load(request.get_json()).data
+        form = schema.load(request.get_json())
         form['destination'] = Dialaction(**form['destination'])
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
-        return schema.dump(model).data, 201, self.build_headers(model)
+        return schema.dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.incalls.read')
     def get(self):
@@ -49,7 +49,7 @@ class IncallItem(ItemResource):
         return super(IncallItem, self).put(id)
 
     def parse_and_update(self, model):
-        form = self.schema().load(request.get_json(), partial=True).data
+        form = self.schema().load(request.get_json(), partial=True)
         updated_fields = self.find_updated_fields(model, form)
         if 'destination' in form:
             form['destination'] = Dialaction(**form['destination'])

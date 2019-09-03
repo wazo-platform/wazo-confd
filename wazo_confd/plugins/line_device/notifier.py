@@ -37,16 +37,16 @@ class LineDeviceNotifier:
     def associated(self, line, device):
         self._reload_sccp(line)
 
-        line_serialized = LineSchema(only=LINE_FIELDS).dump(line).data
-        device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device).data
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
+        device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device)
         event = LineDeviceAssociatedEvent(line=line_serialized, device=device_serialized)
         self._bus.send_bus_event(event)
 
     def dissociated(self, line, device):
         self._reload_sccp(line)
 
-        line_serialized = LineSchema(only=LINE_FIELDS).dump(line).data
-        device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device).data
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
+        device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device)
         event = LineDeviceDissociatedEvent(line=line_serialized, device=device_serialized)
         self._bus.send_bus_event(event)
 

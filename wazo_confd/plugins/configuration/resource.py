@@ -23,10 +23,10 @@ class LiveReloadResource(ConfdResource):
     @required_acl('confd.configuration.live_reload.read')
     def get(self):
         model = self.service.get()
-        return self.schema().dump(model).data
+        return self.schema().dump(model)
 
     @required_acl('confd.configuration.live_reload.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         self.service.edit(form)
         return '', 204

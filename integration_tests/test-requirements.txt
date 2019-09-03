@@ -1,7 +1,7 @@
-git+https://github.com/wazo-pbx/wazo-auth-client.git
-git+https://github.com/wazo-pbx/wazo-provd-client.git
-git+https://github.com/wazo-pbx/xivo-lib-rest-client.git
-git+https://github.com/wazo-pbx/xivo-test-helpers.git
+https://github.com/wazo-pbx/wazo-auth-client/archive/buster.zip
+https://github.com/wazo-pbx/wazo-provd-client/archive/buster.zip
+https://github.com/wazo-pbx/xivo-lib-rest-client/archive/buster.zip
+https://github.com/wazo-pbx/xivo-test-helpers/archive/buster.zip
 docker
 docker-compose
 kombu

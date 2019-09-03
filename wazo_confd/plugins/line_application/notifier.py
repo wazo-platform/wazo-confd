@@ -37,16 +37,16 @@ class LineApplicationNotifier:
     def associated(self, line, application):
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
 
-        line_serialized = LineSchema(only=LINE_FIELDS).dump(line).data
-        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application).data
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
+        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = LineApplicationAssociatedEvent(line=line_serialized, application=application_serialized)
         self._bus.send_bus_event(event)
 
     def dissociated(self, line, application):
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
 
-        line_serialized = LineSchema(only=LINE_FIELDS).dump(line).data
-        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application).data
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
+        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = LineApplicationDissociatedEvent(line=line_serialized, application=application_serialized)
         self._bus.send_bus_event(event)
 

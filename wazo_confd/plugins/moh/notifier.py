@@ -32,19 +32,19 @@ class MohNotifier:
 
     def created(self, moh):
         self.send_sysconfd_handlers()
-        moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh).data
+        moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh)
         event = CreateMohEvent(moh_serialized)
         self.bus.send_bus_event(event)
 
     def edited(self, moh):
         self.send_sysconfd_handlers()
-        moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh).data
+        moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh)
         event = EditMohEvent(moh_serialized)
         self.bus.send_bus_event(event)
 
     def deleted(self, moh):
         self.send_sysconfd_handlers()
-        moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh).data
+        moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh)
         event = DeleteMohEvent(moh_serialized)
         self.bus.send_bus_event(event)
 

@@ -4,9 +4,6 @@
 from marshmallow import fields
 
 from xivo.tenant_flask_helpers import Tenant
-from requests.exceptions import HTTPError
-
-from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -66,7 +63,7 @@ class LineDeviceGet(LineDevice):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
         line_device = self.service.get_association_from_line(line)
-        return self.schema().dump(line_device).data
+        return self.schema().dump(line_device)
 
 
 class DeviceLineGet(LineDevice):
@@ -79,4 +76,4 @@ class DeviceLineGet(LineDevice):
         device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
         line_devices = self.service.find_all_associations_from_device(device)
         return {'total': len(line_devices),
-                'items': self.schema().dump(line_devices, many=True).data}
+                'items': self.schema().dump(line_devices, many=True)}

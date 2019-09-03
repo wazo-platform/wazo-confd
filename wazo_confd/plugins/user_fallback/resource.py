@@ -21,11 +21,11 @@ class UserFallbackList(ConfdResource):
     @required_acl('confd.users.{user_id}.fallbacks.read')
     def get(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
-        return self.schema().dump(user.fallbacks).data
+        return self.schema().dump(user.fallbacks)
 
     @required_acl('confd.users.{user_id}.fallbacks.update')
     def put(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
-        fallbacks = self.schema().load(request.get_json()).data
+        fallbacks = self.schema().load(request.get_json())
         self.service.edit(user, fallbacks)
         return '', 204

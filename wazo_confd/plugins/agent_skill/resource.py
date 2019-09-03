@@ -33,7 +33,7 @@ class AgentSkillItem(ConfdResource):
         agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         skill = self.skill_dao.get(skill_id, tenant_uuids=tenant_uuids)
         agent_skill = self._find_or_create_agent_skill(agent, skill)
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         agent_skill.weight = form['weight']
         self.service.associate_agent_skill(agent, agent_skill)
         return '', 204

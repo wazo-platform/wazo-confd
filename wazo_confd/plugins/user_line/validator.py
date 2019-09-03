@@ -31,13 +31,13 @@ class UserLineAssociationValidator(ValidatorAssociation):
 
         lines_reachable_from_extension = set(
             line_extension.line_id
-            for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id),
+            for line_extension in line_extension_dao.find_all_by(extension_id=main_line_extension.extension_id)
         )
 
         users_reachable_from_extension = set(
             user_line.user_id
             for line_id in lines_reachable_from_extension
-            for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True),
+            for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True)
         )
         users_reachable_from_extension.add(user.id)
 

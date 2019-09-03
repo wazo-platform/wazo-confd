@@ -31,4 +31,4 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
         if not line.endpoint_sip:
             return 'Resource Not Found.', 404
 
-        return self.schema().dump(line.endpoint_sip).data
+        return self.schema().dump(line.endpoint_sip)

@@ -84,10 +84,10 @@ class FeaturesConfigurationList(ConfdResource):
 
     def get(self):
         options = self.service.list(section=self.section_name)
-        return self.schema().dump(options).data
+        return self.schema().dump(options)
 
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         variables = [self.model(**option) for option in form]
         self.service.edit(self.section_name, variables)
         return '', 204

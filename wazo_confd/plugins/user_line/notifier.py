@@ -40,8 +40,8 @@ class UserLineNotifier:
 
     def associated(self, user_line):
         self._send_sysconfd_handlers()
-        user_serialized = UserSchema(only=USER_FIELDS).dump(user_line.user).data
-        line_serialized = LineSchema(only=LINE_FIELDS).dump(user_line.line).data
+        user_serialized = UserSchema(only=USER_FIELDS).dump(user_line.user)
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(user_line.line)
         event = UserLineAssociatedEvent(
             user=user_serialized,
             line=line_serialized,
@@ -52,8 +52,8 @@ class UserLineNotifier:
 
     def dissociated(self, user_line):
         self._send_sysconfd_handlers()
-        user_serialized = UserSchema(only=USER_FIELDS).dump(user_line.user).data
-        line_serialized = LineSchema(only=LINE_FIELDS).dump(user_line.line).data
+        user_serialized = UserSchema(only=USER_FIELDS).dump(user_line.user)
+        line_serialized = LineSchema(only=LINE_FIELDS).dump(user_line.line)
         event = UserLineDissociatedEvent(
             user=user_serialized,
             line=line_serialized,

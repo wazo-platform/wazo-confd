@@ -35,7 +35,7 @@ class LegacyResource(ConfdResource):
         self.line_extension_dao = line_extension_dao
 
     def get_extension_or_fail(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         try:
             return self.extension_dao.get(form['extension_id'])
         except NotFoundError:
@@ -48,14 +48,14 @@ class LineExtensionLegacy(LegacyResource):
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         line_extension = self.line_extension_dao.get_by(line_id=line.id)
-        return self.schema().dump(line_extension).data
+        return self.schema().dump(line_extension)
 
     @required_acl('confd.#')
     def post(self, line_id):
         line = self.line_dao.get(line_id)
         extension = self.get_extension_or_fail()
         line_extension = self.service.associate(line, extension)
-        return self.schema().dump(line_extension).data, 201, self.build_headers(line_extension)
+        return self.schema().dump(line_extension), 201, self.build_headers(line_extension)
 
     @required_acl('confd.#')
     def delete(self, line_id):
@@ -78,4 +78,4 @@ class ExtensionLineLegacy(LegacyResource):
     def get(self, extension_id):
         extension = self.extension_dao.get(extension_id)
         line_extension = self.line_extension_dao.get_by(extension_id=extension.id)
-        return self.schema().dump(line_extension).data
+        return self.schema().dump(line_extension)

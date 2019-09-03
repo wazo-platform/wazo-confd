@@ -76,14 +76,14 @@ class LineEndpointGet(LineEndpoint):
 
     def get(self, line_id):
         line_endpoint = self.service.get_association_from_line(line_id)
-        return self.schema().dump(line_endpoint).data
+        return self.schema().dump(line_endpoint)
 
 
 class EndpointLineGet(LineEndpoint):
 
     def get(self, endpoint_id):
         line_endpoint = self.service.get_association_from_endpoint(endpoint_id)
-        return self.schema().dump(line_endpoint).data
+        return self.schema().dump(line_endpoint)
 
 
 class LineEndpointAssociationSip(LineEndpointAssociation):

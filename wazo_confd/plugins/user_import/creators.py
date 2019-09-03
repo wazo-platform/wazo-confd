@@ -38,7 +38,7 @@ class Creator(metaclass=abc.ABCMeta):
 
     def update(self, fields, model):
         if getattr(self, 'schema', False):
-            fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
+            fields = self.schema(handle_error=False).load(fields, partial=True)
 
         self.update_model(fields, model)
         self.service.edit(model)
@@ -59,7 +59,7 @@ class UserCreator(Creator):
 
     def create(self, fields, tenant_uuid):
         if fields:
-            form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
+            form = self.schema_nullable(handle_error=False).load(fields)
             form['tenant_uuid'] = tenant_uuid
             return self.service.create(User(**form))
 
@@ -72,13 +72,13 @@ class WazoUserCreator(Creator):
         pass
 
     def create(self, fields, tenant_uuid):
-        fields = self.schema(handle_error=False, strict=True).load(fields).data
+        fields = self.schema(handle_error=False).load(fields)
         fields['tenant_uuid'] = tenant_uuid
         # We need to have user_uuid on create, so the real create is on associate
         return fields
 
     def update(self, fields, model):
-        fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
+        fields = self.schema(handle_error=False).load(fields, partial=True)
         self.update_model(fields, model)
         self.service.update(model)
 
@@ -114,7 +114,7 @@ class VoicemailCreator(Creator):
             return self.service.dao.find_by(number=number, context=context)
 
     def update(self, fields, model):
-        fields = self.schema(handle_error=False, strict=True).load(fields, partial=True).data
+        fields = self.schema(handle_error=False).load(fields, partial=True)
         self.update_model(fields, model)
         self.service.edit(model, None)
 
@@ -122,7 +122,7 @@ class VoicemailCreator(Creator):
         number = fields.get('number')
         context = fields.get('context')
         if number or context:
-            form = self.schema(handle_error=False, strict=True).load(fields).data
+            form = self.schema(handle_error=False).load(fields)
             return self.service.create(Voicemail(**form), None)
 
 
@@ -157,7 +157,7 @@ class SipCreator(Creator):
             return self.service.find_by(name=name)
 
     def create(self, fields, tenant_uuid):
-        form = self.schema_nullable(handle_error=False, strict=True).load(fields).data
+        form = self.schema_nullable(handle_error=False).load(fields)
         return self.service.create(SIP(tenant_uuid=tenant_uuid, **form))
 
 
@@ -187,7 +187,7 @@ class ExtensionCreator(Creator):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
-            form = self.schema(handle_error=False, strict=True).load(fields).data
+            form = self.schema(handle_error=False).load(fields)
             tenant_uuids = [tenant_uuid] if tenant_uuid is not None else None
             return self.service.create(Extension(**form), tenant_uuids=tenant_uuids)
 

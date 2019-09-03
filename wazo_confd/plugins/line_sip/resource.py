@@ -38,7 +38,7 @@ class LineSipList(ListResource):
         params = self.search_params()
         total, items = self.service.search(params)
         return {'total': total,
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.#')
     def post(self):

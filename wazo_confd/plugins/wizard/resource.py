@@ -45,7 +45,7 @@ class WizardSchema(BaseSchema):
     language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
     timezone = fields.String(validate=Length(max=128), required=True)
     network = fields.Nested(WizardNetworkSchema, required=True)
-    steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}).data)
+    steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}))
 
 
 class ConfiguredSchema(BaseSchema):
@@ -62,13 +62,13 @@ class WizardResource(ErrorCatchingResource):
 
     def get(self):
         configured = self.service.get()
-        return self.configured_schema().dump(configured).data
+        return self.configured_schema().dump(configured)
 
     @xivo_unconfigured
     def post(self):
-        wizard = self.wizard_schema().load(request.get_json()).data
+        wizard = self.wizard_schema().load(request.get_json())
         wizard_with_uuid = self.service.create(wizard)
-        return self.wizard_schema().dump(wizard_with_uuid).data
+        return self.wizard_schema().dump(wizard_with_uuid)
 
 
 class WizardDiscoverInterfaceSchema(BaseSchema):
@@ -107,4 +107,4 @@ class WizardDiscoverResource(ErrorCatchingResource):
                     'hostname': self.service.get_hostname(),
                     'timezone': self.service.get_timezone(),
                     'domain': self.service.get_domain()}
-        return self.schema().dump(discover).data
+        return self.schema().dump(discover)

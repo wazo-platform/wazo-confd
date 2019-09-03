@@ -68,6 +68,7 @@ class QueueSchema(BaseSchema):
         for key in ('wait_time_destination', 'wait_ratio_destination'):
             if data.get(key):
                 data[key] = Dialaction(**data[key])
+        return data
 
     @post_dump
     def wrap_members(self, data):

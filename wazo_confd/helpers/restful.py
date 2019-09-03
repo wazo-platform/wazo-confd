@@ -84,7 +84,7 @@ class ListResource(ConfdResource):
 
         total, items = self.service.search(params, **kwargs)
         return {'total': total,
-                'items': self.schema().dump(items, many=True).data}
+                'items': self.schema().dump(items, many=True)}
 
     def search_params(self):
         args = ((key, request.args[key]) for key in request.args)
@@ -119,11 +119,11 @@ class ListResource(ConfdResource):
         return form
 
     def post(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
-        return self.schema().dump(model).data, 201, self.build_headers(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     def build_headers(self, model):
         raise NotImplementedError()
@@ -140,7 +140,7 @@ class ItemResource(ConfdResource):
     def get(self, id):
         kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
-        return self.schema().dump(model).data
+        return self.schema().dump(model)
 
     def put(self, id):
         kwargs = self._add_tenant_uuid()
@@ -149,7 +149,7 @@ class ItemResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model, **kwargs):
-        form = self.schema().load(request.get_json(), partial=True).data
+        form = self.schema().load(request.get_json(), partial=True)
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.items():
             setattr(model, name, value)

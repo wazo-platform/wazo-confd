@@ -19,10 +19,10 @@ class DHCPResource(ConfdResource):
     @required_acl('confd.dhcp.read')
     def get(self):
         model = self.service.get()
-        return self.schema().dump(model).data
+        return self.schema().dump(model)
 
     @required_acl('confd.dhcp.update')
     def put(self):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         self.service.edit(form)
         return '', 204

@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import fields, pre_dump, post_load
+from marshmallow import (
+    EXCLUDE,
+    fields,
+    pre_dump,
+    post_load,
+)
 from marshmallow.validate import Length
 
 from wazo_confd.auth import required_acl
@@ -17,7 +22,7 @@ class UserSubResource(ConfdResource):
 
     def get(self, user_id):
         user = self.service.get(user_id)
-        return self.schema().dump(user).data
+        return self.schema().dump(user)
 
     def put(self, user_id):
         user = self.service.get(user_id)
@@ -25,7 +30,7 @@ class UserSubResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self.schema().load(request.get_json()).data
+        form = self.schema().load(request.get_json())
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, self.schema())
@@ -44,8 +49,8 @@ class ServiceIncallFilterSchema(BaseSchema):
 
 
 class ServicesSchema(BaseSchema):
-    dnd = fields.Nested(ServiceDNDSchema)
-    incallfilter = fields.Nested(ServiceIncallFilterSchema)
+    dnd = fields.Nested(ServiceDNDSchema, unknown=EXCLUDE)
+    incallfilter = fields.Nested(ServiceIncallFilterSchema, unknown=EXCLUDE)
 
     types = ['dnd', 'incallfilter']
 
@@ -123,9 +128,9 @@ class ForwardUnconditionalSchema(BaseSchema):
 
 
 class ForwardsSchema(BaseSchema):
-    busy = fields.Nested(ForwardBusySchema)
-    noanswer = fields.Nested(ForwardNoAnswerSchema)
-    unconditional = fields.Nested(ForwardUnconditionalSchema)
+    busy = fields.Nested(ForwardBusySchema, unknown=EXCLUDE)
+    noanswer = fields.Nested(ForwardNoAnswerSchema, unknown=EXCLUDE)
+    unconditional = fields.Nested(ForwardUnconditionalSchema, unknown=EXCLUDE)
 
     types = ['busy', 'noanswer', 'unconditional']
 
