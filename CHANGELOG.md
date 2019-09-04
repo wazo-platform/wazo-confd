@@ -1,6 +1,18 @@
 Changelog
 =========
 
+19.13
+-----
+
+* A new API for configuring features access has been added:
+
+  * GET `/1.1/access_features`
+  * POST `/1.1/access_features`
+  * GET `/1.1/access_features/<access_feature_id>`
+  * PUT `/1.1/access_features/<access_features_id>`
+  * DELETE `/1.1/access_features/<access_feature_id>`
+
+
 19.12
 -----
 
