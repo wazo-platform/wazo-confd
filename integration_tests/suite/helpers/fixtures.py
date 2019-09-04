@@ -251,3 +251,9 @@ class application(IsolatedAction):
     id_field = 'uuid'
     actions = {'generate': h.application.generate_application,
                'delete': h.application.delete_application}
+
+
+class access_feature(IsolatedAction):
+
+    actions = {'generate': h.access_feature.generate_access_feature,
+               'delete': h.access_feature.delete_access_feature}
