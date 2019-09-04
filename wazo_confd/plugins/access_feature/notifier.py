@@ -20,15 +20,15 @@ class AccessFeatureNotifier:
         self.bus = bus
 
     def created(self, access_feature):
-        event = CreateAccessFeatureEvent(self.schema.dump(access_feature).data)
+        event = CreateAccessFeatureEvent(self.schema.dump(access_feature))
         self.bus.send_bus_event(event)
 
     def edited(self, access_feature):
-        event = EditAccessFeatureEvent(self.schema.dump(access_feature).data)
+        event = EditAccessFeatureEvent(self.schema.dump(access_feature))
         self.bus.send_bus_event(event)
 
     def deleted(self, access_feature):
-        event = DeleteAccessFeatureEvent(self.schema.dump(access_feature).data)
+        event = DeleteAccessFeatureEvent(self.schema.dump(access_feature))
         self.bus.send_bus_event(event)
 
 
