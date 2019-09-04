@@ -1,0 +1,127 @@
+paths:
+  /access_features:
+    get:
+      operationId: list_access_features
+      summary: List access features
+      description: '**Required ACL:** `confd.access_features.read`'
+      tags:
+      - access_features
+      parameters:
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: AccessFeatures list
+          schema:
+            $ref: '#/definitions/AccessFeatureItems'
+    post:
+      operationId: create_access_feature
+      summary: Create access_feature
+      description: '**Required ACL:** `confd.access_features.create`'
+      tags:
+      - access_features
+      parameters:
+      - name: body
+        in: body
+        description: Access feature to create
+        required: true
+        schema:
+          $ref: '#/definitions/AccessFeature'
+      responses:
+        '201':
+          description: AccessFeature created
+          schema:
+            $ref: '#/definitions/AccessFeature'
+        '400':
+          $ref: '#/responses/CreateError'
+  /access_features/{access_feature_id}:
+    get:
+      operationId: get_access_feature
+      summary: Get access_feature
+      description: '**Required ACL:** `confd.access_features.{access_feature_id}.read`'
+      tags:
+      - access_features
+      parameters:
+      - $ref: '#/parameters/access_featureid'
+      responses:
+        '200':
+          description: AccessFeature
+          schema:
+            $ref: '#/definitions/AccessFeature'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_access_feature
+      summary: Update access_feature
+      description: '**Required ACL:** `confd.access_features.{access_feature_id}.update`'
+      tags:
+      - access_features
+      parameters:
+      - $ref: '#/parameters/access_featureid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/AccessFeature'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_access_feature
+      summary: Delete access feature
+      description: '**Required ACL:** `confd.access_features.{access_feature_id}.delete`'
+      tags:
+      - access_features
+      parameters:
+      - $ref: '#/parameters/access_featureid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  access_featureid:
+    required: true
+    type: integer
+    name: access_feature_id
+    in: path
+    description: Access feature ID
+definitions:
+  AccessFeature:
+    title: Access feature
+    properties:
+      id:
+        type: integer
+        description: The access_feature ID
+      host:
+        type: string
+        description: The host or subnet string (e.g. 10.0.0.0/24)
+      feature:
+        type: string
+        description: The feature to limit the access to
+        enum:
+          - phonebook
+      enabled:
+        type: boolean
+    - required:
+      - access_feature
+  AccessFeatureItems:
+    title: AccessFeatureItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/AccessFeature'
+      total:
+        type: integer
+    required:
+    - total
