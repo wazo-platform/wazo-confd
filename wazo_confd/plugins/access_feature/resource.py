@@ -26,3 +26,20 @@ class AccessFeatureList(ListResource):
     @required_acl('confd.access_features.read')
     def get(self):
         return super(AccessFeatureList, self).get()
+
+
+class AccessFeatureItem(ItemResource):
+
+    schema = AccessFeatureSchema
+
+    @required_acl('confd.access_features.{id}.read')
+    def get(self, id):
+        return super(AccessFeatureItem, self).get(id)
+
+    @required_acl('confd.access_features.{id}.update')
+    def put(self, id):
+        return super(AccessFeatureItem, self).put(id)
+
+    @required_acl('confd.access_features.{id}.delete')
+    def delete(self, id):
+        return super(AccessFeatureItem, self).delete(id)

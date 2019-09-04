@@ -16,3 +16,10 @@ class Plugin:
             '/access_features',
             resource_class_args=(service,)
         )
+
+        api.add_resource(
+            AccessFeatureItem,
+            '/access_features/<int:id>',
+            endpoint='access_features',
+            resource_class_args=(service,)
+        )
