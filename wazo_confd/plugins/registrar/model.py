@@ -28,6 +28,14 @@ class Registrar:
         self._registrar['id'] = value
 
     @property
+    def deletable(self):
+        return self._registrar.get('deletable')
+
+    @deletable.setter
+    def deletable(self, value):
+        self._registrar['deletable'] = value
+
+    @property
     def name(self):
         return self._registrar.get('displayname')
 
