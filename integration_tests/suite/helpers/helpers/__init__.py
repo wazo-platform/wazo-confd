@@ -86,6 +86,7 @@ def setup_provd(host, port):
 
 from . import destination
 
+from . import access_feature
 from . import agent
 from . import agent_login_status
 from . import agent_skill

@@ -23,6 +23,7 @@ setup(
             'wazo-confd=wazo_confd.main:main',
         ],
         'wazo_confd.plugins': [
+            'access_feature = wazo_confd.plugins.access_feature.plugin:Plugin',
             'agent = wazo_confd.plugins.agent.plugin:Plugin',
             'agent_skill = wazo_confd.plugins.agent_skill.plugin:Plugin',
             'api = wazo_confd.plugins.api.plugin:Plugin',

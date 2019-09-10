@@ -68,6 +68,7 @@ DEFAULT_CONFIG = {
         'port': '8668'
     },
     'enabled_plugins': {
+        'access_feature': True,
         'agent': True,
         'agent_skill': True,
         'api': True,
