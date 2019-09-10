@@ -196,21 +196,21 @@ definitions:
             * announce
             * context
             * timeout
-            * monitor_type
-            * monitor_format
-            * queue_youarenext
-            * queue_thereare
-            * queue_callswaiting
-            * queue_holdtime
-            * queue_minutes
-            * queue_seconds
-            * queue_thankyou
-            * queue_reporthold
-            * periodic_announce
-            * announce_frequency
-            * periodic_announce_frequency
-            * announce_round_seconds
-            * announce_holdtime
+            * monitor-type
+            * monitor-format
+            * queue-youarenext
+            * queue-thereare
+            * queue-callswaiting
+            * queue-holdtime
+            * queue-minutes
+            * queue-seconds
+            * queue-thankyou
+            * queue-reporthold
+            * periodic-announce
+            * announce-frequency
+            * periodic-announce-frequency
+            * announce-round-seconds
+            * announce-holdtime
             * retry
             * wrapuptime
             * maxlen
@@ -230,10 +230,10 @@ definitions:
             * setqueueentryvar
             * setqueuevar
             * membermacro
-            * min_announce_frequency
-            * random_periodic_announce
-            * announce_position
-            * announce_position_limit
+            * min-announce-frequency
+            * random-periodic-announce
+            * announce-position
+            * announce-position-limit
             * defaultrule
 
             Options must have the following form:
