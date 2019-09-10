@@ -66,6 +66,8 @@ def test_put_errors(registrar):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'main_host', None
+    yield s.check_bogus_field_returns_error, url, 'deletable', 123
+    yield s.check_bogus_field_returns_error, url, 'deletable', 'wrong'
     yield s.check_bogus_field_returns_error, url, 'main_host', 123
     yield s.check_bogus_field_returns_error, url, 'main_port', 'wrong'
     yield s.check_bogus_field_returns_error, url, 'backup_host', 123
@@ -145,6 +147,7 @@ def test_create_registrar_minimal_parameters():
     assert_that(
         response.item,
         has_entries(
+            deletable=True,
             name=none(),
             main_host='1.2.3.4',
             main_port=none(),
@@ -162,6 +165,7 @@ def test_create_registrar_minimal_parameters():
 
 def test_create_registrar_null_parameters():
     response = confd.registrars.post(
+        deletable=True,
         name=None,
         main_host='1.2.3.4',
         main_port=None,
@@ -179,6 +183,7 @@ def test_create_registrar_null_parameters():
     assert_that(
         response.item,
         has_entries(
+            deletable=True,
             name=none(),
             main_host='1.2.3.4',
             main_port=none(),
@@ -205,6 +210,7 @@ def test_create_registrar_no_parameters():
 def test_create_registrar_all_parameters():
 
     parameters = {
+        'deletable': True,
         'name': 'TestRegistrar',
         'main_host': '1.2.3.4',
         'main_port': 5060,
@@ -226,9 +232,10 @@ def test_create_registrar_all_parameters():
     assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.registrar(main_host='1.2.3.4', proxy_main_host='1.2.3.4')
+@fixtures.registrar(deletable=False, main_host='1.2.3.4', proxy_main_host='1.2.3.4')
 def test_edit_registrar_all_parameters(registrar):
     parameters = {
+        'deletable': True,
         'name': 'TestRegistrar',
         'main_host': '1.2.3.4',
         'main_port': 5060,
@@ -250,6 +257,7 @@ def test_edit_registrar_all_parameters(registrar):
 
 
 @fixtures.registrar(
+    deletable=False,
     name='TestRegistrar',
     main_host='1.2.3.4',
     main_port=5060,
@@ -263,6 +271,7 @@ def test_edit_registrar_all_parameters(registrar):
 )
 def test_edit_registrar_null_parameters(registrar):
     response = confd.registrars(registrar['id']).put(
+        deletable=True,
         name=None,
         main_host='1.2.3.4',
         main_port=None,
@@ -281,6 +290,7 @@ def test_edit_registrar_null_parameters(registrar):
     assert_that(
         response.item,
         has_entries(
+            deletable=True,
             name=none(),
             main_host='1.2.3.4',
             main_port=none(),
@@ -299,6 +309,7 @@ def test_edit_registrar_null_parameters(registrar):
 def test_edit_registrar_no_parameters():
 
     parameters = {
+        'deletable': True,
         'name': 'TestRegistrar',
         'main_host': '1.2.3.4',
         'main_port': 5060,

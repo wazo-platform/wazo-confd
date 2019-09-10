@@ -104,6 +104,9 @@ definitions:
       id:
         type: string
         description: Registrar identifier
+      deletable:
+        type: boolean
+        description: Define if the registrar can be deleted
       name:
         type: string
         description: Display name of the registrar
