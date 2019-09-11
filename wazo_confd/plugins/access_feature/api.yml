@@ -112,8 +112,9 @@ definitions:
           - phonebook
       enabled:
         type: boolean
-    - required:
-      - access_feature
+    required:
+    - host
+    - feature
   AccessFeatureItems:
     title: AccessFeatureItems
     properties:
