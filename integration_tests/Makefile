@@ -1,6 +1,6 @@
 .PHONY: test-setup test egg-info update-db build-provd build-confd
 
-PROVD_DIR ?= ../../provisioning
+PROVD_DIR ?= ../../provd/
 MANAGE_DB_DIR ?= ../../manage-db/
 POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/postgres-test/Dockerfile
 
