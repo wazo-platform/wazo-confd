@@ -291,7 +291,7 @@ def test_associate_2_sip_lines(device):
     registrar = confd.registrars('default').get().item
     registrar['proxy_backup_host'] = '127.0.0.2'
     registrar['backup_host'] = '127.0.0.2'
-    confd.registrars(registrar['id']).put(registrar)
+    confd.registrars(registrar['id']).put(registrar).assert_updated()
 
     with line_fellowship('sip') as (user1, line1, extension1, sip1), \
             line_fellowship('sip') as (user2, line2, extension2, sip2):
