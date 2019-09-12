@@ -15,6 +15,7 @@ class ProvdHelper:
     DOCKER_PROVD_IMAGE = "wazopbx/wazo-provd"
 
     DEFAULT_CONFIGS = [{'X_type': 'registrar',
+                        'deletable': True,
                         'displayname': 'local',
                         'id': 'default',
                         'parent_ids': [],
@@ -34,12 +35,14 @@ class ProvdHelper:
                                                            'username': 'apmy3dCQDw'}}},
                         'role': 'autocreate'},
                        {'X_type': 'internal',
+                        'deletable': True,
                         'id': 'base',
                         'parent_ids': [],
                         'raw_config': {'X_xivo_phonebook_ip': '127.0.0.1',
                                        'ntp_enabled': True,
                                        'ntp_ip': '127.0.0.1'}},
                        {'X_type': 'device',
+                        'deletable': True,
                         'id': 'defaultconfigdevice',
                         'label': 'Default config device',
                         'parent_ids': [],

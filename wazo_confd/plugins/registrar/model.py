@@ -29,7 +29,7 @@ class Registrar:
 
     @property
     def deletable(self):
-        return self._registrar.get('deletable')
+        return self._registrar.get('deletable', True)
 
     @deletable.setter
     def deletable(self, value):
