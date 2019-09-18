@@ -11,24 +11,26 @@ Architecture: all
 Provides: xivo-confd
 Conflicts: xivo-confd
 Replaces: xivo-confd
-Depends: ${python3:Depends},
-         ${misc:Depends},
-         wazo-auth-client-python3,
-         wazo-provd-client-python3,
-         xivo-bus-python3,
-         xivo-lib-python-python3,
-         xivo-libdao-python3,
-         xivo-manage-db,
-         python3-consul,
-         python3-flask,
-         python3-flask-cors (>= 3.0.2),
-         python3-flask-restful,
-         python3-cheroot,
-         python3-requests (>= 2.4.3),
-         python3-netifaces,
-         python3-marshmallow,
-         python3-tz,
-         rename
+Depends:
+  ${python3:Depends},
+  ${misc:Depends},
+  python3-cheroot,
+  python3-consul,
+  python3-flask,
+  python3-flask-cors (>= 3.0.2),
+  python3-flask-restful,
+  python3-kombu (>= 4.2.1-3),
+  python3-marshmallow,
+  python3-netifaces,
+  python3-requests (>= 2.4.3),
+  python3-tz,
+  rename,
+  wazo-auth-client-python3,
+  wazo-provd-client-python3,
+  xivo-bus-python3,
+  xivo-lib-python-python3,
+  xivo-libdao-python3,
+  xivo-manage-db
 Description: Wazo configuration server
  Wazo is a system based on a powerful IPBX, to bring an easy to
  install solution for telephony and related services.
