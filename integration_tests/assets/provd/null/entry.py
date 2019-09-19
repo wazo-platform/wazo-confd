@@ -30,8 +30,9 @@ from twisted.web.resource import NoResource
 
 _MSG = 'Null plugin always reject requests'
 
+
 class NullPlugin(Plugin):
     IS_PLUGIN = True
-    
+
     http_service = NoResource(_MSG)
-    tftp_service = TFTPNullService(errmsg=_MSG) 
+    tftp_service = TFTPNullService(errmsg=_MSG)

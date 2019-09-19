@@ -30,7 +30,7 @@ from provd.servers.tftp.service import TFTPFileService
 
 class ZeroPlugin(StandardPlugin):
     IS_PLUGIN = True
-    
+
     def __init__(self, app, plugin_dir, gen_cfg, spec_cfg):
         StandardPlugin.__init__(self, app, plugin_dir, gen_cfg, spec_cfg)
         self.tftp_service = TFTPFileService(self._tftpboot_dir)

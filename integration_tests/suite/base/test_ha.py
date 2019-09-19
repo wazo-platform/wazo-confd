@@ -38,7 +38,7 @@ def test_put():
     }
     result = confd.ha.put(body)
     result.assert_status(204)
-    sysconfd.assert_request('/update_ha_config', method='POST',  json={'node_type': 'master', 'remote_address': '10.10.10.10'})
+    sysconfd.assert_request('/update_ha_config', method='POST', json={'node_type': 'master', 'remote_address': '10.10.10.10'})
 
 
 def test_put_errors():

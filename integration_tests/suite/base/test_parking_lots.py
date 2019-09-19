@@ -78,7 +78,7 @@ def error_checks(url):
 
 
 @fixtures.parking_lot(name='search', slots_start='701', slots_end='750', music_on_hold='search', timeout=100)
-@fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850',  music_on_hold='hidden', timeout=None)
+@fixtures.parking_lot(name='hidden', slots_start='801', slots_end='850', music_on_hold='hidden', timeout=None)
 def test_search(parking_lot, hidden):
     url = confd.parkinglots
     searches = {

@@ -118,7 +118,7 @@ def test_get_users_associated_to_switchboard(switchboard, user1, user2):
 @fixtures.user()
 def test_get_switchboards_associated_to_user(switchboard1, switchboard2, user):
     with a.switchboard_member_user(switchboard1, [user]), \
-         a.switchboard_member_user(switchboard2, [user]):
+            a.switchboard_member_user(switchboard2, [user]):
         response = confd.users(user['uuid']).get()
         assert_that(response.item, has_entries(
             switchboards=contains_inanyorder(
@@ -142,7 +142,7 @@ def test_delete_switchboard_when_switchboard_and_user_associated(switchboard, us
 @fixtures.user()
 def test_delete_user_when_switchboard_and_user_associated(switchboard1, switchboard2, user):
     with a.switchboard_member_user(switchboard2, [user]), \
-         a.switchboard_member_user(switchboard1, [user]):
+            a.switchboard_member_user(switchboard1, [user]):
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.switchboards(switchboard1['uuid']).get()
