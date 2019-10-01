@@ -45,7 +45,7 @@ Development
 
 You need the repos xivo-manage-db up-to-date.
 
-1. ```git clone https://github.com/wazo-pbx/xivo-manage-db```
+1. ```git clone https://github.com/wazo-platform/xivo-manage-db```
 2. ```MANAGE_DB_DIR=../../xivo-manage-db make update-db```
 3. Execute the steps above to run integration tests
 
@@ -54,7 +54,7 @@ You need the repos xivo-manage-db up-to-date.
 
 You need the repos wazo-provd up-to-date.
 
-1. ```git clone https://github.com/wazo-pbx/wazo-provd```
+1. ```git clone https://github.com/wazo-platform/wazo-provd```
 2. ```PROVD_DIR=../../wazo-provd make build-provd```
 3. Execute the steps above to run integration tests
 

@@ -1,7 +1,7 @@
-https://github.com/wazo-pbx/wazo-auth-client/archive/master.zip
-https://github.com/wazo-pbx/wazo-provd-client/archive/master.zip
-https://github.com/wazo-pbx/xivo-lib-rest-client/archive/master.zip
-https://github.com/wazo-pbx/xivo-test-helpers/archive/master.zip
+https://github.com/wazo-platform/wazo-auth-client/archive/master.zip
+https://github.com/wazo-platform/wazo-provd-client/archive/master.zip
+https://github.com/wazo-platform/xivo-lib-rest-client/archive/master.zip
+https://github.com/wazo-platform/xivo-test-helpers/archive/master.zip
 docker
 docker-compose
 kombu
