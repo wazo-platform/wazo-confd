@@ -81,97 +81,98 @@ def setup_provd(host, port):
     provd.port = port
 
 
-from . import destination
+from . import access_feature  # noqa
+from . import agent  # noqa
+from . import agent_login_status  # noqa
+from . import agent_skill  # noqa
+from . import application  # noqa
+from . import call_filter  # noqa
+from . import call_filter_recipient_user  # noqa
+from . import call_filter_surrogate_user  # noqa
+from . import call_permission  # noqa
+from . import call_pickup  # noqa
+from . import call_pickup_interceptor_group  # noqa
+from . import call_pickup_interceptor_user  # noqa
+from . import call_pickup_target_group  # noqa
+from . import call_pickup_target_user  # noqa
+from . import conference  # noqa
+from . import conference_extension  # noqa
+from . import context_context  # noqa
+from . import destination  # noqa
+from . import device  # noqa
+from . import endpoint_custom  # noqa
+from . import endpoint_iax  # noqa
+from . import endpoint_sccp  # noqa
+from . import endpoint_sip  # noqa
+from . import extension  # noqa
+from . import extension_feature  # noqa
+from . import funckey_template  # noqa
+from . import group  # noqa
+from . import group_call_permission  # noqa
+from . import group_extension  # noqa
+from . import group_member_extension  # noqa
+from . import group_member_user  # noqa
+from . import group_schedule  # noqa
+from . import incall  # noqa
+from . import incall_extension  # noqa
+from . import incall_schedule  # noqa
+from . import incall_user  # noqa
+from . import ivr  # noqa
+from . import line  # noqa
+from . import line_application  # noqa
+from . import line_device  # noqa
+from . import line_endpoint_custom  # noqa
+from . import line_endpoint_sccp  # noqa
+from . import line_endpoint_sip  # noqa
+from . import line_extension  # noqa
+from . import line_fellowship  # noqa
+from . import line_sip  # noqa
+from . import meetme  # noqa
+from . import moh  # noqa
+from . import paging  # noqa
+from . import paging_caller_user  # noqa
+from . import paging_member_user  # noqa
+from . import parking_lot  # noqa
+from . import parking_lot_extension  # noqa
+from . import outcall  # noqa
+from . import outcall_call_permission  # noqa
+from . import outcall_extension  # noqa
+from . import outcall_schedule  # noqa
+from . import outcall_trunk  # noqa
+from . import queue  # noqa
+from . import queue_extension  # noqa
+from . import queue_member_agent  # noqa
+from . import queue_member_user  # noqa
+from . import queue_schedule  # noqa
+from . import register_iax  # noqa
+from . import register_sip  # noqa
+from . import registrar  # noqa
+from . import sound  # noqa
+from . import schedule  # noqa
+from . import skill  # noqa
+from . import skill_rule  # noqa
+from . import switchboard  # noqa
+from . import switchboard_member_user  # noqa
+from . import trunk  # noqa
+from . import trunk_endpoint_custom  # noqa
+from . import trunk_endpoint_iax  # noqa
+from . import trunk_endpoint_sip  # noqa
+from . import trunk_register_iax  # noqa
+from . import trunk_register_sip  # noqa
+from . import user  # noqa
+from . import user_agent  # noqa
+from . import user_call_permission  # noqa
+from . import user_funckey_template  # noqa
+from . import user_import  # noqa
+from . import user_line  # noqa
+from . import user_schedule  # noqa
+from . import user_voicemail  # noqa
+from . import voicemail  # noqa
+from . import voicemail_zonemessages  # noqa
 
-from . import access_feature
-from . import agent
-from . import agent_login_status
-from . import agent_skill
-from . import application
-from . import call_filter
-from . import call_filter_recipient_user
-from . import call_filter_surrogate_user
-from . import call_permission
-from . import call_pickup
-from . import call_pickup_interceptor_group
-from . import call_pickup_interceptor_user
-from . import call_pickup_target_group
-from . import call_pickup_target_user
-from . import conference
-from . import conference_extension
-from . import context_context
-from . import device
-from . import endpoint_custom
-from . import endpoint_iax
-from . import endpoint_sccp
-from . import endpoint_sip
-from . import extension
-from . import extension_feature
-from . import funckey_template
-from . import group
-from . import group_call_permission
-from . import group_extension
-from . import group_member_extension
-from . import group_member_user
-from . import group_schedule
-from . import incall
-from . import incall_extension
-from . import incall_schedule
-from . import incall_user
-from . import ivr
-from . import line
-from . import line_application
-from . import line_device
-from . import line_endpoint_custom
-from . import line_endpoint_sccp
-from . import line_endpoint_sip
-from . import line_extension
-from . import line_fellowship
-from . import line_sip
-from . import meetme
-from . import moh
-from . import paging
-from . import paging_caller_user
-from . import paging_member_user
-from . import parking_lot
-from . import parking_lot_extension
-from . import outcall
-from . import outcall_call_permission
-from . import outcall_extension
-from . import outcall_schedule
-from . import outcall_trunk
-from . import queue
-from . import queue_extension
-from . import queue_member_agent
-from . import queue_member_user
-from . import queue_schedule
-from . import register_iax
-from . import register_sip
-from . import registrar
-from . import sound
-from . import schedule
-from . import skill
-from . import skill_rule
-from . import switchboard
-from . import switchboard_member_user
-from . import trunk
-from . import trunk_endpoint_custom
-from . import trunk_endpoint_iax
-from . import trunk_endpoint_sip
-from . import trunk_register_iax
-from . import trunk_register_sip
-from . import user
-from . import user_agent
-from . import user_call_permission
-from . import user_funckey_template
-from . import user_import
-from . import user_line
-from . import user_schedule
-from . import user_voicemail
-from . import voicemail
-from . import voicemail_zonemessages
 
 __all__ = [
+    'access_feature',
     'destination',
     'agent',
     'agent_login_status',
@@ -234,6 +235,7 @@ __all__ = [
     'queue_member_agent',
     'queue_member_user',
     'queue_schedule',
+    'registrar',
     'register_iax',
     'register_sip',
     'sound',
