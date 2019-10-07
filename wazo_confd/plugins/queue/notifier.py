@@ -11,16 +11,12 @@ from wazo_confd import bus, sysconfd
 
 
 class QueueNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['module reload app_queue.so'],
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, queue):

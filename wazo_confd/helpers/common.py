@@ -51,6 +51,7 @@ def handle_api_exception(func):
             rollback()
             message = decode_and_log_error(error, exc_info=True)
             return ['Unexpected error: {}'.format(message)], 500
+
     return wrapper
 
 
@@ -85,8 +86,9 @@ def extract_http_messages(error):
     message = data.get('message', None)
     if isinstance(message, dict):
         code = error.code
-        messages = ["Input Error - {}: {}".format(key, value)
-                    for key, value in message.items()]
+        messages = [
+            "Input Error - {}: {}".format(key, value) for key, value in message.items()
+        ]
     elif isinstance(message, str):
         code = error.code
         messages = [message]

@@ -7,7 +7,7 @@ by returning file not found errors.
 
 __version__ = "$Revision: 10355 $ $Date: 2011-03-08 14:38:11 -0500 (Tue, 08 Mar 2011) $"
 __license__ = """
-    Copyright (C) 2010  Proformatique <technique@proformatique.com>
+    Copyright 2010-2019 The Wazo Authors  (see the AUTHORS file)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,8 +30,9 @@ from twisted.web.resource import NoResource
 
 _MSG = 'Null plugin always reject requests'
 
+
 class NullPlugin(Plugin):
     IS_PLUGIN = True
-    
+
     http_service = NoResource(_MSG)
-    tftp_service = TFTPNullService(errmsg=_MSG) 
+    tftp_service = TFTPNullService(errmsg=_MSG)

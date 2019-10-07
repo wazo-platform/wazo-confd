@@ -10,7 +10,6 @@ from wazo_confd.plugins.endpoint_sip.service import build_service as build_sip_s
 
 
 class LineSipService:
-
     def __init__(self, line_service, sip_service):
         self.line_service = line_service
         self.sip_service = sip_service
@@ -23,9 +22,11 @@ class LineSipService:
 
     def search(self, params):
         total, items = self.line_service.search(params)
-        items = (LineSip.from_line_and_sip(line, line.endpoint_sip)
-                 for line in items
-                 if line.endpoint_sip is not None)
+        items = (
+            LineSip.from_line_and_sip(line, line.endpoint_sip)
+            for line in items
+            if line.endpoint_sip is not None
+        )
         return total, items
 
     def create(self, line_sip):
@@ -60,5 +61,6 @@ class LineSipService:
 
 
 def build_service(provd_client):
-    return LineSipService(build_line_service(provd_client),
-                          build_sip_service(provd_client))
+    return LineSipService(
+        build_line_service(provd_client), build_sip_service(provd_client)
+    )

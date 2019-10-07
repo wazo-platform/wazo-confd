@@ -4,12 +4,10 @@
 from xivo_dao.helpers import errors
 
 from wazo_confd.helpers.destination import DestinationValidator
-from wazo_confd.helpers.validator import (Validator,
-                                          ValidationGroup)
+from wazo_confd.helpers.validator import Validator, ValidationGroup
 
 
 class IvrModelValidator(Validator):
-
     def __init__(self, destination_validator):
         self._destination_validator = destination_validator
 
@@ -31,7 +29,4 @@ class IvrModelValidator(Validator):
 def build_validator():
     ivr_validator = IvrModelValidator(DestinationValidator())
 
-    return ValidationGroup(
-        create=[ivr_validator],
-        edit=[ivr_validator],
-    )
+    return ValidationGroup(create=[ivr_validator], edit=[ivr_validator])

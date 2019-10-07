@@ -36,12 +36,11 @@ from ..helpers.config import (
     gen_queue_exten,
     gen_line_exten,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
-outside_range_regex = re.compile(r"Extension '(\d+)' is outside of range for context '([\w_-]+)'")
+outside_range_regex = re.compile(
+    r"Extension '(\d+)' is outside of range for context '([\w_-]+)'"
+)
 
 FAKE_ID = 999999999
 
@@ -82,10 +81,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'exten', {}
     yield s.check_bogus_field_returns_error, url, 'exten', []
     yield s.check_bogus_field_returns_error, url, 'exten', '01234567890123456789012345678901234567890'
-    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123', {'context': CONTEXT}
+    yield s.check_bogus_field_returns_error, url, 'exten', 'ABC123', {
+        'context': CONTEXT
+    }
     yield s.check_bogus_field_returns_error, url, 'exten', 'XXXX', {'context': CONTEXT}
     yield s.check_bogus_field_returns_error, url, 'exten', '_+111', {'context': CONTEXT}
-    yield s.check_bogus_field_returns_error, url, 'exten', '_1+111', {'context': 'to-extern'}
+    yield s.check_bogus_field_returns_error, url, 'exten', '_1+111', {
+        'context': 'to-extern'
+    }
     yield s.check_bogus_field_returns_error, url, 'context', None
     yield s.check_bogus_field_returns_error, url, 'context', True
     yield s.check_bogus_field_returns_error, url, 'context', {}
@@ -107,45 +110,49 @@ def test_get_multi_tenant(_, __, in_main, in_sub):
 @fixtures.extension()
 def test_get(extension):
     response = confd.extensions(extension['id']).get()
-    assert_that(response.item, has_entries(
-        exten=extension['exten'],
-        context=extension['context'],
-        enabled=True,
-        group=none(),
-        queue=none(),
-        incall=none(),
-        outcall=none(),
-        lines=empty(),
-        conference=none(),
-        parking_lot=none(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            exten=extension['exten'],
+            context=extension['context'],
+            enabled=True,
+            group=none(),
+            queue=none(),
+            incall=none(),
+            outcall=none(),
+            lines=empty(),
+            conference=none(),
+            parking_lot=none(),
+        ),
+    )
 
 
 def test_create_minimal_parameters():
     exten = h.extension.find_available_exten(CONTEXT)
 
-    response = confd.extensions.post(exten=exten,
-                                     context=CONTEXT)
+    response = confd.extensions.post(exten=exten, context=CONTEXT)
     response.assert_created('extensions')
 
-    assert_that(response.item, has_entries(exten=exten,
-                                           context=CONTEXT,
-                                           enabled=True,
-                                           tenant_uuid=not_(none())))
+    assert_that(
+        response.item,
+        has_entries(
+            exten=exten, context=CONTEXT, enabled=True, tenant_uuid=not_(none())
+        ),
+    )
 
 
 def test_create_with_enabled_parameter():
     exten = h.extension.find_available_exten(CONTEXT)
 
-    response = confd.extensions.post(exten=exten,
-                                     context=CONTEXT,
-                                     enabled=False)
+    response = confd.extensions.post(exten=exten, context=CONTEXT, enabled=False)
     response.assert_created('extensions')
 
-    assert_that(response.item, has_entries(exten=exten,
-                                           context=CONTEXT,
-                                           enabled=False,
-                                           tenant_uuid=not_(none())))
+    assert_that(
+        response.item,
+        has_entries(
+            exten=exten, context=CONTEXT, enabled=False, tenant_uuid=not_(none())
+        ),
+    )
 
 
 def test_create_extension_in_different_ranges():
@@ -166,7 +173,9 @@ def create_in_range(exten, context):
     response.assert_created('extensions')
 
 
-@fixtures.context(incall_ranges=[{'start': '4185550000', 'end': '4185559999', 'did_length': 4}])
+@fixtures.context(
+    incall_ranges=[{'start': '4185550000', 'end': '4185559999', 'did_length': 4}]
+)
 def test_create_extension_in_context_with_did_length(context):
     response = confd.extensions.create(exten='1000', context=context['name'])
     response.assert_created('extensions')
@@ -174,20 +183,19 @@ def test_create_extension_in_context_with_did_length(context):
 
 @fixtures.extension()
 def test_create_2_extensions_with_same_exten(extension):
-    response = confd.extensions.post(context=extension['context'],
-                                     exten=extension['exten'])
+    response = confd.extensions.post(
+        context=extension['context'], exten=extension['exten']
+    )
     response.assert_match(400, e.resource_exists('Extension'))
 
 
 def test_create_extension_with_fake_context():
-    response = confd.extensions.post(exten='1234',
-                                     context='fakecontext')
+    response = confd.extensions.post(exten='1234', context='fakecontext')
     response.assert_match(400, e.not_found('Context'))
 
 
 def test_create_pattern():
-    response = confd.extensions.post(exten='_XXXX',
-                                     context='default')
+    response = confd.extensions.post(exten='_XXXX', context='default')
     response.assert_created('extensions')
 
 
@@ -211,7 +219,9 @@ def test_create_2_extensions_same_exten_different_context(context):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
 def test_create_multi_tenant(in_main):
-    response = confd.extensions.post(exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT)
+    response = confd.extensions.post(
+        exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT
+    )
     response.assert_status(400)
 
 
@@ -256,15 +266,15 @@ def test_edit_extension_line_with_exten_outside_range(extension, line):
 
 @fixtures.extension()
 def test_edit_extension_with_fake_context(extension):
-    response = confd.extensions(extension['id']).put(exten='1234',
-                                                     context='fakecontext')
+    response = confd.extensions(extension['id']).put(
+        exten='1234', context='fakecontext'
+    )
     response.assert_match(400, e.not_found('Context'))
 
 
 @fixtures.extension()
 def test_edit_pattern(extension):
-    response = confd.extensions(extension['id']).put(exten='_X21',
-                                                     context='default')
+    response = confd.extensions(extension['id']).put(exten='_X21', context='default')
     response.assert_updated()
 
 
@@ -285,7 +295,9 @@ def test_edit_multi_tenant(main_ctx, _, main, sub):
     response = confd.extensions(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
 
-    response = confd.extensions(sub['id']).put(context=main_ctx['name'], wazo_tenant=SUB_TENANT)
+    response = confd.extensions(sub['id']).put(
+        context=main_ctx['name'], wazo_tenant=SUB_TENANT
+    )
     response.assert_status(400)
 
 
@@ -294,7 +306,9 @@ def test_edit_multi_tenant(main_ctx, _, main, sub):
 def test_update_required_parameters(extension, context):
     exten = h.extension.find_available_exten(context['name'])
 
-    response = confd.extensions(extension['id']).put(exten=exten, context=context['name'])
+    response = confd.extensions(extension['id']).put(
+        exten=exten, context=context['name']
+    )
     response.assert_updated()
 
     response = confd.extensions(extension['id']).get()
@@ -315,7 +329,9 @@ def test_update_additional_parameters(extension1):
 @fixtures.extension(exten='1001', context='main')
 @fixtures.extension(exten='1001', context='sub')
 def test_update_and_multi_tenant(_, __, in_main, in_sub):
-    response = confd.extensions(in_main['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
+    response = confd.extensions(in_main['id']).put(
+        wazo_tenant=SUB_TENANT, enabled=False
+    )
     response.assert_match(404, e.not_found('Extension'))
 
     response = confd.extensions(in_sub['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
@@ -324,7 +340,9 @@ def test_update_and_multi_tenant(_, __, in_main, in_sub):
     response = confd.extensions(in_sub['id']).get()
     assert_that(response.item, has_entries(id=in_sub['id'], enabled=False))
 
-    response = confd.extensions(in_sub['id']).put(context='main', wazo_tenant=SUB_TENANT)
+    response = confd.extensions(in_sub['id']).put(
+        context='main', wazo_tenant=SUB_TENANT
+    )
     response.assert_match(400, e.not_found('Context'))
 
 
@@ -349,24 +367,48 @@ def test_that_changing_tenant_is_not_possible(_, __, in_main, in_sub):
 @fixtures.extension()
 @fixtures.device()
 @fixtures.device()
-def test_edit_extension_then_funckeys_updated(user1, user2, user3,
-                                              line_sip1, line_sip2, line_sip3,
-                                              extension1, extension2, extension3,
-                                              device1, device2):
+def test_edit_extension_then_funckeys_updated(
+    user1,
+    user2,
+    user3,
+    line_sip1,
+    line_sip2,
+    line_sip3,
+    extension1,
+    extension2,
+    extension3,
+    device1,
+    device2,
+):
     timestamp = datetime.datetime.utcnow()
-    with a.line_extension(line_sip1, extension1), a.user_line(user1, line_sip1), a.line_device(line_sip1, device1), \
-            a.line_extension(line_sip2, extension2), a.user_line(user2, line_sip2), a.line_device(line_sip2, device2), \
-            a.line_extension(line_sip3, extension3), a.user_line(user3, line_sip3):
+    with a.line_extension(line_sip1, extension1), a.user_line(
+        user1, line_sip1
+    ), a.line_device(line_sip1, device1), a.line_extension(
+        line_sip2, extension2
+    ), a.user_line(
+        user2, line_sip2
+    ), a.line_device(
+        line_sip2, device2
+    ), a.line_extension(
+        line_sip3, extension3
+    ), a.user_line(
+        user3, line_sip3
+    ):
         device2_updated_count = provd.updated_count(device2['id'], timestamp)
 
         destination = {'type': 'user', 'user_id': user3['id']}
-        confd.users(user1['id']).funckeys(1).put(destination=destination).assert_updated()
+        confd.users(user1['id']).funckeys(1).put(
+            destination=destination
+        ).assert_updated()
 
         confd.extensions(extension3['id']).put(exten='1033').assert_updated()
 
         config = provd.configs.get(device1['id'])
         assert_that(config['raw_config']['funckeys']['1']['value'], equal_to('1033'))
-        assert_that(provd.updated_count(device2['id'], timestamp), equal_to(device2_updated_count))
+        assert_that(
+            provd.updated_count(device2['id'], timestamp),
+            equal_to(device2_updated_count),
+        )
 
 
 @fixtures.user()
@@ -376,35 +418,46 @@ def test_edit_extension_then_funckeys_updated(user1, user2, user3,
 @fixtures.extension()
 @fixtures.extension()
 @fixtures.device()
-def test_edit_extension_with_no_change_device_not_updated(user1, user2,
-                                                          line_sip1, line_sip2,
-                                                          extension1, extension2,
-                                                          device):
+def test_edit_extension_with_no_change_device_not_updated(
+    user1, user2, line_sip1, line_sip2, extension1, extension2, device
+):
     timestamp = datetime.datetime.utcnow()
-    with a.line_extension(line_sip1, extension1), a.user_line(user1, line_sip1), a.line_device(line_sip1, device), \
-            a.line_extension(line_sip2, extension2), a.user_line(user2, line_sip2):
+    with a.line_extension(line_sip1, extension1), a.user_line(
+        user1, line_sip1
+    ), a.line_device(line_sip1, device), a.line_extension(
+        line_sip2, extension2
+    ), a.user_line(
+        user2, line_sip2
+    ):
         destination = {'type': 'user', 'user_id': user2['id']}
-        confd.users(user1['id']).funckeys(1).put(destination=destination).assert_updated()
+        confd.users(user1['id']).funckeys(1).put(
+            destination=destination
+        ).assert_updated()
 
         device_updated_count = provd.updated_count(device['id'], timestamp)
 
-        confd.extensions(extension2['id']).put(exten=extension2['exten']).assert_updated()
+        confd.extensions(extension2['id']).put(
+            exten=extension2['exten']
+        ).assert_updated()
 
-        assert_that(provd.updated_count(device['id'], timestamp), equal_to(device_updated_count))
+        assert_that(
+            provd.updated_count(device['id'], timestamp), equal_to(device_updated_count)
+        )
 
 
 @fixtures.extension_feature()
 def test_search_do_not_find_extension_feature(extension):
     response = confd.extensions().get()
-    assert_that(response.items, is_not(has_item(has_entries(context=extension['context']))))
+    assert_that(
+        response.items, is_not(has_item(has_entries(context=extension['context'])))
+    )
 
 
 @fixtures.extension(exten='4999', context='default')
 @fixtures.extension(exten='9999', context='from-extern')
 def test_search(extension, hidden):
     url = confd.extensions
-    searches = {'exten': '499',
-                'context': 'fault'}
+    searches = {'exten': '499', 'context': 'fault'}
 
     for field, term in searches.items():
         yield check_search, url, extension, hidden, field, term
@@ -431,25 +484,19 @@ def test_search_multi_tenant(*_):
         all_of(
             not_(has_item(has_entries(context='main'))),
             has_item(has_entries(context='sub')),
-        )
+        ),
     )
 
     response = confd.extensions.get(wazo_tenant=MAIN_TENANT)
     assert_that(
         response.items,
-        has_items(
-            has_entries(context='main'),
-            not_(has_entries(context='sub')),
-        )
+        has_items(has_entries(context='main'), not_(has_entries(context='sub'))),
     )
 
     response = confd.extensions.get(recurse=True, wazo_tenant=MAIN_TENANT)
     assert_that(
         response.items,
-        has_items(
-            has_entries(context='main'),
-            has_entries(context='sub'),
-        )
+        has_items(has_entries(context='main'), has_entries(context='sub')),
     )
 
 
@@ -470,9 +517,9 @@ def test_search_extensions_in_context():
     exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
 
-    with fixtures.extension(exten=exten1, context='default'), \
-            fixtures.extension(exten=exten1, context='from-extern') as extension2, \
-            fixtures.extension(exten=exten2, context='from-extern'):
+    with fixtures.extension(exten=exten1, context='default'), fixtures.extension(
+        exten=exten1, context='from-extern'
+    ) as extension2, fixtures.extension(exten=exten2, context='from-extern'):
 
         response = confd.extensions.get(search=exten1, context='from-extern')
         assert_that(response.items, contains(extension2))
@@ -482,9 +529,11 @@ def test_search_list_extensions_in_context():
     exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
 
-    with fixtures.extension(exten=exten1, context='default'), \
-            fixtures.extension(exten=exten1, context='from-extern') as extension2, \
-            fixtures.extension(exten=exten2, context='from-extern') as extension3:
+    with fixtures.extension(exten=exten1, context='default'), fixtures.extension(
+        exten=exten1, context='from-extern'
+    ) as extension2, fixtures.extension(
+        exten=exten2, context='from-extern'
+    ) as extension3:
 
         response = confd.extensions.get(context='from-extern')
         assert_that(response.items, contains_inanyorder(extension2, extension3))

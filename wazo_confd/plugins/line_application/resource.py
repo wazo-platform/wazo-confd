@@ -18,7 +18,9 @@ class LineApplicationAssociation(ConfdResource):
     def put(self, line_id, application_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-        application = self.application_dao.get(application_uuid, tenant_uuids=tenant_uuids)
+        application = self.application_dao.get(
+            application_uuid, tenant_uuids=tenant_uuids
+        )
         self.service.associate(line, application)
         return '', 204
 
@@ -26,6 +28,8 @@ class LineApplicationAssociation(ConfdResource):
     def delete(self, line_id, application_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-        application = self.application_dao.get(application_uuid, tenant_uuids=tenant_uuids)
+        application = self.application_dao.get(
+            application_uuid, tenant_uuids=tenant_uuids
+        )
         self.service.dissociate(line, application)
         return '', 204

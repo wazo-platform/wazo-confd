@@ -7,7 +7,6 @@ from wazo_confd.plugins.configuration.notifier import build_notifier
 
 
 class LiveReloadService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class LiveReloadService:
 
 
 def build_service():
-    return LiveReloadService(configuration_dao,
-                             build_notifier())
+    return LiveReloadService(configuration_dao, build_notifier())

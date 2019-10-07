@@ -14,5 +14,4 @@ class HEPConfigurationService(AsteriskConfigurationService):
 
 
 def build_service():
-    return HEPConfigurationService(asterisk_file_dao,
-                                   build_notifier())
+    return HEPConfigurationService(asterisk_file_dao, build_notifier())

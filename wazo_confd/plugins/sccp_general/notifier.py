@@ -7,16 +7,12 @@ from wazo_confd import bus, sysconfd
 
 
 class SCCPGeneralNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {
-            'ipbx': ipbx,
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ipbx, 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, sccp_general):

@@ -14,9 +14,9 @@ from wazo_confd.helpers.validator import (
 def build_validator():
     return ValidationGroup(
         create=[
-            UniqueField('number', lambda number: paging_dao.find_by(number=number), 'Paging'),
+            UniqueField(
+                'number', lambda number: paging_dao.find_by(number=number), 'Paging'
+            )
         ],
-        edit=[
-            Optional('number', UniqueFieldChanged('number', paging_dao, 'Paging')),
-        ]
+        edit=[Optional('number', UniqueFieldChanged('number', paging_dao, 'Paging'))],
     )

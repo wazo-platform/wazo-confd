@@ -14,24 +14,24 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class SCCPGeneralOptionSchema(BaseSchema):
-    key = fields.String(validate=(Length(max=80)),
-                        required=True,
-                        attribute='option_name')
-    value = fields.String(validate=(Length(max=80)),
-                          required=True,
-                          attribute='option_value')
+    key = fields.String(
+        validate=(Length(max=80)), required=True, attribute='option_name'
+    )
+    value = fields.String(
+        validate=(Length(max=80)), required=True, attribute='option_value'
+    )
 
 
 class SCCPGeneralSchema(BaseSchema):
-    options = fields.Nested(SCCPGeneralOptionSchema,
-                            many=True,
-                            required=True)
+    options = fields.Nested(SCCPGeneralOptionSchema, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data):
         options = data.get('options')
         if isinstance(options, dict):
-            data['options'] = [{'key': key, 'value': value} for key, value in options.items()]
+            data['options'] = [
+                {'key': key, 'value': value} for key, value in options.items()
+            ]
         return data
 
     @post_dump

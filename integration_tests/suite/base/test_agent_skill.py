@@ -1,23 +1,11 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    has_entries,
-)
+from hamcrest import assert_that, contains_inanyorder, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -71,11 +59,10 @@ def test_update_properties(agent, skill):
         response.assert_updated()
 
         response = confd.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            skills=contains_inanyorder(has_entries(
-                skill_weight=5,
-            ))
-        ))
+        assert_that(
+            response.item,
+            has_entries(skills=contains_inanyorder(has_entries(skill_weight=5))),
+        )
 
 
 @fixtures.agent()
@@ -95,12 +82,14 @@ def test_associate_multiple_skills_to_agent(agent, skill1, skill2):
         response.assert_updated()
 
         response = confd.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            skills=contains_inanyorder(
-                has_entries(id=skill1['id']),
-                has_entries(id=skill2['id']),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                skills=contains_inanyorder(
+                    has_entries(id=skill1['id']), has_entries(id=skill2['id'])
+                )
+            ),
+        )
 
 
 @fixtures.agent()
@@ -112,12 +101,14 @@ def test_associate_multiple_agents_to_skill(agent1, agent2, skill):
         response.assert_updated()
 
         response = confd.agents.skills(skill['id']).get()
-        assert_that(response.item, has_entries(
-            agents=contains_inanyorder(
-                has_entries(id=agent1['id']),
-                has_entries(id=agent2['id']),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                agents=contains_inanyorder(
+                    has_entries(id=agent1['id']), has_entries(id=agent2['id'])
+                )
+            ),
+        )
 
 
 @fixtures.agent(wazo_tenant=MAIN_TENANT)
@@ -125,13 +116,25 @@ def test_associate_multiple_agents_to_skill(agent1, agent2, skill):
 @fixtures.skill(wazo_tenant=MAIN_TENANT)
 @fixtures.skill(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_agent, sub_agent, main_skill, sub_skill):
-    response = confd.agents(main_agent['id']).skills(main_skill['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.agents(main_agent['id'])
+        .skills(main_skill['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Agent'))
 
-    response = confd.agents(sub_agent['id']).skills(main_skill['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.agents(sub_agent['id'])
+        .skills(main_skill['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Skill'))
 
-    response = confd.agents(main_agent['id']).skills(sub_skill['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.agents(main_agent['id'])
+        .skills(sub_skill['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -155,10 +158,18 @@ def test_dissociate_not_associated(agent, skill):
 @fixtures.skill(wazo_tenant=MAIN_TENANT)
 @fixtures.skill(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_agent, sub_agent, main_skill, sub_skill):
-    response = confd.agents(main_agent['id']).skills(sub_skill['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.agents(main_agent['id'])
+        .skills(sub_skill['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Agent'))
 
-    response = confd.agents(sub_agent['id']).skills(main_skill['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.agents(sub_agent['id'])
+        .skills(main_skill['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Skill'))
 
 
@@ -167,16 +178,19 @@ def test_dissociate_multi_tenant(main_agent, sub_agent, main_skill, sub_skill):
 def test_get_agent_relation(agent, skill):
     with a.agent_skill(agent, skill, skill_weight=0):
         response = confd.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            skills=contains_inanyorder(
-                has_entries(
-                    id=skill['id'],
-                    name=skill['name'],
-                    skill_weight=0,
-                    links=skill['links'],
+        assert_that(
+            response.item,
+            has_entries(
+                skills=contains_inanyorder(
+                    has_entries(
+                        id=skill['id'],
+                        name=skill['name'],
+                        skill_weight=0,
+                        links=skill['links'],
+                    )
                 )
-            )
-        ))
+            ),
+        )
 
 
 @fixtures.skill()
@@ -184,18 +198,21 @@ def test_get_agent_relation(agent, skill):
 def test_get_skill_relation(skill, agent):
     with a.agent_skill(agent, skill, skill_weight=0):
         response = confd.agents.skills(skill['id']).get()
-        assert_that(response.item, has_entries(
-            agents=contains_inanyorder(
-                has_entries(
-                    id=agent['id'],
-                    number=agent['number'],
-                    firstname=agent['firstname'],
-                    lastname=agent['lastname'],
-                    skill_weight=0,
-                    links=agent['links'],
+        assert_that(
+            response.item,
+            has_entries(
+                agents=contains_inanyorder(
+                    has_entries(
+                        id=agent['id'],
+                        number=agent['number'],
+                        firstname=agent['firstname'],
+                        lastname=agent['lastname'],
+                        skill_weight=0,
+                        links=agent['links'],
+                    )
                 )
-            )
-        ))
+            ),
+        )
 
 
 @fixtures.agent()

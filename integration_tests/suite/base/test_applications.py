@@ -14,15 +14,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_UUID = '00000000-0000-0000-0000-000000000000'
 
@@ -67,9 +60,7 @@ def error_checks(url):
 @fixtures.application(name='hidden')
 def test_search(application, hidden):
     url = confd.applications
-    searches = {
-        'name': 'search',
-    }
+    searches = {'name': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, application, hidden, field, term
@@ -102,33 +93,27 @@ def test_sort_offset_limit(application1, application2):
 @fixtures.application(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.applications.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.applications.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.applications.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.application()
 def test_get(application):
     response = confd.applications(application['uuid']).get()
-    assert_that(response.item, has_entries(
-        uuid=application['uuid'],
-        name=application['name'],
-        destination=application['destination'],
-        destination_options=application['destination_options'],
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=application['uuid'],
+            name=application['name'],
+            destination=application['destination'],
+            destination_options=application['destination_options'],
+        ),
+    )
 
 
 @fixtures.application(wazo_tenant=MAIN_TENANT)
@@ -145,30 +130,36 @@ def test_create_minimal_parameters():
     response = confd.applications.post()
     response.assert_created('applications')
 
-    assert_that(response.item, has_entries(
-        uuid=not_none(),
-        tenant_uuid=MAIN_TENANT,
-        destination=None,
-        destination_options={},
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=not_none(),
+            tenant_uuid=MAIN_TENANT,
+            destination=None,
+            destination_options={},
+        ),
+    )
 
     confd.applications(response.item['uuid']).delete().assert_deleted()
 
 
 def test_create_minimal_node_parameters():
-    response = confd.applications.post(destination='node', destination_options={'type': 'holding'})
+    response = confd.applications.post(
+        destination='node', destination_options={'type': 'holding'}
+    )
     response.assert_created('applications')
 
-    assert_that(response.item, has_entries(
-        uuid=not_none(),
-        tenant_uuid=MAIN_TENANT,
-        destination='node',
-        destination_options=has_entries(
-            type='holding',
-            music_on_hold=None,
-            answer=False,
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=not_none(),
+            tenant_uuid=MAIN_TENANT,
+            destination='node',
+            destination_options=has_entries(
+                type='holding', music_on_hold=None, answer=False
+            ),
+        ),
+    )
 
     confd.applications(response.item['uuid']).delete().assert_deleted()
 
@@ -181,7 +172,7 @@ def test_create_all_parameters():
             'type': 'holding',
             'music_on_hold': 'default',
             'answer': True,
-        }
+        },
     }
 
     response = confd.applications.post(**parameters)
@@ -208,7 +199,7 @@ def test_edit_all_parameters(application):
             'type': 'holding',
             'music_on_hold': 'updated_moh',
             'answer': True,
-        }
+        },
     }
 
     response = confd.applications(application['uuid']).put(**parameters)
@@ -220,10 +211,7 @@ def test_edit_all_parameters(application):
 
 @fixtures.application(destination='node', destination_options={'type': 'holding'})
 def test_edit_remove_destination(application):
-    parameters = {
-        'destination': None,
-        'destination_options': {},
-    }
+    parameters = {'destination': None, 'destination_options': {}}
 
     response = confd.applications(application['uuid']).put(**parameters)
     response.assert_updated()
@@ -263,5 +251,9 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.application()
 def test_bus_events(application):
     yield s.check_bus_event, 'config.applications.created', confd.applications.post
-    yield s.check_bus_event, 'config.applications.edited', confd.applications(application['uuid']).put
-    yield s.check_bus_event, 'config.applications.deleted', confd.applications(application['uuid']).delete
+    yield s.check_bus_event, 'config.applications.edited', confd.applications(
+        application['uuid']
+    ).put
+    yield s.check_bus_event, 'config.applications.deleted', confd.applications(
+        application['uuid']
+    ).delete

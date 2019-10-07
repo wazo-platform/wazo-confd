@@ -4,10 +4,7 @@
 import csv
 
 from io import StringIO
-from flask import (
-    json,
-    make_response,
-)
+from flask import json, make_response
 
 
 def output_csv(data, code, http_headers=None):

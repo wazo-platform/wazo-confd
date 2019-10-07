@@ -12,14 +12,10 @@ from xivo_bus.resources.conference.event import (
 
 from ..notifier import ConferenceNotifier
 
-EXPECTED_HANDLERS = {
-    'ipbx': ['module reload app_confbridge.so'],
-    'agentbus': [],
-}
+EXPECTED_HANDLERS = {'ipbx': ['module reload app_confbridge.so'], 'agentbus': []}
 
 
 class TestConferenceNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

@@ -10,10 +10,7 @@ from xivo_dao.helpers.exception import NotFoundError
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 
-from .schema import (
-    CallFilterRecipientUsersSchema,
-    CallFilterSurrogateUsersSchema,
-)
+from .schema import CallFilterRecipientUsersSchema, CallFilterSurrogateUsersSchema
 
 
 class CallFilterRecipientUserList(ConfdResource):
@@ -29,12 +26,16 @@ class CallFilterRecipientUserList(ConfdResource):
     @required_acl('confd.callfilters.{call_filter_id}.recipients.users.update')
     def put(self, call_filter_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
+        call_filter = self.call_filter_dao.get(
+            call_filter_id, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
             recipients = []
             for user_form in form['users']:
-                user = self.user_dao.get_by(uuid=user_form['user']['uuid'], tenant_uuids=tenant_uuids)
+                user = self.user_dao.get_by(
+                    uuid=user_form['user']['uuid'], tenant_uuids=tenant_uuids
+                )
                 recipient = self.service.find_recipient_by_user(call_filter, user)
                 if not recipient:
                     recipient = CallFilterMember()
@@ -62,12 +63,16 @@ class CallFilterSurrogateUserList(ConfdResource):
     @required_acl('confd.callfilters.{call_filter_id}.surrogates.users.update')
     def put(self, call_filter_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        call_filter = self.call_filter_dao.get(call_filter_id, tenant_uuids=tenant_uuids)
+        call_filter = self.call_filter_dao.get(
+            call_filter_id, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
             surrogates = []
             for user_form in form['users']:
-                user = self.user_dao.get_by(uuid=user_form['user']['uuid'], tenant_uuids=tenant_uuids)
+                user = self.user_dao.get_by(
+                    uuid=user_form['user']['uuid'], tenant_uuids=tenant_uuids
+                )
                 surrogate = self.service.find_surrogate_by_user(call_filter, user)
                 if not surrogate:
                     surrogate = CallFilterMember()

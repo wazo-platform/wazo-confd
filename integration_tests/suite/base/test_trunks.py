@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -99,38 +92,32 @@ def test_sorting_offset_limit(_, __, trunk1, trunk2):
 @fixtures.trunk(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.trunks.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.trunks.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.trunks.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.trunk()
 def test_get(trunk):
     response = confd.trunks(trunk['id']).get()
-    assert_that(response.item, has_entries(
-        id=trunk['id'],
-        context=trunk['context'],
-        twilio_incoming=trunk['twilio_incoming'],
-        endpoint_sip=none(),
-        endpoint_custom=none(),
-        endpoint_iax=none(),
-        outcalls=empty(),
-        register_iax=none(),
-        register_sip=none(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=trunk['id'],
+            context=trunk['context'],
+            twilio_incoming=trunk['twilio_incoming'],
+            endpoint_sip=none(),
+            endpoint_custom=none(),
+            endpoint_iax=none(),
+            outcalls=empty(),
+            register_iax=none(),
+            register_sip=none(),
+        ),
+    )
 
 
 @fixtures.trunk(wazo_tenant=MAIN_TENANT)
@@ -152,10 +139,7 @@ def test_create_minimal_parameters():
 
 @fixtures.context()
 def test_create_all_parameters(context):
-    parameters = {
-        'context': context['name'],
-        'twilio_incoming': True,
-    }
+    parameters = {'context': context['name'], 'twilio_incoming': True}
     response = confd.trunks.post(**parameters)
     response.assert_created('trunks')
 
@@ -179,10 +163,7 @@ def test_edit_minimal_parameters(trunk):
 @fixtures.context(name='not_default')
 @fixtures.trunk()
 def test_edit_all_parameters(context, trunk):
-    parameters = {
-        'context': context['name'],
-        'twilio_incoming': True,
-    }
+    parameters = {'context': context['name'], 'twilio_incoming': True}
 
     response = confd.trunks(trunk['id']).put(**parameters)
     response.assert_updated()
@@ -201,7 +182,9 @@ def test_edit_multi_tenant(context, main, sub):
     response = confd.trunks(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
 
-    response = confd.trunks(sub['id']).put(context=context['name'], wazo_tenant=MAIN_TENANT)
+    response = confd.trunks(sub['id']).put(
+        context=context['name'], wazo_tenant=MAIN_TENANT
+    )
     response.assert_match(400, e.different_tenant())
 
 

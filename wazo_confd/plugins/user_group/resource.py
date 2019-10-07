@@ -2,10 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import (
-    EXCLUDE,
-    fields,
-)
+from marshmallow import EXCLUDE, fields
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -20,10 +17,7 @@ class GroupSchemaIDLoad(BaseSchema):
 
 
 class GroupsIDSchema(BaseSchema):
-    groups = fields.Nested(
-        GroupSchemaIDLoad,
-        many=True, required=True, unknown=EXCLUDE
-    )
+    groups = fields.Nested(GroupSchemaIDLoad, many=True, required=True, unknown=EXCLUDE)
 
 
 class UserGroupItem(ConfdResource):

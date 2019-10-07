@@ -15,7 +15,6 @@ from ..notifier import TrunkNotifier
 
 
 class TestTrunkNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -49,14 +48,18 @@ class TestTrunkNotifier(unittest.TestCase):
 
         self.notifier.edited(self.trunk)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self._sysconfd_handlers())
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self._sysconfd_handlers()
+        )
 
     def test_when_trunk_iax_edited_then_iax_reloaded(self):
         self.trunk.endpoint = 'iax'
 
         self.notifier.edited(self.trunk)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self._sysconfd_handlers())
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self._sysconfd_handlers()
+        )
 
     def test_when_trunk_custom_edited_then_no_reload(self):
         self.trunk.endpoint = 'custom'
@@ -75,14 +78,18 @@ class TestTrunkNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.trunk)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self._sysconfd_handlers())
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self._sysconfd_handlers()
+        )
 
     def test_when_trunk_iax_deleted_then_iax_reloaded(self):
         self.trunk.endpoint = 'iax'
 
         self.notifier.deleted(self.trunk)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self._sysconfd_handlers())
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self._sysconfd_handlers()
+        )
 
     def test_when_trunk_custom_deleted_then_no_reload(self):
         self.trunk.endpoint = 'custom'
@@ -102,8 +109,7 @@ class TestTrunkNotifier(unittest.TestCase):
         elif self.trunk.endpoint == 'iax':
             ipbx_commands = ['iax2 reload']
         else:
-            raise AssertionError('no sysconfd handlers for endpoint {}'.format(self.trunk.endpoint))
-        return {
-            'ipbx': ipbx_commands,
-            'agentbus': []
-        }
+            raise AssertionError(
+                'no sysconfd handlers for endpoint {}'.format(self.trunk.endpoint)
+            )
+        return {'ipbx': ipbx_commands, 'agentbus': []}

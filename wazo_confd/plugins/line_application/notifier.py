@@ -18,17 +18,12 @@ LINE_FIELDS = [
     'endpoint_custom.id',
 ]
 
-APPLICATION_FIELDS = [
-    'uuid',
-]
+APPLICATION_FIELDS = ['uuid']
 
 
 class LineApplicationNotifier:
 
-    REQUEST_HANDLERS = {
-        'ipbx': ['module reload res_pjsip.so'],
-        'agentbus': [],
-    }
+    REQUEST_HANDLERS = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
 
     def __init__(self, bus, sysconfd):
         self._bus = bus
@@ -38,16 +33,24 @@ class LineApplicationNotifier:
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
 
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
-        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
-        event = LineApplicationAssociatedEvent(line=line_serialized, application=application_serialized)
+        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(
+            application
+        )
+        event = LineApplicationAssociatedEvent(
+            line=line_serialized, application=application_serialized
+        )
         self._bus.send_bus_event(event)
 
     def dissociated(self, line, application):
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
 
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
-        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
-        event = LineApplicationDissociatedEvent(line=line_serialized, application=application_serialized)
+        application_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(
+            application
+        )
+        event = LineApplicationDissociatedEvent(
+            line=line_serialized, application=application_serialized
+        )
         self._bus.send_bus_event(event)
 
 

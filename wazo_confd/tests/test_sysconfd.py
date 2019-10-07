@@ -4,18 +4,12 @@
 from unittest import TestCase
 
 from mock import patch, Mock
-from hamcrest import (
-    assert_that,
-    equal_to,
-    has_entries,
-    has_items,
-)
+from hamcrest import assert_that, equal_to, has_entries, has_items
 
 from .._sysconfd import SysconfdPublisher
 
 
 class TestSysconfdClient(TestCase):
-
     def setUp(self):
         self.dao = Mock()
         self.url = "http://localhost:8668"
@@ -33,9 +27,7 @@ class TestSysconfdClient(TestCase):
 
         url = "http://localhost:8668/delete_voicemail"
         self.session.request.assert_called_once_with(
-            'GET',
-            url,
-            params={'mailbox': '123', 'context': 'default'},
+            'GET', url, params={'mailbox': '123', 'context': 'default'}
         )
 
     def test_commonconf_generate(self):
@@ -185,8 +177,7 @@ class TestSysconfdClient(TestCase):
 
         expected_url = "http://localhost:8668/exec_request_handlers"
         expected_body = has_entries(
-            ipbx=has_items('command2', 'command5'),
-            bus=has_items('command6'),
+            ipbx=has_items('command2', 'command5'), bus=has_items('command6')
         )
 
         assert_that(method, equal_to("POST"))

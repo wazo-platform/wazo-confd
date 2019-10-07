@@ -60,7 +60,6 @@ def _create_funckey_model(funckey):
 
 
 class FindUpdateFieldsMixin:
-
     def find_updated_fields_position(self, model, form):
         updated_fields = []
         for position, funckey in form.items():
@@ -85,12 +84,12 @@ class FindUpdateFieldsMixin:
 
 
 class FuncKeyDestination(ConfdResource):
-
     @required_acl('confd.funckeys.destinations.read')
     def get(self):
-        return [{'type': type_,
-                 'parameters': funckey().get_parameters()}
-                for type_, funckey in FuncKeyDestinationField.destination_schemas.items()]
+        return [
+            {'type': type_, 'parameters': funckey().get_parameters()}
+            for type_, funckey in FuncKeyDestinationField.destination_schemas.items()
+        ]
 
 
 class FuncKeyTemplateList(ListResource):
@@ -100,14 +99,20 @@ class FuncKeyTemplateList(ListResource):
     model = FuncKeyTemplate
 
     def build_headers(self, template):
-        return {'Location': url_for('func_keys_templates', id=template.id, _external=True)}
+        return {
+            'Location': url_for('func_keys_templates', id=template.id, _external=True)
+        }
 
     @required_acl('confd.funckeys.templates.read')
     def get(self):
         params = self.search_params()
         result = self.service.search(params)
-        return {'total': result.total,
-                'items': [self.schema(context=self.context).dump(item) for item in result.items]}
+        return {
+            'total': result.total,
+            'items': [
+                self.schema(context=self.context).dump(item) for item in result.items
+            ],
+        }
 
     @required_acl('confd.funckeys.templates.create')
     def post(self):
@@ -141,7 +146,9 @@ class FuncKeyTemplateItem(ConfdResource, FindUpdateFieldsMixin):
     def put(self, id):
         template = self.service.get(id)
         template_form = self.schema().load(request.get_json())
-        updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
+        updated_fields = self.find_updated_fields_position(
+            template.keys, template_form.get('keys', {})
+        )
 
         for position, funckey in template_form.get('keys', {}).items():
             template_form['keys'][position] = _create_funckey_model(funckey)
@@ -185,7 +192,6 @@ class FuncKeyTemplateItemPosition(ItemResource):
 
 
 class UserFuncKey(ConfdResource):
-
     def __init__(self, service, user_dao, template_dao):
         super(UserFuncKey, self).__init__()
         self.service = service
@@ -210,7 +216,9 @@ class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
         user = self.user_dao.get_by_id_uuid(user_id)
         template = self.template_dao.get(user.private_template_id)
         template_form = self.schema().load(request.get_json())
-        updated_fields = self.find_updated_fields_position(template.keys, template_form.get('keys', {}))
+        updated_fields = self.find_updated_fields_position(
+            template.keys, template_form.get('keys', {})
+        )
 
         for position, funckey in template_form.get('keys', {}).items():
             template_form['keys'][position] = _create_funckey_model(funckey)
@@ -250,7 +258,6 @@ class UserFuncKeyItemPosition(UserFuncKey):
 
 
 class UserFuncKeyTemplate(ConfdResource):
-
     def __init__(self, service, user_dao, template_dao):
         super(UserFuncKeyTemplate, self).__init__()
         self.service = service
@@ -262,7 +269,6 @@ class UserFuncKeyTemplate(ConfdResource):
 
 
 class UserFuncKeyTemplateAssociation(UserFuncKeyTemplate):
-
     @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.update')
     def put(self, user_id, template_id):
         user = self.get_user(user_id)
@@ -286,8 +292,10 @@ class UserFuncKeyTemplateGet(UserFuncKeyTemplate):
     def get(self, user_id):
         user = self.get_user(user_id)
         result = self.service.find_all_by_user_id(user.id)
-        return {'total': len(result),
-                'items': [self.schema().dump(item) for item in result]}
+        return {
+            'total': len(result),
+            'items': [self.schema().dump(item) for item in result],
+        }
 
 
 class FuncKeyTemplateUserGet(UserFuncKeyTemplate):
@@ -298,5 +306,7 @@ class FuncKeyTemplateUserGet(UserFuncKeyTemplate):
     def get(self, template_id):
         template = self.template_dao.get(template_id)
         result = self.service.find_all_by_template_id(template.id)
-        return {'total': len(result),
-                'items': [self.schema().dump(item) for item in result]}
+        return {
+            'total': len(result),
+            'items': [self.schema().dump(item) for item in result],
+        }

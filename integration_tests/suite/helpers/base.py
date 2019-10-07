@@ -11,10 +11,7 @@ from .auth import AuthClient
 from .bus import setup_bus as setup_bus_helpers
 from .client import ConfdClient
 from .database import create_helper as db_create_helper
-from .filesystem import (
-    FileSystemClient,
-    TenantFileSystemClient,
-)
+from .filesystem import FileSystemClient, TenantFileSystemClient
 from .helpers import setup_confd as setup_confd_helpers
 from .helpers import setup_database as setup_database_helpers
 from .helpers import setup_new_client as setup_new_client_helpers
@@ -67,8 +64,12 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def setup_helpers(cls):
         setup_confd_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
-        setup_new_client_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
-        setup_database_helpers(host='localhost', port=cls.service_port(5432, 'postgres'))
+        setup_new_client_helpers(
+            host='localhost', port=cls.service_port('9486', 'confd')
+        )
+        setup_database_helpers(
+            host='localhost', port=cls.service_port(5432, 'postgres')
+        )
         setup_provd_helpers(host='localhost', port=cls.service_port(8666, 'provd'))
         setup_bus_helpers(host='localhost', port=cls.service_port(5672, 'rabbitmq'))
 
@@ -79,10 +80,12 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def new_client(cls, headers=None, encoder=None):
-        client = ConfdClient.from_options(host='localhost',
-                                          port=cls.service_port('9486', 'confd'),
-                                          headers=headers,
-                                          encoder=encoder)
+        client = ConfdClient.from_options(
+            host='localhost',
+            port=cls.service_port('9486', 'confd'),
+            headers=headers,
+            encoder=encoder,
+        )
         return client
 
     @classmethod
@@ -93,7 +96,11 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def create_auth(cls):
-        return AuthClient(host='localhost', port=cls.service_port(9497, 'auth'), verify_certificate=False)
+        return AuthClient(
+            host='localhost',
+            port=cls.service_port(9497, 'auth'),
+            verify_certificate=False,
+        )
 
     @classmethod
     def create_ari(cls):

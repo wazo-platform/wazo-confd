@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class UserScheduleAssociationValidator(ValidatorAssociation):
-
     def validate(self, user, schedule):
         self.validate_same_tenant(user, schedule)
         self.validate_user_not_already_associated(user)
@@ -22,14 +21,9 @@ class UserScheduleAssociationValidator(ValidatorAssociation):
     def validate_user_not_already_associated(self, user):
         if user.schedules:
             raise errors.resource_associated(
-                'User',
-                'Schedule',
-                user_id=user.id,
-                schedule_id=user.schedules[0].id,
+                'User', 'Schedule', user_id=user.id, schedule_id=user.schedules[0].id
             )
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[UserScheduleAssociationValidator()],
-    )
+    return ValidationAssociation(association=[UserScheduleAssociationValidator()])

@@ -10,7 +10,6 @@ from .storage import DEFAULT_DIRECTORIES, RESERVED_DIRECTORIES
 
 
 class SoundDeleteValidator(Validator):
-
     def validate(self, sound):
         if sound.name in DEFAULT_DIRECTORIES + [ASTERISK_CATEGORY]:
             raise errors.not_permitted('Cannot delete default sound category')
@@ -19,27 +18,22 @@ class SoundDeleteValidator(Validator):
 
 
 class SoundFileUpdateValidator(Validator):
-
     def validate(self, sound):
         if sound.name == ASTERISK_CATEGORY:
             raise errors.not_permitted('Cannot update system sounds')
 
 
 class SoundFileDeleteValidator(Validator):
-
     def validate(self, sound):
         if sound.name == ASTERISK_CATEGORY:
             raise errors.not_permitted('Cannot delete system sounds')
 
 
 def build_validator():
-    return ValidationGroup(
-        delete=[SoundDeleteValidator()],
-    )
+    return ValidationGroup(delete=[SoundDeleteValidator()])
 
 
 def build_validator_file():
     return ValidationGroup(
-        edit=[SoundFileUpdateValidator()],
-        delete=[SoundFileDeleteValidator()],
+        edit=[SoundFileUpdateValidator()], delete=[SoundFileDeleteValidator()]
     )

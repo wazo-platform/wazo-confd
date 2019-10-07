@@ -13,7 +13,6 @@ from wazo_confd import bus, sysconfd
 
 
 class UserNotifier:
-
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd
         self.bus = bus
@@ -69,7 +68,6 @@ def build_notifier():
 
 
 class UserServiceNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 
@@ -78,7 +76,9 @@ class UserServiceNotifier:
         for type_ in schema.types:
             service = services.get(type_, services)
             event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
-            self.bus.send_bus_event(event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
+            self.bus.send_bus_event(
+                event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
+            )
 
 
 def build_notifier_service():
@@ -86,7 +86,6 @@ def build_notifier_service():
 
 
 class UserForwardNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 
@@ -94,8 +93,12 @@ class UserForwardNotifier:
         forwards = schema.dump(user)
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
-            event = EditUserForwardEvent(user.uuid, type_, forward['enabled'], forward['destination'])
-            self.bus.send_bus_event(event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True})
+            event = EditUserForwardEvent(
+                user.uuid, type_, forward['enabled'], forward['destination']
+            )
+            self.bus.send_bus_event(
+                event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
+            )
 
 
 def build_notifier_forward():

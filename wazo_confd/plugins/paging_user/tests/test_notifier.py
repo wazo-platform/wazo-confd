@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -16,7 +16,6 @@ from ..notifier import PagingUserNotifier
 
 
 class TestPagingUserNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.user1 = Mock(User, uuid='abcd-1234')
@@ -26,14 +25,18 @@ class TestPagingUserNotifier(unittest.TestCase):
         self.notifier = PagingUserNotifier(self.bus)
 
     def test_associate_caller_then_bus_event(self):
-        expected_event = PagingCallerUsersAssociatedEvent(self.paging.id, [self.user1.uuid, self.user2.uuid])
+        expected_event = PagingCallerUsersAssociatedEvent(
+            self.paging.id, [self.user1.uuid, self.user2.uuid]
+        )
 
         self.notifier.callers_associated(self.paging, [self.user1, self.user2])
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_associate_member_then_bus_event(self):
-        expected_event = PagingMemberUsersAssociatedEvent(self.paging.id, [self.user1.uuid, self.user2.uuid])
+        expected_event = PagingMemberUsersAssociatedEvent(
+            self.paging.id, [self.user1.uuid, self.user2.uuid]
+        )
 
         self.notifier.members_associated(self.paging, [self.user1, self.user2])
 

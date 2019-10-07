@@ -10,7 +10,6 @@ from wazo_confd import bus
 
 
 class UserCallPermissionNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 

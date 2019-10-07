@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class GroupTrunkAssociationValidator(ValidatorAssociation):
-
     def validate(self, outcall, trunks):
         for trunk in trunks:
             self.validate_same_tenant(outcall, trunk)
@@ -17,7 +16,7 @@ class GroupTrunkAssociationValidator(ValidatorAssociation):
         if outcall.tenant_uuid != trunk.tenant_uuid:
             raise errors.different_tenants(
                 outcall_tenant_uuid=outcall.tenant_uuid,
-                trunk_tenant_uuid=trunk.tenant_uuid
+                trunk_tenant_uuid=trunk.tenant_uuid,
             )
 
     def validate_no_duplicate_trunk(self, trunks):
@@ -26,6 +25,4 @@ class GroupTrunkAssociationValidator(ValidatorAssociation):
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[GroupTrunkAssociationValidator()],
-    )
+    return ValidationAssociation(association=[GroupTrunkAssociationValidator()])

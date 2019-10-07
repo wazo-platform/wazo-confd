@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -37,22 +37,36 @@ def error_checks(url):
 @fixtures.user()
 def test_get(user):
     response = confd.users(user['uuid']).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=None,
-                                           busy_destination=None,
-                                           congestion_destination=None,
-                                           fail_destination=None))
+    assert_that(
+        response.item,
+        has_entries(
+            noanswer_destination=None,
+            busy_destination=None,
+            congestion_destination=None,
+            fail_destination=None,
+        ),
+    )
 
 
-@fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},
-                          'busy_destination': {'type': 'none'},
-                          'congestion_destination': {'type': 'none'},
-                          'fail_destination': {'type': 'none'}})
+@fixtures.user(
+    fallbacks={
+        'noanswer_destination': {'type': 'none'},
+        'busy_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+        'fail_destination': {'type': 'none'},
+    }
+)
 def test_get_all_parameters(user):
     response = confd.users(user['uuid']).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination={'type': 'none'},
-                                           busy_destination={'type': 'none'},
-                                           congestion_destination={'type': 'none'},
-                                           fail_destination={'type': 'none'}))
+    assert_that(
+        response.item,
+        has_entries(
+            noanswer_destination={'type': 'none'},
+            busy_destination={'type': 'none'},
+            congestion_destination={'type': 'none'},
+            fail_destination={'type': 'none'},
+        ),
+    )
 
 
 @fixtures.user()
@@ -63,30 +77,43 @@ def test_edit(user):
 
 @fixtures.user()
 def test_edit_with_all_parameters(user):
-    parameters = {'noanswer_destination': {'type': 'none'},
-                  'busy_destination': {'type': 'none'},
-                  'congestion_destination': {'type': 'none'},
-                  'fail_destination': {'type': 'none'}}
+    parameters = {
+        'noanswer_destination': {'type': 'none'},
+        'busy_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+        'fail_destination': {'type': 'none'},
+    }
     response = confd.users(user['id']).fallbacks.put(parameters)
     response.assert_updated()
 
 
-@fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},
-                          'busy_destination': {'type': 'none'},
-                          'congestion_destination': {'type': 'none'},
-                          'fail_destination': {'type': 'none'}})
+@fixtures.user(
+    fallbacks={
+        'noanswer_destination': {'type': 'none'},
+        'busy_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+        'fail_destination': {'type': 'none'},
+    }
+)
 def test_edit_to_none(user):
-    response = confd.users(user['uuid']).fallbacks.put(noanswer_destination=None,
-                                                       busy_destination=None,
-                                                       congestion_destination=None,
-                                                       fail_destination=None)
+    response = confd.users(user['uuid']).fallbacks.put(
+        noanswer_destination=None,
+        busy_destination=None,
+        congestion_destination=None,
+        fail_destination=None,
+    )
     response.assert_updated
 
     response = confd.users(user['uuid']).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=None,
-                                           busy_destination=None,
-                                           congestion_destination=None,
-                                           fail_destination=None))
+    assert_that(
+        response.item,
+        has_entries(
+            noanswer_destination=None,
+            busy_destination=None,
+            congestion_destination=None,
+            fail_destination=None,
+        ),
+    )
 
 
 @fixtures.user()
@@ -107,44 +134,77 @@ def test_valid_destinations(user, *destinations):
 
 
 def _update_user_fallbacks_with_destination(user_id, destination):
-    response = confd.users(user_id).fallbacks.put(noanswer_destination=destination,
-                                                  busy_destination=destination,
-                                                  congestion_destination=destination,
-                                                  fail_destination=destination)
+    response = confd.users(user_id).fallbacks.put(
+        noanswer_destination=destination,
+        busy_destination=destination,
+        congestion_destination=destination,
+        fail_destination=destination,
+    )
     response.assert_updated()
     response = confd.users(user_id).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=has_entries(**destination),
-                                           busy_destination=has_entries(**destination),
-                                           congestion_destination=has_entries(**destination),
-                                           fail_destination=has_entries(**destination)))
+    assert_that(
+        response.item,
+        has_entries(
+            noanswer_destination=has_entries(**destination),
+            busy_destination=has_entries(**destination),
+            congestion_destination=has_entries(**destination),
+            fail_destination=has_entries(**destination),
+        ),
+    )
 
 
 @fixtures.user()
 def test_nonexistent_destinations(user):
-    meetme = ivr = group = outcall = queue = dest_user = voicemail = conference = skill_rule = {'id': 99999999}
+    meetme = (
+        ivr
+    ) = group = outcall = queue = dest_user = voicemail = conference = skill_rule = {
+        'id': 99999999
+    }
     switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
-    for destination in valid_destinations(meetme, ivr, group, outcall, queue, switchboard,
-                                          dest_user, voicemail, conference, skill_rule, application):
-        if destination['type'] in ('meetme',
-                                   'ivr',
-                                   'group',
-                                   'outcall',
-                                   'queue',
-                                   'switchboard',
-                                   'user',
-                                   'voicemail',
-                                   'conference'):
-            yield _update_user_fallbacks_with_nonexistent_destination, user['uuid'], destination
+    for destination in valid_destinations(
+        meetme,
+        ivr,
+        group,
+        outcall,
+        queue,
+        switchboard,
+        dest_user,
+        voicemail,
+        conference,
+        skill_rule,
+        application,
+    ):
+        if destination['type'] in (
+            'meetme',
+            'ivr',
+            'group',
+            'outcall',
+            'queue',
+            'switchboard',
+            'user',
+            'voicemail',
+            'conference',
+        ):
+            yield _update_user_fallbacks_with_nonexistent_destination, user[
+                'uuid'
+            ], destination
 
-        if destination['type'] == 'application' and destination['application'] == 'custom':
-            yield _update_user_fallbacks_with_nonexistent_destination, user['uuid'], destination
+        if (
+            destination['type'] == 'application'
+            and destination['application'] == 'custom'
+        ):
+            yield _update_user_fallbacks_with_nonexistent_destination, user[
+                'uuid'
+            ], destination
 
 
 def _update_user_fallbacks_with_nonexistent_destination(user_id, destination):
-    response = confd.users(user_id).fallbacks.put(noanswer_destination=destination,
-                                                  busy_destination=destination,
-                                                  congestion_destination=destination,
-                                                  fail_destination=destination)
+    response = confd.users(user_id).fallbacks.put(
+        noanswer_destination=destination,
+        busy_destination=destination,
+        congestion_destination=destination,
+        fail_destination=destination,
+    )
     response.assert_status(400)
 
 
@@ -154,15 +214,24 @@ def test_bus_events(user):
     yield s.check_bus_event, 'config.users.fallbacks.edited', url
 
 
-@fixtures.user(fallbacks={'noanswer_destination': {'type': 'none'},
-                          'busy_destination': {'type': 'none'},
-                          'congestion_destination': {'type': 'none'},
-                          'fail_destination': {'type': 'none'}})
+@fixtures.user(
+    fallbacks={
+        'noanswer_destination': {'type': 'none'},
+        'busy_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+        'fail_destination': {'type': 'none'},
+    }
+)
 def test_get_fallbacks_relation(user):
     response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(
-        fallbacks=has_entries(noanswer_destination=has_entries(type='none'),
-                              busy_destination=has_entries(type='none'),
-                              congestion_destination=has_entries(type='none'),
-                              fail_destination=has_entries(type='none'))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            fallbacks=has_entries(
+                noanswer_destination=has_entries(type='none'),
+                busy_destination=has_entries(type='none'),
+                congestion_destination=has_entries(type='none'),
+                fail_destination=has_entries(type='none'),
+            )
+        ),
+    )

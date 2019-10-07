@@ -6,20 +6,15 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
 
-        api.add_resource(
-            ContextList,
-            '/contexts',
-            resource_class_args=(service,)
-        )
+        api.add_resource(ContextList, '/contexts', resource_class_args=(service,))
 
         api.add_resource(
             ContextItem,
             '/contexts/<int:id>',
             endpoint='contexts',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

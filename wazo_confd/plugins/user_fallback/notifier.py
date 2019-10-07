@@ -7,7 +7,6 @@ from wazo_confd import bus
 
 
 class UserFallbackNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 

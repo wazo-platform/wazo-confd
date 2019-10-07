@@ -5,7 +5,10 @@ import unittest
 import uuid
 
 from mock import Mock
-from xivo_bus.resources.user_line.event import UserLineAssociatedEvent, UserLineDissociatedEvent
+from xivo_bus.resources.user_line.event import (
+    UserLineAssociatedEvent,
+    UserLineDissociatedEvent,
+)
 
 from ..notifier import UserLineNotifier
 
@@ -16,7 +19,7 @@ from wazo_confd.plugins.endpoint_sip.schema import SipSchema  # noqa
 
 EXPECTED_SYSCONFD_HANDLERS = {
     'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
-    'agentbus': []
+    'agentbus': [],
 }
 
 USER_UUID = str(uuid.uuid4())
@@ -24,23 +27,16 @@ TENANT_UUID = str(uuid.uuid4())
 
 
 class TestUserLineNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.user = Mock(uuid=USER_UUID, id=1, tenant_uuid=TENANT_UUID)
         self.line = Mock(
-            id=2,
-            endpoint_sip={'id': 3},
-            endpoint_sccp=None,
-            endpoint_custom=None,
+            id=2, endpoint_sip={'id': 3}, endpoint_sccp=None, endpoint_custom=None
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.user_line = Mock(
-            user=self.user,
-            line=self.line,
-            main_user=True,
-            main_line=True,
+            user=self.user, line=self.line, main_user=True, main_line=True
         )
         self.notifier = UserLineNotifier(self.bus, self.sysconfd)
 
@@ -69,7 +65,9 @@ class TestUserLineNotifier(unittest.TestCase):
     def test_associated_then_sip_reload(self):
         self.notifier.associated(self.user_line)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )
 
     def test_dissociated_then_bus_event(self):
         expected_event = UserLineDissociatedEvent(
@@ -96,4 +94,6 @@ class TestUserLineNotifier(unittest.TestCase):
     def test_dissociated_then_sip_reload(self):
         self.notifier.dissociated(self.user_line)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )

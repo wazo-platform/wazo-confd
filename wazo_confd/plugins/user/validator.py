@@ -15,17 +15,14 @@ from wazo_confd.helpers.validator import (
 
 
 class NoVoicemailAssociated(Validator):
-
     def validate(self, user):
         if user.voicemail:
-            raise errors.resource_associated('User',
-                                             'Voicemail',
-                                             user_id=user.id,
-                                             voicemail_id=user.voicemail.id)
+            raise errors.resource_associated(
+                'User', 'Voicemail', user_id=user.id, voicemail_id=user.voicemail.id
+            )
 
 
 class NoLineAssociated(Validator):
-
     def __init__(self, dao):
         self.dao = dao
 
@@ -37,7 +34,6 @@ class NoLineAssociated(Validator):
 
 
 class NoEmptyFieldWhenEnabled(Validator):
-
     def __init__(self, field, enabled):
         self.field = field
         self.enabled = enabled
@@ -50,37 +46,46 @@ class NoEmptyFieldWhenEnabled(Validator):
 
 def build_validator():
     return ValidationGroup(
-        delete=[
-            NoVoicemailAssociated(),
-            NoLineAssociated(user_line_dao)
-        ],
+        delete=[NoVoicemailAssociated(), NoLineAssociated(user_line_dao)],
         create=[
-            Optional('email',
-                     UniqueField('email',
-                                 lambda email: user_dao.find_by(email=email),
-                                 'User')),
-            Optional('username',
-                     UniqueField('username',
-                                 lambda username: user_dao.find_by(username=username),
-                                 'User'))
+            Optional(
+                'email',
+                UniqueField(
+                    'email', lambda email: user_dao.find_by(email=email), 'User'
+                ),
+            ),
+            Optional(
+                'username',
+                UniqueField(
+                    'username',
+                    lambda username: user_dao.find_by(username=username),
+                    'User',
+                ),
+            ),
         ],
         edit=[
-            Optional('email',
-                     UniqueFieldChanged('email', user_dao, 'User')),
-            Optional('username',
-                     UniqueFieldChanged('username', user_dao, 'User')),
-        ]
+            Optional('email', UniqueFieldChanged('email', user_dao, 'User')),
+            Optional('username', UniqueFieldChanged('username', user_dao, 'User')),
+        ],
     )
 
 
 def build_validator_forward():
     return ValidationGroup(
         edit=[
-            Optional('busy_enabled',
-                     NoEmptyFieldWhenEnabled('busy_destination', 'busy_enabled')),
-            Optional('noanswer_enabled',
-                     NoEmptyFieldWhenEnabled('noanswer_destination', 'noanswer_enabled')),
-            Optional('unconditional_enabled',
-                     NoEmptyFieldWhenEnabled('unconditional_destination', 'unconditional_enabled'))
+            Optional(
+                'busy_enabled',
+                NoEmptyFieldWhenEnabled('busy_destination', 'busy_enabled'),
+            ),
+            Optional(
+                'noanswer_enabled',
+                NoEmptyFieldWhenEnabled('noanswer_destination', 'noanswer_enabled'),
+            ),
+            Optional(
+                'unconditional_enabled',
+                NoEmptyFieldWhenEnabled(
+                    'unconditional_destination', 'unconditional_enabled'
+                ),
+            ),
         ]
     )

@@ -8,7 +8,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
@@ -16,7 +15,5 @@ class Plugin:
         service = build_service(ari_client)
 
         api.add_resource(
-            SoundLanguageList,
-            '/sounds/languages',
-            resource_class_args=(service,)
+            SoundLanguageList, '/sounds/languages', resource_class_args=(service,)
         )

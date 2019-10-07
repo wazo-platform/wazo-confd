@@ -15,20 +15,9 @@ from hamcrest import (
 )
 
 from . import confd, mocks
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.helpers import (
-    context as context_helper,
-    voicemail as vm_helper,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.helpers import context as context_helper, voicemail as vm_helper
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_search_errors():
@@ -115,8 +104,13 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', [{'string': 'string'}]
     yield s.check_bogus_field_returns_error, url, 'options', [['string']]
     yield s.check_bogus_field_returns_error, url, 'options', [[None, None]]
-    yield s.check_bogus_field_returns_error, url, 'options', [['string', 'string', 'string']]
-    yield s.check_bogus_field_returns_error, url, 'options', [['string', 'string'], ['string']]
+    yield s.check_bogus_field_returns_error, url, 'options', [
+        ['string', 'string', 'string']
+    ]
+    yield s.check_bogus_field_returns_error, url, 'options', [
+        ['string', 'string'],
+        ['string'],
+    ]
 
 
 def error_required_checks(url):
@@ -130,12 +124,9 @@ def test_fake_fields(voicemail):
     fake = [
         ('context', 'wrongcontext', 'Context'),
         ('language', 'fakelanguage', 'Language'),
-        ('timezone', 'faketimezone', 'Timezone')
+        ('timezone', 'faketimezone', 'Timezone'),
     ]
-    requests = [
-        confd.voicemails.post,
-        confd.voicemails(voicemail['id']).put,
-    ]
+    requests = [confd.voicemails.post, confd.voicemails(voicemail['id']).put]
 
     for (field, value, error_field) in fake:
         for request in requests:
@@ -153,9 +144,7 @@ def _generate_fields():
 @fixtures.voicemail()
 def test_create_voicemail_with_same_number_and_context(voicemail):
     response = confd.voicemails.post(
-        name='testvoicemail',
-        number=voicemail['number'],
-        context=voicemail['context'],
+        name='testvoicemail', number=voicemail['number'], context=voicemail['context']
     )
     response.assert_match(400, e.resource_exists('Voicemail'))
 
@@ -170,8 +159,7 @@ def test_create_multi_tenant(in_main):
 @fixtures.voicemail()
 def test_edit_voicemail_with_same_number_and_context(first_voicemail, second_voicemail):
     response = confd.voicemails(first_voicemail['id']).put(
-        number=second_voicemail['number'],
-        context=second_voicemail['context'],
+        number=second_voicemail['number'], context=second_voicemail['context']
     )
     response.assert_match(400, e.resource_exists('Voicemail'))
 
@@ -216,35 +204,20 @@ def check_search(url, voicemail, hidden, field, term):
 @fixtures.voicemail(context='sub_ctx')
 def test_list_multi_tenant(_, __, main, sub):
     response = confd.voicemails.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main), not_(has_item(sub))),
-    )
+    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
 
     response = confd.voicemails.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.voicemails.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.voicemail(
-    name='sort1',
-    number='8001',
-    email='sort1@example.com',
-    pager='sort1@example.com',
+    name='sort1', number='8001', email='sort1@example.com', pager='sort1@example.com'
 )
 @fixtures.voicemail(
-    name='sort2',
-    number='8002',
-    email='sort2@example.com',
-    pager='sort2@example.com',
+    name='sort2', number='8002', email='sort2@example.com', pager='sort2@example.com'
 )
 def test_sorting_offset_limit(voicemail1, voicemail2):
     url = confd.voicemails.get
@@ -270,9 +243,7 @@ def test_list_voicemails(first, second):
 def test_get_voicemail(voicemail):
     response = confd.voicemails(voicemail['id']).get()
     assert_that(response.item, has_entries(voicemail))
-    assert_that(response.item, has_entries(
-        users=empty(),
-    ))
+    assert_that(response.item, has_entries(users=empty()))
 
 
 @fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
@@ -303,7 +274,7 @@ def test_create_minimal_voicemail():
             delete_messages=False,
             options=contains(),
             tenant_uuid=MAIN_TENANT,
-        )
+        ),
     )
 
 
@@ -311,17 +282,11 @@ def test_create_voicemails_same_number_different_contexts():
     number, context = vm_helper.new_number_and_context('vmctx1')
     other_context = context_helper.generate_context(name='vmctx2')
 
-    response = confd.voicemails.post(
-        name='samenumber1',
-        number=number,
-        context=context,
-    )
+    response = confd.voicemails.post(name='samenumber1', number=number, context=context)
     response.assert_ok()
 
     response = confd.voicemails.post(
-        name='samenumber2',
-        number=number,
-        context=other_context['name'],
+        name='samenumber2', number=number, context=other_context['name']
     )
     response.assert_ok()
 
@@ -365,8 +330,10 @@ def test_create_voicemail_with_all_parameters(_):
             ask_password=False,
             delete_messages=True,
             enabled=True,
-            options=has_items(["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]),
-        )
+            options=has_items(
+                ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
+            ),
+        ),
     )
 
 
@@ -414,8 +381,10 @@ def test_edit_voicemail(voicemail, _):
             ask_password=False,
             delete_messages=True,
             enabled=False,
-            options=has_items(["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]),
-        )
+            options=has_items(
+                ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
+            ),
+        ),
     )
 
 
@@ -449,7 +418,9 @@ def test_edit_multi_tenant(main_ctx, _, main, sub):
     response = confd.voicemails(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
 
-    response = confd.voicemails(sub['id']).put(context=main_ctx['name'], wazo_tenant=SUB_TENANT)
+    response = confd.voicemails(sub['id']).put(
+        context=main_ctx['name'], wazo_tenant=SUB_TENANT
+    )
     response.assert_status(400)
 
 
@@ -479,10 +450,7 @@ def test_delete_voicemail_deletes_on_disk(voicemail, sysconfd):
 
     sysconfd.assert_request(
         '/delete_voicemail',
-        query={
-            'mailbox': voicemail['number'],
-            'context': voicemail['context'],
-        }
+        query={'mailbox': voicemail['number'], 'context': voicemail['context']},
     )
 
 
@@ -526,4 +494,6 @@ def test_update_fields_with_null_value(voicemail, _):
 def test_user_voicemail_edited_bus_event(user, voicemail):
     with a.user_voicemail(user, voicemail):
         routing_key = 'config.users.{}.voicemails.edited'.format(user['uuid'])
-        yield s.check_bus_event, routing_key, confd.voicemails(voicemail['id']).put, {'name': 'bostwana'}
+        yield s.check_bus_event, routing_key, confd.voicemails(voicemail['id']).put, {
+            'name': 'bostwana'
+        }

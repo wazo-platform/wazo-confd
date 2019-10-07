@@ -9,7 +9,6 @@ from .validator import build_validator
 
 
 class UserLineService:
-
     def __init__(self, dao, validator, notifier):
         self.dao = dao
         self.validator = validator
@@ -66,6 +65,4 @@ class UserLineService:
 
 
 def build_service():
-    return UserLineService(user_line_dao,
-                           build_validator(),
-                           build_notifier())
+    return UserLineService(user_line_dao, build_validator(), build_notifier())

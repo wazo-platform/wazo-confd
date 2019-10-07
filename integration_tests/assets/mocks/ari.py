@@ -1,21 +1,14 @@
 # -*- coding: utf-8 -*-
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
 import logging
 import sys
 
-from flask import (
-    Flask,
-    jsonify,
-    make_response,
-    request,
-)
+from flask import Flask, jsonify, make_response, request
 
-_EMPTY_RESPONSES = {
-    'sounds': {},
-}
+_EMPTY_RESPONSES = {'sounds': {}}
 
 app = Flask(__name__)
 websocket = None
@@ -38,12 +31,14 @@ def _reset():
 def log_request():
     if not request.path.startswith('/_'):
         path = request.path
-        log = {'method': request.method,
-               'path': path,
-               'query': request.args.items(multi=True),
-               'body': request.data,
-               'json': request.json,
-               'headers': dict(request.headers)}
+        log = {
+            'method': request.method,
+            'path': path,
+            'query': request.args.items(multi=True),
+            'body': request.data,
+            'json': request.json,
+            'headers': dict(request.headers),
+        }
         _requests.append(log)
 
 
@@ -70,7 +65,11 @@ def set_response():
 
 @app.route('/ari/sounds', methods=['GET'])
 def get_sounds():
-    return make_response(json.dumps(_responses.get('sounds', [])), 200, {'Content-Type': 'application/json'})
+    return make_response(
+        json.dumps(_responses.get('sounds', [])),
+        200,
+        {'Content-Type': 'application/json'},
+    )
 
 
 @app.route('/ari/sounds/<sound_id>', methods=['GET'])

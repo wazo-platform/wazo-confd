@@ -82,7 +82,6 @@ def load_uuid():
 
 
 class HTTPServer:
-
     def __init__(self, global_config):
         self.config = global_config['rest_api']
         http_helpers.add_logger(app, logger)
@@ -109,21 +108,22 @@ class HTTPServer:
 
     def run(self):
         if self.config['profile']:
-            app.wsgi_app = ProfilerMiddleware(app.wsgi_app, profile_dir=self.config['profile'])
+            app.wsgi_app = ProfilerMiddleware(
+                app.wsgi_app, profile_dir=self.config['profile']
+            )
 
         wsgi_app = ReverseProxied(ProxyFix(wsgi.WSGIPathInfoDispatcher({'/': app})))
 
         bind_addr = (self.config['listen'], self.config['port'])
         self.server = wsgi.WSGIServer(bind_addr=bind_addr, wsgi_app=wsgi_app)
         self.server.ssl_adapter = http_helpers.ssl_adapter(
-            self.config['certificate'],
-            self.config['private_key'],
+            self.config['certificate'], self.config['private_key']
         )
         logger.debug(
             'WSGIServer starting... uid: %s, listen: %s:%s',
             os.getuid(),
             bind_addr[0],
-            bind_addr[1]
+            bind_addr[1],
         )
         for route in http_helpers.list_routes(app):
             logger.debug(route)

@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,5 +17,5 @@ class Plugin:
             SwitchboardMemberUserItem,
             '/switchboards/<uuid:switchboard_uuid>/members/users',
             endpoint='switchboard_member_users',
-            resource_class_args=(service, switchboard_dao, user_dao)
+            resource_class_args=(service, switchboard_dao, user_dao),
         )

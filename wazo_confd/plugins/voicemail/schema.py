@@ -30,10 +30,9 @@ class VoicemailSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('voicemails'))
 
-    users = fields.Nested('UserSchema',
-                          only=['uuid',
-                                'firstname',
-                                'lastname',
-                                'links'],
-                          many=True,
-                          dump_only=True)
+    users = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )

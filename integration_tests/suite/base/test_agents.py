@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -87,7 +80,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'description', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', True
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
 
@@ -150,19 +145,21 @@ def test_sorting_offset_limit(agent1, agent2):
 @fixtures.agent()
 def test_get(agent):
     response = confd.agents(agent['id']).get()
-    assert_that(response.item, has_entries(
-        id=agent['id'],
-        number=agent['number'],
-        firstname=agent['firstname'],
-        lastname=agent['lastname'],
-        password=agent['password'],
-        preprocess_subroutine=agent['preprocess_subroutine'],
-        description=agent['description'],
-
-        queues=empty(),
-        skills=empty(),
-        users=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=agent['id'],
+            number=agent['number'],
+            firstname=agent['firstname'],
+            lastname=agent['lastname'],
+            password=agent['password'],
+            preprocess_subroutine=agent['preprocess_subroutine'],
+            description=agent['description'],
+            queues=empty(),
+            skills=empty(),
+            users=empty(),
+        ),
+    )
 
 
 @fixtures.agent(wazo_tenant=MAIN_TENANT)
@@ -179,15 +176,18 @@ def test_create_minimal_parameters():
     response = confd.agents.post(number='1234')
     response.assert_created('agents')
 
-    assert_that(response.item, has_entries(
-        id=instance_of(int),
-        number='1234',
-        firstname=None,
-        lastname=None,
-        password=None,
-        preprocess_subroutine=None,
-        description=None,
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=instance_of(int),
+            number='1234',
+            firstname=None,
+            lastname=None,
+            password=None,
+            preprocess_subroutine=None,
+            description=None,
+        ),
+    )
 
     confd.agents(response.item['id']).delete().assert_deleted()
 
@@ -280,6 +280,8 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.agent()
 def test_bus_events(agent):
-    yield s.check_bus_event, 'config.agent.created', confd.agents.post, {'number': '123456789123456789'}
+    yield s.check_bus_event, 'config.agent.created', confd.agents.post, {
+        'number': '123456789123456789'
+    }
     yield s.check_bus_event, 'config.agent.edited', confd.agents(agent['id']).put
     yield s.check_bus_event, 'config.agent.deleted', confd.agents(agent['id']).delete

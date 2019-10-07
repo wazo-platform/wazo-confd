@@ -5,7 +5,6 @@ from wazo_confd.database import provisioning_networking as provisioning_networki
 
 
 class ProvisioningNetworkingService:
-
     def __init__(self, notifier, sysconfd):
         self.notifier = notifier
         self.sysconfd = sysconfd

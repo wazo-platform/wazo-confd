@@ -4,16 +4,13 @@
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.extension_feature.event import (
-    EditExtensionFeatureEvent,
-)
+from xivo_bus.resources.extension_feature.event import EditExtensionFeatureEvent
 from xivo_dao.alchemy.extension import Extension
 
 from ..notifier import ExtensionFeatureNotifier
 
 
 class TestExtensionFeatureNotifier(unittest.TestCase):
-
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
@@ -22,10 +19,7 @@ class TestExtensionFeatureNotifier(unittest.TestCase):
         self.notifier = ExtensionFeatureNotifier(self.sysconfd, self.bus)
 
     def test_when_extension_edited_then_handlers_sent(self):
-        expected_handlers = {
-            'ipbx': ['dialplan reload'],
-            'agentbus': [],
-        }
+        expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
         updated_fields = ['exten']
         self.notifier.edited(self.extension, updated_fields)
 

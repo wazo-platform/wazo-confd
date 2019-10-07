@@ -16,13 +16,12 @@ REGISTER_ERROR = "The 'register' key can only be defined in trunk options"
 
 
 class IAXGeneralOption(BaseSchema):
-    key = fields.String(validate=(Length(max=128),
-                                  NoneOf(['register'], error=REGISTER_ERROR)),
-                        required=True,
-                        attribute='var_name')
-    value = fields.String(validate=Length(max=255),
-                          required=True,
-                          attribute='var_val')
+    key = fields.String(
+        validate=(Length(max=128), NoneOf(['register'], error=REGISTER_ERROR)),
+        required=True,
+        attribute='var_name',
+    )
+    value = fields.String(validate=Length(max=255), required=True, attribute='var_val')
 
 
 class IAXGeneralOrderedOption(IAXGeneralOption):
@@ -38,18 +37,17 @@ class IAXGeneralOrderedOption(IAXGeneralOption):
 
 
 class IAXGeneralSchema(BaseSchema):
-    options = fields.Nested(IAXGeneralOption,
-                            many=True,
-                            required=True)
+    options = fields.Nested(IAXGeneralOption, many=True, required=True)
 
-    ordered_options = fields.List(fields.Nested(IAXGeneralOrderedOption),
-                                  required=True)
+    ordered_options = fields.List(fields.Nested(IAXGeneralOrderedOption), required=True)
 
     @pre_load
     def convert_options_to_collection(self, data):
         options = data.get('options')
         if isinstance(options, dict):
-            data['options'] = [{'key': key, 'value': value} for key, value in options.items()]
+            data['options'] = [
+                {'key': key, 'value': value} for key, value in options.items()
+            ]
         return data
 
     @post_load
@@ -68,8 +66,10 @@ class IAXGeneralSchema(BaseSchema):
 
     @pre_dump
     def separate_options_and_ordered_options(self, data):
-        return {'options': [option for option in data if option.metric is None],
-                'ordered_options': [option for option in data if option.metric is not None]}
+        return {
+            'options': [option for option in data if option.metric is None],
+            'ordered_options': [option for option in data if option.metric is not None],
+        }
 
     @post_dump
     def convert_options_to_dict(self, data):

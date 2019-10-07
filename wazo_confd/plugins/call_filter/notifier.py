@@ -11,7 +11,6 @@ from wazo_confd import bus
 
 
 class CallFilterNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 

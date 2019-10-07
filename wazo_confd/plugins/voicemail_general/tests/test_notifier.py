@@ -9,14 +9,10 @@ from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
 from ..notifier import VoicemailGeneralNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['voicemail reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['voicemail reload'], 'agentbus': []}
 
 
 class TestVoicemailGeneralNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.voicemail_general = Mock(StaticVoicemail)

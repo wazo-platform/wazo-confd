@@ -10,16 +10,12 @@ from wazo_confd import bus, sysconfd
 
 
 class ConferenceExtensionNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['dialplan reload'],
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, conference, extension):

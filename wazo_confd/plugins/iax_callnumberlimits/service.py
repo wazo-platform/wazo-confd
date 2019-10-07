@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class IAXCallNumberLimitsService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class IAXCallNumberLimitsService:
 
 
 def build_service():
-    return IAXCallNumberLimitsService(iax_callnumberlimits_dao,
-                                      build_notifier())
+    return IAXCallNumberLimitsService(iax_callnumberlimits_dao, build_notifier())

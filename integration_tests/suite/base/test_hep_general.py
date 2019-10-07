@@ -28,8 +28,7 @@ def test_get():
 
 
 def test_edit():
-    parameters = {'options': {'nat': 'toto',
-                              'username': 'Bob'}}
+    parameters = {'options': {'nat': 'toto', 'username': 'Bob'}}
 
     response = confd.asterisk.hep.general.put(**parameters)
     response.assert_updated()

@@ -13,7 +13,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -23,18 +22,18 @@ class Plugin:
             '/users/<uuid:user_id>/callpermissions/<int:call_permission_id>',
             '/users/<int:user_id>/callpermissions/<int:call_permission_id>',
             endpoint='user_call_permissions',
-            resource_class_args=(service, user_dao, call_permission_dao)
+            resource_class_args=(service, user_dao, call_permission_dao),
         )
 
         api.add_resource(
             UserCallPermissionGet,
             '/users/<uuid:user_id>/callpermissions',
             '/users/<int:user_id>/callpermissions',
-            resource_class_args=(service, user_dao, call_permission_dao)
+            resource_class_args=(service, user_dao, call_permission_dao),
         )
 
         api.add_resource(
             CallPermissionUserGet,
             '/callpermissions/<int:call_permission_id>/users',
-            resource_class_args=(service, user_dao, call_permission_dao)
+            resource_class_args=(service, user_dao, call_permission_dao),
         )

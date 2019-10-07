@@ -9,14 +9,10 @@ from xivo_dao.alchemy.staticiax import StaticIAX
 
 from ..notifier import IAXGeneralNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['iax2 reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
 
 
 class TestIAXGeneralNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.iax_general = Mock(StaticIAX)

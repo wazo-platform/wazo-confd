@@ -1,4 +1,4 @@
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -23,7 +23,9 @@ def check_missing_required_field_returns_error(request, field):
     response.assert_match(400, re.compile(re.escape(field)))
 
 
-def check_bogus_field_returns_error(request, field, bogus, required_field=None, message=None):
+def check_bogus_field_returns_error(
+    request, field, bogus, required_field=None, message=None
+):
     message = message or field
     body = required_field if required_field else {}
     body[field] = bogus
@@ -72,24 +74,40 @@ def check_bogus_query_string_returns_error(request, query_string, bogus):
 
 def check_sorting(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(**{id_field: resource1[id_field]}),
-                                         has_entries(**{id_field: resource2[id_field]})))
+    assert_that(
+        response.items,
+        contains(
+            has_entries(**{id_field: resource1[id_field]}),
+            has_entries(**{id_field: resource2[id_field]}),
+        ),
+    )
 
     response = url(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(**{id_field: resource2[id_field]}),
-                                         has_entries(**{id_field: resource1[id_field]})))
+    assert_that(
+        response.items,
+        contains(
+            has_entries(**{id_field: resource2[id_field]}),
+            has_entries(**{id_field: resource1[id_field]}),
+        ),
+    )
 
 
 def check_offset(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, offset=1)
-    assert_that(response.items, contains(has_entries(**{id_field: resource2[id_field]})))
+    assert_that(
+        response.items, contains(has_entries(**{id_field: resource2[id_field]}))
+    )
 
 
 def check_offset_legacy(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, skip=1)
-    assert_that(response.items, contains(has_entries(**{id_field: resource2[id_field]})))
+    assert_that(
+        response.items, contains(has_entries(**{id_field: resource2[id_field]}))
+    )
 
 
 def check_limit(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, limit=1)
-    assert_that(response.items, contains(has_entries(**{id_field: resource1[id_field]})))
+    assert_that(
+        response.items, contains(has_entries(**{id_field: resource1[id_field]}))
+    )

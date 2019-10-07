@@ -6,7 +6,6 @@ from ..database import create_helper as db_create_helper
 
 
 class NewClientWrapper:
-
     def __init__(self):
         self.host = None
         self.port = None
@@ -25,14 +24,12 @@ class NewClientWrapper:
         return getattr(self._client.url, attr)
 
     def _create_client(self):
-        return ConfdClient.from_options(host=self.host,
-                                        port=self.port,
-                                        headers=self.headers,
-                                        encoder=self.encoder)
+        return ConfdClient.from_options(
+            host=self.host, port=self.port, headers=self.headers, encoder=self.encoder
+        )
 
 
 class DatabaseWrapper:
-
     def __init__(self):
         self.host = None
         self.port = None
@@ -45,7 +42,6 @@ class DatabaseWrapper:
 
 
 class ProvdWrapper:
-
     def __init__(self):
         self.host = None
         self.port = None
@@ -54,6 +50,7 @@ class ProvdWrapper:
     def __getattr__(self, attr):
         if self._provd is None:
             from ..provd import create_helper as provd_create_helper
+
             self._provd = provd_create_helper(host=self.host, port=self.port)
         return getattr(self._provd, attr)
 
@@ -176,7 +173,6 @@ from . import voicemail_zonemessages
 
 __all__ = [
     'destination',
-
     'agent',
     'agent_login_status',
     'agent_skill',

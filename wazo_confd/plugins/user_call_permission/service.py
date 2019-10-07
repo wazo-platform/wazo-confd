@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class UserCallPermissionService:
-
     def __init__(self, dao, notifier, validator):
         self.dao = dao
         self.notifier = notifier
@@ -44,7 +43,5 @@ class UserCallPermissionService:
 
 def build_service():
     return UserCallPermissionService(
-        user_call_permission_dao,
-        build_notifier(),
-        build_validator(),
+        user_call_permission_dao, build_notifier(), build_validator()
     )

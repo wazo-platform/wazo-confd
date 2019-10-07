@@ -1,21 +1,11 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-    has_key,
-    is_not,
-)
+from hamcrest import assert_that, has_entries, has_key, is_not
 
 from . import confd, provd
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
 
 FAKE_ID = 999999999
 
@@ -62,7 +52,9 @@ def test_get_errors(user):
 @fixtures.extension()
 @fixtures.device()
 def test_list(user, line_sip, extension, device):
-    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
+    with a.line_extension(line_sip, extension), a.user_line(
+        user, line_sip
+    ), a.line_device(line_sip, device):
         destination_1 = {'type': 'custom', 'exten': '1234'}
         destination_2 = {'type': 'custom', 'exten': '456'}
         destination_3 = {'type': 'custom', 'exten': '789'}
@@ -70,8 +62,10 @@ def test_list(user, line_sip, extension, device):
         confd.users(user['id']).funckeys(1).put(destination=destination_1)
         confd.users(user['id']).funckeys(2).put(destination=destination_2)
         confd.users(user['id']).funckeys(3).put(destination=destination_3)
-        template_parameters = {'name': 'pos4',
-                               'keys': {'4': {'destination': destination_4}}}
+        template_parameters = {
+            'name': 'pos4',
+            'keys': {'4': {'destination': destination_4}},
+        }
         template = confd.funckeys.templates.post(**template_parameters).item
         confd.users(user['id']).funckeys.templates(template['id']).put()
 
@@ -79,13 +73,15 @@ def test_list(user, line_sip, extension, device):
         assert_that(
             response.item,
             has_entries(
-                keys=has_entries({
-                    '1': has_entries(destination=has_entries(destination_1)),
-                    '2': has_entries(destination=has_entries(destination_2)),
-                    '3': has_entries(destination=has_entries(destination_3)),
-                    '4': has_entries(destination=has_entries(destination_4)),
-                })
-            )
+                keys=has_entries(
+                    {
+                        '1': has_entries(destination=has_entries(destination_1)),
+                        '2': has_entries(destination=has_entries(destination_2)),
+                        '3': has_entries(destination=has_entries(destination_3)),
+                        '4': has_entries(destination=has_entries(destination_4)),
+                    }
+                )
+            ),
         )
 
 
@@ -97,12 +93,12 @@ def test_put_position(user, line_sip, extension, device):
     modified_funckey = {
         'blf': False,
         'label': 'myfunckey',
-        'destination': {'type': 'park_position', 'position': 701}
+        'destination': {'type': 'park_position', 'position': 701},
     }
     uuid_funckey = {
         'blf': False,
         'label': 'myfunckey',
-        'destination': {'type': 'park_position', 'position': 702}
+        'destination': {'type': 'park_position', 'position': 702},
     }
 
     provd_funckey = {
@@ -119,7 +115,9 @@ def test_put_position(user, line_sip, extension, device):
     }
     position = 1
 
-    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
+    with a.line_extension(line_sip, extension), a.user_line(
+        user, line_sip
+    ), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
         confd.users(user['id']).funckeys(position).put(destination=destination)
 
@@ -150,17 +148,27 @@ def test_delete_position(user, line_sip, extension, device):
     destination_uuid = {'type': 'custom', 'exten': '1235'}
     position_id = 1
     position_uuid = 2
-    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
-        confd.users(user['id']).funckeys(position_id).put(destination=destination_id).assert_updated()
-        confd.users(user['id']).funckeys(position_uuid).put(destination=destination_uuid).assert_updated()
+    with a.line_extension(line_sip, extension), a.user_line(
+        user, line_sip
+    ), a.line_device(line_sip, device):
+        confd.users(user['id']).funckeys(position_id).put(
+            destination=destination_id
+        ).assert_updated()
+        confd.users(user['id']).funckeys(position_uuid).put(
+            destination=destination_uuid
+        ).assert_updated()
 
         response = confd.users(user['id']).funckeys(position_id).delete()
         response.assert_deleted()
         response = confd.users(user['uuid']).funckeys(position_uuid).delete()
         response.assert_deleted()
 
-        response = confd.users(user['id']).funckeys(position_id).get().assert_status(404)
-        response = confd.users(user['uuid']).funckeys(position_uuid).get().assert_status(404)
+        response = (
+            confd.users(user['id']).funckeys(position_id).get().assert_status(404)
+        )
+        response = (
+            confd.users(user['uuid']).funckeys(position_uuid).get().assert_status(404)
+        )
         check_provd_does_not_have_funckey(device, position_id)
         check_provd_does_not_have_funckey(device, position_uuid)
 
@@ -175,10 +183,11 @@ def check_provd_does_not_have_funckey(device, position):
 
 @fixtures.user()
 def test_get_position(user):
-    funckey = {'label': 'example',
-               'blf': True,
-               'destination': {'type': 'custom',
-                               'exten': '1234'}}
+    funckey = {
+        'label': 'example',
+        'blf': True,
+        'destination': {'type': 'custom', 'exten': '1234'},
+    }
 
     confd.users(user['id']).funckeys(1).put(funckey).assert_updated()
 
@@ -195,9 +204,13 @@ def test_get_position(user):
 
 @fixtures.user()
 def test_put_error_on_duplicate_destination(user):
-    parameters = {'name': 'duplicate_dest',
-                  'keys': {'1': {'destination': {'type': 'custom', 'exten': '123'}},
-                           '2': {'destination': {'type': 'custom', 'exten': '123'}}}}
+    parameters = {
+        'name': 'duplicate_dest',
+        'keys': {
+            '1': {'destination': {'type': 'custom', 'exten': '123'}},
+            '2': {'destination': {'type': 'custom', 'exten': '123'}},
+        },
+    }
 
     response = confd.users(user['id']).funckeys.put(**parameters)
     response.assert_status(400)
@@ -205,8 +218,10 @@ def test_put_error_on_duplicate_destination(user):
 
 @fixtures.user()
 def test_error_when_user_are_not_bs_filter_member(user):
-    parameters = {'name': 'validate_bsfilter',
-                  'keys': {'1': {'destination': {'type': 'bsfilter', 'filter_member_id': '123'}}}}
+    parameters = {
+        'name': 'validate_bsfilter',
+        'keys': {'1': {'destination': {'type': 'bsfilter', 'filter_member_id': '123'}}},
+    }
 
     response = confd.users(user['id']).funckeys.put(**parameters)
     response.assert_match(400, e.missing_association('User', 'BSFilter'))
@@ -216,10 +231,16 @@ def test_error_when_user_are_not_bs_filter_member(user):
 @fixtures.line_sip(position=2)
 @fixtures.extension()
 @fixtures.device()
-def test_when_line_has_another_position_then_func_key_generated(user, line_sip, extension, device):
-    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
+def test_when_line_has_another_position_then_func_key_generated(
+    user, line_sip, extension, device
+):
+    with a.line_extension(line_sip, extension), a.user_line(
+        user, line_sip
+    ), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
-        confd.users(user['id']).funckeys(1).put(destination=destination).assert_updated()
+        confd.users(user['id']).funckeys(1).put(
+            destination=destination
+        ).assert_updated()
         response = confd.users(user['id']).funckeys(1).get()
         assert_that(response.item['destination'], has_entries(destination))
 
@@ -228,15 +249,25 @@ def test_when_line_has_another_position_then_func_key_generated(user, line_sip, 
 @fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
-def test_when_move_funckey_position_then_no_duplicate_error(user, line_sip, extension, device):
-    with a.line_extension(line_sip, extension), a.user_line(user, line_sip), a.line_device(line_sip, device):
+def test_when_move_funckey_position_then_no_duplicate_error(
+    user, line_sip, extension, device
+):
+    with a.line_extension(line_sip, extension), a.user_line(
+        user, line_sip
+    ), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
-        confd.users(user['id']).funckeys(1).put(destination=destination).assert_updated()
+        confd.users(user['id']).funckeys(1).put(
+            destination=destination
+        ).assert_updated()
 
-        response = confd.users(user['id']).funckeys.put(keys={'2': {'destination': destination}})
+        response = confd.users(user['id']).funckeys.put(
+            keys={'2': {'destination': destination}}
+        )
         response.assert_updated()
         check_provd_does_not_have_funckey(device, 1)
-        check_provd_has_funckey(device, 2, {'label': '', 'type': 'blf', 'line': 1, 'value': '1234'})
+        check_provd_has_funckey(
+            device, 2, {'label': '', 'type': 'blf', 'line': 1, 'value': '1234'}
+        )
 
 
 def test_edit_all_parameters():

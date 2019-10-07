@@ -17,7 +17,11 @@ class CallPermissionList(ListResource):
     schema = CallPermissionSchema
 
     def build_headers(self, call_permission):
-        return {'Location': url_for('callpermissions', id=call_permission.id, _external=True)}
+        return {
+            'Location': url_for(
+                'callpermissions', id=call_permission.id, _external=True
+            )
+        }
 
     @required_acl('confd.callpermissions.create')
     def post(self):

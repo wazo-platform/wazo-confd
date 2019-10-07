@@ -9,14 +9,10 @@ from xivo_dao.alchemy.iaxcallnumberlimits import IAXCallNumberLimits
 
 from ..notifier import IAXCallNumberLimitsNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['iax2 reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
 
 
 class TestIAXCallNumberLimitsNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.iax_callnumberlimits = Mock(IAXCallNumberLimits)

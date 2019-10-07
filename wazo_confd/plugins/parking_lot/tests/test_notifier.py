@@ -12,14 +12,10 @@ from xivo_bus.resources.parking_lot.event import (
 
 from ..notifier import ParkingLotNotifier
 
-EXPECTED_HANDLERS = {
-    'ipbx': ['module reload res_parking.so'],
-    'agentbus': [],
-}
+EXPECTED_HANDLERS = {'ipbx': ['module reload res_parking.so'], 'agentbus': []}
 
 
 class TestParkingLotNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

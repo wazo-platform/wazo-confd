@@ -14,7 +14,6 @@ from .auth_client import auth_client
 
 
 class UserImportResource(ConfdResource):
-
     def __init__(self, service):
         self.service = service
 
@@ -69,7 +68,4 @@ class UserExportResource(ConfdResource):
     def get(self):
         tenant = Tenant.autodetect()
         csv_header, users = self.service.export(tenant.uuid)
-        return {
-            'headers': csv_header,
-            'content': users,
-        }
+        return {'headers': csv_header, 'content': users}

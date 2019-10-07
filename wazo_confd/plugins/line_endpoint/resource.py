@@ -15,34 +15,27 @@ class LineEndpointSchema(BaseSchema):
 
 
 class LineSccpSchema(LineEndpointSchema):
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('endpoint_sccp',
-                          field='endpoint_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('endpoint_sccp', field='endpoint_id', target='id'),
+    )
 
 
 class LineSipSchema(LineEndpointSchema):
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('endpoint_sip',
-                          field='endpoint_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('endpoint_sip', field='endpoint_id', target='id'),
+    )
 
 
 class LineCustomSchema(LineEndpointSchema):
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('endpoint_custom',
-                          field='endpoint_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('endpoint_custom', field='endpoint_id', target='id'),
+    )
 
 
 class LineEndpoint(ConfdResource):
-
     def __init__(self, service):
         super(LineEndpoint, self).__init__()
         self.service = service
@@ -73,21 +66,18 @@ class LineEndpointAssociation(LineEndpoint):
 
 
 class LineEndpointGet(LineEndpoint):
-
     def get(self, line_id):
         line_endpoint = self.service.get_association_from_line(line_id)
         return self.schema().dump(line_endpoint)
 
 
 class EndpointLineGet(LineEndpoint):
-
     def get(self, endpoint_id):
         line_endpoint = self.service.get_association_from_endpoint(endpoint_id)
         return self.schema().dump(line_endpoint)
 
 
 class LineEndpointAssociationSip(LineEndpointAssociation):
-
     @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
         return super(LineEndpointAssociationSip, self).put(line_id, endpoint_id)
@@ -116,7 +106,6 @@ class EndpointLineGetSip(EndpointLineGet):
 
 
 class LineEndpointAssociationSccp(LineEndpointAssociation):
-
     @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
         return super(LineEndpointAssociationSccp, self).put(line_id, endpoint_id)
@@ -145,7 +134,6 @@ class EndpointLineGetSccp(EndpointLineGet):
 
 
 class LineEndpointAssociationCustom(LineEndpointAssociation):
-
     @required_acl('confd.lines.{line_id}.endpoints.custom.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
         return super(LineEndpointAssociationCustom, self).put(line_id, endpoint_id)

@@ -7,19 +7,20 @@ from mock import Mock, sentinel
 
 from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 
-from wazo_confd.helpers.validator import (GetResource,
-                                          MemberOfSequence,
-                                          Optional,
-                                          ResourceExists,
-                                          UniqueField,
-                                          UniqueFieldChanged,
-                                          ValidationAssociation,
-                                          ValidationGroup,
-                                          Validator)
+from wazo_confd.helpers.validator import (
+    GetResource,
+    MemberOfSequence,
+    Optional,
+    ResourceExists,
+    UniqueField,
+    UniqueFieldChanged,
+    ValidationAssociation,
+    ValidationGroup,
+    Validator,
+)
 
 
 class TestGetResource(unittest.TestCase):
-
     def setUp(self):
         self.dao_get = Mock()
         self.validator = GetResource('field', self.dao_get)
@@ -29,8 +30,9 @@ class TestGetResource(unittest.TestCase):
 
         self.dao_get.side_effect = NotFoundError
 
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(InputError))
+        assert_that(
+            calling(self.validator.validate).with_args(model), raises(InputError)
+        )
 
     def test_given_resource_exists_then_validation_passes(self):
         model = Mock(field=sentinel.field)
@@ -41,7 +43,6 @@ class TestGetResource(unittest.TestCase):
 
 
 class TestUniqueField(unittest.TestCase):
-
     def setUp(self):
         self.dao_find = Mock()
         self.validator = UniqueField('field', self.dao_find)
@@ -58,12 +59,12 @@ class TestUniqueField(unittest.TestCase):
 
         self.dao_find.return_value = model
 
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(ResourceError))
+        assert_that(
+            calling(self.validator.validate).with_args(model), raises(ResourceError)
+        )
 
 
 class TestUniqueFieldChanged(unittest.TestCase):
-
     def setUp(self):
         self.dao = Mock()
         self.validator = UniqueFieldChanged('field', self.dao)
@@ -88,12 +89,12 @@ class TestUniqueFieldChanged(unittest.TestCase):
 
         self.dao.find_by.return_value = other_model
 
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(ResourceError))
+        assert_that(
+            calling(self.validator.validate).with_args(model), raises(ResourceError)
+        )
 
 
 class TestResourceExists(unittest.TestCase):
-
     def setUp(self):
         self.dao_exist = Mock()
         self.validator = ResourceExists('field', self.dao_exist)
@@ -103,8 +104,9 @@ class TestResourceExists(unittest.TestCase):
 
         self.dao_exist.return_value = False
 
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(InputError))
+        assert_that(
+            calling(self.validator.validate).with_args(model), raises(InputError)
+        )
 
     def test_given_resource_exists_then_validation_passes(self):
         model = Mock(field=sentinel.field)
@@ -117,7 +119,6 @@ class TestResourceExists(unittest.TestCase):
 
 
 class TestOptional(unittest.TestCase):
-
     def setUp(self):
         self.child_validator = Mock(Validator)
         self.validator = Optional('field', self.child_validator)
@@ -149,7 +150,6 @@ class TestOptional(unittest.TestCase):
 
 
 class TestMemberOfSequence(unittest.TestCase):
-
     def setUp(self):
         self.dao_list = Mock()
         self.validator = MemberOfSequence('field', self.dao_list)
@@ -158,8 +158,9 @@ class TestMemberOfSequence(unittest.TestCase):
         model = Mock(field='value')
         self.dao_list.return_value = []
 
-        assert_that(calling(self.validator.validate).with_args(model),
-                    raises(InputError))
+        assert_that(
+            calling(self.validator.validate).with_args(model), raises(InputError)
+        )
 
     def test_given_field_in_list_then_validation_passes(self):
         model = Mock(field='value')
@@ -169,7 +170,6 @@ class TestMemberOfSequence(unittest.TestCase):
 
 
 class TestValidationGroup(unittest.TestCase):
-
     def test_when_validating_create_then_calls_common_and_create_validators(self):
         common = Mock(Validator)
         create = Mock(Validator)
@@ -208,8 +208,9 @@ class TestValidationGroup(unittest.TestCase):
 
 
 class TestValidationAssociation(unittest.TestCase):
-
-    def test_when_validating_association_then_calls_common_and_association_validators(self):
+    def test_when_validating_association_then_calls_common_and_association_validators(
+        self
+    ):
         common = Mock(Validator)
         association = Mock(Validator)
         model = Mock()
@@ -228,7 +229,9 @@ class TestValidationAssociation(unittest.TestCase):
         model1 = Mock()
         model2 = Mock()
 
-        validator = ValidationAssociation(common=[common], association=[association], dissociation=[dissociation])
+        validator = ValidationAssociation(
+            common=[common], association=[association], dissociation=[dissociation]
+        )
 
         validator.validate_association(model1, model2)
         validator.validate_dissociation(model1, model2)
@@ -237,7 +240,9 @@ class TestValidationAssociation(unittest.TestCase):
         association.validate.assert_called_once_with(model1, model2)
         dissociation.validate.assert_called_once_with(model1, model2)
 
-    def test_when_validating_dissociation_then_calls_common_and_dissociation_validators(self):
+    def test_when_validating_dissociation_then_calls_common_and_dissociation_validators(
+        self
+    ):
         common = Mock(Validator)
         dissociation = Mock(Validator)
         model = Mock()

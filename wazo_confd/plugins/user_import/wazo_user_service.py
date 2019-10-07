@@ -5,7 +5,6 @@ from .auth_client import auth_client
 
 
 class WazoUserService:
-
     def __init__(self, auth_client):
         self._auth_client = auth_client
 
@@ -15,7 +14,9 @@ class WazoUserService:
             firstname=user.get('firstname'),
             lastname=user.get('lastname'),
             email_address=user.get('email_address'),
-            username=user.get('username') or user.get('email_address') or user.get('uuid'),
+            username=user.get('username')
+            or user.get('email_address')
+            or user.get('uuid'),
             password=user.get('password'),
             enabled=user.get('enabled') if user.get('enabled') is not None else True,
             tenant_uuid=user.get('tenant_uuid'),

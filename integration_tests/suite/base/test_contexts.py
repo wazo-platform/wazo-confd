@@ -15,15 +15,8 @@ from hamcrest import (
 from xivo_test_helpers.hamcrest.uuid_ import uuid_
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -95,8 +88,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'user_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': '50', 'end': '060'}]
+    yield s.check_bogus_field_returns_error, url, 'user_ranges', [
+        {'start': '60', 'end': '50'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'user_ranges', [
+        {'start': '50', 'end': '060'}
+    ]
     yield s.check_bogus_field_returns_error, url, 'user_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'group_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'group_ranges', 'invalid'
@@ -106,8 +103,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'group_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': '50', 'end': '060'}]
+    yield s.check_bogus_field_returns_error, url, 'group_ranges', [
+        {'start': '60', 'end': '50'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'group_ranges', [
+        {'start': '50', 'end': '060'}
+    ]
     yield s.check_bogus_field_returns_error, url, 'group_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', 'invalid'
@@ -117,8 +118,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': '50', 'end': '060'}]
+    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [
+        {'start': '60', 'end': '50'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'queue_ranges', [
+        {'start': '50', 'end': '060'}
+    ]
     yield s.check_bogus_field_returns_error, url, 'queue_ranges', [{'start': 'invalid'}]
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', 'invalid'
@@ -126,11 +131,21 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', None
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', {}
     yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', ['1234']
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'end': '1234'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [{'start': 'invalid'}]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [
+        {'end': '1234'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [
+        {'start': None}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [
+        {'start': '60', 'end': '50'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [
+        {'start': '50', 'end': '060'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'conference_room_ranges', [
+        {'start': 'invalid'}
+    ]
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', 123
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', True
@@ -139,10 +154,18 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', ['1234']
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'end': '1234'}]
     yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': None}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '60', 'end': '50'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '50', 'end': '060'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': 'invalid'}]
-    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [{'start': '123', 'did_length': None}]
+    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [
+        {'start': '60', 'end': '50'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [
+        {'start': '50', 'end': '060'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [
+        {'start': 'invalid'}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'incall_ranges', [
+        {'start': '123', 'did_length': None}
+    ]
 
 
 @fixtures.context(name='unique')
@@ -154,11 +177,7 @@ def unique_error_checks(url, context):
 @fixtures.context(name='hidden', type='incall', description='hidden')
 def test_search(context, hidden):
     url = confd.contexts
-    searches = {
-        'name': 'search',
-        'type': 'internal',
-        'description': 'desc_search',
-    }
+    searches = {'name': 'search', 'type': 'internal', 'description': 'desc_search'}
 
     for field, term in searches.items():
         yield check_search, url, context, hidden, field, term
@@ -203,21 +222,24 @@ def test_sorting_offset_limit(context1, context2):
 @fixtures.context()
 def test_get(context):
     response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(
-        id=context['id'],
-        name=context['name'],
-        label=context['label'],
-        type=context['type'],
-        user_ranges=context['user_ranges'],
-        group_ranges=context['group_ranges'],
-        queue_ranges=context['queue_ranges'],
-        conference_room_ranges=context['conference_room_ranges'],
-        incall_ranges=context['incall_ranges'],
-        description=context['description'],
-        enabled=context['enabled'],
-        tenant_uuid=uuid_(),
-        contexts=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=context['id'],
+            name=context['name'],
+            label=context['label'],
+            type=context['type'],
+            user_ranges=context['user_ranges'],
+            group_ranges=context['group_ranges'],
+            queue_ranges=context['queue_ranges'],
+            conference_room_ranges=context['conference_room_ranges'],
+            incall_ranges=context['incall_ranges'],
+            description=context['description'],
+            enabled=context['enabled'],
+            tenant_uuid=uuid_(),
+            contexts=empty(),
+        ),
+    )
 
 
 def test_create_minimal_parameters():
@@ -230,7 +252,9 @@ def test_create_minimal_parameters():
 
 
 def test_create_out_of_tree_tenant():
-    response = confd.contexts.post(name='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000')
+    response = confd.contexts.post(
+        name='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000'
+    )
     response.assert_status(401)
 
 
@@ -346,6 +370,10 @@ def test_delete_when_sip_general_option_associated(context):
 
 @fixtures.context()
 def test_bus_events(context):
-    yield s.check_bus_event, 'config.contexts.created', confd.contexts.post, {'name': 'bus_event'}
+    yield s.check_bus_event, 'config.contexts.created', confd.contexts.post, {
+        'name': 'bus_event'
+    }
     yield s.check_bus_event, 'config.contexts.edited', confd.contexts(context['id']).put
-    yield s.check_bus_event, 'config.contexts.deleted', confd.contexts(context['id']).delete
+    yield s.check_bus_event, 'config.contexts.deleted', confd.contexts(
+        context['id']
+    ).delete

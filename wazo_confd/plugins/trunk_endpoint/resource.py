@@ -15,25 +15,20 @@ class TrunkEndpointSchema(BaseSchema):
 
 
 class TrunkEndpointSipSchema(TrunkEndpointSchema):
-    links = ListLink(Link('trunks',
-                          field='trunk_id',
-                          target='id'),
-                     Link('endpoint_sip',
-                          field='endpoint_id',
-                          target='id'))
+    links = ListLink(
+        Link('trunks', field='trunk_id', target='id'),
+        Link('endpoint_sip', field='endpoint_id', target='id'),
+    )
 
 
 class TrunkEndpointCustomSchema(TrunkEndpointSchema):
-    links = ListLink(Link('trunks',
-                          field='trunk_id',
-                          target='id'),
-                     Link('endpoint_custom',
-                          field='endpoint_id',
-                          target='id'))
+    links = ListLink(
+        Link('trunks', field='trunk_id', target='id'),
+        Link('endpoint_custom', field='endpoint_id', target='id'),
+    )
 
 
 class TrunkEndpoint(ConfdResource):
-
     def __init__(self, service):
         super(TrunkEndpoint, self).__init__()
         self.service = service
@@ -65,21 +60,18 @@ class TrunkEndpointAssociation(TrunkEndpoint):
 
 
 class TrunkEndpointGet(TrunkEndpoint):
-
     def get(self, trunk_id):
         trunk_endpoint = self.service.get_association_from_trunk(trunk_id)
         return self.schema().dump(trunk_endpoint)
 
 
 class EndpointTrunkGet(TrunkEndpoint):
-
     def get(self, endpoint_id):
         trunk_endpoint = self.service.get_association_from_endpoint(endpoint_id)
         return self.schema().dump(trunk_endpoint)
 
 
 class TrunkEndpointAssociationSip(TrunkEndpointAssociation):
-
     @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_id}.update')
     def put(self, trunk_id, endpoint_id):
         return super(TrunkEndpointAssociationSip, self).put(trunk_id, endpoint_id)
@@ -106,7 +98,6 @@ class EndpointTrunkGetSip(EndpointTrunkGet):
 
 
 class TrunkEndpointAssociationCustom(TrunkEndpointAssociation):
-
     @required_acl('confd.trunks.{trunk_id}.endpoints.custom.{endpoint_id}.update')
     def put(self, trunk_id, endpoint_id):
         return super(TrunkEndpointAssociationCustom, self).put(trunk_id, endpoint_id)
@@ -133,7 +124,6 @@ class EndpointTrunkGetCustom(EndpointTrunkGet):
 
 
 class TrunkEndpointAssociationIAX(TrunkEndpointAssociation):
-
     @required_acl('confd.trunks.{trunk_id}.endpoints.iax.{endpoint_id}.update')
     def put(self, trunk_id, endpoint_id):
         return super(TrunkEndpointAssociationIAX, self).put(trunk_id, endpoint_id)

@@ -21,7 +21,6 @@ APPLICATION_FIELDS = [
 
 
 class ApplicationNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 

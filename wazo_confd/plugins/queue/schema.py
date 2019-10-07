@@ -14,7 +14,10 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 class QueueSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)), required=True)
+    name = fields.String(
+        validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)),
+        required=True,
+    )
     label = fields.String(validate=Length(max=128), missing=None)
     data_quality = StrictBoolean(attribute='data_quality_bool')
     dtmf_hangup_callee_enabled = StrictBoolean()
@@ -34,7 +37,9 @@ class QueueSchema(BaseSchema):
     wait_time_destination = DestinationField(allow_none=True)
     wait_ratio_threshold = fields.Float(validate=Range(min=0), allow_none=True)
     wait_ratio_destination = DestinationField(allow_none=True)
-    caller_id_mode = fields.String(validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True)
+    caller_id_mode = fields.String(
+        validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True
+    )
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
     enabled = StrictBoolean()
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
@@ -47,20 +52,13 @@ class QueueSchema(BaseSchema):
         dump_only=True,
     )
     schedules = fields.Nested(
-        'ScheduleSchema',
-        only=['id', 'name', 'links'],
-        many=True,
-        dump_only=True,
+        'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
     agent_queue_members = fields.Nested(
-        'QueueAgentQueueMembersSchema',
-        many=True,
-        dump_only=True,
+        'QueueAgentQueueMembersSchema', many=True, dump_only=True
     )
     user_queue_members = fields.Nested(
-        'QueueUserQueueMembersSchema',
-        many=True,
-        dump_only=True,
+        'QueueUserQueueMembersSchema', many=True, dump_only=True
     )
 
     @post_load
@@ -84,8 +82,7 @@ class QueueAgentQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
     penalty = fields.Integer()
     agent = fields.Nested(
-        'AgentSchema',
-        only=['id', 'number', 'firstname', 'lastname', 'links'],
+        'AgentSchema', only=['id', 'number', 'firstname', 'lastname', 'links']
     )
 
     @post_dump(pass_many=True)
@@ -107,10 +104,7 @@ class QueueAgentQueueMembersSchema(BaseSchema):
 
 class QueueUserQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
-    user = fields.Nested(
-        'UserSchema',
-        only=['uuid', 'firstname', 'lastname', 'links'],
-    )
+    user = fields.Nested('UserSchema', only=['uuid', 'firstname', 'lastname', 'links'])
 
     @post_dump(pass_many=True)
     def merge_user_queue_member(self, data, many):

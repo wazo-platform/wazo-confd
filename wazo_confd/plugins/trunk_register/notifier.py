@@ -12,7 +12,6 @@ from wazo_confd import bus
 
 
 class TrunkRegisterIAXNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 
@@ -26,7 +25,6 @@ class TrunkRegisterIAXNotifier:
 
 
 class TrunkRegisterSIPNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 

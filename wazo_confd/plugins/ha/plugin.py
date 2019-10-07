@@ -9,14 +9,9 @@ from .service import HAService
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         notifier = HANotifier(bus, sysconfd)
         service = HAService(notifier, sysconfd)
 
-        api.add_resource(
-            HAResource,
-            '/ha',
-            resource_class_args=(service,)
-        )
+        api.add_resource(HAResource, '/ha', resource_class_args=(service,))

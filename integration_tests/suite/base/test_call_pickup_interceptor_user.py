@@ -1,24 +1,11 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    empty,
-    has_entries,
-)
+from hamcrest import assert_that, contains_inanyorder, empty, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
 
@@ -61,23 +48,32 @@ def test_associate(call_pickup, user):
 @fixtures.user()
 @fixtures.user()
 def test_associate_multiple(call_pickup, user1, user2, user3):
-    response = confd.callpickups(call_pickup['id']).interceptors.users.put(users=[user1, user2, user3])
+    response = confd.callpickups(call_pickup['id']).interceptors.users.put(
+        users=[user1, user2, user3]
+    )
     response.assert_updated()
 
     response = confd.callpickups(call_pickup['id']).get()
-    assert_that(response.item, has_entries(
-        interceptors=has_entries(users=contains_inanyorder(
-            has_entries(uuid=user1['uuid']),
-            has_entries(uuid=user2['uuid']),
-            has_entries(uuid=user3['uuid'])
-        ))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            interceptors=has_entries(
+                users=contains_inanyorder(
+                    has_entries(uuid=user1['uuid']),
+                    has_entries(uuid=user2['uuid']),
+                    has_entries(uuid=user3['uuid']),
+                )
+            )
+        ),
+    )
 
 
 @fixtures.call_pickup()
 @fixtures.user()
 def test_associate_same_user(call_pickup, user):
-    response = confd.callpickups(call_pickup['id']).interceptors.users.put(users=[user, user])
+    response = confd.callpickups(call_pickup['id']).interceptors.users.put(
+        users=[user, user]
+    )
     response.assert_status(400)
 
 
@@ -114,20 +110,25 @@ def test_associate_multi_tenant(main_call_pickup, sub_call_pickup, main_user, su
 def test_get_users_associated_to_call_pickup(call_pickup, user1, user2):
     with a.call_pickup_interceptor_user(call_pickup, user1, user2):
         response = confd.callpickups(call_pickup['id']).get()
-        assert_that(response.item, has_entries(
-            interceptors=has_entries(users=contains_inanyorder(
-                has_entries(
-                    uuid=user1['uuid'],
-                    firstname=user1['firstname'],
-                    lastname=user1['lastname'],
-                ),
-                has_entries(
-                    uuid=user2['uuid'],
-                    firstname=user2['firstname'],
-                    lastname=user2['lastname'],
-                ),
-            ))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                interceptors=has_entries(
+                    users=contains_inanyorder(
+                        has_entries(
+                            uuid=user1['uuid'],
+                            firstname=user1['firstname'],
+                            lastname=user1['lastname'],
+                        ),
+                        has_entries(
+                            uuid=user2['uuid'],
+                            firstname=user2['firstname'],
+                            lastname=user2['lastname'],
+                        ),
+                    )
+                )
+            ),
+        )
 
 
 @fixtures.call_pickup()
@@ -141,7 +142,9 @@ def test_dissociate(call_pickup, user):
 @fixtures.call_pickup()
 @fixtures.user()
 @fixtures.user()
-def test_delete_call_pickup_when_call_pickup_and_user_associated(call_pickup, user1, user2):
+def test_delete_call_pickup_when_call_pickup_and_user_associated(
+    call_pickup, user1, user2
+):
     with a.call_pickup_interceptor_user(call_pickup, user1, user2, check=False):
         confd.callpickups(call_pickup['id']).delete().assert_deleted()
 
@@ -155,9 +158,12 @@ def test_delete_call_pickup_when_call_pickup_and_user_associated(call_pickup, us
 @fixtures.call_pickup()
 @fixtures.call_pickup()
 @fixtures.user()
-def test_delete_user_when_call_pickup_and_user_associated(call_pickup1, call_pickup2, user):
-    with a.call_pickup_interceptor_user(call_pickup1, user, check=False), \
-            a.call_pickup_interceptor_user(call_pickup2, user, check=False):
+def test_delete_user_when_call_pickup_and_user_associated(
+    call_pickup1, call_pickup2, user
+):
+    with a.call_pickup_interceptor_user(
+        call_pickup1, user, check=False
+    ), a.call_pickup_interceptor_user(call_pickup2, user, check=False):
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.callpickups(call_pickup1['id']).get()

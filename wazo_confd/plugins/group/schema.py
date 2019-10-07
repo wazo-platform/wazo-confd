@@ -12,18 +12,27 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)), required=True)
+    name = fields.String(
+        validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)),
+        required=True,
+    )
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
-    ring_strategy = fields.String(validate=OneOf([
-        'all',
-        'random',
-        'least_recent',
-        'linear',  # Issue when editing to this value: ASTERISK-17049
-        'fewest_calls',
-        'memorized_round_robin',
-        'weight_random'
-    ]))
-    caller_id_mode = fields.String(validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True)
+    ring_strategy = fields.String(
+        validate=OneOf(
+            [
+                'all',
+                'random',
+                'least_recent',
+                'linear',  # Issue when editing to this value: ASTERISK-17049
+                'fewest_calls',
+                'memorized_round_robin',
+                'weight_random',
+            ]
+        )
+    )
+    caller_id_mode = fields.String(
+        validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True
+    )
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     user_timeout = fields.Integer(validate=Range(min=0), allow_none=True)
@@ -33,32 +42,28 @@ class GroupSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('groups'))
 
-    extensions = fields.Nested('ExtensionSchema',
-                               only=['id', 'exten', 'context', 'links'],
-                               many=True,
-                               dump_only=True)
-    fallbacks = fields.Nested('GroupFallbackSchema',
-                              dump_only=True)
-    incalls = fields.Nested('IncallSchema',
-                            only=['id',
-                                  'extensions',
-                                  'links'],
-                            many=True,
-                            dump_only=True)
-    user_queue_members = fields.Nested('GroupUsersMemberSchema',
-                                       many=True,
-                                       dump_only=True)
-    extension_queue_members = fields.Nested('GroupExtensionsMemberSchema',
-                                            many=True,
-                                            dump_only=True)
-    schedules = fields.Nested('ScheduleSchema',
-                              only=['id', 'name', 'links'],
-                              many=True,
-                              dump_only=True)
-    call_permissions = fields.Nested('CallPermissionSchema',
-                                     only=['id', 'name', 'links'],
-                                     many=True,
-                                     dump_only=True)
+    extensions = fields.Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    fallbacks = fields.Nested('GroupFallbackSchema', dump_only=True)
+    incalls = fields.Nested(
+        'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
+    )
+    user_queue_members = fields.Nested(
+        'GroupUsersMemberSchema', many=True, dump_only=True
+    )
+    extension_queue_members = fields.Nested(
+        'GroupExtensionsMemberSchema', many=True, dump_only=True
+    )
+    schedules = fields.Nested(
+        'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
+    )
+    call_permissions = fields.Nested(
+        'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
+    )
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):
@@ -80,8 +85,7 @@ class GroupSchema(BaseSchema):
         users_member = data.pop('user_queue_members', [])
         extensions_member = data.pop('extension_queue_members', [])
         if not self.only or 'members' in self.only:
-            data['members'] = {'users': users_member,
-                               'extensions': extensions_member}
+            data['members'] = {'users': users_member, 'extensions': extensions_member}
         return data
 
     @post_load
@@ -102,9 +106,9 @@ class GroupSchema(BaseSchema):
 
 class GroupUsersMemberSchema(BaseSchema):
     priority = fields.Integer()
-    user = fields.Nested('UserSchema',
-                         only=['uuid', 'firstname', 'lastname', 'links'],
-                         dump_only=True)
+    user = fields.Nested(
+        'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
+    )
 
     @post_dump(pass_many=True)
     def merge_user_group_member(self, data, many):

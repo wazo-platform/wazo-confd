@@ -6,7 +6,6 @@ from .validator import build_validator
 
 
 class ContextContextService:
-
     def __init__(self, context_dao, notifier, validator):
         self.context_dao = context_dao
         self.notifier = notifier
@@ -19,6 +18,4 @@ class ContextContextService:
 
 
 def build_service(context_dao):
-    return ContextContextService(context_dao,
-                                 build_notifier(),
-                                 build_validator())
+    return ContextContextService(context_dao, build_notifier(), build_validator())

@@ -1,11 +1,7 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import (
-    EXCLUDE,
-    fields,
-    post_load,
-)
+from marshmallow import EXCLUDE, fields, post_load
 from marshmallow.validate import Range
 from wazo_confd.helpers.mallow import BaseSchema
 
@@ -21,10 +17,7 @@ class GroupUserSchema(BaseSchema):
 
 
 class GroupUsersSchema(BaseSchema):
-    users = fields.Nested(
-        GroupUserSchema,
-        many=True, required=True, unknown=EXCLUDE
-    )
+    users = fields.Nested(GroupUserSchema, many=True, required=True, unknown=EXCLUDE)
 
     @post_load
     def set_default_priority(self, data):
@@ -40,15 +33,13 @@ class GroupExtensionSchema(BaseSchema):
 
     @post_load
     def add_envelope(self, data):
-        data['extension'] = {'exten': data.pop('exten'),
-                             'context': data.pop('context')}
+        data['extension'] = {'exten': data.pop('exten'), 'context': data.pop('context')}
         return data
 
 
 class GroupExtensionsSchema(BaseSchema):
     extensions = fields.Nested(
-        GroupExtensionSchema,
-        many=True, required=True, unknown=EXCLUDE
+        GroupExtensionSchema, many=True, required=True, unknown=EXCLUDE
     )
 
     @post_load

@@ -6,7 +6,6 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class TrunkRegisterAssociation(ConfdResource):
-
     def __init__(self, service, trunk_dao, register_dao):
         super(TrunkRegisterAssociation, self).__init__()
         self.service = service
@@ -27,7 +26,6 @@ class TrunkRegisterAssociation(ConfdResource):
 
 
 class TrunkRegisterAssociationIAX(TrunkRegisterAssociation):
-
     @required_acl('confd.trunks.{trunk_id}.registers.iax.{register_id}.update')
     def put(self, trunk_id, register_id):
         return super(TrunkRegisterAssociationIAX, self).put(trunk_id, register_id)
@@ -38,7 +36,6 @@ class TrunkRegisterAssociationIAX(TrunkRegisterAssociation):
 
 
 class TrunkRegisterAssociationSIP(TrunkRegisterAssociation):
-
     @required_acl('confd.trunks.{trunk_id}.registers.sip.{register_id}.update')
     def put(self, trunk_id, register_id):
         return super(TrunkRegisterAssociationSIP, self).put(trunk_id, register_id)

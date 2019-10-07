@@ -3,14 +3,7 @@
 
 import unittest
 from mock import Mock
-from hamcrest import (
-    calling,
-    assert_that,
-    equal_to,
-    has_entries,
-    has_key,
-    has_property,
-)
+from hamcrest import calling, assert_that, equal_to, has_entries, has_key, has_property
 from marshmallow import ValidationError
 from xivo_test_helpers.hamcrest.raises import raises
 
@@ -20,14 +13,15 @@ from ..resource import RegisterIAXSchema
 
 
 class TestRegisterIAXSchema(unittest.TestCase):
-
     def setUp(self):
         self.schema = RegisterIAXSchema(handle_error=False, exclude=('links', 'trunk'))
 
     def test_dump(self):
-        register = Mock(var_val='auth_username:auth_password@'
-                                'remote_host:6666/callback_extension?callback_context',
-                        id=1)
+        register = Mock(
+            var_val='auth_username:auth_password@'
+            'remote_host:6666/callback_extension?callback_context',
+            id=1,
+        )
 
         result = self.schema.dump(register)
         assert_that(
@@ -39,12 +33,11 @@ class TestRegisterIAXSchema(unittest.TestCase):
                 remote_port=6666,
                 callback_extension='callback_extension',
                 callback_context='callback_context',
-            )
+            ),
         )
 
     def test_dump_only_required(self):
-        register = Mock(var_val='remote_host',
-                        id=1)
+        register = Mock(var_val='remote_host', id=1)
 
         result = self.schema.dump(register)
         assert_that(
@@ -56,12 +49,13 @@ class TestRegisterIAXSchema(unittest.TestCase):
                 remote_port=None,
                 callback_extension=None,
                 callback_context=None,
-            )
+            ),
         )
 
     def test_dump_without_auth_username(self):
-        register = Mock(var_val='remote_host:6666/callback_extension?callback_context',
-                        id=1)
+        register = Mock(
+            var_val='remote_host:6666/callback_extension?callback_context', id=1
+        )
 
         result = self.schema.dump(register)
         assert_that(
@@ -73,13 +67,15 @@ class TestRegisterIAXSchema(unittest.TestCase):
                 remote_port=6666,
                 callback_extension='callback_extension',
                 callback_context='callback_context',
-            )
+            ),
         )
 
     def test_dump_without_auth_password(self):
-        register = Mock(var_val='auth_username@'
-                                'remote_host:6666/callback_extension?callback_context',
-                        id=1)
+        register = Mock(
+            var_val='auth_username@'
+            'remote_host:6666/callback_extension?callback_context',
+            id=1,
+        )
 
         result = self.schema.dump(register)
         assert_that(
@@ -91,13 +87,15 @@ class TestRegisterIAXSchema(unittest.TestCase):
                 remote_port=6666,
                 callback_extension='callback_extension',
                 callback_context='callback_context',
-            )
+            ),
         )
 
     def test_dump_without_remote_port(self):
-        register = Mock(var_val='auth_username:auth_password@'
-                                'remote_host/callback_extension?callback_context',
-                        id=1)
+        register = Mock(
+            var_val='auth_username:auth_password@'
+            'remote_host/callback_extension?callback_context',
+            id=1,
+        )
 
         result = self.schema.dump(register)
         assert_that(
@@ -109,13 +107,14 @@ class TestRegisterIAXSchema(unittest.TestCase):
                 remote_port=None,
                 callback_extension='callback_extension',
                 callback_context='callback_context',
-            )
+            ),
         )
 
     def test_dump_without_callback_extension(self):
-        register = Mock(var_val='auth_username:auth_password@'
-                                'remote_host:6666?callback_context',
-                        id=1)
+        register = Mock(
+            var_val='auth_username:auth_password@' 'remote_host:6666?callback_context',
+            id=1,
+        )
 
         result = self.schema.dump(register)
         assert_that(
@@ -127,7 +126,7 @@ class TestRegisterIAXSchema(unittest.TestCase):
                 remote_port=6666,
                 callback_extension=None,
                 callback_context='callback_context',
-            )
+            ),
         )
 
     def test_load(self):
@@ -144,8 +143,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
         assert_that(
             result['var_val'],
-            equal_to('auth_username:auth_password@'
-                     'remote_host:6666/callback_extension?callback_context'),
+            equal_to(
+                'auth_username:auth_password@'
+                'remote_host:6666/callback_extension?callback_context'
+            ),
         )
 
     def test_load_only_required(self):
@@ -165,11 +166,15 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
         result = self.schema.load(body)
 
-        assert_that(result['var_val'], equal_to('remote_host:6666/callback_extension?callback_context'))
+        assert_that(
+            result['var_val'],
+            equal_to('remote_host:6666/callback_extension?callback_context'),
+        )
 
     # FIXME(sileht):
-    @unittest.skip("This tests shouldn't have passed with marshmallow 2.x "
-                   "but it does...")
+    @unittest.skip(
+        "This tests shouldn't have passed with marshmallow 2.x " "but it does..."
+    )
     def test_load_without_auth_password(self):
         body = {
             'auth_username': 'auth_username',
@@ -183,8 +188,9 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
         assert_that(
             result['var_val'],
-            equal_to('auth_username@'
-                     'remote_host:6666/callback_extension?callback_context'),
+            equal_to(
+                'auth_username@' 'remote_host:6666/callback_extension?callback_context'
+            ),
         )
 
     def test_load_without_remote_port(self):
@@ -200,8 +206,10 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
         assert_that(
             result['var_val'],
-            equal_to('auth_username:auth_password@'
-                     'remote_host/callback_extension?callback_context'),
+            equal_to(
+                'auth_username:auth_password@'
+                'remote_host/callback_extension?callback_context'
+            ),
         )
 
     def test_validate_total_length(self):
@@ -215,33 +223,23 @@ class TestRegisterIAXSchema(unittest.TestCase):
 
         assert_that(
             calling(self.schema.load).with_args(body),
-            raises(ValidationError, has_property(
-                'messages', has_key('_schema')
-            ))
+            raises(ValidationError, has_property('messages', has_key('_schema'))),
         )
 
     def test_validate_auth_username(self):
-        body = {
-            'auth_username': 'auth_username',
-            'remote_host': 'remote_host',
-        }
+        body = {'auth_username': 'auth_username', 'remote_host': 'remote_host'}
 
         assert_that(
             calling(self.schema.load).with_args(body),
-            raises(ValidationError, has_property(
-                'messages', has_key('auth_username')
-            ))
+            raises(ValidationError, has_property('messages', has_key('auth_username'))),
         )
 
     def test_validate_callback_context(self):
-        body = {
-            'callback_context': 'callback_context',
-            'remote_host': 'remote_host',
-        }
+        body = {'callback_context': 'callback_context', 'remote_host': 'remote_host'}
 
         assert_that(
             calling(self.schema.load).with_args(body),
-            raises(ValidationError, has_property(
-                'messages', has_key('callback_context')
-            ))
+            raises(
+                ValidationError, has_property('messages', has_key('callback_context'))
+            ),
         )

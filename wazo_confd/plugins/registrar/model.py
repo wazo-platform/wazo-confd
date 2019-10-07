@@ -3,7 +3,6 @@
 
 
 class Registrar:
-
     @classmethod
     def from_args(cls, **kwargs):
         baseregistrar = {

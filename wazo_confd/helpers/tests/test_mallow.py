@@ -9,7 +9,6 @@ from wazo_confd.helpers.mallow import StrictBoolean, AsteriskSection
 
 
 class TestStrictBolean(unittest.TestCase):
-
     def test_that_strict_boolean_raise_error(self):
         strict = StrictBoolean()._deserialize
         self.assertRaises(ValidationError, strict, '1', None, None)
@@ -20,15 +19,11 @@ class TestStrictBolean(unittest.TestCase):
 
 
 class TestAsteriskSection(unittest.TestCase):
-
     def setUp(self):
         self.validator = AsteriskSection()
 
     def test_valid_section_names(self):
-        values = [
-            'default',
-            'abc-def_013.Z',
-        ]
+        values = ['default', 'abc-def_013.Z']
         for value in values:
             assert_that(self.validator(value), equal_to(value))
 
@@ -45,5 +40,6 @@ class TestAsteriskSection(unittest.TestCase):
             'general',
         ]
         for value in values:
-            assert_that(calling(self.validator).with_args(value),
-                        raises(ValidationError))
+            assert_that(
+                calling(self.validator).with_args(value), raises(ValidationError)
+            )

@@ -1,21 +1,9 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    empty,
-    has_entries,
-    has_item,
-    has_items,
-)
+from hamcrest import assert_that, contains, empty, has_entries, has_item, has_items
 
-from ..helpers import (
-    scenarios as s,
-    errors as e,
-    associations as a,
-    fixtures,
-)
+from ..helpers import scenarios as s, errors as e, associations as a, fixtures
 from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
@@ -43,14 +31,28 @@ def test_associate_errors(line, extension):
 @fixtures.line_sip(context='sub-internal')
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
-def test_associate_multi_tenant(main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten):
-    response = confd.lines(sub_line['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(
+    main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten
+):
+    response = (
+        confd.lines(sub_line['id'])
+        .extensions(main_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.lines(main_line['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(main_line['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -70,7 +72,9 @@ def test_dissociate_errors(line, extension):
 @fixtures.line_sip(context='sub-internal')
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
-def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten):
+def test_dissociate_multi_tenant(
+    main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten
+):
     url = confd.lines(sub_line['id']).extensions(main_exten['id'])
     response = url.delete(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found('Extension'))
@@ -123,9 +127,7 @@ def test_associate_line_and_internal_extension(line, extension):
     response = confd.lines(line['id']).extensions.get()
     assert_that(
         response.items,
-        contains(
-            has_entries(line_id=line['id'], extension_id=extension['id']),
-        )
+        contains(has_entries(line_id=line['id'], extension_id=extension['id'])),
     )
 
 
@@ -140,7 +142,9 @@ def test_associate_extension_not_in_internal_context(extension, line):
 @fixtures.line_sip()
 @fixtures.user()
 @fixtures.user()
-def test_associate_extension_to_one_line_multiple_users(extension, line, first_user, second_user):
+def test_associate_extension_to_one_line_multiple_users(
+    extension, line, first_user, second_user
+):
     with a.user_line(first_user, line), a.user_line(second_user, line):
         response = confd.lines(line['id']).extensions(extension['id']).put()
         response.assert_updated()
@@ -149,7 +153,9 @@ def test_associate_extension_to_one_line_multiple_users(extension, line, first_u
 @fixtures.extension()
 @fixtures.extension()
 @fixtures.line_sip()
-def test_associate_two_internal_extensions_to_same_line(first_extension, second_extension, line):
+def test_associate_two_internal_extensions_to_same_line(
+    first_extension, second_extension, line
+):
     response = confd.lines(line['id']).extensions(first_extension['id']).put()
     response.assert_updated()
 
@@ -176,7 +182,9 @@ def test_associate_multi_lines_to_extension(extension, line1, line2, line3):
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_extension_with_same_user(user, extension, line1, line2):
+def test_associate_multi_lines_to_extension_with_same_user(
+    user, extension, line1, line2
+):
     with a.user_line(user, line1), a.user_line(user, line2):
         response = confd.lines(line1['id']).extensions(extension['id']).put()
         response.assert_updated()
@@ -190,7 +198,9 @@ def test_associate_multi_lines_to_extension_with_same_user(user, extension, line
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_extension_with_different_user(user1, user2, exten, line1, line2):
+def test_associate_multi_lines_to_extension_with_different_user(
+    user1, user2, exten, line1, line2
+):
     with a.user_line(user1, line1), a.user_line(user2, line2):
         response = confd.lines(line1['id']).extensions(exten['id']).put()
         response.assert_updated()
@@ -204,7 +214,9 @@ def test_associate_multi_lines_to_extension_with_different_user(user1, user2, ex
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_multi_lines_to_multi_extensions_with_same_user(user, extension1, extension2, line1, line2):
+def test_associate_multi_lines_to_multi_extensions_with_same_user(
+    user, extension1, extension2, line1, line2
+):
     with a.user_line(user, line1), a.user_line(user, line2):
         response = confd.lines(line1['id']).extensions(extension1['id']).put()
         response.assert_updated()
@@ -249,9 +261,7 @@ def test_associate_line_with_endpoint(line, sip, extension):
         response = confd.lines(line['id']).extensions.get()
         assert_that(
             response.items,
-            contains(
-                has_entries(line_id=line['id'], extension_id=extension['id']),
-            )
+            contains(has_entries(line_id=line['id'], extension_id=extension['id'])),
         )
 
 
@@ -316,7 +326,7 @@ def test_get_multi_lines_extension(line1, line2, extension):
             has_items(
                 has_entries(line_id=line1['id'], extension_id=extension['id']),
                 has_entries(line_id=line2['id'], extension_id=extension['id']),
-            )
+            ),
         )
 
 
@@ -345,8 +355,10 @@ def test_get_extension_relation(line, exten):
         assert_that(
             response.item['extensions'],
             contains(
-                has_entries(id=exten['id'], exten=exten['exten'], context=exten['context']),
-            )
+                has_entries(
+                    id=exten['id'], exten=exten['exten'], context=exten['context']
+                )
+            ),
         )
 
 
@@ -360,7 +372,5 @@ def test_get_line_relation(line, sip, extension):
             response = confd.extensions(extension['id']).get()
             assert_that(
                 response.item['lines'],
-                contains(
-                    has_entries(id=line['id'], name=line['name']),
-                )
+                contains(has_entries(id=line['id'], name=line['name'])),
             )

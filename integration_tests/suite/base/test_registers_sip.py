@@ -1,13 +1,7 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    empty,
-    has_entries,
-    none,
-    not_,
-)
+from hamcrest import assert_that, empty, has_entries, none, not_
 
 from ..helpers import scenarios as s
 from ..helpers import fixtures
@@ -93,30 +87,36 @@ def error_checks(url):
 @fixtures.register_sip()
 def test_get(register_sip):
     response = confd.registers.sip(register_sip['id']).get()
-    assert_that(response.item, has_entries(
-        id=register_sip['id'],
-        transport=none(),
-        sip_username=register_sip['sip_username'],
-        auth_password=none(),
-        auth_username=none(),
-        remote_host=register_sip['remote_host'],
-        remote_port=none(),
-        callback_extension=none(),
-        expiration=none(),
-        enabled=True,
-        trunk=none(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=register_sip['id'],
+            transport=none(),
+            sip_username=register_sip['sip_username'],
+            auth_password=none(),
+            auth_username=none(),
+            remote_host=register_sip['remote_host'],
+            remote_port=none(),
+            callback_extension=none(),
+            expiration=none(),
+            enabled=True,
+            trunk=none(),
+        ),
+    )
 
 
 def test_create_minimal_parameters():
-    response = confd.registers.sip.post(sip_username='sip-username', remote_host='remote-host')
+    response = confd.registers.sip.post(
+        sip_username='sip-username', remote_host='remote-host'
+    )
     response.assert_created('register_sip', location='registers/sip')
 
-    assert_that(response.item, has_entries(
-        id=not_(empty()),
-        sip_username='sip-username',
-        remote_host='remote-host',
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=not_(empty()), sip_username='sip-username', remote_host='remote-host'
+        ),
+    )
 
 
 def test_create_all_parameters():
@@ -129,7 +129,7 @@ def test_create_all_parameters():
         remote_port=1234,
         callback_extension='callback-extension',
         expiration=1000,
-        enabled=True
+        enabled=True,
     )
     response = confd.registers.sip.post(**parameters)
 
@@ -156,7 +156,7 @@ def test_edit_all_parameters(register_sip):
         remote_port=1234,
         callback_extension='callback-extension',
         expiration=1000,
-        enabled=False
+        enabled=False,
     )
 
     response = confd.registers.sip(register_sip['id']).put(**parameters)
@@ -174,7 +174,13 @@ def test_delete(register_sip):
 
 @fixtures.register_sip()
 def test_bus_events(register_sip):
-    yield s.check_bus_event, 'config.register.sip.created', confd.registers.sip.post, {'sip_username': 'bus-event',
-                                                                                       'remote_host': 'bus-event'}
-    yield s.check_bus_event, 'config.register.sip.edited', confd.registers.sip(register_sip['id']).put
-    yield s.check_bus_event, 'config.register.sip.deleted', confd.registers.sip(register_sip['id']).delete
+    yield s.check_bus_event, 'config.register.sip.created', confd.registers.sip.post, {
+        'sip_username': 'bus-event',
+        'remote_host': 'bus-event',
+    }
+    yield s.check_bus_event, 'config.register.sip.edited', confd.registers.sip(
+        register_sip['id']
+    ).put
+    yield s.check_bus_event, 'config.register.sip.deleted', confd.registers.sip(
+        register_sip['id']
+    ).delete

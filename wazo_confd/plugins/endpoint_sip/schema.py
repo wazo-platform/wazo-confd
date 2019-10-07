@@ -28,7 +28,6 @@ class SipSchema(BaseSchema):
 
 
 class SipSchemaNullable(SipSchema):
-
     def on_bind_field(self, field_name, field_obj):
         super(SipSchemaNullable, self).on_bind_field(field_name, field_obj)
         nullable_fields = ['username', 'host', 'secret']

@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -19,5 +18,5 @@ class Plugin:
             '/users/<int:user_id>/schedules/<int:schedule_id>',
             '/users/<uuid:user_id>/schedules/<int:schedule_id>',
             endpoint='user_schedules',
-            resource_class_args=(service, user_dao, schedule_dao)
+            resource_class_args=(service, user_dao, schedule_dao),
         )

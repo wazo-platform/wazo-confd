@@ -15,12 +15,10 @@ from wazo_confd.helpers.restful import ConfdResource
 class UserVoicemailSchema(BaseSchema):
     user_id = fields.Integer(dump_only=True)
     voicemail_id = fields.Integer(required=True)
-    links = ListLink(Link('voicemails',
-                          field='voicemail_id',
-                          target='id'),
-                     Link('users',
-                          field='user_id',
-                          target='id'))
+    links = ListLink(
+        Link('voicemails', field='voicemail_id', target='id'),
+        Link('users', field='user_id', target='id'),
+    )
 
 
 class UserVoicemailResource(ConfdResource):
@@ -39,7 +37,6 @@ class UserVoicemailResource(ConfdResource):
 
 
 class UserVoicemailItem(UserVoicemailResource):
-
     @required_acl('confd.users.{user_id}.voicemails.{voicemail_id}.update')
     def put(self, user_id, voicemail_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -52,7 +49,6 @@ class UserVoicemailItem(UserVoicemailResource):
 
 
 class UserVoicemailList(UserVoicemailResource):
-
     @required_acl('confd.users.{user_id}.voicemails.read')
     def get(self, user_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -72,7 +68,6 @@ class UserVoicemailList(UserVoicemailResource):
 
 
 class VoicemailUserList(UserVoicemailResource):
-
     @required_acl('confd.voicemails.{voicemail_id}.users.read')
     def get(self, voicemail_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -80,12 +75,10 @@ class VoicemailUserList(UserVoicemailResource):
         voicemail = self.voicemail_dao.get(voicemail_id, tenant_uuids=tenant_uuids)
 
         items = self.service.find_all_by(voicemail_id=voicemail.id)
-        return {'total': len(items),
-                'items': self.schema().dump(items, many=True)}
+        return {'total': len(items), 'items': self.schema().dump(items, many=True)}
 
 
 class UserVoicemailLegacy(UserVoicemailResource):
-
     @required_acl('confd.users.{user_id}.voicemail.read')
     def get(self, user_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -103,7 +96,11 @@ class UserVoicemailLegacy(UserVoicemailResource):
         voicemail = self.get_voicemail_or_fail(tenant_uuids=tenant_uuids)
 
         user_voicemail = self.service.associate(user, voicemail)
-        return self.schema().dump(user_voicemail), 201, self.build_headers(user_voicemail)
+        return (
+            self.schema().dump(user_voicemail),
+            201,
+            self.build_headers(user_voicemail),
+        )
 
     @required_acl('confd.users.{user_id}.voicemail.delete')
     def delete(self, user_id):
@@ -117,15 +114,19 @@ class UserVoicemailLegacy(UserVoicemailResource):
         return '', 204
 
     def build_headers(self, model):
-        url = url_for('user_voicemails',
-                      user_id=model.user_id,
-                      voicemail_id=model.voicemail_id,
-                      _external=True)
+        url = url_for(
+            'user_voicemails',
+            user_id=model.user_id,
+            voicemail_id=model.voicemail_id,
+            _external=True,
+        )
         return {'Location': url}
 
     def get_voicemail_or_fail(self, tenant_uuids=None):
         form = self.schema().load(request.get_json())
         try:
-            return self.voicemail_dao.get(form['voicemail_id'], tenant_uuids=tenant_uuids)
+            return self.voicemail_dao.get(
+                form['voicemail_id'], tenant_uuids=tenant_uuids
+            )
         except NotFoundError:
             raise errors.param_not_found('voicemail_id', 'Voicemail')

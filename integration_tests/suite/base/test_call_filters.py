@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -91,17 +84,17 @@ def error_checks(url):
 
 @fixtures.call_filter(name='unique')
 def unique_error_checks(url, call_filter):
-    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {'strategy': 'all', 'source': 'all'}
+    yield s.check_bogus_field_returns_error, url, 'name', call_filter['name'], {
+        'strategy': 'all',
+        'source': 'all',
+    }
 
 
 @fixtures.call_filter(name="search", description="SearchDesc")
 @fixtures.call_filter(name="hidden", description="HiddenDesc")
 def test_search(call_filter, hidden):
     url = confd.callfilters
-    searches = {
-        'name': 'search',
-        'description': 'Search',
-    }
+    searches = {'name': 'search', 'description': 'Search'}
 
     for field, term in searches.items():
         yield check_search, url, call_filter, hidden, field, term
@@ -134,46 +127,34 @@ def test_sorting_offset_limit(call_filter1, call_filter2):
 @fixtures.call_filter(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.callfilters.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.callfilters.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.callfilters.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.call_filter()
 def test_get(call_filter):
     response = confd.callfilters(call_filter['id']).get()
-    assert_that(response.item, has_entries(
-        name=call_filter['name'],
-        source=call_filter['source'],
-        caller_id_mode=none(),
-        caller_id_name=none(),
-        strategy=call_filter['strategy'],
-        surrogates_timeout=none(),
-        description=none(),
-        enabled=True,
-        recipients=has_entries(
-            users=empty()
+    assert_that(
+        response.item,
+        has_entries(
+            name=call_filter['name'],
+            source=call_filter['source'],
+            caller_id_mode=none(),
+            caller_id_name=none(),
+            strategy=call_filter['strategy'],
+            surrogates_timeout=none(),
+            description=none(),
+            enabled=True,
+            recipients=has_entries(users=empty()),
+            surrogates=has_entries(users=empty()),
+            fallbacks=has_entries(noanswer_destination=none()),
         ),
-        surrogates=has_entries(
-            users=empty()
-        ),
-        fallbacks=has_entries(
-            noanswer_destination=none()
-        ),
-    ))
+    )
 
 
 @fixtures.call_filter(wazo_tenant=MAIN_TENANT)
@@ -187,17 +168,10 @@ def test_get_multi_tenant(main, sub):
 
 
 def test_create_minimal_parameters():
-    response = confd.callfilters.post(
-        name='minimal',
-        source='all',
-        strategy='all',
-    )
+    response = confd.callfilters.post(name='minimal', source='all', strategy='all')
     response.assert_created('callfilters')
 
-    assert_that(response.item, has_entries(
-        id=not_(empty()),
-        tenant_uuid=MAIN_TENANT,
-    ))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
     confd.callfilters(response.item['id']).delete().assert_deleted()
 

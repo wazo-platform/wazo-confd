@@ -6,7 +6,6 @@ from .resource import SccpItem, SccpList
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -15,10 +14,6 @@ class Plugin:
             SccpItem,
             '/endpoints/sccp/<int:id>',
             endpoint='endpoint_sccp',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
-        api.add_resource(
-            SccpList,
-            '/endpoints/sccp',
-            resource_class_args=(service,)
-        )
+        api.add_resource(SccpList, '/endpoints/sccp', resource_class_args=(service,))

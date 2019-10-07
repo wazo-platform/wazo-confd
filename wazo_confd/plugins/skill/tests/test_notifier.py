@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -14,7 +14,6 @@ from ..notifier import SkillNotifier
 
 
 class TestSkillNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.skill = Mock(id=1234)

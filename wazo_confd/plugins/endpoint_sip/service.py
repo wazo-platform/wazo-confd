@@ -11,7 +11,6 @@ from .validator import build_validator
 
 
 class SipEndpointService(CRUDService):
-
     def __init__(self, dao, validator, notifier, device_updater):
         super(SipEndpointService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
@@ -24,7 +23,6 @@ class SipEndpointService(CRUDService):
 def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
-    return SipEndpointService(endpoint_sip_dao_module,
-                              build_validator(),
-                              build_notifier(),
-                              device_updater)
+    return SipEndpointService(
+        endpoint_sip_dao_module, build_validator(), build_notifier(), device_updater
+    )

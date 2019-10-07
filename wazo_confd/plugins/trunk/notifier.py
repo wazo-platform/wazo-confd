@@ -12,20 +12,14 @@ from wazo_confd import bus, sysconfd
 
 class TrunkNotifier:
 
-    _IPBX_COMMANDS = {
-        'sip': ['module reload res_pjsip.so'],
-        'iax': ['iax2 reload'],
-    }
+    _IPBX_COMMANDS = {'sip': ['module reload res_pjsip.so'], 'iax': ['iax2 reload']}
 
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx_commands):
-        handlers = {
-            'ipbx': ipbx_commands,
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ipbx_commands, 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, trunk):

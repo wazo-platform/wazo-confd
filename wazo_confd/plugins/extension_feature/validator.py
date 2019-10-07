@@ -8,22 +8,16 @@ from wazo_confd.helpers.validator import Validator, ValidationGroup
 
 
 class ExtenAvailableOnUpdateValidator(Validator):
-
     def __init__(self, dao):
         self.dao = dao
 
     def validate(self, extension):
-        existing = self.dao.find_by(exten=extension.exten,
-                                    context=extension.context)
+        existing = self.dao.find_by(exten=extension.exten, context=extension.context)
         if existing and existing.id != extension.id:
-            raise errors.resource_exists('Extension',
-                                         exten=extension.exten,
-                                         context=extension.context)
+            raise errors.resource_exists(
+                'Extension', exten=extension.exten, context=extension.context
+            )
 
 
 def build_validator():
-    return ValidationGroup(
-        edit=[
-            ExtenAvailableOnUpdateValidator(extension_dao),
-        ],
-    )
+    return ValidationGroup(edit=[ExtenAvailableOnUpdateValidator(extension_dao)])

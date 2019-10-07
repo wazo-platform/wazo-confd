@@ -22,18 +22,18 @@ from wazo_confd.helpers.validator import (
 
 
 class PrivateTemplateValidator(Validator):
-
     def validate(self, template):
         if template.private:
-            raise errors.not_permitted("Deleting private templates is not allowed",
-                                       template_id=template.id)
+            raise errors.not_permitted(
+                "Deleting private templates is not allowed", template_id=template.id
+            )
 
 
 class SimilarFuncKeyValidator(Validator):
-
     def validate(self, template):
-        counter = Counter(funckey.hash_destination()
-                          for funckey in template.keys.values())
+        counter = Counter(
+            funckey.hash_destination() for funckey in template.keys.values()
+        )
         if len(counter) > 0:
             destination, counts = counter.most_common(1)[0]
             if counts > 1:
@@ -42,7 +42,6 @@ class SimilarFuncKeyValidator(Validator):
 
 
 class FuncKeyMappingValidator(Validator):
-
     def __init__(self, funckey_validator):
         self.funckey_validator = funckey_validator
 
@@ -60,11 +59,12 @@ class FuncKeyValidator(Validator):
         if text is not None:
             for char in self.INVALID_CHARS:
                 if char in text:
-                    raise errors.wrong_type(field, self.INVALID_CHARS_MSG, **{field: text})
+                    raise errors.wrong_type(
+                        field, self.INVALID_CHARS_MSG, **{field: text}
+                    )
 
 
 class FuncKeyModelValidator(FuncKeyValidator):
-
     def __init__(self, destinations):
         self.destinations = destinations
 
@@ -81,13 +81,11 @@ class FuncKeyModelValidator(FuncKeyValidator):
 
 
 class ForwardValidator(FuncKeyValidator):
-
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
 
 
 class ParkPositionValidator(FuncKeyValidator):
-
     def __init__(self, dao):
         self.dao = dao
 
@@ -100,13 +98,11 @@ class ParkPositionValidator(FuncKeyValidator):
 
 
 class CustomValidator(FuncKeyValidator):
-
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
 
 
 class BSFilterValidator(FuncKeyValidator):
-
     def validate(self, user, funckey):
         if funckey.destination.type != 'bsfilter':
             return
@@ -118,8 +114,14 @@ class BSFilterValidator(FuncKeyValidator):
 def build_validator():
     destination_validators = {
         'agent': [GetResource('agent_id', agent_dao.get, 'Agent')],
-        'bsfilter': [ResourceExists('filter_member_id', call_filter_dao.member_exists, 'FilterMember')],
-        'conference': [ResourceExists('conference_id', conference_dao.exists, 'Conference')],
+        'bsfilter': [
+            ResourceExists(
+                'filter_member_id', call_filter_dao.member_exists, 'FilterMember'
+            )
+        ],
+        'conference': [
+            ResourceExists('conference_id', conference_dao.exists, 'Conference')
+        ],
         'custom': [CustomValidator()],
         'forward': [ForwardValidator()],
         'group': [GetResource('group_id', group_dao.get, 'Group')],
@@ -140,8 +142,10 @@ def build_validator():
 
     private_template_validator = PrivateTemplateValidator()
 
-    return ValidationGroup(common=[mapping_validator, similar_validator],
-                           delete=[private_template_validator])
+    return ValidationGroup(
+        common=[mapping_validator, similar_validator],
+        delete=[private_template_validator],
+    )
 
 
 def build_validator_bsfilter():

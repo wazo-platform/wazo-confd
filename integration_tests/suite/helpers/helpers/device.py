@@ -4,12 +4,7 @@
 import string
 import hashlib
 
-from random import (
-    choice,
-    randint,
-    random,
-    randrange,
-)
+from random import choice, randint, random, randrange
 
 from . import confd, provd
 
@@ -65,14 +60,14 @@ def generate_autoprov():
         'plugin': 'xivo-aastra-3.3.1-SP4',
         'remote_state_sip_username': sip_username,
         'vendor': 'Aastra',
-        'version': '3.3.1.4322'
+        'version': '3.3.1.4322',
     }
 
     config = {
         'id': autoprov_id,
         'transient': True,
         'parent_ids': ['autoprov'],
-        'raw_config': {'sip_lines': {'1': {'username': sip_username}}}
+        'raw_config': {'sip_lines': {'1': {'username': sip_username}}},
     }
 
     provd.devices.create(device)

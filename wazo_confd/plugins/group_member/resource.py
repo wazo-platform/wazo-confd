@@ -14,7 +14,6 @@ from .schema import GroupUsersSchema, GroupExtensionsSchema
 
 
 class Extension:
-
     def __init__(self, exten=None, context=None):
         self.exten = exten
         self.context = context
@@ -45,7 +44,9 @@ class GroupMemberUserItem(GroupMemberItem):
         members = []
         try:
             for member_form in form['users']:
-                user = self.user_dao.get_by(uuid=member_form['user']['uuid'], tenant_uuids=tenant_uuids)
+                user = self.user_dao.get_by(
+                    uuid=member_form['user']['uuid'], tenant_uuids=tenant_uuids
+                )
                 member = self._find_or_create_member(group, user)
                 member.priority = member_form['priority']
                 members.append(member)

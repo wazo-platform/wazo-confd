@@ -3,11 +3,7 @@
 
 from unittest import TestCase
 
-from hamcrest import (
-    assert_that,
-    equal_to,
-    has_entry,
-)
+from hamcrest import assert_that, equal_to, has_entry
 
 from ..csv_ import output_csv
 
@@ -16,37 +12,29 @@ SOME_INPUT = {'headers': [], 'content': []}
 
 
 class TestCSVRepresentation(TestCase):
-
     def test_csv_empty(self):
         result = output_csv({'headers': [], 'content': []}, SOME_STATUS_CODE)
 
         assert_that(result.data, equal_to('\r\n'.encode('utf-8')))
 
     def test_csv_strings(self):
-        body = [
-            {'a': '1',
-             'b': '2',
-             'c': '3'},
-            {'a': '4',
-             'b': '5',
-             'c': '6'},
-        ]
-        result = output_csv({'headers': ['a', 'b', 'c'], 'content': body}, SOME_STATUS_CODE)
+        body = [{'a': '1', 'b': '2', 'c': '3'}, {'a': '4', 'b': '5', 'c': '6'}]
+        result = output_csv(
+            {'headers': ['a', 'b', 'c'], 'content': body}, SOME_STATUS_CODE
+        )
 
-        assert_that(result.data, equal_to('a,b,c\r\n1,2,3\r\n4,5,6\r\n'.encode('utf-8')))
+        assert_that(
+            result.data, equal_to('a,b,c\r\n1,2,3\r\n4,5,6\r\n'.encode('utf-8'))
+        )
 
     def test_csv_non_ascii(self):
-        body = [
-            {'a': 'é'},
-        ]
+        body = [{'a': 'é'}]
         result = output_csv({'headers': ['a'], 'content': body}, SOME_STATUS_CODE)
 
         assert_that(result.data, equal_to('a\r\né\r\n'.encode('utf-8')))
 
     def test_csv_integers(self):
-        body = [
-            {'a': 1},
-        ]
+        body = [{'a': 1}]
         result = output_csv({'headers': ['a'], 'content': body}, SOME_STATUS_CODE)
 
         assert_that(result.data, equal_to('a\r\n1\r\n'.encode('utf-8')))

@@ -17,7 +17,6 @@ from hamcrest import (
 
 
 class SysconfdMock:
-
     def __init__(self, url):
         self.base_url = url
 
@@ -38,11 +37,19 @@ class SysconfdMock:
     def assert_request(self, path, method='GET', query=None, body=None, json=None):
         results = self.requests_matching(path, method)
         if query:
-            assert_that(results, has_item(has_entry('query', has_entries(query))), pformat(results))
+            assert_that(
+                results,
+                has_item(has_entry('query', has_entries(query))),
+                pformat(results),
+            )
         if body:
-            assert_that(results, has_item(has_entry('body', equal_to(body))), pformat(results))
+            assert_that(
+                results, has_item(has_entry('body', equal_to(body))), pformat(results)
+            )
         if json:
-            assert_that(results, has_item(has_entry('json', equal_to(json))), pformat(results))
+            assert_that(
+                results, has_item(has_entry('json', equal_to(json))), pformat(results)
+            )
 
     def assert_no_request(self, path, method='GET', query=None, body=None, json=None):
         try:
@@ -62,12 +69,22 @@ class SysconfdMock:
         else:
             json_matcher = anything()
 
-        assert_that(results, not(has_item(all_of(query_matcher, body_matcher, json_matcher), pformat(results))))
+        assert_that(
+            results,
+            not (
+                has_item(
+                    all_of(query_matcher, body_matcher, json_matcher), pformat(results)
+                )
+            ),
+        )
 
     def requests_matching(self, path, method='GET'):
         regex = re.compile(path)
-        results = [request for request in self.requests()
-                   if regex.match(request['path']) and request['method'] == method]
+        results = [
+            request
+            for request in self.requests()
+            if regex.match(request['path']) and request['method'] == method
+        ]
 
         if not results:
             raise AssertionError("Request not found: {} {}".format(method, path))
@@ -75,9 +92,6 @@ class SysconfdMock:
 
     def set_response(self, response, content):
         url = "{}/_set_response".format(self.base_url)
-        content = {
-            'response': response,
-            'content': content,
-        }
+        content = {'response': response, 'content': content}
         response = requests.post(url, json=content)
         response.raise_for_status()

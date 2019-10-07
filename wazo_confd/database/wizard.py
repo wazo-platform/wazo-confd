@@ -20,7 +20,11 @@ def set_language(language):
     row.var_val = language
     Session.add(row)
 
-    row = Session.query(SCCPGeneralSettings).filter(SCCPGeneralSettings.option_name == 'language').first()
+    row = (
+        Session.query(SCCPGeneralSettings)
+        .filter(SCCPGeneralSettings.option_name == 'language')
+        .first()
+    )
     row.option_value = language
     Session.add(row)
 
@@ -47,19 +51,23 @@ def set_resolvconf(hostname, domain, nameservers):
 
 
 def set_netiface(interface, address, netmask, gateway):
-    Session.add(Netiface(ifname=interface,
-                         hwtypeid=1,
-                         networktype='voip',
-                         type='iface',
-                         family='inet',
-                         method='static',
-                         address=address,
-                         netmask=netmask,
-                         broadcast='',
-                         gateway=gateway,
-                         mtu=1500,
-                         options='',
-                         description='Wizard Configuration'))
+    Session.add(
+        Netiface(
+            ifname=interface,
+            hwtypeid=1,
+            networktype='voip',
+            type='iface',
+            family='inet',
+            method='static',
+            address=address,
+            netmask=netmask,
+            broadcast='',
+            gateway=gateway,
+            mtu=1500,
+            options='',
+            description='Wizard Configuration',
+        )
+    )
 
 
 def set_xivo_configured():
@@ -76,6 +84,11 @@ def create(wizard):
     network = wizard['network']
 
     set_language(wizard['language'])
-    set_netiface(network['interface'], network['ip_address'], network['netmask'], network['gateway'])
+    set_netiface(
+        network['interface'],
+        network['ip_address'],
+        network['netmask'],
+        network['gateway'],
+    )
     set_resolvconf(network['hostname'], network['domain'], network['nameservers'])
     set_timezone(wizard['timezone'])

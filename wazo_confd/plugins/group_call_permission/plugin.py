@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,5 +17,5 @@ class Plugin:
             GroupCallPermissionAssociation,
             '/groups/<int:group_id>/callpermissions/<int:call_permission_id>',
             endpoint='group_call_permissions',
-            resource_class_args=(service, group_dao, call_permission_dao)
+            resource_class_args=(service, group_dao, call_permission_dao),
         )

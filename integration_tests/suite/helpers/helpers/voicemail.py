@@ -1,4 +1,4 @@
-# Copyright 2017-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -26,9 +26,11 @@ def new_number_and_context(context):
 def find_available_number(context=config.CONTEXT, exclude=None):
     exclude = {int(n) for n in exclude} if exclude else set()
     response = confd.voicemails.get()
-    numbers = [int(v['number'])
-               for v in response.items
-               if v['context'] == context and v['number'].isdigit()]
+    numbers = [
+        int(v['number'])
+        for v in response.items
+        if v['context'] == context and v['number'].isdigit()
+    ]
 
     available_numbers = set(config.USER_EXTENSION_RANGE) - set(numbers) - exclude
     return str(available_numbers.pop())

@@ -1,23 +1,11 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -80,13 +68,25 @@ def test_associate_multiple_groups_to_schedule(group1, group2, schedule):
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
 @fixtures.schedule(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_group, sub_group, main_schedule, sub_schedule):
-    response = confd.groups(main_group['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.groups(main_group['id'])
+        .schedules(sub_schedule['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Group'))
 
-    response = confd.groups(sub_group['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.groups(sub_group['id'])
+        .schedules(main_schedule['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Schedule'))
 
-    response = confd.groups(main_group['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.groups(main_group['id'])
+        .schedules(sub_schedule['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -110,10 +110,18 @@ def test_dissociate_not_associated(group, schedule):
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
 @fixtures.schedule(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_group, sub_group, main_schedule, sub_schedule):
-    response = confd.groups(main_group['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.groups(main_group['id'])
+        .schedules(sub_schedule['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Group'))
 
-    response = confd.groups(sub_group['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.groups(sub_group['id'])
+        .schedules(main_schedule['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Schedule'))
 
 
@@ -122,10 +130,14 @@ def test_dissociate_multi_tenant(main_group, sub_group, main_schedule, sub_sched
 def test_get_group_relation(group, schedule):
     with a.group_schedule(group, schedule):
         response = confd.groups(group['id']).get()
-        assert_that(response.item, has_entries(
-            schedules=contains(has_entries(id=schedule['id'],
-                                           name=schedule['name']))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                schedules=contains(
+                    has_entries(id=schedule['id'], name=schedule['name'])
+                )
+            ),
+        )
 
 
 @fixtures.schedule()
@@ -133,9 +145,9 @@ def test_get_group_relation(group, schedule):
 def test_get_schedule_relation(schedule, group):
     with a.group_schedule(group, schedule):
         response = confd.schedules(schedule['id']).get()
-        assert_that(response.item, has_entries(
-            groups=contains(has_entries(id=group['id']))
-        ))
+        assert_that(
+            response.item, has_entries(groups=contains(has_entries(id=group['id'])))
+        )
 
 
 @fixtures.group()

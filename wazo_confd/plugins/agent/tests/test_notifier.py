@@ -15,7 +15,6 @@ from ..notifier import AgentNotifier
 
 
 class TestAgentNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -24,10 +23,7 @@ class TestAgentNotifier(unittest.TestCase):
         self.notifier = AgentNotifier(self.bus, self.sysconfd)
 
     def _expected_handlers(self, ipbx_command=None):
-        return {
-            'ipbx': [ipbx_command] if ipbx_command else [],
-            'agentbus': []
-        }
+        return {'ipbx': [ipbx_command] if ipbx_command else [], 'agentbus': []}
 
     def test_when_agent_created_then_call_expected_handlers(self):
         self.notifier.created(self.agent)

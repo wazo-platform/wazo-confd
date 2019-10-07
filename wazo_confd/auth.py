@@ -3,6 +3,4 @@
 
 from xivo.auth_verifier import required_acl
 
-__all__ = [
-    'required_acl',
-]
+__all__ = ['required_acl']

@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class QueueGeneralService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,7 +20,4 @@ class QueueGeneralService:
 
 
 def build_service():
-    return QueueGeneralService(
-        queue_general_dao,
-        build_notifier(),
-    )
+    return QueueGeneralService(queue_general_dao, build_notifier())

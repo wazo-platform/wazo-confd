@@ -13,10 +13,15 @@ from .validator import (
 
 
 class CallPickupMemberService:
-
-    def __init__(self, call_pickup_dao, notifier,
-                 validator_interceptor_group, validator_target_group,
-                 validator_interceptor_user, validator_target_user):
+    def __init__(
+        self,
+        call_pickup_dao,
+        notifier,
+        validator_interceptor_group,
+        validator_target_group,
+        validator_interceptor_user,
+        validator_target_user,
+    ):
         self.call_pickup_dao = call_pickup_dao
         self.notifier = notifier
         self.validator_interceptor_user = validator_interceptor_user

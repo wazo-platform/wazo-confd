@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class CallPickupGroupValidator(ValidatorAssociation):
-
     def validate(self, call_pickup, groups):
         self.validate_same_tenant(call_pickup, groups)
         self.validate_no_duplicate_group(groups)
@@ -26,19 +25,14 @@ class CallPickupGroupValidator(ValidatorAssociation):
 
 
 def build_validator_target_group():
-    return ValidationAssociation(
-        association=[CallPickupGroupValidator()],
-    )
+    return ValidationAssociation(association=[CallPickupGroupValidator()])
 
 
 def build_validator_interceptor_group():
-    return ValidationAssociation(
-        association=[CallPickupGroupValidator()],
-    )
+    return ValidationAssociation(association=[CallPickupGroupValidator()])
 
 
 class CallPickupUserValidator(ValidatorAssociation):
-
     def validate(self, call_pickup, users):
         self.validate_same_tenant(call_pickup, users)
         self.validate_no_duplicate_user(users)
@@ -57,12 +51,8 @@ class CallPickupUserValidator(ValidatorAssociation):
 
 
 def build_validator_target_user():
-    return ValidationAssociation(
-        association=[CallPickupUserValidator()],
-    )
+    return ValidationAssociation(association=[CallPickupUserValidator()])
 
 
 def build_validator_interceptor_user():
-    return ValidationAssociation(
-        association=[CallPickupUserValidator()],
-    )
+    return ValidationAssociation(association=[CallPickupUserValidator()])

@@ -11,7 +11,6 @@ from wazo_confd import bus, sysconfd
 
 
 class SipEndpointNotifier:
-
     def __init__(self, sysconfd, bus):
         self.sysconfd = sysconfd
         self.bus = bus

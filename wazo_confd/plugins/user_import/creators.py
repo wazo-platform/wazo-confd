@@ -24,7 +24,6 @@ from .wazo_user_schema import WazoUserSchema
 
 
 class Creator(metaclass=abc.ABCMeta):
-
     def __init__(self, service):
         self.service = service
 
@@ -85,12 +84,15 @@ class WazoUserCreator(Creator):
     def update_model(self, fields, model):
         model.update(fields)
         if 'email_address' in fields:
-            email = {'address': fields['email_address'], 'confirmed': True} if fields['email_address'] else None
+            email = (
+                {'address': fields['email_address'], 'confirmed': True}
+                if fields['email_address']
+                else None
+            )
             model['emails'] = [email] if email else []
 
 
 class ContextCreator(Creator):
-
     def find(self, fields, tenant_uuid):
         name = fields.get('context')
         if name:
@@ -127,7 +129,6 @@ class VoicemailCreator(Creator):
 
 
 class LineCreator(Creator):
-
     def find(self, fields, tenant_uuid):
         return None
 
@@ -162,7 +163,6 @@ class SipCreator(Creator):
 
 
 class SccpCreator(Creator):
-
     def find(self, fields, tenant_uuid):
         return None
 
@@ -193,7 +193,6 @@ class ExtensionCreator(Creator):
 
 
 class ExtensionIncallCreator(Creator):
-
     def find(self, fields, tenant_uuid):
         exten = fields.get('exten')
         context = fields.get('context')
@@ -215,19 +214,22 @@ class ExtensionIncallCreator(Creator):
         self.service.edit(resource)
 
     def extract_extension_fields(self, fields):
-        return {key: fields[key]
-                for key in ('exten', 'context')
-                if fields.get(key) is not None}
+        return {
+            key: fields[key]
+            for key in ('exten', 'context')
+            if fields.get(key) is not None
+        }
 
 
 class IncallCreator(Creator):
-
     def find(self, fields, tenant_uuid):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
             try:
-                extension = extension_dao.get_by(exten=exten, context=context, type='incall')
+                extension = extension_dao.get_by(
+                    exten=exten, context=context, type='incall'
+                )
                 return self.service.get(int(extension.typeval))
             except NotFoundError:
                 return None
@@ -235,24 +237,30 @@ class IncallCreator(Creator):
     def create(self, fields, tenant_uuid):
         fields = self.extract_extension_fields(fields)
         if fields:
-            incall = Incall(destination=Dialaction(action='none'), tenant_uuid=tenant_uuid)
+            incall = Incall(
+                destination=Dialaction(action='none'), tenant_uuid=tenant_uuid
+            )
             return self.service.create(incall)
 
     def update(self, fields, resource):
         pass
 
     def extract_extension_fields(self, fields):
-        return {key: fields[key]
-                for key in ('exten', 'context')
-                if fields.get(key) is not None}
+        return {
+            key: fields[key]
+            for key in ('exten', 'context')
+            if fields.get(key) is not None
+        }
 
 
 class CallPermissionCreator(Creator):
-
     def find(self, fields, tenant_uuid):
         names = fields.get('names')
         if names is not None:
-            return [self.service.get_by(tenant_uuids=[tenant_uuid], name=name) for name in names]
+            return [
+                self.service.get_by(tenant_uuids=[tenant_uuid], name=name)
+                for name in names
+            ]
 
     def create(self, fields, tenant_uuid):
         return self.find(fields, tenant_uuid)

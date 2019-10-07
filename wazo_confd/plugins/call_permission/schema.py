@@ -23,16 +23,10 @@ class CallPermissionSchema(BaseSchema):
     links = ListLink(Link('callpermissions'))
 
     outcalls = fields.Nested(
-        'OutcallSchema',
-        only=['id', 'name', 'links'],
-        many=True,
-        dump_only=True,
+        'OutcallSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
     groups = fields.Nested(
-        'GroupSchema',
-        only=['id', 'name', 'links'],
-        many=True,
-        dump_only=True,
+        'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
     users = fields.Nested(
         'UserSchema',

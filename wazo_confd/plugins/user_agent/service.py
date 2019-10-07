@@ -8,7 +8,6 @@ from wazo_confd.plugins.user_agent.validator import build_validator
 
 
 class UserAgentService:
-
     def __init__(self, dao, validator, notifier):
         self.dao = dao
         self.validator = validator
@@ -38,6 +37,4 @@ class UserAgentService:
 
 
 def build_service():
-    return UserAgentService(user_dao,
-                            build_validator(),
-                            build_notifier())
+    return UserAgentService(user_dao, build_validator(), build_notifier())

@@ -14,12 +14,11 @@ from wazo_confd.helpers.validator import (
 def build_validator():
     return ValidationGroup(
         create=[
-            UniqueField('name',
-                        lambda name: call_filter_dao.find_by(name=name),
-                        'CallFilter')
+            UniqueField(
+                'name', lambda name: call_filter_dao.find_by(name=name), 'CallFilter'
+            )
         ],
         edit=[
-            Optional('name',
-                     UniqueFieldChanged('name', call_filter_dao, 'CallFilter'))
-        ]
+            Optional('name', UniqueFieldChanged('name', call_filter_dao, 'CallFilter'))
+        ],
     )

@@ -10,7 +10,7 @@ from .resource import (
     UnallocatedDeviceList,
     UnallocatedDeviceItem,
     DeviceAutoprov,
-    DeviceSynchronize
+    DeviceSynchronize,
 )
 
 
@@ -30,35 +30,29 @@ class Plugin:
             DeviceItem,
             '/devices/<id>',
             endpoint='devices',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
-        api.add_resource(
-            DeviceList,
-            '/devices',
-            resource_class_args=(service,)
-        )
+        api.add_resource(DeviceList, '/devices', resource_class_args=(service,))
 
         api.add_resource(
-            DeviceAutoprov,
-            '/devices/<id>/autoprov',
-            resource_class_args=(service,)
+            DeviceAutoprov, '/devices/<id>/autoprov', resource_class_args=(service,)
         )
 
         api.add_resource(
             DeviceSynchronize,
             '/devices/<id>/synchronize',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
         api.add_resource(
             UnallocatedDeviceList,
             '/devices/unallocated',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
         api.add_resource(
             UnallocatedDeviceItem,
             '/devices/unallocated/<id>',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

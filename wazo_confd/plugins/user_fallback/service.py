@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class UserFallbackService:
-
     def __init__(self, notifier, validator):
         self.validator = validator
         self.notifier = notifier
@@ -21,5 +20,4 @@ class UserFallbackService:
 
 
 def build_service():
-    return UserFallbackService(build_notifier(),
-                               build_validator())
+    return UserFallbackService(build_notifier(), build_validator())

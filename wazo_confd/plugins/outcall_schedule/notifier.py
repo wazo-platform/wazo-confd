@@ -10,7 +10,6 @@ from wazo_confd import bus
 
 
 class OutcallScheduleNotifier:
-
     def __init__(self, bus):
         self._bus = bus
 

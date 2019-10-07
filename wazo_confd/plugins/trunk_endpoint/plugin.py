@@ -19,7 +19,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         self.load_sip(api)
@@ -33,19 +32,19 @@ class Plugin:
             TrunkEndpointAssociationSip,
             '/trunks/<int:trunk_id>/endpoints/sip/<int:endpoint_id>',
             endpoint='trunk_endpoint_sip',
-            resource_class_args=(service, trunk_dao, endpoint_sip_dao)
+            resource_class_args=(service, trunk_dao, endpoint_sip_dao),
         )
 
         api.add_resource(
             TrunkEndpointGetSip,
             '/trunks/<int:trunk_id>/endpoints/sip',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
         api.add_resource(
             EndpointTrunkGetSip,
             '/endpoints/sip/<int:endpoint_id>/trunks',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
     def load_custom(self, api):
@@ -55,19 +54,19 @@ class Plugin:
             TrunkEndpointAssociationCustom,
             '/trunks/<int:trunk_id>/endpoints/custom/<int:endpoint_id>',
             endpoint='trunk_endpoint_custom',
-            resource_class_args=(service, trunk_dao, endpoint_custom_dao)
+            resource_class_args=(service, trunk_dao, endpoint_custom_dao),
         )
 
         api.add_resource(
             TrunkEndpointGetCustom,
             '/trunks/<int:trunk_id>/endpoints/custom',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
         api.add_resource(
             EndpointTrunkGetCustom,
             '/endpoints/custom/<int:endpoint_id>/trunks',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
 
     def load_iax(self, api):
@@ -77,7 +76,7 @@ class Plugin:
             TrunkEndpointAssociationIAX,
             '/trunks/<int:trunk_id>/endpoints/iax/<int:endpoint_id>',
             endpoint='trunk_endpoint_iax',
-            resource_class_args=(service, trunk_dao, endpoint_iax_dao)
+            resource_class_args=(service, trunk_dao, endpoint_iax_dao),
         )
 
     def build_sip_service(self):

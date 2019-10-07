@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class DeviceDao:
-
     def __init__(self, client):
         self.client = client
 
@@ -60,7 +59,9 @@ class DeviceDao:
 
     def new_device(self, tenant_uuid=None):
         config_id = self.configs.autocreate()['id']
-        device_id = self.devices.create({'config': config_id}, tenant_uuid=tenant_uuid)['id']
+        device_id = self.devices.create({'config': config_id}, tenant_uuid=tenant_uuid)[
+            'id'
+        ]
         return self.get(device_id, tenant_uuid=tenant_uuid)
 
     def create_or_update(self, device, tenant_uuid=None):

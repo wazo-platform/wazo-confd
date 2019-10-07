@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,12 +17,12 @@ class Plugin:
             GroupMemberUserItem,
             '/groups/<int:group_id>/members/users',
             endpoint='group_member_users',
-            resource_class_args=(service, group_dao, user_dao)
+            resource_class_args=(service, group_dao, user_dao),
         )
 
         api.add_resource(
             GroupMemberExtensionItem,
             '/groups/<int:group_id>/members/extensions',
             endpoint='group_member_extensions',
-            resource_class_args=(service, group_dao)
+            resource_class_args=(service, group_dao),
         )

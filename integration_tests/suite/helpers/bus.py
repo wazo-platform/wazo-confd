@@ -5,7 +5,6 @@ from xivo_test_helpers import bus
 
 
 class BusClientWrapper:
-
     def __init__(self):
         self.host = None
         self.port = None

@@ -1,22 +1,11 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-)
+from hamcrest import assert_that, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -114,13 +103,25 @@ def test_associate_when_register_sip(trunk, custom, register):
 @fixtures.custom(wazo_tenant=MAIN_TENANT)
 @fixtures.custom(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
-    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(main_trunk['id'])
+        .endpoints.custom(sub_custom['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Trunk'))
 
-    response = confd.trunks(sub_trunk['id']).endpoints.custom(main_custom['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(sub_trunk['id'])
+        .endpoints.custom(main_custom['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('CustomEndpoint'))
 
-    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.trunks(main_trunk['id'])
+        .endpoints.custom(sub_custom['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -132,10 +133,8 @@ def test_get_endpoint_associated_to_trunk(trunk, custom):
         assert_that(
             response.item,
             has_entries(
-                trunk_id=trunk['id'],
-                endpoint='custom',
-                endpoint_id=custom['id'],
-            )
+                trunk_id=trunk['id'], endpoint='custom', endpoint_id=custom['id']
+            ),
         )
 
 
@@ -147,10 +146,8 @@ def test_get_trunk_associated_to_endpoint(trunk, custom):
         assert_that(
             response.item,
             has_entries(
-                trunk_id=trunk['id'],
-                endpoint='custom',
-                endpoint_id=custom['id'],
-            )
+                trunk_id=trunk['id'], endpoint='custom', endpoint_id=custom['id']
+            ),
         )
 
 
@@ -180,10 +177,18 @@ def test_dissociate_not_associated(trunk, custom):
 @fixtures.custom(wazo_tenant=MAIN_TENANT)
 @fixtures.custom(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
-    response = confd.trunks(main_trunk['id']).endpoints.custom(sub_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(main_trunk['id'])
+        .endpoints.custom(sub_custom['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Trunk'))
 
-    response = confd.trunks(sub_trunk['id']).endpoints.custom(main_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(sub_trunk['id'])
+        .endpoints.custom(main_custom['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('CustomEndpoint'))
 
 
@@ -196,10 +201,9 @@ def test_get_endpoint_custom_relation(trunk, custom):
             response.item,
             has_entries(
                 endpoint_custom=has_entries(
-                    id=custom['id'],
-                    interface=custom['interface']
+                    id=custom['id'], interface=custom['interface']
                 )
-            )
+            ),
         )
 
 
@@ -208,12 +212,7 @@ def test_get_endpoint_custom_relation(trunk, custom):
 def test_get_trunk_relation(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom):
         response = confd.endpoints.custom(custom['id']).get()
-        assert_that(
-            response.item,
-            has_entries(
-                trunk=has_entries(id=trunk['id'])
-            )
-        )
+        assert_that(response.item, has_entries(trunk=has_entries(id=trunk['id'])))
 
 
 @fixtures.trunk()

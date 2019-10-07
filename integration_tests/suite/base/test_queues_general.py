@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -28,8 +28,7 @@ def test_get():
 
 
 def test_edit_queue_general():
-    parameters = {'options': {'nat': 'toto',
-                              'username': 'Bob'}}
+    parameters = {'options': {'nat': 'toto', 'username': 'Bob'}}
 
     response = confd.asterisk.queues.general.put(**parameters)
     response.assert_updated()

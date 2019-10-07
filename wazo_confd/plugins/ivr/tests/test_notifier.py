@@ -4,24 +4,16 @@
 import unittest
 
 from mock import Mock
-from xivo_bus.resources.ivr.event import (
-    CreateIvrEvent,
-    DeleteIvrEvent,
-    EditIvrEvent,
-)
+from xivo_bus.resources.ivr.event import CreateIvrEvent, DeleteIvrEvent, EditIvrEvent
 from xivo_dao.alchemy.ivr import IVR
 
 from ..notifier import IvrNotifier
 
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestIvrNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

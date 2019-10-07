@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidationAssociation, ValidatorAssocia
 
 
 class SwitchboardMemberUserValidator(ValidatorAssociation):
-
     def validate(self, switchboard, users):
         self.validate_same_tenant(switchboard, users)
 
@@ -21,6 +20,4 @@ class SwitchboardMemberUserValidator(ValidatorAssociation):
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[SwitchboardMemberUserValidator()]
-    )
+    return ValidationAssociation(association=[SwitchboardMemberUserValidator()])

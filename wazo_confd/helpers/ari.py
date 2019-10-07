@@ -17,8 +17,9 @@ class AsteriskUnauthorized(HTTPError):
 
 
 class Client:
-
-    def __init__(self, host='localhost', port=5039, https=False, username=None, password=None):
+    def __init__(
+        self, host='localhost', port=5039, https=False, username=None, password=None
+    ):
         self._host = host
         self._port = port
         self._https = https
@@ -27,7 +28,7 @@ class Client:
         self._base_url = '{scheme}://{host}{port}/ari'.format(
             scheme='https' if self._https else 'http',
             host=self._host,
-            port=':{}'.format(self._port) if self._port else ''
+            port=':{}'.format(self._port) if self._port else '',
         )
         self._params = {'api_key': '{}:{}'.format(username, password)}
 
@@ -39,7 +40,9 @@ class Client:
             raise AsteriskUnreachable(e)
 
         if response.status_code == 401:
-            raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
+            raise AsteriskUnauthorized(
+                'Asterisk unauthorized error {}'.format(self._params)
+            )
 
         response.raise_for_status()
         results = []
@@ -54,7 +57,9 @@ class Client:
         result['formats'] = []
 
         for format_ in sound['formats']:
-            if format_['language'] and not re.match(LANGUAGE_REGEX, format_['language']):
+            if format_['language'] and not re.match(
+                LANGUAGE_REGEX, format_['language']
+            ):
                 continue
             result['formats'].append(format_)
 
@@ -62,14 +67,18 @@ class Client:
 
     def get_sound(self, sound_id, params=None):
         params = params or {}
-        url = '{base_url}/sounds/{sound_id}'.format(base_url=self._base_url, sound_id=sound_id)
+        url = '{base_url}/sounds/{sound_id}'.format(
+            base_url=self._base_url, sound_id=sound_id
+        )
         try:
             response = requests.get(url, params=self._params)
         except RequestException as e:
             raise AsteriskUnreachable(e)
 
         if response.status_code == 401:
-            raise AsteriskUnauthorized('Asterisk unauthorized error {}'.format(self._params))
+            raise AsteriskUnauthorized(
+                'Asterisk unauthorized error {}'.format(self._params)
+            )
 
         response.raise_for_status()
         result = self._filter_sound(response.json(), params)
@@ -97,7 +106,13 @@ class Client:
         return sound_languages
 
     def _extract_sounds_languages(self, sounds):
-        return set(format_['language'] for sound in sounds for format_ in sound['formats'])
+        return set(
+            format_['language'] for sound in sounds for format_ in sound['formats']
+        )
 
     def _remove_non_standard_tag(self, languages):
-        return [language for language in languages if re.match(LANGUAGE_REGEX, language['tag'])]
+        return [
+            language
+            for language in languages
+            if re.match(LANGUAGE_REGEX, language['tag'])
+        ]

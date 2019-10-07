@@ -10,11 +10,11 @@ def line_fellowship(endpoint_type='sip', registrar=None, wazo_tenant=None):
     context = h.context.generate_context(wazo_tenant=wazo_tenant)
     user = h.user.generate_user(wazo_tenant=wazo_tenant, context=context['name'])
     line = h.line.generate_line(
-        wazo_tenant=wazo_tenant,
-        context=context['name'],
-        registrar=registrar,
+        wazo_tenant=wazo_tenant, context=context['name'], registrar=registrar
     )
-    extension = h.extension.generate_extension(wazo_tenant=wazo_tenant, context=context['name'])
+    extension = h.extension.generate_extension(
+        wazo_tenant=wazo_tenant, context=context['name']
+    )
 
     if endpoint_type == 'sip':
         endpoint = h.endpoint_sip.generate_sip(wazo_tenant=wazo_tenant)

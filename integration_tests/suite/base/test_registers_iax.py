@@ -1,13 +1,7 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    empty,
-    has_entries,
-    none,
-    not_,
-)
+from hamcrest import assert_that, empty, has_entries, none, not_
 
 from . import confd
 from ..helpers import fixtures
@@ -82,27 +76,27 @@ def error_checks(url):
 @fixtures.register_iax()
 def test_get(register_iax):
     response = confd.registers.iax(register_iax['id']).get()
-    assert_that(response.item, has_entries(
-        id=register_iax['id'],
-        auth_username=none(),
-        auth_password=none(),
-        remote_host=register_iax['remote_host'],
-        remote_port=none(),
-        callback_extension=none(),
-        callback_context=none(),
-        enabled=True,
-        trunk=none(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=register_iax['id'],
+            auth_username=none(),
+            auth_password=none(),
+            remote_host=register_iax['remote_host'],
+            remote_port=none(),
+            callback_extension=none(),
+            callback_context=none(),
+            enabled=True,
+            trunk=none(),
+        ),
+    )
 
 
 def test_create_minimal_parameters():
     response = confd.registers.iax.post(remote_host='remote-host')
     response.assert_created('register_iax', location='registers/iax')
 
-    assert_that(response.item, has_entries(
-        id=not_(empty()),
-        remote_host='remote-host',
-    ))
+    assert_that(response.item, has_entries(id=not_(empty()), remote_host='remote-host'))
 
 
 def test_create_all_parameters():
@@ -113,7 +107,7 @@ def test_create_all_parameters():
         remote_port=1234,
         callback_extension='callback-extension',
         callback_context='callback-context',
-        enabled=True
+        enabled=True,
     )
     response = confd.registers.iax.post(**parameters)
 
@@ -138,7 +132,7 @@ def test_edit_all_parameters(register_iax):
         remote_port=1234,
         callback_extension='callback-extension',
         callback_context='callback-context',
-        enabled=False
+        enabled=False,
     )
 
     response = confd.registers.iax(register_iax['id']).put(**parameters)
@@ -156,6 +150,12 @@ def test_delete(register_iax):
 
 @fixtures.register_iax()
 def test_bus_events(register_iax):
-    yield s.check_bus_event, 'config.register.iax.created', confd.registers.iax.post, {'remote_host': 'bus-event'}
-    yield s.check_bus_event, 'config.register.iax.edited', confd.registers.iax(register_iax['id']).put
-    yield s.check_bus_event, 'config.register.iax.deleted', confd.registers.iax(register_iax['id']).delete
+    yield s.check_bus_event, 'config.register.iax.created', confd.registers.iax.post, {
+        'remote_host': 'bus-event'
+    }
+    yield s.check_bus_event, 'config.register.iax.edited', confd.registers.iax(
+        register_iax['id']
+    ).put
+    yield s.check_bus_event, 'config.register.iax.deleted', confd.registers.iax(
+        register_iax['id']
+    ).delete

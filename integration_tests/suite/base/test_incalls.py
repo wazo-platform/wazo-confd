@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -15,19 +15,9 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.helpers.destination import (
-    invalid_destinations,
-    valid_destinations,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -55,7 +45,9 @@ def test_put_errors(incall):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
@@ -94,7 +86,8 @@ def check_search(url, incall, hidden, field, term):
         all_of(
             has_item(has_entry(field, incall[field])),
             is_not(has_item(has_entry(field, hidden[field]))),
-        ))
+        ),
+    )
 
     response = url.get(**{field: incall[field]})
     assert_that(
@@ -102,7 +95,7 @@ def check_search(url, incall, hidden, field, term):
         all_of(
             has_item(has_entry('id', incall['id'])),
             is_not(has_item(has_entry('id', hidden['id']))),
-        )
+        ),
     )
 
 
@@ -134,15 +127,18 @@ def test_sorting_offset_limit(incall1, incall2):
 @fixtures.incall()
 def test_get(incall):
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        id=incall['id'],
-        preprocess_subroutine=incall['preprocess_subroutine'],
-        description=incall['description'],
-        caller_id_mode=incall['caller_id_mode'],
-        caller_id_name=incall['caller_id_name'],
-        destination=incall['destination'],
-        extensions=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=incall['id'],
+            preprocess_subroutine=incall['preprocess_subroutine'],
+            description=incall['description'],
+            caller_id_mode=incall['caller_id_mode'],
+            caller_id_name=incall['caller_id_name'],
+            destination=incall['destination'],
+            extensions=empty(),
+        ),
+    )
 
 
 def test_create_minimal_parameters():
@@ -163,14 +159,17 @@ def test_create_all_parameters():
     )
     response.assert_created('incalls')
 
-    assert_that(response.item, has_entries(
-        preprocess_subroutine='default',
-        description='description',
-        caller_id_mode='prepend',
-        caller_id_name='name_',
-        destination={'type': 'none'},
-        tenant_uuid=SUB_TENANT,
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            preprocess_subroutine='default',
+            description='description',
+            caller_id_mode='prepend',
+            caller_id_name='name_',
+            destination={'type': 'none'},
+            tenant_uuid=SUB_TENANT,
+        ),
+    )
 
 
 @fixtures.incall()
@@ -260,113 +259,156 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.group()
 def test_get_group_destination_relation(group):
-    incall = confd.incalls.post(destination={'type': 'group',
-                                             'group_id': group['id']}).item
+    incall = confd.incalls.post(
+        destination={'type': 'group', 'group_id': group['id']}
+    ).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(group_id=group['id'], group_name=group['name'])
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(group_id=group['id'], group_name=group['name'])
+        ),
+    )
 
 
 @fixtures.user()
 def test_get_user_destination_relation(user):
-    incall = confd.incalls.post(destination={'type': 'user',
-                                             'user_id': user['id']}).item
+    incall = confd.incalls.post(
+        destination={'type': 'user', 'user_id': user['id']}
+    ).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(
-            user_id=user['id'],
-            user_firstname=user['firstname'],
-            user_lastname=user['lastname'],
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                user_id=user['id'],
+                user_firstname=user['firstname'],
+                user_lastname=user['lastname'],
+            )
+        ),
+    )
 
 
 @fixtures.ivr()
 def test_get_ivr_destination_relation(ivr):
-    incall = confd.incalls.post(destination={'type': 'ivr',
-                                             'ivr_id': ivr['id']}).item
+    incall = confd.incalls.post(destination={'type': 'ivr', 'ivr_id': ivr['id']}).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(ivr_id=ivr['id'], ivr_name=ivr['name'])
-    ))
+    assert_that(
+        response.item,
+        has_entries(destination=has_entries(ivr_id=ivr['id'], ivr_name=ivr['name'])),
+    )
 
 
 @fixtures.conference()
 def test_get_conference_destination_relation(conference):
-    incall = confd.incalls.post(destination={'type': 'conference',
-                                             'conference_id': conference['id']}).item
+    incall = confd.incalls.post(
+        destination={'type': 'conference', 'conference_id': conference['id']}
+    ).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(conference_id=conference['id'], conference_name=conference['name'])
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                conference_id=conference['id'], conference_name=conference['name']
+            )
+        ),
+    )
 
 
 @fixtures.switchboard()
 def test_get_switchboard_destination_relation(switchboard):
-    incall = confd.incalls.post(destination={'type': 'switchboard',
-                                             'switchboard_uuid': switchboard['uuid']}).item
+    incall = confd.incalls.post(
+        destination={'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']}
+    ).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(switchboard_uuid=switchboard['uuid'], switchboard_name=switchboard['name'])
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                switchboard_uuid=switchboard['uuid'],
+                switchboard_name=switchboard['name'],
+            )
+        ),
+    )
 
 
 @fixtures.voicemail()
 def test_get_voicemail_destination_relation(voicemail):
-    incall = confd.incalls.post(destination={'type': 'voicemail',
-                                             'voicemail_id': voicemail['id']}).item
+    incall = confd.incalls.post(
+        destination={'type': 'voicemail', 'voicemail_id': voicemail['id']}
+    ).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(voicemail_id=voicemail['id'], voicemail_name=voicemail['name'])
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                voicemail_id=voicemail['id'], voicemail_name=voicemail['name']
+            )
+        ),
+    )
 
 
 @fixtures.queue()
 def test_get_queue_destination_relation(queue):
-    incall = confd.incalls.post(destination={'type': 'queue', 'queue_id': queue['id']}).item
+    incall = confd.incalls.post(
+        destination={'type': 'queue', 'queue_id': queue['id']}
+    ).item
 
     response = confd.incalls(incall['id']).get()
-    assert_that(response.item, has_entries(
-        destination=has_entries(
-            queue_id=queue['id'],
-            queue_label=queue['label'],
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(queue_id=queue['id'], queue_label=queue['label'])
+        ),
+    )
 
 
 @fixtures.group()
 def test_get_incalls_relation_when_group_destination(group):
-    incall1 = confd.incalls.post(destination={'type': 'group', 'group_id': group['id']}).item
-    incall2 = confd.incalls.post(destination={'type': 'group', 'group_id': group['id']}).item
+    incall1 = confd.incalls.post(
+        destination={'type': 'group', 'group_id': group['id']}
+    ).item
+    incall2 = confd.incalls.post(
+        destination={'type': 'group', 'group_id': group['id']}
+    ).item
 
     response = confd.groups(group['id']).get()
-    assert_that(response.item, has_entries(
-        incalls=contains_inanyorder(
-            has_entries(id=incall1['id'], extensions=incall1['extensions']),
-            has_entries(id=incall2['id'], extensions=incall2['extensions']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            incalls=contains_inanyorder(
+                has_entries(id=incall1['id'], extensions=incall1['extensions']),
+                has_entries(id=incall2['id'], extensions=incall2['extensions']),
+            )
+        ),
+    )
 
 
 @fixtures.user()
 def test_get_incalls_relation_when_user_destination(user):
-    incall1 = confd.incalls.post(destination={'type': 'user', 'user_id': user['id']}).item
-    incall2 = confd.incalls.post(destination={'type': 'user', 'user_id': user['id']}).item
+    incall1 = confd.incalls.post(
+        destination={'type': 'user', 'user_id': user['id']}
+    ).item
+    incall2 = confd.incalls.post(
+        destination={'type': 'user', 'user_id': user['id']}
+    ).item
 
     response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(
-        incalls=contains_inanyorder(
-            has_entries(id=incall1['id'], extensions=incall1['extensions']),
-            has_entries(id=incall2['id'], extensions=incall2['extensions']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            incalls=contains_inanyorder(
+                has_entries(id=incall1['id'], extensions=incall1['extensions']),
+                has_entries(id=incall2['id'], extensions=incall2['extensions']),
+            )
+        ),
+    )
 
 
 @fixtures.ivr()
@@ -375,37 +417,54 @@ def test_get_incalls_relation_when_ivr_destination(ivr):
     incall2 = confd.incalls.post(destination={'type': 'ivr', 'ivr_id': ivr['id']}).item
 
     response = confd.ivr(ivr['id']).get()
-    assert_that(response.item, has_entries(
-        incalls=contains_inanyorder(
-            has_entries(id=incall1['id'], extensions=incall1['extensions']),
-            has_entries(id=incall2['id'], extensions=incall2['extensions']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            incalls=contains_inanyorder(
+                has_entries(id=incall1['id'], extensions=incall1['extensions']),
+                has_entries(id=incall2['id'], extensions=incall2['extensions']),
+            )
+        ),
+    )
 
 
 @fixtures.conference()
 def test_get_incalls_relation_when_conference_destination(conference):
-    incall1 = confd.incalls.post(destination={'type': 'conference', 'conference_id': conference['id']}).item
-    incall2 = confd.incalls.post(destination={'type': 'conference', 'conference_id': conference['id']}).item
+    incall1 = confd.incalls.post(
+        destination={'type': 'conference', 'conference_id': conference['id']}
+    ).item
+    incall2 = confd.incalls.post(
+        destination={'type': 'conference', 'conference_id': conference['id']}
+    ).item
 
     response = confd.conferences(conference['id']).get()
-    assert_that(response.item, has_entries(
-        incalls=contains_inanyorder(
-            has_entries(id=incall1['id'], extensions=incall1['extensions']),
-            has_entries(id=incall2['id'], extensions=incall2['extensions']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            incalls=contains_inanyorder(
+                has_entries(id=incall1['id'], extensions=incall1['extensions']),
+                has_entries(id=incall2['id'], extensions=incall2['extensions']),
+            )
+        ),
+    )
 
 
 @fixtures.switchboard()
 def test_get_incalls_relation_when_switchboard_destination(switchboard):
-    incall1 = confd.incalls.post(destination={'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']}).item
-    incall2 = confd.incalls.post(destination={'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']}).item
+    incall1 = confd.incalls.post(
+        destination={'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']}
+    ).item
+    incall2 = confd.incalls.post(
+        destination={'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']}
+    ).item
 
     response = confd.switchboards(switchboard['uuid']).get()
-    assert_that(response.item, has_entries(
-        incalls=contains_inanyorder(
-            has_entries(id=incall1['id'], extensions=incall1['extensions']),
-            has_entries(id=incall2['id'], extensions=incall2['extensions']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            incalls=contains_inanyorder(
+                has_entries(id=incall1['id'], extensions=incall1['extensions']),
+                has_entries(id=incall2['id'], extensions=incall2['extensions']),
+            )
+        ),
+    )

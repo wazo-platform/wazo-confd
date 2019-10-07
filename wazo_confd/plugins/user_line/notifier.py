@@ -10,11 +10,7 @@ from wazo_confd import bus, sysconfd
 from wazo_confd.plugins.line.schema import LineSchema
 from wazo_confd.plugins.user.schema import UserSchema
 
-USER_FIELDS = [
-    'id',
-    'uuid',
-    'tenant_uuid',
-]
+USER_FIELDS = ['id', 'uuid', 'tenant_uuid']
 
 LINE_FIELDS = [
     'id',
@@ -26,7 +22,6 @@ LINE_FIELDS = [
 
 
 class UserLineNotifier:
-
     def __init__(self, bus, sysconfd):
         self._bus = bus
         self._sysconfd = sysconfd

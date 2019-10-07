@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -19,11 +18,11 @@ class Plugin:
             '/users/<int:user_id>/agents/<int:agent_id>',
             '/users/<uuid:user_id>/agents/<int:agent_id>',
             endpoint='user_agents',
-            resource_class_args=(service, user_dao, agent_dao)
+            resource_class_args=(service, user_dao, agent_dao),
         )
         api.add_resource(
             UserAgentList,
             '/users/<int:user_id>/agents',
             '/users/<uuid:user_id>/agents',
-            resource_class_args=(service, user_dao)
+            resource_class_args=(service, user_dao),
         )

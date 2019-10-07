@@ -16,15 +16,8 @@ from hamcrest import (
 )
 
 from . import BaseIntegrationTest, confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 NOT_FOUND_UUID = 'uuid-not-found'
 
@@ -96,10 +89,7 @@ def unique_error_checks(url, moh):
 @fixtures.moh(name='hidden', label='hidden')
 def test_search(visible, hidden):
     url = confd.moh
-    searches = {
-        'name': 'visible',
-        'label': 'hello',
-    }
+    searches = {'name': 'visible', 'label': 'hello'}
 
     for field, term in searches.items():
         yield check_search, url, visible, hidden, field, term
@@ -131,36 +121,30 @@ def test_sorting_offset_limit(moh1, moh2):
 @fixtures.moh(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.moh.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.moh.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.moh.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.moh()
 def test_get(moh):
     response = confd.moh(moh['uuid']).get()
-    assert_that(response.item, has_entries(
-        uuid=moh['uuid'],
-        name=moh['name'],
-        label=moh['label'],
-        mode=moh['mode'],
-        application=moh['application'],
-        sort=moh['sort'],
-        files=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=moh['uuid'],
+            name=moh['name'],
+            label=moh['label'],
+            mode=moh['mode'],
+            application=moh['application'],
+            sort=moh['sort'],
+            files=empty(),
+        ),
+    )
 
 
 @fixtures.moh(wazo_tenant=MAIN_TENANT)
@@ -177,10 +161,9 @@ def test_create_minimal_parameters():
     response = confd.moh.post(name='moh1', mode='files')
     response.assert_created('moh')
 
-    assert_that(response.item, has_entries(
-        uuid=is_not(empty()),
-        tenant_uuid=MAIN_TENANT,
-    ))
+    assert_that(
+        response.item, has_entries(uuid=is_not(empty()), tenant_uuid=MAIN_TENANT)
+    )
 
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
@@ -195,15 +178,18 @@ def test_create_all_parameters():
     )
     response.assert_created('moh')
 
-    assert_that(response.item, has_entries(
-        tenant_uuid=MAIN_TENANT,
-        name='moh1',
-        label='MOH 1',
-        mode='custom',
-        application='/usr/bin/mpg123 xxx',
-        sort='alphabetical',
-        files=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            tenant_uuid=MAIN_TENANT,
+            name='moh1',
+            label='MOH 1',
+            mode='custom',
+            application='/usr/bin/mpg123 xxx',
+            sort='alphabetical',
+            files=empty(),
+        ),
+    )
 
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
@@ -235,11 +221,7 @@ def test_edit_minimal_parameters(moh):
 
 @fixtures.moh()
 def test_edit_all_parameters(moh):
-    parameters = {
-        'label': 'Foo',
-        'application': '/bin/rm -rf /',
-        'sort': 'random',
-    }
+    parameters = {'label': 'Foo', 'application': '/bin/rm -rf /', 'sort': 'random'}
 
     response = confd.moh(moh['uuid']).put(**parameters)
     response.assert_updated()
@@ -302,7 +284,11 @@ def test_add_update_delete_filename(moh):
     client = _new_moh_file_client()
 
     # add a new file
-    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content is not checked')
+    response = (
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content='content is not checked')
+    )
     response.assert_status(204)
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get()
@@ -313,7 +299,9 @@ def test_add_update_delete_filename(moh):
     assert_that(response.item, has_entries(files=contains({'name': 'foo.wav'})))
 
     # update/overwrite the file
-    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='some new content')
+    response = (
+        client.url.moh(moh['uuid']).files('foo.wav').put(content='some new content')
+    )
     response.assert_status(204)
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get()
@@ -331,37 +319,53 @@ def test_add_update_delete_filename(moh):
 def test_add_update_delete_filename_multi_tenant(moh):
     client = _new_moh_file_client()
 
-    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content', wazo_tenant=SUB_TENANT)
+    response = (
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content='content', wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found(resource='MOH'))
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='MOH'))
 
-    response = client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=SUB_TENANT)
+    response = (
+        client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found(resource='MOH'))
 
     # valid tenant
-    response = client.url.moh(moh['uuid']).files('foo.wav').put(content='content', wazo_tenant=MAIN_TENANT)
+    response = (
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content='content', wazo_tenant=MAIN_TENANT)
+    )
     response.assert_status(204)
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=MAIN_TENANT)
     assert_that(response.raw, equal_to('content'))
 
-    response = client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=MAIN_TENANT)
+    response = (
+        client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_deleted()
 
 
 @fixtures.moh()
 def test_add_filename_errors(moh):
     client = _new_moh_file_client()
-    filenames = [
-        '.foo.wav',
-        'foo/bar.wav',
-        '../bar.wav',
-    ]
+    filenames = ['.foo.wav', 'foo/bar.wav', '../bar.wav']
     for filename in filenames:
-        response = client.url.moh(moh['uuid']).files(filename).put(content='content is not checked')
-        assert_that(response.status, equal_to(404), 'unexpected status for MOH filename {}'.format(filename))
+        response = (
+            client.url.moh(moh['uuid'])
+            .files(filename)
+            .put(content='content is not checked')
+        )
+        assert_that(
+            response.status,
+            equal_to(404),
+            'unexpected status for MOH filename {}'.format(filename),
+        )
 
 
 def _new_moh_file_client():
@@ -371,13 +375,19 @@ def _new_moh_file_client():
         return data['content']
 
     return BaseIntegrationTest.new_client(
-        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": "valid-token-multitenant"},
+        headers={
+            "Content-Type": "application/octet-stream",
+            "X-Auth-Token": "valid-token-multitenant",
+        },
         encoder=encoder,
     )
 
 
 @fixtures.moh()
 def test_bus_events(moh):
-    yield s.check_bus_event, 'config.moh.created', confd.moh.post, {'name': 'bus_event', 'mode': 'files'}
+    yield s.check_bus_event, 'config.moh.created', confd.moh.post, {
+        'name': 'bus_event',
+        'mode': 'files',
+    }
     yield s.check_bus_event, 'config.moh.edited', confd.moh(moh['uuid']).put
     yield s.check_bus_event, 'config.moh.deleted', confd.moh(moh['uuid']).delete

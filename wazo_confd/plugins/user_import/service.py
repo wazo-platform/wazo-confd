@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 
 class ImportService:
-
     def __init__(self, entry_creator, entry_associator, entry_updater):
         self.entry_creator = entry_creator
         self.entry_associator = entry_associator
@@ -57,7 +56,6 @@ class ImportService:
 
 
 class ExportService:
-
     def __init__(self, user_export_dao, auth_client):
         self._user_export_dao = user_export_dao
         self._auth_client = auth_client

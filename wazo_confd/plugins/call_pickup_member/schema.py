@@ -1,10 +1,7 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import (
-    fields,
-    EXCLUDE,
-)
+from marshmallow import fields, EXCLUDE
 
 from wazo_confd.helpers.mallow import BaseSchema
 
@@ -15,8 +12,7 @@ class CallPickupInterceptorGroupSchema(BaseSchema):
 
 class CallPickupInterceptorGroupsSchema(BaseSchema):
     groups = fields.Nested(
-        CallPickupInterceptorGroupSchema, many=True, required=True,
-        unknown=EXCLUDE
+        CallPickupInterceptorGroupSchema, many=True, required=True, unknown=EXCLUDE
     )
 
 
@@ -26,8 +22,7 @@ class CallPickupTargetGroupSchema(BaseSchema):
 
 class CallPickupTargetGroupsSchema(BaseSchema):
     groups = fields.Nested(
-        CallPickupTargetGroupSchema, many=True, required=True,
-        unknown=EXCLUDE
+        CallPickupTargetGroupSchema, many=True, required=True, unknown=EXCLUDE
     )
 
 
@@ -37,8 +32,7 @@ class CallPickupInterceptorUserSchema(BaseSchema):
 
 class CallPickupInterceptorUsersSchema(BaseSchema):
     users = fields.Nested(
-        CallPickupInterceptorUserSchema,
-        many=True, required=True, unknown=EXCLUDE
+        CallPickupInterceptorUserSchema, many=True, required=True, unknown=EXCLUDE
     )
 
 
@@ -48,6 +42,5 @@ class CallPickupTargetUserSchema(BaseSchema):
 
 class CallPickupTargetUsersSchema(BaseSchema):
     users = fields.Nested(
-        CallPickupTargetUserSchema,
-        many=True, required=True, unknown=EXCLUDE
+        CallPickupTargetUserSchema, many=True, required=True, unknown=EXCLUDE
     )

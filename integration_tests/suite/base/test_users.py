@@ -17,15 +17,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -137,13 +130,17 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'caller_id', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id', []
     yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', 123
-    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', s.random_string(81)
+    yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', s.random_string(
+        81
+    )
     yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', {}
     yield s.check_bogus_field_returns_error, url, 'outgoing_caller_id', []
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 123
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', 'invalid_regex'
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', '123abcd'
-    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', s.random_string(81)
+    yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', s.random_string(
+        81
+    )
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', {}
     yield s.check_bogus_field_returns_error, url, 'mobile_phone_number', []
     yield s.check_bogus_field_returns_error, url, 'username', 123
@@ -163,7 +160,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'userfield', 123
@@ -209,7 +208,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', 'invalid_char'
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', {}
     yield s.check_bogus_field_returns_error, url, 'call_permission_password', []
-    yield s.check_bogus_field_returns_error, url, 'call_permission_password', s.random_string(17)
+    yield s.check_bogus_field_returns_error, url, 'call_permission_password', s.random_string(
+        17
+    )
     yield s.check_bogus_field_returns_error, url, 'subscription_type', 'one'
     yield s.check_bogus_field_returns_error, url, 'subscription_type', -1
     yield s.check_bogus_field_returns_error, url, 'subscription_type', 11
@@ -258,8 +259,12 @@ def test_unique_errors(user1, user2):
 
 
 def unique_error_checks(url, existing_resource, required_body=None):
-    yield s.check_bogus_field_returns_error, url, 'username', existing_resource['username'], required_body
-    yield s.check_bogus_field_returns_error, url, 'email', existing_resource['email'], required_body
+    yield s.check_bogus_field_returns_error, url, 'username', existing_resource[
+        'username'
+    ], required_body
+    yield s.check_bogus_field_returns_error, url, 'email', existing_resource[
+        'email'
+    ], required_body
 
 
 @fixtures.user()
@@ -282,24 +287,27 @@ def test_that_the_directory_view_works_with_unicode_characters(user):
 @fixtures.sip()
 @fixtures.extension()
 def test_summary_view_on_sip_endpoint(user, line, sip, extension):
-    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), \
-            a.user_line(user, line):
+    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), a.user_line(
+        user, line
+    ):
 
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
-            contains(has_entries(
-                id=user['id'],
-                uuid=user['uuid'],
-                firstname=user['firstname'],
-                lastname=user['lastname'],
-                email=user['email'],
-                provisioning_code=line['provisioning_code'],
-                extension=extension['exten'],
-                context=extension['context'],
-                enabled=True,
-                protocol='sip',
-            ))
+            contains(
+                has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=line['provisioning_code'],
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='sip',
+                )
+            ),
         )
 
 
@@ -308,24 +316,27 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
 @fixtures.sccp()
 @fixtures.extension()
 def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
-    with a.line_endpoint_sccp(line, sccp), a.line_extension(line, extension), \
-            a.user_line(user, line):
+    with a.line_endpoint_sccp(line, sccp), a.line_extension(
+        line, extension
+    ), a.user_line(user, line):
 
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
-            contains(has_entries(
-                id=user['id'],
-                uuid=user['uuid'],
-                firstname=user['firstname'],
-                lastname=user['lastname'],
-                email=user['email'],
-                provisioning_code=line['provisioning_code'],
-                extension=extension['exten'],
-                context=extension['context'],
-                enabled=True,
-                protocol='sccp',
-            ))
+            contains(
+                has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=line['provisioning_code'],
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='sccp',
+                )
+            ),
         )
 
 
@@ -334,24 +345,27 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
 @fixtures.custom()
 @fixtures.extension()
 def test_summary_view_on_custom_endpoint(user, line, custom, extension):
-    with a.line_endpoint_custom(line, custom), a.line_extension(line, extension), \
-            a.user_line(user, line):
+    with a.line_endpoint_custom(line, custom), a.line_extension(
+        line, extension
+    ), a.user_line(user, line):
 
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
-            contains(has_entries(
-                id=user['id'],
-                uuid=user['uuid'],
-                firstname=user['firstname'],
-                lastname=user['lastname'],
-                email=user['email'],
-                provisioning_code=none(),
-                extension=extension['exten'],
-                context=extension['context'],
-                enabled=True,
-                protocol='custom',
-            ))
+            contains(
+                has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=none(),
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='custom',
+                )
+            ),
         )
 
 
@@ -360,18 +374,20 @@ def test_summary_view_on_user_without_line(user):
     response = confd.users.get(view='summary', id=user['id'])
     assert_that(
         response.items,
-        contains(has_entries(
-            id=user['id'],
-            uuid=user['uuid'],
-            firstname=user['firstname'],
-            lastname=user['lastname'],
-            email=user['email'],
-            provisioning_code=none(),
-            extension=none(),
-            context=none(),
-            enabled=True,
-            protocol=none(),
-        ))
+        contains(
+            has_entries(
+                id=user['id'],
+                uuid=user['uuid'],
+                firstname=user['firstname'],
+                lastname=user['lastname'],
+                email=user['email'],
+                provisioning_code=none(),
+                extension=none(),
+                context=none(),
+                enabled=True,
+                protocol=none(),
+            )
+        ),
     )
 
 
@@ -379,8 +395,12 @@ def test_summary_view_on_user_without_line(user):
 @fixtures.user(firstname="Hîde", lastname="Mé")
 def test_search_using_legacy_parameter(user1, user2):
     response = confd.users.get(q="lègacy usér")
-    assert_that(response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér")))
-    assert_that(response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé"))))
+    assert_that(
+        response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér"))
+    )
+    assert_that(
+        response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé")))
+    )
 
 
 @fixtures.user(
@@ -452,18 +472,20 @@ def test_search_on_users_extension(user, line, extension):
 @fixtures.extension()
 def test_search_on_users_with_context_filter(user, line, extension):
     with a.user_line(user, line), a.line_extension(line, extension):
-        response = confd.users.get(firstname='context-filter', view='directory', context='default')
+        response = confd.users.get(
+            firstname='context-filter', view='directory', context='default'
+        )
         assert_that(response.total, equal_to(1))
         assert_that(response.items, has_item(has_entry('exten', extension['exten'])))
 
-        response = confd.users.get(firstname='context-filter', view='directory', context='other')
+        response = confd.users.get(
+            firstname='context-filter', view='directory', context='other'
+        )
         assert_that(response.total, equal_to(0))
 
 
 @fixtures.user(
-    firstname="Âboubacar",
-    lastname="Manè",
-    description="Âboubacar le grand danseur",
+    firstname="Âboubacar", lastname="Manè", description="Âboubacar le grand danseur"
 )
 @fixtures.line()
 @fixtures.sip()
@@ -471,10 +493,14 @@ def test_search_on_users_with_context_filter(user, line, extension):
 def test_search_on_summary_view(user, line, sip, extension):
     url = confd.users(view='summary')
 
-    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(line, extension):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(
+        line, extension
+    ):
         yield check_search, url, 'firstname', 'âbou', user['firstname']
         yield check_search, url, 'lastname', 'man', user['lastname']
-        yield check_search, url, 'provisioning_code', line['provisioning_code'], line['provisioning_code']
+        yield check_search, url, 'provisioning_code', line['provisioning_code'], line[
+            'provisioning_code'
+        ]
         yield check_search, url, 'extension', extension['exten'], extension['exten']
 
 
@@ -487,22 +513,13 @@ def check_search(url, field, term, value):
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.users.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.users.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.users.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.user(
@@ -559,13 +576,10 @@ def test_get_user(user):
                 'noanswer': {'destination': None, 'enabled': False},
                 'unconditional': {'destination': None, 'enabled': False},
             },
-            services={
-                'dnd': {'enabled': False},
-                'incallfilter': {'enabled': False},
-            },
+            services={'dnd': {'enabled': False}, 'incallfilter': {'enabled': False}},
             voicemail=none(),
             queues=empty(),
-        )
+        ),
     )
 
 
@@ -578,15 +592,20 @@ def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
     assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
 
 
-@fixtures.user(firstname="Snôw", lastname="Whîte", username='snow.white+dwarves@disney.example.com')
+@fixtures.user(
+    firstname="Snôw", lastname="Whîte", username='snow.white+dwarves@disney.example.com'
+)
 def test_that_the_username_can_be_an_email(user):
     result = confd.users(user['id']).get()
 
-    assert_that(result.item, has_entries(
-        firstname='Snôw',
-        lastname='Whîte',
-        username='snow.white+dwarves@disney.example.com',
-    ))
+    assert_that(
+        result.item,
+        has_entries(
+            firstname='Snôw',
+            lastname='Whîte',
+            username='snow.white+dwarves@disney.example.com',
+        ),
+    )
 
 
 def test_create_minimal_parameters():
@@ -611,7 +630,7 @@ def test_create_with_null_parameters_fills_default_values():
             supervision_enabled=True,
             ring_seconds=30,
             simultaneous_calls=5,
-        )
+        ),
     )
 
 

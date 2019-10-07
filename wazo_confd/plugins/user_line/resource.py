@@ -2,20 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
-from marshmallow import (
-    EXCLUDE,
-    fields,
-)
+from marshmallow import EXCLUDE, fields
 
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import (
-    BaseSchema,
-    Link,
-    ListLink,
-)
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -35,14 +28,10 @@ class LineSchemaIDLoad(BaseSchema):
 
 
 class LinesIDSchema(BaseSchema):
-    lines = fields.Nested(
-        LineSchemaIDLoad,
-        many=True, required=True, unknown=EXCLUDE
-    )
+    lines = fields.Nested(LineSchemaIDLoad, many=True, required=True, unknown=EXCLUDE)
 
 
 class UserLineResource(ConfdResource):
-
     def __init__(self, service, user_dao, line_dao):
         super(UserLineResource, self).__init__()
         self.service = service
@@ -62,8 +51,10 @@ class UserLineList(UserLineResource):
     def get(self, user_id):
         user = self.get_user(user_id)
         items = self.service.find_all_by(user_id=user.id)
-        return {'total': len(items),
-                'items': self.deprecated_schema().dump(items, many=True)}
+        return {
+            'total': len(items),
+            'items': self.deprecated_schema().dump(items, many=True),
+        }
 
     @required_acl('confd.users.{user_id}.lines.update')
     def put(self, user_id):
@@ -85,7 +76,11 @@ class UserLineList(UserLineResource):
         user = self.get_user(user_id)
         line = self.get_line_or_fail()
         user_line = self.service.associate(user, line)
-        return self.deprecated_schema().dump(user_line), 201, self.build_headers(user_line)
+        return (
+            self.deprecated_schema().dump(user_line),
+            201,
+            self.build_headers(user_line),
+        )
 
     def get_line_or_fail(self):
         form = self.deprecated_schema().load(request.get_json())
@@ -95,10 +90,9 @@ class UserLineList(UserLineResource):
             raise errors.param_not_found('line_id', 'Line')
 
     def build_headers(self, model):
-        url = url_for('user_lines',
-                      user_id=model.user_id,
-                      line_id=model.line_id,
-                      _external=True)
+        url = url_for(
+            'user_lines', user_id=model.user_id, line_id=model.line_id, _external=True
+        )
         return {'Location': url}
 
 
@@ -135,5 +129,4 @@ class LineUserList(UserLineResource):
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         items = self.service.find_all_by(line_id=line.id)
-        return {'total': len(items),
-                'items': self.schema().dump(items, many=True)}
+        return {'total': len(items), 'items': self.schema().dump(items, many=True)}

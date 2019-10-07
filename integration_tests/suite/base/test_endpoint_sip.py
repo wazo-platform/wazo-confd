@@ -1,4 +1,4 @@
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -14,15 +14,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 ALL_OPTIONS = [
     ['buggymwi', 'yes'],
@@ -169,46 +162,42 @@ def test_delete_errors(sip):
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(main)), not_(has_items(sub)),
-    )
+    assert_that(response.items, all_of(has_items(main)), not_(has_items(sub)))
 
     response = confd.endpoints.sip.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(sub), not_(has_items(main))),
-    )
+    assert_that(response.items, all_of(has_items(sub), not_(has_items(main))))
 
     response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.sip()
 def test_get(sip):
     response = confd.endpoints.sip(sip['id']).get()
-    assert_that(response.item, has_entries({
-        'username': has_length(8),
-        'secret': has_length(8),
-        'type': 'friend',
-        'host': 'dynamic',
-        'options': instance_of(list),
-        'trunk': None,
-        'line': None,
-    }))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'username': has_length(8),
+                'secret': has_length(8),
+                'type': 'friend',
+                'host': 'dynamic',
+                'options': instance_of(list),
+                'trunk': None,
+                'line': None,
+            }
+        ),
+    )
 
 
 @fixtures.sip()
 @fixtures.sip()
 def test_list(sip1, sip2):
     response = confd.endpoints.sip.get()
-    assert_that(response.items, has_items(
-        has_entry('id', sip1['id']),
-        has_entry('id', sip2['id']),
-    ))
+    assert_that(
+        response.items,
+        has_items(has_entry('id', sip1['id']), has_entry('id', sip2['id'])),
+    )
 
     response = confd.endpoints.sip.get(search=sip1['username'])
     assert_that(response.items, contains(has_entry('id', sip1['id'])))
@@ -228,14 +217,19 @@ def test_create_minimal_parameters():
     response = confd.endpoints.sip.post()
 
     response.assert_created('endpoint_sip', location='endpoints/sip')
-    assert_that(response.item,  has_entries({
-        'tenant_uuid': MAIN_TENANT,
-        'username': has_length(8),
-        'secret': has_length(8),
-        'type': 'friend',
-        'host': 'dynamic',
-        'options': instance_of(list),
-    }))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'tenant_uuid': MAIN_TENANT,
+                'username': has_length(8),
+                'secret': has_length(8),
+                'type': 'friend',
+                'host': 'dynamic',
+                'options': instance_of(list),
+            }
+        ),
+    )
 
 
 def test_create_all_parameters():
@@ -247,21 +241,23 @@ def test_create_all_parameters():
         options=ALL_OPTIONS,
     )
 
-    assert_that(response.item, has_entries({
-        'tenant_uuid': MAIN_TENANT,
-        'username': 'myusername',
-        'secret': 'mysecret',
-        'type': 'peer',
-        'host': '127.0.0.1',
-        'options': has_items(*ALL_OPTIONS)
-    }))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'tenant_uuid': MAIN_TENANT,
+                'username': 'myusername',
+                'secret': 'mysecret',
+                'type': 'peer',
+                'host': '127.0.0.1',
+                'options': has_items(*ALL_OPTIONS),
+            }
+        ),
+    )
 
 
 def test_create_additional_options():
-    options = ALL_OPTIONS + [
-        ["foo", "bar"],
-        ["spam", "eggs"]
-    ]
+    options = ALL_OPTIONS + [["foo", "bar"], ["spam", "eggs"]]
 
     response = confd.endpoints.sip.post(options=options)
     assert_that(response.item['options'], has_items(*options))
@@ -277,27 +273,31 @@ def test_create_username_already_taken(sip):
 def test_update_required_parameters(sip):
     url = confd.endpoints.sip(sip['id'])
 
-    response = url.put(username="updatedusername",
-                       secret="updatedsecret",
-                       type="peer",
-                       host="127.0.0.1")
+    response = url.put(
+        username="updatedusername",
+        secret="updatedsecret",
+        type="peer",
+        host="127.0.0.1",
+    )
     response.assert_updated()
 
     response = url.get()
-    assert_that(response.item, has_entries({
-        'username': 'updatedusername',
-        'secret': 'updatedsecret',
-        'type': 'peer',
-        'host': '127.0.0.1',
-    }))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'username': 'updatedusername',
+                'secret': 'updatedsecret',
+                'type': 'peer',
+                'host': '127.0.0.1',
+            }
+        ),
+    )
 
 
 @fixtures.sip(options=[["allow", "gsm"], ["nat", "force_rport,comedia"]])
 def test_update_options(sip):
-    options = [
-        ["allow", "g723"],
-        ["insecure", "port"]
-    ]
+    options = [["allow", "g723"], ["insecure", "port"]]
 
     url = confd.endpoints.sip(sip['id'])
     response = url.put(options=options)
@@ -307,18 +307,15 @@ def test_update_options(sip):
     assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.sip(options=[
-    ["allow", "gsm"],
-    ["foo", "bar"],
-    ["foo", "baz"],
-    ["spam", "eggs"]
-])
+@fixtures.sip(
+    options=[["allow", "gsm"], ["foo", "bar"], ["foo", "baz"], ["spam", "eggs"]]
+)
 def test_update_additional_options(sip):
     options = [
         ["allow", "g723"],
         ["foo", "newbar"],
         ["foo", "newbaz"],
-        ["spam", "neweggs"]
+        ["spam", "neweggs"],
     ]
 
     url = confd.endpoints.sip(sip['id'])

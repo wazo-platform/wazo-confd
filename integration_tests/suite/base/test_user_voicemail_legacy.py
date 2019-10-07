@@ -1,4 +1,4 @@
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -79,8 +79,7 @@ def test_get_when_not_associated(user):
 @fixtures.user()
 @fixtures.voicemail()
 def test_get_user_voicemail_association(user, voicemail):
-    expected = has_entries({'user_id': user['id'],
-                            'voicemail_id': voicemail['id']})
+    expected = has_entries({'user_id': user['id'], 'voicemail_id': voicemail['id']})
 
     with a.user_voicemail(user, voicemail):
         response = confd.users(user['id']).voicemail.get()

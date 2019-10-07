@@ -25,11 +25,15 @@ class SwitchboardMemberUserItem(ConfdResource):
     @required_acl('confd.switchboards.{switchboard_uuid}.members.users.update')
     def put(self, switchboard_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        switchboard = self.switchboard_dao.get(switchboard_uuid, tenant_uuids=tenant_uuids)
+        switchboard = self.switchboard_dao.get(
+            switchboard_uuid, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
-            users = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
-                     for user in form['users']]
+            users = [
+                self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
+                for user in form['users']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 

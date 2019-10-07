@@ -16,12 +16,7 @@ from hamcrest import (
 )
 
 from . import confd, provd
-from ..helpers import (
-    associations as a,
-    fixtures,
-    helpers as h,
-    scenarios as s,
-)
+from ..helpers import associations as a, fixtures, helpers as h, scenarios as s
 from ..helpers.helpers.line_fellowship import line_fellowship
 
 
@@ -29,10 +24,7 @@ from ..helpers.helpers.line_fellowship import line_fellowship
 def line_device(endpoint_type='sip', registrar=None):
     device = h.device.generate_device()
 
-    line_etc = line_fellowship(
-        endpoint_type=endpoint_type,
-        registrar=registrar,
-    )
+    line_etc = line_fellowship(endpoint_type=endpoint_type, registrar=registrar)
     with line_etc as (user, line, extension, endpoint):
         with a.line_device(line, device):
             yield line, device
@@ -86,7 +78,6 @@ def error_checks(url):
     name='VisibleRegistrar',
     proxy_main_host='1.2.3.4',
     outbound_proxy_port=5060,
-
 )
 @fixtures.registrar(
     id='HiddenId',
@@ -118,14 +109,10 @@ def check_search(url, registrar, hidden, field, term):
 
 
 @fixtures.registrar(
-    proxy_main_host="99.20.30.40",
-    name="SortRegistrar1",
-    main_port=5060,
+    proxy_main_host="99.20.30.40", name="SortRegistrar1", main_port=5060
 )
 @fixtures.registrar(
-    proxy_main_host="99.20.30.50",
-    name="SortRegistrar2",
-    main_port=5061,
+    proxy_main_host="99.20.30.50", name="SortRegistrar2", main_port=5061
 )
 def test_sorting_offset_limit(registrar1, registrar2):
     url = confd.registrars.get
@@ -159,7 +146,7 @@ def test_create_registrar_minimal_parameters():
             proxy_backup_port=none(),
             outbound_proxy_host=none(),
             outbound_proxy_port=none(),
-        )
+        ),
     )
 
 
@@ -195,7 +182,7 @@ def test_create_registrar_null_parameters():
             proxy_backup_port=none(),
             outbound_proxy_host=none(),
             outbound_proxy_port=none(),
-        )
+        ),
     )
 
 
@@ -203,7 +190,7 @@ def test_create_registrar_no_parameters():
     response = confd.registrars.post()
     response.assert_match(
         400,
-        re.compile(re.escape('main_host')) and re.compile(re.escape('proxy_main_host'))
+        re.compile(re.escape('main_host')) and re.compile(re.escape('proxy_main_host')),
     )
 
 
@@ -302,7 +289,7 @@ def test_edit_registrar_null_parameters(registrar):
             proxy_backup_port=none(),
             outbound_proxy_host=none(),
             outbound_proxy_port=none(),
-        )
+        ),
     )
 
 
@@ -347,17 +334,11 @@ def test_edit_registrar_updates_autoprov(registrar):
     response.assert_updated()
 
     autoprov_sip_config = provd.configs.get('autoprov')['raw_config']['sip_lines']['1']
-    assert_that(
-        autoprov_sip_config, has_entries(
-            proxy_ip='2.3.4.5',
-        )
-    )
-    autoprov_sccp_config = provd.configs.get('autoprov')['raw_config']['sccp_call_managers']['1']
-    assert_that(
-        autoprov_sccp_config, has_entries(
-            ip='2.3.4.5',
-        )
-    )
+    assert_that(autoprov_sip_config, has_entries(proxy_ip='2.3.4.5'))
+    autoprov_sccp_config = provd.configs.get('autoprov')['raw_config'][
+        'sccp_call_managers'
+    ]['1']
+    assert_that(autoprov_sccp_config, has_entries(ip='2.3.4.5'))
 
 
 @fixtures.registrar(
@@ -385,18 +366,23 @@ def test_edit_registrar_updates_sip_device(registrar):
         response.assert_updated()
 
         config = provd.configs.get(device['id'])['raw_config']['sip_lines']
-        assert_that(config, has_entries({
-            '1': has_entries(
-                proxy_ip=new_registrar_body['proxy_main_host'],
-                proxy_port=new_registrar_body['proxy_main_port'],
-                registrar_port=new_registrar_body['main_port'],
-                registrar_ip=new_registrar_body['main_host'],
-                outbound_proxy_ip=new_registrar_body['outbound_proxy_host'],
-                outbound_proxy_port=new_registrar_body['outbound_proxy_port'],
-                backup_proxy_ip=new_registrar_body['proxy_backup_host'],
-                backup_proxy_port=new_registrar_body['proxy_backup_port'],
-            )
-        }))
+        assert_that(
+            config,
+            has_entries(
+                {
+                    '1': has_entries(
+                        proxy_ip=new_registrar_body['proxy_main_host'],
+                        proxy_port=new_registrar_body['proxy_main_port'],
+                        registrar_port=new_registrar_body['main_port'],
+                        registrar_ip=new_registrar_body['main_host'],
+                        outbound_proxy_ip=new_registrar_body['outbound_proxy_host'],
+                        outbound_proxy_port=new_registrar_body['outbound_proxy_port'],
+                        backup_proxy_ip=new_registrar_body['proxy_backup_host'],
+                        backup_proxy_port=new_registrar_body['proxy_backup_port'],
+                    )
+                }
+            ),
+        )
 
 
 @fixtures.registrar(
@@ -424,14 +410,15 @@ def test_edit_registrar_updates_sccp_device(registrar):
         response.assert_updated()
 
         config = provd.configs.get(device['id'])['raw_config']['sccp_call_managers']
-        assert_that(config, has_entries({
-            '1': has_entries(
-                ip=new_registrar_body['proxy_main_host'],
+        assert_that(
+            config,
+            has_entries(
+                {
+                    '1': has_entries(ip=new_registrar_body['proxy_main_host']),
+                    '2': has_entries(ip=new_registrar_body['proxy_backup_host']),
+                }
             ),
-            '2': has_entries(
-                ip=new_registrar_body['proxy_backup_host']
-            )
-        }))
+        )
 
 
 def test_registrar_addresses_without_backup_on_sip_device():
@@ -442,10 +429,13 @@ def test_registrar_addresses_without_backup_on_sip_device():
         config = provd.configs.get(device['id'])
         sip_config = config['raw_config']['sip_lines']['1']
 
-        assert_that(sip_config, has_entries(
-            proxy_ip=registrar['proxy_main_host'],
-            registrar_ip=registrar['main_host']
-        ))
+        assert_that(
+            sip_config,
+            has_entries(
+                proxy_ip=registrar['proxy_main_host'],
+                registrar_ip=registrar['main_host'],
+            ),
+        )
 
         assert_that(sip_config, is_not(has_key('backup_proxy_ip')))
         assert_that(sip_config, is_not(has_key('backup_registrar_ip')))
@@ -459,11 +449,10 @@ def check_registrar_addresses_without_backup_on_sccp_device():
         config = provd.configs.get(device['id'])
         sccp_config = config['raw_config']['sccp_call_managers']
 
-        assert_that(sccp_config, has_entries(
-            {'1': has_entries(
-                ip=registrar['proxy_main_host']
-            )}
-        ))
+        assert_that(
+            sccp_config,
+            has_entries({'1': has_entries(ip=registrar['proxy_main_host'])}),
+        )
 
         assert_that(sccp_config, is_not(has_key('2')))
 
@@ -478,5 +467,9 @@ def test_delete_registrar(registrar):
 def test_bus_events(registrar):
     body = {'name': 'a', 'main_host': '1.2.3.4', 'proxy_main_host': '1.2.3.4'}
     yield s.check_bus_event, 'config.registrar.created', confd.registrars.post, body
-    yield s.check_bus_event, 'config.registrar.edited', confd.registrars(registrar['id']).put
-    yield s.check_bus_event, 'config.registrar.deleted', confd.registrars(registrar['id']).delete
+    yield s.check_bus_event, 'config.registrar.edited', confd.registrars(
+        registrar['id']
+    ).put
+    yield s.check_bus_event, 'config.registrar.deleted', confd.registrars(
+        registrar['id']
+    ).delete

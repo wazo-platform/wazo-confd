@@ -10,14 +10,10 @@ from xivo_dao.alchemy.context import Context
 
 from ..notifier import ContextContextNotifier
 
-EXPECTED_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+EXPECTED_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestContextContextNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -27,7 +23,9 @@ class TestContextContextNotifier(unittest.TestCase):
         self.notifier = ContextContextNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = ContextContextsAssociatedEvent(self.context.id, [self.context.id])
+        expected_event = ContextContextsAssociatedEvent(
+            self.context.id, [self.context.id]
+        )
 
         self.notifier.associated_contexts(self.context, [self.context])
 

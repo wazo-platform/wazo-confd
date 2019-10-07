@@ -1,18 +1,9 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-    none,
-)
+from hamcrest import assert_that, has_entries, none
 
-from ..helpers import (
-    scenarios as s,
-    errors as e,
-    fixtures,
-    associations as a,
-)
+from ..helpers import scenarios as s, errors as e, fixtures, associations as a
 from . import confd
 
 FAKE_ID = 999999999
@@ -109,9 +100,9 @@ def test_dissociate_not_associated(trunk, register):
 def test_get_register_iax_relation(trunk, register):
     with a.trunk_register_iax(trunk, register):
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, has_entries(
-            register_iax=has_entries(id=register['id'])
-        ))
+        assert_that(
+            response.item, has_entries(register_iax=has_entries(id=register['id']))
+        )
 
 
 @fixtures.trunk()
@@ -119,9 +110,7 @@ def test_get_register_iax_relation(trunk, register):
 def test_get_trunk_relation(trunk, register):
     with a.trunk_register_iax(trunk, register):
         response = confd.registers.iax(register['id']).get()
-        assert_that(response.item, has_entries(
-            trunk=has_entries(id=trunk['id'])
-        ))
+        assert_that(response.item, has_entries(trunk=has_entries(id=trunk['id'])))
 
 
 @fixtures.trunk()
@@ -143,9 +132,7 @@ def test_delete_iax_when_trunk_and_iax_associated(trunk, register):
         confd.registers.iax(register['id']).delete().assert_deleted()
 
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, has_entries(
-            register_iax=none()
-        ))
+        assert_that(response.item, has_entries(register_iax=none()))
 
 
 @fixtures.trunk()

@@ -13,7 +13,9 @@ class SwitchboardSchema(BaseSchema):
     name = fields.String(validate=Length(max=128), required=True)
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     queue_music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
-    waiting_room_music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
+    waiting_room_music_on_hold = fields.String(
+        validate=Length(max=128), allow_none=True
+    )
     links = ListLink(Link('switchboards', field='uuid'))
     extensions = fields.Nested(
         'ExtensionSchema',
@@ -22,10 +24,7 @@ class SwitchboardSchema(BaseSchema):
         dump_only=True,
     )
     incalls = fields.Nested(
-        'IncallSchema',
-        only=['id', 'extensions', 'links'],
-        many=True,
-        dump_only=True,
+        'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
 
     user_members = fields.Nested(

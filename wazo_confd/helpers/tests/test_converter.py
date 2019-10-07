@@ -10,29 +10,18 @@ from wazo_confd.helpers.converter import FilenameConverter
 
 
 class TestFilenameConverter(unittest.TestCase):
-
     def setUp(self):
         self.converter = FilenameConverter(None)
 
     def test_valid_filenames(self):
-        values = [
-            'foo',
-            'foo.wav',
-            'foé.txt',
-            'foo.bar.-!3_X!".lol',
-        ]
+        values = ['foo', 'foo.wav', 'foé.txt', 'foo.bar.-!3_X!".lol']
         for value in values:
             assert_that(self.converter.to_python(value), equal_to(value))
 
     def test_invalid_filenames(self):
-        values = [
-            '',
-            '.',
-            '.foo',
-            '..',
-            '../foo',
-            'foo/bar',
-        ]
+        values = ['', '.', '.foo', '..', '../foo', 'foo/bar']
         for value in values:
-            assert_that(calling(self.converter.to_python).with_args(value),
-                        raises(ValidationError))
+            assert_that(
+                calling(self.converter.to_python).with_args(value),
+                raises(ValidationError),
+            )

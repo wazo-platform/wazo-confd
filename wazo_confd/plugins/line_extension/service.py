@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class LineExtensionService:
-
     def __init__(self, dao, notifier, validator):
         self.dao = dao
         self.notifier = notifier
@@ -39,6 +38,4 @@ class LineExtensionService:
 
 
 def build_service():
-    return LineExtensionService(line_extension_dao,
-                                build_notifier(),
-                                build_validator())
+    return LineExtensionService(line_extension_dao, build_notifier(), build_validator())

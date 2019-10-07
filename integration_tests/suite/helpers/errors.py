@@ -18,7 +18,9 @@ class RegexError:
         self.group = group
 
     def __str__(self):
-        return "<{} {} {}>".format(self.__class__.__name__, self.regex.pattern, self.group)
+        return "<{} {} {}>".format(
+            self.__class__.__name__, self.regex.pattern, self.group
+        )
 
     def __repr__(self):
         return str(self)
@@ -26,13 +28,17 @@ class RegexError:
     def assert_match(self, errors):
         match = self.find_error(errors)
         if self.items:
-            assert_that(match.groups(),
-                        has_items(*self.items),
-                        self.NO_MATCH.format(self.items, errors))
+            assert_that(
+                match.groups(),
+                has_items(*self.items),
+                self.NO_MATCH.format(self.items, errors),
+            )
         if self.group:
-            assert_that(match.groupdict(),
-                        has_entries(self.group),
-                        self.NO_MATCH.format(self.items, errors))
+            assert_that(
+                match.groupdict(),
+                has_entries(self.group),
+                self.NO_MATCH.format(self.items, errors),
+            )
 
     def find_error(self, errors):
         assert_that(errors, instance_of(list), "Expecting a list of errors")
@@ -44,14 +50,15 @@ class RegexError:
 
 
 class SequenceError(RegexError):
-
     def assert_match(self, errors):
         match = self.find_error(errors)
         matched_items = match.group(1)
         for item in self.items:
-            assert_that(matched_items,
-                        contains_string(item),
-                        self.NO_MATCH.format(self.items, errors))
+            assert_that(
+                matched_items,
+                contains_string(item),
+                self.NO_MATCH.format(self.items, errors),
+            )
 
 
 def build_error(raw_regex, builder=RegexError):
@@ -59,11 +66,21 @@ def build_error(raw_regex, builder=RegexError):
     return partial(builder, regex)
 
 
-wrong_type = build_error(r"field '(?P<field>[^']+)': wrong type. Should be an? (?P<type>[\w-]+( [\w-]+)*)")
+wrong_type = build_error(
+    r"field '(?P<field>[^']+)': wrong type. Should be an? (?P<type>[\w-]+( [\w-]+)*)"
+)
 not_found = build_error(r"(?P<resource>\w+) was not found")
-missing_association = build_error(r"(?P<left>\w+) must be associated with a (?P<right>\w+)")
+missing_association = build_error(
+    r"(?P<left>\w+) must be associated with a (?P<right>\w+)"
+)
 resource_exists = build_error(r"(?P<resource>\w+) already exists")
-resource_associated = build_error(r"(?P<left>\w+) is associated with a (?P<right>\w+( \w+)*)")
-unknown_parameters = build_error(r"unknown parameters: ((\w+)(, (\w+))*)", SequenceError)
-missing_parameters = build_error(r"missing parameters: ((\w+)(, (\w+))*)", SequenceError)
+resource_associated = build_error(
+    r"(?P<left>\w+) is associated with a (?P<right>\w+( \w+)*)"
+)
+unknown_parameters = build_error(
+    r"unknown parameters: ((\w+)(, (\w+))*)", SequenceError
+)
+missing_parameters = build_error(
+    r"missing parameters: ((\w+)(, (\w+))*)", SequenceError
+)
 different_tenant = build_error(r"different tenants")

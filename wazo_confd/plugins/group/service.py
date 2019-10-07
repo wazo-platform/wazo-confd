@@ -10,6 +10,4 @@ from .validator import build_validator
 
 
 def build_service():
-    return CRUDService(group_dao,
-                       build_validator(),
-                       build_notifier())
+    return CRUDService(group_dao, build_validator(), build_notifier())

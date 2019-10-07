@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class PagingUserAssociationValidator(ValidatorAssociation):
-
     def validate(self, paging, users):
         for user in users:
             self.validate_same_tenant(paging, user)
@@ -16,8 +15,7 @@ class PagingUserAssociationValidator(ValidatorAssociation):
     def validate_same_tenant(self, paging, user):
         if paging.tenant_uuid != user.tenant_uuid:
             raise errors.different_tenants(
-                paging_tenant_uuid=paging.tenant_uuid,
-                user_tenant_uuid=user.tenant_uuid
+                paging_tenant_uuid=paging.tenant_uuid, user_tenant_uuid=user.tenant_uuid
             )
 
     def validate_no_duplicate_user(self, users):
@@ -26,6 +24,4 @@ class PagingUserAssociationValidator(ValidatorAssociation):
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[PagingUserAssociationValidator()],
-    )
+    return ValidationAssociation(association=[PagingUserAssociationValidator()])

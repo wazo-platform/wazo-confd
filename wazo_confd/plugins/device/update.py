@@ -3,8 +3,15 @@
 
 
 class DeviceUpdater:
-
-    def __init__(self, user_dao, line_dao, user_line_dao, line_extension_dao, func_key_template_db, provd_updater):
+    def __init__(
+        self,
+        user_dao,
+        line_dao,
+        user_line_dao,
+        line_extension_dao,
+        func_key_template_db,
+        provd_updater,
+    ):
         self.user_dao = user_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
@@ -13,7 +20,9 @@ class DeviceUpdater:
         self.provd_updater = provd_updater
 
     def update_for_template(self, template):
-        private_users = self.user_dao.find_all_by(func_key_private_template_id=template.id)
+        private_users = self.user_dao.find_all_by(
+            func_key_private_template_id=template.id
+        )
         public_users = self.user_dao.find_all_by(func_key_template_id=template.id)
         for user in private_users + public_users:
             self.update_for_user(user)
@@ -37,7 +46,9 @@ class DeviceUpdater:
     def _find_user_id_by_extension(self, extension):
         line_extension = self.line_extension_dao.find_by(extension_id=extension.id)
         if line_extension:
-            user_line = self.user_line_dao.find_by(line_id=line_extension.line_id, main_user=True)
+            user_line = self.user_line_dao.find_by(
+                line_id=line_extension.line_id, main_user=True
+            )
             return user_line.user_id if user_line else None
 
     def update_for_user(self, user):
@@ -59,7 +70,6 @@ class DeviceUpdater:
 
 
 class ProvdUpdater:
-
     def __init__(self, dao, config_generator, line_dao):
         self.dao = dao
         self.config_generator = config_generator

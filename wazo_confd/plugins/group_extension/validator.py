@@ -12,7 +12,6 @@ from wazo_confd.helpers.validator import (
 
 
 class GroupExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRangeMixin):
-
     def __init__(self, context_dao):
         self._context_dao = context_dao
 
@@ -26,30 +25,40 @@ class GroupExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRang
 
     def validate_group_not_already_associated(self, group):
         if group.extensions:
-            raise errors.resource_associated('Group', 'Extension',
-                                             group_id=group.id,
-                                             extension_id=group.extensions[0].id)
+            raise errors.resource_associated(
+                'Group',
+                'Extension',
+                group_id=group.id,
+                extension_id=group.extensions[0].id,
+            )
 
     def validate_extension_not_already_associated(self, extension):
         if extension.group:
-            raise errors.resource_associated('Group', 'Extension',
-                                             group_id=extension.group.id,
-                                             extension_id=extension.id)
+            raise errors.resource_associated(
+                'Group',
+                'Extension',
+                group_id=extension.group.id,
+                extension_id=extension.id,
+            )
 
     def validate_extension_not_associated_to_other_resource(self, extension):
         if not (extension.type == 'user' and extension.typeval == '0'):
-            raise errors.resource_associated('Extension',
-                                             extension.type,
-                                             extension_id=extension.id,
-                                             associated_id=extension.typeval)
+            raise errors.resource_associated(
+                'Extension',
+                extension.type,
+                extension_id=extension.id,
+                associated_id=extension.typeval,
+            )
 
     def validate_extension_is_in_internal_context(self, extension):
         context = self._context_dao.get_by_name(extension.context)
         if context.type != 'internal':
-            raise errors.unhandled_context_type(context.type,
-                                                extension.context,
-                                                id=extension.id,
-                                                context=extension.context)
+            raise errors.unhandled_context_type(
+                context.type,
+                extension.context,
+                id=extension.id,
+                context=extension.context,
+            )
 
     def validate_exten_is_in_context_group_range(self, extension):
         if self._is_pattern(extension.exten):
@@ -69,5 +78,5 @@ class GroupExtensionAssociationValidator(ValidatorAssociation, BaseExtensionRang
 
 def build_validator():
     return ValidationAssociation(
-        association=[GroupExtensionAssociationValidator(context_dao_module)],
+        association=[GroupExtensionAssociationValidator(context_dao_module)]
     )

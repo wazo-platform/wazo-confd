@@ -1,0 +1,12 @@
+- project:
+    templates:
+      - wazo-tox-linters
+      - wazo-tox-py37
+    check:
+      jobs:
+        - wazo-tox-integration:
+            nodeset: debian10-vm
+    gate:
+      jobs:
+        - wazo-tox-integration:
+            nodeset: debian10-vm

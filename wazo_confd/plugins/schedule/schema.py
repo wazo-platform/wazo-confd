@@ -1,13 +1,7 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import (
-    EXCLUDE,
-    fields,
-    post_load,
-    validates,
-    validates_schema
-)
+from marshmallow import EXCLUDE, fields, post_load, validates, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Regexp, Range
 
@@ -23,22 +17,48 @@ class ScheduleOpenPeriod(BaseSchema):
     hours_start = fields.String(validate=Regexp(HOUR_REGEX), required=True)
     hours_end = fields.String(validate=Regexp(HOUR_REGEX), required=True)
     week_days = fields.List(
-        fields.Integer(validate=Range(min=1, max=7)),
-        missing=[1, 2, 3, 4, 5, 6, 7]
+        fields.Integer(validate=Range(min=1, max=7)), missing=[1, 2, 3, 4, 5, 6, 7]
     )
     month_days = fields.List(
         fields.Integer(validate=Range(min=1, max=31)),
         missing=[
-            1, 2, 3, 4, 5, 6, 7, 8, 9,
-            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-            20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-            30, 31
-        ]
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+        ],
     )
     months = fields.List(
         fields.Integer(validate=Range(min=1, max=12)),
         attribute='months_list',
-        missing=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        missing=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     )
 
     @validates_schema
@@ -91,19 +111,16 @@ class ScheduleSchema(BaseSchema):
     name = fields.String(validate=Length(max=128), allow_none=True)
     timezone = fields.String(validate=Length(max=128), allow_none=True)
     closed_destination = DestinationField(required=True)
-    open_periods = fields.Nested('ScheduleOpenPeriod', many=True,
-                                 unknown=EXCLUDE)
-    exceptional_periods = fields.Nested('ScheduleExceptionalPeriod', many=True,
-                                        unknown=EXCLUDE)
+    open_periods = fields.Nested('ScheduleOpenPeriod', many=True, unknown=EXCLUDE)
+    exceptional_periods = fields.Nested(
+        'ScheduleExceptionalPeriod', many=True, unknown=EXCLUDE
+    )
 
     enabled = fields.Boolean()
     links = ListLink(Link('schedules'))
 
     incalls = fields.Nested(
-        'IncallSchema',
-        only=['id', 'links'],
-        many=True,
-        dump_only=True,
+        'IncallSchema', only=['id', 'links'], many=True, dump_only=True
     )
     users = fields.Nested(
         'UserSchema',
@@ -112,22 +129,13 @@ class ScheduleSchema(BaseSchema):
         dump_only=True,
     )
     groups = fields.Nested(
-        'GroupSchema',
-        only=['id', 'name', 'links'],
-        many=True,
-        dump_only=True,
+        'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
     queues = fields.Nested(
-        'QueueSchema',
-        only=['id', 'name', 'label', 'links'],
-        many=True,
-        dump_only=True,
+        'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
     outcalls = fields.Nested(
-        'OutcallSchema',
-        only=['id', 'name', 'links'],
-        many=True,
-        dump_only=True,
+        'OutcallSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
 
     @post_load

@@ -8,7 +8,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -17,5 +16,5 @@ class Plugin:
             UserFallbackList,
             '/users/<uuid:user_id>/fallbacks',
             '/users/<int:user_id>/fallbacks',
-            resource_class_args=(service, user_dao)
+            resource_class_args=(service, user_dao),
         )

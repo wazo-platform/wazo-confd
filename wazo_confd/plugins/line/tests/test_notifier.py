@@ -24,7 +24,6 @@ SYSCONFD_HANDLERS = {
 
 
 class TestLineNotifier(unittest.TestCase):
-
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()

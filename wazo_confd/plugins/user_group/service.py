@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class UserGroupService:
-
     def __init__(self, user_dao, notifier, validator):
         self.user_dao = user_dao
         self.validator = validator
@@ -21,6 +20,4 @@ class UserGroupService:
 
 
 def build_service():
-    return UserGroupService(user_dao_module,
-                            build_notifier(),
-                            build_validator())
+    return UserGroupService(user_dao_module, build_notifier(), build_validator())

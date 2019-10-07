@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class ConferenceExtensionService:
-
     def __init__(self, extension_dao, notifier, validator):
         self.extension_dao = extension_dao
         self.validator = validator
@@ -32,6 +31,6 @@ class ConferenceExtensionService:
 
 
 def build_service():
-    return ConferenceExtensionService(extension_dao_module,
-                                      build_notifier(),
-                                      build_validator())
+    return ConferenceExtensionService(
+        extension_dao_module, build_notifier(), build_validator()
+    )

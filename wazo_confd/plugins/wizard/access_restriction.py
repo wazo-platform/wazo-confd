@@ -10,4 +10,5 @@ def xivo_unconfigured(func):
         if wizard_db.get_xivo_configured().configured:
             abort(403, message='XiVO is already configured')
         return func(*args, **kwargs)
+
     return wrapper

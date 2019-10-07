@@ -18,21 +18,33 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 from wazo_provd_client import Client as ProvdClient
 
 from wazo_confd.database import user_export as user_export_dao
-from wazo_confd.plugins.call_permission.service import build_service as build_call_permission_service
+from wazo_confd.plugins.call_permission.service import (
+    build_service as build_call_permission_service,
+)
 from wazo_confd.plugins.context.service import build_service as build_context_service
 from wazo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
 from wazo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
-from wazo_confd.plugins.extension.service import build_service as build_extension_service
+from wazo_confd.plugins.extension.service import (
+    build_service as build_extension_service,
+)
 from wazo_confd.plugins.incall.service import build_service as build_incall_service
-from wazo_confd.plugins.incall_extension.service import build_service as build_incall_extension_service
+from wazo_confd.plugins.incall_extension.service import (
+    build_service as build_incall_extension_service,
+)
 from wazo_confd.plugins.line.service import build_service as build_line_service
 from wazo_confd.plugins.line_endpoint.service import build_service as build_le_service
-from wazo_confd.plugins.line_extension.service import build_service as build_line_extension_service
+from wazo_confd.plugins.line_extension.service import (
+    build_service as build_line_extension_service,
+)
 from wazo_confd.plugins.user.service import build_service as build_user_service
-from wazo_confd.plugins.user_call_permission.service import build_service as build_user_call_permission_service
+from wazo_confd.plugins.user_call_permission.service import (
+    build_service as build_user_call_permission_service,
+)
 from wazo_confd.plugins.user_line.service import build_service as build_ul_service
 from wazo_confd.plugins.user_voicemail.service import build_service as build_uv_service
-from wazo_confd.plugins.voicemail.service import build_service as build_voicemail_service
+from wazo_confd.plugins.voicemail.service import (
+    build_service as build_voicemail_service,
+)
 
 from .associators import (
     CallPermissionAssociator,
@@ -64,7 +76,6 @@ from .auth_client import set_auth_client_config, auth_client
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
@@ -108,17 +119,23 @@ class Plugin:
 
         entry_creator = EntryCreator(creators)
 
-        associators = OrderedDict([
-            ('wazo_user', WazoUserAssociator(wazo_user_service)),
-            ('voicemail', VoicemailAssociator(user_voicemail_service)),
-            ('sip', SipAssociator(line_sip_service)),
-            ('sccp', SccpAssociator(line_sccp_service)),
-            ('line', LineAssociator(user_line_service)),
-            ('extension', ExtensionAssociator(line_extension_service)),
-            ('incall', IncallAssociator(incall_extension_service)),
-            ('call_permissions', CallPermissionAssociator(user_call_permission_service,
-                                                          call_permission_service)),
-        ])
+        associators = OrderedDict(
+            [
+                ('wazo_user', WazoUserAssociator(wazo_user_service)),
+                ('voicemail', VoicemailAssociator(user_voicemail_service)),
+                ('sip', SipAssociator(line_sip_service)),
+                ('sccp', SccpAssociator(line_sccp_service)),
+                ('line', LineAssociator(user_line_service)),
+                ('extension', ExtensionAssociator(line_extension_service)),
+                ('incall', IncallAssociator(incall_extension_service)),
+                (
+                    'call_permissions',
+                    CallPermissionAssociator(
+                        user_call_permission_service, call_permission_service
+                    ),
+                ),
+            ]
+        )
 
         entry_associator = EntryAssociator(associators)
 
@@ -134,21 +151,17 @@ class Plugin:
             extension_dao,
             incall_dao,
             call_permission_dao,
-            user_call_permission_dao
+            user_call_permission_dao,
         )
 
         entry_updater = EntryUpdater(creators, associators, entry_finder)
 
         import_service = ImportService(entry_creator, entry_associator, entry_updater)
         api.add_resource(
-            UserImportResource,
-            '/users/import',
-            resource_class_args=(import_service,),
+            UserImportResource, '/users/import', resource_class_args=(import_service,)
         )
 
         export_service = ExportService(user_export_dao, auth_client)
         api.add_resource(
-            UserExportResource,
-            '/users/export',
-            resource_class_args=(export_service,)
+            UserExportResource, '/users/export', resource_class_args=(export_service,)
         )

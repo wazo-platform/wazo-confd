@@ -1,20 +1,13 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    equal_to,
-    has_key,
-    has_entry,
-    has_entries,
-)
+from hamcrest import assert_that, equal_to, has_key, has_entry, has_entries
 
 from . import confd
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 
-VALID_SERVICES = ['dnd',
-                  'incallfilter']
+VALID_SERVICES = ['dnd', 'incallfilter']
 
 
 @fixtures.user()
@@ -77,7 +70,9 @@ def test_put_error(user):
 @fixtures.user(services={'dnd': {'enabled': True}, 'incallfilter': {'enabled': True}})
 def test_get_services_relation(user):
     response = confd.users(user['uuid']).get()
-    assert_that(response.item, has_entries(
-        services={'dnd': {'enabled': True},
-                  'incallfilter': {'enabled': True}}
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            services={'dnd': {'enabled': True}, 'incallfilter': {'enabled': True}}
+        ),
+    )

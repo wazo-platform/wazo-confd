@@ -6,7 +6,6 @@ from .validator import build_validator
 
 
 class QueueScheduleService:
-
     def __init__(self, queue_dao, notifier, validator):
         self.queue_dao = queue_dao
         self.validator = validator
@@ -30,6 +29,4 @@ class QueueScheduleService:
 
 
 def build_service(queue_dao):
-    return QueueScheduleService(queue_dao,
-                                build_notifier(),
-                                build_validator())
+    return QueueScheduleService(queue_dao, build_notifier(), build_validator())

@@ -15,7 +15,6 @@ from ..service import TemplateService
 
 
 class TestTemplateService(unittest.TestCase):
-
     def setUp(self):
         self.validator = Mock()
         self.validator_bsfilter = Mock()
@@ -28,12 +27,14 @@ class TestTemplateService(unittest.TestCase):
         self.device_updater = Mock(DeviceUpdater)
 
         self.template = FuncKeyTemplate(id=sentinel.template_id, name=sentinel.name)
-        self.service = TemplateService(self.template_dao,
-                                       self.user_dao,
-                                       self.validator,
-                                       self.validator_bsfilter,
-                                       self.notifier,
-                                       self.device_updater)
+        self.service = TemplateService(
+            self.template_dao,
+            self.user_dao,
+            self.validator,
+            self.validator_bsfilter,
+            self.notifier,
+            self.device_updater,
+        )
 
     def test_when_searching_then_returns_search_from_database(self):
         expected_search = self.template_dao.search.return_value
@@ -97,14 +98,18 @@ class TestTemplateService(unittest.TestCase):
         self.validator.validate_delete.assert_called_once_with(self.template)
 
     @patch('xivo_dao.helpers.db_manager.Session.expire')
-    def test_when_deleting_then_updates_devices_associated_to_users(self, session_expire):
+    def test_when_deleting_then_updates_devices_associated_to_users(
+        self, session_expire
+    ):
         expected_user = User(func_key_template_id=sentinel.func_key_template_id)
         self.user_dao.find_all_by.return_value = [expected_user]
 
         self.service.delete(self.template)
 
         self.device_updater.update_for_user.assert_called_once_with(expected_user)
-        self.user_dao.find_all_by.assert_called_once_with(func_key_template_id=self.template.id)
+        self.user_dao.find_all_by.assert_called_once_with(
+            func_key_template_id=self.template.id
+        )
 
     def test_when_deleting_then_deletes_template_in_database(self):
         self.service.delete(self.template)

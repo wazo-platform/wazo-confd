@@ -21,21 +21,23 @@ class VoicemailZoneMessagesOption(BaseSchema):
     @post_load
     def convert_to_sqlalchemy(self, data):
         message = data['message'] if data['message'] else ''
-        return {'var_name': data['name'],
-                'var_val': '{}|{}'.format(data['timezone'], message)}
+        return {
+            'var_name': data['name'],
+            'var_val': '{}|{}'.format(data['timezone'], message),
+        }
 
     @pre_dump
     def convert_to_api(self, data):
         timezone, message = data.var_val.split('|', 1)
-        return {'name': data.var_name,
-                'timezone': timezone,
-                'message': message if message else None}
+        return {
+            'name': data.var_name,
+            'timezone': timezone,
+            'message': message if message else None,
+        }
 
 
 class VoicemailZoneMessagesSchema(BaseSchema):
-    items = fields.Nested(VoicemailZoneMessagesOption,
-                          many=True,
-                          required=True)
+    items = fields.Nested(VoicemailZoneMessagesOption, many=True, required=True)
 
     @post_load
     def remove_envelope(self, data):

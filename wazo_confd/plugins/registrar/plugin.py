@@ -8,7 +8,6 @@ from .resource import RegistrarList, RegistrarItem
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
@@ -20,15 +19,11 @@ class Plugin:
         registrar_dao = build_dao(provd_client)
         service = build_service(registrar_dao, provd_client)
 
-        api.add_resource(
-            RegistrarList,
-            '/registrars',
-            resource_class_args=(service,)
-        )
+        api.add_resource(RegistrarList, '/registrars', resource_class_args=(service,))
 
         api.add_resource(
             RegistrarItem,
             '/registrars/<id>',
             endpoint='registrars',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

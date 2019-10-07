@@ -6,20 +6,17 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
 
         api.add_resource(
-            RegisterSIPList,
-            '/registers/sip',
-            resource_class_args=(service,)
+            RegisterSIPList, '/registers/sip', resource_class_args=(service,)
         )
 
         api.add_resource(
             RegisterSIPItem,
             '/registers/sip/<int:id>',
             endpoint='register_sip',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

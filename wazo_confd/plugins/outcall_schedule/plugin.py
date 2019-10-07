@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,5 +17,5 @@ class Plugin:
             OutcallScheduleItem,
             '/outcalls/<int:outcall_id>/schedules/<int:schedule_id>',
             endpoint='outcall_schedules',
-            resource_class_args=(service, outcall_dao, schedule_dao)
+            resource_class_args=(service, outcall_dao, schedule_dao),
         )

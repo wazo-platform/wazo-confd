@@ -16,11 +16,11 @@ class SysconfdError(Exception):
 
 
 class SysconfdPublisher:
-
     @classmethod
     def from_config(cls, config):
-        url = "http://{}:{}".format(config['sysconfd']['host'],
-                                    config['sysconfd']['port'])
+        url = "http://{}:{}".format(
+            config['sysconfd']['host'], config['sysconfd']['port']
+        )
         return cls(url, configuration_dao)
 
     def __init__(self, base_url, dao):
@@ -38,16 +38,17 @@ class SysconfdPublisher:
             commands.update(set(new_commands))
 
     def move_voicemail(self, old_number, old_context, number, context):
-        params = {'old_mailbox': old_number,
-                  'old_context': old_context,
-                  'new_mailbox': number,
-                  'new_context': context}
+        params = {
+            'old_mailbox': old_number,
+            'old_context': old_context,
+            'new_mailbox': number,
+            'new_context': context,
+        }
         url = "{}/move_voicemail".format(self.base_url)
         self.add_request('GET', url, params=params)
 
     def delete_voicemail(self, number, context):
-        params = {'mailbox': number,
-                  'context': context}
+        params = {'mailbox': number, 'context': context}
         url = "{}/delete_voicemail".format(self.base_url)
         self.add_request('GET', url, params=params)
 
@@ -60,14 +61,12 @@ class SysconfdPublisher:
         self.add_request('POST', url, json={})
 
     def set_hosts(self, hostname, domain):
-        data = {'hostname': hostname,
-                'domain': domain}
+        data = {'hostname': hostname, 'domain': domain}
         url = "{}/hosts".format(self.base_url)
         self.add_request('POST', url, json=data)
 
     def set_resolvconf(self, nameserver, domain):
-        data = {'nameservers': nameserver,
-                'search': [domain]}
+        data = {'nameservers': nameserver, 'search': [domain]}
         url = "{}/resolv_conf".format(self.base_url)
         self.add_request('POST', url, json=data)
         self.flush()
@@ -110,8 +109,7 @@ class SysconfdPublisher:
 
     def check_for_errors(self, response):
         if response.status_code != 200:
-            raise SysconfdError(response.status_code,
-                                response.text)
+            raise SysconfdError(response.status_code, response.text)
 
     def add_request(self, *args, **kwargs):
         self.requests.append(lambda session: session.request(*args, **kwargs))
@@ -125,8 +123,7 @@ class SysconfdPublisher:
     def flush_handlers(self, session):
         if len(self.handlers) > 0:
             url = "{}/exec_request_handlers".format(self.base_url)
-            body = {key: tuple(commands)
-                    for key, commands in self.handlers.items()}
+            body = {key: tuple(commands) for key, commands in self.handlers.items()}
             response = session.request('POST', url, json=body)
             self.check_for_errors(response)
 

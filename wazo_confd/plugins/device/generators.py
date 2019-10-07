@@ -3,7 +3,6 @@
 
 
 class ConfigGenerator:
-
     def __init__(self, raw_generator):
         self.raw_generator = raw_generator
 
@@ -21,13 +20,11 @@ class ConfigGenerator:
 
 
 class RawConfigGenerator:
-
     def __init__(self, generators):
         self.generators = generators
 
     def generate(self, device):
-        raw_config = {'X_key': '',
-                      'config_version': 1}
+        raw_config = {'X_key': '', 'config_version': 1}
 
         for generator in self.generators:
             section = generator.generate(device)
@@ -38,19 +35,19 @@ class RawConfigGenerator:
 
 
 class UserGenerator:
-
     def __init__(self, device_db):
         self.device_db = device_db
 
     def generate(self, device):
         row = self.device_db.profile_for_device(device.id)
         if row:
-            return {'X_xivo_user_uuid': row.uuid,
-                    'X_xivo_phonebook_profile': row.context}
+            return {
+                'X_xivo_user_uuid': row.uuid,
+                'X_xivo_phonebook_profile': row.context,
+            }
 
 
 class ExtensionGenerator:
-
     def __init__(self, extension_dao):
         self.extension_dao = extension_dao
 
@@ -74,8 +71,9 @@ class ExtensionGenerator:
 
 
 class FuncKeyGenerator:
-
-    def __init__(self, user_dao, line_dao, user_line_dao, template_dao, device_dao, converters):
+    def __init__(
+        self, user_dao, line_dao, user_line_dao, template_dao, device_dao, converters
+    ):
         self.user_dao = user_dao
         self.line_dao = line_dao
         self.user_line_dao = user_line_dao
@@ -119,7 +117,6 @@ class FuncKeyGenerator:
 
 
 class SipGenerator:
-
     def __init__(self, registrar_dao, device_db):
         self.registrar_dao = registrar_dao
         self.device_db = device_db
@@ -140,13 +137,15 @@ class SipGenerator:
         extension = row.Extension
         registrar = self.registrar_dao.get(line.configregistrar)
 
-        config = {'auth_username': sip.name,
-                  'username': sip.name,
-                  'password': sip.secret,
-                  'display_name': line.caller_id_name,
-                  'number': extension.exten,
-                  'registrar_ip': registrar.main_host,
-                  'proxy_ip': registrar.proxy_main_host}
+        config = {
+            'auth_username': sip.name,
+            'username': sip.name,
+            'password': sip.secret,
+            'display_name': line.caller_id_name,
+            'number': extension.exten,
+            'registrar_ip': registrar.main_host,
+            'proxy_ip': registrar.proxy_main_host,
+        }
 
         optional_keys = {
             'registrar_port': 'main_port',
@@ -168,7 +167,6 @@ class SipGenerator:
 
 
 class SccpGenerator:
-
     def __init__(self, registrar_dao, line_dao):
         self.registrar_dao = registrar_dao
         self.line_dao = line_dao

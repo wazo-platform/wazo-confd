@@ -3,7 +3,6 @@
 
 
 class SoundLanguageService:
-
     def __init__(self, ari_client):
         self.ari_client = ari_client
 

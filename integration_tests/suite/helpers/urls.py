@@ -3,7 +3,6 @@
 
 
 class UrlFragment:
-
     @classmethod
     def root(cls, base=''):
         return cls([base])

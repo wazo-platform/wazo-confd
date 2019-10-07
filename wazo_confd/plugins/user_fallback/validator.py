@@ -6,7 +6,6 @@ from wazo_confd.helpers.validator import Validator, ValidationGroup
 
 
 class UserFallbackValidator(Validator):
-
     def __init__(self, destination_validator):
         self._destination_validator = destination_validator
 
@@ -19,6 +18,4 @@ class UserFallbackValidator(Validator):
 def build_validator():
     fallbacks_validator = UserFallbackValidator(DestinationValidator())
 
-    return ValidationGroup(
-        edit=[fallbacks_validator]
-    )
+    return ValidationGroup(edit=[fallbacks_validator])

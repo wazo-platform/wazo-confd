@@ -14,7 +14,6 @@ from ..notifier import UserAgentNotifier
 
 
 class TestAgentNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.agent = Mock(id=1)

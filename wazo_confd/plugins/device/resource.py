@@ -13,7 +13,6 @@ from .schema import DeviceSchema
 
 
 class SingleTenantMixin:
-
     def _add_tenant_uuid(self):
         tenant_uuid = Tenant.autodetect().uuid
         return {'tenant_uuid': tenant_uuid}
@@ -41,8 +40,7 @@ class DeviceList(SingleTenantMixin, ListResource):
             kwargs['tenant_uuid'] = tenant_uuid
 
         total, items = self.service.search(params, tenant_uuid=tenant_uuid)
-        return {'total': total,
-                'items': self.schema().dump(items, many=True)}
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.devices.create')
     def post(self):
@@ -64,12 +62,10 @@ class UnallocatedDeviceList(ListResource):
         params['recurse'] = False
 
         total, items = self.service.search(params)
-        return {'total': total,
-                'items': self.schema().dump(items, many=True)}
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
 
 
 class UnallocatedDeviceItem(SingleTenantConfdResource):
-
     def __init__(self, service):
         self.service = service
 
@@ -103,7 +99,6 @@ class DeviceItem(SingleTenantMixin, ItemResource):
 
 
 class DeviceAutoprov(SingleTenantConfdResource):
-
     def __init__(self, service):
         self.service = service
 
@@ -116,7 +111,6 @@ class DeviceAutoprov(SingleTenantConfdResource):
 
 
 class DeviceSynchronize(SingleTenantConfdResource):
-
     def __init__(self, service):
         self.service = service
 

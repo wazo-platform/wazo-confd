@@ -15,11 +15,11 @@ def build_validator():
         create=[
             UniqueField(
                 'name',
-                lambda name, tenant_uuids: skill_dao.find_by(name=name, tenant_uuids=tenant_uuids),
-                'Skill'
-            ),
+                lambda name, tenant_uuids: skill_dao.find_by(
+                    name=name, tenant_uuids=tenant_uuids
+                ),
+                'Skill',
+            )
         ],
-        edit=[
-            UniqueFieldChanged('name', skill_dao, 'Skill'),
-        ]
+        edit=[UniqueFieldChanged('name', skill_dao, 'Skill')],
     )

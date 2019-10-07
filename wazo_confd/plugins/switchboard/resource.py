@@ -17,7 +17,9 @@ class SwitchboardList(ListResource):
     schema = SwitchboardSchema
 
     def build_headers(self, switchboard):
-        return {'Location': url_for('switchboards', uuid=switchboard.uuid, _external=True)}
+        return {
+            'Location': url_for('switchboards', uuid=switchboard.uuid, _external=True)
+        }
 
     @required_acl('confd.switchboards.create')
     def post(self):

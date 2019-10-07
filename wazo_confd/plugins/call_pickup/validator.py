@@ -15,15 +15,10 @@ def build_validator():
     return ValidationGroup(
         create=[
             UniqueField(
-                'name',
-                lambda name: call_pickup_dao.find_by(name=name),
-                'CallPickup',
+                'name', lambda name: call_pickup_dao.find_by(name=name), 'CallPickup'
             )
         ],
         edit=[
-            Optional(
-                'name',
-                UniqueFieldChanged('name', call_pickup_dao, 'CallPickup')
-            )
-        ]
+            Optional('name', UniqueFieldChanged('name', call_pickup_dao, 'CallPickup'))
+        ],
     )

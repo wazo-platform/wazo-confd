@@ -5,7 +5,6 @@ from xivo_dao.helpers import errors
 
 
 class Entry:
-
     def __init__(self, number, entry_dict):
         self.number = number
         self.entry_dict = entry_dict
@@ -31,7 +30,9 @@ class Entry:
             'sip_id': self.sip.id if self.sip else None,
             'sccp_id': self.sccp.id if self.sccp else None,
             'extension_id': self.extension.id if self.extension else None,
-            'incall_extension_id': self.extension_incall.id if self.extension_incall else None,
+            'incall_extension_id': self.extension_incall.id
+            if self.extension_incall
+            else None,
             'call_permission_ids': self.extract_call_permission_ids(),
         }
 
@@ -73,7 +74,6 @@ class Entry:
 
 
 class EntryCreator:
-
     def __init__(self, creators):
         self.creators = creators
 
@@ -84,10 +84,14 @@ class EntryCreator:
         entry.create('user', self.creators['user'], tenant_uuid)
         entry.create('wazo_user', self.creators['wazo_user'], tenant_uuid)
         entry.find_or_create('voicemail', self.creators['voicemail'], tenant_uuid)
-        entry.find_or_create('call_permissions', self.creators['call_permissions'], tenant_uuid)
+        entry.find_or_create(
+            'call_permissions', self.creators['call_permissions'], tenant_uuid
+        )
         entry.find_or_create('line', self.creators['line'], tenant_uuid)
         entry.find_or_create('extension', self.creators['extension'], tenant_uuid)
-        entry.find_or_create('extension_incall', self.creators['extension_incall'], tenant_uuid)
+        entry.find_or_create(
+            'extension_incall', self.creators['extension_incall'], tenant_uuid
+        )
         entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
         self.create_endpoint(entry, tenant_uuid)
         return entry
@@ -101,7 +105,6 @@ class EntryCreator:
 
 
 class EntryAssociator:
-
     def __init__(self, associators):
         self.associators = associators
 
@@ -111,11 +114,21 @@ class EntryAssociator:
 
 
 class EntryFinder:
-
-    def __init__(self, user_dao, voicemail_dao, user_voicemail_dao,
-                 line_dao, user_line_dao, line_extension_dao,
-                 sip_dao, sccp_dao, extension_dao, incall_dao, call_permission_dao,
-                 user_call_permission_dao):
+    def __init__(
+        self,
+        user_dao,
+        voicemail_dao,
+        user_voicemail_dao,
+        line_dao,
+        user_line_dao,
+        line_extension_dao,
+        sip_dao,
+        sccp_dao,
+        extension_dao,
+        incall_dao,
+        call_permission_dao,
+        user_call_permission_dao,
+    ):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
         self.user_voicemail_dao = user_voicemail_dao
@@ -142,12 +155,18 @@ class EntryFinder:
             'firstname': user.firstname,
             'lastname': user.lastname,
             'username': user.username,
-            'emails': [email] if email else []
+            'emails': [email] if email else [],
         }
 
-        user_call_permissions = self.user_call_permission_dao.find_all_by(user_id=user.id)
+        user_call_permissions = self.user_call_permission_dao.find_all_by(
+            user_id=user.id
+        )
         for user_call_permission in user_call_permissions:
-            entry.call_permissions.append(self.call_permission_dao.get_by(id=user_call_permission.call_permission_id))
+            entry.call_permissions.append(
+                self.call_permission_dao.get_by(
+                    id=user_call_permission.call_permission_id
+                )
+            )
 
         user_voicemail = self.user_voicemail_dao.find_by_user_id(user.id)
         if user_voicemail:
@@ -161,14 +180,18 @@ class EntryFinder:
         if len(incalls) > 1:
             raise errors.not_permitted('Cannot update when user has multiple incalls')
         elif len(incalls) == 1:
-            entry.extension_incall = self.extension_dao.get_by(type='incall', typeval=str(incalls[0].id))
+            entry.extension_incall = self.extension_dao.get_by(
+                type='incall', typeval=str(incalls[0].id)
+            )
             entry.incall = incalls[0]
 
         return entry
 
     def attach_line_resources(self, entry, user_line):
         entry.line = self.line_dao.get(user_line.line_id)
-        line_extension = self.line_extension_dao.find_by(line_id=user_line.line_id, main_extension=True)
+        line_extension = self.line_extension_dao.find_by(
+            line_id=user_line.line_id, main_extension=True
+        )
         if line_extension:
             entry.extension = self.extension_dao.get(line_extension.extension_id)
 
@@ -179,7 +202,6 @@ class EntryFinder:
 
 
 class EntryUpdater:
-
     def __init__(self, creators, associators, finder):
         self.creators = creators
         self.associators = associators
@@ -194,9 +216,13 @@ class EntryUpdater:
 
     def create_missing_resources(self, entry, tenant_uuid):
         entry.find_or_create('voicemail', self.creators['voicemail'], tenant_uuid)
-        entry.find_or_create('call_permissions', self.creators['call_permissions'], tenant_uuid)
+        entry.find_or_create(
+            'call_permissions', self.creators['call_permissions'], tenant_uuid
+        )
         entry.find_or_create('extension', self.creators['extension'], tenant_uuid)
-        entry.find_or_create('extension_incall', self.creators['extension_incall'], tenant_uuid)
+        entry.find_or_create(
+            'extension_incall', self.creators['extension_incall'], tenant_uuid
+        )
         entry.find_or_create('incall', self.creators['incall'], tenant_uuid)
         entry.find_or_create('line', self.creators['line'], tenant_uuid)
         self.find_or_create_endpoint(entry, tenant_uuid)

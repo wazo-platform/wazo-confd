@@ -25,7 +25,6 @@ SYSCONFD_HANDLERS = {
 
 
 class TestLineExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

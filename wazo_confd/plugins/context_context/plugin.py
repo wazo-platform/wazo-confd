@@ -8,7 +8,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service(context_dao)
@@ -16,5 +15,5 @@ class Plugin:
         api.add_resource(
             ContextContextList,
             '/contexts/<int:context_id>/contexts',
-            resource_class_args=(service, context_dao)
+            resource_class_args=(service, context_dao),
         )

@@ -63,10 +63,7 @@ DEFAULT_CONFIG = {
         'port': 8666,
         'verify_certificate': '/usr/share/xivo-certs/server.crt',
     },
-    'sysconfd': {
-        'host': 'localhost',
-        'port': '8668'
-    },
+    'sysconfd': {'host': 'localhost', 'port': '8668'},
     'enabled_plugins': {
         'access_feature': True,
         'agent': True,
@@ -175,10 +172,7 @@ DEFAULT_CONFIG = {
         'ttl_interval': 30,
         'extra_tags': [],
     },
-    'wizard': {
-        'service_id': None,
-        'service_key': None,
-    },
+    'wizard': {'service_id': None, 'service_key': None},
 }
 
 
@@ -191,41 +185,61 @@ def load(argv):
 
     cli_config = _parse_cli_args(argv)
     file_config = read_config_file_hierarchy(ChainMap(cli_config, DEFAULT_CONFIG))
-    reinterpreted_config = _get_reinterpreted_raw_values(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
+    reinterpreted_config = _get_reinterpreted_raw_values(
+        ChainMap(cli_config, file_config, DEFAULT_CONFIG)
+    )
     service_key = _load_key_file(ChainMap(cli_config, file_config, DEFAULT_CONFIG))
-    return ChainMap(reinterpreted_config, key_config, cli_config, service_key, file_config, DEFAULT_CONFIG)
+    return ChainMap(
+        reinterpreted_config,
+        key_config,
+        cli_config,
+        service_key,
+        file_config,
+        DEFAULT_CONFIG,
+    )
 
 
 def _load_key_file(config):
     key_file = parse_config_file(config['auth']['key_file'])
-    return {'auth': {'username': key_file.get('service_id'),
-                     'password': key_file.get('service_key')}}
+    return {
+        'auth': {
+            'username': key_file.get('service_id'),
+            'password': key_file.get('service_key'),
+        }
+    }
 
 
 def _parse_cli_args(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c',
-                        '--config-file',
-                        action='store',
-                        help="The path where is the config file. Default: %(default)s")
-    parser.add_argument('-d',
-                        '--debug',
-                        action='store_true',
-                        help="Log debug messages. Overrides log_level. Default: %(default)s")
-    parser.add_argument('-l',
-                        '--log-level',
-                        action='store',
-                        default='INFO',
-                        help="Logs messages with LOG_LEVEL details. Must be one of:\n"
-                             "critical, error, warning, info, debug. Default: %(default)s")
-    parser.add_argument('-u',
-                        '--user',
-                        action='store',
-                        help="The owner of the process.")
-    parser.add_argument('-p',
-                        '--profile',
-                        help="Write profiling stats to directory (for debugging performance issues)",
-                        action='store')
+    parser.add_argument(
+        '-c',
+        '--config-file',
+        action='store',
+        help="The path where is the config file. Default: %(default)s",
+    )
+    parser.add_argument(
+        '-d',
+        '--debug',
+        action='store_true',
+        help="Log debug messages. Overrides log_level. Default: %(default)s",
+    )
+    parser.add_argument(
+        '-l',
+        '--log-level',
+        action='store',
+        default='INFO',
+        help="Logs messages with LOG_LEVEL details. Must be one of:\n"
+        "critical, error, warning, info, debug. Default: %(default)s",
+    )
+    parser.add_argument(
+        '-u', '--user', action='store', help="The owner of the process."
+    )
+    parser.add_argument(
+        '-p',
+        '--profile',
+        help="Write profiling stats to directory (for debugging performance issues)",
+        action='store',
+    )
     parsed_args = parser.parse_args(argv)
 
     result = {}

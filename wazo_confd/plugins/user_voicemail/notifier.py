@@ -9,7 +9,6 @@ from wazo_confd import bus, sysconfd
 
 
 class UserVoicemailNotifier:
-
     def __init__(self, bus, sysconfd):
         self._bus = bus
         self._sysconfd = sysconfd

@@ -13,18 +13,11 @@ from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 from ..notifier import FuncKeyTemplateNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
-SYSCONFD_HANDLERS_SCCP = {
-    'ipbx': ['module reload chan_sccp.so'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS_SCCP = {'ipbx': ['module reload chan_sccp.so'], 'agentbus': []}
 
 
 class TestFuncKeyTemplateNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -46,12 +39,16 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(self):
+    def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(
+        self
+    ):
         self.device_db.template_has_sccp_device.return_value = True
 
         self.notifier.edited(self.func_key_template, None)
 
-        self.device_db.template_has_sccp_device.assert_called_once_with(self.func_key_template.id)
+        self.device_db.template_has_sccp_device.assert_called_once_with(
+            self.func_key_template.id
+        )
         calls = [call(SYSCONFD_HANDLERS), call(SYSCONFD_HANDLERS_SCCP)]
         self.sysconfd.exec_request_handlers.assert_has_calls(calls)
 
@@ -62,7 +59,9 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
-    def test_when_func_key_template_edited_and_no_change_then_dialplan_not_reloaded(self):
+    def test_when_func_key_template_edited_and_no_change_then_dialplan_not_reloaded(
+        self
+    ):
         self.device_db.template_has_sccp_device.return_value = False
 
         self.notifier.edited(self.func_key_template, [])
@@ -77,7 +76,9 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
-    def test_when_func_key_template_edited_and_undefined_change_then_dialplan_reloaded(self):
+    def test_when_func_key_template_edited_and_undefined_change_then_dialplan_reloaded(
+        self
+    ):
         self.device_db.template_has_sccp_device.return_value = False
 
         self.notifier.edited(self.func_key_template, None)
@@ -91,12 +92,16 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(self):
+    def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(
+        self
+    ):
         self.device_db.template_has_sccp_device.return_value = True
 
         self.notifier.deleted(self.func_key_template)
 
-        self.device_db.template_has_sccp_device.assert_called_once_with(self.func_key_template.id)
+        self.device_db.template_has_sccp_device.assert_called_once_with(
+            self.func_key_template.id
+        )
         calls = [call(SYSCONFD_HANDLERS), call(SYSCONFD_HANDLERS_SCCP)]
         self.sysconfd.exec_request_handlers.assert_has_calls(calls)
 

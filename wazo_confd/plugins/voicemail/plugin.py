@@ -6,20 +6,15 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
 
-        api.add_resource(
-            VoicemailList,
-            '/voicemails',
-            resource_class_args=(service,)
-        )
+        api.add_resource(VoicemailList, '/voicemails', resource_class_args=(service,))
 
         api.add_resource(
             VoicemailItem,
             '/voicemails/<int:id>',
             endpoint='voicemails',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

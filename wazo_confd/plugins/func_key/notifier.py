@@ -12,17 +12,13 @@ from wazo_confd.database import device as device_db_module
 
 
 class FuncKeyTemplateNotifier:
-
     def __init__(self, bus, sysconfd, device_db):
         self.bus = bus
         self.sysconfd = sysconfd
         self.device_db = device_db
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {
-            'ipbx': ipbx,
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ipbx, 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, template):

@@ -12,7 +12,6 @@ LANGUAGE_REGEX = r"^[a-z]{2}_[A-Z]{2}$"
 
 
 class Validator(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def validate(self, model):
         return
@@ -22,14 +21,12 @@ class Validator(metaclass=abc.ABCMeta):
 
 
 class ValidatorAssociation(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def validate(self, model1, model2):
         return
 
 
 class GetResource(Validator):
-
     def __init__(self, field, dao_get, resource='Resource'):
         self.field = field
         self.dao_get = dao_get
@@ -54,7 +51,6 @@ class GetResource(Validator):
 
 
 class UniqueField(Validator):
-
     def __init__(self, field, dao_find, resource='Resource'):
         self.field = field
         self.dao_find = dao_find
@@ -78,7 +74,6 @@ class UniqueField(Validator):
 
 
 class UniqueFieldChanged(Validator):
-
     def __init__(self, field, dao, resource='Resource'):
         self.field = field
         self.dao = dao
@@ -103,7 +98,6 @@ class UniqueFieldChanged(Validator):
 
 
 class ResourceExists(Validator):
-
     def __init__(self, field, dao_exist, resource='Resource'):
         self.field = field
         self.dao_exist = dao_exist
@@ -118,7 +112,6 @@ class ResourceExists(Validator):
 
 
 class Optional(Validator):
-
     def __init__(self, field, *validators):
         self.field = field
         self.validators = validators
@@ -131,7 +124,6 @@ class Optional(Validator):
 
 
 class MemberOfSequence(Validator):
-
     def __init__(self, field, dao_list, resource='Resource'):
         self.field = field
         self.resource = resource
@@ -146,7 +138,6 @@ class MemberOfSequence(Validator):
 
 
 class ValidationGroup:
-
     def __init__(self, common=None, create=None, edit=None, delete=None):
         self.common = common or []
         self.create = create or []
@@ -173,7 +164,6 @@ class ValidationGroup:
 
 
 class ValidationAssociation:
-
     def __init__(self, common=None, association=None, dissociation=None):
         self.common = common or []
         self.association = association or []
@@ -189,10 +179,8 @@ class ValidationAssociation:
 
 
 class BaseExtensionRangeMixin:
-
     def _exten_in_range(self, exten, context_ranges):
-        return any(context_range.in_range(exten)
-                   for context_range in context_ranges)
+        return any(context_range.in_range(exten) for context_range in context_ranges)
 
     def _is_pattern(self, exten):
         return exten.startswith('_')

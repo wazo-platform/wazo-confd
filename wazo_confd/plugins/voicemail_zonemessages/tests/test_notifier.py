@@ -4,19 +4,17 @@
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.voicemail_zonemessages.event import EditVoicemailZoneMessagesEvent
+from xivo_bus.resources.voicemail_zonemessages.event import (
+    EditVoicemailZoneMessagesEvent,
+)
 from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
 from ..notifier import VoicemailZoneMessagesNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['voicemail reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['voicemail reload'], 'agentbus': []}
 
 
 class TestVoicemailZoneMessagesNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.voicemail_zonemessages = Mock(StaticVoicemail)

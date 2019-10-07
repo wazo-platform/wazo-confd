@@ -18,17 +18,12 @@ LINE_FIELDS = [
     'endpoint_custom.id',
 ]
 
-DEVICE_FIELDS = [
-    'id',
-]
+DEVICE_FIELDS = ['id']
 
 
 class LineDeviceNotifier:
 
-    REQUEST_HANDLERS = {
-        'ipbx': ['module reload chan_sccp.so'],
-        'agentbus': [],
-    }
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'], 'agentbus': []}
 
     def __init__(self, bus, sysconfd):
         self._bus = bus
@@ -39,7 +34,9 @@ class LineDeviceNotifier:
 
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
         device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device)
-        event = LineDeviceAssociatedEvent(line=line_serialized, device=device_serialized)
+        event = LineDeviceAssociatedEvent(
+            line=line_serialized, device=device_serialized
+        )
         self._bus.send_bus_event(event)
 
     def dissociated(self, line, device):
@@ -47,7 +44,9 @@ class LineDeviceNotifier:
 
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
         device_serialized = DeviceSchema(only=DEVICE_FIELDS).dump(device)
-        event = LineDeviceDissociatedEvent(line=line_serialized, device=device_serialized)
+        event = LineDeviceDissociatedEvent(
+            line=line_serialized, device=device_serialized
+        )
         self._bus.send_bus_event(event)
 
     def _reload_sccp(self, line):

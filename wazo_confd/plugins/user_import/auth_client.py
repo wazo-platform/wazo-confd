@@ -11,7 +11,6 @@ auth_config = {}
 
 
 class AuthClientProxy(AuthClient):
-
     def __init__(self, *args, **kwargs):
         super(AuthClientProxy, self).__init__(*args, **kwargs)
         self.users_created = []

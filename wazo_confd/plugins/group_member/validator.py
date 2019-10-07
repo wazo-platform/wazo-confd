@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class GroupMemberUserAssociationValidator(ValidatorAssociation):
-
     def validate(self, group, members):
         users = [member.user for member in members]
         for user in users:
@@ -21,14 +20,12 @@ class GroupMemberUserAssociationValidator(ValidatorAssociation):
     def validate_same_tenant(self, group, user):
         if group.tenant_uuid != user.tenant_uuid:
             raise errors.different_tenants(
-                group_tenant_uuid=group.tenant_uuid,
-                user_tenant_uuid=user.tenant_uuid
+                group_tenant_uuid=group.tenant_uuid, user_tenant_uuid=user.tenant_uuid
             )
 
     def validate_user_has_endpoint(self, user):
         if not user.lines:
-            raise errors.missing_association('User', 'Line',
-                                             user_uuid=user.uuid)
+            raise errors.missing_association('User', 'Line', user_uuid=user.uuid)
 
     def validate_no_duplicate_user(self, users):
         if len(users) != len(set(users)):
@@ -38,31 +35,32 @@ class GroupMemberUserAssociationValidator(ValidatorAssociation):
         all_lines = [user.lines[0] for user in users]
         for line in all_lines:
             if all_lines.count(line) > 1:
-                raise errors.not_permitted('Cannot associate different users with the same line',
-                                           line_id=line.id)
+                raise errors.not_permitted(
+                    'Cannot associate different users with the same line',
+                    line_id=line.id,
+                )
 
 
 class GroupMemberExtensionAssociationValidator(ValidatorAssociation):
-
     def validate(self, group, members):
-        extensions = [{
-            'exten': member.extension.exten,
-            'context': member.extension.context
-        } for member in members]
+        extensions = [
+            {'exten': member.extension.exten, 'context': member.extension.context}
+            for member in members
+        ]
         self.validate_no_duplicate_extension(extensions)
 
     def validate_no_duplicate_extension(self, extensions):
         if any(extensions.count(extension) > 1 for extension in extensions):
-            raise errors.not_permitted('Cannot associate same extensions more than once')
+            raise errors.not_permitted(
+                'Cannot associate same extensions more than once'
+            )
 
 
 def build_validator_member_user():
-    return ValidationAssociation(
-        association=[GroupMemberUserAssociationValidator()],
-    )
+    return ValidationAssociation(association=[GroupMemberUserAssociationValidator()])
 
 
 def build_validator_member_extension():
     return ValidationAssociation(
-        association=[GroupMemberExtensionAssociationValidator()],
+        association=[GroupMemberExtensionAssociationValidator()]
     )

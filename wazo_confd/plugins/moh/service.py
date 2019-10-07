@@ -10,7 +10,6 @@ from .validator import build_validator
 
 
 class MohService(CRUDService):
-
     def __init__(self, dao, validator, notifier, storage):
         super(MohService, self).__init__(dao, validator, notifier)
         self._storage = storage
@@ -56,7 +55,4 @@ class MohService(CRUDService):
 
 
 def build_service():
-    return MohService(moh_dao,
-                      build_validator(),
-                      build_notifier(),
-                      build_storage())
+    return MohService(moh_dao, build_validator(), build_notifier(), build_storage())

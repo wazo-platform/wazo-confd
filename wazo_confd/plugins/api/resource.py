@@ -17,9 +17,13 @@ class SwaggerResource(Resource):
     api_filename = "api.yml"
 
     def get(self):
-        api_spec = ChainMap(*load_all_api_specs('wazo_confd.plugins', self.api_filename))
+        api_spec = ChainMap(
+            *load_all_api_specs('wazo_confd.plugins', self.api_filename)
+        )
 
         if not api_spec.get('info'):
             return {'error': "API spec does not exist"}, 404
 
-        return make_response(yaml.dump(dict(api_spec)), 200, {'Content-Type': 'application/x-yaml'})
+        return make_response(
+            yaml.dump(dict(api_spec)), 200, {'Content-Type': 'application/x-yaml'}
+        )

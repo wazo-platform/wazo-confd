@@ -14,15 +14,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -56,7 +49,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', True
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', 1234
@@ -116,22 +111,13 @@ def check_search(url, conference, hidden, field, term):
 @fixtures.conference(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.conferences.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.conferences.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.conferences.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.conference(name='sort1')
@@ -165,7 +151,7 @@ def test_get(conference):
             announce_only_user=conference['announce_only_user'],
             music_on_hold=conference['music_on_hold'],
             extensions=empty(),
-        )
+        ),
     )
 
 
@@ -287,5 +273,9 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.conference()
 def test_bus_events(conference):
     yield s.check_bus_event, 'config.conferences.created', confd.conferences.post
-    yield s.check_bus_event, 'config.conferences.edited', confd.conferences(conference['id']).put
-    yield s.check_bus_event, 'config.conferences.deleted', confd.conferences(conference['id']).delete
+    yield s.check_bus_event, 'config.conferences.edited', confd.conferences(
+        conference['id']
+    ).put
+    yield s.check_bus_event, 'config.conferences.deleted', confd.conferences(
+        conference['id']
+    ).delete

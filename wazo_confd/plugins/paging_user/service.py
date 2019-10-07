@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class PagingUserService:
-
     def __init__(self, paging_dao, notifier, validator):
         self.paging_dao = paging_dao
         self.validator = validator
@@ -26,6 +25,4 @@ class PagingUserService:
 
 
 def build_service():
-    return PagingUserService(paging_dao_module,
-                             build_notifier(),
-                             build_validator())
+    return PagingUserService(paging_dao_module, build_notifier(), build_validator())

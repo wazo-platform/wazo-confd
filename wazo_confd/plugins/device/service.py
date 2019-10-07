@@ -9,7 +9,6 @@ from xivo_dao.helpers.db_manager import Session
 
 
 class DeviceService(CRUDService):
-
     def __init__(self, dao, validator, notifier, search_engine, line_dao, line_device):
         super(DeviceService, self).__init__(dao, validator, notifier)
         self.search_engine = search_engine
@@ -62,8 +61,7 @@ class SearchEngine:
         'description',
     ]
 
-    DIRECTION = ['asc',
-                 'desc']
+    DIRECTION = ['asc', 'desc']
 
     DEFAULT_ORDER = 'ip'
     DEFAULT_DIRECTION = 'asc'
@@ -74,16 +72,16 @@ class SearchEngine:
     def search(self, parameters, tenant_uuid=None):
         self.validate_parameters(parameters)
         provd_devices = self.find_all_devices(parameters, tenant_uuid=tenant_uuid)
-        provd_devices = self.filter_devices(provd_devices,
-                                            parameters.get('search'))
+        provd_devices = self.filter_devices(provd_devices, parameters.get('search'))
         total = len(provd_devices)
 
-        provd_devices = self.paginate_devices(provd_devices,
-                                              parameters.get('offset', parameters.get('skip', 0)),
-                                              parameters.get('limit'))
+        provd_devices = self.paginate_devices(
+            provd_devices,
+            parameters.get('offset', parameters.get('skip', 0)),
+            parameters.get('limit'),
+        )
 
-        items = [self.dao.build_device(provd_device)
-                 for provd_device in provd_devices]
+        items = [self.dao.build_device(provd_device) for provd_device in provd_devices]
 
         return SearchResult(total=total, items=items)
 
@@ -94,15 +92,26 @@ class SearchEngine:
 
         if 'order' in parameters:
             if parameters['order'] not in self.PROVD_DEVICE_KEYS:
-                raise errors.invalid_ordering(parameters['order'], self.PROVD_DEVICE_KEYS)
+                raise errors.invalid_ordering(
+                    parameters['order'], self.PROVD_DEVICE_KEYS
+                )
 
     def find_all_devices(self, parameters, tenant_uuid=None):
-        query = {key: value for key, value in parameters.items()
-                 if key in self.PROVD_DEVICE_KEYS}
+        query = {
+            key: value
+            for key, value in parameters.items()
+            if key in self.PROVD_DEVICE_KEYS
+        }
         order = parameters.get('order', self.DEFAULT_ORDER)
         direction = parameters.get('direction', self.DEFAULT_DIRECTION)
         recurse = parameters.get('recurse', False)
-        return self.dao.devices.list(search=query, order=order, direction=direction, tenant_uuid=tenant_uuid, recurse=recurse)['devices']
+        return self.dao.devices.list(
+            search=query,
+            order=order,
+            direction=direction,
+            tenant_uuid=tenant_uuid,
+            recurse=recurse,
+        )['devices']
 
     def filter_devices(self, devices, search=None):
         if search is None:
@@ -110,8 +119,7 @@ class SearchEngine:
 
         search = search.lower()
 
-        return [device for device in devices
-                if self._matches_search(device, search)]
+        return [device for device in devices if self._matches_search(device, search)]
 
     def _matches_search(self, device, search_lowered):
         for key in self.PROVD_DEVICE_KEYS:
@@ -121,5 +129,5 @@ class SearchEngine:
 
     def paginate_devices(self, devices, offset=0, limit=None):
         if limit:
-            return devices[offset:offset + limit]
+            return devices[offset : offset + limit]
         return devices[offset:]

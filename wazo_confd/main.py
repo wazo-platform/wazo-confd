@@ -21,7 +21,9 @@ def main(argv=None):
     argv = argv or sys.argv[1:]
     config = load_config(argv)
 
-    xivo_logging.setup_logging(config['log_filename'], FOREGROUND, config['debug'], config['log_level'])
+    xivo_logging.setup_logging(
+        config['log_filename'], FOREGROUND, config['debug'], config['log_level']
+    )
     xivo_logging.silence_loggers(['Flask-Cors'], logging.WARNING)
 
     if config['user']:

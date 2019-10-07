@@ -11,8 +11,10 @@ from . import new_client
 
 
 def csv_client():
-    new_client.headers = {"Content-Type": "text/csv; charset=utf-8",
-                          "X-Auth-Token": "valid-token-multitenant"}
+    new_client.headers = {
+        "Content-Type": "text/csv; charset=utf-8",
+        "X-Auth-Token": "valid-token-multitenant",
+    }
     new_client.encoder = generate_csv
     return new_client
 
@@ -42,11 +44,13 @@ def generate_entry(**params):
 
 
 def make_entry(params):
-    entry = {'firstname': params.get('firstname', words.name()),
-             'lastname': params.get('lastname', words.name()),
-             'username': params.get('username', words.alphanumeric()),
-             'password': params.get('password', words.alphanumeric()),
-             'email': params.get('email', '{}@example.com'.format(words.alphanumeric()))}
+    entry = {
+        'firstname': params.get('firstname', words.name()),
+        'lastname': params.get('lastname', words.name()),
+        'username': params.get('username', words.alphanumeric()),
+        'password': params.get('password', words.alphanumeric()),
+        'email': params.get('email', '{}@example.com'.format(words.alphanumeric())),
+    }
 
     if params.get('voicemail'):
         name = "{e[firstname]} {e[lastname]}".format(e=entry)
@@ -79,7 +83,9 @@ def make_entry(params):
 
     nb_permissions = params.pop('call_permissions', 0)
     if nb_permissions > 0:
-        permissions = [call_permission.generate_call_permission() for _ in range(nb_permissions)]
+        permissions = [
+            call_permission.generate_call_permission() for _ in range(nb_permissions)
+        ]
         entry['call_permissions'] = ';'.join(p['name'] for p in permissions)
 
     return entry

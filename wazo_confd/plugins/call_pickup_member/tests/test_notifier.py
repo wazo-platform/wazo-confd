@@ -24,7 +24,6 @@ SYSCONFD_HANDLERS = {
 
 
 class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -38,60 +37,72 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
 
     def test_interceptor_users_associate_then_bus_event(self):
         expected_event = CallPickupInterceptorUsersAssociatedEvent(
-            self.call_pickup.id,
-            [self.user1.uuid, self.user2.uuid]
+            self.call_pickup.id, [self.user1.uuid, self.user2.uuid]
         )
 
-        self.notifier.interceptor_users_associated(self.call_pickup, [self.user1, self.user2])
+        self.notifier.interceptor_users_associated(
+            self.call_pickup, [self.user1, self.user2]
+        )
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_interceptor_users_associate_then_sysconfd_event(self):
-        self.notifier.interceptor_users_associated(self.call_pickup, [self.user1, self.user2])
+        self.notifier.interceptor_users_associated(
+            self.call_pickup, [self.user1, self.user2]
+        )
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_target_users_associate_then_bus_event(self):
         expected_event = CallPickupTargetUsersAssociatedEvent(
-            self.call_pickup.id,
-            [self.user1.uuid, self.user2.uuid]
+            self.call_pickup.id, [self.user1.uuid, self.user2.uuid]
         )
 
-        self.notifier.target_users_associated(self.call_pickup, [self.user1, self.user2])
+        self.notifier.target_users_associated(
+            self.call_pickup, [self.user1, self.user2]
+        )
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_target_users_associate_then_sysconfd_event(self):
-        self.notifier.target_users_associated(self.call_pickup, [self.user1, self.user2])
+        self.notifier.target_users_associated(
+            self.call_pickup, [self.user1, self.user2]
+        )
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_interceptor_groups_associate_then_bus_event(self):
         expected_event = CallPickupInterceptorGroupsAssociatedEvent(
-            self.call_pickup.id,
-            [self.group1.uuid, self.group2.uuid]
+            self.call_pickup.id, [self.group1.uuid, self.group2.uuid]
         )
 
-        self.notifier.interceptor_groups_associated(self.call_pickup, [self.group1, self.group2])
+        self.notifier.interceptor_groups_associated(
+            self.call_pickup, [self.group1, self.group2]
+        )
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_interceptor_groups_associate_then_sysconfd_event(self):
-        self.notifier.interceptor_groups_associated(self.call_pickup, [self.group1, self.group2])
+        self.notifier.interceptor_groups_associated(
+            self.call_pickup, [self.group1, self.group2]
+        )
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_target_groups_associate_then_bus_event(self):
         expected_event = CallPickupTargetGroupsAssociatedEvent(
-            self.call_pickup.id,
-            [self.group1.uuid, self.group2.uuid]
+            self.call_pickup.id, [self.group1.uuid, self.group2.uuid]
         )
 
-        self.notifier.target_groups_associated(self.call_pickup, [self.group1, self.group2])
+        self.notifier.target_groups_associated(
+            self.call_pickup, [self.group1, self.group2]
+        )
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_target_groups_associate_then_sysconfd_event(self):
-        self.notifier.target_groups_associated(self.call_pickup, [self.group1, self.group2])
+        self.notifier.target_groups_associated(
+            self.call_pickup, [self.group1, self.group2]
+        )
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)

@@ -2,12 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import (
-    EXCLUDE,
-    fields,
-    pre_dump,
-    post_load,
-)
+from marshmallow import EXCLUDE, fields, pre_dump, post_load
 from marshmallow.validate import Length
 
 from wazo_confd.auth import required_acl
@@ -16,7 +11,6 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class UserSubResource(ConfdResource):
-
     def __init__(self, service):
         self.service = service
 
@@ -108,21 +102,27 @@ class UserServiceList(UserSubResource):
 
 class ForwardBusySchema(BaseSchema):
     enabled = StrictBoolean(attribute='busy_enabled')
-    destination = fields.String(attribute='busy_destination', validate=Length(max=128), allow_none=True)
+    destination = fields.String(
+        attribute='busy_destination', validate=Length(max=128), allow_none=True
+    )
 
     types = ['busy']
 
 
 class ForwardNoAnswerSchema(BaseSchema):
     enabled = StrictBoolean(attribute='noanswer_enabled')
-    destination = fields.String(attribute='noanswer_destination', validate=Length(max=128), allow_none=True)
+    destination = fields.String(
+        attribute='noanswer_destination', validate=Length(max=128), allow_none=True
+    )
 
     types = ['noanswer']
 
 
 class ForwardUnconditionalSchema(BaseSchema):
     enabled = StrictBoolean(attribute='unconditional_enabled')
-    destination = fields.String(attribute='unconditional_destination', validate=Length(max=128), allow_none=True)
+    destination = fields.String(
+        attribute='unconditional_destination', validate=Length(max=128), allow_none=True
+    )
 
     types = ['unconditional']
 

@@ -3,7 +3,11 @@
 
 from xivo_dao.resources.endpoint_custom import dao as custom_dao
 
-from wazo_confd.helpers.validator import ValidationGroup, UniqueField, UniqueFieldChanged
+from wazo_confd.helpers.validator import (
+    ValidationGroup,
+    UniqueField,
+    UniqueFieldChanged,
+)
 
 
 def find_by_interface(interface):
@@ -12,10 +16,6 @@ def find_by_interface(interface):
 
 def build_validator():
     return ValidationGroup(
-        create=[
-            UniqueField('interface', find_by_interface, 'CustomEndpoint')
-        ],
-        edit=[
-            UniqueFieldChanged('interface', custom_dao, 'CustomEndpoint')
-        ]
+        create=[UniqueField('interface', find_by_interface, 'CustomEndpoint')],
+        edit=[UniqueFieldChanged('interface', custom_dao, 'CustomEndpoint')],
     )

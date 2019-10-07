@@ -6,7 +6,6 @@ from .validator import build_validator
 
 
 class SwitchboardMemberUserService:
-
     def __init__(self, notifier, validator):
         self.validator = validator
         self.notifier = notifier
@@ -20,5 +19,4 @@ class SwitchboardMemberUserService:
 
 
 def build_service():
-    return SwitchboardMemberUserService(build_notifier(),
-                                        build_validator())
+    return SwitchboardMemberUserService(build_notifier(), build_validator())

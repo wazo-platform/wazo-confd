@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class SCCPGeneralService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class SCCPGeneralService:
 
 
 def build_service():
-    return SCCPGeneralService(sccp_general_dao,
-                              build_notifier())
+    return SCCPGeneralService(sccp_general_dao, build_notifier())

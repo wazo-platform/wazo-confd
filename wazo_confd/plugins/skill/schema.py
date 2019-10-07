@@ -18,10 +18,7 @@ class SkillSchema(BaseSchema):
     links = ListLink(Link('skills'))
 
     agents = fields.Nested(
-        'SkillAgentsSchema',
-        attribute='agent_queue_skills',
-        many=True,
-        dump_only=True,
+        'SkillAgentsSchema', attribute='agent_queue_skills', many=True, dump_only=True
     )
 
 

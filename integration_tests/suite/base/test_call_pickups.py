@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -73,32 +66,20 @@ def unique_error_checks(url, call_pickup):
 @fixtures.call_pickup(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.callpickups.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.callpickups.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.callpickups.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.call_pickup(name="search", description="SearchDesc")
 @fixtures.call_pickup(name="hidden", description="HiddenDesc")
 def test_search(call_pickup, hidden):
     url = confd.callpickups
-    searches = {
-        'name': 'search',
-        'description': 'Search',
-    }
+    searches = {'name': 'search', 'description': 'Search'}
 
     for field, term in searches.items():
         yield check_search, url, call_pickup, hidden, field, term
@@ -131,19 +112,16 @@ def test_sorting_offset_limit(call_pickup1, call_pickup2):
 @fixtures.call_pickup()
 def test_get(call_pickup):
     response = confd.callpickups(call_pickup['id']).get()
-    assert_that(response.item, has_entries(
-        name=call_pickup['name'],
-        description=none(),
-        enabled=True,
-        interceptors=has_entries(
-            groups=empty(),
-            users=empty(),
+    assert_that(
+        response.item,
+        has_entries(
+            name=call_pickup['name'],
+            description=none(),
+            enabled=True,
+            interceptors=has_entries(groups=empty(), users=empty()),
+            targets=has_entries(groups=empty(), users=empty()),
         ),
-        targets=has_entries(
-            groups=empty(),
-            users=empty(),
-        ),
-    ))
+    )
 
 
 @fixtures.call_pickup(wazo_tenant=MAIN_TENANT)
@@ -157,9 +135,7 @@ def test_get_multi_tenant(main, sub):
 
 
 def test_create_minimal_parameters():
-    response = confd.callpickups.post(
-        name='minimal',
-    )
+    response = confd.callpickups.post(name='minimal')
     response.assert_created('callpickups')
 
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, id=not_(empty())))

@@ -20,8 +20,7 @@ class UserList(ListResource):
 
     model = User
     schema = UserSchemaNullable
-    view_schemas = {'directory': UserDirectorySchema,
-                    'summary': UserSummarySchema}
+    view_schemas = {'directory': UserDirectorySchema, 'summary': UserSummarySchema}
 
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
@@ -41,15 +40,16 @@ class UserList(ListResource):
 
     def legacy_search(self, params, tenant_uuids=None):
         result = self.service.legacy_search(params['q'], tenant_uuids=tenant_uuids)
-        return {'total': result.total,
-                'items': self.schema().dump(result.items, many=True)}
+        return {
+            'total': result.total,
+            'items': self.schema().dump(result.items, many=True),
+        }
 
     def user_search(self, params, tenant_uuids=None):
         view = request.args.get('view')
         schema = self.view_schemas.get(view, self.schema)
         result = self.service.search(params, tenant_uuids)
-        return {'total': result.total,
-                'items': schema().dump(result.items, many=True)}
+        return {'total': result.total, 'items': schema().dump(result.items, many=True)}
 
 
 class UserItem(ItemResource):

@@ -6,7 +6,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
 
@@ -16,10 +15,8 @@ class Plugin:
             ExtensionFeatureItem,
             '/extensions/features/<int:id>',
             endpoint='extensions_features',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
         api.add_resource(
-            ExtensionFeatureList,
-            '/extensions/features',
-            resource_class_args=(service,)
+            ExtensionFeatureList, '/extensions/features', resource_class_args=(service,)
         )

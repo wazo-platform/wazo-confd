@@ -1,9 +1,7 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (assert_that,
-                      contains_inanyorder,
-                      has_entries)
+from hamcrest import assert_that, contains_inanyorder, has_entries
 
 from ..helpers import errors as e
 from ..helpers import scenarios as s
@@ -62,11 +60,16 @@ def test_associate_multiple(group1, group2, group3, user, line):
         response.assert_updated()
 
         response = confd.users(user['uuid']).get()
-        assert_that(response.item, has_entries(
-            groups=contains_inanyorder(has_entries(id=group1['id']),
-                                       has_entries(id=group2['id']),
-                                       has_entries(id=group3['id']))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                groups=contains_inanyorder(
+                    has_entries(id=group1['id']),
+                    has_entries(id=group2['id']),
+                    has_entries(id=group3['id']),
+                )
+            ),
+        )
 
 
 @fixtures.group()
@@ -90,7 +93,9 @@ def test_associate_same_group(group, user, line):
 @fixtures.user()
 @fixtures.line_sip()
 def test_dissociate(group1, group2, user, line):
-    with a.user_line(user, line), a.group_member_user(group1, user), a.group_member_user(group2, user):
+    with a.user_line(user, line), a.group_member_user(
+        group1, user
+    ), a.group_member_user(group2, user):
         response = confd.users(user['uuid']).groups.put(groups=[])
         response.assert_updated()
 

@@ -12,20 +12,17 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 class NodeApplicationDestinationOptionsSchema(BaseSchema):
 
     type = fields.String(
-        attribute='type_',
-        validate=OneOf(['holding']),
-        required=True,
-        missing='holding',
+        attribute='type_', validate=OneOf(['holding']), required=True, missing='holding'
     )
-    music_on_hold = fields.String(validate=Length(max=128), allow_none=True, missing=None)
+    music_on_hold = fields.String(
+        validate=Length(max=128), allow_none=True, missing=None
+    )
     answer = fields.Boolean(missing=False)
 
 
 class ApplicationDestinationOptionsField(fields.Field):
 
-    _options = {
-        'node': fields.Nested(NodeApplicationDestinationOptionsSchema),
-    }
+    _options = {'node': fields.Nested(NodeApplicationDestinationOptionsSchema)}
 
     def _deserialize(self, value, attr, data):
         destination = data.get('destination')
@@ -57,10 +54,7 @@ class ApplicationSchema(BaseSchema):
     links = ListLink(Link('applications', field='uuid', target='application_uuid'))
 
     lines = fields.Nested(
-        'LineSchema',
-        only=['id', 'name', 'links'],
-        many=True,
-        dump_only=True,
+        'LineSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
 
     @pre_dump

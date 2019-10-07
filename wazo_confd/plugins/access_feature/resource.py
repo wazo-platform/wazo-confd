@@ -17,7 +17,9 @@ class AccessFeatureList(ListResource):
     schema = AccessFeatureSchema
 
     def build_headers(self, access_feature):
-        return {'Location': url_for('access_features', id=access_feature.id, _external=True)}
+        return {
+            'Location': url_for('access_features', id=access_feature.id, _external=True)
+        }
 
     @required_acl('confd.access_features.create')
     def post(self):

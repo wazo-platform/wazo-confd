@@ -4,16 +4,13 @@
 import unittest
 
 from mock import Mock
-from xivo_bus.resources.dhcp.event import (
-    EditDHCPEvent,
-)
+from xivo_bus.resources.dhcp.event import EditDHCPEvent
 from xivo_dao.alchemy.dhcp import Dhcp
 
 from ..notifier import DHCPNotifier
 
 
 class TestDHCPNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

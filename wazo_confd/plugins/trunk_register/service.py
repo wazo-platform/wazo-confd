@@ -8,7 +8,6 @@ from .validator import build_validator_iax, build_validator_sip
 
 
 class TrunkRegisterService:
-
     def __init__(self, trunk_dao, validator, notifier):
         self.trunk_dao = trunk_dao
         self.validator = validator
@@ -16,7 +15,6 @@ class TrunkRegisterService:
 
 
 class TrunkRegisterIAXService(TrunkRegisterService):
-
     def associate(self, trunk, register):
         if trunk.register_iax is register:
             return
@@ -35,7 +33,6 @@ class TrunkRegisterIAXService(TrunkRegisterService):
 
 
 class TrunkRegisterSIPService(TrunkRegisterService):
-
     def associate(self, trunk, register):
         if trunk.register_sip is register:
             return
@@ -55,15 +52,11 @@ class TrunkRegisterSIPService(TrunkRegisterService):
 
 def build_service_iax():
     return TrunkRegisterIAXService(
-        trunk_dao_module,
-        build_validator_iax(),
-        build_notifier_iax(),
+        trunk_dao_module, build_validator_iax(), build_notifier_iax()
     )
 
 
 def build_service_sip():
     return TrunkRegisterSIPService(
-        trunk_dao_module,
-        build_validator_sip(),
-        build_notifier_sip(),
+        trunk_dao_module, build_validator_sip(), build_notifier_sip()
     )

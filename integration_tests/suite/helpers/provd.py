@@ -14,45 +14,63 @@ class ProvdHelper:
 
     DOCKER_PROVD_IMAGE = "wazopbx/wazo-provd"
 
-    DEFAULT_CONFIGS = [{'X_type': 'registrar',
-                        'deletable': True,
-                        'displayname': 'local',
-                        'id': 'default',
-                        'parent_ids': [],
-                        'proxy_main': '127.0.0.1',
-                        'raw_config': {'X_key': 'xivo'},
-                        'registrar_main': '127.0.0.1',
-                        },
-                       {'X_type': 'internal',
-                        'id': 'autoprov',
-                        'parent_ids': ['base', 'defaultconfigdevice'],
-                        'raw_config': {'sccp_call_managers': {'1': {'ip': '127.0.0.1'}},
-                                       'sip_lines': {'1': {'display_name': 'Autoprov',
-                                                           'number': 'autoprov',
-                                                           'password': 'autoprov',
-                                                           'proxy_ip': '127.0.0.1',
-                                                           'registrar_ip': '127.0.0.1',
-                                                           'username': 'apmy3dCQDw'}}},
-                        'role': 'autocreate'},
-                       {'X_type': 'internal',
-                        'deletable': True,
-                        'id': 'base',
-                        'parent_ids': [],
-                        'raw_config': {'X_xivo_phonebook_ip': '127.0.0.1',
-                                       'ntp_enabled': True,
-                                       'ntp_ip': '127.0.0.1'}},
-                       {'X_type': 'device',
-                        'deletable': True,
-                        'id': 'defaultconfigdevice',
-                        'label': 'Default config device',
-                        'parent_ids': [],
-                        'raw_config': {'ntp_enabled': True, 'ntp_ip': '127.0.0.1'}},
-                       {'X_type': 'device',
-                        'deletable': True,
-                        'id': 'mockdevicetemplate',
-                        'parent_ids': ['base'],
-                        'raw_config': {}},
-                       ]
+    DEFAULT_CONFIGS = [
+        {
+            'X_type': 'registrar',
+            'deletable': True,
+            'displayname': 'local',
+            'id': 'default',
+            'parent_ids': [],
+            'proxy_main': '127.0.0.1',
+            'raw_config': {'X_key': 'xivo'},
+            'registrar_main': '127.0.0.1',
+        },
+        {
+            'X_type': 'internal',
+            'id': 'autoprov',
+            'parent_ids': ['base', 'defaultconfigdevice'],
+            'raw_config': {
+                'sccp_call_managers': {'1': {'ip': '127.0.0.1'}},
+                'sip_lines': {
+                    '1': {
+                        'display_name': 'Autoprov',
+                        'number': 'autoprov',
+                        'password': 'autoprov',
+                        'proxy_ip': '127.0.0.1',
+                        'registrar_ip': '127.0.0.1',
+                        'username': 'apmy3dCQDw',
+                    }
+                },
+            },
+            'role': 'autocreate',
+        },
+        {
+            'X_type': 'internal',
+            'deletable': True,
+            'id': 'base',
+            'parent_ids': [],
+            'raw_config': {
+                'X_xivo_phonebook_ip': '127.0.0.1',
+                'ntp_enabled': True,
+                'ntp_ip': '127.0.0.1',
+            },
+        },
+        {
+            'X_type': 'device',
+            'deletable': True,
+            'id': 'defaultconfigdevice',
+            'label': 'Default config device',
+            'parent_ids': [],
+            'raw_config': {'ntp_enabled': True, 'ntp_ip': '127.0.0.1'},
+        },
+        {
+            'X_type': 'device',
+            'deletable': True,
+            'id': 'mockdevicetemplate',
+            'parent_ids': ['base'],
+            'raw_config': {},
+        },
+    ]
 
     def __init__(self, client):
         self.client = client
@@ -100,11 +118,7 @@ class ProvdHelper:
     def associate_line_device(self, device_id):
         # line <-> device association is an operation that is currently performed
         # "completely" only by the web-interface -- fake a minimum amount of work here
-        config = {
-            'id': device_id,
-            'parent_ids': [],
-            'raw_config': {},
-        }
+        config = {'id': device_id, 'parent_ids': [], 'raw_config': {}}
         self.configs.create(config)
 
         device = self.devices.get(device_id)

@@ -8,14 +8,15 @@ from .validator import build_validator
 
 
 class IncallExtensionService:
-
     def __init__(self, extension_dao, notifier, validator):
         self.extension_dao = extension_dao
         self.validator = validator
         self.notifier = notifier
 
     def get(self, incall, extension):
-        return self.extension_dao.get_by(type='incall', typeval=str(incall.id), id=extension.id)
+        return self.extension_dao.get_by(
+            type='incall', typeval=str(incall.id), id=extension.id
+        )
 
     def associate(self, incall, extension):
         if extension in incall.extensions:
@@ -35,6 +36,6 @@ class IncallExtensionService:
 
 
 def build_service():
-    return IncallExtensionService(extension_dao_module,
-                                  build_notifier(),
-                                  build_validator())
+    return IncallExtensionService(
+        extension_dao_module, build_notifier(), build_validator()
+    )

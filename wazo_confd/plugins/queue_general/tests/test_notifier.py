@@ -8,14 +8,10 @@ from xivo_bus.resources.queue_general.event import EditQueueGeneralEvent
 
 from ..notifier import QueueGeneralNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload app_queue.so'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
 
 
 class TestQueueGeneralNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.queue_general = Mock()

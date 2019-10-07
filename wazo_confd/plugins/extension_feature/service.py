@@ -11,7 +11,6 @@ from .validator import build_validator
 
 
 class ExtensionService(CRUDService):
-
     def search(self, parameters):
         parameters['is_feature'] = True
         return self.dao.search(**parameters)
@@ -27,6 +26,4 @@ class ExtensionService(CRUDService):
 
 
 def build_service():
-    return ExtensionService(extension_dao,
-                            build_validator(),
-                            build_notifier())
+    return ExtensionService(extension_dao, build_validator(), build_notifier())

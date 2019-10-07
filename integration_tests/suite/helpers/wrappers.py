@@ -69,8 +69,10 @@ class IsolatedAction:
                 for result in func(*new_args, **kwargs):
                     yield result
                 self.__exit__()
+
             return generator_decorated
         else:
+
             @wraps(func)
             def decorated(*args, **kwargs):
                 resource = self.__enter__()
@@ -79,6 +81,7 @@ class IsolatedAction:
                 result = func(*new_args, **kwargs)
                 self.__exit__()
                 return result
+
             return decorated
 
     def __enter__(self):

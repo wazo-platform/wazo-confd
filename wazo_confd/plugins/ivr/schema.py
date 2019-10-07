@@ -35,14 +35,7 @@ class IvrSchema(BaseSchema):
     links = ListLink(Link('ivr'))
 
     incalls = fields.Nested(
-        'IncallSchema',
-        only=[
-            'id',
-            'extensions',
-            'links'
-        ],
-        many=True,
-        dump_only=True,
+        'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
 
     @post_load
@@ -52,7 +45,10 @@ class IvrSchema(BaseSchema):
                 data[key] = Dialaction(**data[key])
         if 'choices' in data:
             data['choices'] = [
-                IVRChoice(exten=choice['exten'], destination=Dialaction(**choice['destination']))
+                IVRChoice(
+                    exten=choice['exten'],
+                    destination=Dialaction(**choice['destination']),
+                )
                 for choice in data['choices']
             ]
         return data

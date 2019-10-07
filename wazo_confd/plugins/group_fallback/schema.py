@@ -9,7 +9,9 @@ from wazo_confd.helpers.destination import DestinationField
 
 
 class GroupFallbackSchema(BaseSchema):
-    noanswer_destination = DestinationField(attribute='noanswer', default=None, allow_none=True)
+    noanswer_destination = DestinationField(
+        attribute='noanswer', default=None, allow_none=True
+    )
 
     @post_load
     def create_objects(self, data):

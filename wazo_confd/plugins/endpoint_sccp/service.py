@@ -14,6 +14,4 @@ class SccpEndpointService(CRUDService):
 
 
 def build_service():
-    return SccpEndpointService(dao,
-                               build_validator(),
-                               build_notifier())
+    return SccpEndpointService(dao, build_validator(), build_notifier())

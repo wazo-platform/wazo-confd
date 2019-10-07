@@ -11,16 +11,12 @@ from wazo_confd import bus, sysconfd
 
 
 class RegisterIAXNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['iax2 reload'],
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ['iax2 reload'], 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, register):

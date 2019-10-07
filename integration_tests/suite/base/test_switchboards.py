@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 NOT_FOUND_SWITCHBOARD_UUID = 'uuid-not-found'
 
@@ -67,22 +60,13 @@ def error_checks(url):
 @fixtures.switchboard(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.switchboards.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.switchboards.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.switchboards.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.switchboard(name='hidden', preprocess_subroutine='hidden')
@@ -113,25 +97,30 @@ def test_sorting(switchboard1, switchboard2):
 
 def check_sorting(switchboard1, switchboard2, field, search):
     response = confd.switchboards.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(
-        has_entries(uuid=switchboard1['uuid']),
-        has_entries(uuid=switchboard2['uuid']),
-    ))
+    assert_that(
+        response.items,
+        contains(
+            has_entries(uuid=switchboard1['uuid']),
+            has_entries(uuid=switchboard2['uuid']),
+        ),
+    )
 
     response = confd.switchboards.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(
-        has_entries(uuid=switchboard2['uuid']),
-        has_entries(uuid=switchboard1['uuid']),
-    ))
+    assert_that(
+        response.items,
+        contains(
+            has_entries(uuid=switchboard2['uuid']),
+            has_entries(uuid=switchboard1['uuid']),
+        ),
+    )
 
 
 @fixtures.switchboard()
 def test_get(switchboard):
     response = confd.switchboards(switchboard['uuid']).get()
-    assert_that(response.item, has_entries(
-        uuid=switchboard['uuid'],
-        name=switchboard['name'],
-    ))
+    assert_that(
+        response.item, has_entries(uuid=switchboard['uuid'], name=switchboard['name'])
+    )
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
@@ -148,11 +137,10 @@ def test_create_minimal_parameters():
     response = confd.switchboards.post(name='MySwitchboard')
     response.assert_created('switchboards')
 
-    assert_that(response.item, has_entries(
-        uuid=not_(empty()),
-        tenant_uuid=MAIN_TENANT,
-        name='MySwitchboard',
-    ))
+    assert_that(
+        response.item,
+        has_entries(uuid=not_(empty()), tenant_uuid=MAIN_TENANT, name='MySwitchboard'),
+    )
 
     confd.switchboards(response.item['uuid']).delete().assert_deleted()
 
@@ -197,9 +185,19 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.switchboard()
 def test_bus_events(switchboard):
     routing_key_create = 'config.switchboards.*.created'
-    routing_key_edit = 'config.switchboards.{uuid}.edited'.format(uuid=switchboard['uuid'])
-    routing_key_delete = 'config.switchboards.{uuid}.deleted'.format(uuid=switchboard['uuid'])
+    routing_key_edit = 'config.switchboards.{uuid}.edited'.format(
+        uuid=switchboard['uuid']
+    )
+    routing_key_delete = 'config.switchboards.{uuid}.deleted'.format(
+        uuid=switchboard['uuid']
+    )
 
-    yield s.check_bus_event, routing_key_create, confd.switchboards.post, {'name': 'bus_event'}
-    yield s.check_bus_event, routing_key_edit, confd.switchboards(switchboard['uuid']).put
-    yield s.check_bus_event, routing_key_delete, confd.switchboards(switchboard['uuid']).delete
+    yield s.check_bus_event, routing_key_create, confd.switchboards.post, {
+        'name': 'bus_event'
+    }
+    yield s.check_bus_event, routing_key_edit, confd.switchboards(
+        switchboard['uuid']
+    ).put
+    yield s.check_bus_event, routing_key_delete, confd.switchboards(
+        switchboard['uuid']
+    ).delete

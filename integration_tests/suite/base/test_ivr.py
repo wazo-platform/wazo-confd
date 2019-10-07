@@ -14,15 +14,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 
@@ -90,10 +83,16 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'choices', 123
     yield s.check_bogus_field_returns_error, url, 'choices', {}
     yield s.check_bogus_field_returns_error, url, 'choices', ['invalid']
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'destination': {'type': 'none'}}]
+    yield s.check_bogus_field_returns_error, url, 'choices', [
+        {'destination': {'type': 'none'}}
+    ]
     yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': '1'}]
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': 123, 'destination': {'type': 'none'}}]
-    yield s.check_bogus_field_returns_error, url, 'choices', [{'exten': '1', 'destination': 'invalid'}]
+    yield s.check_bogus_field_returns_error, url, 'choices', [
+        {'exten': 123, 'destination': {'type': 'none'}}
+    ]
+    yield s.check_bogus_field_returns_error, url, 'choices', [
+        {'exten': '1', 'destination': 'invalid'}
+    ]
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'invalid_destination', destination
@@ -107,22 +106,13 @@ def error_checks(url):
 @fixtures.ivr(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.ivr.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.ivr.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.ivr.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.ivr(description='search')
@@ -160,21 +150,24 @@ def test_sorting_offset_limit(ivr1, ivr2):
 @fixtures.ivr()
 def test_get(ivr):
     response = confd.ivr(ivr['id']).get()
-    assert_that(response.item, has_entries(
-        id=ivr['id'],
-        name=ivr['name'],
-        description=ivr['description'],
-        menu_sound=ivr['menu_sound'],
-        invalid_sound=ivr['invalid_sound'],
-        abort_sound=ivr['abort_sound'],
-        timeout=ivr['timeout'],
-        max_tries=ivr['max_tries'],
-        invalid_destination=ivr['invalid_destination'],
-        timeout_destination=ivr['timeout_destination'],
-        abort_destination=ivr['abort_destination'],
-        choices=empty(),
-        incalls=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=ivr['id'],
+            name=ivr['name'],
+            description=ivr['description'],
+            menu_sound=ivr['menu_sound'],
+            invalid_sound=ivr['invalid_sound'],
+            abort_sound=ivr['abort_sound'],
+            timeout=ivr['timeout'],
+            max_tries=ivr['max_tries'],
+            invalid_destination=ivr['invalid_destination'],
+            timeout_destination=ivr['timeout_destination'],
+            abort_destination=ivr['abort_destination'],
+            choices=empty(),
+            incalls=empty(),
+        ),
+    )
 
 
 @fixtures.ivr(wazo_tenant=MAIN_TENANT)
@@ -214,21 +207,24 @@ def test_create_all_parameters(user1, user2, user3):
     )
     response.assert_created('ivr')
 
-    assert_that(response.item, has_entries(
-        tenant_uuid=MAIN_TENANT,
-        name='ivr1',
-        greeting_sound='greeting',
-        menu_sound='menu',
-        invalid_sound='invalid',
-        abort_sound='abort',
-        timeout=4,
-        max_tries=2,
-        description='description',
-        invalid_destination=has_entries({'type': 'user', 'user_id': user1['id']}),
-        timeout_destination=has_entries({'type': 'user', 'user_id': user2['id']}),
-        abort_destination=has_entries({'type': 'user', 'user_id': user3['id']}),
-        choices=[{'exten': '1', 'destination': {'type': 'none'}}],
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            tenant_uuid=MAIN_TENANT,
+            name='ivr1',
+            greeting_sound='greeting',
+            menu_sound='menu',
+            invalid_sound='invalid',
+            abort_sound='abort',
+            timeout=4,
+            max_tries=2,
+            description='description',
+            invalid_destination=has_entries({'type': 'user', 'user_id': user1['id']}),
+            timeout_destination=has_entries({'type': 'user', 'user_id': user2['id']}),
+            abort_destination=has_entries({'type': 'user', 'user_id': user3['id']}),
+            choices=[{'exten': '1', 'destination': {'type': 'none'}}],
+        ),
+    )
 
 
 @fixtures.ivr(name='ivr1', menu_sound='menu')
@@ -282,16 +278,22 @@ def test_valid_destinations(ivr, *destinations):
 
 
 def create_ivr_with_destination(destination):
-    response = confd.ivr.post(name='ivr', menu_sound='beep', abort_destination=destination)
+    response = confd.ivr.post(
+        name='ivr', menu_sound='beep', abort_destination=destination
+    )
     response.assert_created('ivr')
-    assert_that(response.item, has_entries(abort_destination=has_entries(**destination)))
+    assert_that(
+        response.item, has_entries(abort_destination=has_entries(**destination))
+    )
 
 
 def update_ivr_with_destination(ivr_id, destination):
     response = confd.ivr(ivr_id).put(abort_destination=destination)
     response.assert_updated()
     response = confd.ivr(ivr_id).get()
-    assert_that(response.item, has_entries(abort_destination=has_entries(**destination)))
+    assert_that(
+        response.item, has_entries(abort_destination=has_entries(**destination))
+    )
 
 
 @fixtures.ivr(wazo_tenant=MAIN_TENANT)
@@ -324,6 +326,9 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.ivr()
 def test_bus_events(ivr):
-    yield s.check_bus_event, 'config.ivr.created', confd.ivr.post, {'name': 'a', 'menu_sound': 'hello'}
+    yield s.check_bus_event, 'config.ivr.created', confd.ivr.post, {
+        'name': 'a',
+        'menu_sound': 'hello',
+    }
     yield s.check_bus_event, 'config.ivr.edited', confd.ivr(ivr['id']).put
     yield s.check_bus_event, 'config.ivr.deleted', confd.ivr(ivr['id']).delete

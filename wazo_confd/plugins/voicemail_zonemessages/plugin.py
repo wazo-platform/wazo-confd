@@ -6,7 +6,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -14,5 +13,5 @@ class Plugin:
         api.add_resource(
             VoicemailZoneMessagesList,
             '/asterisk/voicemail/zonemessages',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

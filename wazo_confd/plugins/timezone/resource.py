@@ -8,9 +8,10 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class TimezoneList(ConfdResource):
-
     @required_acl('confd.timezones.get')
     def get(self):
         timezones = pytz.all_timezones
-        return {'total': len(timezones),
-                'items': [{'zone_name': timezone} for timezone in timezones]}
+        return {
+            'total': len(timezones),
+            'items': [{'zone_name': timezone} for timezone in timezones],
+        }

@@ -15,7 +15,6 @@ from ..notifier import ExtensionNotifier
 
 
 class TestExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
@@ -25,9 +24,7 @@ class TestExtensionNotifier(unittest.TestCase):
 
     def test_when_extension_created_then_event_sent_on_bus(self):
         expected_event = CreateExtensionEvent(
-            self.extension.id,
-            self.extension.exten,
-            self.extension.context,
+            self.extension.id, self.extension.exten, self.extension.context
         )
 
         self.notifier.created(self.extension)
@@ -35,10 +32,7 @@ class TestExtensionNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_extension_created_then_dialplan_reloaded(self):
-        expected_handlers = {
-            'ipbx': ['dialplan reload'],
-            'agentbus': [],
-        }
+        expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
         self.notifier.created(self.extension)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
@@ -80,9 +74,7 @@ class TestExtensionNotifier(unittest.TestCase):
 
     def test_when_extension_edited_then_event_sent_on_bus(self):
         expected_event = EditExtensionEvent(
-            self.extension.id,
-            self.extension.exten,
-            self.extension.context,
+            self.extension.id, self.extension.exten, self.extension.context
         )
 
         self.notifier.edited(self.extension, None)
@@ -90,19 +82,14 @@ class TestExtensionNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_extension_deleted_then_dialplan_reloaded(self):
-        expected_handlers = {
-            'ipbx': ['dialplan reload'],
-            'agentbus': [],
-        }
+        expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
         self.notifier.deleted(self.extension)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_extension_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteExtensionEvent(
-            self.extension.id,
-            self.extension.exten,
-            self.extension.context,
+            self.extension.id, self.extension.exten, self.extension.context
         )
 
         self.notifier.deleted(self.extension)

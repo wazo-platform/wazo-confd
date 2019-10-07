@@ -16,25 +16,30 @@ auth_verifier = AuthVerifier()
 
 
 class ErrorCatchingResource(Resource):
-    method_decorators = ([handle_api_exception] + Resource.method_decorators)
+    method_decorators = [handle_api_exception] + Resource.method_decorators
 
 
 class ConfdResource(ErrorCatchingResource):
 
-    method_decorators = [auth_verifier.verify_token] + ErrorCatchingResource.method_decorators
+    method_decorators = [
+        auth_verifier.verify_token
+    ] + ErrorCatchingResource.method_decorators
 
     def _has_write_tenant_uuid(self):
-        return (self._has_write_tenant_uuid_sqlalchemy()
-                or self._has_write_tenant_uuid_custom())
+        return (
+            self._has_write_tenant_uuid_sqlalchemy()
+            or self._has_write_tenant_uuid_custom()
+        )
 
     def _has_write_tenant_uuid_sqlalchemy(self):
-        return (hasattr(self, 'model')
-                and hasattr(self.model, '__mapper__')
-                and hasattr(self.model.__mapper__.c, 'tenant_uuid'))
+        return (
+            hasattr(self, 'model')
+            and hasattr(self.model, '__mapper__')
+            and hasattr(self.model.__mapper__.c, 'tenant_uuid')
+        )
 
     def _has_write_tenant_uuid_custom(self):
-        return (hasattr(self, 'model')
-                and hasattr(self.model, 'has_tenant_uuid'))
+        return hasattr(self, 'model') and hasattr(self.model, 'has_tenant_uuid')
 
     def _has_a_tenant_uuid(self):
         if getattr(self, 'has_tenant_uuid', None):
@@ -69,7 +74,6 @@ class ConfdResource(ErrorCatchingResource):
 
 
 class ListResource(ConfdResource):
-
     def __init__(self, service):
         super(ListResource, self).__init__()
         self.service = service
@@ -83,8 +87,7 @@ class ListResource(ConfdResource):
             kwargs['tenant_uuids'] = tenant_uuids
 
         total, items = self.service.search(params, **kwargs)
-        return {'total': total,
-                'items': self.schema().dump(items, many=True)}
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     def search_params(self):
         args = ((key, request.args[key]) for key in request.args)
