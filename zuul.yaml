@@ -4,9 +4,17 @@
       - wazo-tox-py37
     check:
       jobs:
-        - wazo-tox-integration:
+        - confd-tox-integration:
             nodeset: debian10-vm
     gate:
       jobs:
-        - wazo-tox-integration:
+        - confd-tox-integration:
             nodeset: debian10-vm
+
+- job:
+    name: confd-tox-integration
+    description: Run dird integration tests
+    parent: wazo-tox-integration
+    timeout: 10800
+    vars:
+      integration_test_timeout: 60
