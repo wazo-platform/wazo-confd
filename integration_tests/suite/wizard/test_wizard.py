@@ -430,6 +430,7 @@ class TestWizard(IntegrationTest):
                     raw_config=has_entries(
                         ntp_enabled=True,
                         ntp_ip=ip_address,
+                        X_xivo_phonebook_ip=ip_address,
                         sip_dtmf_mode='RTP-out-of-band',
                         admin_username='admin',
                         admin_password=has_length(16),

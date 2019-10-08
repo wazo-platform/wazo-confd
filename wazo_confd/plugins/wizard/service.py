@@ -159,6 +159,7 @@ class WizardService:
                          'parent_ids': [],
                          'raw_config': {'ntp_enabled': True,
                                         'ntp_ip': address,
+                                        'X_xivo_phonebook_ip': address,
                                         'sip_dtmf_mode': 'RTP-out-of-band',
                                         'admin_username': 'admin',
                                         'admin_password': self._generate_phone_password(length=16),
