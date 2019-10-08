@@ -158,12 +158,12 @@ class WizardService:
                          'label': 'Default config device',
                          'parent_ids': [],
                          'raw_config': {'ntp_enabled': True,
-                                         'ntp_ip': address,
-                                         'sip_dtmf_mode': 'RTP-out-of-band',
-                                         'admin_username': 'admin',
-                                         'admin_password': self._generate_phone_password(length=16),
-                                         'user_username': 'user',
-                                         'user_password': self._generate_phone_password(length=16)}}
+                                        'ntp_ip': address,
+                                        'sip_dtmf_mode': 'RTP-out-of-band',
+                                        'admin_username': 'admin',
+                                        'admin_password': self._generate_phone_password(length=16),
+                                        'user_username': 'user',
+                                        'user_password': self._generate_phone_password(length=16)}}
         autoprov_config = {'X_type': 'internal',
                            'deletable': False,
                            'id': 'autoprov',
