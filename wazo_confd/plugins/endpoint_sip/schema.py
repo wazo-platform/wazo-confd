@@ -4,7 +4,7 @@
 import re
 import string
 
-from marshmallow import fields
+from marshmallow import fields, post_load
 from marshmallow.validate import Length, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -16,7 +16,8 @@ SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 class SipSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    username = fields.String(validate=Regexp(USERNAME_REGEX), attribute='name')
+    username = fields.String(validate=Regexp(USERNAME_REGEX))
+    name = fields.String(validate=Regexp(USERNAME_REGEX))
     secret = fields.String(validate=Regexp(SECRET_REGEX))
     type = fields.String(validate=OneOf(['friend', 'peer', 'user']))
     host = fields.String(validate=Length(max=255))
@@ -25,6 +26,13 @@ class SipSchema(BaseSchema):
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+
+    @post_load
+    def set_name_if_missing(self, data, **kwargs):
+        name = data.get('name')
+        if not name:
+            data['name'] = data.get('username')
+        return data
 
 
 class SipSchemaNullable(SipSchema):
