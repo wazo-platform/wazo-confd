@@ -3,14 +3,7 @@
 
 from flask import request
 
-from marshmallow import (
-    EXCLUDE,
-    fields,
-    pre_dump,
-    post_load,
-    pre_load,
-    post_dump,
-)
+from marshmallow import EXCLUDE, fields, pre_dump, post_load, pre_load, post_dump
 from marshmallow.validate import Length
 
 from xivo_dao.alchemy.asterisk_file_variable import AsteriskFileVariable
@@ -27,15 +20,16 @@ class AsteriskOptionSchema(BaseSchema):
 
 class AsteriskConfigurationSchema(BaseSchema):
     options = fields.Nested(
-        AsteriskOptionSchema,
-        many=True, required=True, unknown=EXCLUDE
+        AsteriskOptionSchema, many=True, required=True, unknown=EXCLUDE
     )
 
     @pre_load
     def convert_options_to_collection(self, data):
         options = data.get('options')
         if isinstance(options, dict):
-            data['options'] = [{'key': key, 'value': value} for key, value in options.items()]
+            data['options'] = [
+                {'key': key, 'value': value} for key, value in options.items()
+            ]
         return data
 
     @post_dump

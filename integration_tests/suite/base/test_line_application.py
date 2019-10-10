@@ -1,23 +1,11 @@
 # Copyright 2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 FAKE_UUID = '00000000-0000-0000-0000-000000000000'
@@ -83,13 +71,25 @@ def test_associate_multiple_lines_to_application(line1, line2, application):
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_line, sub_line, main_app, sub_app):
-    response = confd.lines(main_line['id']).applications(sub_app['uuid']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .applications(sub_app['uuid'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).applications(main_app['uuid']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .applications(main_app['uuid'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Application'))
 
-    response = confd.lines(main_line['id']).applications(sub_app['uuid']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .applications(sub_app['uuid'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -115,10 +115,18 @@ def test_dissociate_not_associated(line, application):
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_app, sub_app):
-    response = confd.lines(main_line['id']).applications(sub_app['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .applications(sub_app['uuid'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).applications(main_app['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .applications(main_app['uuid'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Application'))
 
 
@@ -127,12 +135,14 @@ def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_app, sub_app):
 def test_get_line_relation(line, application):
     with a.line_application(line, application):
         response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entries(
-            application=has_entries(
-                uuid=application['uuid'],
-                name=application['name'],
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                application=has_entries(
+                    uuid=application['uuid'], name=application['name']
+                )
+            ),
+        )
 
 
 @fixtures.application()
@@ -140,14 +150,10 @@ def test_get_line_relation(line, application):
 def test_get_application_relation(application, line):
     with a.line_application(line, application):
         response = confd.applications(application['uuid']).get()
-        assert_that(response.item, has_entries(
-            lines=contains(
-                has_entries(
-                    id=line['id'],
-                    name=line['name'],
-                )
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(lines=contains(has_entries(id=line['id'], name=line['name']))),
+        )
 
 
 @fixtures.line()
@@ -170,7 +176,11 @@ def test_delete_application_when_line_and_application_associated(line, applicati
 @fixtures.application()
 def test_bus_events(line, application):
     url = confd.lines(line['id']).applications(application['uuid'])
-    routing_key = 'config.lines.{}.applications.{}.updated'.format(line['id'], application['uuid'])
+    routing_key = 'config.lines.{}.applications.{}.updated'.format(
+        line['id'], application['uuid']
+    )
     yield s.check_bus_event, routing_key, url.put
-    routing_key = 'config.lines.{}.applications.{}.deleted'.format(line['id'], application['uuid'])
+    routing_key = 'config.lines.{}.applications.{}.deleted'.format(
+        line['id'], application['uuid']
+    )
     yield s.check_bus_event, routing_key, url.delete

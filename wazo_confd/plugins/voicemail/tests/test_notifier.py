@@ -18,7 +18,6 @@ from ..notifier import VoicemailNotifier
 
 
 class TestVoicemailNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -49,7 +48,7 @@ class TestVoicemailNotifier(unittest.TestCase):
 
         assert_that(
             self.bus.send_bus_event.call_args_list,
-            contains(call(expected_event1), call(expected_event2))
+            contains(call(expected_event1), call(expected_event2)),
         )
 
     def test_when_voicemail_edited_then_sysconfd_called(self):

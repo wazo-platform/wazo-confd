@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class LineDeviceService:
-
     def __init__(self, validator, line_dao, notifier):
         self.validator = validator
         self.line_dao = line_dao

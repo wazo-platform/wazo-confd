@@ -15,7 +15,9 @@ class AgentSchema(BaseSchema):
     number = fields.String(validate=Regexp(NUMBER_REGEX), required=True)
     firstname = fields.String(validate=Length(max=128), allow_none=True)
     lastname = fields.String(validate=Length(max=128), allow_none=True)
-    password = fields.String(validate=Length(max=128), allow_none=True, attribute='passwd')
+    password = fields.String(
+        validate=Length(max=128), allow_none=True, attribute='passwd'
+    )
     language = fields.String(validate=Length(max=20), allow_none=True)
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
     description = fields.String(allow_none=True)
@@ -28,10 +30,7 @@ class AgentSchema(BaseSchema):
         dump_only=True,
     )
     skills = fields.Nested(
-        'AgentSkillsSchema',
-        attribute='agent_queue_skills',
-        many=True,
-        dump_only=True,
+        'AgentSkillsSchema', attribute='agent_queue_skills', many=True, dump_only=True
     )
     users = fields.Nested(
         'UserSchema',
@@ -44,9 +43,7 @@ class AgentSchema(BaseSchema):
 class AgentQueuesMemberSchema(BaseSchema):
     penalty = fields.Integer()
     queue = fields.Nested(
-        'QueueSchema',
-        only=['id', 'name', 'label', 'links'],
-        dump_only=True,
+        'QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True
     )
 
     @post_dump(pass_many=True)
@@ -67,11 +64,7 @@ class AgentQueuesMemberSchema(BaseSchema):
 
 class AgentSkillsSchema(BaseSchema):
     skill_weight = fields.Integer(attribute='weight')
-    skill = fields.Nested(
-        'SkillSchema',
-        only=['id', 'name', 'links'],
-        dump_only=True,
-    )
+    skill = fields.Nested('SkillSchema', only=['id', 'name', 'links'], dump_only=True)
 
     @post_dump(pass_many=True)
     def merge_agent_queue_skills(self, data, many):

@@ -1,10 +1,7 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-)
+from hamcrest import assert_that, has_entries
 
 from . import confd
 from ..helpers import (
@@ -14,10 +11,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 @fixtures.line()
@@ -59,10 +53,8 @@ def test_get_custom_endpoint_associated_to_line(line, custom):
         assert_that(
             response.item,
             has_entries(
-                line_id=line['id'],
-                endpoint_id=custom['id'],
-                endpoint='custom'
-            )
+                line_id=line['id'], endpoint_id=custom['id'], endpoint='custom'
+            ),
         )
 
 
@@ -87,10 +79,8 @@ def test_get_line_associated_to_a_custom_endpoint(line, custom):
         assert_that(
             response.item,
             has_entries(
-                line_id=line['id'],
-                endpoint_id=custom['id'],
-                endpoint='custom'
-            )
+                line_id=line['id'], endpoint_id=custom['id'], endpoint='custom'
+            ),
         )
 
 
@@ -112,7 +102,9 @@ def test_associate_when_endpoint_already_associated(line, custom):
 @fixtures.line()
 @fixtures.custom()
 @fixtures.custom()
-def test_associate_with_another_endpoint_when_already_associated(line, custom1, custom2):
+def test_associate_with_another_endpoint_when_already_associated(
+    line, custom1, custom2
+):
     with a.line_endpoint_custom(line, custom1):
         response = confd.lines(line['id']).endpoints.custom(custom2['id']).put()
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
@@ -143,13 +135,25 @@ def test_associate_when_trunk_already_associated(line, trunk, custom):
 @fixtures.custom(wazo_tenant=MAIN_TENANT)
 @fixtures.custom(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_line, sub_line, main_custom, sub_custom):
-    response = confd.lines(main_line['id']).endpoints.custom(sub_custom['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.custom(sub_custom['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).endpoints.custom(main_custom['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .endpoints.custom(main_custom['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('CustomEndpoint'))
 
-    response = confd.lines(main_line['id']).endpoints.custom(sub_custom['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.custom(sub_custom['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -193,10 +197,18 @@ def test_dissociate_when_associated_to_extension(line, custom, extension):
 @fixtures.custom(wazo_tenant=MAIN_TENANT)
 @fixtures.custom(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_custom, sub_custom):
-    response = confd.lines(main_line['id']).endpoints.custom(sub_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.custom(sub_custom['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).endpoints.custom(main_custom['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .endpoints.custom(main_custom['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('CustomEndpoint'))
 
 
@@ -207,10 +219,11 @@ def test_get_endpoint_custom_relation(line, custom):
         response = confd.lines(line['id']).get()
         assert_that(
             response.item,
-            has_entries(endpoint_custom=has_entries(
-                id=custom['id'],
-                interface=custom['interface'],
-            ))
+            has_entries(
+                endpoint_custom=has_entries(
+                    id=custom['id'], interface=custom['interface']
+                )
+            ),
         )
 
 
@@ -219,10 +232,7 @@ def test_get_endpoint_custom_relation(line, custom):
 def test_get_line_relation(line, custom):
     with a.line_endpoint_custom(line, custom):
         response = confd.endpoints.custom(custom['id']).get()
-        assert_that(
-            response.item,
-            has_entries(line=has_entries(id=line['id']))
-        )
+        assert_that(response.item, has_entries(line=has_entries(id=line['id'])))
 
 
 @fixtures.line()

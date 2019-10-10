@@ -3,12 +3,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.helpers.destination import DestinationValidator
-from wazo_confd.helpers.validator import (Validator,
-                                          ValidationGroup)
+from wazo_confd.helpers.validator import Validator, ValidationGroup
 
 
 class IncallModelValidator(Validator):
-
     def __init__(self, destination_validator):
         self._destination_validator = destination_validator
 
@@ -19,7 +17,4 @@ class IncallModelValidator(Validator):
 def build_validator():
     incall_validator = IncallModelValidator(DestinationValidator())
 
-    return ValidationGroup(
-        create=[incall_validator],
-        edit=[incall_validator],
-    )
+    return ValidationGroup(create=[incall_validator], edit=[incall_validator])

@@ -10,17 +10,13 @@ from wazo_confd import bus, sysconfd
 
 
 class TrunkEndpointNotifier:
-
     def __init__(self, endpoint, bus, sysconfd):
         self.endpoint = endpoint
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {
-            'ipbx': ipbx,
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ipbx, 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, trunk, endpoint):

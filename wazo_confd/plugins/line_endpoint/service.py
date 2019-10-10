@@ -9,7 +9,6 @@ from .validator import build_validator
 
 
 class LineEndpointService:
-
     def __init__(self, endpoint, line_service, endpoint_service, validator):
         self.endpoint = endpoint
         self.line_service = line_service
@@ -21,9 +20,11 @@ class LineEndpointService:
         if not line.is_associated(self.endpoint):
             raise errors.not_found('LineEndpoint', line_id=line_id)
 
-        return {'line_id': line.id,
-                'endpoint': self.endpoint,
-                'endpoint_id': line.endpoint_id}
+        return {
+            'line_id': line.id,
+            'endpoint': self.endpoint,
+            'endpoint_id': line.endpoint_id,
+        }
 
     def get_association_from_endpoint(self, endpoint_id):
         endpoint = self.endpoint_service.get(endpoint_id)
@@ -31,9 +32,11 @@ class LineEndpointService:
         if not line:
             raise errors.not_found('LineEndpoint', endpoint_id=endpoint_id)
 
-        return {'line_id': line.id,
-                'endpoint': self.endpoint,
-                'endpoint_id': line.endpoint_id}
+        return {
+            'line_id': line.id,
+            'endpoint': self.endpoint,
+            'endpoint_id': line.endpoint_id,
+        }
 
     def associate(self, line, endpoint):
         if line.is_associated_with(endpoint):

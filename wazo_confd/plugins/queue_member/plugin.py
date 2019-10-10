@@ -14,7 +14,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -23,7 +22,7 @@ class Plugin:
             QueueMemberAgentItem,
             '/queues/<int:queue_id>/members/agents/<int:agent_id>',
             endpoint='queue_member_agents',
-            resource_class_args=(service, queue_dao, agent_dao)
+            resource_class_args=(service, queue_dao, agent_dao),
         )
 
         api.add_resource(
@@ -31,11 +30,11 @@ class Plugin:
             '/queues/<int:queue_id>/members/users/<uuid:user_id>',
             '/queues/<int:queue_id>/members/users/<int:user_id>',
             endpoint='queue_member_users',
-            resource_class_args=(service, queue_dao, user_dao)
+            resource_class_args=(service, queue_dao, user_dao),
         )
 
         api.add_resource(
             QueueMemberAgentListLegacy,
             '/queues/<int:queue_id>/members/agents',
-            resource_class_args=(service, queue_dao, agent_dao)
+            resource_class_args=(service, queue_dao, agent_dao),
         )

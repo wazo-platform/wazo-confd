@@ -8,9 +8,7 @@ from flask import Flask, request, jsonify
 
 logging.basicConfig(level=logging.DEBUG)
 
-_EMPTY_RESPONSES = {
-    'get_ha_config': {'node_type': 'disabled', 'remote_address': ''},
-}
+_EMPTY_RESPONSES = {'get_ha_config': {'node_type': 'disabled', 'remote_address': ''}}
 
 app = Flask(__name__)
 
@@ -29,12 +27,14 @@ def _reset():
 def log_request():
     if not request.path.startswith('/_requests'):
         path = request.path
-        log = {'method': request.method,
-               'path': path,
-               'query': dict(request.args.items()),
-               'body': request.data,
-               'json': request.json,
-               'headers': dict(request.headers)}
+        log = {
+            'method': request.method,
+            'path': path,
+            'query': dict(request.args.items()),
+            'body': request.data,
+            'json': request.json,
+            'headers': dict(request.headers),
+        }
         _requests.append(log)
 
 

@@ -5,8 +5,9 @@ from wazo_confd.helpers.resource import CRUDService
 
 
 class RegistrarService(CRUDService):
-
-    def __init__(self, dao, validator, notifier, line_service, device_updater, provd_client):
+    def __init__(
+        self, dao, validator, notifier, line_service, device_updater, provd_client
+    ):
         super(RegistrarService, self).__init__(dao, validator, notifier)
         self.line_service = line_service
         self.device_updater = device_updater

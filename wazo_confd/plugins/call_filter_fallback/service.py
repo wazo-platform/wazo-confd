@@ -9,7 +9,6 @@ from .validator import build_validator
 
 
 class CallFilterFallbackService:
-
     def __init__(self, dao, notifier, validator):
         self.call_filter_dao = dao
         self.notifier = notifier
@@ -23,6 +22,6 @@ class CallFilterFallbackService:
 
 
 def build_service():
-    return CallFilterFallbackService(call_filter_dao,
-                                     build_notifier(),
-                                     build_validator())
+    return CallFilterFallbackService(
+        call_filter_dao, build_notifier(), build_validator()
+    )

@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,5 +17,5 @@ class Plugin:
             IncallExtensionItem,
             '/incalls/<int:incall_id>/extensions/<int:extension_id>',
             endpoint='incall_extensions',
-            resource_class_args=(service, incall_dao, extension_dao)
+            resource_class_args=(service, incall_dao, extension_dao),
         )

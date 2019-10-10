@@ -13,23 +13,25 @@ EXTEN_REGEX = r'[A-Z0-9+*]+'
 
 class BaseDestinationSchema(Schema):
     type = fields.String(
-        validate=OneOf([
-            'agent',
-            'bsfilter',
-            'conference',
-            'custom',
-            'forward',
-            'group',
-            'groupmember',
-            'onlinerec',
-            'paging',
-            'park_position',
-            'parking',
-            'queue',
-            'service',
-            'transfer',
-            'user',
-        ]),
+        validate=OneOf(
+            [
+                'agent',
+                'bsfilter',
+                'conference',
+                'custom',
+                'forward',
+                'group',
+                'groupmember',
+                'onlinerec',
+                'paging',
+                'park_position',
+                'parking',
+                'queue',
+                'service',
+                'transfer',
+                'user',
+            ]
+        ),
         required=True,
     )
 
@@ -44,7 +46,11 @@ class BaseDestinationSchema(Schema):
         parameters = []
         exclude_fields = ['href', 'type']
         for field_name, field_obj in self.declared_fields.items():
-            if field_name is None or field_name in exclude_fields or field_obj.dump_only:
+            if (
+                field_name is None
+                or field_name in exclude_fields
+                or field_obj.dump_only
+            ):
                 continue
 
             parameter = {'name': field_name}
@@ -88,10 +94,7 @@ class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
 
     group = fields.Nested(
-        'GroupSchema',
-        attribute='groupfeatures',
-        only=['name'],
-        dump_only=True,
+        'GroupSchema', attribute='groupfeatures', only=['name'], dump_only=True
     )
 
     @post_dump
@@ -105,8 +108,7 @@ class GroupDestinationSchema(BaseDestinationSchema):
 
 class GroupMemberDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
-    action = fields.String(validate=OneOf(['join', 'leave', 'toggle']),
-                           required=True)
+    action = fields.String(validate=OneOf(['join', 'leave', 'toggle']), required=True)
 
 
 class QueueDestinationSchema(BaseDestinationSchema):
@@ -123,20 +125,22 @@ class PagingDestinationSchema(BaseDestinationSchema):
 
 class ServiceDestinationSchema(BaseDestinationSchema):
     service = fields.String(
-        validate=OneOf([
-            "enablevm",
-            "vmusermsg",
-            "vmuserpurge",
-            "phonestatus",
-            "recsnd",
-            "calllistening",
-            "directoryaccess",
-            "fwdundoall",
-            "pickup",
-            "callrecord",
-            "incallfilter",
-            "enablednd",
-        ]),
+        validate=OneOf(
+            [
+                "enablevm",
+                "vmusermsg",
+                "vmuserpurge",
+                "phonestatus",
+                "recsnd",
+                "calllistening",
+                "directoryaccess",
+                "fwdundoall",
+                "pickup",
+                "callrecord",
+                "incallfilter",
+                "enablednd",
+            ]
+        ),
         required=True,
     )
 
@@ -147,17 +151,13 @@ class CustomDestinationSchema(BaseDestinationSchema):
 
 class ForwardDestinationSchema(BaseDestinationSchema):
     forward = fields.String(
-        validate=OneOf(['busy', 'noanswer', 'unconditional']),
-        required=True,
+        validate=OneOf(['busy', 'noanswer', 'unconditional']), required=True
     )
     exten = fields.String(validate=Regexp(EXTEN_REGEX), allow_none=True)
 
 
 class TransferDestinationSchema(BaseDestinationSchema):
-    transfer = fields.String(
-        validate=OneOf(['blind', 'attended']),
-        required=True,
-    )
+    transfer = fields.String(validate=OneOf(['blind', 'attended']), required=True)
 
 
 class ParkPositionDestinationSchema(BaseDestinationSchema):
@@ -194,8 +194,7 @@ class _BSFilterMemberDestinationSchema(Schema):
 
 class AgentDestinationSchema(BaseDestinationSchema):
     agent_id = fields.Integer(required=True)
-    action = fields.String(validate=OneOf(['login', 'logout', 'toggle']),
-                           required=True)
+    action = fields.String(validate=OneOf(['login', 'logout', 'toggle']), required=True)
 
 
 class OnlineRecordingDestinationSchema(BaseDestinationSchema):
@@ -229,13 +228,15 @@ class FuncKeyDestinationField(fields.Nested):
     def _deserialize(self, value, attr, data):
         self.schema.context = self.context
         base = super(FuncKeyDestinationField, self)._deserialize(value, attr, data)
-        return fields.Nested(self.destination_schemas[base['type']],
-                             unknown=self.unknown)._deserialize(value, attr, data)
+        return fields.Nested(
+            self.destination_schemas[base['type']], unknown=self.unknown
+        )._deserialize(value, attr, data)
 
     def _serialize(self, nested_obj, attr, obj):
         base = super(FuncKeyDestinationField, self)._serialize(nested_obj, attr, obj)
-        return fields.Nested(self.destination_schemas[base['type']],
-                             unknown=self.unknown)._serialize(nested_obj, attr, obj)
+        return fields.Nested(
+            self.destination_schemas[base['type']], unknown=self.unknown
+        )._serialize(nested_obj, attr, obj)
 
 
 class FuncKeySchema(BaseSchema):
@@ -273,8 +274,7 @@ class FuncKeyPositionField(fields.Field):
         template = {}
         for raw_position, raw_funckey in value.items():
             position = self.key_field._serialize(raw_position, attr, obj)
-            funckey = self.nested_field.serialize(raw_position,
-                                                  getattr(obj, attr))
+            funckey = self.nested_field.serialize(raw_position, getattr(obj, attr))
             template[position] = funckey
         return template
 

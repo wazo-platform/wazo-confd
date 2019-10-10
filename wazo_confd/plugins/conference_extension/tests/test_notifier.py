@@ -14,14 +14,10 @@ from xivo_dao.alchemy.conference import Conference
 
 from ..notifier import ConferenceExtensionNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestConferenceExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -31,7 +27,9 @@ class TestConferenceExtensionNotifier(unittest.TestCase):
         self.notifier = ConferenceExtensionNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = ConferenceExtensionAssociatedEvent(self.conference.id, self.extension.id)
+        expected_event = ConferenceExtensionAssociatedEvent(
+            self.conference.id, self.extension.id
+        )
 
         self.notifier.associated(self.conference, self.extension)
 
@@ -43,7 +41,9 @@ class TestConferenceExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = ConferenceExtensionDissociatedEvent(self.conference.id, self.extension.id)
+        expected_event = ConferenceExtensionDissociatedEvent(
+            self.conference.id, self.extension.id
+        )
 
         self.notifier.dissociated(self.conference, self.extension)
 

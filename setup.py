@@ -14,14 +14,10 @@ setup(
     url='http://wazo.community',
     license='GPLv3',
     packages=find_packages(),
-
     package_data={'wazo_confd.plugins': ['*/api.yml']},
-
     zip_safe=False,
     entry_points={
-        'console_scripts': [
-            'wazo-confd=wazo_confd.main:main',
-        ],
+        'console_scripts': ['wazo-confd=wazo_confd.main:main'],
         'wazo_confd.plugins': [
             'access_feature = wazo_confd.plugins.access_feature.plugin:Plugin',
             'agent = wazo_confd.plugins.agent.plugin:Plugin',
@@ -119,6 +115,6 @@ setup(
             'voicemail_general = wazo_confd.plugins.voicemail_general.plugin:Plugin',
             'voicemail_zonemessages = wazo_confd.plugins.voicemail_zonemessages.plugin:Plugin',
             'wizard = wazo_confd.plugins.wizard.plugin:Plugin',
-        ]
-    }
+        ],
+    },
 )

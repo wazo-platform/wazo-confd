@@ -13,7 +13,6 @@ from ..common import handle_api_exception
 
 
 class TestCommon(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         app = Flask('test')
@@ -28,7 +27,6 @@ class TestCommon(unittest.TestCase):
 
 
 class TestHandleError(TestCommon):
-
     def raise_(self, ex):
         raise ex
 

@@ -17,16 +17,19 @@ USER_LINE2_ID = 12
 
 EXPECTED_SYSCONFD_HANDLERS = {
     'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
-    'agentbus': []
+    'agentbus': [],
 }
 
 
 class TestUserVoicemailNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.user = Mock(uuid='1234-abcd', id=1, lines=[Mock(id=USER_LINE1_ID), Mock(id=USER_LINE2_ID)])
+        self.user = Mock(
+            uuid='1234-abcd',
+            id=1,
+            lines=[Mock(id=USER_LINE1_ID), Mock(id=USER_LINE2_ID)],
+        )
         self.voicemail = Mock(id=2)
 
         self.notifier = UserVoicemailNotifier(self.bus, self.sysconfd)
@@ -41,10 +44,14 @@ class TestUserVoicemailNotifier(unittest.TestCase):
     def test_associated_then_sip_reload(self):
         self.notifier.associated(self.user, self.voicemail)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )
 
     def test_dissociated_then_bus_event(self):
-        expected_event = UserVoicemailDissociatedEvent(self.user.uuid, self.voicemail.id)
+        expected_event = UserVoicemailDissociatedEvent(
+            self.user.uuid, self.voicemail.id
+        )
 
         self.notifier.dissociated(self.user, self.voicemail)
 
@@ -53,4 +60,6 @@ class TestUserVoicemailNotifier(unittest.TestCase):
     def test_dissociated_then_sip_reload(self):
         self.notifier.dissociated(self.user, self.voicemail)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )

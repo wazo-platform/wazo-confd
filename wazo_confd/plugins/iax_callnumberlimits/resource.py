@@ -14,15 +14,15 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class IAXCallNumberLimitsSchema(BaseSchema):
-    ip_address = fields.String(required=True, validate=(Length(max=39)), attribute='destination')
+    ip_address = fields.String(
+        required=True, validate=(Length(max=39)), attribute='destination'
+    )
     netmask = fields.String(required=True, validate=(Length(max=39)))
     limit = fields.Integer(required=True, attribute='calllimits')
 
 
 class IAXCallNumberLimitsCollectionSchema(BaseSchema):
-    items = fields.Nested(IAXCallNumberLimitsSchema,
-                          many=True,
-                          required=True)
+    items = fields.Nested(IAXCallNumberLimitsSchema, many=True, required=True)
 
     @post_load
     def remove_envelope(self, data):

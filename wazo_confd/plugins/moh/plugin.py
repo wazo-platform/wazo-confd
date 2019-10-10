@@ -6,27 +6,19 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
 
-        api.add_resource(
-            MohList,
-            '/moh',
-            resource_class_args=(service,)
-        )
+        api.add_resource(MohList, '/moh', resource_class_args=(service,))
 
         api.add_resource(
-            MohItem,
-            '/moh/<uuid>',
-            endpoint='moh',
-            resource_class_args=(service,)
+            MohItem, '/moh/<uuid>', endpoint='moh', resource_class_args=(service,)
         )
 
         api.add_resource(
             MohFileItem,
             '/moh/<uuid>/files/<filename:filename>',
             endpoint='mohfileitem',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

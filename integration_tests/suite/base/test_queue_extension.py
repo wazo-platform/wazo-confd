@@ -1,18 +1,9 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
-from ..helpers import (
-    scenarios as s,
-    errors as e,
-    fixtures,
-    associations as a,
-)
+from ..helpers import scenarios as s, errors as e, fixtures, associations as a
 from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
@@ -115,14 +106,28 @@ def test_associate_when_exten_pattern(extension, queue):
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
 @fixtures.extension(context='main-internal', exten=gen_queue_exten())
 @fixtures.extension(context='sub-internal', exten=gen_queue_exten())
-def test_associate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx, main_exten, sub_exten):
-    response = confd.queues(sub_queue['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(
+    main_queue, sub_queue, main_ctx, sub_ctx, main_exten, sub_exten
+):
+    response = (
+        confd.queues(sub_queue['id'])
+        .extensions(main_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.queues(main_queue['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Queue'))
 
-    response = confd.queues(main_queue['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -147,11 +152,21 @@ def test_dissociate_not_associated(extension, queue):
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
 @fixtures.extension(context='main-internal', exten=gen_queue_exten())
 @fixtures.extension(context='sub-internal', exten=gen_queue_exten())
-def test_dissociate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx, main_exten, sub_exten):
-    response = confd.queues(sub_queue['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(
+    main_queue, sub_queue, main_ctx, sub_ctx, main_exten, sub_exten
+):
+    response = (
+        confd.queues(sub_queue['id'])
+        .extensions(main_exten['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.queues(main_queue['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .extensions(sub_exten['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Queue'))
 
 
@@ -160,13 +175,18 @@ def test_dissociate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx, main_
 def test_get_queue_relation(extension, queue):
     with a.queue_extension(queue, extension):
         response = confd.queues(queue['id']).get()
-        assert_that(response.item, has_entries(
-            extensions=contains(has_entries(
-                id=extension['id'],
-                exten=extension['exten'],
-                context=extension['context']
-            ))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                extensions=contains(
+                    has_entries(
+                        id=extension['id'],
+                        exten=extension['exten'],
+                        context=extension['context'],
+                    )
+                )
+            ),
+        )
 
 
 @fixtures.extension(exten=gen_queue_exten())
@@ -174,12 +194,10 @@ def test_get_queue_relation(extension, queue):
 def test_get_extension_relation(extension, queue):
     with a.queue_extension(queue, extension):
         response = confd.extensions(extension['id']).get()
-        assert_that(response.item, has_entries(
-            queue=has_entries(
-                id=queue['id'],
-                name=queue['name']
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(queue=has_entries(id=queue['id'], name=queue['name'])),
+        )
 
 
 @fixtures.extension(exten=gen_queue_exten())

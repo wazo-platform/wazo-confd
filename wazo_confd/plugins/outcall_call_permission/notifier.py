@@ -10,7 +10,6 @@ from wazo_confd import bus
 
 
 class OutcallCallPermissionNotifier:
-
     def __init__(self, bus):
         self.bus = bus
 

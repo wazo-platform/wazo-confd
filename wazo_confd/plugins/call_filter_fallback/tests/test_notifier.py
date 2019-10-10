@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -11,7 +11,6 @@ from ..notifier import CallFilterFallbackNotifier
 
 
 class TestCallFilterFallbackNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.call_filter = Mock(CallFilter, id=1)

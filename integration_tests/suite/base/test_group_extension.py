@@ -1,18 +1,9 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
-from ..helpers import (
-    scenarios as s,
-    errors as e,
-    fixtures,
-    associations as a,
-)
+from ..helpers import scenarios as s, errors as e, fixtures, associations as a
 from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
@@ -116,14 +107,28 @@ def test_associate_when_exten_pattern(extension, group):
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
 @fixtures.extension(context='main-internal', exten=gen_group_exten())
 @fixtures.extension(context='sub-internal', exten=gen_group_exten())
-def test_associate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten):
-    response = confd.groups(sub_group['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(
+    main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten
+):
+    response = (
+        confd.groups(sub_group['id'])
+        .extensions(main_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.groups(main_group['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.groups(main_group['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Group'))
 
-    response = confd.groups(main_group['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.groups(main_group['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -148,11 +153,21 @@ def test_dissociate_not_associated(extension, group):
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
 @fixtures.extension(context='main-internal', exten=gen_group_exten())
 @fixtures.extension(context='sub-internal', exten=gen_group_exten())
-def test_dissociate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten):
-    response = confd.groups(sub_group['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(
+    main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten
+):
+    response = (
+        confd.groups(sub_group['id'])
+        .extensions(main_exten['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.groups(main_group['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.groups(main_group['id'])
+        .extensions(sub_exten['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Group'))
 
 
@@ -161,11 +176,18 @@ def test_dissociate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx, main_
 def test_get_group_relation(extension, group):
     with a.group_extension(group, extension):
         response = confd.groups(group['id']).get()
-        assert_that(response.item, has_entries(
-            extensions=contains(has_entries(id=extension['id'],
-                                            exten=extension['exten'],
-                                            context=extension['context']))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                extensions=contains(
+                    has_entries(
+                        id=extension['id'],
+                        exten=extension['exten'],
+                        context=extension['context'],
+                    )
+                )
+            ),
+        )
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -173,10 +195,10 @@ def test_get_group_relation(extension, group):
 def test_get_extension_relation(extension, group):
     with a.group_extension(group, extension):
         response = confd.extensions(extension['id']).get()
-        assert_that(response.item, has_entries(
-            group=has_entries(id=group['id'],
-                              name=group['name'])
-        ))
+        assert_that(
+            response.item,
+            has_entries(group=has_entries(id=group['id'], name=group['name'])),
+        )
 
 
 @fixtures.extension(exten=gen_group_exten())

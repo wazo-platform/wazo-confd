@@ -10,7 +10,6 @@ from wazo_confd import bus, sysconfd
 
 
 class GroupMemberNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
@@ -34,7 +33,10 @@ class GroupMemberNotifier:
 
     def extensions_associated(self, group, members):
         self.send_sysconfd_handlers()
-        extensions = [{'exten': member.extension.exten, 'context': member.extension.context} for member in members]
+        extensions = [
+            {'exten': member.extension.exten, 'context': member.extension.context}
+            for member in members
+        ]
         event = GroupMemberExtensionsAssociatedEvent(group.id, extensions)
         self.bus.send_bus_event(event)
 

@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class GroupCallPermissionService:
-
     def __init__(self, group_dao, notifier, validator):
         self.group_dao = group_dao
         self.notifier = notifier
@@ -32,7 +31,5 @@ class GroupCallPermissionService:
 
 def build_service():
     return GroupCallPermissionService(
-        group_dao_module,
-        build_notifier(),
-        build_validator(),
+        group_dao_module, build_notifier(), build_validator()
     )

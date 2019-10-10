@@ -4,15 +4,17 @@
 from xivo_dao.resources.call_filter import dao as call_filter_dao_module
 
 from .notifier import build_notifier
-from .validator import (
-    build_validator_recipient_user,
-    build_validator_surrogate_user,
-)
+from .validator import build_validator_recipient_user, build_validator_surrogate_user
 
 
 class CallFilterUserService:
-
-    def __init__(self, call_filter_dao, notifier, validator_recipient_user, validator_surrogate_user):
+    def __init__(
+        self,
+        call_filter_dao,
+        notifier,
+        validator_recipient_user,
+        validator_surrogate_user,
+    ):
         self.call_filter_dao = call_filter_dao
         self.notifier = notifier
         self.validator_recipient_user = validator_recipient_user

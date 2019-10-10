@@ -38,10 +38,7 @@ class RegistrarDao:
         return registrar
 
     def get(self, registrar_id, tenant_uuids=None):
-        parameters = {
-            'X_type': 'registrar',
-            'id': registrar_id,
-        }
+        parameters = {'X_type': 'registrar', 'id': registrar_id}
 
         resources = self.client.configs.list(parameters)['configs']
         if not resources:
@@ -62,7 +59,9 @@ class RegistrarDao:
         query = {'X_type': 'registrar'}
         order = self.REGISTRAR_KEYS.get(parameters.pop('order', self.DEFAULT_ORDER))
         direction = parameters.pop('direction', self.DEFAULT_DIRECTION)
-        results = self.client.configs.list(search=query, order=order, direction=direction)['configs']
+        results = self.client.configs.list(
+            search=query, order=order, direction=direction
+        )['configs']
         return results
 
     def _filter_registrars(self, registrars, search=None):
@@ -71,18 +70,27 @@ class RegistrarDao:
 
         if search.get('search'):
             search_text = search.pop('search')
-            registrars = [registrar for registrar in registrars
-                          if self._matches_text_search(registrar, search_text)]
+            registrars = [
+                registrar
+                for registrar in registrars
+                if self._matches_text_search(registrar, search_text)
+            ]
         if search:
-            registrars = [registrar for registrar in registrars
-                          if self._matches_search(registrar, search)]
+            registrars = [
+                registrar
+                for registrar in registrars
+                if self._matches_search(registrar, search)
+            ]
         return registrars
 
     def _matches_search(self, registrar, search):
         for key, value in search.items():
             if key in self.REGISTRAR_KEYS:
                 real_key = self.REGISTRAR_KEYS[key]
-                if real_key in registrar and str(value).lower() in str(registrar[real_key]).lower():
+                if (
+                    real_key in registrar
+                    and str(value).lower() in str(registrar[real_key]).lower()
+                ):
                     return True
         return False
 
@@ -100,7 +108,7 @@ class RegistrarDao:
 
     def _paginate_registrars(self, registrars, offset=0, limit=None):
         if limit:
-            return registrars[offset:offset + limit]
+            return registrars[offset : offset + limit]
         return registrars[offset:]
 
     def find_by(self, **criteria):
@@ -121,7 +129,7 @@ class RegistrarDao:
             registrars = self._paginate_registrars(
                 registrars,
                 criteria.get('offset', criteria.get('skip', 0)),
-                criteria.get('limit')
+                criteria.get('limit'),
             )
         else:
             registrars = []

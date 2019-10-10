@@ -15,7 +15,6 @@ from wazo_confd.helpers.validator import (
 
 
 class QueueValidator(Validator):
-
     def validate(self, queue):
         self.validate_unique_name_through_group(queue)
 
@@ -28,14 +27,11 @@ class QueueValidator(Validator):
 def build_validator():
     return ValidationGroup(
         create=[
-            UniqueField('name',
-                        lambda name: queue_dao.find_by(name=name),
-                        'Queue'),
+            UniqueField('name', lambda name: queue_dao.find_by(name=name), 'Queue'),
             QueueValidator(),
         ],
         edit=[
-            Optional('name',
-                     UniqueFieldChanged('name', queue_dao, 'Queue')),
+            Optional('name', UniqueFieldChanged('name', queue_dao, 'Queue')),
             QueueValidator(),
-        ]
+        ],
     )

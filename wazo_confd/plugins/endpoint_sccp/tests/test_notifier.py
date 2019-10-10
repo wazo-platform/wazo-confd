@@ -20,7 +20,6 @@ SYSCONFD_HANDLERS = {
 
 
 class TestSccpEndpointNotifier(unittest.TestCase):
-
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()

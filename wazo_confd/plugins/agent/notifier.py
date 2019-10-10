@@ -11,16 +11,12 @@ from wazo_confd import bus, sysconfd
 
 
 class AgentNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx_command=None):
-        handlers = {
-            'ipbx': [ipbx_command] if ipbx_command else [],
-            'agentbus': [],
-        }
+        handlers = {'ipbx': [ipbx_command] if ipbx_command else [], 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, agent):

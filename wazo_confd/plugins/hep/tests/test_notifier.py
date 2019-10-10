@@ -9,14 +9,10 @@ from xivo_bus.resources.hep.event import HEPGeneralUpdatedEvent
 from ..notifier import HEPConfigurationNotifier
 
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_hep.so'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload res_hep.so'], 'agentbus': []}
 
 
 class TestHEPConfigurationNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.hep = Mock()

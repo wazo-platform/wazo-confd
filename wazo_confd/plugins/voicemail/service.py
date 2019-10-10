@@ -12,7 +12,6 @@ from .validator import build_validator
 
 
 class VoicemailService(CRUDService):
-
     def __init__(self, dao, validator, notifier, sysconf, extra=None):
         super(VoicemailService, self).__init__(dao, validator, notifier, extra)
         self.sysconf = sysconf
@@ -42,13 +41,12 @@ class VoicemailService(CRUDService):
 
     def move_voicemail(self, voicemail, old_number, old_context):
         if (old_number != voicemail.number) or (old_context != voicemail.context):
-            self.sysconf.move_voicemail(old_number, old_context, voicemail.number, voicemail.context)
+            self.sysconf.move_voicemail(
+                old_number, old_context, voicemail.number, voicemail.context
+            )
 
 
 def build_service():
     return VoicemailService(
-        voicemail_dao,
-        build_validator(),
-        build_notifier(),
-        sysconfd
+        voicemail_dao, build_validator(), build_notifier(), sysconfd
     )

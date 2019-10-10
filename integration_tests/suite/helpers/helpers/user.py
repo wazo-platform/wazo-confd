@@ -1,4 +1,4 @@
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -9,10 +9,14 @@ def add_user(wazo_tenant=None, **params):
     user_uuid = response.item['uuid']
     if 'services' in params:
         if 'dnd' in params['services']:
-            response = confd.users(user_uuid).services.dnd.put(params['services']['dnd'])
+            response = confd.users(user_uuid).services.dnd.put(
+                params['services']['dnd']
+            )
             response.assert_updated()
         if 'incallfilter' in params['services']:
-            response = confd.users(user_uuid).services.incallfilter.put(params['services']['incallfilter'])
+            response = confd.users(user_uuid).services.incallfilter.put(
+                params['services']['incallfilter']
+            )
             response.assert_updated()
     if 'fallbacks' in params:
         response = confd.users(user_uuid).fallbacks.put(params['fallbacks'])

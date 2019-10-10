@@ -19,15 +19,23 @@ class LineSchema(BaseSchema):
     context = fields.String(required=True)
     provisioning_code = fields.String(validate=(Predicate('isdigit'), Length(equal=6)))
     position = fields.Integer(validate=Range(min=1))
-    caller_id_name = fields.String(allow_none=True)  # Validate length callerid_name + num = max(160)
+    caller_id_name = fields.String(
+        allow_none=True
+    )  # Validate length callerid_name + num = max(160)
     caller_id_num = fields.String(validate=Predicate('isdigit'), allow_none=True)
     registrar = fields.String(validate=Length(max=128))
     links = ListLink(Link('lines'))
 
-    application = fields.Nested('ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True)
-    endpoint_sip = fields.Nested('SipSchema', only=['id', 'username', 'links'], dump_only=True)
+    application = fields.Nested(
+        'ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True
+    )
+    endpoint_sip = fields.Nested(
+        'SipSchema', only=['id', 'username', 'links'], dump_only=True
+    )
     endpoint_sccp = fields.Nested('SccpSchema', only=['id', 'links'], dump_only=True)
-    endpoint_custom = fields.Nested('CustomSchema', only=['id', 'interface', 'links'], dump_only=True)
+    endpoint_custom = fields.Nested(
+        'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
+    )
     extensions = fields.Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
@@ -43,7 +51,6 @@ class LineSchema(BaseSchema):
 
 
 class LineSchemaNullable(LineSchema):
-
     def on_bind_field(self, field_name, field_obj):
         super(LineSchemaNullable, self).on_bind_field(field_name, field_obj)
         nullable_fields = ['provisioning_code', 'position', 'registrar']

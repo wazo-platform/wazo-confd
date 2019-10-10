@@ -17,7 +17,11 @@ class ApplicationList(ListResource):
     schema = ApplicationSchema
 
     def build_headers(self, application):
-        return {'Location': url_for('applications', application_uuid=application.uuid, _external=True)}
+        return {
+            'Location': url_for(
+                'applications', application_uuid=application.uuid, _external=True
+            )
+        }
 
     @required_acl('confd.applications.create')
     def post(self):

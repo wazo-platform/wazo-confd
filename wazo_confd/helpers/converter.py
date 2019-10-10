@@ -5,7 +5,6 @@ from werkzeug.routing import BaseConverter, ValidationError
 
 
 class FilenameConverter(BaseConverter):
-
     def to_python(self, value):
         if not value or len(value) > 194:
             raise ValidationError()

@@ -10,7 +10,6 @@ from wazo_confd.helpers.resource import CRUDService
 
 
 class TestCRUDService(unittest.TestCase):
-
     def setUp(self):
         self.dao = Mock()
         self.validator = Mock()

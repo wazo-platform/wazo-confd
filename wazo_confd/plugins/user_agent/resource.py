@@ -11,9 +11,7 @@ from wazo_confd.helpers.restful import ConfdResource
 class UserAgentSchema(BaseSchema):
     user_id = fields.Integer(attribute='id')
     agent_id = fields.Integer()
-    links = ListLink(Link('users',
-                          field='id',
-                          target='id'))
+    links = ListLink(Link('users', field='id', target='id'))
 
 
 class UserAgentItem(ConfdResource):

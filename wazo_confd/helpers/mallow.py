@@ -17,6 +17,7 @@ class BaseSchema(Schema):
         super(BaseSchema, self).__init__(*args, **kwargs)
 
         if handle_error:
+
             def handle_error_fn(error, data):
                 # Ugly hack to keep the same error message from python2 to python3
                 # The message can be a dictionary and we do not want to cast it to string,
@@ -62,14 +63,10 @@ class UserSchemaUUIDLoad(BaseSchema):
 
 
 class UsersUUIDSchema(BaseSchema):
-    users = fields.Nested(
-        UserSchemaUUIDLoad,
-        many=True, required=True, unknown=EXCLUDE
-    )
+    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True, unknown=EXCLUDE)
 
 
 class StrictBoolean(fields.Boolean):
-
     def _deserialize(self, value, attr, data):
         if not isinstance(value, bool):
             self.fail('invalid')
@@ -122,7 +119,9 @@ class AsteriskSection:
     DEFAULT_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
     DEFAULT_RESERVED_NAMES = ['general']
 
-    def __init__(self, max_length=79, regex=DEFAULT_REGEX, reserved_names=DEFAULT_RESERVED_NAMES):
+    def __init__(
+        self, max_length=79, regex=DEFAULT_REGEX, reserved_names=DEFAULT_RESERVED_NAMES
+    ):
         self._max_length = max_length
         self._regex = re.compile(regex) if isinstance(regex, str) else regex
         self._reserved_names = reserved_names
@@ -131,7 +130,9 @@ class AsteriskSection:
         if not value:
             raise ValidationError('Shorter than minimum length 1')
         if len(value) > self._max_length:
-            raise ValidationError('Longer than maximum length {}'.format(self._max_length))
+            raise ValidationError(
+                'Longer than maximum length {}'.format(self._max_length)
+            )
         if value in self._reserved_names:
             raise ValidationError('Reserved Asterisk section name')
         if self._regex.match(value) is None:

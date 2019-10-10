@@ -1,4 +1,4 @@
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -16,7 +16,6 @@ from ..notifier import UserCallPermissionNotifier
 
 
 class TestUserCallPermissionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.call_permission = Mock(CallPermission, id=4)
@@ -25,14 +24,18 @@ class TestUserCallPermissionNotifier(unittest.TestCase):
         self.notifier = UserCallPermissionNotifier(self.bus)
 
     def test_when_call_permission_associate_to_user_then_event_sent_on_bus(self):
-        expected_event = UserCallPermissionAssociatedEvent(self.user.uuid, self.call_permission.id)
+        expected_event = UserCallPermissionAssociatedEvent(
+            self.user.uuid, self.call_permission.id
+        )
 
         self.notifier.associated(self.user, self.call_permission)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_dissociate_to_user_then_event_sent_on_bus(self):
-        expected_event = UserCallPermissionDissociatedEvent(self.user.uuid, self.call_permission.id)
+        expected_event = UserCallPermissionDissociatedEvent(
+            self.user.uuid, self.call_permission.id
+        )
 
         self.notifier.dissociated(self.user, self.call_permission)
 

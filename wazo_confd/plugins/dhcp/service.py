@@ -5,7 +5,6 @@ from wazo_confd.database import dhcp as dhcp_dao
 
 
 class DHCPService:
-
     def __init__(self, notifier):
         self.notifier = notifier
 

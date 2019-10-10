@@ -3,23 +3,11 @@
 
 import re
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -72,17 +60,18 @@ def test_associate(queue, user, line):
 def test_update_properties(queue, user, line):
     with a.user_line(user, line):
         with a.queue_member_user(queue, user, priority=0):
-            response = confd.queues(queue['id']).members.users(user['id']).put(priority=42)
+            response = (
+                confd.queues(queue['id']).members.users(user['id']).put(priority=42)
+            )
             response.assert_updated()
 
             response = confd.queues(queue['id']).get()
-            assert_that(response.item, has_entries(
-                members=has_entries(
-                    users=contains(has_entries(
-                        priority=42,
-                    ))
-                )
-            ))
+            assert_that(
+                response.item,
+                has_entries(
+                    members=has_entries(users=contains(has_entries(priority=42)))
+                ),
+            )
 
 
 @fixtures.queue()
@@ -103,7 +92,9 @@ def test_associate_multiple_user_with_same_line(queue, user1, user2, line):
     with a.user_line(user1, line), a.user_line(user2, line):
         with a.queue_member_user(queue, user1):
             response = confd.queues(queue['id']).members.users(user2['id']).put()
-            response.assert_match(400, re.compile('Cannot associate different users with the same line'))
+            response.assert_match(
+                400, re.compile('Cannot associate different users with the same line')
+            )
 
 
 @fixtures.queue()
@@ -134,13 +125,25 @@ def test_associate_multiple_queues_to_user(queue1, queue2, user, line):
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_queue, sub_queue, main_user, sub_user):
-    response = confd.queues(main_queue['id']).members.users(main_user['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .members.users(main_user['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Queue'))
 
-    response = confd.queues(sub_queue['id']).members.users(main_user['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.queues(sub_queue['id'])
+        .members.users(main_user['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('User'))
 
-    response = confd.queues(main_queue['id']).members.users(sub_user['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .members.users(sub_user['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -168,7 +171,11 @@ def test_dissociate_not_associated(queue, user, line):
 @fixtures.line_sip(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(queue, user, line):
     with a.user_line(user, line):
-        response = confd.queues(queue['id']).members.users(user['id']).delete(wazo_tenant=SUB_TENANT)
+        response = (
+            confd.queues(queue['id'])
+            .members.users(user['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
         response.assert_match(404, e.not_found('Queue'))
 
 
@@ -179,19 +186,22 @@ def test_get_queue_relation(queue, user, line):
     with a.user_line(user, line):
         with a.queue_member_user(queue, user, priority=0):
             response = confd.queues(queue['id']).get()
-            assert_that(response.item, has_entries(
-                members=has_entries(
-                    users=contains(
-                        has_entries(
-                            uuid=user['uuid'],
-                            firstname=user['firstname'],
-                            lastname=user['lastname'],
-                            priority=0,
-                            links=user['links'],
+            assert_that(
+                response.item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(
+                            has_entries(
+                                uuid=user['uuid'],
+                                firstname=user['firstname'],
+                                lastname=user['lastname'],
+                                priority=0,
+                                links=user['links'],
+                            )
                         )
                     )
-                )
-            ))
+                ),
+            )
 
 
 @fixtures.queue()
@@ -201,16 +211,19 @@ def test_get_user_relation(queue, user, line):
     with a.user_line(user, line):
         with a.queue_member_user(queue, user):
             response = confd.users(user['id']).get()
-            assert_that(response.item, has_entries(
-                queues=contains(
-                    has_entries(
-                        id=queue['id'],
-                        name=queue['name'],
-                        label=queue['label'],
-                        links=queue['links'],
+            assert_that(
+                response.item,
+                has_entries(
+                    queues=contains(
+                        has_entries(
+                            id=queue['id'],
+                            name=queue['name'],
+                            label=queue['label'],
+                            links=queue['links'],
+                        )
                     )
-                )
-            ))
+                ),
+            )
 
 
 @fixtures.queue()

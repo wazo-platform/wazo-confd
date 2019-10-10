@@ -16,7 +16,6 @@ from ..schema import RegistrarSchema
 
 
 class TestRegistrarNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.schema = RegistrarSchema(exclude=['links'])

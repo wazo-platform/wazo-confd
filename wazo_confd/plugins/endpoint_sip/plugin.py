@@ -8,7 +8,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
@@ -23,10 +22,6 @@ class Plugin:
             SipItem,
             '/endpoints/sip/<int:id>',
             endpoint='endpoint_sip',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
-        api.add_resource(
-            SipList,
-            '/endpoints/sip',
-            resource_class_args=(service,)
-        )
+        api.add_resource(SipList, '/endpoints/sip', resource_class_args=(service,))

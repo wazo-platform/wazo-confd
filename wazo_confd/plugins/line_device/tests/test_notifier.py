@@ -20,19 +20,12 @@ from ..notifier import LineDeviceNotifier
 
 class TestLineDeviceNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {
-        'ipbx': ['module reload chan_sccp.so'],
-        'agentbus': [],
-    }
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'], 'agentbus': []}
 
     def setUp(self):
         self.sysconfd = Mock()
         self.line = Mock(
-            Line,
-            id=1,
-            endpoint_sip={'id': 2},
-            endpoint_sccp=None,
-            endpoint_custom=None,
+            Line, id=1, endpoint_sip={'id': 2}, endpoint_sccp=None, endpoint_custom=None
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.device = Mock(Device, id='custom-id')
@@ -55,13 +48,17 @@ class TestLineDeviceNotifier(unittest.TestCase):
         self.line.endpoint = "sccp"
         self.notifier.associated(self.line, self.device)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self.REQUEST_HANDLERS
+        )
 
     def test_given_line_is_sccp_when_dissociated_then_sccp_reloaded(self):
         self.line.endpoint = "sccp"
         self.notifier.dissociated(self.line, self.device)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self.REQUEST_HANDLERS
+        )
 
     def test_associate_then_bus_event(self):
         expected_event = LineDeviceAssociatedEvent(
@@ -72,7 +69,7 @@ class TestLineDeviceNotifier(unittest.TestCase):
                 'endpoint_sccp': self.line.endpoint_sccp,
                 'endpoint_custom': self.line.endpoint_custom,
             },
-            device={'id': self.device.id}
+            device={'id': self.device.id},
         )
 
         self.notifier.associated(self.line, self.device)
@@ -88,7 +85,7 @@ class TestLineDeviceNotifier(unittest.TestCase):
                 'endpoint_sccp': self.line.endpoint_sccp,
                 'endpoint_custom': self.line.endpoint_custom,
             },
-            device={'id': self.device.id}
+            device={'id': self.device.id},
         )
 
         self.notifier.dissociated(self.line, self.device)

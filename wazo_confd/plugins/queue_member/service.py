@@ -10,8 +10,14 @@ from .validator import build_validator_member_user, build_validator_member_agent
 
 
 class QueueMemberService:
-
-    def __init__(self, queue_dao, agent_dao, validator_member_user, validator_member_agent, notifier):
+    def __init__(
+        self,
+        queue_dao,
+        agent_dao,
+        validator_member_user,
+        validator_member_agent,
+        notifier,
+    ):
         self.queue_dao = queue_dao
         self.agent_dao = agent_dao
         self.notifier = notifier
@@ -44,7 +50,9 @@ class QueueMemberService:
 
     def associate_legacy(self, queue, member):
         if member in queue.agent_queue_members:
-            raise errors.resource_associated('Agent', 'Queue', member.agent.id, queue.id)
+            raise errors.resource_associated(
+                'Agent', 'Queue', member.agent.id, queue.id
+            )
 
         self.validator_member_agent.validate_association(queue, member)
         self.queue_dao.associate_member_agent(queue, member)

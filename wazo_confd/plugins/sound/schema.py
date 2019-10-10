@@ -9,7 +9,9 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from .storage import RESERVED_DIRECTORIES
 
 ASTERISK_CATEGORY = 'system'
-RESERVED_DIRECTORIES_ERROR = "The following name are reserved for internal usage: {}".format(RESERVED_DIRECTORIES)
+RESERVED_DIRECTORIES_ERROR = "The following name are reserved for internal usage: {}".format(
+    RESERVED_DIRECTORIES
+)
 DIRECTORY_REGEX = r'^[a-zA-Z0-9]{1}[-_.a-zA-Z0-9]+$'
 
 
@@ -34,11 +36,15 @@ class SoundFileSchema(BaseSchema):
 
 class SoundSchema(BaseSchema):
     tenant_uuid = fields.String()
-    name = fields.String(validate=[Length(max=149, min=1),
-                                   NoneOf([ASTERISK_CATEGORY]),
-                                   NoneOf(RESERVED_DIRECTORIES, error=RESERVED_DIRECTORIES_ERROR),
-                                   Regexp(DIRECTORY_REGEX)],
-                         required=True)
+    name = fields.String(
+        validate=[
+            Length(max=149, min=1),
+            NoneOf([ASTERISK_CATEGORY]),
+            NoneOf(RESERVED_DIRECTORIES, error=RESERVED_DIRECTORIES_ERROR),
+            Regexp(DIRECTORY_REGEX),
+        ],
+        required=True,
+    )
     files = fields.Nested(SoundFileSchema, many=True, dump_only=True)
 
     links = ListLink(Link('sounds', field='name', target='category'))

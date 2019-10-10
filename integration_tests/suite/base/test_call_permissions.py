@@ -16,15 +16,8 @@ from hamcrest import (
 
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -77,8 +70,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'extensions', {}
 
 
-@fixtures.call_permission(name="search", password="123", description="SearchDesc", mode='deny', enabled=True)
-@fixtures.call_permission(name="hidden", password="456", description="HiddenDesc", mode='allow', enabled=False)
+@fixtures.call_permission(
+    name="search", password="123", description="SearchDesc", mode='deny', enabled=True
+)
+@fixtures.call_permission(
+    name="hidden", password="456", description="HiddenDesc", mode='allow', enabled=False
+)
 def test_search(call_permission, hidden):
     url = confd.callpermissions
     searches = {
@@ -119,22 +116,13 @@ def check_search(url, call_permission, hidden, field, term):
 @fixtures.call_permission(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.callpermissions.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.callpermissions.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.callpermissions.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.call_permission(
@@ -147,17 +135,20 @@ def test_list_multi_tenant(main, sub):
 )
 def test_get(call_permission):
     response = confd.callpermissions(call_permission['id']).get()
-    assert_that(response.item, has_entries(
-        name='search',
-        password='123',
-        description='SearchDesc',
-        mode='deny',
-        enabled=True,
-        extensions=contains_inanyorder('123', '456'),
-        users=empty(),
-        outcalls=empty(),
-        groups=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            name='search',
+            password='123',
+            description='SearchDesc',
+            mode='deny',
+            enabled=True,
+            extensions=contains_inanyorder('123', '456'),
+            users=empty(),
+            outcalls=empty(),
+            groups=empty(),
+        ),
+    )
 
 
 @fixtures.call_permission(wazo_tenant=MAIN_TENANT)
@@ -174,15 +165,18 @@ def test_create_minimal_parameters():
     response = confd.callpermissions.post(name='minimal')
     response.assert_created('callpermissions')
 
-    assert_that(response.item, has_entries(
-        tenant_uuid=MAIN_TENANT,
-        name='minimal',
-        password=None,
-        description=None,
-        mode='deny',
-        enabled=True,
-        extensions=[],
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            tenant_uuid=MAIN_TENANT,
+            name='minimal',
+            password=None,
+            description=None,
+            mode='deny',
+            enabled=True,
+            extensions=[],
+        ),
+    )
 
 
 def test_create_all_parameters():
@@ -214,22 +208,22 @@ def test_create_2_call_permissions_with_same_name(call_permission):
 
 @fixtures.call_permission()
 def test_create_with_invalid_mode(call_permission):
-    response = confd.callpermissions.post(name=call_permission['name'], mode='invalidmode')
+    response = confd.callpermissions.post(
+        name=call_permission['name'], mode='invalidmode'
+    )
     response.assert_status(400)
 
 
 def test_create_with_duplicate_extensions():
-    parameters = {'name': 'duplicate_perm',
-                  'extensions': ['123', '123', '456']}
+    parameters = {'name': 'duplicate_perm', 'extensions': ['123', '123', '456']}
 
     response = confd.callpermissions.post(**parameters)
     response.assert_created('callpermissions')
     assert_that(
         response.item,
         has_entries(
-            name=parameters['name'],
-            extensions=contains_inanyorder('123', '456'),
-        )
+            name=parameters['name'], extensions=contains_inanyorder('123', '456')
+        ),
     )
 
 
@@ -255,7 +249,9 @@ def test_edit_all_parameters(call_permission):
 @fixtures.call_permission(name='call_permission1')
 @fixtures.call_permission(name='call_permission2')
 def test_edit_with_same_name(first_call_permission, second_call_permission):
-    response = confd.callpermissions(first_call_permission['id']).put(name=second_call_permission['name'])
+    response = confd.callpermissions(first_call_permission['id']).put(
+        name=second_call_permission['name']
+    )
     response.assert_match(400, e.resource_exists('CallPermission'))
 
 

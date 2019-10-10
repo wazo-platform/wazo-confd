@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class OutcallCallPermissionService:
-
     def __init__(self, outcall_dao, notifier, validator):
         self.outcall_dao = outcall_dao
         self.notifier = notifier
@@ -32,7 +31,5 @@ class OutcallCallPermissionService:
 
 def build_service():
     return OutcallCallPermissionService(
-        outcall_dao_module,
-        build_notifier(),
-        build_validator(),
+        outcall_dao_module, build_notifier(), build_validator()
     )

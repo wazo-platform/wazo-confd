@@ -14,5 +14,4 @@ class RTPConfigurationService(AsteriskConfigurationService):
 
 
 def build_service():
-    return RTPConfigurationService(asterisk_file_dao,
-                                   build_notifier())
+    return RTPConfigurationService(asterisk_file_dao, build_notifier())

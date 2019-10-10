@@ -7,7 +7,6 @@ from wazo_confd import bus, sysconfd
 
 
 class UserGroupNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
@@ -19,7 +18,8 @@ class UserGroupNotifier:
                 'module reload app_queue.so',
                 'module reload chan_sccp.so',
             ],
-            'agentbus': []}
+            'agentbus': [],
+        }
         self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, user, groups):

@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,5 +17,5 @@ class Plugin:
             AgentSkillItem,
             '/agents/<int:agent_id>/skills/<int:skill_id>',
             endpoint='agent_skills',
-            resource_class_args=(service, agent_dao, skill_dao)
+            resource_class_args=(service, agent_dao, skill_dao),
         )

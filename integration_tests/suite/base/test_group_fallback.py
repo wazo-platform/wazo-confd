@@ -1,11 +1,7 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    equal_to,
-    has_entries
-)
+from hamcrest import assert_that, equal_to, has_entries
 
 from . import confd
 from ..helpers import scenarios as s
@@ -96,28 +92,54 @@ def _update_group_fallbacks_with_destination(group_id, destination):
     response = confd.groups(group_id).fallbacks.put(noanswer_destination=destination)
     response.assert_updated()
     response = confd.groups(group_id).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=has_entries(**destination)))
+    assert_that(
+        response.item, has_entries(noanswer_destination=has_entries(**destination))
+    )
 
 
 @fixtures.group()
 def test_nonexistent_destinations(group):
-    meetme = ivr = dest_group = outcall = queue = user = voicemail = conference = skill_rule = {'id': 99999999}
+    meetme = (
+        ivr
+    ) = dest_group = outcall = queue = user = voicemail = conference = skill_rule = {
+        'id': 99999999
+    }
     switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
-    for destination in valid_destinations(meetme, ivr, dest_group, outcall, queue, switchboard,
-                                          user, voicemail, conference, skill_rule, application):
-        if destination['type'] in ('meetme',
-                                   'ivr',
-                                   'group',
-                                   'outcall',
-                                   'queue',
-                                   'switchboard',
-                                   'user',
-                                   'voicemail',
-                                   'conference'):
-            yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
+    for destination in valid_destinations(
+        meetme,
+        ivr,
+        dest_group,
+        outcall,
+        queue,
+        switchboard,
+        user,
+        voicemail,
+        conference,
+        skill_rule,
+        application,
+    ):
+        if destination['type'] in (
+            'meetme',
+            'ivr',
+            'group',
+            'outcall',
+            'queue',
+            'switchboard',
+            'user',
+            'voicemail',
+            'conference',
+        ):
+            yield _update_user_fallbacks_with_nonexistent_destination, group[
+                'id'
+            ], destination
 
-        if destination['type'] == 'application' and destination['application'] == 'custom':
-            yield _update_user_fallbacks_with_nonexistent_destination, group['id'], destination
+        if (
+            destination['type'] == 'application'
+            and destination['application'] == 'custom'
+        ):
+            yield _update_user_fallbacks_with_nonexistent_destination, group[
+                'id'
+            ], destination
 
 
 def _update_user_fallbacks_with_nonexistent_destination(group_id, destination):
@@ -133,8 +155,13 @@ def test_bus_events(group):
 
 @fixtures.group()
 def test_get_fallbacks_relation(group):
-    confd.groups(group['id']).fallbacks.put(noanswer_destination={'type': 'none'}).assert_updated
+    confd.groups(group['id']).fallbacks.put(
+        noanswer_destination={'type': 'none'}
+    ).assert_updated
     response = confd.groups(group['id']).get()
-    assert_that(response.item, has_entries(
-        fallbacks=has_entries(noanswer_destination=has_entries(type='none'))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            fallbacks=has_entries(noanswer_destination=has_entries(type='none'))
+        ),
+    )

@@ -18,7 +18,9 @@ class ParkingLotExtensionItem(ConfdResource):
     @required_acl('confd.parkinglots.{parking_lot_id}.extensions.{extension_id}.delete')
     def delete(self, parking_lot_id, extension_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        parking_lot = self.parking_lot_dao.get(parking_lot_id, tenant_uuids=tenant_uuids)
+        parking_lot = self.parking_lot_dao.get(
+            parking_lot_id, tenant_uuids=tenant_uuids
+        )
         extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(parking_lot, extension)
         return '', 204
@@ -26,7 +28,9 @@ class ParkingLotExtensionItem(ConfdResource):
     @required_acl('confd.parkinglots.{parking_lot_id}.extensions.{extension_id}.update')
     def put(self, parking_lot_id, extension_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        parking_lot = self.parking_lot_dao.get(parking_lot_id, tenant_uuids=tenant_uuids)
+        parking_lot = self.parking_lot_dao.get(
+            parking_lot_id, tenant_uuids=tenant_uuids
+        )
         extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
         self.service.associate(parking_lot, extension)
         return '', 204

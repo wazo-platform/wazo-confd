@@ -20,7 +20,6 @@ SYSCONFD_HANDLERS = {
 
 
 class TestCallPickupNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

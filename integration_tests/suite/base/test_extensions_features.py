@@ -1,20 +1,10 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-    has_entry,
-    has_item,
-    is_not,
-)
+from hamcrest import assert_that, has_entries, has_entry, has_item, is_not
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
 
 FAKE_ID = 999999999
 
@@ -68,10 +58,7 @@ def test_delete_unimplemented(extension):
 @fixtures.extension_feature(exten='9999', feature='hidden')
 def test_search(extension, hidden):
     url = confd.extensions.features
-    searches = {
-        'exten': '499',
-        'feature': 'sea',
-    }
+    searches = {'exten': '499', 'feature': 'sea'}
 
     for field, term in searches.items():
         yield check_search, url, extension, hidden, field, term
@@ -102,12 +89,15 @@ def test_sorting_offset_limit(extension1, extension2):
 @fixtures.extension_feature()
 def test_get(extension):
     response = confd.extensions.features(extension['id']).get()
-    assert_that(response.item, has_entries(
-        exten=extension['exten'],
-        context=extension['context'],
-        feature=extension['feature'],
-        enabled=True,
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            exten=extension['exten'],
+            context=extension['context'],
+            feature=extension['feature'],
+            enabled=True,
+        ),
+    )
 
 
 @fixtures.extension_feature()
@@ -130,10 +120,14 @@ def test_edit_all_parameters(extension):
 @fixtures.extension_feature(exten='1234')
 @fixtures.extension_feature()
 def test_edit_with_same_extension(extension1, extension2):
-    response = confd.extensions.features(extension2['id']).put(exten=extension1['exten'])
+    response = confd.extensions.features(extension2['id']).put(
+        exten=extension1['exten']
+    )
     response.assert_match(400, e.resource_exists('Extension'))
 
 
 @fixtures.extension_feature()
 def test_bus_events(extension):
-    yield s.check_bus_event, 'config.extension_feature.edited', confd.extensions.features(extension['id']).put
+    yield s.check_bus_event, 'config.extension_feature.edited', confd.extensions.features(
+        extension['id']
+    ).put

@@ -4,18 +4,16 @@
 from xivo_dao.resources.line import dao as line_dao
 from wazo_provd_client import Client as ProvdClient
 
-from wazo_confd.plugins.device.builder import build_dao as build_device_dao, build_device_updater
-
-from .resource import (
-    LineDeviceAssociation,
-    LineDeviceGet,
-    DeviceLineGet,
+from wazo_confd.plugins.device.builder import (
+    build_dao as build_device_dao,
+    build_device_updater,
 )
+
+from .resource import LineDeviceAssociation, LineDeviceGet, DeviceLineGet
 from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
@@ -32,17 +30,17 @@ class Plugin:
             LineDeviceAssociation,
             '/lines/<int:line_id>/devices/<device_id>',
             endpoint='line_devices',
-            resource_class_args=(line_dao, device_dao, service)
+            resource_class_args=(line_dao, device_dao, service),
         )
 
         api.add_resource(
             LineDeviceGet,
             '/lines/<int:line_id>/devices',
-            resource_class_args=(line_dao, device_dao, service)
+            resource_class_args=(line_dao, device_dao, service),
         )
 
         api.add_resource(
             DeviceLineGet,
             '/devices/<device_id>/lines',
-            resource_class_args=(line_dao, device_dao, service)
+            resource_class_args=(line_dao, device_dao, service),
         )

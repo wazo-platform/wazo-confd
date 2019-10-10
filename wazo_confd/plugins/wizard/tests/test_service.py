@@ -12,7 +12,6 @@ from ..service import WizardService
 
 
 class TestWizardService(unittest.TestCase):
-
     def setUp(self):
         self.service = WizardService(Mock(), Mock(), Mock(), Mock(), Mock(), Mock())
 
@@ -23,7 +22,9 @@ class TestWizardService(unittest.TestCase):
         netifaces.ifaddresses.return_value = {
             4: [{'addr': '192.168.0.1', 'netmask': '255.255.0.0'}]
         }
-        expected_result = [{'ip_address': '192.168.0.1', 'netmask': '255.255.0.0', 'interface': 'eth0'}]
+        expected_result = [
+            {'ip_address': '192.168.0.1', 'netmask': '255.255.0.0', 'interface': 'eth0'}
+        ]
 
         result = self.service.get_interfaces()
 
@@ -36,7 +37,9 @@ class TestWizardService(unittest.TestCase):
         netifaces.ifaddresses.return_value = {
             4: [{'addr': '192.168.0.1', 'netmask': '255.255.0.0'}]
         }
-        expected_result = [{'ip_address': '192.168.0.1', 'netmask': '255.255.0.0', 'interface': 'eth0'}]
+        expected_result = [
+            {'ip_address': '192.168.0.1', 'netmask': '255.255.0.0', 'interface': 'eth0'}
+        ]
 
         result = self.service.get_interfaces()
 
@@ -55,10 +58,14 @@ class TestWizardService(unittest.TestCase):
     @patch('wazo_confd.plugins.wizard.service.netifaces')
     def test_get_gateways(self, netifaces):
         netifaces.AF_INET = 4
-        netifaces.gateways.return_value = {4: [('192.168.2.0', 'eth0'), ('192.168.32.0', 'eth1')]}
-        expected_result = [{'gateway': '192.168.2.0', 'interface': 'eth0'},
-                           {'gateway': '192.168.32.0', 'interface': 'eth1'},
-                           {'gateway': '0.0.0.0', 'interface': None}]
+        netifaces.gateways.return_value = {
+            4: [('192.168.2.0', 'eth0'), ('192.168.32.0', 'eth1')]
+        }
+        expected_result = [
+            {'gateway': '192.168.2.0', 'interface': 'eth0'},
+            {'gateway': '192.168.32.0', 'interface': 'eth1'},
+            {'gateway': '0.0.0.0', 'interface': None},
+        ]
 
         result = self.service.get_gateways()
 
@@ -75,7 +82,11 @@ class TestWizardService(unittest.TestCase):
         assert_that(result, equal_to(expected_result))
 
     def test_get_timezone(self):
-        with patch('wazo_confd.plugins.wizard.service.open', mock_open(read_data='America/Montreal'), create=True) as mopen:
+        with patch(
+            'wazo_confd.plugins.wizard.service.open',
+            mock_open(read_data='America/Montreal'),
+            create=True,
+        ) as mopen:
             result = self.service.get_timezone()
 
         mopen.assert_called_once_with('/etc/timezone', 'r')
@@ -89,12 +100,18 @@ class TestWizardService(unittest.TestCase):
         assert_that(result, none())
 
     def test_get_nameservers(self):
-        resolv_conf = dedent('''
+        resolv_conf = dedent(
+            '''
             search example.com
             nameserver 192.168.2.0
-            nameserver 192.168.2.1''')
+            nameserver 192.168.2.1'''
+        )
         expected_result = ['192.168.2.0', '192.168.2.1']
-        with patch('wazo_confd.plugins.wizard.service.open', mock_open(read_data=resolv_conf), create=True) as mopen:
+        with patch(
+            'wazo_confd.plugins.wizard.service.open',
+            mock_open(read_data=resolv_conf),
+            create=True,
+        ) as mopen:
             result = self.service.get_nameservers()
 
         mopen.assert_called_once_with('/etc/resolv.conf', 'r')

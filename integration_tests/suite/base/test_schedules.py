@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 
@@ -77,47 +70,113 @@ def error_checks(url):
 
     for key in ('open_periods', 'exceptional_periods'):
         regex = r'{}.*0.*hours_start'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': 7}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': '7:15'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': 'abcd'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': '24:00'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_start': '10:60'}], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_start': 7}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_start': '7:15'}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_start': 'abcd'}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_start': None}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_start': '24:00'}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_start': '10:60'}
+        ], regex
 
         regex = r'{}.*0.*hours_end'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': 8}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': '8:15'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': 'abcd'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': '24:00'}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'hours_end': '10:60'}], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_end': 8}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_end': '8:15'}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_end': 'abcd'}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_end': None}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_end': '24:00'}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'hours_end': '10:60'}
+        ], regex
 
         regex = r'{}.*0.*week_days'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': 1}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': []}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': ['1-2']}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': [None]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': [-1]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'week_days': [8]}], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': None}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': 1}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': []}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': ['1-2']}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': [None]}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': [-1]}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'week_days': [8]}
+        ], regex
 
         regex = r'{}.*0.*month_days'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': 1}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': []}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': ['1-2']}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': [None]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': [-1]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'month_days': [32]}], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': None}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': 1}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': []}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': ['1-2']}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': [None]}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': [-1]}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'month_days': [32]}
+        ], regex
 
         regex = r'{}.*0.*months'.format(key)
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': None}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': 1}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': []}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': ['1-2']}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': [None]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': [-1]}], regex
-        yield s.check_bogus_field_returns_error_matching_regex, url, key, [{'months': [13]}], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': None}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': 1}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': []}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': ['1-2']}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': [None]}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': [-1]}
+        ], regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, key, [
+            {'months': [13]}
+        ], regex
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'closed_destination', destination
@@ -131,32 +190,20 @@ def error_checks(url):
 @fixtures.schedule(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.schedules.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.schedules.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.schedules.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.schedule(name='search', timezone='search')
 @fixtures.schedule(name='hidden', timezone='hidden')
 def test_search(schedule, hidden):
     url = confd.schedules
-    searches = {
-        'name': 'search',
-        'timezone': 'search',
-    }
+    searches = {'name': 'search', 'timezone': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, schedule, hidden, field, term
@@ -187,21 +234,23 @@ def test_sort_offset_limit(schedule1, schedule2):
 @fixtures.schedule()
 def test_get(schedule):
     response = confd.schedules(schedule['id']).get()
-    assert_that(response.item, has_entries(
-        id=schedule['id'],
-        name=schedule['name'],
-        timezone=schedule['timezone'],
-        closed_destination=schedule['closed_destination'],
-        open_periods=schedule['open_periods'],
-        exceptional_periods=schedule['exceptional_periods'],
-        enabled=schedule['enabled'],
-
-        groups=empty(),
-        incalls=empty(),
-        outcalls=empty(),
-        queues=empty(),
-        users=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=schedule['id'],
+            name=schedule['name'],
+            timezone=schedule['timezone'],
+            closed_destination=schedule['closed_destination'],
+            open_periods=schedule['open_periods'],
+            exceptional_periods=schedule['exceptional_periods'],
+            enabled=schedule['enabled'],
+            groups=empty(),
+            incalls=empty(),
+            outcalls=empty(),
+            queues=empty(),
+            users=empty(),
+        ),
+    )
 
 
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
@@ -227,31 +276,27 @@ def test_create_all_parameters():
     parameters = {
         'name': 'MySchedule',
         'timezone': 'American/Toronto',
-        'closed_destination': {
-            'type': 'hangup',
-            'cause': 'busy',
-            'timeout': 25
-        },
-        'open_periods': [{
-            'hours_start': '07:15',
-            'hours_end': '08:15',
-            'week_days': [1, 2, 3, 4, 5],
-            'month_days': [1, 15, 30],
-            'months': [1, 6, 12]
-        }],
-        'exceptional_periods': [{
-            'hours_start': '07:25',
-            'hours_end': '07:35',
-            'week_days': [1, 2, 3, 4, 5],
-            'month_days': [1, 30],
-            'months': [1, 12],
-            'destination': {
-                'type': 'hangup',
-                'cause': 'congestion',
-                'timeout': 30
+        'closed_destination': {'type': 'hangup', 'cause': 'busy', 'timeout': 25},
+        'open_periods': [
+            {
+                'hours_start': '07:15',
+                'hours_end': '08:15',
+                'week_days': [1, 2, 3, 4, 5],
+                'month_days': [1, 15, 30],
+                'months': [1, 6, 12],
             }
-        }],
-        'enabled': False
+        ],
+        'exceptional_periods': [
+            {
+                'hours_start': '07:25',
+                'hours_end': '07:35',
+                'week_days': [1, 2, 3, 4, 5],
+                'month_days': [1, 30],
+                'months': [1, 12],
+                'destination': {'type': 'hangup', 'cause': 'congestion', 'timeout': 30},
+            }
+        ],
+        'enabled': False,
     }
 
     response = confd.schedules.post(**parameters)
@@ -266,52 +311,118 @@ def test_create_all_parameters():
 def test_create_open_periods_default_values():
     response = confd.schedules.post(
         open_periods=[{'hours_start': '07:15', 'hours_end': '08:15'}],
-        closed_destination={'type': 'none'}
+        closed_destination={'type': 'none'},
     )
 
-    assert_that(response.item, has_entries(
-        open_periods=contains(has_entries(
-            hours_start='07:15',
-            hours_end='08:15',
-            week_days=[1, 2, 3, 4, 5, 6, 7],
-            month_days=[
-                1, 2, 3, 4, 5, 6, 7, 8, 9,
-                10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                30, 31
-            ],
-            months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        ))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            open_periods=contains(
+                has_entries(
+                    hours_start='07:15',
+                    hours_end='08:15',
+                    week_days=[1, 2, 3, 4, 5, 6, 7],
+                    month_days=[
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        30,
+                        31,
+                    ],
+                    months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                )
+            )
+        ),
+    )
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 
 
 def test_create_exceptional_periods_default_values():
     response = confd.schedules.post(
-        exceptional_periods=[{
-            'hours_start': '07:15',
-            'hours_end': '08:15',
-            'destination': {'type': 'none'}
-        }],
-        closed_destination={'type': 'none'}
+        exceptional_periods=[
+            {
+                'hours_start': '07:15',
+                'hours_end': '08:15',
+                'destination': {'type': 'none'},
+            }
+        ],
+        closed_destination={'type': 'none'},
     )
 
-    assert_that(response.item, has_entries(
-        exceptional_periods=contains(has_entries(
-            hours_start='07:15',
-            hours_end='08:15',
-            week_days=[1, 2, 3, 4, 5, 6, 7],
-            month_days=[
-                1, 2, 3, 4, 5, 6, 7, 8, 9,
-                10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-                30, 31
-            ],
-            months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-            destination={'type': 'none'}
-        ))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            exceptional_periods=contains(
+                has_entries(
+                    hours_start='07:15',
+                    hours_end='08:15',
+                    week_days=[1, 2, 3, 4, 5, 6, 7],
+                    month_days=[
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        30,
+                        31,
+                    ],
+                    months=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                    destination={'type': 'none'},
+                )
+            )
+        ),
+    )
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 
@@ -327,31 +438,27 @@ def test_edit_all_parameters(schedule):
     parameters = {
         'name': 'MySchedule',
         'timezone': 'American/Toronto',
-        'closed_destination': {
-            'type': 'hangup',
-            'cause': 'busy',
-            'timeout': 25
-        },
-        'open_periods': [{
-            'hours_start': '07:15',
-            'hours_end': '08:15',
-            'week_days': [1, 2, 3, 4, 5],
-            'month_days': [1, 15, 30],
-            'months': [1, 6, 12]
-        }],
-        'exceptional_periods': [{
-            'hours_start': '07:25',
-            'hours_end': '07:35',
-            'week_days': [1, 2, 3, 4, 5],
-            'month_days': [1, 30],
-            'months': [1, 12],
-            'destination': {
-                'type': 'hangup',
-                'cause': 'congestion',
-                'timeout': 30
+        'closed_destination': {'type': 'hangup', 'cause': 'busy', 'timeout': 25},
+        'open_periods': [
+            {
+                'hours_start': '07:15',
+                'hours_end': '08:15',
+                'week_days': [1, 2, 3, 4, 5],
+                'month_days': [1, 15, 30],
+                'months': [1, 6, 12],
             }
-        }],
-        'enabled': False
+        ],
+        'exceptional_periods': [
+            {
+                'hours_start': '07:25',
+                'hours_end': '07:35',
+                'week_days': [1, 2, 3, 4, 5],
+                'month_days': [1, 30],
+                'months': [1, 12],
+                'destination': {'type': 'hangup', 'cause': 'congestion', 'timeout': 30},
+            }
+        ],
+        'enabled': False,
     }
 
     response = confd.schedules(schedule['id']).put(**parameters)
@@ -382,17 +489,20 @@ def test_valid_destinations(schedule, *destinations):
 def create_schedule_with_destination(destination):
     response = confd.schedules.post(
         closed_destination=destination,
-        exceptional_periods=[{
-            'hours_start': '07:15',
-            'hours_end': '08:15',
-            'destination': destination
-        }]
+        exceptional_periods=[
+            {'hours_start': '07:15', 'hours_end': '08:15', 'destination': destination}
+        ],
     )
     response.assert_created('schedules')
-    assert_that(response.item, has_entries(
-        closed_destination=has_entries(**destination),
-        exceptional_periods=has_items(has_entries(destination=has_entries(**destination)))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(**destination),
+            exceptional_periods=has_items(
+                has_entries(destination=has_entries(**destination))
+            ),
+        ),
+    )
 
     confd.schedules(response.item['id']).delete().assert_deleted()
 
@@ -400,18 +510,21 @@ def create_schedule_with_destination(destination):
 def update_schedule_with_destination(schedule_id, destination):
     response = confd.schedules(schedule_id).put(
         closed_destination=destination,
-        exceptional_periods=[{
-            'hours_start': '07:15',
-            'hours_end': '08:15',
-            'destination': destination
-        }]
+        exceptional_periods=[
+            {'hours_start': '07:15', 'hours_end': '08:15', 'destination': destination}
+        ],
     )
     response.assert_updated()
     response = confd.schedules(schedule_id).get()
-    assert_that(response.item, has_entries(
-        closed_destination=has_entries(**destination),
-        exceptional_periods=has_items(has_entries(destination=has_entries(**destination)))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(**destination),
+            exceptional_periods=has_items(
+                has_entries(destination=has_entries(**destination))
+            ),
+        ),
+    )
 
 
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
@@ -446,5 +559,9 @@ def test_delete_multi_tenant(main, sub):
 def test_bus_events(schedule):
     required_body = {'closed_destination': {'type': 'none'}}
     yield s.check_bus_event, 'config.schedules.created', confd.schedules.post, required_body
-    yield s.check_bus_event, 'config.schedules.edited', confd.schedules(schedule['id']).put
-    yield s.check_bus_event, 'config.schedules.deleted', confd.schedules(schedule['id']).delete
+    yield s.check_bus_event, 'config.schedules.edited', confd.schedules(
+        schedule['id']
+    ).put
+    yield s.check_bus_event, 'config.schedules.deleted', confd.schedules(
+        schedule['id']
+    ).delete

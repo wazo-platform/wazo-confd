@@ -12,7 +12,6 @@ from ..notifier import ProvisioningNetworkingNotifier
 
 
 class TestProvisioningNetworkingNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

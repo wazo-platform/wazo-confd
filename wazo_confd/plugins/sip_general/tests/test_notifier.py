@@ -10,14 +10,10 @@ from xivo_dao.alchemy.staticsip import StaticSIP
 from ..notifier import SIPGeneralNotifier
 
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_pjsip.so'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
 
 
 class TestSIPGeneralNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sip_general = Mock(StaticSIP)

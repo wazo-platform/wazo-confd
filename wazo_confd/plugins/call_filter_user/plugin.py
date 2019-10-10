@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -18,12 +17,12 @@ class Plugin:
             CallFilterRecipientUserList,
             '/callfilters/<int:call_filter_id>/recipients/users',
             endpoint='call_filter_recipients_users',
-            resource_class_args=(service, call_filter_dao, user_dao)
+            resource_class_args=(service, call_filter_dao, user_dao),
         )
 
         api.add_resource(
             CallFilterSurrogateUserList,
             '/callfilters/<int:call_filter_id>/surrogates/users',
             endpoint='call_filter_surrogate_users',
-            resource_class_args=(service, call_filter_dao, user_dao)
+            resource_class_args=(service, call_filter_dao, user_dao),
         )

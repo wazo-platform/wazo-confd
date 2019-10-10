@@ -10,7 +10,6 @@ from wazo_confd import bus
 
 
 class IncallScheduleNotifier:
-
     def __init__(self, bus):
         self._bus = bus
 

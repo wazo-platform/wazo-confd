@@ -8,7 +8,6 @@ from xivo_dao.helpers.exception import NotFoundError
 
 
 class Associator(metaclass=abc.ABCMeta):
-
     def __init__(self, service):
         self.service = service
 
@@ -23,7 +22,6 @@ class Associator(metaclass=abc.ABCMeta):
 
 # WazoUser need to be an associator to have the user uuid
 class WazoUserAssociator(Associator):
-
     def associate(self, entry):
         user = entry.get_resource('user')
         wazo_user = entry.get_resource('wazo_user')
@@ -35,7 +33,6 @@ class WazoUserAssociator(Associator):
 
 
 class LineAssociator(Associator):
-
     def associate(self, entry):
         user = entry.get_resource('user')
         line = entry.get_resource('line')
@@ -53,7 +50,6 @@ class LineAssociator(Associator):
 
 
 class ExtensionAssociator(Associator):
-
     def associate(self, entry):
         line = entry.get_resource('line')
         extension = entry.get_resource('extension')
@@ -75,7 +71,6 @@ class ExtensionAssociator(Associator):
 
 
 class SipAssociator(Associator):
-
     def associate(self, entry):
         line = entry.get_resource('line')
         sip = entry.get_resource('sip')
@@ -90,7 +85,6 @@ class SipAssociator(Associator):
 
 
 class SccpAssociator(Associator):
-
     def associate(self, entry):
         line = entry.get_resource('line')
         sccp = entry.get_resource('sccp')
@@ -105,7 +99,6 @@ class SccpAssociator(Associator):
 
 
 class VoicemailAssociator(Associator):
-
     def associate(self, entry):
         user = entry.get_resource('user')
         voicemail = entry.get_resource('voicemail')
@@ -119,11 +112,12 @@ class VoicemailAssociator(Associator):
             self.service.associate(user, voicemail)
 
     def associated(self, user, voicemail):
-        return self.service.find_by(user_id=user.id, voicemail_id=voicemail.id) is not None
+        return (
+            self.service.find_by(user_id=user.id, voicemail_id=voicemail.id) is not None
+        )
 
 
 class IncallAssociator(Associator):
-
     def associate(self, entry):
         incall = entry.get_resource('incall')
         extension = entry.get_resource('extension_incall')
@@ -135,9 +129,11 @@ class IncallAssociator(Associator):
         ring_seconds = entry.extract_field('incall', 'ring_seconds')
         user = entry.get_resource('user')
         incall = entry.get_resource('incall')
-        incall.destination = Dialaction(action='user',
-                                        actionarg1=str(user.id),
-                                        actionarg2=str(ring_seconds) if ring_seconds else None)
+        incall.destination = Dialaction(
+            action='user',
+            actionarg1=str(user.id),
+            actionarg2=str(ring_seconds) if ring_seconds else None,
+        )
 
     def update(self, entry):
         incall = entry.get_resource('incall')
@@ -156,7 +152,6 @@ class IncallAssociator(Associator):
 
 
 class CallPermissionAssociator(Associator):
-
     def __init__(self, service, call_permission_service):
         super(CallPermissionAssociator, self).__init__(service)
         self.call_permission_service = call_permission_service
@@ -176,5 +171,7 @@ class CallPermissionAssociator(Associator):
         user = entry.get_resource('user')
         names = entry.extract_field('call_permissions', 'names')
         if names is not None:
-            entry.call_permissions = [self.call_permission_service.get_by(name=name) for name in names]
+            entry.call_permissions = [
+                self.call_permission_service.get_by(name=name) for name in names
+            ]
             self.associate_permissions(user, entry.call_permissions)

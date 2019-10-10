@@ -17,7 +17,6 @@ def build_storage(base_path='/var/lib/asterisk/moh'):
 
 
 class _MohFilesystemStorage:
-
     def __init__(self, base_path):
         self._base_path = base_path
 
@@ -36,7 +35,10 @@ class _MohFilesystemStorage:
                 if os.path.isdir(path):
                     logger.info('MOH directory %s already exist', path)
                 else:
-                    logger.error('Could not create MOH directory %s: file exists and is not a directory', path)
+                    logger.error(
+                        'Could not create MOH directory %s: file exists and is not a directory',
+                        path,
+                    )
             else:
                 logger.error('Could not create MOH directory %s: %s', path, e)
 
@@ -74,7 +76,9 @@ class _MohFilesystemStorage:
 
     def save_file(self, moh, filename, content):
         path = self._filename_path(moh, filename)
-        with os.fdopen(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o660), 'wb') as fobj:
+        with os.fdopen(
+            os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o660), 'wb'
+        ) as fobj:
             return fobj.write(content)
 
     def remove_file(self, moh, filename):

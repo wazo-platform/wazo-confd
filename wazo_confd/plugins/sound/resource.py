@@ -74,7 +74,12 @@ class SoundFileItem(ConfdResource):
         sound = self.service.get(tenant.uuid, category, with_files=False)
         sound_file = SoundFile(
             name=filename,
-            formats=[SoundFormat(format_=parameters.get('format'), language=parameters.get('language'))],
+            formats=[
+                SoundFormat(
+                    format_=parameters.get('format'),
+                    language=parameters.get('language'),
+                )
+            ],
         )
         sound.files = [sound_file]
         self.service.save_first_file(sound, request.data)

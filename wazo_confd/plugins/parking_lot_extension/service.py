@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class ParkingLotExtensionService:
-
     def __init__(self, extension_dao, notifier, validator):
         self.extension_dao = extension_dao
         self.validator = validator
@@ -32,6 +31,6 @@ class ParkingLotExtensionService:
 
 
 def build_service():
-    return ParkingLotExtensionService(extension_dao_module,
-                                      build_notifier(),
-                                      build_validator())
+    return ParkingLotExtensionService(
+        extension_dao_module, build_notifier(), build_validator()
+    )

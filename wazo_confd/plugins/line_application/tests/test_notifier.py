@@ -17,19 +17,12 @@ from ..notifier import LineApplicationNotifier
 
 class TestLineApplicationNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {
-        'ipbx': ['module reload res_pjsip.so'],
-        'agentbus': [],
-    }
+    REQUEST_HANDLERS = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
 
     def setUp(self):
         self.sysconfd = Mock()
         self.line = Mock(
-            Line,
-            id=1,
-            endpoint_sip={'id': 2},
-            endpoint_sccp=None,
-            endpoint_custom=None,
+            Line, id=1, endpoint_sip={'id': 2}, endpoint_sccp=None, endpoint_custom=None
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.application = Mock(Application, uuid='custom-uuid')
@@ -39,12 +32,16 @@ class TestLineApplicationNotifier(unittest.TestCase):
     def test_associate_then_pjsip_reloaded(self):
         self.notifier.associated(self.line, self.application)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self.REQUEST_HANDLERS
+        )
 
     def test_dissociate_then_pjsip_reloaded(self):
         self.notifier.dissociated(self.line, self.application)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(self.REQUEST_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            self.REQUEST_HANDLERS
+        )
 
     def test_associate_then_bus_event(self):
         expected_event = LineApplicationAssociatedEvent(
@@ -55,7 +52,7 @@ class TestLineApplicationNotifier(unittest.TestCase):
                 'endpoint_sccp': self.line.endpoint_sccp,
                 'endpoint_custom': self.line.endpoint_custom,
             },
-            application={'uuid': self.application.uuid}
+            application={'uuid': self.application.uuid},
         )
 
         self.notifier.associated(self.line, self.application)
@@ -71,7 +68,7 @@ class TestLineApplicationNotifier(unittest.TestCase):
                 'endpoint_sccp': self.line.endpoint_sccp,
                 'endpoint_custom': self.line.endpoint_custom,
             },
-            application={'uuid': self.application.uuid}
+            application={'uuid': self.application.uuid},
         )
 
         self.notifier.dissociated(self.line, self.application)

@@ -30,11 +30,15 @@ class CallPickupInterceptorGroupList(ConfdResource):
     @required_acl('confd.callpickups.{call_pickup_id}.interceptors.groups.update')
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
+        call_pickup = self.call_pickup_dao.get(
+            call_pickup_id, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
-            interceptors = [self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
-                            for group in form['groups']]
+            interceptors = [
+                self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
+                for group in form['groups']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('groups', 'Group', **e.metadata)
 
@@ -55,11 +59,15 @@ class CallPickupTargetGroupList(ConfdResource):
     @required_acl('confd.callpickups.{call_pickup_id}.targets.groups.update')
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
+        call_pickup = self.call_pickup_dao.get(
+            call_pickup_id, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
-            targets = [self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
-                       for group in form['groups']]
+            targets = [
+                self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
+                for group in form['groups']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('groups', 'Group', **e.metadata)
 
@@ -80,11 +88,15 @@ class CallPickupInterceptorUserList(ConfdResource):
     @required_acl('confd.callpickups.{call_pickup_id}.interceptors.users.update')
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
+        call_pickup = self.call_pickup_dao.get(
+            call_pickup_id, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
-            interceptors = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
-                            for user in form['users']]
+            interceptors = [
+                self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
+                for user in form['users']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 
@@ -105,11 +117,15 @@ class CallPickupTargetUserList(ConfdResource):
     @required_acl('confd.callpickups.{call_pickup_id}.targets.users.update')
     def put(self, call_pickup_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        call_pickup = self.call_pickup_dao.get(call_pickup_id, tenant_uuids=tenant_uuids)
+        call_pickup = self.call_pickup_dao.get(
+            call_pickup_id, tenant_uuids=tenant_uuids
+        )
         form = self.schema().load(request.get_json())
         try:
-            targets = [self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
-                       for user in form['users']]
+            targets = [
+                self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
+                for user in form['users']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('users', 'User', **e.metadata)
 

@@ -16,25 +16,20 @@ class ExtensionSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('extensions'))
 
-    conference = fields.Nested('ConferenceSchema',
-                               only=['id', 'name', 'links'],
-                               dump_only=True)
-    parking_lot = fields.Nested('ParkingLotSchema',
-                                only=['id', 'name', 'links'],
-                                dump_only=True)
-    group = fields.Nested('GroupSchema',
-                          only=['id', 'name', 'links'],
-                          dump_only=True)
-    incall = fields.Nested('IncallSchema',
-                           only=['id', 'links'],
-                           dump_only=True)
-    lines = fields.Nested('LineSchema',
-                          only=['id', 'name', 'links'],
-                          many=True,
-                          dump_only=True)
-    outcall = fields.Nested('OutcallSchema',
-                            only=['id', 'name', 'links'],
-                            dump_only=True)
-    queue = fields.Nested('QueueSchema',
-                          only=['id', 'name', 'label', 'links'],
-                          dump_only=True)
+    conference = fields.Nested(
+        'ConferenceSchema', only=['id', 'name', 'links'], dump_only=True
+    )
+    parking_lot = fields.Nested(
+        'ParkingLotSchema', only=['id', 'name', 'links'], dump_only=True
+    )
+    group = fields.Nested('GroupSchema', only=['id', 'name', 'links'], dump_only=True)
+    incall = fields.Nested('IncallSchema', only=['id', 'links'], dump_only=True)
+    lines = fields.Nested(
+        'LineSchema', only=['id', 'name', 'links'], many=True, dump_only=True
+    )
+    outcall = fields.Nested(
+        'OutcallSchema', only=['id', 'name', 'links'], dump_only=True
+    )
+    queue = fields.Nested(
+        'QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True
+    )

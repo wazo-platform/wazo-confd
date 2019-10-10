@@ -14,14 +14,10 @@ from xivo_dao.alchemy.useriax import UserIAX as IAXEndpoint
 from ..notifier import IAXEndpointNotifier
 
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['iax2 reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
 
 
 class TestIAXEndpointNotifier(unittest.TestCase):
-
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()

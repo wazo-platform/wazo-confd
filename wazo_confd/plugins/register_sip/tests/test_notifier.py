@@ -12,14 +12,10 @@ from xivo_bus.resources.register.event import (
 
 from ..notifier import RegisterSIPNotifier
 
-EXPECTED_SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_pjsip.so'],
-    'agentbus': []
-}
+EXPECTED_SYSCONFD_HANDLERS = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
 
 
 class TestRegisterSIPNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -51,14 +47,20 @@ class TestRegisterSIPNotifier(unittest.TestCase):
     def test_when_register_sip_created_then_sip_reloaded(self):
         self.notifier.created(self.register_sip)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )
 
     def test_when_register_sip_edited_then_sip_reloaded(self):
         self.notifier.edited(self.register_sip)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )
 
     def test_when_register_sip_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.register_sip)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )

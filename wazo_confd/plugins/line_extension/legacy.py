@@ -15,12 +15,10 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 class LineExtensionLegacySchema(BaseSchema):
     line_id = fields.Integer(dump_only=True)
     extension_id = fields.Integer(required=True)
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('extensions',
-                          field='extension_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('extensions', field='extension_id', target='id'),
+    )
 
 
 class LegacyResource(ConfdResource):
@@ -43,7 +41,6 @@ class LegacyResource(ConfdResource):
 
 
 class LineExtensionLegacy(LegacyResource):
-
     @required_acl('confd.#')
     def get(self, line_id):
         line = self.line_dao.get(line_id)
@@ -55,7 +52,11 @@ class LineExtensionLegacy(LegacyResource):
         line = self.line_dao.get(line_id)
         extension = self.get_extension_or_fail()
         line_extension = self.service.associate(line, extension)
-        return self.schema().dump(line_extension), 201, self.build_headers(line_extension)
+        return (
+            self.schema().dump(line_extension),
+            201,
+            self.build_headers(line_extension),
+        )
 
     @required_acl('confd.#')
     def delete(self, line_id):
@@ -66,14 +67,11 @@ class LineExtensionLegacy(LegacyResource):
         return '', 204
 
     def build_headers(self, model):
-        url = url_for('line_extension_legacy',
-                      line_id=model.line_id,
-                      _external=True)
+        url = url_for('line_extension_legacy', line_id=model.line_id, _external=True)
         return {'Location': url}
 
 
 class ExtensionLineLegacy(LegacyResource):
-
     @required_acl('confd.#')
     def get(self, extension_id):
         extension = self.extension_dao.get(extension_id)

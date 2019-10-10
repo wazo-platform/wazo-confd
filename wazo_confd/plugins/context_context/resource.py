@@ -2,10 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import (
-    EXCLUDE,
-    fields,
-)
+from marshmallow import EXCLUDE, fields
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -21,8 +18,7 @@ class ContextSchemaIDLoad(BaseSchema):
 
 class ContextsSchema(BaseSchema):
     contexts = fields.Nested(
-        ContextSchemaIDLoad,
-        many=True, required=True, unknown=EXCLUDE
+        ContextSchemaIDLoad, many=True, required=True, unknown=EXCLUDE
     )
 
 

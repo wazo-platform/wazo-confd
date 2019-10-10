@@ -1,22 +1,10 @@
 # Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -79,13 +67,25 @@ def test_associate_multiple_outcalls_to_schedule(outcall1, outcall2, schedule):
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
 @fixtures.schedule(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_outcall, sub_outcall, main_schedule, sub_schedule):
-    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.outcalls(main_outcall['id'])
+        .schedules(sub_schedule['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Outcall'))
 
-    response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.outcalls(sub_outcall['id'])
+        .schedules(main_schedule['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Schedule'))
 
-    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.outcalls(main_outcall['id'])
+        .schedules(sub_schedule['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -108,11 +108,21 @@ def test_dissociate_not_associated(outcall, schedule):
 @fixtures.outcall(wazo_tenant=SUB_TENANT)
 @fixtures.schedule(wazo_tenant=MAIN_TENANT)
 @fixtures.schedule(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_outcall, sub_outcall, main_schedule, sub_schedule):
-    response = confd.outcalls(main_outcall['id']).schedules(sub_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(
+    main_outcall, sub_outcall, main_schedule, sub_schedule
+):
+    response = (
+        confd.outcalls(main_outcall['id'])
+        .schedules(sub_schedule['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Outcall'))
 
-    response = confd.outcalls(sub_outcall['id']).schedules(main_schedule['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.outcalls(sub_outcall['id'])
+        .schedules(main_schedule['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Schedule'))
 
 
@@ -121,9 +131,14 @@ def test_dissociate_multi_tenant(main_outcall, sub_outcall, main_schedule, sub_s
 def test_get_outcall_relation(outcall, schedule):
     with a.outcall_schedule(outcall, schedule):
         response = confd.outcalls(outcall['id']).get()
-        assert_that(response.item, has_entries(
-            schedules=contains(has_entries(id=schedule['id'], name=schedule['name']))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                schedules=contains(
+                    has_entries(id=schedule['id'], name=schedule['name'])
+                )
+            ),
+        )
 
 
 @fixtures.schedule()
@@ -131,9 +146,9 @@ def test_get_outcall_relation(outcall, schedule):
 def test_get_schedule_relation(schedule, outcall):
     with a.outcall_schedule(outcall, schedule):
         response = confd.schedules(schedule['id']).get()
-        assert_that(response.item, has_entries(
-            outcalls=contains(has_entries(id=outcall['id']))
-        ))
+        assert_that(
+            response.item, has_entries(outcalls=contains(has_entries(id=outcall['id'])))
+        )
 
 
 @fixtures.outcall()

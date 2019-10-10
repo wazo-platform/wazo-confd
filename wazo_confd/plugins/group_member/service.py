@@ -8,7 +8,6 @@ from .validator import build_validator_member_user, build_validator_member_exten
 
 
 class GroupMemberUserService:
-
     def __init__(self, group_dao, notifier, validator_user, validator_extension):
         self.group_dao = group_dao
         self.validator_user = validator_user
@@ -23,7 +22,10 @@ class GroupMemberUserService:
 
     def find_member_extension(self, queue, extension):
         for member in queue.extension_queue_members:
-            if member.extension.exten == extension.exten and member.extension.context == extension.context:
+            if (
+                member.extension.exten == extension.exten
+                and member.extension.context == extension.context
+            ):
                 return member
         return None
 
@@ -43,5 +45,5 @@ def build_service():
         group_dao_module,
         build_notifier(),
         build_validator_member_user(),
-        build_validator_member_extension()
+        build_validator_member_extension(),
     )

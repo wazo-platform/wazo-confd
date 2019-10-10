@@ -1,21 +1,14 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import (
-    url_for,
-    request,
-)
+from flask import url_for, request
 from marshmallow import fields
 
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import (
-    BaseSchema,
-    Link,
-    ListLink,
-)
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -29,7 +22,6 @@ class LineExtensionSchema(BaseSchema):
 
 
 class LineExtensionResource(ConfdResource):
-
     def __init__(self, service, line_dao, extension_dao):
         super(LineExtensionResource, self).__init__()
         self.service = service
@@ -45,8 +37,7 @@ class ExtensionLineList(LineExtensionResource):
     def get(self, extension_id):
         extension = self.extension_dao.get(extension_id)
         items = self.service.find_all_by(extension_id=extension.id)
-        return {'total': len(items),
-                'items': self.schema().dump(items, many=True)}
+        return {'total': len(items), 'items': self.schema().dump(items, many=True)}
 
 
 class LineExtensionList(LineExtensionResource):
@@ -57,8 +48,7 @@ class LineExtensionList(LineExtensionResource):
     def get(self, line_id):
         line = self.line_dao.get(line_id)
         items = self.service.find_all_by(line_id=line.id)
-        return {'total': len(items),
-                'items': self.schema().dump(items, many=True)}
+        return {'total': len(items), 'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.lines.{line_id}.extensions.create')
     def post(self, line_id):
@@ -72,10 +62,12 @@ class LineExtensionList(LineExtensionResource):
         return self.schema().dump(line_extension), 201, headers
 
     def build_headers(self, model):
-        url = url_for('line_extensions',
-                      extension_id=model.extension_id,
-                      line_id=model.line_id,
-                      _external=True)
+        url = url_for(
+            'line_extensions',
+            extension_id=model.extension_id,
+            line_id=model.line_id,
+            _external=True,
+        )
         return {'Location': url}
 
     def get_extension_or_fail(self):

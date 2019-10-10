@@ -1,26 +1,11 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    empty,
-    has_entries,
-    is_not,
-    none,
-)
+from hamcrest import assert_that, contains, empty, has_entries, is_not, none
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -64,23 +49,32 @@ def test_associate(call_filter, user):
 @fixtures.user()
 @fixtures.user()
 def test_associate_multiple(call_filter, user1, user2, user3):
-    response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user3, user1, user2])
+    response = confd.callfilters(call_filter['id']).surrogates.users.put(
+        users=[user3, user1, user2]
+    )
     response.assert_updated()
 
     response = confd.callfilters(call_filter['id']).get()
-    assert_that(response.item, has_entries(
-        surrogates=has_entries(users=contains(
-            has_entries(uuid=user3['uuid']),
-            has_entries(uuid=user1['uuid']),
-            has_entries(uuid=user2['uuid'])
-        ))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            surrogates=has_entries(
+                users=contains(
+                    has_entries(uuid=user3['uuid']),
+                    has_entries(uuid=user1['uuid']),
+                    has_entries(uuid=user2['uuid']),
+                )
+            )
+        ),
+    )
 
 
 @fixtures.call_filter()
 @fixtures.user()
 def test_associate_same_user(call_filter, user):
-    response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user, user])
+    response = confd.callfilters(call_filter['id']).surrogates.users.put(
+        users=[user, user]
+    )
     response.assert_status(400)
 
 
@@ -88,7 +82,9 @@ def test_associate_same_user(call_filter, user):
 @fixtures.user()
 def test_associate_recipient_to_surrogate(call_filter, user):
     with a.call_filter_recipient_user(call_filter, user):
-        response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user])
+        response = confd.callfilters(call_filter['id']).surrogates.users.put(
+            users=[user]
+        )
         response.assert_status(400)
 
 
@@ -98,20 +94,17 @@ def test_associate_recipient_to_surrogate(call_filter, user):
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_call_filter, sub_call_filter, main_user, sub_user):
     response = confd.callfilters(main_call_filter['id']).surrogates.users.put(
-        users=[{'uuid': main_user['uuid']}],
-        wazo_tenant=SUB_TENANT,
+        users=[{'uuid': main_user['uuid']}], wazo_tenant=SUB_TENANT
     )
     response.assert_match(404, e.not_found('CallFilter'))
 
     response = confd.callfilters(sub_call_filter['id']).surrogates.users.put(
-        users=[{'uuid': main_user['uuid']}],
-        wazo_tenant=SUB_TENANT,
+        users=[{'uuid': main_user['uuid']}], wazo_tenant=SUB_TENANT
     )
     response.assert_match(400, e.not_found('User'))
 
     response = confd.callfilters(main_call_filter['id']).surrogates.users.put(
-        users=[{'uuid': sub_user['uuid']}],
-        wazo_tenant=MAIN_TENANT,
+        users=[{'uuid': sub_user['uuid']}], wazo_tenant=MAIN_TENANT
     )
     response.assert_match(400, e.different_tenant())
 
@@ -122,22 +115,27 @@ def test_associate_multi_tenant(main_call_filter, sub_call_filter, main_user, su
 def test_get_users_associated_to_call_filter(call_filter, user1, user2):
     with a.call_filter_surrogate_user(call_filter, user2, user1):
         response = confd.callfilters(call_filter['id']).get()
-        assert_that(response.item, has_entries(
-            surrogates=has_entries(users=contains(
-                has_entries(
-                    uuid=user2['uuid'],
-                    firstname=user2['firstname'],
-                    lastname=user2['lastname'],
-                    member_id=is_not(none()),
-                ),
-                has_entries(
-                    uuid=user1['uuid'],
-                    firstname=user1['firstname'],
-                    lastname=user1['lastname'],
-                    member_id=is_not(none()),
-                ),
-            ))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                surrogates=has_entries(
+                    users=contains(
+                        has_entries(
+                            uuid=user2['uuid'],
+                            firstname=user2['firstname'],
+                            lastname=user2['lastname'],
+                            member_id=is_not(none()),
+                        ),
+                        has_entries(
+                            uuid=user1['uuid'],
+                            firstname=user1['firstname'],
+                            lastname=user1['lastname'],
+                            member_id=is_not(none()),
+                        ),
+                    )
+                )
+            ),
+        )
 
 
 @fixtures.call_filter()
@@ -152,7 +150,9 @@ def test_dissociate(call_filter, user1, user2):
 @fixtures.call_filter()
 @fixtures.user()
 @fixtures.user()
-def test_delete_call_filter_when_call_filter_and_user_associated(call_filter, user1, user2):
+def test_delete_call_filter_when_call_filter_and_user_associated(
+    call_filter, user1, user2
+):
     with a.call_filter_surrogate_user(call_filter, user1, user2, check=False):
         confd.callfilters(call_filter['id']).delete().assert_deleted()
 
@@ -166,9 +166,12 @@ def test_delete_call_filter_when_call_filter_and_user_associated(call_filter, us
 @fixtures.call_filter()
 @fixtures.call_filter()
 @fixtures.user()
-def test_delete_user_when_call_filter_and_user_associated(call_filter1, call_filter2, user):
-    with a.call_filter_surrogate_user(call_filter1, user, check=False), \
-            a.call_filter_surrogate_user(call_filter2, user, check=False):
+def test_delete_user_when_call_filter_and_user_associated(
+    call_filter1, call_filter2, user
+):
+    with a.call_filter_surrogate_user(
+        call_filter1, user, check=False
+    ), a.call_filter_surrogate_user(call_filter2, user, check=False):
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.callfilters(call_filter1['id']).get()

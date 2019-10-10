@@ -14,23 +14,20 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class VoicemailGeneralOption(BaseSchema):
-    key = fields.String(validate=(Length(max=128)),
-                        required=True,
-                        attribute='var_name')
-    value = fields.String(required=True,
-                          attribute='var_val')
+    key = fields.String(validate=(Length(max=128)), required=True, attribute='var_name')
+    value = fields.String(required=True, attribute='var_val')
 
 
 class VoicemailGeneralSchema(BaseSchema):
-    options = fields.Nested(VoicemailGeneralOption,
-                            many=True,
-                            required=True)
+    options = fields.Nested(VoicemailGeneralOption, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data):
         options = data.get('options')
         if isinstance(options, dict):
-            data['options'] = [{'key': key, 'value': value} for key, value in options.items()]
+            data['options'] = [
+                {'key': key, 'value': value} for key, value in options.items()
+            ]
         return data
 
     @post_dump

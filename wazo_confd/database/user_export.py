@@ -20,40 +20,42 @@ from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.rightcallmember import RightCallMember
 
 
-COLUMNS = ('uuid',
-           'firstname',
-           'lastname',
-           'email',
-           'mobile_phone_number',
-           'outgoing_caller_id',
-           'language',
-           'call_permission_password',
-           'enabled',
-           'ring_seconds',
-           'simultaneous_calls',
-           'supervision_enabled',
-           'call_transfer_enabled',
-           'dtmf_hangup_enabled',
-           'call_record_enabled',
-           'online_call_record_enabled',
-           'userfield',
-           'voicemail_name',
-           'voicemail_number',
-           'voicemail_context',
-           'voicemail_password',
-           'voicemail_email',
-           'voicemail_attach_audio',
-           'voicemail_delete_messages',
-           'voicemail_ask_password',
-           'line_protocol',
-           'provisioning_code',
-           'context',
-           'sip_username',
-           'sip_secret',
-           'exten',
-           'incall_exten',
-           'incall_context',
-           'call_permissions')
+COLUMNS = (
+    'uuid',
+    'firstname',
+    'lastname',
+    'email',
+    'mobile_phone_number',
+    'outgoing_caller_id',
+    'language',
+    'call_permission_password',
+    'enabled',
+    'ring_seconds',
+    'simultaneous_calls',
+    'supervision_enabled',
+    'call_transfer_enabled',
+    'dtmf_hangup_enabled',
+    'call_record_enabled',
+    'online_call_record_enabled',
+    'userfield',
+    'voicemail_name',
+    'voicemail_number',
+    'voicemail_context',
+    'voicemail_password',
+    'voicemail_email',
+    'voicemail_attach_audio',
+    'voicemail_delete_messages',
+    'voicemail_ask_password',
+    'line_protocol',
+    'provisioning_code',
+    'context',
+    'sip_username',
+    'sip_secret',
+    'exten',
+    'incall_exten',
+    'incall_context',
+    'call_permissions',
+)
 
 
 def export_query(tenant_uuid, separator=";"):
@@ -61,14 +63,17 @@ def export_query(tenant_uuid, separator=";"):
         Session.query(
             Incall.exten.label('exten'),
             Incall.context.label('context'),
-            User.id.label('user_id')
+            User.id.label('user_id'),
         )
-        .join(Dialaction,
-              and_(Dialaction.category == 'incall',
-                   Dialaction.action == 'user',
-                   cast(Dialaction.categoryval, Integer) == Incall.id))
-        .join(User,
-              cast(Dialaction.actionarg1, Integer) == User.id)
+        .join(
+            Dialaction,
+            and_(
+                Dialaction.category == 'incall',
+                Dialaction.action == 'user',
+                cast(Dialaction.categoryval, Integer) == Incall.id,
+            ),
+        )
+        .join(User, cast(Dialaction.actionarg1, Integer) == User.id)
         .order_by(Incall.exten, Incall.context)
         .subquery()
     )
@@ -77,7 +82,7 @@ def export_query(tenant_uuid, separator=";"):
         Session.query(
             ordered_incalls.c.user_id,
             func.string_agg(ordered_incalls.c.exten, separator).label('exten'),
-            func.string_agg(ordered_incalls.c.context, separator).label('context')
+            func.string_agg(ordered_incalls.c.context, separator).label('context'),
         )
         .group_by(ordered_incalls.c.user_id)
         .subquery()
@@ -85,14 +90,16 @@ def export_query(tenant_uuid, separator=";"):
 
     ordered_call_permissions = aliased(
         Session.query(
-            RightCall.name,
-            cast(RightCallMember.typeval, Integer).label('user_id')
+            RightCall.name, cast(RightCallMember.typeval, Integer).label('user_id')
         )
-        .join(RightCallMember,
-              RightCallMember.rightcallid == RightCall.id)
-        .join(User,
-              and_(RightCallMember.type == 'user',
-                   cast(RightCallMember.typeval, Integer) == User.id))
+        .join(RightCallMember, RightCallMember.rightcallid == RightCall.id)
+        .join(
+            User,
+            and_(
+                RightCallMember.type == 'user',
+                cast(RightCallMember.typeval, Integer) == User.id,
+            ),
+        )
         .order_by(RightCall.name)
         .subquery()
     )
@@ -100,7 +107,7 @@ def export_query(tenant_uuid, separator=";"):
     grouped_call_permissions = aliased(
         Session.query(
             ordered_call_permissions.c.user_id,
-            func.string_agg(ordered_call_permissions.c.name, separator).label('name')
+            func.string_agg(ordered_call_permissions.c.name, separator).label('name'),
         )
         .group_by(ordered_call_permissions.c.user_id)
         .subquery()
@@ -151,10 +158,10 @@ def export_query(tenant_uuid, separator=";"):
         .outerjoin(Line.endpoint_sip)
         .outerjoin(Line.line_extensions)
         .outerjoin(LineExtension.main_extension_rel)
-        .outerjoin(grouped_incalls,
-                   User.id == grouped_incalls.c.user_id)
-        .outerjoin(grouped_call_permissions,
-                   User.id == grouped_call_permissions.c.user_id)
+        .outerjoin(grouped_incalls, User.id == grouped_incalls.c.user_id)
+        .outerjoin(
+            grouped_call_permissions, User.id == grouped_call_permissions.c.user_id
+        )
         .filter(User.tenant_uuid == tenant_uuid)
     )
 

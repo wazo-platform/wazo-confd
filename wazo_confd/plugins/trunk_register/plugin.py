@@ -5,15 +5,11 @@ from xivo_dao.resources.register_iax import dao as register_iax_dao
 from xivo_dao.resources.register_sip import dao as register_sip_dao
 from xivo_dao.resources.trunk import dao as trunk_dao
 
-from .resource import (
-    TrunkRegisterAssociationSIP,
-    TrunkRegisterAssociationIAX,
-)
+from .resource import TrunkRegisterAssociationSIP, TrunkRegisterAssociationIAX
 from .service import build_service_iax, build_service_sip
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         self.load_iax(api)
@@ -26,7 +22,7 @@ class Plugin:
             TrunkRegisterAssociationIAX,
             '/trunks/<int:trunk_id>/registers/iax/<int:register_id>',
             endpoint='trunk_register_iax',
-            resource_class_args=(service, trunk_dao, register_iax_dao)
+            resource_class_args=(service, trunk_dao, register_iax_dao),
         )
 
     def load_sip(self, api):
@@ -36,5 +32,5 @@ class Plugin:
             TrunkRegisterAssociationSIP,
             '/trunks/<int:trunk_id>/registers/sip/<int:register_id>',
             endpoint='trunk_register_sip',
-            resource_class_args=(service, trunk_dao, register_sip_dao)
+            resource_class_args=(service, trunk_dao, register_sip_dao),
         )

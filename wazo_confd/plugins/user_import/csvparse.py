@@ -14,7 +14,6 @@ ParseRule = namedtuple('ParseRule', ['csv_name', 'parser', 'name'])
 
 
 class CsvParser:
-
     def __init__(self, lines):
         self.reader = csv.DictReader(lines)
 
@@ -23,7 +22,6 @@ class CsvParser:
 
 
 class CsvIterator:
-
     def __init__(self, reader):
         self.reader = reader
         self.position = 0
@@ -35,7 +33,6 @@ class CsvIterator:
 
 
 class Rule:
-
     def __init__(self, csv_name, name):
         self.csv_name = csv_name
         self.name = name
@@ -47,7 +44,6 @@ class Rule:
 
 
 class UnicodeRule(Rule):
-
     def parse(self, value):
         if value == "":
             return None
@@ -55,7 +51,6 @@ class UnicodeRule(Rule):
 
 
 class BooleanRule(Rule):
-
     def parse(self, value):
         if value == "":
             return None
@@ -65,7 +60,6 @@ class BooleanRule(Rule):
 
 
 class IntRule(Rule):
-
     def parse(self, value):
         if value == "":
             return None
@@ -75,7 +69,6 @@ class IntRule(Rule):
 
 
 class ColonListRule(Rule):
-
     def parse(self, value):
         if value == "":
             return []
@@ -104,9 +97,7 @@ class CsvRow:
         IntRule('simultaneous_calls', 'simultaneous_calls'),
     )
 
-    CONTEXT_RULES = (
-        UnicodeRule('context', 'context'),
-    )
+    CONTEXT_RULES = (UnicodeRule('context', 'context'),)
 
     VOICEMAIL_RULES = (
         UnicodeRule('voicemail_name', 'name'),
@@ -129,10 +120,7 @@ class CsvRow:
         UnicodeRule('sip_secret', 'secret'),
     )
 
-    EXTENSION_RULES = (
-        UnicodeRule('exten', 'exten'),
-        UnicodeRule('context', 'context'),
-    )
+    EXTENSION_RULES = (UnicodeRule('exten', 'exten'), UnicodeRule('context', 'context'))
 
     INCALL_RULES = (
         UnicodeRule('incall_exten', 'exten'),
@@ -140,9 +128,7 @@ class CsvRow:
         IntRule('incall_ring_seconds', 'ring_seconds'),
     )
 
-    CALL_PERMISSION_RULES = (
-        ColonListRule('call_permissions', 'names'),
-    )
+    CALL_PERMISSION_RULES = (ColonListRule('call_permissions', 'names'),)
 
     WAZO_USER_RULES = (
         UnicodeRule('uuid', 'uuid'),
@@ -179,10 +165,11 @@ class CsvRow:
         return entry
 
     def format_error(self, exc):
-        return {'message': str(exc),
-                'timestamp': int(time.time()),
-                'details': {'row': self.fields,
-                            'row_number': self.position}}
+        return {
+            'message': str(exc),
+            'timestamp': int(time.time()),
+            'details': {'row': self.fields, 'row_number': self.position},
+        }
 
 
 def parse():

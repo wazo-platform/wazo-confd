@@ -14,14 +14,10 @@ from xivo_dao.alchemy.queuefeatures import QueueFeatures as Queue
 
 from ..notifier import QueueExtensionNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestQueueExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -43,7 +39,9 @@ class TestQueueExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = QueueExtensionDissociatedEvent(self.queue.id, self.extension.id)
+        expected_event = QueueExtensionDissociatedEvent(
+            self.queue.id, self.extension.id
+        )
 
         self.notifier.dissociated(self.queue, self.extension)
 

@@ -1,22 +1,11 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-)
+from hamcrest import assert_that, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -105,13 +94,25 @@ def test_associate_when_register_iax(trunk, sip, register):
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
-    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(main_trunk['id'])
+        .endpoints.sip(sub_sip['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Trunk'))
 
-    response = confd.trunks(sub_trunk['id']).endpoints.sip(main_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(sub_trunk['id'])
+        .endpoints.sip(main_sip['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('SIPEndpoint'))
 
-    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.trunks(main_trunk['id'])
+        .endpoints.sip(sub_sip['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -122,11 +123,7 @@ def test_get_endpoint_associated_to_trunk(trunk, sip):
         response = confd.trunks(trunk['id']).endpoints.sip.get()
         assert_that(
             response.item,
-            has_entries(
-                trunk_id=trunk['id'],
-                endpoint='sip',
-                endpoint_id=sip['id'],
-            )
+            has_entries(trunk_id=trunk['id'], endpoint='sip', endpoint_id=sip['id']),
         )
 
 
@@ -137,11 +134,7 @@ def test_get_trunk_associated_to_endpoint(trunk, sip):
         response = confd.endpoints.sip(sip['id']).trunks.get()
         assert_that(
             response.item,
-            has_entries(
-                trunk_id=trunk['id'],
-                endpoint='sip',
-                endpoint_id=sip['id'],
-            )
+            has_entries(trunk_id=trunk['id'], endpoint='sip', endpoint_id=sip['id']),
         )
 
 
@@ -171,10 +164,18 @@ def test_dissociate_not_associated(trunk, sip):
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
-    response = confd.trunks(main_trunk['id']).endpoints.sip(sub_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(main_trunk['id'])
+        .endpoints.sip(sub_sip['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Trunk'))
 
-    response = confd.trunks(sub_trunk['id']).endpoints.sip(main_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.trunks(sub_trunk['id'])
+        .endpoints.sip(main_sip['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('SIPEndpoint'))
 
 
@@ -187,7 +188,7 @@ def test_get_endpoint_sip_relation(trunk, sip):
             response.item,
             has_entries(
                 endpoint_sip=has_entries(id=sip['id'], username=sip['username'])
-            )
+            ),
         )
 
 
@@ -196,10 +197,7 @@ def test_get_endpoint_sip_relation(trunk, sip):
 def test_get_trunk_relation(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.endpoints.sip(sip['id']).get()
-        assert_that(
-            response.item,
-            has_entries(trunk=has_entries(id=trunk['id']))
-        )
+        assert_that(response.item, has_entries(trunk=has_entries(id=trunk['id'])))
 
 
 @fixtures.trunk()

@@ -1,24 +1,11 @@
 # Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    empty,
-    has_entries,
-)
+from hamcrest import assert_that, contains_inanyorder, empty, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 99999999
 
@@ -61,23 +48,32 @@ def test_associate(call_pickup, group):
 @fixtures.group()
 @fixtures.group()
 def test_associate_multiple(call_pickup, group1, group2, group3):
-    response = confd.callpickups(call_pickup['id']).targets.groups.put(groups=[group1, group2, group3])
+    response = confd.callpickups(call_pickup['id']).targets.groups.put(
+        groups=[group1, group2, group3]
+    )
     response.assert_updated()
 
     response = confd.callpickups(call_pickup['id']).get()
-    assert_that(response.item, has_entries(
-        targets=has_entries(groups=contains_inanyorder(
-            has_entries(id=group1['id']),
-            has_entries(id=group2['id']),
-            has_entries(id=group3['id'])
-        ))
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            targets=has_entries(
+                groups=contains_inanyorder(
+                    has_entries(id=group1['id']),
+                    has_entries(id=group2['id']),
+                    has_entries(id=group3['id']),
+                )
+            )
+        ),
+    )
 
 
 @fixtures.call_pickup()
 @fixtures.group()
 def test_associate_same_group(call_pickup, group):
-    response = confd.callpickups(call_pickup['id']).targets.groups.put(groups=[group, group])
+    response = confd.callpickups(call_pickup['id']).targets.groups.put(
+        groups=[group, group]
+    )
     response.assert_status(400)
 
 
@@ -85,7 +81,9 @@ def test_associate_same_group(call_pickup, group):
 @fixtures.call_pickup(wazo_tenant=SUB_TENANT)
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(main_call_pickup, sub_call_pickup, main_group, sub_group):
+def test_associate_multi_tenant(
+    main_call_pickup, sub_call_pickup, main_group, sub_group
+):
     response = (
         confd.callpickups(main_call_pickup['id'])
         .targets.groups(groups=[sub_group])
@@ -114,18 +112,17 @@ def test_associate_multi_tenant(main_call_pickup, sub_call_pickup, main_group, s
 def test_get_groups_associated_to_call_pickup(call_pickup, group1, group2):
     with a.call_pickup_target_group(call_pickup, group1, group2):
         response = confd.callpickups(call_pickup['id']).get()
-        assert_that(response.item, has_entries(
-            targets=has_entries(groups=contains_inanyorder(
-                has_entries(
-                    id=group1['id'],
-                    name=group1['name'],
-                ),
-                has_entries(
-                    id=group2['id'],
-                    name=group2['name'],
-                ),
-            ))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                targets=has_entries(
+                    groups=contains_inanyorder(
+                        has_entries(id=group1['id'], name=group1['name']),
+                        has_entries(id=group2['id'], name=group2['name']),
+                    )
+                )
+            ),
+        )
 
 
 @fixtures.call_pickup()
@@ -139,7 +136,9 @@ def test_dissociate(call_pickup, group):
 @fixtures.call_pickup()
 @fixtures.group()
 @fixtures.group()
-def test_delete_call_pickup_when_call_pickup_and_group_associated(call_pickup, group1, group2):
+def test_delete_call_pickup_when_call_pickup_and_group_associated(
+    call_pickup, group1, group2
+):
     with a.call_pickup_target_group(call_pickup, group1, group2, check=False):
         confd.callpickups(call_pickup['id']).delete().assert_deleted()
 
@@ -153,9 +152,12 @@ def test_delete_call_pickup_when_call_pickup_and_group_associated(call_pickup, g
 @fixtures.call_pickup()
 @fixtures.call_pickup()
 @fixtures.group()
-def test_delete_group_when_call_pickup_and_group_associated(call_pickup1, call_pickup2, group):
-    with a.call_pickup_target_group(call_pickup1, group, check=False), \
-            a.call_pickup_target_group(call_pickup2, group, check=False):
+def test_delete_group_when_call_pickup_and_group_associated(
+    call_pickup1, call_pickup2, group
+):
+    with a.call_pickup_target_group(
+        call_pickup1, group, check=False
+    ), a.call_pickup_target_group(call_pickup2, group, check=False):
         confd.groups(group['id']).delete().assert_deleted()
 
         response = confd.callpickups(call_pickup1['id']).get()

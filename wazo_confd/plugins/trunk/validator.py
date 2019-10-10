@@ -13,7 +13,6 @@ from wazo_confd.helpers.validator import (
 
 
 class ContextTenantValidator(Validator):
-
     def __init__(self, context_dao_module):
         self.context_dao = context_dao_module
 
@@ -25,18 +24,24 @@ class ContextTenantValidator(Validator):
         if trunk.tenant_uuid != context.tenant_uuid:
             raise errors.different_tenants(
                 trunk_tenant_uuid=trunk.tenant_uuid,
-                context_tenant_uuid=context.tenant_uuid
+                context_tenant_uuid=context.tenant_uuid,
             )
 
 
 def build_validator():
     return ValidationGroup(
         create=[
-            Optional('context', GetResource('context', context_dao_module.get_by_name, 'Context')),
+            Optional(
+                'context',
+                GetResource('context', context_dao_module.get_by_name, 'Context'),
+            ),
             ContextTenantValidator(context_dao_module),
         ],
         edit=[
-            Optional('context', GetResource('context', context_dao_module.get_by_name, 'Context')),
+            Optional(
+                'context',
+                GetResource('context', context_dao_module.get_by_name, 'Context'),
+            ),
             ContextTenantValidator(context_dao_module),
-        ]
+        ],
     )

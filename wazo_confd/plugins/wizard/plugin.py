@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
@@ -25,25 +24,22 @@ class Plugin:
         auth_config.pop('username', None)
         auth_config.pop('password', None)
         if not service_id or not service_key:
-            logger.info('failed to load the wizard plugin: missing service_id or service_key')
+            logger.info(
+                'failed to load the wizard plugin: missing service_id or service_key'
+            )
             return
 
-        auth_client = AuthClient(username=service_id,
-                                 password=service_key,
-                                 **auth_config)
+        auth_client = AuthClient(
+            username=service_id, password=service_key, **auth_config
+        )
         provd_client = ProvdClient(**config['provd'])
 
         service = build_service(provd_client, auth_client, infos_dao)
 
         api.add_resource(
-            WizardResource,
-            '/wizard',
-            endpoint='wizard',
-            resource_class_args=(service,)
+            WizardResource, '/wizard', endpoint='wizard', resource_class_args=(service,)
         )
 
         api.add_resource(
-            WizardDiscoverResource,
-            '/wizard/discover',
-            resource_class_args=(service,)
+            WizardDiscoverResource, '/wizard/discover', resource_class_args=(service,)
         )

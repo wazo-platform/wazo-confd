@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class FeaturesConfigurationService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class FeaturesConfigurationService:
 
 
 def build_service():
-    return FeaturesConfigurationService(features_dao,
-                                        build_notifier())
+    return FeaturesConfigurationService(features_dao, build_notifier())

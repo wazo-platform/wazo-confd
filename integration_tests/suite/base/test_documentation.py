@@ -17,7 +17,6 @@ logger.setLevel(logging.INFO)
 
 
 class TestDocumentation(unittest.TestCase):
-
     def test_documentation_errors(self):
         confd_port = BaseIntegrationTest.service_port(9486, 'confd')
         api_url = 'https://localhost:{port}/1.1/api/api.yml'.format(port=confd_port)

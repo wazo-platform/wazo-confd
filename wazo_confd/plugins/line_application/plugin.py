@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -17,5 +16,5 @@ class Plugin:
             LineApplicationAssociation,
             '/lines/<int:line_id>/applications/<uuid:application_uuid>',
             endpoint='line_applications',
-            resource_class_args=(line_dao, application_dao, service)
+            resource_class_args=(line_dao, application_dao, service),
         )

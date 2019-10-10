@@ -110,12 +110,14 @@ NAMES = [
 
 
 def name():
-    return (random.choice(NAMES)
-            .replace("e", "é")
-            .replace("a", "à")
-            .replace("i", "ï")
-            .replace("o", "ô")
-            .replace("u", "û"))
+    return (
+        random.choice(NAMES)
+        .replace("e", "é")
+        .replace("a", "à")
+        .replace("i", "ï")
+        .replace("o", "ô")
+        .replace("u", "û")
+    )
 
 
 def alphanumeric(length=16):

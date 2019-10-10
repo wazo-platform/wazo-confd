@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -59,7 +52,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'ring_strategy', 123
@@ -118,8 +113,7 @@ def unique_error_checks(url, group, queue):
 @fixtures.group(name='search', preprocess_subroutine='search')
 def test_search(hidden, group):
     url = confd.groups
-    searches = {'name': 'search',
-                'preprocess_subroutine': 'search'}
+    searches = {'name': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, group, hidden, field, term
@@ -164,27 +158,27 @@ def test_sorting_offset_limit(group1, group2):
 @fixtures.group()
 def test_get(group):
     response = confd.groups(group['id']).get()
-    assert_that(response.item, has_entries(
-        id=group['id'],
-        name=group['name'],
-        caller_id_mode=group['caller_id_mode'],
-        caller_id_name=group['caller_id_name'],
-        timeout=group['timeout'],
-        music_on_hold=group['music_on_hold'],
-        preprocess_subroutine=group['preprocess_subroutine'],
-        ring_in_use=group['ring_in_use'],
-        ring_strategy=group['ring_strategy'],
-        user_timeout=group['user_timeout'],
-        retry_delay=group['retry_delay'],
-        enabled=group['enabled'],
-        extensions=empty(),
-        members=has_entries(
-            users=empty(),
+    assert_that(
+        response.item,
+        has_entries(
+            id=group['id'],
+            name=group['name'],
+            caller_id_mode=group['caller_id_mode'],
+            caller_id_name=group['caller_id_name'],
+            timeout=group['timeout'],
+            music_on_hold=group['music_on_hold'],
+            preprocess_subroutine=group['preprocess_subroutine'],
+            ring_in_use=group['ring_in_use'],
+            ring_strategy=group['ring_strategy'],
+            user_timeout=group['user_timeout'],
+            retry_delay=group['retry_delay'],
+            enabled=group['enabled'],
             extensions=empty(),
+            members=has_entries(users=empty(), extensions=empty()),
+            incalls=empty(),
+            fallbacks=has_entries(noanswer_destination=none()),
         ),
-        incalls=empty(),
-        fallbacks=has_entries(noanswer_destination=none())
-    ))
+    )
 
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
@@ -201,25 +195,28 @@ def test_create_minimal_parameters():
     response = confd.groups.post(name='MyGroup')
     response.assert_created('groups')
 
-    assert_that(response.item, has_entries(id=not_(empty()),
-                                           name='MyGroup',
-                                           tenant_uuid=MAIN_TENANT))
+    assert_that(
+        response.item,
+        has_entries(id=not_(empty()), name='MyGroup', tenant_uuid=MAIN_TENANT),
+    )
 
     confd.groups(response.item['id']).delete().assert_deleted()
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyGroup',
-                  'caller_id_mode': 'prepend',
-                  'caller_id_name': 'GROUP-',
-                  'timeout': 42,
-                  'music_on_hold': 'default',
-                  'preprocess_subroutine': 'subroutien',
-                  'ring_in_use': False,
-                  'ring_strategy': 'weight_random',
-                  'user_timeout': 24,
-                  'retry_delay': 12,
-                  'enabled': False}
+    parameters = {
+        'name': 'MyGroup',
+        'caller_id_mode': 'prepend',
+        'caller_id_name': 'GROUP-',
+        'timeout': 42,
+        'music_on_hold': 'default',
+        'preprocess_subroutine': 'subroutien',
+        'ring_in_use': False,
+        'ring_strategy': 'weight_random',
+        'user_timeout': 24,
+        'retry_delay': 12,
+        'enabled': False,
+    }
 
     response = confd.groups.post(**parameters)
     response.assert_created('groups')
@@ -244,17 +241,19 @@ def test_edit_minimal_parameters(group):
 
 @fixtures.group()
 def test_edit_all_parameters(group):
-    parameters = {'name': 'MyGroup',
-                  'caller_id_mode': 'prepend',
-                  'caller_id_name': 'GROUP-',
-                  'timeout': 42,
-                  'music_on_hold': 'default',
-                  'preprocess_subroutine': 'subroutien',
-                  'ring_in_use': False,
-                  'ring_strategy': 'random',
-                  'user_timeout': 24,
-                  'retry_delay': 12,
-                  'enabled': False}
+    parameters = {
+        'name': 'MyGroup',
+        'caller_id_mode': 'prepend',
+        'caller_id_name': 'GROUP-',
+        'timeout': 42,
+        'music_on_hold': 'default',
+        'preprocess_subroutine': 'subroutien',
+        'ring_in_use': False,
+        'ring_strategy': 'random',
+        'user_timeout': 24,
+        'retry_delay': 12,
+        'enabled': False,
+    }
 
     response = confd.groups(group['id']).put(**parameters)
     response.assert_updated()
@@ -293,6 +292,8 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.group()
 def test_bus_events(group):
-    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {'name': 'group_bus_event'}
+    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
+        'name': 'group_bus_event'
+    }
     yield s.check_bus_event, 'config.groups.edited', confd.groups(group['id']).put
     yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['id']).delete

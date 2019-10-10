@@ -1,10 +1,7 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-)
+from hamcrest import assert_that, has_entries
 
 from . import confd
 from ..helpers import (
@@ -14,10 +11,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 @fixtures.line()
@@ -58,11 +52,7 @@ def test_get_sip_endpoint_associated_to_line(line, sip):
         response = confd.lines(line['id']).endpoints.sip.get()
         assert_that(
             response.item,
-            has_entries(
-                line_id=line['id'],
-                endpoint_id=sip['id'],
-                endpoint='sip',
-            )
+            has_entries(line_id=line['id'], endpoint_id=sip['id'], endpoint='sip'),
         )
 
 
@@ -86,11 +76,7 @@ def test_get_line_associated_to_a_sip_endpoint(line, sip):
         response = confd.endpoints.sip(sip['id']).lines.get()
         assert_that(
             response.item,
-            has_entries(
-                line_id=line['id'],
-                endpoint_id=sip['id'],
-                endpoint='sip',
-            )
+            has_entries(line_id=line['id'], endpoint_id=sip['id'], endpoint='sip'),
         )
 
 
@@ -143,13 +129,25 @@ def test_associate_when_trunk_already_associated(line, trunk, sip):
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_line, sub_line, main_sip, sub_sip):
-    response = confd.lines(main_line['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.sip(sub_sip['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).endpoints.sip(main_sip['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .endpoints.sip(main_sip['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('SIPEndpoint'))
 
-    response = confd.lines(main_line['id']).endpoints.sip(sub_sip['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.sip(sub_sip['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -193,10 +191,18 @@ def test_dissociate_when_associated_to_extension(line, sip, extension):
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sip, sub_sip):
-    response = confd.lines(main_line['id']).endpoints.sip(sub_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.sip(sub_sip['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).endpoints.sip(main_sip['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .endpoints.sip(main_sip['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('SIPEndpoint'))
 
 
@@ -207,10 +213,9 @@ def test_get_endpoint_sip_relation(line, sip):
         response = confd.lines(line['id']).get()
         assert_that(
             response.item,
-            has_entries(endpoint_sip=has_entries(
-                id=sip['id'],
-                username=sip['username'],
-            ))
+            has_entries(
+                endpoint_sip=has_entries(id=sip['id'], username=sip['username'])
+            ),
         )
 
 
@@ -219,10 +224,7 @@ def test_get_endpoint_sip_relation(line, sip):
 def test_get_line_relation(line, sip):
     with a.line_endpoint_sip(line, sip):
         response = confd.endpoints.sip(sip['id']).get()
-        assert_that(
-            response.item,
-            has_entries(line=has_entries(id=line['id']))
-        )
+        assert_that(response.item, has_entries(line=has_entries(id=line['id'])))
 
 
 @fixtures.line()

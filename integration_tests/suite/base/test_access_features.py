@@ -1,22 +1,10 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    empty,
-    has_entries,
-    has_entry,
-    has_item,
-    is_not,
-    not_,
-)
+from hamcrest import assert_that, empty, has_entries, has_entry, has_item, is_not, not_
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
 
 
 def test_get_errors():
@@ -54,10 +42,7 @@ def error_checks(url):
 @fixtures.access_feature(host='1.2.4.0/24')
 def test_search(access_feature, hidden):
     url = confd.access_features
-    searches = {
-        'host': '1.2.3',
-        'enabled': False,
-    }
+    searches = {'host': '1.2.3', 'enabled': False}
 
     for field, term in searches.items():
         yield check_search, url, access_feature, hidden, field, term
@@ -88,12 +73,15 @@ def test_sorting_offset_limit(access_feature1, access_feature2):
 @fixtures.access_feature(host='1.2.3.0/24')
 def test_get(access_feature):
     response = confd.access_features(access_feature['id']).get()
-    assert_that(response.item, has_entries(
-        id=access_feature['id'],
-        host=access_feature['host'],
-        feature='phonebook',
-        enabled=True,
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=access_feature['id'],
+            host=access_feature['host'],
+            feature='phonebook',
+            enabled=True,
+        ),
+    )
 
 
 def test_create_minimal_parameters():
@@ -106,11 +94,7 @@ def test_create_minimal_parameters():
 
 
 def test_create_all_parameters():
-    parameters = {
-        'host': '1.2.3.0/24',
-        'feature': 'phonebook',
-        'enabled': True,
-    }
+    parameters = {'host': '1.2.3.0/24', 'feature': 'phonebook', 'enabled': True}
 
     response = confd.access_features.post(**parameters)
     response.assert_created('access_features')
@@ -122,7 +106,9 @@ def test_create_all_parameters():
 
 @fixtures.access_feature(host='1.2.3.0/24')
 def test_create_already_existing_access_feature(_):
-    response = confd.access_features.post({'host': '1.2.3.0/24', 'feature': 'phonebook'})
+    response = confd.access_features.post(
+        {'host': '1.2.3.0/24', 'feature': 'phonebook'}
+    )
     response.assert_match(400, e.resource_exists(resource='AccessFeatures'))
 
 
@@ -134,11 +120,7 @@ def test_edit_minimal_parameters(access_feature):
 
 @fixtures.access_feature()
 def test_edit_all_parameters(access_feature):
-    parameters = {
-        'host': '1.2.3.0/24',
-        'feature': 'phonebook',
-        'enabled': False,
-    }
+    parameters = {'host': '1.2.3.0/24', 'feature': 'phonebook', 'enabled': False}
 
     response = confd.access_features(access_feature['id']).put(**parameters)
     response.assert_updated()
@@ -164,6 +146,13 @@ def test_delete(access_feature):
 
 @fixtures.access_feature(host='1.2.3.0/24')
 def test_bus_events(access_feature):
-    yield s.check_bus_event, 'config.access_feature.created', confd.access_features.post, {'host': '9.2.4.0/24', 'feature': 'phonebook'}
-    yield s.check_bus_event, 'config.access_feature.edited', confd.access_features(access_feature['id']).put
-    yield s.check_bus_event, 'config.access_feature.deleted', confd.access_features(access_feature['id']).delete
+    yield s.check_bus_event, 'config.access_feature.created', confd.access_features.post, {
+        'host': '9.2.4.0/24',
+        'feature': 'phonebook',
+    }
+    yield s.check_bus_event, 'config.access_feature.edited', confd.access_features(
+        access_feature['id']
+    ).put
+    yield s.check_bus_event, 'config.access_feature.deleted', confd.access_features(
+        access_feature['id']
+    ).delete

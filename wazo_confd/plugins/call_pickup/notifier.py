@@ -11,7 +11,6 @@ from wazo_confd import bus, sysconfd
 
 
 class CallPickupNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd

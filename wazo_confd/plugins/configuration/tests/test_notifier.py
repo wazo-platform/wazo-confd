@@ -10,7 +10,6 @@ from ..notifier import LiveReloadNotifier
 
 
 class TestLiveReloadNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.device_db = Mock()

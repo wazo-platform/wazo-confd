@@ -15,7 +15,9 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
         self.user_dao = user_dao
         self.line_dao = line_dao
 
-    @required_acl('confd.users.{user_uuid}.lines.{line_id}.associated.endpoints.sip.read')
+    @required_acl(
+        'confd.users.{user_uuid}.lines.{line_id}.associated.endpoints.sip.read'
+    )
     def get(self, user_uuid, line_id):
         user = self.user_dao.get_by(uuid=str(user_uuid))
 

@@ -3,7 +3,6 @@
 
 
 class HAService:
-
     def __init__(self, notifier, sysconfd):
         self.notifier = notifier
         self.sysconfd = sysconfd

@@ -12,14 +12,10 @@ from xivo_bus.resources.context.event import (
 
 from ..notifier import ContextNotifier
 
-EXPECTED_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+EXPECTED_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestContextNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

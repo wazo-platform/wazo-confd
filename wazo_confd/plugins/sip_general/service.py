@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class SIPGeneralService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class SIPGeneralService:
 
 
 def build_service():
-    return SIPGeneralService(sip_general_dao,
-                             build_notifier())
+    return SIPGeneralService(sip_general_dao, build_notifier())

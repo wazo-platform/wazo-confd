@@ -29,14 +29,10 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 class TestDeviceCreateWithTemplate(unittest.TestCase):
-
     def setUp(self):
         self.provd = provd
         self.provd.reset()
@@ -144,38 +140,23 @@ def check_search(url, device, hidden, field, term):
 @fixtures.device(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.devices.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.devices.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.devices.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.device()
 @fixtures.device(wazo_tenant=SUB_TENANT)
 def test_list_unallocated(main, sub):
     response = confd.devices.unallocated.get()
-    assert_that(
-        response.items,
-        all_of(has_item(main), not_(has_item(sub))),
-    )
+    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
 
     response = confd.devices.unallocated.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main), not_(has_item(sub))),
-    )
+    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
 
 
 @fixtures.device(
@@ -242,7 +223,7 @@ def test_create_device_minimal_parameters():
             version=none(),
             description=none(),
             options=none(),
-        )
+        ),
     )
 
     provd_device = provd.devices.get(response.item['id'])
@@ -279,7 +260,7 @@ def test_create_device_null_parameters():
             version=none(),
             description=none(),
             options=none(),
-        )
+        ),
     )
 
     provd_device = provd.devices.get(response.item['id'])
@@ -310,17 +291,19 @@ def test_create_device_all_parameters():
     provd_device = provd.devices.get(response.item['id'])
     assert_that(
         provd_device,
-        has_entries({
-            'ip': ip,
-            'mac': mac,
-            'model': '6731i',
-            'plugin': 'null',
-            'sn': 'sn',
-            'vendor': 'Aastra',
-            'version': '1.0',
-            'description': 'mydevice',
-            'options': {'switchboard': True}},
-        )
+        has_entries(
+            {
+                'ip': ip,
+                'mac': mac,
+                'model': '6731i',
+                'plugin': 'null',
+                'sn': 'sn',
+                'vendor': 'Aastra',
+                'version': '1.0',
+                'description': 'mydevice',
+                'options': {'switchboard': True},
+            }
+        ),
     )
 
     provd_config = provd.configs.get(provd_device['config'])
@@ -443,7 +426,7 @@ def test_edit_device_null_parameters(device):
             version=none(),
             description=none(),
             options=none(),
-        )
+        ),
     )
 
 
@@ -457,7 +440,9 @@ def test_edit_device_with_same_mac(first_device, second_device):
 @fixtures.device(wazo_tenant=MAIN_TENANT)
 @fixtures.device(wazo_tenant=SUB_TENANT)
 def test_edit_device_with_same_mac_different_tenants(first_device, second_device):
-    response = confd.devices(first_device['id']).put(mac=second_device['mac'], wazo_tenant=MAIN_TENANT)
+    response = confd.devices(first_device['id']).put(
+        mac=second_device['mac'], wazo_tenant=MAIN_TENANT
+    )
     response.assert_match(400, e.resource_exists('Device'))
 
 
@@ -492,7 +477,9 @@ def test_delete_device_multi_tenant(main, sub):
     response.assert_deleted()
 
     params = {'id': sub['id']}
-    provd_devices = provd.devices.list(params, tenant_uuid=MAIN_TENANT, recurse=True)['devices']
+    provd_devices = provd.devices.list(params, tenant_uuid=MAIN_TENANT, recurse=True)[
+        'devices'
+    ]
     assert_that(provd_devices, empty())
 
 
@@ -522,9 +509,12 @@ def test_reset_to_autoprov_device_associated_to_line(provd, device, line):
 @fixtures.device(wazo_tenant=SUB_TENANT)
 @fixtures.line(context='main_ctx')
 @fixtures.line(context='sub_ctx')
-def test_reset_to_autoprov_multi_tenant(provd, _, __, main_device, sub_device, main_line, sub_line):
-    with a.line_device(main_line, main_device, check=False) \
-            and a.line_device(sub_line, sub_device, check=False):
+def test_reset_to_autoprov_multi_tenant(
+    provd, _, __, main_device, sub_device, main_line, sub_line
+):
+    with a.line_device(main_line, main_device, check=False) and a.line_device(
+        sub_line, sub_device, check=False
+    ):
         response = confd.devices(main_device['id']).autoprov.get(wazo_tenant=SUB_TENANT)
         response.assert_match(404, e.not_found('Device'))
 

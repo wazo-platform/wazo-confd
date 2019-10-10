@@ -11,7 +11,9 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 class HASchema(BaseSchema):
 
-    node_type = fields.String(validate=OneOf(['disabled', 'master', 'slave']), required=True)
+    node_type = fields.String(
+        validate=OneOf(['disabled', 'master', 'slave']), required=True
+    )
     remote_address = fields.IP()
 
     @validates_schema

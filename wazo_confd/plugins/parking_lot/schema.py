@@ -12,10 +12,16 @@ class ParkingLotSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(allow_none=True, validate=Length(max=128))
-    slots_start = fields.String(validate=(Length(max=40), Predicate('isdigit')), required=True)
-    slots_end = fields.String(validate=(Length(max=40), Predicate('isdigit')), required=True)
+    slots_start = fields.String(
+        validate=(Length(max=40), Predicate('isdigit')), required=True
+    )
+    slots_end = fields.String(
+        validate=(Length(max=40), Predicate('isdigit')), required=True
+    )
     timeout = fields.Integer(validate=Range(min=0), allow_none=True, missing=45)
-    music_on_hold = fields.String(validate=Length(max=128), allow_none=True, missing='default')
+    music_on_hold = fields.String(
+        validate=Length(max=128), allow_none=True, missing='default'
+    )
     links = ListLink(Link('parkinglots'))
 
     extensions = fields.Nested(

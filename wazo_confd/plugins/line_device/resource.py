@@ -13,16 +13,13 @@ from wazo_confd.helpers.restful import ConfdResource
 class LineDeviceSchema(BaseSchema):
     line_id = fields.Integer()
     device_id = fields.String()
-    links = ListLink(Link('lines',
-                          field='line_id',
-                          target='id'),
-                     Link('devices',
-                          field='device_id',
-                          target='id'))
+    links = ListLink(
+        Link('lines', field='line_id', target='id'),
+        Link('devices', field='device_id', target='id'),
+    )
 
 
 class LineDevice(ConfdResource):
-
     def __init__(self, line_dao, device_dao, service):
         super(LineDevice, self).__init__()
         self.line_dao = line_dao
@@ -75,5 +72,7 @@ class DeviceLineGet(LineDevice):
         tenant_uuid = Tenant.autodetect().uuid
         device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
         line_devices = self.service.find_all_associations_from_device(device)
-        return {'total': len(line_devices),
-                'items': self.schema().dump(line_devices, many=True)}
+        return {
+            'total': len(line_devices),
+            'items': self.schema().dump(line_devices, many=True),
+        }

@@ -1,23 +1,11 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -83,47 +71,55 @@ def test_get_errors(queue, agent):
 def test_get(queue, agent):
     with a.queue_member_agent(queue, agent, penalty=5):
         response = confd.queues(queue['id']).members.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            queue_id=queue['id'],
-            agent_id=agent['id'],
-            penalty=5,
-        ))
+        assert_that(
+            response.item,
+            has_entries(queue_id=queue['id'], agent_id=agent['id'], penalty=5),
+        )
 
 
 @fixtures.queue()
 @fixtures.agent()
 def test_associate(queue, agent):
-    response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=7, priority=42)
+    response = (
+        confd.queues(queue['id'])
+        .members.agents(agent['id'])
+        .put(penalty=7, priority=42)
+    )
     response.assert_updated()
 
     confd.queues(queue['id']).members.agents(agent['id']).delete().assert_deleted()
 
     # Legacy
-    response = confd.queues(queue['id']).members.agents.post(agent_id=agent['id'], penalty=7)
+    response = confd.queues(queue['id']).members.agents.post(
+        agent_id=agent['id'], penalty=7
+    )
     response.assert_created()
-    assert_that(response.item, has_entries(
-        agent_id=agent['id'],
-        queue_id=queue['id'],
-        penalty=7,
-    ))
+    assert_that(
+        response.item,
+        has_entries(agent_id=agent['id'], queue_id=queue['id'], penalty=7),
+    )
 
 
 @fixtures.queue()
 @fixtures.agent()
 def test_update_properties(queue, agent):
     with a.queue_member_agent(queue, agent, penalty=0, priority=0):
-        response = confd.queues(queue['id']).members.agents(agent['id']).put(penalty=41, priority=42)
+        response = (
+            confd.queues(queue['id'])
+            .members.agents(agent['id'])
+            .put(penalty=41, priority=42)
+        )
         response.assert_updated()
 
         response = confd.queues(queue['id']).get()
-        assert_that(response.item, has_entries(
-            members=has_entries(
-                agents=contains(has_entries(
-                    penalty=41,
-                    priority=42,
-                ))
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                members=has_entries(
+                    agents=contains(has_entries(penalty=41, priority=42))
+                )
+            ),
+        )
 
 
 @fixtures.queue()
@@ -176,13 +172,25 @@ def test_associate_multiple_queues_to_agent(queue1, queue2, agent):
 @fixtures.agent(wazo_tenant=MAIN_TENANT)
 @fixtures.agent(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_queue, sub_queue, main_agent, sub_agent):
-    response = confd.queues(main_queue['id']).members.agents(main_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .members.agents(main_agent['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Queue'))
 
-    response = confd.queues(sub_queue['id']).members.agents(main_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.queues(sub_queue['id'])
+        .members.agents(main_agent['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Agent'))
 
-    response = confd.queues(main_queue['id']).members.agents(sub_agent['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.queues(main_queue['id'])
+        .members.agents(sub_agent['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -208,7 +216,11 @@ def test_dissociate_not_associated(queue, agent):
 @fixtures.agent(wazo_tenant=MAIN_TENANT)
 def test_dissociate_multi_tenant(queue, agent):
     with a.queue_member_agent(queue, agent, check=False):
-        response = confd.queues(queue['id']).members.agents(agent['id']).delete(wazo_tenant=SUB_TENANT)
+        response = (
+            confd.queues(queue['id'])
+            .members.agents(agent['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
         response.assert_match(404, e.not_found('Queue'))
 
 
@@ -217,21 +229,24 @@ def test_dissociate_multi_tenant(queue, agent):
 def test_get_queue_relation(queue, agent):
     with a.queue_member_agent(queue, agent, priority=0, penalty=0):
         response = confd.queues(queue['id']).get()
-        assert_that(response.item, has_entries(
-            members=has_entries(
-                agents=contains(
-                    has_entries(
-                        id=agent['id'],
-                        number=agent['number'],
-                        firstname=agent['firstname'],
-                        lastname=agent['lastname'],
-                        priority=0,
-                        penalty=0,
-                        links=agent['links'],
+        assert_that(
+            response.item,
+            has_entries(
+                members=has_entries(
+                    agents=contains(
+                        has_entries(
+                            id=agent['id'],
+                            number=agent['number'],
+                            firstname=agent['firstname'],
+                            lastname=agent['lastname'],
+                            priority=0,
+                            penalty=0,
+                            links=agent['links'],
+                        )
                     )
                 )
-            )
-        ))
+            ),
+        )
 
 
 @fixtures.agent()
@@ -239,17 +254,20 @@ def test_get_queue_relation(queue, agent):
 def test_get_agent_relation(agent, queue):
     with a.queue_member_agent(queue, agent, penalty=0):
         response = confd.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            queues=contains(
-                has_entries(
-                    id=queue['id'],
-                    name=queue['name'],
-                    label=queue['label'],
-                    penalty=0,
-                    links=queue['links'],
+        assert_that(
+            response.item,
+            has_entries(
+                queues=contains(
+                    has_entries(
+                        id=queue['id'],
+                        name=queue['name'],
+                        label=queue['label'],
+                        penalty=0,
+                        links=queue['links'],
+                    )
                 )
-            )
-        ))
+            ),
+        )
 
 
 @fixtures.queue()

@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class IAXGeneralService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class IAXGeneralService:
 
 
 def build_service():
-    return IAXGeneralService(iax_general_dao,
-                             build_notifier())
+    return IAXGeneralService(iax_general_dao, build_notifier())

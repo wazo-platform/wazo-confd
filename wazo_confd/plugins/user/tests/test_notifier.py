@@ -22,7 +22,7 @@ from ..resource_sub import (
     ForwardBusySchema,
     ForwardNoAnswerSchema,
     ForwardUnconditionalSchema,
-    ForwardsSchema
+    ForwardsSchema,
 )
 
 
@@ -38,7 +38,6 @@ EXPECTED_HANDLERS = {
 
 
 class TestUserNotifier(unittest.TestCase):
-
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
@@ -108,19 +107,18 @@ class TestUserNotifier(unittest.TestCase):
 
 
 class TestUserServiceNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
-        self.user = Mock(User, uuid='1234-abcd', dnd_enabled=True, incallfilter_enabled=True)
+        self.user = Mock(
+            User, uuid='1234-abcd', dnd_enabled=True, incallfilter_enabled=True
+        )
 
         self.notifier = UserServiceNotifier(self.bus)
 
     def test_when_user_service_dnd_edited_then_event_sent_on_bus(self):
         schema = ServiceDNDSchema()
         expected_event = EditUserServiceEvent(
-            self.user.uuid,
-            schema.types[0],
-            self.user.dnd_enabled,
+            self.user.uuid, schema.types[0], self.user.dnd_enabled
         )
 
         self.notifier.edited(self.user, schema)
@@ -133,9 +131,7 @@ class TestUserServiceNotifier(unittest.TestCase):
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
         schema = ServiceIncallFilterSchema()
         expected_event = EditUserServiceEvent(
-            self.user.uuid,
-            schema.types[0],
-            self.user.incallfilter_enabled,
+            self.user.uuid, schema.types[0], self.user.incallfilter_enabled
         )
 
         self.notifier.edited(self.user, schema)
@@ -147,14 +143,17 @@ class TestUserServiceNotifier(unittest.TestCase):
 
 
 class TestUserForwardNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.user = Mock(
-            User, uuid='1234-abcd',
-            busy_enabled=True, busy_destination='123',
-            noanswer_enabled=False, noanswer_destination='456',
-            unconditional_enabled=True, unconditional_destination='789',
+            User,
+            uuid='1234-abcd',
+            busy_enabled=True,
+            busy_destination='123',
+            noanswer_enabled=False,
+            noanswer_destination='456',
+            unconditional_enabled=True,
+            unconditional_destination='789',
         )
 
         self.notifier = UserForwardNotifier(self.bus)
@@ -162,10 +161,7 @@ class TestUserForwardNotifier(unittest.TestCase):
     def test_when_user_forward_busy_edited_then_event_sent_on_bus(self):
         schema = ForwardBusySchema()
         expected_event = EditUserForwardEvent(
-            self.user.uuid,
-            'busy',
-            self.user.busy_enabled,
-            self.user.busy_destination,
+            self.user.uuid, 'busy', self.user.busy_enabled, self.user.busy_destination
         )
 
         self.notifier.edited(self.user, schema)
@@ -212,10 +208,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         expected_busy_event = EditUserForwardEvent(
-            self.user.uuid,
-            'busy',
-            self.user.busy_enabled,
-            self.user.busy_destination,
+            self.user.uuid, 'busy', self.user.busy_enabled, self.user.busy_destination
         )
         expected_noanswer_event = EditUserForwardEvent(
             self.user.uuid,
@@ -232,15 +225,15 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_calls = [
             call(
                 expected_busy_event,
-                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}
+                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
             ),
             call(
                 expected_noanswer_event,
-                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}
+                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
             ),
             call(
                 expected_unconditional_event,
-                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True}
+                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
             ),
         ]
         self.bus.send_bus_event.assert_has_calls(expected_calls)

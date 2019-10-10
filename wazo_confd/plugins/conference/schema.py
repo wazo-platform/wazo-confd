@@ -14,8 +14,12 @@ class ConferenceSchema(BaseSchema):
     preprocess_subroutine = fields.String(allow_none=True, validate=Length(max=39))
     max_users = fields.Integer(validate=Range(min=0))
     record = fields.Boolean()
-    pin = fields.String(allow_none=True, validate=(Length(max=80), Predicate('isdigit')))
-    admin_pin = fields.String(allow_none=True, validate=(Length(max=80), Predicate('isdigit')))
+    pin = fields.String(
+        allow_none=True, validate=(Length(max=80), Predicate('isdigit'))
+    )
+    admin_pin = fields.String(
+        allow_none=True, validate=(Length(max=80), Predicate('isdigit'))
+    )
     quiet_join_leave = fields.Boolean()
     announce_join_leave = fields.Boolean()
     announce_user_count = fields.Boolean()
@@ -23,13 +27,12 @@ class ConferenceSchema(BaseSchema):
     music_on_hold = fields.String(allow_none=True, validate=Length(max=128))
     links = ListLink(Link('conferences'))
 
-    extensions = fields.Nested('ExtensionSchema',
-                               only=['id', 'exten', 'context', 'links'],
-                               many=True,
-                               dump_only=True)
-    incalls = fields.Nested('IncallSchema',
-                            only=['id',
-                                  'extensions',
-                                  'links'],
-                            many=True,
-                            dump_only=True)
+    extensions = fields.Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    incalls = fields.Nested(
+        'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
+    )

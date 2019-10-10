@@ -13,14 +13,10 @@ from xivo_bus.resources.register.event import (
 from ..notifier import RegisterIAXNotifier
 
 
-EXPECTED_SYSCONFD_HANDLERS = {
-    'ipbx': ['iax2 reload'],
-    'agentbus': []
-}
+EXPECTED_SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
 
 
 class TestRegisterIAXNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -52,14 +48,20 @@ class TestRegisterIAXNotifier(unittest.TestCase):
     def test_when_register_iax_created_then_iax_reloaded(self):
         self.notifier.created(self.register_iax)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )
 
     def test_when_register_iax_edited_then_iax_reloaded(self):
         self.notifier.edited(self.register_iax)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )
 
     def test_when_register_iax_deleted_then_iax_reloaded(self):
         self.notifier.deleted(self.register_iax)
 
-        self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_SYSCONFD_HANDLERS)
+        self.sysconfd.exec_request_handlers.assert_called_once_with(
+            EXPECTED_SYSCONFD_HANDLERS
+        )

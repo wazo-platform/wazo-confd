@@ -40,7 +40,7 @@ COMPLETE_POST_BODY = {
         'ip_address': '127.0.0.1',
         'netmask': '255.255.0.0',
         'gateway': '127.2.5.1',
-        'nameservers': ['8.8.8.8', '1.2.3.4']
+        'nameservers': ['8.8.8.8', '1.2.3.4'],
     },
     'steps': {
         'database': True,
@@ -50,7 +50,7 @@ COMPLETE_POST_BODY = {
         'commonconf': True,
         'provisioning': True,
         'admin': True,
-    }
+    },
 }
 
 MINIMAL_POST_BODY = {
@@ -64,7 +64,7 @@ MINIMAL_POST_BODY = {
         'ip_address': '127.0.0.1',
         'netmask': '255.255.0.0',
         'gateway': '127.2.5.1',
-        'nameservers': ['8.8.8.8']
+        'nameservers': ['8.8.8.8'],
     },
 }
 
@@ -79,7 +79,8 @@ DISABLED_STEPS_POST_BODY = {
         'ip_address': '127.0.0.1',
         'netmask': '255.255.0.0',
         'gateway': '127.2.5.1',
-        'nameservers': ['8.8.8.8']},
+        'nameservers': ['8.8.8.8'],
+    },
     'steps': {
         'database': False,
         'manage_services': False,
@@ -88,7 +89,7 @@ DISABLED_STEPS_POST_BODY = {
         'commonconf': False,
         'provisioning': False,
         'admin': False,
-    }
+    },
 }
 
 
@@ -122,7 +123,6 @@ class mocks:
 
 
 class TestWizardErrors(IntegrationTest):
-
     def test_error_license(self):
         self.check_bogus_field_returns_error('license', 1234)
         self.check_bogus_field_returns_error('license', 'asdf')
@@ -212,7 +212,6 @@ class TestWizardErrors(IntegrationTest):
 
 
 class TestWizardDiscover(IntegrationTest):
-
     def test_get_wizard_discover(self):
         docker_status = self.service_status()
         hostname = docker_status['Config']['Hostname']
@@ -231,19 +230,18 @@ class TestWizardDiscover(IntegrationTest):
                 gateways=has_item(has_entry('gateway', gateway)),
                 timezone=TIMEZONE,
                 interfaces=has_item(has_entry('ip_address', ip_address)),
-            )
+            ),
         )
 
     def test_wizard_discover_ignores_interface_lo(self):
         response = self.confd.wizard.discover.get()
         assert_that(
             response.item,
-            has_entries(interfaces=is_not(has_item(has_entry('interface', 'lo'))))
+            has_entries(interfaces=is_not(has_item(has_entry('interface', 'lo')))),
         )
 
 
 class TestWizardErrorConfigured(IntegrationTest):
-
     def test_error_configured(self):
         body = copy.deepcopy(MINIMAL_POST_BODY)
         response = self.confd.wizard.post(body)
@@ -257,7 +255,6 @@ class TestWizardErrorConfigured(IntegrationTest):
 
 
 class TestWizardDefaultValue(IntegrationTest):
-
     def test_default_configuration(self):
         body = copy.deepcopy(MINIMAL_POST_BODY)
         response = self.confd.wizard.post(body)
@@ -270,7 +267,6 @@ class TestWizardDefaultValue(IntegrationTest):
 
 
 class TestWizard(IntegrationTest):
-
     @mocks.sysconfd()
     @mocks.auth()
     def test_post(self, sysconfd, auth):
@@ -302,15 +298,18 @@ class TestWizard(IntegrationTest):
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
             assert_that(queries.general_has_timezone(data['timezone']))
-            assert_that(queries.resolvconf_is_configured(
-                data['network']['hostname'],
-                data['network']['domain'],
-                data['network']['nameservers']
-            ))
-            assert_that(queries.netiface_is_configured(
-                data['network']['ip_address'],
-                data['network']['gateway']
-            ))
+            assert_that(
+                queries.resolvconf_is_configured(
+                    data['network']['hostname'],
+                    data['network']['domain'],
+                    data['network']['nameservers'],
+                )
+            )
+            assert_that(
+                queries.netiface_is_configured(
+                    data['network']['ip_address'], data['network']['gateway']
+                )
+            )
 
     def validate_auth(self, auth, data):
         auth.assert_request(
@@ -319,31 +318,24 @@ class TestWizard(IntegrationTest):
             json={
                 'username': 'root',
                 'password': data['admin_password'],
-                'firstname': 'root'
-            }
+                'firstname': 'root',
+            },
         )
-        auth.assert_request(
-            r'^/0.1/users/.{36}/policies/.{36}$',
-            method='PUT',
-        )
+        auth.assert_request(r'^/0.1/users/.{36}/policies/.{36}$', method='PUT')
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_request(
-            '/xivoctl',
-            method='POST',
-            json={'wazo-service': 'enable'},
+            '/xivoctl', method='POST', json={'wazo-service': 'enable'}
         )
         sysconfd.assert_request(
-            '/xivoctl',
-            method='POST',
-            json={'wazo-service': 'start'},
+            '/xivoctl', method='POST', json={'wazo-service': 'start'}
         )
         sysconfd.assert_request(
             '/hosts',
             method='POST',
             json={
                 'hostname': data['network']['hostname'],
-                'domain': data['network']['domain']
+                'domain': data['network']['domain'],
             },
         )
         sysconfd.assert_request(
@@ -351,22 +343,13 @@ class TestWizard(IntegrationTest):
             method='POST',
             json={
                 'nameservers': data['network']['nameservers'],
-                'search': [data['network']['domain']]
+                'search': [data['network']['domain']],
             },
         )
+        sysconfd.assert_request('/commonconf_generate', method='POST', json={})
+        sysconfd.assert_request('/commonconf_apply', method='GET')
         sysconfd.assert_request(
-            '/commonconf_generate',
-            method='POST',
-            json={},
-        )
-        sysconfd.assert_request(
-            '/commonconf_apply',
-            method='GET'
-        )
-        sysconfd.assert_request(
-            '/exec_request_handlers',
-            method='POST',
-            json={'chown_autoprov_config': []},
+            '/exec_request_handlers', method='POST', json={'chown_autoprov_config': []}
         )
         sysconfd.assert_request(
             '/exec_request_handlers',
@@ -398,15 +381,16 @@ class TestWizard(IntegrationTest):
                     raw_config=has_entries(
                         sccp_call_managers={'1': {'ip': ip_address}},
                         sip_lines=has_entries(
-                            '1', has_entries(
+                            '1',
+                            has_entries(
                                 display_name='Autoprov',
                                 number='autoprov',
                                 password=has_length(8),
                                 proxy_ip=ip_address,
                                 registrar_ip=ip_address,
-                                username=starts_with('ap')
-                            )
-                        )
+                                username=starts_with('ap'),
+                            ),
+                        ),
                     ),
                     role='autocreate',
                 ),
@@ -434,15 +418,14 @@ class TestWizard(IntegrationTest):
                         admin_username='admin',
                         admin_password=has_length(16),
                         user_username='user',
-                        user_password=has_length(16)
-                    )
-                )
-            )
+                        user_password=has_length(16),
+                    ),
+                ),
+            ),
         )
 
 
 class TestWizardSteps(IntegrationTest):
-
     @mocks.sysconfd()
     @mocks.auth()
     def test_post(self, sysconfd, auth):
@@ -468,41 +451,35 @@ class TestWizardSteps(IntegrationTest):
         until.assert_(assert_bus_event_received, tries=5)
 
     def validate_auth(self, auth, data):
-        auth.assert_no_request(
-            '/0.1/users',
-            method='POST',
-        )
-        auth.assert_no_request(
-            r'^/0.1/users/.{36}/policies/.{36}$',
-            method='PUT',
-        )
+        auth.assert_no_request('/0.1/users', method='POST')
+        auth.assert_no_request(r'^/0.1/users/.{36}/policies/.{36}$', method='PUT')
 
     def validate_sysconfd(self, sysconfd, data):
         sysconfd.assert_no_request(
-            '/xivoctl',
-            method='POST',
-            body=json.dumps({'wazo-service': 'enable'})
+            '/xivoctl', method='POST', body=json.dumps({'wazo-service': 'enable'})
         )
         sysconfd.assert_no_request(
             '/hosts',
             method='POST',
-            body=json.dumps({
-                'hostname': data['network']['hostname'],
-                'domain': data['network']['domain']
-            })
+            body=json.dumps(
+                {
+                    'hostname': data['network']['hostname'],
+                    'domain': data['network']['domain'],
+                }
+            ),
         )
         sysconfd.assert_no_request(
             '/resolv_conf',
             method='POST',
-            body=json.dumps({
-                'nameservers': data['network']['nameservers'],
-                'search': [data['network']['domain']]
-            })
+            body=json.dumps(
+                {
+                    'nameservers': data['network']['nameservers'],
+                    'search': [data['network']['domain']],
+                }
+            ),
         )
         sysconfd.assert_no_request(
-            '/commonconf_generate',
-            method='POST',
-            body=json.dumps({})
+            '/commonconf_generate', method='POST', body=json.dumps({})
         )
 
     def validate_provd(self):

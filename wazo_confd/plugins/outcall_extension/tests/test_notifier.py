@@ -14,14 +14,10 @@ from xivo_dao.alchemy.outcall import Outcall
 
 from ..notifier import OutcallExtensionNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestOutcallExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -31,7 +27,9 @@ class TestOutcallExtensionNotifier(unittest.TestCase):
         self.notifier = OutcallExtensionNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = OutcallExtensionAssociatedEvent(self.outcall.id, self.extension.id)
+        expected_event = OutcallExtensionAssociatedEvent(
+            self.outcall.id, self.extension.id
+        )
 
         self.notifier.associated(self.outcall, self.extension)
 
@@ -43,7 +41,9 @@ class TestOutcallExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = OutcallExtensionDissociatedEvent(self.outcall.id, self.extension.id)
+        expected_event = OutcallExtensionDissociatedEvent(
+            self.outcall.id, self.extension.id
+        )
 
         self.notifier.dissociated(self.outcall, self.extension)
 

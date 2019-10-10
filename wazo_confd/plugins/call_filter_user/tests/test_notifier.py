@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -16,7 +16,6 @@ from ..notifier import CallFilterUserNotifier
 
 
 class TestCallFilterRecipientUserNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.user1 = Mock(User, uuid='abcd-1234')
@@ -27,20 +26,22 @@ class TestCallFilterRecipientUserNotifier(unittest.TestCase):
 
     def test_recipient_users_associate_then_bus_event(self):
         expected_event = CallFilterRecipientUsersAssociatedEvent(
-            self.call_filter.id,
-            [self.user1.uuid, self.user2.uuid]
+            self.call_filter.id, [self.user1.uuid, self.user2.uuid]
         )
 
-        self.notifier.recipient_users_associated(self.call_filter, [self.user1, self.user2])
+        self.notifier.recipient_users_associated(
+            self.call_filter, [self.user1, self.user2]
+        )
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_surrogate_users_associate_then_bus_event(self):
         expected_event = CallFilterSurrogateUsersAssociatedEvent(
-            self.call_filter.id,
-            [self.user1.uuid, self.user2.uuid]
+            self.call_filter.id, [self.user1.uuid, self.user2.uuid]
         )
 
-        self.notifier.surrogate_users_associated(self.call_filter, [self.user1, self.user2])
+        self.notifier.surrogate_users_associated(
+            self.call_filter, [self.user1, self.user2]
+        )
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)

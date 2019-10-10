@@ -11,7 +11,6 @@ from .validator import build_validator
 
 
 class AccessFeatureService(CRUDService):
-
     def create(self, access_feature):
         self.validator.validate_create(access_feature)
         created_access_feature = self.dao.create(access_feature)

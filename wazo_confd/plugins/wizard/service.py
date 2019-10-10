@@ -41,8 +41,9 @@ logger = logging.getLogger(__name__)
 
 
 class WizardService:
-
-    def __init__(self, validator, notifier, infos_dao, provd_client, auth_client, sysconfd):
+    def __init__(
+        self, validator, notifier, infos_dao, provd_client, auth_client, sysconfd
+    ):
         self.validator = validator
         self.notifier = notifier
         self.infos_dao = infos_dao
@@ -72,14 +73,14 @@ class WizardService:
             autoprov_password = self._generate_phone_password(length=8)
 
             self._initialize_provd(
-                wizard['network']['ip_address'],
-                autoprov_username,
-                autoprov_password,
+                wizard['network']['ip_address'], autoprov_username, autoprov_password
             )
             self._add_asterisk_autoprov_config(autoprov_username, autoprov_password)
             self.sysconfd.exec_request_handlers({'chown_autoprov_config': []})
             self.sysconfd.flush()
-            self.sysconfd.exec_request_handlers({'ipbx': ['module reload res_pjsip.so']})
+            self.sysconfd.exec_request_handlers(
+                {'ipbx': ['module reload res_pjsip.so']}
+            )
             self.sysconfd.restart_provd()
             self.sysconfd.dhcpd_update()
             self.sysconfd.flush()
@@ -94,8 +95,7 @@ class WizardService:
 
     def _add_asterisk_autoprov_config(self, autoprov_username, autoprov_password):
         content = ASTERISK_AUTOPROV_CONFIG_TPL.format(
-            username=autoprov_username,
-            password=autoprov_password,
+            username=autoprov_username, password=autoprov_password
         )
 
         try:
@@ -125,7 +125,9 @@ class WizardService:
         token = self._auth_client.token.new(expiration=60)['token']
         self._auth_client.set_token(token)
         # user will be in the same tenant as wazo-auth-cli
-        user = self._auth_client.users.new(firstname=username, username=username, password=password)
+        user = self._auth_client.users.new(
+            firstname=username, username=username, password=password
+        )
         policy = self._get_policy(DEFAULT_ADMIN_POLICY)
         self._auth_client.users.add_policy(user['uuid'], policy['uuid'])
 
@@ -137,45 +139,63 @@ class WizardService:
     def _initialize_provd(self, address, autoprov_username, autoprov_password):
         token = self._auth_client.token.new(expiration=60)['token']
         self.provd_client.set_token(token)
-        default_config = {'X_type': 'registrar',
-                          'id': 'default',
-                          'deletable': False,
-                          'displayname': 'local',
-                          'parent_ids': [],
-                          'raw_config': {'X_key': 'xivo'},
-                          'proxy_main': address,
-                          'registrar_main': address}
-        base_config = {'X_type': 'internal',
-                       'id': 'base',
-                       'deletable': False,
-                       'parent_ids': [],
-                       'raw_config': {'ntp_enabled': True,
-                                      'ntp_ip': address,
-                                      'X_xivo_phonebook_ip': address}}
-        device_config = {'X_type': 'device',
-                         'deletable': False,
-                         'id': 'defaultconfigdevice',
-                         'label': 'Default config device',
-                         'parent_ids': [],
-                         'raw_config': {'ntp_enabled': True,
-                                         'ntp_ip': address,
-                                         'sip_dtmf_mode': 'RTP-out-of-band',
-                                         'admin_username': 'admin',
-                                         'admin_password': self._generate_phone_password(length=16),
-                                         'user_username': 'user',
-                                         'user_password': self._generate_phone_password(length=16)}}
-        autoprov_config = {'X_type': 'internal',
-                           'deletable': False,
-                           'id': 'autoprov',
-                           'parent_ids': ['base', 'defaultconfigdevice'],
-                           'raw_config': {'sccp_call_managers': {'1': {'ip': address}},
-                                           'sip_lines': {'1': {'display_name': 'Autoprov',
-                                                                 'number': 'autoprov',
-                                                                 'password': autoprov_password,
-                                                                 'proxy_ip': address,
-                                                                 'registrar_ip': address,
-                                                                 'username': autoprov_username}}},
-                           'role': 'autocreate'}
+        default_config = {
+            'X_type': 'registrar',
+            'id': 'default',
+            'deletable': False,
+            'displayname': 'local',
+            'parent_ids': [],
+            'raw_config': {'X_key': 'xivo'},
+            'proxy_main': address,
+            'registrar_main': address,
+        }
+        base_config = {
+            'X_type': 'internal',
+            'id': 'base',
+            'deletable': False,
+            'parent_ids': [],
+            'raw_config': {
+                'ntp_enabled': True,
+                'ntp_ip': address,
+                'X_xivo_phonebook_ip': address,
+            },
+        }
+        device_config = {
+            'X_type': 'device',
+            'deletable': False,
+            'id': 'defaultconfigdevice',
+            'label': 'Default config device',
+            'parent_ids': [],
+            'raw_config': {
+                'ntp_enabled': True,
+                'ntp_ip': address,
+                'sip_dtmf_mode': 'RTP-out-of-band',
+                'admin_username': 'admin',
+                'admin_password': self._generate_phone_password(length=16),
+                'user_username': 'user',
+                'user_password': self._generate_phone_password(length=16),
+            },
+        }
+        autoprov_config = {
+            'X_type': 'internal',
+            'deletable': False,
+            'id': 'autoprov',
+            'parent_ids': ['base', 'defaultconfigdevice'],
+            'raw_config': {
+                'sccp_call_managers': {'1': {'ip': address}},
+                'sip_lines': {
+                    '1': {
+                        'display_name': 'Autoprov',
+                        'number': 'autoprov',
+                        'password': autoprov_password,
+                        'proxy_ip': address,
+                        'registrar_ip': address,
+                        'username': autoprov_username,
+                    }
+                },
+            },
+            'role': 'autocreate',
+        }
 
         self.provd_client.configs.create(base_config)
         self.provd_client.configs.create(default_config)
@@ -192,22 +212,26 @@ class WizardService:
 
     def get_interfaces(self):
         result = []
-        candidate_interfaces = (interface for interface in netifaces.interfaces()
-                                if interface != 'lo')
+        candidate_interfaces = (
+            interface for interface in netifaces.interfaces() if interface != 'lo'
+        )
         for interface in candidate_interfaces:
             addresses_ipv4 = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
             for address in addresses_ipv4:
-                result.append({'ip_address': address.get('addr'),
-                               'netmask': address.get('netmask'),
-                               'interface': interface})
+                result.append(
+                    {
+                        'ip_address': address.get('addr'),
+                        'netmask': address.get('netmask'),
+                        'interface': interface,
+                    }
+                )
         return result
 
     def get_gateways(self):
         default_gateway = {'gateway': '0.0.0.0', 'interface': None}
         gateways = []
         for gateway in netifaces.gateways().get(netifaces.AF_INET, []):
-            gateways.append({'gateway': gateway[0],
-                             'interface': gateway[1]})
+            gateways.append({'gateway': gateway[0], 'interface': gateway[1]})
         gateways.append(default_gateway)
         return gateways
 

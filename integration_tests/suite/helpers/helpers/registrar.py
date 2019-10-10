@@ -3,10 +3,7 @@
 
 import string
 
-from random import (
-    choice,
-    randrange,
-)
+from random import choice, randrange
 
 from . import confd
 
@@ -27,12 +24,7 @@ def generate_ip():
 def generate_registrar(**params):
     name = "".join(choice(string.ascii_letters) for _ in range(20))
     ip = generate_ip()
-    registrar = {
-        'name': name,
-        'id': name,
-        'proxy_main_host': ip,
-        'main_host': ip,
-    }
+    registrar = {'name': name, 'id': name, 'proxy_main_host': ip, 'main_host': ip}
     registrar.update(params)
     confd.registrars.post(registrar)
     return registrar

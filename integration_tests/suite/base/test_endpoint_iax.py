@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 ALL_OPTIONS = [
     ['amaflags', 'default'],
@@ -143,13 +136,18 @@ def unique_error_checks(url, iax):
 @fixtures.iax()
 def test_get(iax):
     response = confd.endpoints.iax(iax['id']).get()
-    assert_that(response.item, has_entries({
-        'name': has_length(8),
-        'type': 'friend',
-        'host': 'dynamic',
-        'options': instance_of(list),
-        'trunk': None,
-    }))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'name': has_length(8),
+                'type': 'friend',
+                'host': 'dynamic',
+                'options': instance_of(list),
+                'trunk': None,
+            }
+        ),
+    )
 
 
 @fixtures.iax(wazo_tenant=MAIN_TENANT)
@@ -166,11 +164,7 @@ def test_get_multi_tenant(main, sub):
 @fixtures.iax(name='hidden', type='peer', host='hidden')
 def test_search(iax, hidden):
     url = confd.endpoints.iax
-    searches = {
-        'name': 'search',
-        'type': 'friend',
-        'host': 'search'
-    }
+    searches = {'name': 'search', 'type': 'friend', 'host': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, iax, hidden, field, term
@@ -202,59 +196,54 @@ def test_sorting_offset_limit(iax1, iax2):
 @fixtures.iax(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(main)), not_(has_items(sub)),
-    )
+    assert_that(response.items, all_of(has_items(main)), not_(has_items(sub)))
 
     response = confd.endpoints.iax.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_items(sub), not_(has_items(main))),
-    )
+    assert_that(response.items, all_of(has_items(sub), not_(has_items(main))))
 
     response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 def test_create_minimal_parameters():
     response = confd.endpoints.iax.post()
 
     response.assert_created('endpoint_iax', location='endpoints/iax')
-    assert_that(response.item, has_entries({
-        'tenant_uuid': MAIN_TENANT,
-        'name': has_length(8),
-        'type': 'friend',
-        'host': 'dynamic',
-        'options': instance_of(list)},
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'tenant_uuid': MAIN_TENANT,
+                'name': has_length(8),
+                'type': 'friend',
+                'host': 'dynamic',
+                'options': instance_of(list),
+            }
+        ),
+    )
 
 
 def test_create_all_parameters():
     response = confd.endpoints.iax.post(
-        name="myname",
-        type="peer",
-        host="127.0.0.1",
-        options=ALL_OPTIONS,
+        name="myname", type="peer", host="127.0.0.1", options=ALL_OPTIONS
     )
 
-    assert_that(response.item, has_entries({
-        'tenant_uuid': MAIN_TENANT,
-        'name': 'myname',
-        'type': 'peer',
-        'host': '127.0.0.1',
-        'options': has_items(*ALL_OPTIONS)
-    }))
+    assert_that(
+        response.item,
+        has_entries(
+            {
+                'tenant_uuid': MAIN_TENANT,
+                'name': 'myname',
+                'type': 'peer',
+                'host': '127.0.0.1',
+                'options': has_items(*ALL_OPTIONS),
+            }
+        ),
+    )
 
 
 def test_create_additional_options():
-    options = ALL_OPTIONS + [
-        ["foo", "bar"],
-        ["spam", "eggs"]
-    ]
+    options = ALL_OPTIONS + [["foo", "bar"], ["spam", "eggs"]]
 
     response = confd.endpoints.iax.post(options=options)
     assert_that(response.item['options'], has_items(*options))
@@ -263,26 +252,20 @@ def test_create_additional_options():
 @fixtures.iax()
 def test_update_required_parameters(iax):
     response = confd.endpoints.iax(iax['id']).put(
-        name="updatedname",
-        type="peer",
-        host="127.0.0.1"
+        name="updatedname", type="peer", host="127.0.0.1"
     )
     response.assert_updated()
 
     response = confd.endpoints.iax(iax['id']).get()
-    assert_that(response.item, has_entries({
-        'name': 'updatedname',
-        'type': 'peer',
-        'host': '127.0.0.1',
-    }))
+    assert_that(
+        response.item,
+        has_entries({'name': 'updatedname', 'type': 'peer', 'host': '127.0.0.1'}),
+    )
 
 
 @fixtures.iax(options=[["allow", "gsm"], ["nat", "force_rport,comedia"]])
 def test_update_options(iax):
-    options = [
-        ["allow", "g723"],
-        ["insecure", "port"]
-    ]
+    options = [["allow", "g723"], ["insecure", "port"]]
 
     response = confd.endpoints.iax(iax['id']).put(options=options)
     response.assert_updated()
@@ -291,18 +274,15 @@ def test_update_options(iax):
     assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.iax(options=[
-    ["allow", "gsm"],
-    ["foo", "bar"],
-    ["foo", "baz"],
-    ["spam", "eggs"]
-])
+@fixtures.iax(
+    options=[["allow", "gsm"], ["foo", "bar"], ["foo", "baz"], ["spam", "eggs"]]
+)
 def test_update_additional_options(iax):
     options = [
         ["allow", "g723"],
         ["foo", "newbar"],
         ["foo", "newbaz"],
-        ["spam", "neweggs"]
+        ["spam", "neweggs"],
     ]
 
     response = confd.endpoints.iax(iax['id']).put(options=options)

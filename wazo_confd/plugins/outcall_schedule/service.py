@@ -6,7 +6,6 @@ from .validator import build_validator
 
 
 class OutcallScheduleService:
-
     def __init__(self, notifier, validator):
         self.validator = validator
         self.notifier = notifier
@@ -29,5 +28,4 @@ class OutcallScheduleService:
 
 
 def build_service():
-    return OutcallScheduleService(build_notifier(),
-                                  build_validator())
+    return OutcallScheduleService(build_notifier(), build_validator())

@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -79,9 +72,7 @@ def unique_error_checks(url, skill):
 @fixtures.skill(name='hidden', category='hidden', description='hidden')
 def test_search(skill, hidden):
     url = confd.agents.skills
-    searches = {'name': 'search',
-                'category': 'search',
-                'description': 'search'}
+    searches = {'name': 'search', 'category': 'search', 'description': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, skill, hidden, field, term
@@ -106,7 +97,7 @@ def test_list_multi_tenant(main, sub):
         all_of(
             has_item(has_entry('id', main['id'])),
             not_(has_item(has_entry('id', sub['id']))),
-        )
+        ),
     )
 
     response = confd.agents.skills.get(wazo_tenant=SUB_TENANT)
@@ -115,16 +106,13 @@ def test_list_multi_tenant(main, sub):
         all_of(
             has_item(has_entry('id', sub['id'])),
             not_(has_item(has_entry('id', main['id']))),
-        )
+        ),
     )
 
     response = confd.agents.skills.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(
         response.items,
-        has_items(
-            has_entry('id', main['id']),
-            has_entry('id', sub['id']),
-        )
+        has_items(has_entry('id', main['id']), has_entry('id', sub['id'])),
     )
 
 
@@ -143,14 +131,16 @@ def test_sort_offset_limit(skill1, skill2):
 @fixtures.skill()
 def test_get(skill):
     response = confd.agents.skills(skill['id']).get()
-    assert_that(response.item, has_entries(
-        id=skill['id'],
-        name=skill['name'],
-        category=skill['category'],
-        description=skill['description'],
-
-        agents=empty(),
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=skill['id'],
+            name=skill['name'],
+            category=skill['category'],
+            description=skill['description'],
+            agents=empty(),
+        ),
+    )
 
 
 @fixtures.skill(wazo_tenant=MAIN_TENANT)
@@ -248,5 +238,9 @@ def test_delete_multi_tenant(main, sub):
 def test_bus_events(skill):
     required_body = {'name': 'Skill'}
     yield s.check_bus_event, 'config.agents.skills.created', confd.agents.skills.post, required_body
-    yield s.check_bus_event, 'config.agents.skills.edited', confd.agents.skills(skill['id']).put
-    yield s.check_bus_event, 'config.agents.skills.deleted', confd.agents.skills(skill['id']).delete
+    yield s.check_bus_event, 'config.agents.skills.edited', confd.agents.skills(
+        skill['id']
+    ).put
+    yield s.check_bus_event, 'config.agents.skills.deleted', confd.agents.skills(
+        skill['id']
+    ).delete

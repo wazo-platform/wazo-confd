@@ -21,10 +21,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 secondary_user_regex = re.compile(r"There are secondary users associated to the line")
@@ -80,13 +77,19 @@ def test_associate_user_line(user, line):
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user):
-    response = confd.users(sub_user['id']).lines(main_line['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.users(sub_user['id']).lines(main_line['id']).put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.users(main_user['id']).lines(sub_line['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.users(main_user['id']).lines(sub_line['id']).put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('User'))
 
-    response = confd.users(main_user['id']).lines(sub_line['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.users(main_user['id']).lines(sub_line['id']).put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -172,8 +175,8 @@ def test_get_user_associated_to_line(user, line):
                     line_id=line['id'],
                     main_user=True,
                     main_line=True,
-                ),
-            )
+                )
+            ),
         )
 
 
@@ -192,7 +195,7 @@ def test_get_secondary_user_associated_to_line(main_user, other_user, line):
                     main_user=False,
                     main_line=True,
                 )
-            )
+            ),
         )
 
 
@@ -225,7 +228,7 @@ def test_associate_user_to_multiple_lines(user, line1, line2, line3):
             has_entries(line_id=line1['id'], main_line=True),
             has_entries(line_id=line2['id'], main_line=False),
             has_entries(line_id=line3['id'], main_line=False),
-        )
+        ),
     )
 
 
@@ -233,7 +236,9 @@ def test_associate_user_to_multiple_lines(user, line1, line2, line3):
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_user_to_multiple_lines_with_same_extension(user, extension, line1, line2):
+def test_associate_user_to_multiple_lines_with_same_extension(
+    user, extension, line1, line2
+):
     with a.line_extension(line1, extension), a.line_extension(line2, extension):
         response = confd.users(user['id']).lines(line1['id']).put()
         response.assert_updated()
@@ -247,7 +252,9 @@ def test_associate_user_to_multiple_lines_with_same_extension(user, extension, l
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_user_to_multiple_lines_with_different_extension(user, extension1, extension2, line1, line2):
+def test_associate_user_to_multiple_lines_with_different_extension(
+    user, extension1, extension2, line1, line2
+):
     with a.line_extension(line1, extension1), a.line_extension(line2, extension2):
         response = confd.users(user['id']).lines(line1['id']).put()
         response.assert_updated()
@@ -261,7 +268,9 @@ def test_associate_user_to_multiple_lines_with_different_extension(user, extensi
 @fixtures.extension()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_associate_two_users_to_two_lines_with_same_extension(user1, user2, extension, line1, line2):
+def test_associate_two_users_to_two_lines_with_same_extension(
+    user1, user2, extension, line1, line2
+):
     with a.line_extension(line1, extension), a.line_extension(line2, extension):
         response = confd.users(user1['id']).lines(line1['id']).put()
         response.assert_updated()
@@ -288,9 +297,7 @@ def test_associate_user_to_line_with_endpoint(user, line, sip):
         response = confd.users(user['id']).lines.get()
         assert_that(
             response.items,
-            contains(
-                has_entries(user_id=user['id'], line_id=line['id']),
-            )
+            contains(has_entries(user_id=user['id'], line_id=line['id'])),
         )
 
 
@@ -304,10 +311,7 @@ def test_associate_lines_to_user(user, line1, line2):
     response = confd.users(user['uuid']).get()
     assert_that(
         response.item['lines'],
-        contains(
-            has_entries(id=line2['id']),
-            has_entries(id=line1['id']),
-        )
+        contains(has_entries(id=line2['id']), has_entries(id=line1['id'])),
     )
 
 
@@ -321,10 +325,7 @@ def test_associate_lines_to_swap_main_line(user, line1, line2):
     response = confd.users(user['uuid']).get()
     assert_that(
         response.item['lines'],
-        contains(
-            has_entries(id=line1['id']),
-            has_entries(id=line2['id']),
-        )
+        contains(has_entries(id=line1['id']), has_entries(id=line2['id'])),
     )
 
     response = confd.users(user['uuid']).lines.put(lines=[line2, line1])
@@ -333,10 +334,7 @@ def test_associate_lines_to_swap_main_line(user, line1, line2):
     response = confd.users(user['uuid']).get()
     assert_that(
         response.item['lines'],
-        contains(
-            has_entries(id=line2['id']),
-            has_entries(id=line1['id']),
-        )
+        contains(has_entries(id=line2['id']), has_entries(id=line1['id'])),
     )
 
 
@@ -386,8 +384,9 @@ def test_dissociate_using_uuid(user, line):
 @fixtures.user()
 @fixtures.line_sip()
 def test_dissociate_second_user_then_first(first_user, second_user, line):
-    with a.user_line(first_user, line, check=False), \
-            a.user_line(second_user, line, check=False):
+    with a.user_line(first_user, line, check=False), a.user_line(
+        second_user, line, check=False
+    ):
         response = confd.users(second_user['id']).lines(line['id']).delete()
         response.assert_deleted()
 
@@ -399,10 +398,12 @@ def test_dissociate_second_user_then_first(first_user, second_user, line):
 @fixtures.line_sip()
 @fixtures.line_sip()
 @fixtures.line_sip()
-def test_dissociate_main_line_then_main_line_fallback_to_secondary(user, line1, line2, line3):
-    with a.user_line(user, line1, check=False), \
-            a.user_line(user, line2, check=False), \
-            a.user_line(user, line3, check=False):
+def test_dissociate_main_line_then_main_line_fallback_to_secondary(
+    user, line1, line2, line3
+):
+    with a.user_line(user, line1, check=False), a.user_line(
+        user, line2, check=False
+    ), a.user_line(user, line3, check=False):
         response = confd.users(user['id']).lines.get()
         assert_that(
             response.items,
@@ -410,7 +411,7 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(user, line1, 
                 has_entries(line_id=line1['id'], main_line=True),
                 has_entries(line_id=line2['id'], main_line=False),
                 has_entries(line_id=line3['id'], main_line=False),
-            )
+            ),
         )
 
         confd.users(user['uuid']).lines(line1['id']).delete().assert_deleted()
@@ -449,10 +450,18 @@ def test_dissociate_not_associated(user, line):
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user):
-    response = confd.users(sub_user['id']).lines(main_line['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.users(sub_user['id'])
+        .lines(main_line['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.users(main_user['id']).lines(sub_line['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.users(main_user['id'])
+        .lines(sub_line['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('User'))
 
 
@@ -468,8 +477,8 @@ def test_get_users_relation(user, line):
                     uuid=user['uuid'],
                     firstname=user['firstname'],
                     lastname=user['lastname'],
-                ),
-            )
+                )
+            ),
         )
 
 
@@ -492,7 +501,7 @@ def test_get_lines_relation(user, line, sip):
                         endpoint_custom=line['endpoint_custom'],
                         extensions=line['extensions'],
                     )
-                )
+                ),
             )
 
 
@@ -510,10 +519,10 @@ def test_bus_events(user, line):
     yield (
         s.check_bus_event,
         'config.users.{}.lines.{}.updated'.format(user['uuid'], line['id']),
-        confd.users(user['uuid']).lines(line['id']).put
+        confd.users(user['uuid']).lines(line['id']).put,
     )
     yield (
         s.check_bus_event,
         'config.users.{}.lines.{}.deleted'.format(user['uuid'], line['id']),
-        confd.users(user['uuid']).lines(line['id']).delete
+        confd.users(user['uuid']).lines(line['id']).delete,
     )

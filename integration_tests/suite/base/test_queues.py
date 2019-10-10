@@ -15,15 +15,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 ALL_OPTIONS = [
@@ -158,7 +151,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'ignore_forward', {}
     yield s.check_bogus_field_returns_error, url, 'ignore_forward', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
@@ -223,11 +218,7 @@ def unique_error_checks(url, queue, group):
 @fixtures.queue(name='search', label='search', preprocess_subroutine='search')
 def test_search(hidden, queue):
     url = confd.queues
-    searches = {
-        'name': 'search',
-        'label': 'search',
-        'preprocess_subroutine': 'search',
-    }
+    searches = {'name': 'search', 'label': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, queue, hidden, field, term
@@ -252,7 +243,7 @@ def test_list_multi_tenant(main, sub):
         all_of(
             has_item(has_entry('id', main['id'])),
             not_(has_item(has_entry('id', sub['id']))),
-        )
+        ),
     )
 
     response = confd.queues.get(wazo_tenant=SUB_TENANT)
@@ -261,13 +252,13 @@ def test_list_multi_tenant(main, sub):
         all_of(
             has_item(has_entry('id', sub['id'])),
             not_(has_item(has_entry('id', main['id']))),
-        )
+        ),
     )
 
     response = confd.queues.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(
         response.items,
-        has_items(has_entry('id', main['id']), has_entry('id', sub['id']))
+        has_items(has_entry('id', main['id']), has_entry('id', sub['id'])),
     )
 
 
@@ -287,40 +278,39 @@ def test_sorting_offset_limit(queue1, queue2):
 @fixtures.queue()
 def test_get(queue):
     response = confd.queues(queue['id']).get()
-    assert_that(response.item, has_entries(
-        id=queue['id'],
-        name=queue['name'],
-        label=queue['label'],
-        data_quality=queue['data_quality'],
-        dtmf_hangup_callee_enabled=queue['dtmf_hangup_callee_enabled'],
-        dtmf_hangup_caller_enabled=queue['dtmf_hangup_caller_enabled'],
-        dtmf_transfer_callee_enabled=queue['dtmf_transfer_callee_enabled'],
-        dtmf_transfer_caller_enabled=queue['dtmf_transfer_caller_enabled'],
-        dtmf_record_callee_enabled=queue['dtmf_record_callee_enabled'],
-        dtmf_record_caller_enabled=queue['dtmf_record_caller_enabled'],
-        retry_on_timeout=queue['retry_on_timeout'],
-        ring_on_hold=queue['ring_on_hold'],
-        announce_hold_time_on_entry=queue['announce_hold_time_on_entry'],
-        ignore_forward=queue['ignore_forward'],
-        wait_time_threshold=queue['wait_time_threshold'],
-        wait_time_destination=queue['wait_time_destination'],
-        wait_ratio_threshold=queue['wait_ratio_threshold'],
-        wait_ratio_destination=queue['wait_ratio_destination'],
-        caller_id_mode=queue['caller_id_mode'],
-        caller_id_name=queue['caller_id_name'],
-        timeout=queue['timeout'],
-        music_on_hold=queue['music_on_hold'],
-        preprocess_subroutine=queue['preprocess_subroutine'],
-        enabled=queue['enabled'],
-        options=not_(empty()),
-
-        extensions=empty(),
-        schedules=empty(),
-        members=has_entries(
-            agents=empty(),
-            users=empty(),
+    assert_that(
+        response.item,
+        has_entries(
+            id=queue['id'],
+            name=queue['name'],
+            label=queue['label'],
+            data_quality=queue['data_quality'],
+            dtmf_hangup_callee_enabled=queue['dtmf_hangup_callee_enabled'],
+            dtmf_hangup_caller_enabled=queue['dtmf_hangup_caller_enabled'],
+            dtmf_transfer_callee_enabled=queue['dtmf_transfer_callee_enabled'],
+            dtmf_transfer_caller_enabled=queue['dtmf_transfer_caller_enabled'],
+            dtmf_record_callee_enabled=queue['dtmf_record_callee_enabled'],
+            dtmf_record_caller_enabled=queue['dtmf_record_caller_enabled'],
+            retry_on_timeout=queue['retry_on_timeout'],
+            ring_on_hold=queue['ring_on_hold'],
+            announce_hold_time_on_entry=queue['announce_hold_time_on_entry'],
+            ignore_forward=queue['ignore_forward'],
+            wait_time_threshold=queue['wait_time_threshold'],
+            wait_time_destination=queue['wait_time_destination'],
+            wait_ratio_threshold=queue['wait_ratio_threshold'],
+            wait_ratio_destination=queue['wait_ratio_destination'],
+            caller_id_mode=queue['caller_id_mode'],
+            caller_id_name=queue['caller_id_name'],
+            timeout=queue['timeout'],
+            music_on_hold=queue['music_on_hold'],
+            preprocess_subroutine=queue['preprocess_subroutine'],
+            enabled=queue['enabled'],
+            options=not_(empty()),
+            extensions=empty(),
+            schedules=empty(),
+            members=has_entries(agents=empty(), users=empty()),
         ),
-    ))
+    )
 
 
 @fixtures.queue(wazo_tenant=MAIN_TENANT)
@@ -337,10 +327,7 @@ def test_create_minimal_parameters():
     response = confd.queues.post(name='MyQueue')
     response.assert_created('queues')
 
-    assert_that(response.item, has_entries(
-        id=not_(empty()),
-        name='MyQueue',
-    ))
+    assert_that(response.item, has_entries(id=not_(empty()), name='MyQueue'))
 
     confd.queues(response.item['id']).delete().assert_deleted()
 
@@ -370,7 +357,7 @@ def test_create_all_parameters():
         'timeout': 42,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutine',
-        'enabled': False
+        'enabled': False,
     }
 
     response = confd.queues.post(**parameters)
@@ -409,9 +396,13 @@ def test_valid_destinations(queue, *destinations):
 
 
 def create_queue_with_destination(destination):
-    response = confd.queues.post(name='queue-destination', wait_time_destination=destination)
+    response = confd.queues.post(
+        name='queue-destination', wait_time_destination=destination
+    )
     response.assert_created('queue')
-    assert_that(response.item, has_entries(wait_time_destination=has_entries(**destination)))
+    assert_that(
+        response.item, has_entries(wait_time_destination=has_entries(**destination))
+    )
 
     confd.queues(response.item['id']).delete().assert_deleted()
 
@@ -420,7 +411,9 @@ def update_queue_with_destination(queue_id, destination):
     response = confd.queues(queue_id).put(wait_time_destination=destination)
     response.assert_updated()
     response = confd.queues(queue_id).get()
-    assert_that(response.item, has_entries(wait_time_destination=has_entries(**destination)))
+    assert_that(
+        response.item, has_entries(wait_time_destination=has_entries(**destination))
+    )
 
 
 @fixtures.queue()
@@ -454,7 +447,7 @@ def test_edit_all_parameters(queue):
         'timeout': 42,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutine',
-        'enabled': False
+        'enabled': False,
     }
 
     response = confd.queues(queue['id']).put(**parameters)
@@ -506,6 +499,8 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.queue()
 def test_bus_events(queue):
-    yield s.check_bus_event, 'config.queue.created', confd.queues.post, {'name': 'queue_bus_event'}
+    yield s.check_bus_event, 'config.queue.created', confd.queues.post, {
+        'name': 'queue_bus_event'
+    }
     yield s.check_bus_event, 'config.queue.edited', confd.queues(queue['id']).put
     yield s.check_bus_event, 'config.queue.deleted', confd.queues(queue['id']).delete

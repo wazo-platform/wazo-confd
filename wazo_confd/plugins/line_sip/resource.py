@@ -23,9 +23,10 @@ class LineSipSchema(BaseSchema):
     callerid = fields.String(validate=Regexp(CALLERID_REGEX), allow_none=True)
     device_slot = fields.Integer(validate=Range(min=0))
     context = fields.String(required=True)
-    provisioning_extension = fields.String(validate=(Length(equal=6), Predicate('isdigit')))
-    links = ListLink(Link('lines'),
-                     Link('lines_sip'))
+    provisioning_extension = fields.String(
+        validate=(Length(equal=6), Predicate('isdigit'))
+    )
+    links = ListLink(Link('lines'), Link('lines_sip'))
 
 
 class LineSipList(ListResource):
@@ -37,8 +38,7 @@ class LineSipList(ListResource):
     def get(self):
         params = self.search_params()
         total, items = self.service.search(params)
-        return {'total': total,
-                'items': self.schema().dump(items, many=True)}
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.#')
     def post(self):

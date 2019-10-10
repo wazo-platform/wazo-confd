@@ -16,7 +16,6 @@ from ..notifier import QueueMemberNotifier
 
 
 class TestQueueMemberNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -26,9 +25,7 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
     def test_agent_associate_then_bus_event(self):
         expected_event = QueueMemberAgentAssociatedEvent(
-            self.queue.id,
-            self.member.agent.id,
-            self.member.penalty,
+            self.queue.id, self.member.agent.id, self.member.penalty
         )
 
         self.notifier.agent_associated(self.queue, self.member)
@@ -46,7 +43,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_agent_dissociate_then_bus_event(self):
-        expected_event = QueueMemberAgentDissociatedEvent(self.queue.id, self.member.agent.id)
+        expected_event = QueueMemberAgentDissociatedEvent(
+            self.queue.id, self.member.agent.id
+        )
 
         self.notifier.agent_dissociated(self.queue, self.member)
 
@@ -63,7 +62,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_user_associate_then_bus_event(self):
-        expected_event = QueueMemberUserAssociatedEvent(self.queue.id, self.member.user.id)
+        expected_event = QueueMemberUserAssociatedEvent(
+            self.queue.id, self.member.user.id
+        )
 
         self.notifier.user_associated(self.queue, self.member)
 
@@ -72,7 +73,11 @@ class TestQueueMemberNotifier(unittest.TestCase):
     def test_user_associate_then_sysconfd_event(self):
         expected_handlers = {
             'agentbus': [],
-            'ipbx': ['module reload res_pjsip.so', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            'ipbx': [
+                'module reload res_pjsip.so',
+                'module reload app_queue.so',
+                'module reload chan_sccp.so',
+            ],
         }
 
         self.notifier.user_associated(self.queue, self.member)
@@ -80,7 +85,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_user_dissociate_then_bus_event(self):
-        expected_event = QueueMemberUserDissociatedEvent(self.queue.id, self.member.user.id)
+        expected_event = QueueMemberUserDissociatedEvent(
+            self.queue.id, self.member.user.id
+        )
 
         self.notifier.user_dissociated(self.queue, self.member)
 
@@ -89,7 +96,11 @@ class TestQueueMemberNotifier(unittest.TestCase):
     def test_user_dissociate_then_sysconfd_event(self):
         expected_handlers = {
             'agentbus': [],
-            'ipbx': ['module reload res_pjsip.so', 'module reload app_queue.so', 'module reload chan_sccp.so'],
+            'ipbx': [
+                'module reload res_pjsip.so',
+                'module reload app_queue.so',
+                'module reload chan_sccp.so',
+            ],
         }
 
         self.notifier.user_dissociated(self.queue, self.member)

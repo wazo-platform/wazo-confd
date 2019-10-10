@@ -10,6 +10,4 @@ from .notifier import build_notifier
 
 
 def build_service():
-    return CRUDService(switchboard_dao,
-                       ValidationGroup(),
-                       build_notifier())
+    return CRUDService(switchboard_dao, ValidationGroup(), build_notifier())

@@ -22,7 +22,6 @@ SYSCONFD_HANDLERS = {
 
 
 class TestUserGroupNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -33,7 +32,9 @@ class TestUserGroupNotifier(unittest.TestCase):
         self.notifier = UserGroupNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = UserGroupsAssociatedEvent(self.user.uuid, [self.group1.id, self.group2.id])
+        expected_event = UserGroupsAssociatedEvent(
+            self.user.uuid, [self.group1.id, self.group2.id]
+        )
 
         self.notifier.associated(self.user, [self.group1, self.group2])
 

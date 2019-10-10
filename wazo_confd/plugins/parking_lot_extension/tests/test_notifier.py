@@ -14,14 +14,10 @@ from xivo_dao.alchemy.parking_lot import ParkingLot
 
 from ..notifier import ParkingLotExtensionNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_parking.so'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload res_parking.so'], 'agentbus': []}
 
 
 class TestParkingLotExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -31,7 +27,9 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
         self.notifier = ParkingLotExtensionNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = ParkingLotExtensionAssociatedEvent(self.parking_lot.id, self.extension.id)
+        expected_event = ParkingLotExtensionAssociatedEvent(
+            self.parking_lot.id, self.extension.id
+        )
 
         self.notifier.associated(self.parking_lot, self.extension)
 
@@ -43,7 +41,9 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = ParkingLotExtensionDissociatedEvent(self.parking_lot.id, self.extension.id)
+        expected_event = ParkingLotExtensionDissociatedEvent(
+            self.parking_lot.id, self.extension.id
+        )
 
         self.notifier.dissociated(self.parking_lot, self.extension)
 

@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class CallFilterRecipientUserAssociationValidator(ValidatorAssociation):
-
     def validate(self, call_filter, users):
         for user in users:
             self.validate_same_tenant(call_filter, user)
@@ -18,7 +17,7 @@ class CallFilterRecipientUserAssociationValidator(ValidatorAssociation):
         if call_filter.tenant_uuid != user.tenant_uuid:
             raise errors.different_tenants(
                 call_filter_tenant_uuid=call_filter.tenant_uuid,
-                user_tenant_uuid=user.tenant_uuid
+                user_tenant_uuid=user.tenant_uuid,
             )
 
     def validate_no_more_than_one_user(self, users):
@@ -36,7 +35,6 @@ class CallFilterRecipientUserAssociationValidator(ValidatorAssociation):
 
 
 class CallFilterSurrogateUserAssociationValidator(ValidatorAssociation):
-
     def validate(self, call_filter, users):
         for user in users:
             self.validate_same_tenant(call_filter, user)
@@ -47,7 +45,7 @@ class CallFilterSurrogateUserAssociationValidator(ValidatorAssociation):
         if call_filter.tenant_uuid != user.tenant_uuid:
             raise errors.different_tenants(
                 call_filter_tenant_uuid=call_filter.tenant_uuid,
-                user_tenant_uuid=user.tenant_uuid
+                user_tenant_uuid=user.tenant_uuid,
             )
 
     def validate_no_duplicate_user(self, users):
@@ -66,11 +64,11 @@ class CallFilterSurrogateUserAssociationValidator(ValidatorAssociation):
 
 def build_validator_recipient_user():
     return ValidationAssociation(
-        association=[CallFilterRecipientUserAssociationValidator()],
+        association=[CallFilterRecipientUserAssociationValidator()]
     )
 
 
 def build_validator_surrogate_user():
     return ValidationAssociation(
-        association=[CallFilterSurrogateUserAssociationValidator()],
+        association=[CallFilterSurrogateUserAssociationValidator()]
     )

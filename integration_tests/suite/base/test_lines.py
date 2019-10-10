@@ -19,17 +19,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    config,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, config, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -116,7 +107,7 @@ def test_get(line):
             endpoint_custom=none(),
             extensions=empty(),
             users=empty(),
-        )
+        ),
     )
 
 
@@ -138,17 +129,11 @@ def test_search(line1, line2):
     response = confd.lines.get()
     assert_that(
         response.items,
-        has_items(
-            has_entry('id', line1['id']),
-            has_entry('id', line2['id']),
-        )
+        has_items(has_entry('id', line1['id']), has_entry('id', line2['id'])),
     )
 
     response = confd.lines.get(search=line1['provisioning_code'])
-    assert_that(
-        response.items,
-        contains(has_entry('id', line1['id']))
-    )
+    assert_that(response.items, contains(has_entry('id', line1['id'])))
 
 
 @fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
@@ -157,22 +142,13 @@ def test_search(line1, line2):
 @fixtures.line(context='sub_ctx')
 def test_list_multi_tenant(_, __, main, sub):
     response = confd.lines.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main), not_(has_item(sub))),
-    )
+    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
 
     response = confd.lines.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.lines.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 def test_create_line_with_fake_context():
@@ -199,7 +175,7 @@ def test_create_line_with_minimal_parameters():
             provisioning_code=has_length(6),
             provisioning_extension=has_length(6),
             tenant_uuid=MAIN_TENANT,
-        )
+        ),
     )
 
 
@@ -227,15 +203,13 @@ def test_create_line_with_all_parameters(registrar):
             provisioning_code="887865",
             provisioning_extension="887865",
             tenant_uuid=MAIN_TENANT,
-        )
+        ),
     )
 
 
 def test_create_line_with_caller_id_raises_error():
     response = confd.lines.post(
-        context=config.CONTEXT,
-        caller_id_name="Jôhn Smîth",
-        caller_id_num="1000",
+        context=config.CONTEXT, caller_id_name="Jôhn Smîth", caller_id_num="1000"
     )
 
     response.assert_status(400)
@@ -243,16 +217,15 @@ def test_create_line_with_caller_id_raises_error():
 
 @fixtures.line(provisioning_code="135246")
 def test_create_line_with_provisioning_code_already_taken(line):
-    response = confd.lines.post(
-        context=config.CONTEXT,
-        provisioning_code="135246",
-    )
+    response = confd.lines.post(context=config.CONTEXT, provisioning_code="135246")
     response.assert_match(400, re.compile("provisioning_code"))
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
 def test_create_multi_tenant(in_main):
-    response = confd.lines.post(exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT)
+    response = confd.lines.post(
+        exten='1001', context=in_main['name'], wazo_tenant=SUB_TENANT
+    )
     response.assert_status(400)
 
 
@@ -286,13 +259,15 @@ def test_update_all_parameters_on_line(line, context, registrar):
             caller_id_num=none(),
             registrar=registrar['id'],
             provisioning_code='243546',
-        )
+        ),
     )
 
 
 @fixtures.line()
 def test_update_caller_id_on_line_without_endpoint_raises_error(line):
-    response = confd.lines(line['id']).put(caller_id_name="Jôhn Smîth", caller_id_num="1000")
+    response = confd.lines(line['id']).put(
+        caller_id_name="Jôhn Smîth", caller_id_num="1000"
+    )
     response.assert_status(400)
 
 
@@ -324,7 +299,9 @@ def test_edit_multi_tenant(main_ctx, _, main, sub):
     response = confd.lines(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
 
-    response = confd.lines(sub['id']).put(context=main_ctx['name'], wazo_tenant=SUB_TENANT)
+    response = confd.lines(sub['id']).put(
+        context=main_ctx['name'], wazo_tenant=SUB_TENANT
+    )
     response.assert_status(400)
 
 
@@ -339,18 +316,21 @@ def test_delete_line(line):
 @fixtures.line_sip()
 @fixtures.extension()
 @fixtures.device()
-def test_delete_line_then_associatons_are_removed(user, line1, line2, extension, device):
-    with a.user_line(user, line1, check=False), \
-         a.user_line(user, line2, check=False), \
-         a.line_extension(line1, extension, check=False), \
-         a.line_device(line1, device, check=False):
+def test_delete_line_then_associatons_are_removed(
+    user, line1, line2, extension, device
+):
+    with a.user_line(user, line1, check=False), a.user_line(
+        user, line2, check=False
+    ), a.line_extension(line1, extension, check=False), a.line_device(
+        line1, device, check=False
+    ):
         response = confd.users(user['id']).lines.get()
         assert_that(
             response.items,
             contains_inanyorder(
                 has_entries(line_id=line1['id'], main_line=True),
                 has_entries(line_id=line2['id'], main_line=False),
-            )
+            ),
         )
 
         response = confd.devices(device['id']).lines.get()
@@ -363,8 +343,7 @@ def test_delete_line_then_associatons_are_removed(user, line1, line2, extension,
 
         response = confd.users(user['id']).lines.get()
         assert_that(
-            response.items,
-            contains(has_entries(line_id=line2['id'], main_line=True))
+            response.items, contains(has_entries(line_id=line2['id'], main_line=True))
         )
         response = confd.devices(device['id']).lines.get()
         assert_that(response.items, empty())

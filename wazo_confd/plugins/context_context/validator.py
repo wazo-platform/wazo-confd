@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class ContextContextAssociationValidator(ValidatorAssociation):
-
     def validate(self, context, contexts):
         self.validate_no_duplicate_context(contexts)
         self.validate_no_self_context(context, contexts)
@@ -22,6 +21,4 @@ class ContextContextAssociationValidator(ValidatorAssociation):
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[ContextContextAssociationValidator()],
-    )
+    return ValidationAssociation(association=[ContextContextAssociationValidator()])

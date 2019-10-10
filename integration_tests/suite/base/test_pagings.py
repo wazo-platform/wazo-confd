@@ -14,15 +14,8 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -97,11 +90,7 @@ def unique_error_checks(url, paging):
 @fixtures.paging(name='hidden', number='456', announce_sound='hidden')
 def test_search(paging, hidden):
     url = confd.pagings
-    searches = {
-        'name': 'search',
-        'number': '123',
-        'announce_sound': 'search',
-    }
+    searches = {'name': 'search', 'number': '123', 'announce_sound': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, paging, hidden, field, term
@@ -133,39 +122,33 @@ def test_sort_offset_limit(paging1, paging2):
 @fixtures.paging(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.pagings.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.pagings.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.pagings.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.paging()
 def test_get(paging):
     response = confd.pagings(paging['id']).get()
-    assert_that(response.item, has_entries(
-        id=paging['id'],
-        name=paging['name'],
-        number=paging['number'],
-        announce_caller=paging['announce_caller'],
-        announce_sound=paging['announce_sound'],
-        caller_notification=paging['caller_notification'],
-        duplex=paging['duplex'],
-        ignore_forward=paging['ignore_forward'],
-        record=paging['record'],
-        enabled=paging['enabled'],
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            id=paging['id'],
+            name=paging['name'],
+            number=paging['number'],
+            announce_caller=paging['announce_caller'],
+            announce_sound=paging['announce_sound'],
+            caller_notification=paging['caller_notification'],
+            duplex=paging['duplex'],
+            ignore_forward=paging['ignore_forward'],
+            record=paging['record'],
+            enabled=paging['enabled'],
+        ),
+    )
 
 
 @fixtures.paging(wazo_tenant=MAIN_TENANT)
@@ -182,10 +165,7 @@ def test_create_minimal_parameters():
     response = confd.pagings.post(number='123')
     response.assert_created('pagings')
 
-    assert_that(response.item, has_entries(
-        id=not_(empty()),
-        tenant_uuid=MAIN_TENANT,
-    ))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
     confd.pagings(response.item['id']).delete().assert_deleted()
 
@@ -269,6 +249,10 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.paging()
 def test_bus_events(paging):
-    yield s.check_bus_event, 'config.pagings.created', confd.pagings.post, {'number': '666'}
+    yield s.check_bus_event, 'config.pagings.created', confd.pagings.post, {
+        'number': '666'
+    }
     yield s.check_bus_event, 'config.pagings.edited', confd.pagings(paging['id']).put
-    yield s.check_bus_event, 'config.pagings.deleted', confd.pagings(paging['id']).delete
+    yield s.check_bus_event, 'config.pagings.deleted', confd.pagings(
+        paging['id']
+    ).delete

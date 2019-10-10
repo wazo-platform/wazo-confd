@@ -6,16 +6,17 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 
 class LineSip:
-
-    def __init__(self,
-                 context,
-                 tenant_uuid,
-                 id=None,
-                 username=None,
-                 secret=None,
-                 callerid=None,
-                 provisioning_extension=None,
-                 device_slot=1):
+    def __init__(
+        self,
+        context,
+        tenant_uuid,
+        id=None,
+        username=None,
+        secret=None,
+        callerid=None,
+        provisioning_extension=None,
+        device_slot=1,
+    ):
         self.id = id
         self.username = username
         self.secret = secret
@@ -27,28 +28,34 @@ class LineSip:
 
     @classmethod
     def from_line_and_sip(cls, line, sip):
-        return cls(id=line.id,
-                   context=line.context,
-                   tenant_uuid=sip.tenant_uuid,
-                   username=sip.name,
-                   secret=sip.secret,
-                   callerid=sip.callerid,
-                   provisioning_extension=line.provisioning_code,
-                   device_slot=line.position)
+        return cls(
+            id=line.id,
+            context=line.context,
+            tenant_uuid=sip.tenant_uuid,
+            username=sip.name,
+            secret=sip.secret,
+            callerid=sip.callerid,
+            provisioning_extension=line.provisioning_code,
+            device_slot=line.position,
+        )
 
     def build_sip(self):
-        return SIP(name=self.username,
-                   secret=self.secret,
-                   callerid=self.callerid,
-                   context=self.context,
-                   tenant_uuid=self.tenant_uuid)
+        return SIP(
+            name=self.username,
+            secret=self.secret,
+            callerid=self.callerid,
+            context=self.context,
+            tenant_uuid=self.tenant_uuid,
+        )
 
     def build_line(self, sip):
-        return Line(position=self.device_slot,
-                    provisioning_code=self.provisioning_extension,
-                    context=self.context,
-                    protocol='sip',
-                    protocolid=sip.id)
+        return Line(
+            position=self.device_slot,
+            provisioning_code=self.provisioning_extension,
+            context=self.context,
+            protocol='sip',
+            protocolid=sip.id,
+        )
 
     def update_sip(self, sip):
         sip.name = self.username

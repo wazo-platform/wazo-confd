@@ -6,20 +6,15 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
 
-        api.add_resource(
-            GroupList,
-            '/groups',
-            resource_class_args=(service,)
-        )
+        api.add_resource(GroupList, '/groups', resource_class_args=(service,))
 
         api.add_resource(
             GroupItem,
             '/groups/<int:id>',
             endpoint='groups',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

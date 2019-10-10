@@ -11,7 +11,6 @@ from .validator import build_validator
 
 
 class LineDevice:
-
     @classmethod
     def from_line(cls, line):
         return cls(line.id, line.device_id)
@@ -22,7 +21,6 @@ class LineDevice:
 
 
 class LineDeviceService:
-
     def __init__(self, validator, line_dao, notifier, device_updater):
         self.validator = validator
         self.line_dao = line_dao

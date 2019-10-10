@@ -11,7 +11,6 @@ from .validator import build_validator
 
 
 class SkillService(CRUDService):
-
     def create(self, skill):
         self.validator.validate_create(skill, tenant_uuids=[skill.tenant_uuid])
         created_skill = self.dao.create(skill)

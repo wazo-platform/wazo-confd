@@ -1,12 +1,7 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    empty,
-    has_entries,
-)
+from hamcrest import assert_that, contains_inanyorder, empty, has_entries
 
 from . import confd
 from ..helpers import (
@@ -16,10 +11,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_UUID = 'uuid-not-found'
 
@@ -97,42 +89,55 @@ def test_associate_multi_tenant(main_switchboard, sub_switchboard, main_user, su
 def test_get_users_associated_to_switchboard(switchboard, user1, user2):
     with (a.switchboard_member_user(switchboard, [user1, user2])):
         response = confd.switchboards(switchboard['uuid']).get()
-        assert_that(response.item, has_entries(
-            members=has_entries(users=contains_inanyorder(
-                has_entries(
-                    uuid=user2['uuid'],
-                    firstname=user2['firstname'],
-                    lastname=user2['lastname'],
-                ),
-                has_entries(
-                    uuid=user1['uuid'],
-                    firstname=user1['firstname'],
-                    lastname=user1['lastname'],
-                ),
-            ))
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                members=has_entries(
+                    users=contains_inanyorder(
+                        has_entries(
+                            uuid=user2['uuid'],
+                            firstname=user2['firstname'],
+                            lastname=user2['lastname'],
+                        ),
+                        has_entries(
+                            uuid=user1['uuid'],
+                            firstname=user1['firstname'],
+                            lastname=user1['lastname'],
+                        ),
+                    )
+                )
+            ),
+        )
 
 
 @fixtures.switchboard()
 @fixtures.switchboard()
 @fixtures.user()
 def test_get_switchboards_associated_to_user(switchboard1, switchboard2, user):
-    with a.switchboard_member_user(switchboard1, [user]), \
-         a.switchboard_member_user(switchboard2, [user]):
+    with a.switchboard_member_user(switchboard1, [user]), a.switchboard_member_user(
+        switchboard2, [user]
+    ):
         response = confd.users(user['uuid']).get()
-        assert_that(response.item, has_entries(
-            switchboards=contains_inanyorder(
-                has_entries(uuid=switchboard1['uuid'], name=switchboard1['name']),
-                has_entries(uuid=switchboard2['uuid'], name=switchboard2['name']),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                switchboards=contains_inanyorder(
+                    has_entries(uuid=switchboard1['uuid'], name=switchboard1['name']),
+                    has_entries(uuid=switchboard2['uuid'], name=switchboard2['name']),
+                )
+            ),
+        )
 
 
 @fixtures.switchboard()
 @fixtures.user()
 @fixtures.user()
-def test_delete_switchboard_when_switchboard_and_user_associated(switchboard, user1, user2):
-    h.switchboard_member_user.associate(switchboard['uuid'], [user1['uuid'], user2['uuid']])
+def test_delete_switchboard_when_switchboard_and_user_associated(
+    switchboard, user1, user2
+):
+    h.switchboard_member_user.associate(
+        switchboard['uuid'], [user1['uuid'], user2['uuid']]
+    )
 
     confd.switchboards(switchboard['uuid']).delete().assert_deleted()
 
@@ -140,9 +145,12 @@ def test_delete_switchboard_when_switchboard_and_user_associated(switchboard, us
 @fixtures.switchboard()
 @fixtures.switchboard()
 @fixtures.user()
-def test_delete_user_when_switchboard_and_user_associated(switchboard1, switchboard2, user):
-    with a.switchboard_member_user(switchboard2, [user]), \
-         a.switchboard_member_user(switchboard1, [user]):
+def test_delete_user_when_switchboard_and_user_associated(
+    switchboard1, switchboard2, user
+):
+    with a.switchboard_member_user(switchboard2, [user]), a.switchboard_member_user(
+        switchboard1, [user]
+    ):
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.switchboards(switchboard1['uuid']).get()
@@ -157,5 +165,7 @@ def test_delete_user_when_switchboard_and_user_associated(switchboard1, switchbo
 def test_bus_events(switchboard, user):
     url = confd.switchboards(switchboard['uuid']).members.users.put
     body = {'users': [{'uuid': user['uuid']}]}
-    routing_key = 'config.switchboards.{}.members.users.updated'.format(switchboard['uuid'])
+    routing_key = 'config.switchboards.{}.members.users.updated'.format(
+        switchboard['uuid']
+    )
     yield s.check_bus_event, routing_key, url, body

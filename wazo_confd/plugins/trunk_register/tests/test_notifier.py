@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -17,7 +17,6 @@ from ..notifier import TrunkRegisterIAXNotifier, TrunkRegisterSIPNotifier
 
 
 class TestTrunkRegisterIAXNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.iax = Mock(id=2)
@@ -41,7 +40,6 @@ class TestTrunkRegisterIAXNotifier(unittest.TestCase):
 
 
 class TestTrunkRegisterSIPNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sip = Mock(id=1)

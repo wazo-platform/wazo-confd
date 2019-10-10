@@ -3,19 +3,13 @@
 
 import unittest
 
-from hamcrest import (
-    assert_that,
-    calling,
-    equal_to,
-    raises,
-)
+from hamcrest import assert_that, calling, equal_to, raises
 from xivo_dao.helpers import errors
 
 from ..storage import _SoundFilesystemStorage
 
 
 class TestBuildPath(unittest.TestCase):
-
     def test_build_path(self):
         storage = _SoundFilesystemStorage('/tmp')
 
@@ -26,8 +20,12 @@ class TestBuildPath(unittest.TestCase):
     def test_build_path_dangerous_fragments(self):
         storage = _SoundFilesystemStorage('/tmp')
 
-        assert_that(calling(storage._build_path).with_args('one', 'im-a-bad-guy/../../etc/passwd'),
-                    raises(errors.ResourceError))
+        assert_that(
+            calling(storage._build_path).with_args(
+                'one', 'im-a-bad-guy/../../etc/passwd'
+            ),
+            raises(errors.ResourceError),
+        )
 
     def test_build_path_empty_fragment(self):
         storage = _SoundFilesystemStorage('/tmp')

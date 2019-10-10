@@ -16,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 class ExtensionService(CRUDService):
-
     def __init__(self, dao, validator, notifier, device_updater):
         super(ExtensionService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
@@ -46,7 +45,6 @@ class ExtensionService(CRUDService):
 
 def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
-    return ExtensionService(extension_dao_module,
-                            build_validator(),
-                            build_notifier(),
-                            device_updater)
+    return ExtensionService(
+        extension_dao_module, build_validator(), build_notifier(), device_updater
+    )

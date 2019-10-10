@@ -10,7 +10,9 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 class PagingSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    number = fields.String(validate=(Length(max=32), Predicate('isdigit')), required=True)
+    number = fields.String(
+        validate=(Length(max=32), Predicate('isdigit')), required=True
+    )
     name = fields.String(validate=Length(max=128), allow_none=True)
     announce_caller = fields.Boolean()
     announce_sound = fields.String(validate=Length(max=64), allow_none=True)
@@ -21,14 +23,18 @@ class PagingSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('pagings'))
 
-    users_caller = fields.Nested('UserSchema',
-                                 only=['uuid', 'firstname', 'lastname', 'links'],
-                                 many=True,
-                                 dump_only=True)
-    users_member = fields.Nested('UserSchema',
-                                 only=['uuid', 'firstname', 'lastname', 'links'],
-                                 many=True,
-                                 dump_only=True)
+    users_caller = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )
+    users_member = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )
 
     @post_dump
     def wrap_users(self, data):

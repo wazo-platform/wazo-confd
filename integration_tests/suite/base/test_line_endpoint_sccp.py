@@ -1,10 +1,7 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    has_entries,
-)
+from hamcrest import assert_that, has_entries
 
 from . import confd
 from ..helpers import (
@@ -14,10 +11,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 @fixtures.line()
@@ -58,11 +52,7 @@ def test_get_sccp_endpoint_associated_to_line(line, sccp):
         response = confd.lines(line['id']).endpoints.sccp.get()
         assert_that(
             response.item,
-            has_entries(
-                line_id=line['id'],
-                endpoint_id=sccp['id'],
-                endpoint='sccp'
-            )
+            has_entries(line_id=line['id'], endpoint_id=sccp['id'], endpoint='sccp'),
         )
 
 
@@ -86,11 +76,7 @@ def test_get_line_associated_to_a_sccp_endpoint(line, sccp):
         response = confd.endpoints.sccp(sccp['id']).lines.get()
         assert_that(
             response.item,
-            has_entries(
-                line_id=line['id'],
-                endpoint_id=sccp['id'],
-                endpoint='sccp'
-            )
+            has_entries(line_id=line['id'], endpoint_id=sccp['id'], endpoint='sccp'),
         )
 
 
@@ -134,13 +120,25 @@ def test_associate_multiple_lines_to_sccp(line1, line2, sccp):
 @fixtures.sccp(wazo_tenant=MAIN_TENANT)
 @fixtures.sccp(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp):
-    response = confd.lines(main_line['id']).endpoints.sccp(sub_sccp['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.sccp(sub_sccp['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).endpoints.sccp(main_sccp['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .endpoints.sccp(main_sccp['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('SCCPEndpoint'))
 
-    response = confd.lines(main_line['id']).endpoints.sccp(sub_sccp['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.sccp(sub_sccp['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -184,10 +182,18 @@ def test_dissociate_when_associated_to_extension(line, sccp, extension):
 @fixtures.sccp(wazo_tenant=MAIN_TENANT)
 @fixtures.sccp(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp):
-    response = confd.lines(main_line['id']).endpoints.sccp(sub_sccp['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(main_line['id'])
+        .endpoints.sccp(sub_sccp['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Line'))
 
-    response = confd.lines(sub_line['id']).endpoints.sccp(main_sccp['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.lines(sub_line['id'])
+        .endpoints.sccp(main_sccp['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('SCCPEndpoint'))
 
 
@@ -197,8 +203,7 @@ def test_get_endpoint_sccp_relation(line, sccp):
     with a.line_endpoint_sccp(line, sccp):
         response = confd.lines(line['id']).get()
         assert_that(
-            response.item,
-            has_entries(endpoint_sccp=has_entries(id=sccp['id']))
+            response.item, has_entries(endpoint_sccp=has_entries(id=sccp['id']))
         )
 
 
@@ -207,10 +212,7 @@ def test_get_endpoint_sccp_relation(line, sccp):
 def test_get_line_relation(line, sccp):
     with a.line_endpoint_sccp(line, sccp):
         response = confd.endpoints.sccp(sccp['id']).get()
-        assert_that(
-            response.item,
-            has_entries(line=has_entries(id=line['id']))
-        )
+        assert_that(response.item, has_entries(line=has_entries(id=line['id'])))
 
 
 @fixtures.line()

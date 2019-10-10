@@ -6,7 +6,6 @@ from wazo_confd.helpers.validator import Validator, ValidationAssociation
 
 
 class AssociateOutcallCallPermission(Validator):
-
     def validate(self, outcall, call_permission):
         self.validate_same_tenant(outcall, call_permission)
 
@@ -19,8 +18,4 @@ class AssociateOutcallCallPermission(Validator):
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[
-            AssociateOutcallCallPermission()
-        ]
-    )
+    return ValidationAssociation(association=[AssociateOutcallCallPermission()])

@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class UserVoicemailService:
-
     def __init__(self, dao, validator, notifier):
         self.dao = dao
         self.validator = validator
@@ -46,6 +45,4 @@ class UserVoicemailService:
 
 
 def build_service():
-    return UserVoicemailService(user_voicemail_dao,
-                                build_validator(),
-                                build_notifier())
+    return UserVoicemailService(user_voicemail_dao, build_validator(), build_notifier())

@@ -14,7 +14,6 @@ from ..notifier import AccessFeatureNotifier
 
 
 class TestAccessFeatureNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.access_feature = {'id': 123}

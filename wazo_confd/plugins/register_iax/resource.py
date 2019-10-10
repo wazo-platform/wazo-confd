@@ -39,7 +39,9 @@ class RegisterIAXSchema(BaseSchema):
     auth_password = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     remote_host = fields.String(validate=Regexp(INVALID_REMOTE_HOST), required=True)
     remote_port = fields.Integer(validate=Range(min=0, max=65535), allow_none=True)
-    callback_extension = fields.String(validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True)
+    callback_extension = fields.String(
+        validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True
+    )
     callback_context = fields.String(allow_none=True)
     enabled = StrictBoolean(missing=True)
     links = ListLink(Link('register_iax'))
@@ -65,20 +67,36 @@ class RegisterIAXSchema(BaseSchema):
     @validates_schema
     def validate_total_length(self, data):
         if len(self.convert_to_chaniax(data)['var_val']) > 255:
-            raise ValidationError('The sum of all fields is longer than maximum length 255')
+            raise ValidationError(
+                'The sum of all fields is longer than maximum length 255'
+            )
 
     @post_load
     def convert_to_chaniax(self, data):
-        chaniax_fmt = '{auth_username}{auth_password}{separator}'\
-                      '{remote_host}{remote_port}{callback_extension}{callback_context}'
+        chaniax_fmt = (
+            '{auth_username}{auth_password}{separator}'
+            '{remote_host}{remote_port}{callback_extension}{callback_context}'
+        )
         data['var_val'] = chaniax_fmt.format(
-            auth_username=data.get('auth_username') if data.get('auth_username') else '',
-            auth_password=':{}'.format(data.get('auth_password')) if data.get('auth_password') else '',
-            separator='@' if data.get('auth_username') or data.get('auth_password') else '',
+            auth_username=data.get('auth_username')
+            if data.get('auth_username')
+            else '',
+            auth_password=':{}'.format(data.get('auth_password'))
+            if data.get('auth_password')
+            else '',
+            separator='@'
+            if data.get('auth_username') or data.get('auth_password')
+            else '',
             remote_host=data.get('remote_host'),
-            remote_port=':{}'.format(data.get('remote_port')) if data.get('remote_port') else '',
-            callback_extension='/{}'.format(data.get('callback_extension')) if data.get('callback_extension') else '',
-            callback_context='?{}'.format(data.get('callback_context')) if data.get('callback_context') else '',
+            remote_port=':{}'.format(data.get('remote_port'))
+            if data.get('remote_port')
+            else '',
+            callback_extension='/{}'.format(data.get('callback_extension'))
+            if data.get('callback_extension')
+            else '',
+            callback_context='?{}'.format(data.get('callback_context'))
+            if data.get('callback_context')
+            else '',
         )
         return data
 

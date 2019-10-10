@@ -13,15 +13,8 @@ from hamcrest import (
     not_,
 )
 from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -49,7 +42,9 @@ def test_put_errors(outcall):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(40)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        40
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'name', True
@@ -107,22 +102,13 @@ def check_search(url, outcall, hidden, field, term):
 @fixtures.outcall(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.outcalls.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(main)), not_(has_item(sub)),
-    )
+    assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
     response = confd.outcalls.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(has_item(sub), not_(has_item(main))),
-    )
+    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
     response = confd.outcalls.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(
-        response.items,
-        has_items(main, sub),
-    )
+    assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.outcall(description='sort1')
@@ -151,7 +137,8 @@ def test_get(outcall):
             name=outcall['name'],
             ring_time=outcall['ring_time'],
             trunks=empty(),
-        ))
+        ),
+    )
 
 
 @fixtures.outcall(wazo_tenant=MAIN_TENANT)
@@ -168,23 +155,20 @@ def test_create_minimal_parameters():
     response = confd.outcalls.post(name='MyOutcall')
     response.assert_created('outcalls')
 
-    assert_that(
-        response.item,
-        has_entries(
-            id=not_(empty()),
-            tenant_uuid=MAIN_TENANT,
-        ))
+    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
 
     confd.outcalls(response.item['id']).delete().assert_deleted()
 
 
 def test_create_all_parameters():
-    parameters = {'name': 'MyOutcall',
-                  'internal_caller_id': True,
-                  'preprocess_subroutine': 'subroutine',
-                  'ring_time': 10,
-                  'description': 'outcall description',
-                  'enabled': False}
+    parameters = {
+        'name': 'MyOutcall',
+        'internal_caller_id': True,
+        'preprocess_subroutine': 'subroutine',
+        'ring_time': 10,
+        'description': 'outcall description',
+        'enabled': False,
+    }
 
     response = confd.outcalls.post(**parameters)
     response.assert_created('outcalls')
@@ -202,12 +186,14 @@ def test_edit_minimal_parameters(outcall):
 
 @fixtures.outcall()
 def test_edit_all_parameters(outcall):
-    parameters = {'name': 'MyOutcall',
-                  'internal_caller_id': True,
-                  'preprocess_subroutine': 'subroutine',
-                  'ring_time': 10,
-                  'description': 'outcall description',
-                  'enabled': False}
+    parameters = {
+        'name': 'MyOutcall',
+        'internal_caller_id': True,
+        'preprocess_subroutine': 'subroutine',
+        'ring_time': 10,
+        'description': 'outcall description',
+        'enabled': False,
+    }
 
     response = confd.outcalls(outcall['id']).put(**parameters)
     response.assert_updated()
@@ -246,6 +232,10 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.outcall()
 def test_bus_events(outcall):
-    yield s.check_bus_event, 'config.outcalls.created', confd.outcalls.post, {'name': 'a'}
+    yield s.check_bus_event, 'config.outcalls.created', confd.outcalls.post, {
+        'name': 'a'
+    }
     yield s.check_bus_event, 'config.outcalls.edited', confd.outcalls(outcall['id']).put
-    yield s.check_bus_event, 'config.outcalls.deleted', confd.outcalls(outcall['id']).delete
+    yield s.check_bus_event, 'config.outcalls.deleted', confd.outcalls(
+        outcall['id']
+    ).delete

@@ -12,14 +12,10 @@ from xivo_bus.resources.queue.event import (
 
 from ..notifier import QueueNotifier
 
-EXPECTED_HANDLERS = {
-    'ipbx': ['module reload app_queue.so'],
-    'agentbus': []
-}
+EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
 
 
 class TestQueueNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()

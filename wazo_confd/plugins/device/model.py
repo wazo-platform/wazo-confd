@@ -3,7 +3,6 @@
 
 
 class Device:
-
     @classmethod
     def from_args(cls, **kwargs):
         device = cls({}, {'parent_ids': []})
@@ -25,7 +24,9 @@ class Device:
     @property
     def config(self):
         if self._config is None:
-            raise Exception("Provd Device has no config associated. The device may be corrupt")
+            raise Exception(
+                "Provd Device has no config associated. The device may be corrupt"
+            )
         return self._config
 
     @config.setter

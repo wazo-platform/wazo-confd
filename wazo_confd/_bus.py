@@ -10,13 +10,16 @@ logger = logging.getLogger(__name__)
 
 
 class BusPublisher:
-
     @classmethod
     def from_config(cls, config):
         bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**config['bus'])
         bus_connection = Connection(bus_url)
-        bus_exchange = Exchange(config['bus']['exchange_name'], type=config['bus']['exchange_type'])
-        bus_producer = Producer(bus_connection, exchange=bus_exchange, auto_declare=True)
+        bus_exchange = Exchange(
+            config['bus']['exchange_name'], type=config['bus']['exchange_type']
+        )
+        bus_producer = Producer(
+            bus_connection, exchange=bus_exchange, auto_declare=True
+        )
         bus_marshaler = Marshaler(config['uuid'])
         bus_publisher = Publisher(bus_producer, bus_marshaler)
         return cls(bus_publisher)

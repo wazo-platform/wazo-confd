@@ -15,12 +15,7 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import (
-    config,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import config, errors as e, fixtures, scenarios as s
 
 
 def test_get_errors():
@@ -72,7 +67,7 @@ def test_get(line):
             device_slot=1,
             provisioning_extension=has_length(6),
             callerid=none(),
-        )
+        ),
     )
 
 
@@ -82,10 +77,7 @@ def test_list(line1, line2):
     response = confd.lines_sip.get()
     assert_that(
         response.items,
-        has_items(
-            has_entry('id', line1['id']),
-            has_entry('id', line2['id']),
-        )
+        has_items(has_entry('id', line1['id']), has_entry('id', line2['id'])),
     )
 
     response = confd.lines_sip.get(search=line1['provisioning_extension'])
@@ -110,7 +102,7 @@ def test_create_line_with_minimal_parameters():
             provisioning_extension=has_length(6),
             secret=not_none(),
             username=not_none(),
-        )
+        ),
     )
 
 
@@ -132,14 +124,16 @@ def test_create_line_with_all_parameters():
             device_slot=2,
             provisioning_extension=u"333222",
             secret=u"secret",
-            username=u"username"
-        )
+            username=u"username",
+        ),
     )
 
 
 @fixtures.line_sip(provisioning_extension="123456")
 def test_create_line_with_provisioning_code_already_taken(line):
-    response = confd.lines_sip.post(context=config.CONTEXT, provisioning_extension="123456")
+    response = confd.lines_sip.post(
+        context=config.CONTEXT, provisioning_extension="123456"
+    )
     response.assert_match(400, re.compile("provisioning_code"))
 
 
@@ -172,8 +166,8 @@ def test_update_all_parameters_on_line(line, context):
             callerid='"Mamàsta Michel" <2000>',
             provisioning_extension='234567',
             secret='newsecret',
-            username='newusername'
-        )
+            username='newusername',
+        ),
     )
 
 

@@ -5,7 +5,6 @@ from xivo_dao.resources.infos import dao as info_dao
 
 
 class InfoService:
-
     def __init__(self, dao):
         self.dao = dao
 

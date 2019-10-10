@@ -5,7 +5,6 @@ from xivo_dao.helpers.db_manager import Session
 
 
 class CRUDService:
-
     def __init__(self, dao, validator, notifier, extra_parameters=None):
         self.dao = dao
         self.validator = validator

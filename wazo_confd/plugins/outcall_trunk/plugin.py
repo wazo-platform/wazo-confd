@@ -9,7 +9,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         service = build_service()
@@ -17,5 +16,5 @@ class Plugin:
         api.add_resource(
             OutcallTrunkList,
             '/outcalls/<int:outcall_id>/trunks',
-            resource_class_args=(service, outcall_dao, trunk_dao)
+            resource_class_args=(service, outcall_dao, trunk_dao),
         )

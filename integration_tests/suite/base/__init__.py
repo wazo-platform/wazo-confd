@@ -37,7 +37,6 @@ class mocks:
 
 
 class SingletonProxy:
-
     def __init__(self, func, *args, **kwargs):
         self.func = func
         self.func_args = args
@@ -56,13 +55,19 @@ class SingletonProxy:
 
 
 confd = SingletonProxy(BaseIntegrationTest.create_confd)
-confd_csv = SingletonProxy(BaseIntegrationTest.create_confd, {'Accept': 'text/csv; charset=utf-8',
-                                                              'X-Auth-Token': 'valid-token-multitenant'})
+confd_csv = SingletonProxy(
+    BaseIntegrationTest.create_confd,
+    {'Accept': 'text/csv; charset=utf-8', 'X-Auth-Token': 'valid-token-multitenant'},
+)
 auth = SingletonProxy(BaseIntegrationTest.create_auth)
 ari = SingletonProxy(BaseIntegrationTest.create_ari)
 provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)
 sysconfd = SingletonProxy(BaseIntegrationTest.create_sysconfd)
 
-wazo_sound = SingletonProxy(BaseIntegrationTest.create_tenant_filesystem, '/var/lib/wazo/sounds')
-asterisk_sound = SingletonProxy(BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds')
+wazo_sound = SingletonProxy(
+    BaseIntegrationTest.create_tenant_filesystem, '/var/lib/wazo/sounds'
+)
+asterisk_sound = SingletonProxy(
+    BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds'
+)

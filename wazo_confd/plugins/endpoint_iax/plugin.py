@@ -6,7 +6,6 @@ from .service import build_service
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
 
@@ -16,10 +15,6 @@ class Plugin:
             IAXItem,
             '/endpoints/iax/<int:id>',
             endpoint='endpoint_iax',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )
-        api.add_resource(
-            IAXList,
-            '/endpoints/iax',
-            resource_class_args=(service,)
-        )
+        api.add_resource(IAXList, '/endpoints/iax', resource_class_args=(service,))

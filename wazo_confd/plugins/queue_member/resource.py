@@ -124,10 +124,14 @@ class QueueMemberAgentListLegacy(ConfdResource):
         self.agent_dao = agent_dao
 
     def build_headers(self, member):
-        return {'Location': url_for('queue_member_agents',
-                                    queue_id=member.queue.id,
-                                    agent_id=member.agent.id,
-                                    _external=True)}
+        return {
+            'Location': url_for(
+                'queue_member_agents',
+                queue_id=member.queue.id,
+                agent_id=member.agent.id,
+                _external=True,
+            )
+        }
 
     @required_acl('confd.queues.{queue_id}.members.agents.create')
     def post(self, queue_id):

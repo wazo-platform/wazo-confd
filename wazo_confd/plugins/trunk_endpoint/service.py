@@ -9,7 +9,6 @@ from .validator import build_validator
 
 
 class TrunkEndpointService:
-
     def __init__(self, endpoint, trunk_dao, endpoint_dao, validator, notifier):
         self.endpoint = endpoint
         self.trunk_dao = trunk_dao
@@ -22,9 +21,11 @@ class TrunkEndpointService:
         if not trunk.is_associated(self.endpoint):
             raise errors.not_found('TrunkEndpoint', trunk_id=trunk_id)
 
-        return {'trunk_id': trunk.id,
-                'endpoint': trunk.endpoint,
-                'endpoint_id': trunk.endpoint_id}
+        return {
+            'trunk_id': trunk.id,
+            'endpoint': trunk.endpoint,
+            'endpoint_id': trunk.endpoint_id,
+        }
 
     def get_association_from_endpoint(self, endpoint_id):
         endpoint = self.endpoint_dao.get(endpoint_id)
@@ -32,9 +33,11 @@ class TrunkEndpointService:
         if not trunk:
             raise errors.not_found('TrunkEndpoint', endpoint_id=endpoint_id)
 
-        return {'trunk_id': trunk.id,
-                'endpoint': trunk.endpoint,
-                'endpoint_id': trunk.endpoint_id}
+        return {
+            'trunk_id': trunk.id,
+            'endpoint': trunk.endpoint,
+            'endpoint_id': trunk.endpoint_id,
+        }
 
     def associate(self, trunk, endpoint):
         if trunk.is_associated_with(endpoint):
@@ -56,8 +59,10 @@ class TrunkEndpointService:
 
 
 def build_service(endpoint, endpoint_dao):
-    return TrunkEndpointService(endpoint,
-                                trunk_dao_module,
-                                endpoint_dao,
-                                build_validator(endpoint),
-                                build_notifier(endpoint))
+    return TrunkEndpointService(
+        endpoint,
+        trunk_dao_module,
+        endpoint_dao,
+        build_validator(endpoint),
+        build_notifier(endpoint),
+    )

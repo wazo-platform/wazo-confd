@@ -20,10 +20,9 @@ class SoundCategory:
             self.files.append(new_file)
 
     def __str__(self):
-        return ('SoundCategory(tenant_uuid={tenant_uuid}, name={name}, files=<{file_count}>)'
-                .format(tenant_uuid=self.tenant_uuid,
-                        name=self.name,
-                        file_count=len(self.files)))
+        return 'SoundCategory(tenant_uuid={tenant_uuid}, name={name}, files=<{file_count}>)'.format(
+            tenant_uuid=self.tenant_uuid, name=self.name, file_count=len(self.files)
+        )
 
 
 class SoundFile:
@@ -55,12 +54,18 @@ class SoundFormat:
 
     has_tenant_uuid = True
 
-    extension_map = {
-        'wav': 'slin',
-    }
+    extension_map = {'wav': 'slin'}
     format_map = {v: k for k, v in extension_map.items()}
 
-    def __init__(self, format_=None, language=None, text=None, path=None, extension=None, tenant_uuid=None):
+    def __init__(
+        self,
+        format_=None,
+        language=None,
+        text=None,
+        path=None,
+        extension=None,
+        tenant_uuid=None,
+    ):
         if format_ is not None:
             self.format = format_
         else:
@@ -71,10 +76,12 @@ class SoundFormat:
         self.tenant_uuid = tenant_uuid
 
     def __eq__(self, other):
-        return (self.format == other.format
-                and self.language == other.language
-                and self.text == other.text
-                and self.path == other.path)
+        return (
+            self.format == other.format
+            and self.language == other.language
+            and self.text == other.text
+            and self.path == other.path
+        )
 
     @property
     def extension(self):

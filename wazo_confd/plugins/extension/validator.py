@@ -4,9 +4,7 @@
 import re
 
 from xivo_dao.helpers import errors
-from xivo_dao.helpers.exception import (
-    InputError,
-)
+from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.context import dao as context_dao_module
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.line_extension import dao as line_extension_dao_module
@@ -24,7 +22,6 @@ from wazo_confd.helpers.validator import (
 
 
 class ExtenAvailableValidator(Validator):
-
     def __init__(self, dao, dao_parking_lot):
         self.dao = dao
         self.parking_lot_dao = dao_parking_lot
@@ -35,36 +32,37 @@ class ExtenAvailableValidator(Validator):
 
         parking_lots = self.parking_lot_dao.find_all_by()
         for parking_lot in parking_lots:
-            if parking_lot.extensions and parking_lot.extensions[0].context == extension.context:
+            if (
+                parking_lot.extensions
+                and parking_lot.extensions[0].context == extension.context
+            ):
                 if parking_lot.in_slots_range(extension.exten):
-                    raise errors.resource_exists('ParkingLot',
-                                                 id=parking_lot.id,
-                                                 slots_start=parking_lot.slots_start,
-                                                 slots_end=parking_lot.slots_end)
+                    raise errors.resource_exists(
+                        'ParkingLot',
+                        id=parking_lot.id,
+                        slots_start=parking_lot.slots_start,
+                        slots_end=parking_lot.slots_end,
+                    )
 
 
 class ExtenAvailableOnCreateValidator(ExtenAvailableValidator):
-
     def validate(self, extension):
-        existing = self.dao.find_by(exten=extension.exten,
-                                    context=extension.context)
+        existing = self.dao.find_by(exten=extension.exten, context=extension.context)
         if existing:
-            raise errors.resource_exists('Extension',
-                                         exten=extension.exten,
-                                         context=extension.context)
+            raise errors.resource_exists(
+                'Extension', exten=extension.exten, context=extension.context
+            )
 
         self._validate_parking_lots(extension)
 
 
 class ExtenAvailableOnUpdateValidator(ExtenAvailableValidator):
-
     def validate(self, extension):
-        existing = self.dao.find_by(exten=extension.exten,
-                                    context=extension.context)
+        existing = self.dao.find_by(exten=extension.exten, context=extension.context)
         if existing and existing.id != extension.id:
-            raise errors.resource_exists('Extension',
-                                         exten=extension.exten,
-                                         context=extension.context)
+            raise errors.resource_exists(
+                'Extension', exten=extension.exten, context=extension.context
+            )
 
         self._validate_parking_lots(extension)
 
@@ -91,7 +89,6 @@ class ExtenRegexValidator(Validator):
 
 
 class SameTenantValidator(Validator):
-
     def __init__(self, context_dao):
         self._context_dao = context_dao
 
@@ -108,7 +105,6 @@ class SameTenantValidator(Validator):
 
 
 class ContextOnUpdateValidator(Validator):
-
     def __init__(self, dao):
         self.dao = dao
 
@@ -138,7 +134,6 @@ class ContextOnUpdateValidator(Validator):
 
 
 class ExtensionRangeValidator(Validator, BaseExtensionRangeMixin):
-
     def __init__(self, dao):
         self.dao = dao
 
@@ -148,24 +143,33 @@ class ExtensionRangeValidator(Validator, BaseExtensionRangeMixin):
 
         context = self.dao.get_by_name(extension.context)
 
-        if extension.conference and not self._exten_in_range(extension.exten, context.conference_room_ranges):
+        if extension.conference and not self._exten_in_range(
+            extension.exten, context.conference_room_ranges
+        ):
             raise errors.outside_context_range(extension.exten, extension.context)
 
-        if extension.group and not self._exten_in_range(extension.exten, context.group_ranges):
+        if extension.group and not self._exten_in_range(
+            extension.exten, context.group_ranges
+        ):
             raise errors.outside_context_range(extension.exten, extension.context)
 
-        if extension.incall and not self._exten_in_range(extension.exten, context.incall_ranges):
+        if extension.incall and not self._exten_in_range(
+            extension.exten, context.incall_ranges
+        ):
             raise errors.outside_context_range(extension.exten, extension.context)
 
-        if extension.lines and not self._exten_in_range(extension.exten, context.user_ranges):
+        if extension.lines and not self._exten_in_range(
+            extension.exten, context.user_ranges
+        ):
             raise errors.outside_context_range(extension.exten, extension.context)
 
-        if extension.queue and not self._exten_in_range(extension.exten, context.queue_ranges):
+        if extension.queue and not self._exten_in_range(
+            extension.exten, context.queue_ranges
+        ):
             raise errors.outside_context_range(extension.exten, extension.context)
 
 
 class ExtensionAssociationValidator(Validator):
-
     def __init__(self, dao, line_extension_dao):
         self.dao = dao
         self.line_extension_dao = line_extension_dao
@@ -175,36 +179,44 @@ class ExtensionAssociationValidator(Validator):
 
         # extensions that are created or dissociated are set to these values by default
         if extension_type != 'user' and typeval != '0':
-            raise errors.resource_associated('Extension',
-                                             extension_type,
-                                             extension_id=extension.id,
-                                             associated_id=typeval)
+            raise errors.resource_associated(
+                'Extension',
+                extension_type,
+                extension_id=extension.id,
+                associated_id=typeval,
+            )
 
         line_extension = self.line_extension_dao.find_by_extension_id(extension.id)
         if line_extension:
-            raise errors.resource_associated('Extension',
-                                             'Line',
-                                             extension_id=extension.id,
-                                             line_id=line_extension.line_id)
+            raise errors.resource_associated(
+                'Extension',
+                'Line',
+                extension_id=extension.id,
+                line_id=line_extension.line_id,
+            )
 
 
 def build_validator():
     return ValidationGroup(
-        common=[
-            GetResource('context', context_dao_module.get_by_name, 'Context'),
-        ],
+        common=[GetResource('context', context_dao_module.get_by_name, 'Context')],
         create=[
-            ExtenAvailableOnCreateValidator(extension_dao_module, parking_lot_dao_module),
+            ExtenAvailableOnCreateValidator(
+                extension_dao_module, parking_lot_dao_module
+            ),
             ExtenRegexValidator(context_dao_module),
         ],
         edit=[
-            ExtenAvailableOnUpdateValidator(extension_dao_module, parking_lot_dao_module),
+            ExtenAvailableOnUpdateValidator(
+                extension_dao_module, parking_lot_dao_module
+            ),
             ContextOnUpdateValidator(context_dao_module),
             ExtensionRangeValidator(context_dao_module),
             ExtenRegexValidator(context_dao_module),
             SameTenantValidator(context_dao_module),
         ],
         delete=[
-            ExtensionAssociationValidator(extension_dao_module, line_extension_dao_module)
-        ]
+            ExtensionAssociationValidator(
+                extension_dao_module, line_extension_dao_module
+            )
+        ],
     )

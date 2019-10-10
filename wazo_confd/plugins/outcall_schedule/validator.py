@@ -7,7 +7,6 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 
 class OutcallScheduleAssociationValidator(ValidatorAssociation):
-
     def validate(self, outcall, schedule):
         self.validate_same_tenant(outcall, schedule)
         self.validate_outcall_not_already_associated(outcall)
@@ -30,6 +29,4 @@ class OutcallScheduleAssociationValidator(ValidatorAssociation):
 
 
 def build_validator():
-    return ValidationAssociation(
-        association=[OutcallScheduleAssociationValidator()],
-    )
+    return ValidationAssociation(association=[OutcallScheduleAssociationValidator()])

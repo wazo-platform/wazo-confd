@@ -18,8 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class SoundService:
-
-    def __init__(self, ari_client, storage, asterisk_storage, validator, validator_file, notifier):
+    def __init__(
+        self, ari_client, storage, asterisk_storage, validator, validator_file, notifier
+    ):
         self._ari_client = ari_client
         self._storage = storage
         self._asterisk_storage = asterisk_storage
@@ -39,7 +40,9 @@ class SoundService:
         if category == ASTERISK_CATEGORY:
             sound = self._get_asterisk_sound(parameters, with_files)
         else:
-            sound = self._storage.get_directory(tenant_uuid, category, parameters, with_files)
+            sound = self._storage.get_directory(
+                tenant_uuid, category, parameters, with_files
+            )
         return sound
 
     def _get_asterisk_sound(self, parameters, with_files=True):
@@ -47,10 +50,14 @@ class SoundService:
         if with_files:
             if 'file_name' in parameters:
                 try:
-                    ari_sounds = [self._ari_client.get_sound(parameters['file_name'], parameters)]
+                    ari_sounds = [
+                        self._ari_client.get_sound(parameters['file_name'], parameters)
+                    ]
                 except HTTPError as e:
                     if e.response.status_code == 404:
-                        raise errors.not_found('Sound', name='system', file_name=parameters['file_name'])
+                        raise errors.not_found(
+                            'Sound', name='system', file_name=parameters['file_name']
+                        )
                     raise
             else:
                 ari_sounds = self._ari_client.get_sounds()
@@ -87,9 +94,11 @@ class SoundService:
 
 
 def build_service(ari_client):
-    return SoundService(ari_client,
-                        build_storage(),
-                        build_storage(base_path='/usr/share/asterisk/sounds'),
-                        build_validator(),
-                        build_validator_file(),
-                        build_notifier())
+    return SoundService(
+        ari_client,
+        build_storage(),
+        build_storage(base_path='/usr/share/asterisk/sounds'),
+        build_validator(),
+        build_validator_file(),
+        build_notifier(),
+    )

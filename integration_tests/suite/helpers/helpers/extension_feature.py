@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -15,10 +15,12 @@ def generate_extension_feature(**parameters):
 def add_extension_feature(**parameters):
     with db.queries() as queries:
         id = queries.insert_extension_feature(**parameters)
-    return {'id': id,
-            'exten': parameters.get('exten'),
-            'context': 'xivo-features',
-            'feature': parameters.get('feature')}
+    return {
+        'id': id,
+        'exten': parameters.get('exten'),
+        'context': 'xivo-features',
+        'feature': parameters.get('feature'),
+    }
 
 
 def delete_extension_feature(extension_feature_id, check=False):

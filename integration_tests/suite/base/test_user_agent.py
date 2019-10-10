@@ -1,25 +1,11 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    empty,
-    has_entries,
-    not_,
-)
+from hamcrest import assert_that, contains_inanyorder, empty, has_entries, not_
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -65,21 +51,32 @@ def test_associate_using_uuid(agent, user):
 @fixtures.agent(wazo_tenant=MAIN_TENANT)
 @fixtures.agent(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_user, sub_user, main_agent, sub_agent):
-    response = confd.users(main_user['uuid']).agents(sub_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.users(main_user['uuid'])
+        .agents(sub_agent['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('User'))
 
-    response = confd.users(sub_user['uuid']).agents(main_agent['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.users(sub_user['uuid'])
+        .agents(main_agent['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Agent'))
 
-    response = confd.users(main_user['uuid']).agents(sub_agent['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.users(main_user['uuid'])
+        .agents(sub_agent['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
 @fixtures.agent()
 @fixtures.user()
 def test_get_agent_associated_to_user(agent, user):
-    expected = has_entries({'user_id': user['id'],
-                            'agent_id': agent['id']})
+    expected = has_entries({'user_id': user['id'], 'agent_id': agent['id']})
 
     with a.user_agent(user, agent):
         response = confd.users(user['id']).agents.get()
@@ -138,10 +135,10 @@ def test_dissociate_multi_tenant(user, agent):
 def test_get_agent_relation(agent, user):
     with a.user_agent(user, agent):
         response = confd.users(user['id']).get()
-        assert_that(response.item, has_entries(
-            agent=has_entries(id=agent['id'],
-                              number=agent['number'])
-        ))
+        assert_that(
+            response.item,
+            has_entries(agent=has_entries(id=agent['id'], number=agent['number'])),
+        )
 
 
 @fixtures.agent()
@@ -150,20 +147,23 @@ def test_get_agent_relation(agent, user):
 def test_get_users_relation(agent, user1, user2):
     with a.user_agent(user1, agent), a.user_agent(user2, agent):
         response = confd.agents(agent['id']).get()
-        assert_that(response.item, has_entries(
-            users=contains_inanyorder(
-                has_entries(
-                    uuid=user1['uuid'],
-                    firstname=user1['firstname'],
-                    lastname=user1['lastname'],
-                ),
-                has_entries(
-                    uuid=user2['uuid'],
-                    firstname=user2['firstname'],
-                    lastname=user2['lastname'],
-                ),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                users=contains_inanyorder(
+                    has_entries(
+                        uuid=user1['uuid'],
+                        firstname=user1['firstname'],
+                        lastname=user1['lastname'],
+                    ),
+                    has_entries(
+                        uuid=user2['uuid'],
+                        firstname=user2['firstname'],
+                        lastname=user2['lastname'],
+                    ),
+                )
+            ),
+        )
 
 
 @fixtures.agent()

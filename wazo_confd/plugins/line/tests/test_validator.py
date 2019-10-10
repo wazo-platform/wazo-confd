@@ -11,7 +11,6 @@ from wazo_confd.plugins.line.validator import ProvCodeAvailable, ProvCodeChanged
 
 
 class TestProvCodeAvailble(unittest.TestCase):
-
     def setUp(self):
         self.dao = Mock()
         self.validator = ProvCodeAvailable(self.dao)
@@ -33,7 +32,6 @@ class TestProvCodeAvailble(unittest.TestCase):
 
 
 class TestProvCodeChanged(unittest.TestCase):
-
     def setUp(self):
         self.dao = Mock()
         self.validator = ProvCodeChanged(self.dao)
@@ -47,7 +45,9 @@ class TestProvCodeChanged(unittest.TestCase):
         self.dao.get.assert_called_once_with(line.id)
 
     def test_given_code_has_changed_and_is_available_then_validation_passes(self):
-        existing_line = Mock(Line, id=1, provisioning_code="123456", provisioningid=123456)
+        existing_line = Mock(
+            Line, id=1, provisioning_code="123456", provisioningid=123456
+        )
         new_line = Mock(Line, id=1, provisioning_code="234567", provisioningid=234567)
 
         self.dao.get.return_value = existing_line
@@ -61,7 +61,9 @@ class TestProvCodeChanged(unittest.TestCase):
     def test_given_code_has_changed_and_same_code_exists_then_validation_fails(self):
         old_line = Mock(Line, id=1, provisioning_code="123456", provisioningid=123456)
         new_line = Mock(Line, id=1, provisioning_code="234567", provisioningid=234567)
-        existing_line = Mock(Line, id=2, provisioning_code="234567", provisioningid=234567)
+        existing_line = Mock(
+            Line, id=2, provisioning_code="234567", provisioningid=234567
+        )
 
         self.dao.get.return_value = old_line
         self.dao.find_by.return_value = existing_line

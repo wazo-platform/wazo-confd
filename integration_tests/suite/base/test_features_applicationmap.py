@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -28,8 +28,7 @@ def test_get():
 
 
 def test_edit_features_applicationmap():
-    parameters = {'options': {'nat': 'toto',
-                              'username': 'Bob'}}
+    parameters = {'options': {'nat': 'toto', 'username': 'Bob'}}
 
     response = confd.asterisk.features.applicationmap.put(**parameters)
     response.assert_updated()
@@ -49,4 +48,6 @@ def test_edit_features_applicationmap_with_no_option():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.features.applicationmap
-    yield s.check_bus_event, 'config.features_applicationmap.edited', url.put, {'options': {}}
+    yield s.check_bus_event, 'config.features_applicationmap.edited', url.put, {
+        'options': {}
+    }

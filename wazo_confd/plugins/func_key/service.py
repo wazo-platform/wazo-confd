@@ -24,14 +24,17 @@ class TemplateService:
         'user',
     )
 
-    SERVICE_BLFS = (
-        'callrecord',
-        'enablednd',
-        'enablevm',
-        'incallfilter',
-    )
+    SERVICE_BLFS = ('callrecord', 'enablednd', 'enablevm', 'incallfilter')
 
-    def __init__(self, template_dao, user_dao, validator, validator_bsfilter, notifier, device_updater):
+    def __init__(
+        self,
+        template_dao,
+        user_dao,
+        validator,
+        validator_bsfilter,
+        notifier,
+        device_updater,
+    ):
         self.template_dao = template_dao
         self.user_dao = user_dao
         self.validator = validator
@@ -110,16 +113,17 @@ class TemplateService:
 def build_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
-    return TemplateService(template_dao_module,
-                           user_dao_module,
-                           build_validator(),
-                           build_validator_bsfilter(),
-                           build_notifier(),
-                           device_updater)
+    return TemplateService(
+        template_dao_module,
+        user_dao_module,
+        build_validator(),
+        build_validator_bsfilter(),
+        build_notifier(),
+        device_updater,
+    )
 
 
 class UserFuncKeyTemplateService:
-
     def __init__(self, user_dao, validator, notifier, device_updater):
         self.user_dao = user_dao
         self.validator = validator
@@ -135,8 +139,10 @@ class UserFuncKeyTemplateService:
 
     def associate(self, user, template):
         if template.private:
-            raise errors.not_permitted("Cannot associate a private template with a user",
-                                       template_id=template.id)
+            raise errors.not_permitted(
+                "Cannot associate a private template with a user",
+                template_id=template.id,
+            )
 
         user.func_key_template_id = template.id
         self.user_dao.edit(user)
@@ -154,7 +160,6 @@ class UserFuncKeyTemplateService:
 def build_user_funckey_template_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
-    return UserFuncKeyTemplateService(user_dao_module,
-                                      build_validator(),
-                                      build_notifier(),
-                                      device_updater)
+    return UserFuncKeyTemplateService(
+        user_dao_module, build_validator(), build_notifier(), device_updater
+    )

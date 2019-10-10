@@ -25,7 +25,9 @@ class QueueGeneralSchema(BaseSchema):
     def convert_options_to_collection(self, data):
         options = data.get('options')
         if isinstance(options, dict):
-            data['options'] = [{'key': key, 'value': value} for key, value in options.items()]
+            data['options'] = [
+                {'key': key, 'value': value} for key, value in options.items()
+            ]
         return data
 
     @post_dump

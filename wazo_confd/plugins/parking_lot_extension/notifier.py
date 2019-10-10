@@ -10,16 +10,12 @@ from wazo_confd import bus, sysconfd
 
 
 class ParkingLotExtensionNotifier:
-
     def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['module reload res_parking.so'],
-            'agentbus': [],
-        }
+        handlers = {'ipbx': ['module reload res_parking.so'], 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, parking_lot, extension):

@@ -1,25 +1,11 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    empty,
-    has_entries,
-    none,
-)
+from hamcrest import assert_that, contains, empty, has_entries, none
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -67,13 +53,16 @@ def test_associate_multiple(outcall, trunk1, trunk2, trunk3):
     response.assert_updated()
 
     response = confd.outcalls(outcall['id']).get()
-    assert_that(response.item, has_entries(
-        trunks=contains(
-            has_entries(id=trunk2['id']),
-            has_entries(id=trunk3['id']),
-            has_entries(id=trunk1['id']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            trunks=contains(
+                has_entries(id=trunk2['id']),
+                has_entries(id=trunk3['id']),
+                has_entries(id=trunk1['id']),
+            )
+        ),
+    )
 
 
 @fixtures.outcall()
@@ -90,12 +79,19 @@ def test_associate_same_trunk(outcall, trunk):
 def test_get_trunks_associated_to_outcall(outcall, trunk1, trunk2):
     with a.outcall_trunk(outcall, trunk2, trunk1):
         response = confd.outcalls(outcall['id']).get()
-        assert_that(response.item, has_entries(
-            trunks=contains(
-                has_entries(id=trunk2['id'], endpoint_sip=none(), endpoint_custom=none()),
-                has_entries(id=trunk1['id'], endpoint_sip=none(), endpoint_custom=none()),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                trunks=contains(
+                    has_entries(
+                        id=trunk2['id'], endpoint_sip=none(), endpoint_custom=none()
+                    ),
+                    has_entries(
+                        id=trunk1['id'], endpoint_sip=none(), endpoint_custom=none()
+                    ),
+                )
+            ),
+        )
 
 
 @fixtures.outcall()
@@ -104,12 +100,15 @@ def test_get_trunks_associated_to_outcall(outcall, trunk1, trunk2):
 def test_get_outcalls_associated_to_trunk(outcall1, outcall2, trunk):
     with a.outcall_trunk(outcall2, trunk), a.outcall_trunk(outcall1, trunk):
         response = confd.trunks(trunk['id']).get()
-        assert_that(response.item, has_entries(
-            outcalls=contains(
-                has_entries(id=outcall2['id'], name=outcall2['name']),
-                has_entries(id=outcall1['id'], name=outcall1['name']),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                outcalls=contains(
+                    has_entries(id=outcall2['id'], name=outcall2['name']),
+                    has_entries(id=outcall1['id'], name=outcall1['name']),
+                )
+            ),
+        )
 
 
 @fixtures.outcall(wazo_tenant=MAIN_TENANT)
@@ -118,20 +117,17 @@ def test_get_outcalls_associated_to_trunk(outcall1, outcall2, trunk):
 @fixtures.trunk(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_outcall, sub_outcall, main_trunk, sub_trunk):
     response = confd.outcalls(main_outcall['id']).trunks.put(
-        trunks=[{'id': main_trunk['id']}],
-        wazo_tenant=SUB_TENANT,
+        trunks=[{'id': main_trunk['id']}], wazo_tenant=SUB_TENANT
     )
     response.assert_match(404, e.not_found('Outcall'))
 
     response = confd.outcalls(sub_outcall['id']).trunks.put(
-        trunks=[{'id': main_trunk['id']}],
-        wazo_tenant=SUB_TENANT,
+        trunks=[{'id': main_trunk['id']}], wazo_tenant=SUB_TENANT
     )
     response.assert_match(400, e.not_found('Trunk'))
 
     response = confd.outcalls(main_outcall['id']).trunks.put(
-        trunks=[{'id': sub_trunk['id']}],
-        wazo_tenant=MAIN_TENANT,
+        trunks=[{'id': sub_trunk['id']}], wazo_tenant=MAIN_TENANT
     )
     response.assert_match(400, e.different_tenant())
 
@@ -166,7 +162,9 @@ def test_delete_outcall_when_outcall_and_trunk_associated(outcall, trunk1, trunk
 @fixtures.outcall()
 @fixtures.trunk()
 def test_delete_trunk_when_outcall_and_trunk_associated(outcall1, outcall2, trunk):
-    with a.outcall_trunk(outcall1, trunk, check=False), a.outcall_trunk(outcall2, trunk, check=False):
+    with a.outcall_trunk(outcall1, trunk, check=False), a.outcall_trunk(
+        outcall2, trunk, check=False
+    ):
         confd.trunks(trunk['id']).delete().assert_deleted()
 
         deleted_trunk = confd.trunks(trunk['id']).get

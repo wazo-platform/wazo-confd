@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 class Controller:
-
     def __init__(self, config):
         self.config = config
         self._service_discovery_args = [
@@ -44,7 +43,7 @@ class Controller:
                 'api': api,
                 'config': config,
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
-            }
+            },
         )
 
     def run(self):

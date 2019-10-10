@@ -14,5 +14,4 @@ class ConfBridgeConfigurationService(AsteriskConfigurationService):
 
 
 def build_service():
-    return ConfBridgeConfigurationService(asterisk_file_dao,
-                                          build_notifier())
+    return ConfBridgeConfigurationService(asterisk_file_dao, build_notifier())

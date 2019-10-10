@@ -8,12 +8,11 @@ from .resource import UserLineAssociatedEndpointSipItem
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
 
         api.add_resource(
             UserLineAssociatedEndpointSipItem,
             '/users/<uuid:user_uuid>/lines/<line_id>/associated/endpoints/sip',
-            resource_class_args=(user_dao, line_dao)
+            resource_class_args=(user_dao, line_dao),
         )

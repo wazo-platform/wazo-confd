@@ -8,7 +8,6 @@ from .validator import build_validator
 
 
 class GroupFallbackService:
-
     def __init__(self, notifier, validator):
         self.validator = validator
         self.notifier = notifier
@@ -21,5 +20,4 @@ class GroupFallbackService:
 
 
 def build_service():
-    return GroupFallbackService(build_notifier(),
-                                build_validator())
+    return GroupFallbackService(build_notifier(), build_validator())

@@ -9,7 +9,6 @@ from .service import ProvisioningNetworkingService
 
 
 class Plugin:
-
     def load(self, dependencies):
         api = dependencies['api']
         notifier = ProvisioningNetworkingNotifier(bus, sysconfd)
@@ -18,5 +17,5 @@ class Plugin:
         api.add_resource(
             ProvisioningNetworkingResource,
             '/provisioning/networking',
-            resource_class_args=(service,)
+            resource_class_args=(service,),
         )

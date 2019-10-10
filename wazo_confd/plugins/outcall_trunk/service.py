@@ -6,7 +6,6 @@ from .validator import build_validator
 
 
 class OutcallTrunkService:
-
     def __init__(self, notifier, validator):
         self.notifier = notifier
         self.validator = validator
@@ -18,5 +17,4 @@ class OutcallTrunkService:
 
 
 def build_service():
-    return OutcallTrunkService(build_notifier(),
-                               build_validator())
+    return OutcallTrunkService(build_notifier(), build_validator())

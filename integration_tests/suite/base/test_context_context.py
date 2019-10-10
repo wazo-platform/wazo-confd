@@ -1,19 +1,10 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    empty,
-    has_entries,
-)
+from hamcrest import assert_that, contains, empty, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import associations as a, fixtures, scenarios as s
 
 FAKE_ID = 999999999
 
@@ -62,13 +53,16 @@ def test_associate_multiple(context, sub_context1, sub_context2, sub_context3):
     response.assert_updated()
 
     response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(
-        contexts=contains(
-            has_entries(id=sub_context2['id']),
-            has_entries(id=sub_context3['id']),
-            has_entries(id=sub_context1['id']),
-        )
-    ))
+    assert_that(
+        response.item,
+        has_entries(
+            contexts=contains(
+                has_entries(id=sub_context2['id']),
+                has_entries(id=sub_context3['id']),
+                has_entries(id=sub_context1['id']),
+            )
+        ),
+    )
 
 
 @fixtures.context()
@@ -92,20 +86,23 @@ def test_associate_same_context(context):
 def test_get_contexts_associated_to_context(context, sub_context1, sub_context2):
     with a.context_context(context, sub_context2, sub_context1):
         response = confd.contexts(context['id']).get()
-        assert_that(response.item, has_entries(
-            contexts=contains(
-                has_entries(
-                    id=sub_context2['id'],
-                    name=sub_context2['name'],
-                    label=sub_context2['label'],
-                ),
-                has_entries(
-                    id=sub_context1['id'],
-                    name=sub_context1['name'],
-                    label=sub_context1['label'],
-                ),
-            )
-        ))
+        assert_that(
+            response.item,
+            has_entries(
+                contexts=contains(
+                    has_entries(
+                        id=sub_context2['id'],
+                        name=sub_context2['name'],
+                        label=sub_context2['label'],
+                    ),
+                    has_entries(
+                        id=sub_context1['id'],
+                        name=sub_context1['name'],
+                        label=sub_context1['label'],
+                    ),
+                )
+            ),
+        )
 
 
 @fixtures.context()
@@ -120,7 +117,9 @@ def test_dissociate(context, sub_context1, sub_context2):
 @fixtures.context()
 @fixtures.context()
 @fixtures.context()
-def test_delete_context_when_context_and_sub_context_associated(context, sub_context1, sub_context2):
+def test_delete_context_when_context_and_sub_context_associated(
+    context, sub_context1, sub_context2
+):
     with a.context_context(context, sub_context1, sub_context2, check=False):
         confd.contexts(context['id']).delete().assert_deleted()
 
@@ -131,8 +130,12 @@ def test_delete_context_when_context_and_sub_context_associated(context, sub_con
 @fixtures.context()
 @fixtures.context()
 @fixtures.context()
-def test_delete_sub_context_when_context_and_sub_context_associated(context1, context2, sub_context):
-    with a.context_context(context1, sub_context, check=False), a.context_context(context2, sub_context, check=False):
+def test_delete_sub_context_when_context_and_sub_context_associated(
+    context1, context2, sub_context
+):
+    with a.context_context(context1, sub_context, check=False), a.context_context(
+        context2, sub_context, check=False
+    ):
         confd.contexts(sub_context['id']).delete().assert_deleted()
 
         deleted_sub_context = confd.contexts(sub_context['id']).get

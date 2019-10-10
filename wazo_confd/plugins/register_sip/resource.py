@@ -14,7 +14,8 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-REGISTER_REGEX = re.compile(r'''^
+REGISTER_REGEX = re.compile(
+    r'''^
                             (?:(?P<transport>.*)://)?
                             (?P<sip_username>[^:/]*)
                             (?::(?P<auth_password>[^:/]*))?
@@ -24,7 +25,9 @@ REGISTER_REGEX = re.compile(r'''^
                             (?::(?P<remote_port>\d*))?
                             (?:/(?P<callback_extension>[^~]*))?
                             (?:~(?P<expiration>\d*))?
-                            $''', re.VERBOSE)
+                            $''',
+    re.VERBOSE,
+)
 
 INVALID_CHAR = r'^[^:/ ]*$'
 INVALID_REMOTE_HOST = r'^[^:/~ ]*$'
@@ -33,13 +36,17 @@ INVALID_CALLBACK_EXTENSION = r'^[^~ ]*$'
 
 class RegisterSIPSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    transport = fields.String(validate=OneOf(['udp', 'tcp', 'tls', 'ws', 'wss']), allow_none=True)
+    transport = fields.String(
+        validate=OneOf(['udp', 'tcp', 'tls', 'ws', 'wss']), allow_none=True
+    )
     sip_username = fields.String(validate=Regexp(INVALID_CHAR), required=True)
     auth_username = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     auth_password = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     remote_host = fields.String(validate=Regexp(INVALID_REMOTE_HOST), required=True)
     remote_port = fields.Integer(validate=Range(min=0, max=65535), allow_none=True)
-    callback_extension = fields.String(validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True)
+    callback_extension = fields.String(
+        validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True
+    )
     expiration = fields.Integer(validate=Range(min=0), allow_none=True)
     enabled = StrictBoolean(missing=True)
     links = ListLink(Link('register_sip'))
@@ -49,27 +56,45 @@ class RegisterSIPSchema(BaseSchema):
     @validates_schema
     def validate_auth_username(self, data):
         if data.get('auth_username') and not data.get('auth_password'):
-            raise ValidationError('Cannot set field "auth_username" if the field "auth_password" is not set',
-                                  'auth_username')
+            raise ValidationError(
+                'Cannot set field "auth_username" if the field "auth_password" is not set',
+                'auth_username',
+            )
 
     @validates_schema
     def validate_total_length(self, data):
         if len(self.convert_to_chansip(data)['var_val']) > 255:
-            raise ValidationError('The sum of all fields is longer than maximum length 255')
+            raise ValidationError(
+                'The sum of all fields is longer than maximum length 255'
+            )
 
     @post_load
     def convert_to_chansip(self, data):
-        chansip_fmt = '{transport}{sip_username}{auth_password}{auth_username}'\
-                      '@{remote_host}{remote_port}{callback_extension}{expiration}'
+        chansip_fmt = (
+            '{transport}{sip_username}{auth_password}{auth_username}'
+            '@{remote_host}{remote_port}{callback_extension}{expiration}'
+        )
         data['var_val'] = chansip_fmt.format(
-            transport='{}://'.format(data.get('transport')) if data.get('transport') else '',
+            transport='{}://'.format(data.get('transport'))
+            if data.get('transport')
+            else '',
             sip_username=data.get('sip_username'),
-            auth_password=':{}'.format(data.get('auth_password')) if data.get('auth_password') else '',
-            auth_username=':{}'.format(data.get('auth_username')) if data.get('auth_username') else '',
+            auth_password=':{}'.format(data.get('auth_password'))
+            if data.get('auth_password')
+            else '',
+            auth_username=':{}'.format(data.get('auth_username'))
+            if data.get('auth_username')
+            else '',
             remote_host=data.get('remote_host'),
-            remote_port=':{}'.format(data.get('remote_port')) if data.get('remote_port') else '',
-            callback_extension='/{}'.format(data.get('callback_extension')) if data.get('callback_extension') else '',
-            expiration='~{}'.format(data.get('expiration')) if data.get('expiration') else '',
+            remote_port=':{}'.format(data.get('remote_port'))
+            if data.get('remote_port')
+            else '',
+            callback_extension='/{}'.format(data.get('callback_extension'))
+            if data.get('callback_extension')
+            else '',
+            expiration='~{}'.format(data.get('expiration'))
+            if data.get('expiration')
+            else '',
         )
         return data
 
@@ -94,11 +119,13 @@ class RegisterSIPList(ListResource):
     @required_acl('confd.registers.create')
     def post(self):
         form = self.schema().load(request.get_json())
-        model = self.model(filename='sip.conf',
-                           category='general',
-                           var_name='register',
-                           var_val=form['var_val'],
-                           enabled=form['enabled'])
+        model = self.model(
+            filename='sip.conf',
+            category='general',
+            var_name='register',
+            var_val=form['var_val'],
+            enabled=form['enabled'],
+        )
         model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 

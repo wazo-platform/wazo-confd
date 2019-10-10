@@ -1,27 +1,16 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-    has_entry,
-    has_item,
-    is_not,
-)
+from hamcrest import assert_that, contains, has_entries, has_entry, has_item, is_not
 
 from . import confd
-from ..helpers import (
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import fixtures, scenarios as s
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
 
 
 invalid_template_destinations = [
     {'type': 'agent'},
     {'type': 'agent', 'agent_id': 1234},
-
     {'type': 'bsfilter'},
     {'type': 'bsfilter', 'filter_member_id': 1234},
 ]
@@ -39,7 +28,9 @@ def test_post_errors():
 
     regex = r'keys.*1.*destination.*type'
     for destination in invalid_template_destinations:
-        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {'1': {'destination': destination}}, regex
+        yield s.check_bogus_field_returns_error_matching_regex, url, 'keys', {
+            '1': {'destination': destination}
+        }, regex
 
 
 @fixtures.funckey_template()
@@ -89,12 +80,24 @@ def test_funckey_template_sorting(funckey_template1, funckey_template2):
 
 def check_funckey_template_sorting(funckey_template1, funckey_template2, field, search):
     response = confd.funckeys.templates.get(search=search, order=field, direction='asc')
-    assert_that(response.items, contains(has_entries(id=funckey_template1['id']),
-                                         has_entries(id=funckey_template2['id'])))
+    assert_that(
+        response.items,
+        contains(
+            has_entries(id=funckey_template1['id']),
+            has_entries(id=funckey_template2['id']),
+        ),
+    )
 
-    response = confd.funckeys.templates.get(search=search, order=field, direction='desc')
-    assert_that(response.items, contains(has_entries(id=funckey_template2['id']),
-                                         has_entries(id=funckey_template1['id'])))
+    response = confd.funckeys.templates.get(
+        search=search, order=field, direction='desc'
+    )
+    assert_that(
+        response.items,
+        contains(
+            has_entries(id=funckey_template2['id']),
+            has_entries(id=funckey_template1['id']),
+        ),
+    )
 
 
 @fixtures.funckey_template(name='template')
@@ -103,7 +106,9 @@ def test_get(funckey_template):
     assert_that(response.item, has_entries(name='template'))
 
 
-@fixtures.funckey_template(keys={'3': {'destination': {'type': 'custom', 'exten': '123'}}})
+@fixtures.funckey_template(
+    keys={'3': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
 def test_get_position(funckey_template):
     response = confd.funckeys.templates(funckey_template['id'])(3).get()
     assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
@@ -117,7 +122,9 @@ def test_delete(funckey_template):
     s.check_resource_not_found(url_get, 'FuncKeyTemplate')
 
 
-@fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}})
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
 def test_delete_position(funckey_template):
     response = confd.funckeys.templates(funckey_template['id'])(1).delete()
     response.assert_deleted()
@@ -129,20 +136,25 @@ def test_create_funckey_template_minimal_parameters():
     response = confd.funckeys.templates.post()
     response.assert_created('templates')
 
-    assert_that(response.item, has_entries(keys={},
-                                           name=None))
+    assert_that(response.item, has_entries(keys={}, name=None))
 
 
 def test_post_error_on_duplicate_destination():
-    parameters = {'name': 'duplicate_dest',
-                  'keys': {'1': {'destination': {'type': 'custom', 'exten': '123'}},
-                           '2': {'destination': {'type': 'custom', 'exten': '123'}}}}
+    parameters = {
+        'name': 'duplicate_dest',
+        'keys': {
+            '1': {'destination': {'type': 'custom', 'exten': '123'}},
+            '2': {'destination': {'type': 'custom', 'exten': '123'}},
+        },
+    }
 
     response = confd.funckeys.templates.post(**parameters)
     response.assert_status(400)
 
 
-@fixtures.funckey_template(keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}})
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
 def test_put_error_on_duplicate_destination(funckey_template):
     destination = {'destination': {'type': 'custom', 'exten': '123'}}
 

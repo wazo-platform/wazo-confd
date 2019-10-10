@@ -9,7 +9,6 @@ from .validator import build_validator
 
 
 class AgentMemberService:
-
     def __init__(self, agent_dao, skill_dao, validator, notifier):
         self.agent_dao = agent_dao
         self.skill_dao = skill_dao
@@ -40,8 +39,5 @@ class AgentMemberService:
 
 def build_service():
     return AgentMemberService(
-        agent_dao_module,
-        skill_dao_module,
-        build_validator(),
-        build_notifier(),
+        agent_dao_module, skill_dao_module, build_validator(), build_notifier()
     )

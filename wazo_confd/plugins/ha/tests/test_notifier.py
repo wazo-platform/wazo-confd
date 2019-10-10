@@ -4,15 +4,12 @@
 import unittest
 
 from mock import Mock
-from xivo_bus.resources.ha.event import (
-    EditHAEvent,
-)
+from xivo_bus.resources.ha.event import EditHAEvent
 
 from ..notifier import HANotifier
 
 
 class TestHANotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -20,8 +17,7 @@ class TestHANotifier(unittest.TestCase):
 
     def test_when_high_availability_edited_then_event_sent_on_bus(self):
         expected_event = EditHAEvent()
-        ha = {'node_type': 'disabled',
-              'remote_address': 'slave.example.com'}
+        ha = {'node_type': 'disabled', 'remote_address': 'slave.example.com'}
 
         self.notifier.edited(ha)
 

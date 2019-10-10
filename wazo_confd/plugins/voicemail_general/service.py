@@ -7,7 +7,6 @@ from .notifier import build_notifier
 
 
 class VoicemailGeneralService:
-
     def __init__(self, dao, notifier):
         self.dao = dao
         self.notifier = notifier
@@ -21,5 +20,4 @@ class VoicemailGeneralService:
 
 
 def build_service():
-    return VoicemailGeneralService(voicemail_general_dao,
-                                   build_notifier())
+    return VoicemailGeneralService(voicemail_general_dao, build_notifier())

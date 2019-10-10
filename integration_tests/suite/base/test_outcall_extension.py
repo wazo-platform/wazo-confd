@@ -1,25 +1,11 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-)
+from hamcrest import assert_that, contains, has_entries
 
 from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    OUTCALL_CONTEXT,
-    CONTEXT,
-    MAIN_TENANT,
-    SUB_TENANT,
-)
+from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers.config import OUTCALL_CONTEXT, CONTEXT, MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -81,10 +67,12 @@ def test_associate(outcall, extension):
 @fixtures.outcall()
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_associate_with_all_parameters(outcall, extension):
-    parameters = {'caller_id': 'CallerID',
-                  'external_prefix': '418',
-                  'prefix': '514',
-                  'strip_digits': 5}
+    parameters = {
+        'caller_id': 'CallerID',
+        'external_prefix': '418',
+        'prefix': '514',
+        'strip_digits': 5,
+    }
     response = confd.outcalls(outcall['id']).extensions(extension['id']).put(parameters)
     response.assert_updated()
 
@@ -93,7 +81,9 @@ def test_associate_with_all_parameters(outcall, extension):
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_associate_already_associated(outcall, extension):
     with a.outcall_extension(outcall, extension):
-        response = confd.outcalls(outcall['id']).extensions(extension['id']).put(prefix='123')
+        response = (
+            confd.outcalls(outcall['id']).extensions(extension['id']).put(prefix='123')
+        )
         response.assert_updated()
 
 
@@ -137,14 +127,28 @@ def test_associate_when_not_outcall_context(outcall, extension):
 @fixtures.context(wazo_tenant=SUB_TENANT, type='outcall', name='sub-outcall')
 @fixtures.extension(context='sub-outcall')
 @fixtures.extension(context=OUTCALL_CONTEXT)
-def test_associate_multi_tenant(main_outcall, sub_outcall, sub_ctx, sub_exten, main_exten):
-    response = confd.outcalls(sub_outcall['id']).extensions(main_exten['id']).put(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(
+    main_outcall, sub_outcall, sub_ctx, sub_exten, main_exten
+):
+    response = (
+        confd.outcalls(sub_outcall['id'])
+        .extensions(main_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.outcalls(main_outcall['id']).extensions(sub_exten['id']).put(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.outcalls(main_outcall['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Outcall'))
 
-    response = confd.outcalls(main_outcall['id']).extensions(sub_exten['id']).put(wazo_tenant=MAIN_TENANT)
+    response = (
+        confd.outcalls(main_outcall['id'])
+        .extensions(sub_exten['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
     response.assert_match(400, e.different_tenant())
 
 
@@ -153,11 +157,21 @@ def test_associate_multi_tenant(main_outcall, sub_outcall, sub_ctx, sub_exten, m
 @fixtures.context(wazo_tenant=SUB_TENANT, type='outcall', name='sub-outcall')
 @fixtures.extension(context='sub-outcall')
 @fixtures.extension(context=OUTCALL_CONTEXT)
-def test_dissociate_multi_tenant(main_outcall, sub_outcall, sub_ctx, sub_exten, main_exten):
-    response = confd.outcalls(sub_outcall['id']).extensions(main_exten['id']).delete(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(
+    main_outcall, sub_outcall, sub_ctx, sub_exten, main_exten
+):
+    response = (
+        confd.outcalls(sub_outcall['id'])
+        .extensions(main_exten['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.outcalls(main_outcall['id']).extensions(sub_exten['id']).delete(wazo_tenant=SUB_TENANT)
+    response = (
+        confd.outcalls(main_outcall['id'])
+        .extensions(sub_exten['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
     response.assert_match(404, e.not_found('Outcall'))
 
 
@@ -179,8 +193,14 @@ def test_dissociate_not_associated(outcall, extension):
 @fixtures.outcall()
 @fixtures.extension(context=OUTCALL_CONTEXT)
 def test_get_outcall_relations(outcall, extension):
-    with a.outcall_extension(outcall, extension,
-                             external_prefix='123', prefix='456', strip_digits=2, caller_id='toto'):
+    with a.outcall_extension(
+        outcall,
+        extension,
+        external_prefix='123',
+        prefix='456',
+        strip_digits=2,
+        caller_id='toto',
+    ):
         response = confd.outcalls(outcall['id']).get()
         assert_that(
             response.item,
@@ -193,10 +213,10 @@ def test_get_outcall_relations(outcall, extension):
                         external_prefix='123',
                         prefix='456',
                         strip_digits=2,
-                        caller_id='toto'
+                        caller_id='toto',
                     )
                 )
-            )
+            ),
         )
 
 
@@ -207,9 +227,7 @@ def test_get_extension_relations(outcall, extension):
         response = confd.extensions(extension['id']).get()
         assert_that(
             response.item,
-            has_entries(
-                outcall=has_entries(id=outcall['id'], name=outcall['name'])
-            )
+            has_entries(outcall=has_entries(id=outcall['id'], name=outcall['name'])),
         )
 
 

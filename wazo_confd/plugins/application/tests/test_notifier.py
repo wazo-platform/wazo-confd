@@ -14,7 +14,6 @@ from ..notifier import ApplicationNotifier
 
 
 class TestApplicationNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.application = Mock(

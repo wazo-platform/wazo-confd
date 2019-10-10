@@ -14,14 +14,10 @@ from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 
 from ..notifier import GroupExtensionNotifier
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
 
 
 class TestGroupExtensionNotifier(unittest.TestCase):
-
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
@@ -43,7 +39,9 @@ class TestGroupExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = GroupExtensionDissociatedEvent(self.group.id, self.extension.id)
+        expected_event = GroupExtensionDissociatedEvent(
+            self.group.id, self.extension.id
+        )
 
         self.notifier.dissociated(self.group, self.extension)
 

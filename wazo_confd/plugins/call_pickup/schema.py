@@ -16,28 +16,16 @@ class CallPickupSchema(BaseSchema):
     links = ListLink(Link('callpickups'))
 
     group_interceptors = fields.Nested(
-        'GroupSchema',
-        only=['id', 'name'],
-        many=True,
-        dump_only=True
+        'GroupSchema', only=['id', 'name'], many=True, dump_only=True
     )
     group_targets = fields.Nested(
-        'GroupSchema',
-        only=['id', 'name'],
-        many=True,
-        dump_only=True
+        'GroupSchema', only=['id', 'name'], many=True, dump_only=True
     )
     user_interceptors = fields.Nested(
-        'UserSchema',
-        only=['uuid', 'firstname', 'lastname'],
-        many=True,
-        dump_only=True
+        'UserSchema', only=['uuid', 'firstname', 'lastname'], many=True, dump_only=True
     )
     user_targets = fields.Nested(
-        'UserSchema',
-        only=['uuid', 'firstname', 'lastname'],
-        many=True,
-        dump_only=True
+        'UserSchema', only=['uuid', 'firstname', 'lastname'], many=True, dump_only=True
     )
 
     @post_dump
@@ -53,9 +41,6 @@ class CallPickupSchema(BaseSchema):
                 'users': interceptor_users,
             }
         if not self.only or 'targets' in self.only:
-            data['targets'] = {
-                'groups': target_groups,
-                'users': target_users,
-            }
+            data['targets'] = {'groups': target_groups, 'users': target_users}
 
         return data

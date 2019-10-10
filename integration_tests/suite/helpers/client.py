@@ -30,12 +30,23 @@ logger = logging.getLogger(__name__)
 
 class ConfdClient:
 
-    DEFAULT_HEADERS = {'Accept': 'application/json',
-                       'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in wazo-auth-mock
-                       'Content-Type': 'application/json'}
+    DEFAULT_HEADERS = {
+        'Accept': 'application/json',
+        'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in wazo-auth-mock
+        'Content-Type': 'application/json',
+    }
 
     @classmethod
-    def from_options(cls, host, port, username=None, password=None, https=True, headers=None, encoder=None):
+    def from_options(
+        cls,
+        host,
+        port,
+        username=None,
+        password=None,
+        https=True,
+        headers=None,
+        encoder=None,
+    ):
         url = '{}://{}:{}/1.1'.format('https' if https else 'http', host, port)
         logger.info('CONFD URL: %s', url)
         return cls(url, username, password, headers, encoder)
@@ -53,7 +64,9 @@ class ConfdClient:
         data = self.encode(data)
         self.log_request(method, full_url, parameters, data)
 
-        response = self.session.request(method, full_url, params=parameters, data=data, headers=headers)
+        response = self.session.request(
+            method, full_url, params=parameters, data=data, headers=headers
+        )
         logger.debug('Response - %s %s', response.status_code, response.text)
 
         return Response(response)
@@ -74,7 +87,9 @@ class ConfdClient:
         return self.request('POST', url, **kwargs)
 
     def put(self, url, body, parameters=None, headers=None):
-        return self.request('PUT', url, data=body, parameters=parameters, headers=headers)
+        return self.request(
+            'PUT', url, data=body, parameters=parameters, headers=headers
+        )
 
     def delete(self, url, headers=None):
         return self.request('DELETE', url, headers=headers)
@@ -93,7 +108,6 @@ class ConfdClient:
 
 
 class RestUrlClient(UrlFragment):
-
     def __init__(self, client, fragments, body=None):
         super(RestUrlClient, self).__init__(fragments)
         self.client = client
@@ -164,9 +178,11 @@ class Response:
         self.response = response
 
     def __repr__(self):
-        return '<{} {}\n{}\n>'.format(self.__class__.__name__,
-                                      self.response.status_code,
-                                      pprint.pformat(self.json))
+        return '<{} {}\n{}\n>'.format(
+            self.__class__.__name__,
+            self.response.status_code,
+            pprint.pformat(self.json),
+        )
 
     @property
     def raw(self):
@@ -226,11 +242,15 @@ class Response:
 
     def assert_content_disposition(self, filename):
         headers = {key.lower(): value for key, value in self.response.headers.items()}
-        expected = has_entry('content-disposition', ends_with('filename={}'.format(filename)))
+        expected = has_entry(
+            'content-disposition', ends_with('filename={}'.format(filename))
+        )
         assert_that(headers, expected, 'Content-Disposition header not found')
 
     def assert_link(self, resource):
-        expected = has_entry('links', has_item(has_entry('rel', contains_string(resource))))
+        expected = has_entry(
+            'links', has_item(has_entry('rel', contains_string(resource)))
+        )
         assert_that(self.json, expected, 'Resource link not found')
 
     def assert_updated(self):
@@ -246,6 +266,8 @@ class Response:
         elif hasattr(assertion, 'search'):
             match = assertion.search(self.raw)
             explanation = "regex {} did not match on {}"
-            assert_that(match is not None, explanation.format(assertion.pattern, self.raw))
+            assert_that(
+                match is not None, explanation.format(assertion.pattern, self.raw)
+            )
         else:
             raise AssertionError("Unable to assert on '{}'".format(repr(assertion)))
