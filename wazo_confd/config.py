@@ -18,7 +18,7 @@ DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-confd/config.yml',
     'extra_config_files': '/etc/wazo-confd/conf.d/',
     'log_filename': '/var/log/wazo-confd.log',
-    'pid_filename': '/var/run/wazo-confd/wazo-confd.pid',
+    'pid_filename': '/run/wazo-confd/wazo-confd.pid',
     'rest_api': {
         'profile': None,
         'listen': '0.0.0.0',

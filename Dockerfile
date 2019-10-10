@@ -6,8 +6,8 @@ RUN true && \
     mkdir -p /etc/wazo-confd/conf.d && \
     touch /var/log/wazo-confd.log && \
     chown www-data /var/log/wazo-confd.log && \
-    mkdir -p /var/run/wazo-confd /var/lib/asterisk/moh && \
-    chown www-data /var/run/wazo-confd /var/lib/asterisk/moh && \
+    mkdir -p /run/wazo-confd /var/lib/asterisk/moh && \
+    chown www-data /run/wazo-confd /var/lib/asterisk/moh && \
     true
 
 # Add certificates
