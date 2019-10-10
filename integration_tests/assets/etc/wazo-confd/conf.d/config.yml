@@ -16,7 +16,7 @@ log_level: info
 log_filename: /var/log/wazo-confd.log
 
 # PID file.
-pid_filename: /var/run/wazo-confd/wazo-confd.pid
+pid_filename: /run/wazo-confd/wazo-confd.pid
 
 db_uri: postgresql://asterisk:proformatique@postgres/asterisk
 
