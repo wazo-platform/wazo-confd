@@ -265,9 +265,9 @@ def test_create_additional_options():
     assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.sip(username="dupusername")
+@fixtures.sip(name='foo', username="dupusername")
 def test_create_username_already_taken(sip):
-    response = confd.endpoints.sip.post(username="dupusername")
+    response = confd.endpoints.sip.post(name='bar', username="dupusername")
     response.assert_created('endpoint_sip', location='endpoints/sip')
 
 

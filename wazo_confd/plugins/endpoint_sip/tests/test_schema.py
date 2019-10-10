@@ -29,3 +29,10 @@ class TestSipSchema(TestCase):
         result = self.schema.load(body)
 
         assert_that(result, has_entries(username='foo', name='bar'))
+
+    def test_that_the_username_matches_the_name_when_dumping_if_none(self):
+        object_ = {'name': 'foobar', 'username': None}
+
+        body = self.schema.dump(object_)
+
+        assert_that(body, has_entries(username='foobar', name='foobar'))

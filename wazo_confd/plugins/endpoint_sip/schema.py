@@ -4,7 +4,7 @@
 import re
 import string
 
-from marshmallow import fields, post_load
+from marshmallow import fields, post_dump, post_load
 from marshmallow.validate import Length, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -28,10 +28,17 @@ class SipSchema(BaseSchema):
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
     @post_load
-    def set_name_if_missing(self, data, **kwargs):
+    def set_name_to_username_if_missing(self, data, **kwargs):
         name = data.get('name')
-        if not name:
+        if not name and 'username' in data:
             data['name'] = data.get('username')
+        return data
+
+    @post_dump
+    def set_username_to_name_if_none(self, data):
+        username = data.get('username')
+        if username is None:
+            data['username'] = data.get('name')
         return data
 
 
