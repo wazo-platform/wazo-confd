@@ -88,7 +88,7 @@ def error_checks(url):
 def test_search(registrar, hidden):
     url = confd.registrars
     searches = {
-        'proxy_main_host': '2.3',
+        'proxy_main_host': '1.2.3',
         'id': 'leid',
         'name': 'ereg',
         'outbound_proxy_port': 5060,
