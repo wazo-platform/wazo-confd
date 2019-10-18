@@ -399,6 +399,7 @@ definitions:
     - $ref: '#/definitions/UserRelationSwitchboards'
     - $ref: '#/definitions/UserRelationVoicemail'
     - $ref: '#/definitions/UserRelationQueues'
+    - $ref: '#/definitions/UserCallPickupTargets'
     - required:
       - firstname
   UserRelationBase:
@@ -489,6 +490,19 @@ definitions:
         readOnly: True
       number:
         type: string
+  UserCallPickupTargets:
+    title: UserCallPickupTargets
+    properties:
+      call_pickup_targets:
+        properties:
+          users:
+            type: array
+            items:
+              $ref: '#/definitions/UserRelationBase'
+          groups:
+            type: array
+            items:
+              $ref: '#/definitions/GroupRelationBase'
   UserService:
     title: UserService
     properties:

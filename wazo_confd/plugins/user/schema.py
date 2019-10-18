@@ -1,7 +1,8 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+import itertools
+from marshmallow import fields, post_dump, pre_dump
 from marshmallow.validate import Length, Range, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
@@ -53,6 +54,14 @@ class UserSchema(BaseSchema):
     call_permissions = fields.Nested(
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
+    call_pickup_user_targets_flat = fields.Nested(
+        'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], many=True, dump_only=True
+    )
+
+    call_pickup_group_targets_flat = fields.Nested(
+        'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
+    )
+
     fallbacks = fields.Nested('UserFallbackSchema', dump_only=True)
     groups = fields.Nested(
         'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
@@ -88,6 +97,33 @@ class UserSchema(BaseSchema):
     queues = fields.Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
+
+    @pre_dump
+    def predump(self, data, **kwargs):
+        data.call_pickup_user_targets_flat = list(
+            set(self._flatten(data.call_pickup_user_targets))
+        )
+
+        data.call_pickup_group_targets_flat = list(
+            set(self._flatten(data.call_pickup_group_targets))
+        )
+        return data
+
+    @post_dump
+    def postdump(self, data):
+        if not self.only or 'call_pickup_targets' in self.only:
+            call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
+            call_pickup_group_targets = data.pop('call_pickup_group_targets_flat', [])
+
+            data['call_pickup_targets'] = {
+                'users': call_pickup_user_targets,
+                'groups': call_pickup_group_targets,
+            }
+        return data
+
+    @staticmethod
+    def _flatten(iterable_of_iterable):
+        return itertools.chain(*iterable_of_iterable)
 
 
 class UserDirectorySchema(BaseSchema):
