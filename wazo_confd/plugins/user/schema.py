@@ -99,7 +99,7 @@ class UserSchema(BaseSchema):
     )
 
     @pre_dump
-    def predump(self, data, **kwargs):
+    def flatten_call_pickup_targets(self, data, **kwargs):
         data.call_pickup_user_targets_flat = list(
             set(self._flatten(data.call_pickup_user_targets))
         )
@@ -110,7 +110,7 @@ class UserSchema(BaseSchema):
         return data
 
     @post_dump
-    def postdump(self, data):
+    def format_call_pickup_targets(self, data):
         if not self.only or 'call_pickup_targets' in self.only:
             call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
             call_pickup_group_targets = data.pop('call_pickup_group_targets_flat', [])
