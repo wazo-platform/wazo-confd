@@ -108,28 +108,21 @@ def test_associate_multi_tenant(main_call_pickup, sub_call_pickup, main_user, su
 @fixtures.user()
 @fixtures.user()
 @fixtures.user()
-def test_interceptor_user_has_targets(call_pickup, user1, user2, user3):
-    response = confd.callpickups(call_pickup['id']).targets.users.put(
-        users=[user2, user3]
-    )
-    response.assert_updated()
-    response = confd.callpickups(call_pickup['id']).interceptors.users.put(
-        users=[user1]
-    )
-    response.assert_updated()
-
-    response = confd.users(user1['id']).get()
-    assert_that(
-        response.item,
-        has_entries(
-            call_pickup_targets=has_entries(
-                users=contains_inanyorder(
-                    has_entries(uuid=user2['uuid']),
-                    has_entries(uuid=user3['uuid']),
-                )
+def test_get_interceptor_user_relation(call_pickup, user1, user2, user3):
+    with a.call_pickup_interceptor_user(call_pickup, user1):
+        with a.call_pickup_target_user(call_pickup, user2, user3):
+            response = confd.users(user1['id']).get()
+            assert_that(
+                response.item,
+                has_entries(
+                    call_pickup_targets=has_entries(
+                        users=contains_inanyorder(
+                            has_entries(uuid=user2['uuid']),
+                            has_entries(uuid=user3['uuid']),
+                        )
+                    )
+                ),
             )
-        ),
-    )
 
 
 @fixtures.call_pickup()
