@@ -5,7 +5,7 @@ import re
 import string
 import logging
 
-from marshmallow import fields, post_dump, post_load
+from marshmallow import fields, post_load
 from marshmallow.validate import Length, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -30,10 +30,9 @@ class SipSchema(BaseSchema):
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
-    # The set_name_to_username_if_missing and set_username_to_name_if_none methods
-    # are compatibility methods that were added in 19.15 to avoid breaking the API
-    # In the old version, the name could not be specified in the API the username
-    # was always copied.
+    # The set_name_to_username_if_missing method is a compatibility method that
+    # was added in 19.15 to avoid breaking the API. In the old version, the name
+    # could not be specified in the API the username was always copied.
     @post_load
     def set_name_to_username_if_missing(self, data, **kwargs):
         name = data.get('name')
@@ -43,14 +42,6 @@ class SipSchema(BaseSchema):
                 ' deprecated. Populate the name field if it is required'
             )
             data['name'] = data['username']
-        return data
-
-    @post_dump
-    def set_username_to_name_if_none(self, data):
-        username = data.get('username')
-        name = data.get('name')
-        if username is None and name:
-            data['username'] = name
         return data
 
 
