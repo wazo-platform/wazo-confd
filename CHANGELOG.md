@@ -5,8 +5,8 @@ Changelog
 -----
 
 * The POST `/1.1/endpoints/sip` now accepts a `name` and a `username` field. If
-  you relied on the behavior that copied to username to the name field you must
-  upgrade your before that compatibility layer gets removed.
+  you relied on the behavior that copied to `username` to the `name` field you must
+  upgrade your software before that compatibility layer gets removed in a future version.
 
 
 19.13
