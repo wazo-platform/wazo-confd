@@ -235,6 +235,7 @@ def test_create_minimal_parameters():
 def test_create_all_parameters():
     response = confd.endpoints.sip.post(
         username="myusername",
+        name="not-the-username",
         secret="mysecret",
         type="peer",
         host="127.0.0.1",
@@ -247,6 +248,7 @@ def test_create_all_parameters():
             {
                 'tenant_uuid': MAIN_TENANT,
                 'username': 'myusername',
+                'name': 'not-the-username',
                 'secret': 'mysecret',
                 'type': 'peer',
                 'host': '127.0.0.1',
@@ -263,9 +265,15 @@ def test_create_additional_options():
     assert_that(response.item['options'], has_items(*options))
 
 
-@fixtures.sip(username="dupusername")
+@fixtures.sip(name='foo', username="dupusername")
 def test_create_username_already_taken(sip):
-    response = confd.endpoints.sip.post(username="dupusername")
+    response = confd.endpoints.sip.post(name='bar', username="dupusername")
+    response.assert_created('endpoint_sip', location='endpoints/sip')
+
+
+@fixtures.sip(name="dupname")
+def test_create_name_already_taken(sip):
+    response = confd.endpoints.sip.post(name="dupname")
     response.assert_match(400, e.resource_exists('SIPEndpoint'))
 
 
