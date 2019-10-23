@@ -31,7 +31,7 @@ class SipSchema(BaseSchema):
     def set_name_to_username_if_missing(self, data, **kwargs):
         name = data.get('name')
         if not name and 'username' in data:
-            data['name'] = data.get('username')
+            data['name'] = data['username']
         return data
 
     @post_dump
