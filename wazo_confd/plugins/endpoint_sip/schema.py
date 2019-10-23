@@ -48,8 +48,9 @@ class SipSchema(BaseSchema):
     @post_dump
     def set_username_to_name_if_none(self, data):
         username = data.get('username')
-        if username is None:
-            data['username'] = data.get('name')
+        name = data.get('name')
+        if username is None and name:
+            data['username'] = name
         return data
 
 
