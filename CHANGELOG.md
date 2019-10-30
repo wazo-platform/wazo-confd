@@ -1,6 +1,12 @@
 Changelog
 =========
 
+19.16
+-----
+
+* Search with the `search` parameter is now accent insensitive
+
+
 19.15
 -----
 
