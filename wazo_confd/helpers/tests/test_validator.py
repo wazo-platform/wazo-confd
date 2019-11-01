@@ -209,7 +209,7 @@ class TestValidationGroup(unittest.TestCase):
 
 class TestValidationAssociation(unittest.TestCase):
     def test_when_validating_association_then_calls_common_and_association_validators(
-        self
+        self,
     ):
         common = Mock(Validator)
         association = Mock(Validator)
@@ -241,7 +241,7 @@ class TestValidationAssociation(unittest.TestCase):
         dissociation.validate.assert_called_once_with(model1, model2)
 
     def test_when_validating_dissociation_then_calls_common_and_dissociation_validators(
-        self
+        self,
     ):
         common = Mock(Validator)
         dissociation = Mock(Validator)

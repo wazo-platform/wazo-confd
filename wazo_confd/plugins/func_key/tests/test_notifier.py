@@ -40,7 +40,7 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(
-        self
+        self,
     ):
         self.device_db.template_has_sccp_device.return_value = True
 
@@ -60,7 +60,7 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_func_key_template_edited_and_no_change_then_dialplan_not_reloaded(
-        self
+        self,
     ):
         self.device_db.template_has_sccp_device.return_value = False
 
@@ -77,7 +77,7 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_func_key_template_edited_and_undefined_change_then_dialplan_reloaded(
-        self
+        self,
     ):
         self.device_db.template_has_sccp_device.return_value = False
 
@@ -93,7 +93,7 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(
-        self
+        self,
     ):
         self.device_db.template_has_sccp_device.return_value = True
 
