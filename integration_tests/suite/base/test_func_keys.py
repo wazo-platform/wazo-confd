@@ -577,7 +577,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
         self.association_url.put().assert_ok()
 
     def test_given_template_has_func_key_when_associated_then_func_key_added_to_provd(
-        self
+        self,
     ):
         self.association_url.put().assert_ok()
 
@@ -585,7 +585,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
             self.check_provd_has_funckey(pos, funckey)
 
     def test_given_template_has_func_key_when_associated_using_uuid_then_func_key_added_to_provd(
-        self
+        self,
     ):
         self.uuid_url.put().assert_ok()
 
@@ -600,7 +600,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
             self.check_provd_does_not_have_funckey(pos)
 
     def test_when_template_dissociated_using_uuid_then_func_key_removed_from_provd(
-        self
+        self,
     ):
         self.uuid_url.put().assert_updated()
         self.uuid_url.delete().assert_deleted()
@@ -641,7 +641,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
             self.check_provd_does_not_have_funckey(pos)
 
     def test_given_template_associated_when_getting_func_key_then_fetches_from_unified_template(
-        self
+        self,
     ):
         self.association_url.put().assert_updated()
 
@@ -656,7 +656,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
         )
 
     def test_given_template_associated_when_getting_func_key_using_uuid_then_fetches_from_unified_template(
-        self
+        self,
     ):
         self.uuid_url.put().assert_updated()
 
@@ -671,7 +671,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
         )
 
     def test_given_template_associated_when_getting_association_then_user_associated(
-        self
+        self,
     ):
         self.association_url.put().assert_updated()
 
@@ -685,7 +685,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
         )
 
     def test_given_template_associated_when_getting_association_using_uuid_then_user_associated(
-        self
+        self,
     ):
         self.uuid_url.put().assert_updated()
 
@@ -699,7 +699,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
         )
 
     def test_given_template_associated_when_getting_association_then_template_associated(
-        self
+        self,
     ):
         self.association_url.put().assert_updated()
 
@@ -1076,7 +1076,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
             self.check_provd_has_funckey(pos, provd_funckey)
 
     def test_when_creating_func_key_that_cannot_be_blf_then_func_key_isnt_blf_in_provd(
-        self
+        self,
     ):
         position = '1'
         funckey = {'blf': True, 'destination': {'type': 'parking'}}

@@ -136,7 +136,7 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
 
 @fixtures.call_permission()
 def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tenant(
-    call_permission
+    call_permission,
 ):
     number = h.voicemail.find_available_number(config.CONTEXT)
     exten = h.extension.find_available_exten(config.CONTEXT)
@@ -1243,7 +1243,7 @@ def test_when_call_permission_column_is_empty_then_call_permission_is_removed(en
 @unittest.skip('PUT has been disabled')
 @fixtures.csv_entry(call_permissions=1)
 def test_when_call_permission_column_is_not_in_csv_then_call_permission_remains_unchanged(
-    entry
+    entry,
 ):
     csv = [{"uuid": entry['user_uuid']}]
 

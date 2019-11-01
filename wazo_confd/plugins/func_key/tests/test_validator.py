@@ -47,7 +47,7 @@ class TestSimilarFuncKeyValidator(unittest.TestCase):
         self.validator.validate(template)
 
     def test_when_template_has_two_func_keys_with_different_destination_then_validation_passes(
-        self
+        self,
     ):
         template = FuncKeyTemplate(
             keys={
@@ -59,7 +59,7 @@ class TestSimilarFuncKeyValidator(unittest.TestCase):
         self.validator.validate(template)
 
     def test_when_template_has_two_func_keys_with_same_destination_then_raises_error(
-        self
+        self,
     ):
         destination = FuncKeyDestCustom(exten='1234')
         template = FuncKeyTemplate(
@@ -126,7 +126,7 @@ class TestFuncKeyValidator(unittest.TestCase):
         )
 
     def test_given_multiple_validators_for_destination_when_validating_then_calls_each_validator(
-        self
+        self,
     ):
         destination = Mock(type='foobar')
         model = FuncKey(destination=destination)
@@ -137,7 +137,7 @@ class TestFuncKeyValidator(unittest.TestCase):
         self.second_dest_validator.validate.assert_called_once_with(destination)
 
     def test_given_label_with_invalid_characters_when_validating_then_raises_error(
-        self
+        self,
     ):
         model = FuncKey(label='hello\n', destination=Mock(type='foobar'))
 
@@ -244,7 +244,7 @@ class TestBSFilterValidator(unittest.TestCase):
         self.validator = BSFilterValidator()
 
     def test_when_func_key_does_not_have_bsfilter_destination_then_validation_passes(
-        self
+        self,
     ):
         funckey = FuncKey(destination=FuncKeyDestCustom(exten='1234'))
 

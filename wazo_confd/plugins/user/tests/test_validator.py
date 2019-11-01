@@ -58,7 +58,7 @@ class TestNoEmptyFieldWhenEnabled(unittest.TestCase):
         self.model = Mock()
 
     def test_given_required_field_are_none_and_enabled_true_when_validating_then_raises_error(
-        self
+        self,
     ):
         self.model.destination_field = None
         self.model.enabled_field = True
@@ -66,7 +66,7 @@ class TestNoEmptyFieldWhenEnabled(unittest.TestCase):
         self.assertRaises(ResourceError, self.validator.validate, self.model)
 
     def test_given_required_field_are_not_none_and_enabled_true_when_validation_passed(
-        self
+        self,
     ):
         self.model.destination_field = '123'
         self.model.enabled_field = True
@@ -74,7 +74,7 @@ class TestNoEmptyFieldWhenEnabled(unittest.TestCase):
         self.validator.validate(self.model)
 
     def test_given_required_field_are_none_and_enabled_false_when_validation_passed(
-        self
+        self,
     ):
         self.model.destination_field = None
         self.model.enabled_field = False
@@ -82,7 +82,7 @@ class TestNoEmptyFieldWhenEnabled(unittest.TestCase):
         self.validator.validate(self.model)
 
     def test_given_required_field_are_not_none_and_enabled_false_when_validation_passed(
-        self
+        self,
     ):
         self.model.destination_field = '123'
         self.model.enabled_field = False

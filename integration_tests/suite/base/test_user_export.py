@@ -30,7 +30,7 @@ UNKNOWN_TENANT = '00000000-0000-0000-0000-000000000000'
     enabled=True,
 )
 def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fields(
-    user
+    user,
 ):
     auth.users.new(uuid=user['uuid'], username='ursule', enabled=False)
 
