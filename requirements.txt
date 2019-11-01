@@ -18,3 +18,4 @@ pyyaml==3.13
 requests==2.21.0
 sqlalchemy==1.2.18  # from xivo-dao
 stevedore==1.29.0
+unidecode==1.0.23  # from xivo-dao
