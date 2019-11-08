@@ -12,7 +12,7 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 logger = logging.getLogger(__name__)
 
-USERNAME_REGEX = r"^[a-zA-Z0-9_-]{1,40}$"
+USERNAME_REGEX = r"^[a-zA-Z0-9_+-]{1,40}$"
 SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 
 
