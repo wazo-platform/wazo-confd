@@ -214,7 +214,9 @@ def test_get_endpoint_sip_relation(line, sip):
         assert_that(
             response.item,
             has_entries(
-                endpoint_sip=has_entries(id=sip['id'], username=sip['username'])
+                endpoint_sip=has_entries(
+                    id=sip['id'], username=sip['username'], name=sip['name']
+                )
             ),
         )
 

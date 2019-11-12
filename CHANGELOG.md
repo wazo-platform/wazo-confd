@@ -5,6 +5,7 @@ Changelog
 -----
 
 * Search with the `search` parameter is now accent insensitive
+* Trunk and Line resources now includes the `name` in the `endpoint_sip` relation
 
 
 19.15

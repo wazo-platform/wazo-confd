@@ -19,7 +19,7 @@ class TrunkSchema(BaseSchema):
     links = ListLink(Link('trunks'))
 
     endpoint_sip = fields.Nested(
-        'SipSchema', only=['id', 'username', 'links'], dump_only=True
+        'SipSchema', only=['id', 'username', 'name', 'links'], dump_only=True
     )
     endpoint_custom = fields.Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
