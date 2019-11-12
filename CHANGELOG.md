@@ -5,7 +5,7 @@ Changelog
 -----
 
 * Search with the `search` parameter is now accent insensitive
-* The trunk list now includes the `name` in the `endpoint_sip` relation
+* Trunk resources now includes the `name` in the `endpoint_sip` relation
 
 
 19.15
