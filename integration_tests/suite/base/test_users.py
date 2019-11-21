@@ -391,18 +391,6 @@ def test_summary_view_on_user_without_line(user):
     )
 
 
-@fixtures.user(firstname="Lègacy", lastname="Usér")
-@fixtures.user(firstname="Hîde", lastname="Mé")
-def test_search_using_legacy_parameter(user1, user2):
-    response = confd.users.get(q="lègacy usér")
-    assert_that(
-        response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér"))
-    )
-    assert_that(
-        response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé")))
-    )
-
-
 @fixtures.user(
     firstname="Léeroy",
     lastname="Jénkins",

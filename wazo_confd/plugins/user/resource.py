@@ -33,17 +33,7 @@ class UserList(ListResource):
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
-        if 'q' in params:
-            return self.legacy_search(params, tenant_uuids=tenant_uuids)
-        else:
-            return self.user_search(params, tenant_uuids=tenant_uuids)
-
-    def legacy_search(self, params, tenant_uuids=None):
-        result = self.service.legacy_search(params['q'], tenant_uuids=tenant_uuids)
-        return {
-            'total': result.total,
-            'items': self.schema().dump(result.items, many=True),
-        }
+        return self.user_search(params, tenant_uuids=tenant_uuids)
 
     def user_search(self, params, tenant_uuids=None):
         view = request.args.get('view')
