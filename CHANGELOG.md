@@ -1,6 +1,12 @@
 Changelog
 =========
 
+19.17
+-----
+
+* Legacy search parameter with `q` has been removed from user resource
+
+
 19.16
 -----
 
