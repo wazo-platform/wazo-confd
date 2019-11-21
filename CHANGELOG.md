@@ -1,29 +1,21 @@
-Changelog
-=========
+# Changelog
 
-19.17
------
+## 19.17
 
 * Legacy search parameter with `q` has been removed from user resource
 
-
-19.16
------
+## 19.16
 
 * Search with the `search` parameter is now accent insensitive
 * Trunk and Line resources now includes the `name` in the `endpoint_sip` relation
 
-
-19.15
------
+## 19.15
 
 * The POST `/1.1/endpoints/sip` now accepts a `name` and a `username` field. If
   you relied on the behavior that copied to `username` to the `name` field you must
   upgrade your software before that compatibility layer gets removed in a future version.
 
-
-19.13
------
+## 19.13
 
 * A new API for configuring features access has been added:
 
@@ -33,14 +25,11 @@ Changelog
   * PUT `/1.1/access_features/<access_features_id>`
   * DELETE `/1.1/access_features/<access_feature_id>`
 
-
-19.12
------
+## 19.12
 
 * The API `/1.1/call_logs` for call logs have been removed
 
-19.11
------
+## 19.11
 
 * A new API for configuring the provisioning registrars has been added:
 
@@ -50,9 +39,7 @@ Changelog
   * PUT `/1.1/registrars/<registrar_id>`
   * DELETE `/1.1/registrars/<registrar_id>`
 
-
-19.10
------
+## 19.10
 
 * A new API for associating a line with an application has been added:
 
@@ -63,9 +50,7 @@ Changelog
   automatically answered anymore. A new `answer` parameter has been
   added in `destination_options` to configure the answer behavior of the node.
 
-
-19.08
------
+## 19.08
 
 * Due to the removal of the Wazo Client QT, the following endpoints has been deleted:
   * GET `/1.1/cti_profiles`
@@ -74,9 +59,7 @@ Changelog
   * PUT `/1.1/users/<user_uuid>/cti`
   Also note that endpoints `/users` don't have `cti_profile` parameter anymore.
 
-
-19.07
------
+## 19.07
 
 * The following endpoints are now multi-tenant.
 
@@ -104,9 +87,7 @@ Changelog
 
   * `/1.1/agents/skills`
 
-
-19.06
------
+## 19.06
 
 * The `http` configuration section has been removed. Also the `https` section has moved to
   `rest_api` to be similar with other daemons.
@@ -124,9 +105,7 @@ Changelog
 
   * `/1.1/agents`
 
-
-19.05
------
+## 19.05
 
 * The following endpoints are now multi-tenant.
 
@@ -169,9 +148,7 @@ Changelog
 * In `/dhcp`, the field `extra_network_interfaces` is renamed to `network_interfaces`.
 * A new function key type has been added: `groupmember`
 
-
-19.04
------
+## 19.04
 
 * New readonly parameters have been added to the funckeys resource:
 
@@ -196,9 +173,7 @@ Changelog
   * `/1.1/callpickups`
   * `/1.1/devices`
 
-
-19.03
------
+## 19.03
 
 * The following endpoints are now multi-tenant.
 
@@ -221,9 +196,7 @@ Changelog
   * GET `/1.1/ha`
   * PUT `/1.1/ha`
 
-
-19.02
------
+## 19.02
 
 * The following endpoints are now multi-tenant.
 
@@ -237,25 +210,19 @@ Changelog
   * `/1.1/schedules`
   * `/1.1/ivr`
 
-
-19.01
------
+## 19.01
 
 * New steps parameter have been added to the wizard resource:
 
   * `admin`
 
-
-18.14
------
+## 18.14
 
 * New readonly parameters have been added to the agent resource:
 
   * `users`
 
-
-18.13
------
+## 18.13
 
 * The following URLs have been deprecated:
 
@@ -293,9 +260,7 @@ Changelog
   * PUT `/1.1/entities/<entity_id>`
   * DELETE `/1.1/entities/<entity_id>`
 
-
-18.10
------
+## 18.10
 
 * Added applications endpoints:
 
@@ -315,10 +280,7 @@ Changelog
 
   * `steps`
 
-
-
-18.09
------
+## 18.09
 
 * Added RTP general endpoints:
 
@@ -354,9 +316,7 @@ Changelog
   * `/parkinglots`
   * `/trunks`
 
-
-18.08
------
+## 18.08
 
 * Added queue skill rule endpoints:
 
@@ -440,10 +400,7 @@ Changelog
   * DELETE `/1.1/queues/<queue_id>/schedules/<schedule_id>`
   * PUT `/1.1/queues/<queue_id>/schedules/<schedule_id>`
 
-
-
-18.07
------
+## 18.07
 
 * The `/extensions` routes are now multi-tenant. This means that created tenant will be in the same
   tenant as the creator or in the tenant specified by the Wazo-Tenant HTTP header. Listing
@@ -487,9 +444,7 @@ Changelog
   * GET `/1.1/queues/<queue_id>`
   * PUT `/1.1/queues/<queue_id>`
 
-
-18.06
------
+## 18.06
 
 * A new API for associating users and groups with a call pickup has been added:
 
@@ -506,9 +461,7 @@ Changelog
   GET, DELETE and PUT on a context that is not in a tenant accessible to the user will result in a
   404.
 
-
-18.05
------
+## 18.05
 
 * Added call pickup endpoints:
 
@@ -518,9 +471,7 @@ Changelog
   * GET `/1.1/callpickups/<call_pickup_id>`
   * PUT `/1.1/callpickups/<call_pickup_id>`
 
-
-18.04
------
+## 18.04
 
 * The `password` field has been removed from GET `/1.1/users/export`
 * The `Wazo-Tenant` header can now be used when creating users in a given tenant.
@@ -530,9 +481,7 @@ Changelog
 
 * The users GET, PUT and DELETE are now filtered by tenant. xivo-confd will behave as if users from other tenants do not exist.
 
-
-18.02
------
+## 18.02
 
 * A new API for editing fallbacks for a call filter has been added:
 
@@ -556,9 +505,7 @@ Changelog
 
   * PUT `/1.1/funckeys/templates/<template_id>`
 
-
-18.01
------
+## 18.01
 
 * Added register iax endpoints:
 
@@ -702,9 +649,7 @@ Changelog
   * DELETE `/1.1/trunks/<trunk_id>/registers/sip/<register_id>`
   * PUT `/1.1/trunks/<trunk_id>/registers/sip/<register_id>`
 
-
-17.17
------
+## 17.17
 
 * Added register sip endpoints:
 
@@ -742,9 +687,7 @@ Changelog
   * GET `/1.1/asterisk/voicemail/general`
   * PUT `/1.1/asterisk/voicemail/general`
 
-
-17.16
------
+## 17.16
 
 * Added Voicemail ZoneMessages endpoints:
 
@@ -774,42 +717,32 @@ Changelog
   * DELETE `/1.1/outcalls/<outcall_id>/schedules/<schedule_id>`
   * PUT `/1.1/outcalls/<outcall_id>/schedules/<schedule_id>`
 
-
-17.13
------
+## 17.13
 
 * A line that is associated to a device can now be deleted
 * A new API for user's services has been added:
 
   * PUT `/1.1/users/<user_id>/services`
 
-
-17.10
------
+## 17.10
 
 * A new API for associating lines with a user has been added:
 
   * PUT `/1.1/users/<user_uuid>/lines`
 
-
-17.09
------
+## 17.09
 
 * A new API for associating groups with a user has been added:
 
   * PUT `/1.1/users/<user_uuid>/groups`
 
-
-17.05
------
+## 17.05
 
 * New readonly parameters have been added to the user resource:
 
   * `agent`
 
-
-17.03
------
+## 17.03
 
 * A new API for managing :abbr:`MOH (Music On Hold)`:
 
@@ -822,9 +755,7 @@ Changelog
   * GET `/1.1/moh/<moh_id>/files/<filename>`
   * PUT `/1.1/moh/<moh_id>/files/<filename>`
 
-
-17.02
------
+## 17.02
 
 * Added schedules endpoints:
 
@@ -848,9 +779,7 @@ Changelog
   * PUT `/1.1/switchboards/<switchboard_uuid>`
   * PUT `/1.1/switchboards/<switchboard_uuid>/members/users`
 
-
-17.01
------
+## 17.01
 
 * Added `conference` destination type for incalls and ivr.
 
@@ -895,9 +824,7 @@ Changelog
   * PUT `/1.1/pagings/<paging_id>/members/users`
   * PUT `/1.1/pagings/<paging_id>/callers/users`
 
-
-16.16
------
+## 16.16
 
 * The `conference` destination type in incalls endpoints has been renamed to `meetme`
 
@@ -973,9 +900,7 @@ Changelog
   * `voicemail`
   * `incalls`
 
-
-16.14
------
+## 16.14
 
 * Added users endpoints in REST API:
 
@@ -1027,9 +952,7 @@ Changelog
   * DELETE `/1.1/outcalls/<outcall_id>/extensions/<extension_id>`
   * PUT `/1.1/outcalls/<outcall_id>/extensions/<extension_id>`
 
-
-16.13
------
+## 16.13
 
 * New readonly parameters have been added to the trunks resource:
 
@@ -1053,9 +976,7 @@ Changelog
   * GET `/1.1/incalls/<incall_id>`
   * PUT `/1.1/incalls/<incall_id>`
 
-
-16.12
------
+## 16.12
 
 * A new API for associating an endpoint with a trunk has been added:
 
@@ -1082,9 +1003,7 @@ Changelog
   * GET `/1.1/asterisk/sip/general`
   * PUT `/1.1/asterisk/sip/general`
 
-
-16.11
------
+## 16.11
 
 * A new API for associating a user with an agent has been added:
 
@@ -1101,9 +1020,7 @@ Changelog
 
   * GET `/1.1/extensions/<extension_id>/line`
 
-
-16.10
------
+## 16.10
 
 * Add possibility to associate many lines to the same user.
 * Add possibility to associate many extensions to the same line (only if these lines are
@@ -1130,9 +1047,7 @@ Changelog
   * POST `/1.1/users/<user_id>/lines`
   * POST `/1.1/lines/<line_id>/extensions`
 
-
-16.09
------
+## 16.09
 
 * Added entities endpoints:
 
@@ -1149,9 +1064,7 @@ Changelog
 
   * `dtmf_hangup_enabled`
 
-
-16.06
------
+## 16.06
 
 * A new API for initializing a Wazo (passing the wizard):
 
@@ -1164,9 +1077,7 @@ Changelog
   * GET `/1.1/users/<user_id>/entities`
   * PUT `/1.1/users/<user_id>/entities/<entity_id>`
 
-
-16.05
------
+## 16.05
 
 * A new API for associating a user with a call permission has been added:
 
@@ -1187,9 +1098,7 @@ Changelog
 * SIP endpoint: `allow` and `disallow` options are not split into multiple options anymore.
 * SCCP endpoint: `allow` and `disallow` options are not split into multiple options anymore.
 
-
-16.04
------
+## 16.04
 
 * The `summary` view has been added to `/users` (GET `/users?view=summary`)
 
@@ -1217,9 +1126,7 @@ Changelog
   * PUT `/1.1/callpermissions/<callpermission_id>`
   * DELETE `/1.1/callpermissions/<callpermission_id>`
 
-
-16.03
------
+## 16.03
 
 * Added switchboard endpoints:
 
@@ -1236,17 +1143,13 @@ Changelog
   * GET `/1.1/devices/<device_id>/associate_line/<line_id>`
   * GET `/1.1/devices/<device_id>/dissociate_line/<line_id>`
 
-
-16.02
------
+## 16.02
 
 * Added users endpoints in REST API:
 
   * GET `/1.1/users/<user_uuid>/lines/main/associated/endpoints/sip`
 
-
-16.01
------
+## 16.01
 
 * The SIP API has been improved. `options` now accepts any extra parameter.  However, due to
   certain database limitations, parameters that appear in changelog 15.17 may only
@@ -1254,16 +1157,12 @@ Changelog
 * A new API for custom endpoints has been added: `/1.1/endpoints/custom`
 * A new API for associating custom endpoints has been added: `/1.1/lines/<line_id>/endpoints/custom/<endpoint_id>`
 
-
-15.20
------
+## 15.20
 
 * A new API for mass updating users has been added: PUT `/1.1/users/import`
 * A new API for exporting users has been added: GET `/1.1/users/export`
 
-
-15.19
------
+## 15.19
 
 * A new API for mass importing users has been added: POST `/1.1/users/import`
 * The following fields have been added to the `/users` API:
@@ -1273,9 +1172,7 @@ Changelog
   * ring_seconds
   * simultaneous_calls
 
-
-15.18
------
+## 15.18
 
 * Ports 50050 and 50051 have been removed. Please use 9486 and 9487 instead
 * Added sccp endpoints in REST API:
@@ -1294,9 +1191,7 @@ Changelog
 
   * GET `/1.1/lines/<line_id>/users`
 
-
-15.17
------
+## 15.17
 
 * A new API for SIP endpoints has been added. Consult the documentation
   on http://api.wazo.community for further details.
@@ -1405,9 +1300,7 @@ Supported parameters on SIP endpoints
  * disallowed-methods
  * textsupport
 
-
-15.16
------
+## 15.16
 
 * The parameter `skip` is now deprecated. Use `offset` instead for:
 
@@ -1422,40 +1315,30 @@ Supported parameters on SIP endpoints
   * `PUT /1.1/users/<uuid>`
   * `DELETE /1.1/users/<uuid>`
 
-
-15.15
------
+## 15.15
 
  * The field `enabled` has been added to the voicemail model
  * A line is no longer required when associating a voicemail with a user
  * Voicemails can now be edited even when they are associated to a user
 
-
-15.14
------
+## 15.14
 
  * All optional fields on a user are now always null (sometimes they were empty strings)
  * The caller id is no longer automatically updated when the firstname or lastname is modified. You must update the
    caller id yourself if you modify the user's name.
  * Caller id will be generated if and only if it does not exist when creating a user.
 
-
-14.16
------
+## 14.16
 
 * Association user-voicemail, when associating a voicemail whose id does not exist:
 
   * before: error 404
   * after: error 400
 
-
-14.14
------
+## 14.14
 
 * Association line-extension, a same extension can not be associated to multiple lines
 
-
-14.13
------
+## 14.13
 
 * Resource line, field `provisioning_extension`: type changed from `int` to `string`
