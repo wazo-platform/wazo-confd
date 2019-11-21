@@ -3,6 +3,7 @@
 ## 19.17
 
 * Legacy search parameter with `q` has been removed from user resource
+* Deprecated `skip` option has been removed from resource list
 
 ## 19.16
 
