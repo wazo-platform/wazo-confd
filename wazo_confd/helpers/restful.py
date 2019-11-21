@@ -5,18 +5,32 @@ from flask import request
 from flask_restful import Resource
 from requests import HTTPError
 
+import marshmallow
+
 from xivo.auth_verifier import AuthVerifier
+from xivo.mallow import fields, validate
 from xivo.tenant_flask_helpers import get_auth_client, get_token, Tenant
 from xivo_dao import tenant_dao
-from xivo_dao.helpers import errors
 
 from wazo_confd.helpers.common import handle_api_exception
+from wazo_confd.helpers.mallow import BaseSchema
 
 auth_verifier = AuthVerifier()
 
 
 class ErrorCatchingResource(Resource):
     method_decorators = [handle_api_exception] + Resource.method_decorators
+
+
+class ListSchema(BaseSchema):
+    limit = fields.Integer(validate=validate.Range(min=0))
+    skip = fields.Integer(validate=validate.Range(min=0))
+    offset = fields.Integer(validate=validate.Range(min=0))
+    search = fields.String()
+    recurse = fields.Boolean()
+
+    class Meta:
+        unknown = marshmallow.INCLUDE
 
 
 class ConfdResource(ErrorCatchingResource):
@@ -90,27 +104,7 @@ class ListResource(ConfdResource):
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     def search_params(self):
-        args = ((key, request.args[key]) for key in request.args)
-        params = {}
-
-        for key, value in args:
-            if key in ('limit', 'skip', 'offset'):
-                params[key] = self.convert_numeric(key, value)
-            elif key == 'recurse':
-                params[key] = self.convert_boolean(key, value)
-            else:
-                params[key] = value
-
-        return params
-
-    def convert_boolean(self, key, value):
-        true_values = ('true', 'True')
-        return value in true_values
-
-    def convert_numeric(self, key, value):
-        if not value.isdigit():
-            raise errors.wrong_type(key, "positive number")
-        return int(value)
+        return ListSchema().load(request.args)
 
     def add_tenant_to_form(self, form):
         if not self._has_write_tenant_uuid():
