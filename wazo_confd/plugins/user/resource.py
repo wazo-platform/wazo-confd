@@ -1,7 +1,7 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
+from flask import url_for
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
@@ -33,10 +33,7 @@ class UserList(ListResource):
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
-        return self.user_search(params, tenant_uuids=tenant_uuids)
-
-    def user_search(self, params, tenant_uuids=None):
-        view = request.args.get('view')
+        view = params.get('view')
         schema = self.view_schemas.get(view, self.schema)
         result = self.service.search(params, tenant_uuids)
         return {'total': result.total, 'items': schema().dump(result.items, many=True)}
