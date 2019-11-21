@@ -118,8 +118,6 @@ def test_sorting_offset_limit(call_filter1, call_filter2):
     yield s.check_sorting, url, call_filter1, call_filter2, 'description', 'Sort'
 
     yield s.check_offset, url, call_filter1, call_filter2, 'name', 'sort'
-    yield s.check_offset_legacy, url, call_filter1, call_filter2, 'name', 'sort'
-
     yield s.check_limit, url, call_filter1, call_filter2, 'name', 'sort'
 
 

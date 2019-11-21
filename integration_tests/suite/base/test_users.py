@@ -536,8 +536,6 @@ def test_sorting_offset_limit(user1, user2):
     yield s.check_sorting, url, user1, user2, 'description', 'description'
 
     yield s.check_offset, url, user1, user2, 'firstname', 'firstname'
-    yield s.check_offset_legacy, url, user1, user2, 'firstname', 'firstname'
-
     yield s.check_limit, url, user1, user2, 'firstname', 'firstname'
 
 

@@ -81,10 +81,7 @@ def check_search(url, trunk, hidden, field, term):
 def test_sorting_offset_limit(_, __, trunk1, trunk2):
     url = confd.trunks.get
     yield s.check_sorting, url, trunk1, trunk2, 'context', 'sort'
-
     yield s.check_offset, url, trunk1, trunk2, 'context', 'sort'
-    yield s.check_offset_legacy, url, trunk1, trunk2, 'context', 'sort'
-
     yield s.check_limit, url, trunk1, trunk2, 'context', 'sort'
 
 

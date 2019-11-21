@@ -270,8 +270,6 @@ def test_sorting_offset_limit(queue1, queue2):
     yield s.check_sorting, url, queue1, queue2, 'preprocess_subroutine', 'sort'
 
     yield s.check_offset, url, queue1, queue2, 'name', 'sort'
-    yield s.check_offset_legacy, url, queue1, queue2, 'name', 'sort'
-
     yield s.check_limit, url, queue1, queue2, 'name', 'sort'
 
 

@@ -150,8 +150,6 @@ def test_sorting_offset_limit(group1, group2):
     yield s.check_sorting, url, group1, group2, 'preprocess_subroutine', 'sort'
 
     yield s.check_offset, url, group1, group2, 'name', 'sort'
-    yield s.check_offset_legacy, url, group1, group2, 'name', 'sort'
-
     yield s.check_limit, url, group1, group2, 'name', 'sort'
 
 

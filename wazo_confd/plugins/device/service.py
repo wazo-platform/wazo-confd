@@ -77,7 +77,7 @@ class SearchEngine:
 
         provd_devices = self.paginate_devices(
             provd_devices,
-            parameters.get('offset', parameters.get('skip', 0)),
+            parameters.get('offset', 0),
             parameters.get('limit'),
         )
 

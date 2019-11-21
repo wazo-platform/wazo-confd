@@ -128,7 +128,7 @@ class RegistrarDao:
             total = len(registrars)
             registrars = self._paginate_registrars(
                 registrars,
-                criteria.get('offset', criteria.get('skip', 0)),
+                criteria.get('offset', 0),
                 criteria.get('limit'),
             )
         else:

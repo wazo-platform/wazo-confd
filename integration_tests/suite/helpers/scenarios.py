@@ -61,8 +61,6 @@ def search_error_checks(url):
     yield check_bogus_query_string_returns_error, url, 'direction', 'invalid'
     yield check_bogus_query_string_returns_error, url, 'limit', -42
     yield check_bogus_query_string_returns_error, url, 'limit', 'invalid'
-    yield check_bogus_query_string_returns_error, url, 'skip', -42
-    yield check_bogus_query_string_returns_error, url, 'skip', 'invalid'
     yield check_bogus_query_string_returns_error, url, 'offset', -42
     yield check_bogus_query_string_returns_error, url, 'offset', 'invalid'
 
@@ -94,13 +92,6 @@ def check_sorting(url, resource1, resource2, field, search, id_field='id'):
 
 def check_offset(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, offset=1)
-    assert_that(
-        response.items, contains(has_entries(**{id_field: resource2[id_field]}))
-    )
-
-
-def check_offset_legacy(url, resource1, resource2, field, search, id_field='id'):
-    response = url(search=search, order=field, skip=1)
     assert_that(
         response.items, contains(has_entries(**{id_field: resource2[id_field]}))
     )

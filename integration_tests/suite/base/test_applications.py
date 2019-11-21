@@ -82,10 +82,7 @@ def test_sort_offset_limit(application1, application2):
     url = confd.applications.get
     id_field = 'uuid'
     yield s.check_sorting, url, application1, application2, 'name', 'sort', id_field
-
     yield s.check_offset, url, application1, application2, 'name', 'sort', id_field
-    yield s.check_offset_legacy, url, application1, application2, 'name', 'sort', id_field
-
     yield s.check_limit, url, application1, application2, 'name', 'sort', id_field
 
 

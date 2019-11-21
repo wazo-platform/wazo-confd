@@ -142,8 +142,6 @@ def test_sorting_offset_limit(ivr1, ivr2):
     yield s.check_sorting, url, ivr1, ivr2, 'description', 'sort'
 
     yield s.check_offset, url, ivr1, ivr2, 'description', 'sort'
-    yield s.check_offset_legacy, url, ivr1, ivr2, 'description', 'sort'
-
     yield s.check_limit, url, ivr1, ivr2, 'description', 'sort'
 
 

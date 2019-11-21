@@ -113,8 +113,6 @@ def test_sort_offset_limit(paging1, paging2):
     yield s.check_sorting, url, paging1, paging2, 'name', 'sort'
 
     yield s.check_offset, url, paging1, paging2, 'name', 'sort'
-    yield s.check_offset_legacy, url, paging1, paging2, 'name', 'sort'
-
     yield s.check_limit, url, paging1, paging2, 'name', 'sort'
 
 

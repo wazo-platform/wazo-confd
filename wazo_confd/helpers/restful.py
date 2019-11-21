@@ -24,7 +24,6 @@ class ErrorCatchingResource(Resource):
 
 class ListSchema(BaseSchema):
     limit = fields.Integer(validate=validate.Range(min=0))
-    skip = fields.Integer(validate=validate.Range(min=0))
     offset = fields.Integer(validate=validate.Range(min=0))
     search = fields.String()
     recurse = fields.Boolean()

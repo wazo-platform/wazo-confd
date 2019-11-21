@@ -104,8 +104,6 @@ def test_sorting_offset_limit(call_pickup1, call_pickup2):
     yield s.check_sorting, url, call_pickup1, call_pickup2, 'description', 'Sort'
 
     yield s.check_offset, url, call_pickup1, call_pickup2, 'name', 'sort'
-    yield s.check_offset_legacy, url, call_pickup1, call_pickup2, 'name', 'sort'
-
     yield s.check_limit, url, call_pickup1, call_pickup2, 'name', 'sort'
 
 

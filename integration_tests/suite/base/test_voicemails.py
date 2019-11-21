@@ -227,8 +227,6 @@ def test_sorting_offset_limit(voicemail1, voicemail2):
     yield s.check_sorting, url, voicemail1, voicemail2, 'pager', 'sort'
 
     yield s.check_offset, url, voicemail1, voicemail2, 'name', 'sort'
-    yield s.check_offset_legacy, url, voicemail1, voicemail2, 'name', 'sort'
-
     yield s.check_limit, url, voicemail1, voicemail2, 'name', 'sort'
 
 
