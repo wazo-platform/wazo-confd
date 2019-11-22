@@ -33,13 +33,8 @@ class DeviceList(SingleTenantMixin, ListResource):
     @required_acl('confd.devices.read')
     def get(self):
         params = self.search_params()
-        tenant_uuid = Tenant.autodetect().uuid
-
-        kwargs = {}
-        if tenant_uuid is not None:
-            kwargs['tenant_uuid'] = tenant_uuid
-
-        total, items = self.service.search(params, tenant_uuid=tenant_uuid)
+        kwargs = self._add_tenant_uuid()
+        total, items = self.service.search(params, **kwargs)
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.devices.create')
@@ -47,7 +42,7 @@ class DeviceList(SingleTenantMixin, ListResource):
         form = self.schema().load(request.get_json())
         model = self.model(**form)
         kwargs = self._add_tenant_uuid()
-        model = self.service.create(model, tenant_uuid=kwargs['tenant_uuid'])
+        model = self.service.create(model, **kwargs)
         return self.schema().dump(model), 201, self.build_headers(model)
 
 
