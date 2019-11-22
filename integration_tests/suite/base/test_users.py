@@ -5,6 +5,7 @@ from hamcrest import (
     all_of,
     assert_that,
     contains,
+    contains_inanyorder,
     empty,
     equal_to,
     has_entries,
@@ -508,6 +509,14 @@ def test_list_multi_tenant(main, sub):
 
     response = confd.users.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(response.items, has_items(main, sub))
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+def test_list_by_multiple_uuids(_, user2, user3):
+    response = confd.users.get(uuid=','.join([user2['uuid'], user3['uuid']]))
+    assert_that(response.items, contains_inanyorder(user2, user3))
 
 
 @fixtures.user(
