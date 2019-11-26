@@ -3,6 +3,8 @@
 #
 # see: dh_installdeb(1)
 
+set -e
+
 DAEMONNAME='wazo-confd'
 LOG_FILENAME='/var/log/wazo-confd.log'
 
