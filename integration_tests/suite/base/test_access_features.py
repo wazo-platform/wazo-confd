@@ -63,10 +63,7 @@ def check_search(url, context, hidden, field, term):
 def test_sorting_offset_limit(access_feature1, access_feature2):
     url = confd.access_features.get
     yield s.check_sorting, url, access_feature1, access_feature2, 'host', '1.2.'
-
     yield s.check_offset, url, access_feature1, access_feature2, 'host', '1.2.'
-    yield s.check_offset_legacy, url, access_feature1, access_feature2, 'host', '1.2.'
-
     yield s.check_limit, url, access_feature1, access_feature2, 'host', '1.2.'
 
 

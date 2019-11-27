@@ -187,8 +187,6 @@ def test_sorting_offset_limit(iax1, iax2):
     yield s.check_sorting, url, iax1, iax2, 'name', 'sort'
 
     yield s.check_offset, url, iax1, iax2, 'name', 'sort'
-    yield s.check_offset_legacy, url, iax1, iax2, 'name', 'sort'
-
     yield s.check_limit, url, iax1, iax2, 'name', 'sort'
 
 

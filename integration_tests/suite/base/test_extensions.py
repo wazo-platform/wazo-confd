@@ -508,8 +508,6 @@ def test_sorting_offset_limit(extension1, extension2):
     yield s.check_sorting, url, extension1, extension2, 'context', 'extern'
 
     yield s.check_offset, url, extension1, extension2, 'exten', '999'
-    yield s.check_offset_legacy, url, extension1, extension2, 'exten', '999'
-
     yield s.check_limit, url, extension1, extension2, 'exten', '999'
 
 

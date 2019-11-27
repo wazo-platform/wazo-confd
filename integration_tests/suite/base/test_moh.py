@@ -112,8 +112,6 @@ def test_sorting_offset_limit(moh1, moh2):
     yield s.check_sorting, url, moh1, moh2, 'name', 'sort', 'uuid'
 
     yield s.check_offset, url, moh1, moh2, 'name', 'sort', 'uuid'
-    yield s.check_offset_legacy, url, moh1, moh2, 'name', 'sort', 'uuid'
-
     yield s.check_limit, url, moh1, moh2, 'name', 'sort', 'uuid'
 
 

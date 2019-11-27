@@ -5,6 +5,7 @@ from hamcrest import (
     all_of,
     assert_that,
     contains,
+    contains_inanyorder,
     empty,
     equal_to,
     has_entries,
@@ -391,18 +392,6 @@ def test_summary_view_on_user_without_line(user):
     )
 
 
-@fixtures.user(firstname="Lègacy", lastname="Usér")
-@fixtures.user(firstname="Hîde", lastname="Mé")
-def test_search_using_legacy_parameter(user1, user2):
-    response = confd.users.get(q="lègacy usér")
-    assert_that(
-        response.items, has_item(has_entries(firstname="Lègacy", lastname="Usér"))
-    )
-    assert_that(
-        response.items, is_not(has_item(has_entries(firstname="Hîde", lastname="Mé")))
-    )
-
-
 @fixtures.user(
     firstname="Léeroy",
     lastname="Jénkins",
@@ -522,6 +511,14 @@ def test_list_multi_tenant(main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+def test_list_by_multiple_uuids(_, user2, user3):
+    response = confd.users.get(uuid=','.join([user2['uuid'], user3['uuid']]))
+    assert_that(response.items, contains_inanyorder(user2, user3))
+
+
 @fixtures.user(
     firstname="firstname1",
     lastname="lastname1",
@@ -548,19 +545,17 @@ def test_sorting_offset_limit(user1, user2):
     yield s.check_sorting, url, user1, user2, 'description', 'description'
 
     yield s.check_offset, url, user1, user2, 'firstname', 'firstname'
-    yield s.check_offset_legacy, url, user1, user2, 'firstname', 'firstname'
-
     yield s.check_limit, url, user1, user2, 'firstname', 'firstname'
 
 
 @fixtures.user()
-def test_head_user(user):
+def test_head(user):
     response = confd.users(user['uuid']).head()
     response.assert_ok()
 
 
 @fixtures.user(**FULL_USER)
-def test_get_user(user):
+def test_get(user):
     response = confd.users(user['id']).get()
     assert_that(response.item, has_entries(FULL_USER))
     assert_that(
@@ -586,7 +581,7 @@ def test_get_user(user):
 @fixtures.user(firstname="Snôm", lastname="Whîte")
 @fixtures.user()
 @fixtures.user()
-def test_that_get_works_with_a_uuid(user_1, user_2_, user_3):
+def test_that_get_by_uuid(user_1, user_2_, user_3):
     result = confd.users(user_1['uuid']).get()
 
     assert_that(result.item, has_entries(firstname='Snôm', lastname='Whîte'))
@@ -634,7 +629,7 @@ def test_create_with_null_parameters_fills_default_values():
     )
 
 
-def test_create_user_with_all_parameters():
+def test_create_with_all_parameters():
     response = confd.users.post(**FULL_USER)
 
     response.assert_created('users')
@@ -642,12 +637,12 @@ def test_create_user_with_all_parameters():
     assert_that(response.item, has_entries(created_at=is_not(none())))
 
 
-def test_create_user_with_all_parameters_null():
+def test_create_with_all_parameters_null():
     response = confd.users.post(**NULL_USER)
     assert_that(response.item, has_entries(NULL_USER))
 
 
-def test_create_user_generates_appropriate_caller_id():
+def test_create_generates_appropriate_caller_id():
     response = confd.users.post(firstname='Jôhn')
     assert_that(response.item, has_entry('caller_id', '"Jôhn"'))
 
@@ -667,7 +662,7 @@ def test_create_user_generates_appropriate_caller_id():
     description="Léeroy Jénkin's bio",
     preprocess_subroutine="leeroy_preprocess",
 )
-def test_update_user_with_all_parameters(user):
+def test_update_with_all_parameters(user):
     user_url = confd.users(user['id'])
 
     response = user_url.put(**FULL_USER)
@@ -678,7 +673,7 @@ def test_update_user_with_all_parameters(user):
 
 
 @fixtures.user()
-def test_update_user_with_all_parameters_null(user):
+def test_update_with_all_parameters_null(user):
     response = confd.users(user['id']).put(**NULL_USER)
     response.assert_updated()
 
@@ -687,7 +682,7 @@ def test_update_user_with_all_parameters_null(user):
 
 
 @fixtures.user()
-def test_that_users_can_be_edited_by_uuid(user):
+def test_update_by_uuid(user):
     response = confd.users(user['uuid']).put({'firstname': 'Fôo', 'lastname': 'Bâr'})
     response.assert_updated()
 
@@ -702,7 +697,7 @@ def test_delete(user):
 
 
 @fixtures.user()
-def test_that_users_can_be_deleted_by_uuid(user):
+def test_delete_by_uuid(user):
     response = confd.users(user['uuid']).delete()
     response.assert_deleted()
 

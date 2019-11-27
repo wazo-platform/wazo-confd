@@ -187,8 +187,6 @@ def test_sorting_offset_limit(device1, device2):
     yield s.check_sorting, url, device1, device2, 'description', 'SortDesc'
 
     yield s.check_offset, url, device1, device2, 'mac', 'aa:bb'
-    yield s.check_offset_legacy, url, device1, device2, 'mac', 'aa:bb'
-
     yield s.check_limit, url, device1, device2, 'mac', 'aa:bb'
 
 

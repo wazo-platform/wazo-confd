@@ -121,10 +121,7 @@ def test_list_multi_tenant(main, sub):
 def test_sort_offset_limit(skill1, skill2):
     url = confd.agents.skills.get
     yield s.check_sorting, url, skill1, skill2, 'name', 'sort'
-
     yield s.check_offset, url, skill1, skill2, 'name', 'sort'
-    yield s.check_offset_legacy, url, skill1, skill2, 'name', 'sort'
-
     yield s.check_limit, url, skill1, skill2, 'name', 'sort'
 
 

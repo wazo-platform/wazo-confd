@@ -97,8 +97,6 @@ def test_sorting_offset_limit(call_permission1, call_permission2):
     yield s.check_sorting, url, call_permission1, call_permission2, 'description', 'Sort'
 
     yield s.check_offset, url, call_permission1, call_permission2, 'name', 'sort'
-    yield s.check_offset_legacy, url, call_permission1, call_permission2, 'name', 'sort'
-
     yield s.check_limit, url, call_permission1, call_permission2, 'name', 'sort'
 
 

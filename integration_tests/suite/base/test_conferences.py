@@ -127,8 +127,6 @@ def test_sorting_offset_limit(conference1, conference2):
     yield s.check_sorting, url, conference1, conference2, 'name', 'sort'
 
     yield s.check_offset, url, conference1, conference2, 'name', 'sort'
-    yield s.check_offset_legacy, url, conference1, conference2, 'name', 'sort'
-
     yield s.check_limit, url, conference1, conference2, 'name', 'sort'
 
 

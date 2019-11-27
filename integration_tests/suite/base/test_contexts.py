@@ -214,8 +214,6 @@ def test_sorting_offset_limit(context1, context2):
     yield s.check_sorting, url, context1, context2, 'description', 'sort'
 
     yield s.check_offset, url, context1, context2, 'name', 'sort'
-    yield s.check_offset_legacy, url, context1, context2, 'name', 'sort'
-
     yield s.check_limit, url, context1, context2, 'name', 'sort'
 
 

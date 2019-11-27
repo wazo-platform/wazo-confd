@@ -226,8 +226,6 @@ def test_sort_offset_limit(schedule1, schedule2):
     yield s.check_sorting, url, schedule1, schedule2, 'name', 'sort'
 
     yield s.check_offset, url, schedule1, schedule2, 'name', 'sort'
-    yield s.check_offset_legacy, url, schedule1, schedule2, 'name', 'sort'
-
     yield s.check_limit, url, schedule1, schedule2, 'name', 'sort'
 
 
