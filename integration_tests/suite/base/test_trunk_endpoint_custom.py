@@ -241,5 +241,7 @@ def test_delete_custom_when_trunk_and_custom_associated(trunk, custom):
 @fixtures.custom()
 def test_bus_events(trunk, custom):
     url = confd.trunks(trunk['id']).endpoints.custom(custom['id'])
-    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
-    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete
+    routing_key = 'config.trunks.{}.endpoints.custom.{}.updated'.format(trunk['id'], custom['id'])
+    yield s.check_bus_event, routing_key, url.put
+    routing_key = 'config.trunks.{}.endpoints.custom.{}.deleted'.format(trunk['id'], custom['id'])
+    yield s.check_bus_event, routing_key, url.delete

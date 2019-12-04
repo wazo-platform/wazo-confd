@@ -180,5 +180,7 @@ def test_delete_iax_when_trunk_and_iax_associated(trunk, iax):
 @fixtures.iax()
 def test_bus_events(trunk, iax):
     url = confd.trunks(trunk['id']).endpoints.iax(iax['id'])
-    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
-    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete
+    routing_key = 'config.trunks.{}.endpoints.iax.{}.updated'.format(trunk['id'], iax['id'])
+    yield s.check_bus_event, routing_key, url.put
+    routing_key = 'config.trunks.{}.endpoints.iax.{}.deleted'.format(trunk['id'], iax['id'])
+    yield s.check_bus_event, routing_key, url.delete
