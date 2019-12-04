@@ -20,12 +20,19 @@ class TestCustomEndpointNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.custom = Mock(
-            Custom, id=1, tenant_uuid=str(uuid.uuid4), interface='custom/custom'
+            Custom,
+            id=1,
+            tenant_uuid=str(uuid.uuid4),
+            interface='custom/custom',
+            trunk={'id': 2},
+            line=None,
         )
         self.custom_serialized = {
             'id': self.custom.id,
             'tenant_uuid': self.custom.tenant_uuid,
             'interface': self.custom.interface,
+            'trunk': self.custom.trunk,
+            'line': self.custom.line,
         }
         self.notifier = CustomEndpointNotifier(self.bus)
 

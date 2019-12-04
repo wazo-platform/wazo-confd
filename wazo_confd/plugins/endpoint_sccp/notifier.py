@@ -14,6 +14,7 @@ from .schema import SccpSchema
 ENDPOINT_SCCP_FIELDS = [
     'id',
     'tenant_uuid',
+    'line.id',
 ]
 
 

@@ -16,6 +16,8 @@ ENDPOINT_SIP_FIELDS = [
     'tenant_uuid',
     'name',
     'username',
+    'trunk.id',
+    'line.id',
 ]
 
 

@@ -23,12 +23,13 @@ class TestIAXEndpointNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.iax = Mock(IAX, id=1, tenant_uuid=str(uuid.uuid4))
+        self.iax = Mock(IAX, id=1, tenant_uuid=str(uuid.uuid4), trunk_rel={'id': 2})
         self.iax.name = 'limitation of mock instantiation with name ...'
         self.iax_serialized = {
             'id': self.iax.id,
             'tenant_uuid': self.iax.tenant_uuid,
             'name': self.iax.name,
+            'trunk': self.iax.trunk_rel,
         }
 
         self.notifier = IAXEndpointNotifier(self.sysconfd, self.bus)

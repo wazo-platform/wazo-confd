@@ -15,6 +15,7 @@ ENDPOINT_IAX_FIELDS = [
     'id',
     'tenant_uuid',
     'name',
+    'trunk.id',
 ]
 
 

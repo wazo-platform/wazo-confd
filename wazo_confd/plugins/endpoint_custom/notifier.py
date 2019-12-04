@@ -15,6 +15,8 @@ ENDPOINT_CUSTOM_FIELDS = [
     'id',
     'tenant_uuid',
     'interface',
+    'trunk.id',
+    'line.id',
 ]
 
 

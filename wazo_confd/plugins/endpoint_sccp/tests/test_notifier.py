@@ -25,10 +25,11 @@ class TestSccpEndpointNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.sccp = Mock(SCCP, id=1, tenant_uuid=str(uuid.uuid4))
+        self.sccp = Mock(SCCP, id=1, tenant_uuid=str(uuid.uuid4), line={'id': 2})
         self.sccp_serialized = {
             'id': self.sccp.id,
             'tenant_uuid': self.sccp.tenant_uuid,
+            'line': self.sccp.line,
         }
 
         self.notifier = SccpEndpointNotifier(self.sysconfd, self.bus)
