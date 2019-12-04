@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+import uuid
+
 from mock import Mock
 
 from xivo_bus.resources.endpoint_custom.event import (
@@ -17,32 +19,31 @@ from ..notifier import CustomEndpointNotifier
 class TestCustomEndpointNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
-        self.custom_endpoint = Mock(Custom, id=1234, interface='custom/custom')
+        self.custom = Mock(Custom, id=1, tenant_uuid=str(uuid.uuid4), interface='custom/custom')
+        self.custom_serialized = {
+            'id': self.custom.id,
+            'tenant_uuid': self.custom.tenant_uuid,
+            'interface': self.custom.interface,
+        }
         self.notifier = CustomEndpointNotifier(self.bus)
 
     def test_when_custom_endpoint_created_then_event_sent_on_bus(self):
-        expected_event = CreateCustomEndpointEvent(
-            self.custom_endpoint.id, self.custom_endpoint.interface
-        )
+        expected_event = CreateCustomEndpointEvent(self.custom_serialized)
 
-        self.notifier.created(self.custom_endpoint)
+        self.notifier.created(self.custom)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_custom_endpoint_edited_then_event_sent_on_bus(self):
-        expected_event = EditCustomEndpointEvent(
-            self.custom_endpoint.id, self.custom_endpoint.interface
-        )
+        expected_event = EditCustomEndpointEvent(self.custom_serialized)
 
-        self.notifier.edited(self.custom_endpoint)
+        self.notifier.edited(self.custom)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_custom_endpoint_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteCustomEndpointEvent(
-            self.custom_endpoint.id, self.custom_endpoint.interface
-        )
+        expected_event = DeleteCustomEndpointEvent(self.custom_serialized)
 
-        self.notifier.deleted(self.custom_endpoint)
+        self.notifier.deleted(self.custom)
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)

@@ -9,21 +9,32 @@ from xivo_bus.resources.endpoint_custom.event import (
 
 from wazo_confd import bus
 
+from .schema import CustomSchema
+
+ENDPOINT_CUSTOM_FIELDS = [
+    'id',
+    'tenant_uuid',
+    'interface',
+]
+
 
 class CustomEndpointNotifier:
     def __init__(self, bus):
         self.bus = bus
 
     def created(self, custom):
-        event = CreateCustomEndpointEvent(custom.id, custom.interface)
+        custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
+        event = CreateCustomEndpointEvent(custom_serialized)
         self.bus.send_bus_event(event)
 
     def edited(self, custom):
-        event = EditCustomEndpointEvent(custom.id, custom.interface)
+        custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
+        event = EditCustomEndpointEvent(custom_serialized)
         self.bus.send_bus_event(event)
 
     def deleted(self, custom):
-        event = DeleteCustomEndpointEvent(custom.id, custom.interface)
+        custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
+        event = DeleteCustomEndpointEvent(custom_serialized)
         self.bus.send_bus_event(event)
 
 
