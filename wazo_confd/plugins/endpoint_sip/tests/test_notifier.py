@@ -25,7 +25,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.sip = Mock(SIP, id=1, tenant_uuid=str(uuid.uuid4), username='username', )
+        self.sip = Mock(SIP, id=1, tenant_uuid=str(uuid.uuid4), username='username',)
         self.sip.name = 'limitation of mock instantiation with name ...'
         self.sip_serialized = {
             'id': self.sip.id,

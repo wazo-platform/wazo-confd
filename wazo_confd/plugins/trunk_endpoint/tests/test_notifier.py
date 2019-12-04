@@ -71,7 +71,11 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_associate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXAssociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            iax={'id': self.iax.id, 'tenant_uuid': self.iax.tenant_uuid, 'name': self.iax.name},
+            iax={
+                'id': self.iax.id,
+                'tenant_uuid': self.iax.tenant_uuid,
+                'name': self.iax.name,
+            },
         )
 
         self.notifier_iax.associated(self.trunk, self.iax)
@@ -127,7 +131,11 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_dissociate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXDissociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            iax={'id': self.iax.id, 'tenant_uuid': self.iax.tenant_uuid, 'name': self.iax.name},
+            iax={
+                'id': self.iax.id,
+                'tenant_uuid': self.iax.tenant_uuid,
+                'name': self.iax.name,
+            },
         )
 
         self.notifier_iax.dissociated(self.trunk, self.iax)
