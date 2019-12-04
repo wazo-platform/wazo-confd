@@ -31,11 +31,13 @@ ENDPOINT_SIP_FIELDS = [
 ENDPOINT_IAX_FIELDS = [
     'id',
     'tenant_uuid',
+    'name',
 ]
 
 ENDPOINT_CUSTOM_FIELDS = [
     'id',
     'tenant_uuid',
+    'interface'
 ]
 
 

@@ -30,8 +30,9 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.sip = Mock(Sip, id=1, username='username', tenant_uuid=tenant_uuid)
         self.sip.name = 'limitation of mock instantiation with name ...'
-        self.custom = Mock(Custom, id=2, tenant_uuid=tenant_uuid)
+        self.custom = Mock(Custom, id=2, tenant_uuid=tenant_uuid, interface='custom')
         self.iax = Mock(IAX, id=3, tenant_uuid=tenant_uuid)
+        self.iax.name = 'limitation of mock instantiation with name ...'
         self.trunk = Mock(Trunk, id=4, tenant_uuid=tenant_uuid)
 
         self.notifier_custom = TrunkEndpointNotifier('custom', self.bus, self.sysconfd)
@@ -56,7 +57,11 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_associate_custom_then_bus_event(self):
         expected_event = TrunkEndpointCustomAssociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            custom={'id': self.custom.id, 'tenant_uuid': self.custom.tenant_uuid},
+            custom={
+                'id': self.custom.id,
+                'tenant_uuid': self.custom.tenant_uuid,
+                'interface': self.custom.interface,
+            },
         )
 
         self.notifier_custom.associated(self.trunk, self.custom)
@@ -66,7 +71,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_associate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXAssociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            iax={'id': self.iax.id, 'tenant_uuid': self.iax.tenant_uuid},
+            iax={'id': self.iax.id, 'tenant_uuid': self.iax.tenant_uuid, 'name': self.iax.name},
         )
 
         self.notifier_iax.associated(self.trunk, self.iax)
@@ -108,7 +113,11 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_dissociate_custom_then_bus_event(self):
         expected_event = TrunkEndpointCustomDissociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            custom={'id': self.custom.id, 'tenant_uuid': self.custom.tenant_uuid},
+            custom={
+                'id': self.custom.id,
+                'tenant_uuid': self.custom.tenant_uuid,
+                'interface': self.custom.interface,
+            },
         )
 
         self.notifier_custom.dissociated(self.trunk, self.custom)
@@ -118,7 +127,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
     def test_dissociate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXDissociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            iax={'id': self.iax.id, 'tenant_uuid': self.iax.tenant_uuid},
+            iax={'id': self.iax.id, 'tenant_uuid': self.iax.tenant_uuid, 'name': self.iax.name},
         )
 
         self.notifier_iax.dissociated(self.trunk, self.iax)
