@@ -5,6 +5,7 @@ from hamcrest import (
     all_of,
     assert_that,
     contains_inanyorder,
+    equal_to,
     empty,
     has_entries,
     has_entry,
@@ -12,9 +13,10 @@ from hamcrest import (
     has_items,
     is_not,
     not_,
+    none,
 )
 
-from . import confd
+from . import confd, db
 from ..helpers import errors as e, fixtures, scenarios as s
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
@@ -407,6 +409,70 @@ def test_get_incalls_relation_when_user_destination(user):
             )
         ),
     )
+
+
+@fixtures.user()
+@fixtures.ivr()
+def test_incall_with_destination_added_then_removed_then_readded(user, ivr):
+    incall = confd.incalls.post(destination={'type': 'ivr', 'ivr_id': ivr['id']}).item
+
+    ivr = confd.ivr(ivr['id']).get().item
+    assert_that(
+        ivr,
+        has_entries(
+            incalls=contains_inanyorder(
+                has_entries(id=incall['id'], extensions=incall['extensions']),
+            )
+        ),
+    )
+
+    with db.queries() as queries:
+        assert_that(queries.get_action_linked('user', user['id']), none())
+        assert_that(queries.get_action_linked('ivr', ivr['id']), equal_to(1))
+        assert_that(queries.get_category_linked('incall', incall['id']), equal_to(1))
+
+    response = confd.ivr(ivr['id']).delete()
+    response.assert_deleted()
+
+    with db.queries() as queries:
+        assert_that(queries.get_action_linked('user', user['id']), none())
+        assert_that(queries.get_action_linked('ivr', ivr['id']), equal_to(0))
+        assert_that(queries.get_category_linked('incall', incall['id']), equal_to(0))
+
+    confd.incalls(incall['id']).put(destination={'type': 'none'})
+    incall = confd.incalls(incall['id']).get().item
+    assert_that(
+        incall,
+        has_entries(
+            destination=has_entries(
+                type='none',
+            )
+        )
+    )
+
+    with db.queries() as queries:
+        assert_that(queries.get_action_linked('user', user['id']), none())
+        assert_that(queries.get_action_linked('ivr', ivr['id']), none())
+
+        # XXX(sileht): is it supposed to be linked for none destination ?
+        assert_that(queries.get_category_linked('incall', incall['id']), equal_to(1))
+
+    confd.incalls(incall['id']).put(destination={'type': 'user', 'user_id': user['id']})
+    incall = confd.incalls(incall['id']).get().item
+    assert_that(
+        incall,
+        has_entries(
+            destination=has_entries(
+                type='user',
+                user_id=user['id'],
+            )
+        )
+    )
+
+    with db.queries() as queries:
+        assert_that(queries.get_action_linked('ivr', ivr['id']), none())
+        assert_that(queries.get_action_linked('user', user['id']), equal_to(1))
+        assert_that(queries.get_category_linked('incall', incall['id']), equal_to(1))
 
 
 @fixtures.ivr()

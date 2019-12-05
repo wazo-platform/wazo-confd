@@ -1,6 +1,10 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from hamcrest import (
+    assert_that,
+    less_than_or_equal_to,
+)
 from contextlib import contextmanager
 from functools import wraps
 
@@ -601,6 +605,44 @@ class DatabaseQueries:
         ).scalar()
 
         return count > 0
+
+    def get_action_linked(self, action, id_):
+        query = text(
+            """SELECT dialaction.linked
+                    FROM dialaction
+                    WHERE
+                        dialaction.action = :action
+                        AND dialaction.actionarg1 = :id_
+            """
+        )
+        linked = self.connection.execute(
+            query,
+            action=action,
+            id_=str(id_),
+        ).fetchall()
+
+        # Ensure we don't have mulitple links
+        assert_that(len(linked), less_than_or_equal_to(1))
+        return linked[0][0] if linked else None
+
+    def get_category_linked(self, category, id_):
+        query = text(
+            """SELECT dialaction.linked
+                    FROM dialaction
+                    WHERE
+                        dialaction.category = :category
+                        AND dialaction.categoryval = :id_
+            """
+        )
+        linked = self.connection.execute(
+            query,
+            category=category,
+            id_=str(id_),
+        ).fetchall()
+
+        # Ensure we don't have mulitple links
+        assert_that(len(linked), less_than_or_equal_to(1))
+        return linked[0][0] if linked else None
 
 
 def create_helper(
