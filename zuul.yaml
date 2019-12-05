@@ -13,7 +13,7 @@
 
 - job:
     name: confd-tox-integration
-    description: Run dird integration tests
+    description: Run confd integration tests
     parent: wazo-tox-integration
     timeout: 10800
     vars:
