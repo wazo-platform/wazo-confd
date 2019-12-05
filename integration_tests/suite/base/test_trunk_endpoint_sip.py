@@ -228,5 +228,11 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
 @fixtures.sip()
 def test_bus_events(trunk, sip):
     url = confd.trunks(trunk['id']).endpoints.sip(sip['id'])
-    yield s.check_bus_event, 'config.trunks.endpoints.updated', url.put
-    yield s.check_bus_event, 'config.trunks.endpoints.deleted', url.delete
+    routing_key = 'config.trunks.{}.endpoints.sip.{}.updated'.format(
+        trunk['id'], sip['id']
+    )
+    yield s.check_bus_event, routing_key, url.put
+    routing_key = 'config.trunks.{}.endpoints.sip.{}.deleted'.format(
+        trunk['id'], sip['id']
+    )
+    yield s.check_bus_event, routing_key, url.delete
