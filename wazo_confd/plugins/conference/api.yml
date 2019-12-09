@@ -25,7 +25,9 @@ paths:
       description: |
         **Required ACL:** `confd.conferences.create`
 
-        All conferences have the same menu. Please consult the asterisk documentation for definitions:
+        All conferences have the same menu. Please consult the asterisk
+        [documentation](https://raw.githubusercontent.com/asterisk/asterisk/master/configs/samples/confbridge.conf.sample)
+        for definitions:
         ```
         * = playback_and_continue
         1 = toggle_mute

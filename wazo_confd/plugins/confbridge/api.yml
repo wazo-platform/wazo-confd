@@ -15,11 +15,15 @@ paths:
     put:
       operationId: update_asterisk_confbridge_wazo_default_bridge
       summary: Update ConfBridge wazo_default_bridge option
-      description: '**Required ACL:** `confd.asterisk.confbridge.wazo_default_bridge.update`
-
+      description: |
+        **Required ACL:** `confd.asterisk.confbridge.wazo_default_bridge.update`
 
         **WARNING** This endpoint restore to default value or delete all fields that
-        are not defined.'
+        are not defined.
+
+        All available configuration options are listed in the
+        [sample](https://raw.githubusercontent.com/asterisk/asterisk/master/configs/samples/confbridge.conf.sample)
+        Asterisk configuration file.
       tags:
       - asterisk
       - conferences
@@ -52,11 +56,16 @@ paths:
     put:
       operationId: update_asterisk_confbridge_wazo_default_user
       summary: Update ConfBridge wazo_default_user option
-      description: '**Required ACL:** `confd.asterisk.confbridge.wazo_default_user.update`
+      description: |
+        **Required ACL:** `confd.asterisk.confbridge.wazo_default_user.update`
 
 
         **WARNING** This endpoint restore to default value or delete all fields that
-        are not defined.'
+        are not defined.
+
+        All available configuration options are listed in the
+        [sample](https://raw.githubusercontent.com/asterisk/asterisk/master/configs/samples/confbridge.conf.sample)
+        Asterisk configuration file.
       tags:
       - asterisk
       - conferences
