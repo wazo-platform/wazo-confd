@@ -19,6 +19,7 @@ class AuthClientProxy:
     def __init__(self, auth_client):
         self._auth_client = auth_client
         self._users_created = []
+        self.users = self._auth_client.users
 
     def new_user(self, *args, **kwargs):
         try:
