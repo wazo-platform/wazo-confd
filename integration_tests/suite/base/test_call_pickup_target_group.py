@@ -108,24 +108,65 @@ def test_associate_multi_tenant(
 
 @fixtures.call_pickup()
 @fixtures.user()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.line_sip()
 @fixtures.group()
 @fixtures.group()
-def test_get_interceptor_user_relation(call_pickup, user, group1, group2):
+def test_get_user_interceptor_user_relation(call_pickup, user1, user2, user3, line1, line2, line3, group1, group2):
+    with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(user3, line3):
+        response = confd.groups(group1['id']).members.users.put(users=[user2])
+        response.assert_updated()
+        response = confd.groups(group2['id']).members.users.put(users=[user3])
+        response.assert_updated()
 
-    with a.call_pickup_interceptor_user(call_pickup, user):
-        with a.call_pickup_target_group(call_pickup, group1, group2):
-            response = confd.users(user['id']).get()
-            assert_that(
-                response.item,
-                has_entries(
-                    call_pickup_targets=has_entries(
-                        groups=contains_inanyorder(
-                            has_entries(id=group1['id']),
-                            has_entries(id=group2['id']),
-                        )
-                    )
-                ),
-            )
+        with a.call_pickup_interceptor_user(call_pickup, user1):
+            with a.call_pickup_target_group(call_pickup, group1, group2):
+                response = confd.users(user1['id']).get()
+                assert_that(
+                    response.item,
+                    has_entries(
+                        call_pickup_target_users=contains_inanyorder(
+                            has_entries(uuid=user2['uuid']),
+                            has_entries(uuid=user3['uuid']),
+                        ),
+                    ),
+                )
+
+
+@fixtures.call_pickup()
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.group()
+@fixtures.group()
+@fixtures.group()
+def test_get_group_interceptor_user_relation(call_pickup, user1, user2, user3, line1, line2, line3, group1, group2, group3):
+    with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(user3, line3):
+        response = confd.groups(group1['id']).members.users.put(users=[user1])
+        response.assert_updated()
+        response = confd.groups(group2['id']).members.users.put(users=[user2])
+        response.assert_updated()
+        response = confd.groups(group3['id']).members.users.put(users=[user3])
+        response.assert_updated()
+
+        with a.call_pickup_interceptor_group(call_pickup, group1):
+            with a.call_pickup_target_group(call_pickup, group2, group3):
+                response = confd.users(user1['id']).get()
+                assert_that(
+                    response.item,
+                    has_entries(
+                        call_pickup_target_users=contains_inanyorder(
+                            has_entries(uuid=user2['uuid']),
+                            has_entries(uuid=user3['uuid']),
+                        ),
+                    ),
+                )
 
 
 @fixtures.call_pickup()
