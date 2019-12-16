@@ -4,7 +4,7 @@
 
 * A new read-only parameter has been added to the users resource:
 
-  * `call_pickup_targets`
+  * `call_pickup_target_users`
 
 ## 19.17
 
