@@ -58,10 +58,6 @@ class UserSchema(BaseSchema):
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], many=True, dump_only=True
     )
 
-    call_pickup_group_targets_flat = fields.Nested(
-        'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
-    )
-
     fallbacks = fields.Nested('UserFallbackSchema', dump_only=True)
     groups = fields.Nested(
         'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
@@ -100,30 +96,31 @@ class UserSchema(BaseSchema):
 
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
-        data.call_pickup_user_targets_flat = list(
-            set(self._flatten(data.call_pickup_user_targets))
-        )
+        all_ = [
+            list(data.users_from_call_pickup_group_interceptors_user_targets),
+            list(data.users_from_call_pickup_group_interceptors_group_targets),
+            list(data.users_from_call_pickup_user_targets),
+            list(data.users_from_call_pickup_group_targets),
+        ]
+        data.call_pickup_user_targets_flat = list(set(self._flatten(all_)))
 
-        data.call_pickup_group_targets_flat = list(
-            set(self._flatten(data.call_pickup_group_targets))
-        )
         return data
 
     @post_dump
     def format_call_pickup_targets(self, data):
-        if not self.only or 'call_pickup_targets' in self.only:
+        if not self.only or 'call_pickup_target_users' in self.only:
             call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
-            call_pickup_group_targets = data.pop('call_pickup_group_targets_flat', [])
-
-            data['call_pickup_targets'] = {
-                'users': call_pickup_user_targets,
-                'groups': call_pickup_group_targets,
-            }
+            data['call_pickup_target_users'] = call_pickup_user_targets
         return data
 
-    @staticmethod
-    def _flatten(iterable_of_iterable):
-        return itertools.chain(*iterable_of_iterable)
+    @classmethod
+    def _flatten(cls, iterable_of_iterable):
+        for item in iterable_of_iterable:
+            try:
+                itercheck = iter(item)
+                yield from cls._flatten(itercheck)
+            except TypeError:
+                yield item
 
 
 class UserDirectorySchema(BaseSchema):

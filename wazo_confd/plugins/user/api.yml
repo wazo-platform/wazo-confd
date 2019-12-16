@@ -493,16 +493,10 @@ definitions:
   UserRelationCallPickupTargets:
     title: UserRelationCallPickupTargets
     properties:
-      call_pickup_targets:
-        properties:
-          users:
-            type: array
-            items:
-              $ref: '#/definitions/UserRelationBase'
-          groups:
-            type: array
-            items:
-              $ref: '#/definitions/GroupRelationBase'
+      call_pickup_target_users:
+        type: array
+        items:
+          $ref: '#/definitions/UserRelationBase'
   UserService:
     title: UserService
     properties:
