@@ -5,6 +5,7 @@ import unittest
 import uuid
 
 from mock import Mock
+from mock import patch
 from xivo_bus.resources.user_line.event import (
     UserLineAssociatedEvent,
     UserLineDissociatedEvent,
@@ -31,6 +32,9 @@ class TestUserLineNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.user = Mock(uuid=USER_UUID, id=1, tenant_uuid=TENANT_UUID)
+        self.serialized_user = {
+            'uuid': self.user.uuid, 'id': self.user.id, 'tenant_uuid': self.user.tenant_uuid
+        }
         self.line = Mock(
             id=2, endpoint_sip={'id': 3}, endpoint_sccp=None, endpoint_custom=None
         )
@@ -40,13 +44,11 @@ class TestUserLineNotifier(unittest.TestCase):
         )
         self.notifier = UserLineNotifier(self.bus, self.sysconfd)
 
-    def test_associated_then_bus_event(self):
+    @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
+    def test_associated_then_bus_event(self, user_dump):
+        user_dump.return_value = self.serialized_user
         expected_event = UserLineAssociatedEvent(
-            user={
-                'uuid': self.user.uuid,
-                'id': self.user.id,
-                'tenant_uuid': self.user.tenant_uuid,
-            },
+            user=self.serialized_user,
             line={
                 'id': self.line.id,
                 'name': self.line.name,
@@ -62,20 +64,20 @@ class TestUserLineNotifier(unittest.TestCase):
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_associated_then_sip_reload(self):
+    @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
+    def test_associated_then_sip_reload(self, user_dump):
+        user_dump.return_value = self.serialized_user
         self.notifier.associated(self.user_line)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(
             EXPECTED_SYSCONFD_HANDLERS
         )
 
-    def test_dissociated_then_bus_event(self):
+    @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
+    def test_dissociated_then_bus_event(self, user_dump):
+        user_dump.return_value = self.serialized_user
         expected_event = UserLineDissociatedEvent(
-            user={
-                'uuid': self.user.uuid,
-                'id': self.user.id,
-                'tenant_uuid': self.user.tenant_uuid,
-            },
+            user=self.serialized_user,
             line={
                 'id': self.line.id,
                 'name': self.line.name,
@@ -91,7 +93,9 @@ class TestUserLineNotifier(unittest.TestCase):
 
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
-    def test_dissociated_then_sip_reload(self):
+    @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
+    def test_dissociated_then_sip_reload(self, user_dump):
+        user_dump.return_value = self.serialized_user
         self.notifier.dissociated(self.user_line)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(
