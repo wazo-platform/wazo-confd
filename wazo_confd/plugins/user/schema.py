@@ -1,7 +1,6 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import itertools
 from marshmallow import fields, post_dump, pre_dump
 from marshmallow.validate import Length, Range, Regexp
 
