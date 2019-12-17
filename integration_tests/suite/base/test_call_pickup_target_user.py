@@ -130,10 +130,7 @@ def test_get_user_interceptor_user_relation(call_pickup, user1, user2, user3):
 @fixtures.line_sip()
 @fixtures.group()
 def test_get_group_interceptor_user_relation(call_pickup, user1, user2, user3, line, group):
-    with a.user_line(user1, line):
-        response = confd.groups(group['id']).members.users.put(users=[user1])
-        response.assert_updated()
-
+    with a.user_line(user1, line), a.group_member_user(group, user1):
         with a.call_pickup_interceptor_group(call_pickup, group):
             with a.call_pickup_target_user(call_pickup, user2, user3):
                 response = confd.users(user1['id']).get()
