@@ -55,7 +55,10 @@ class UserSchema(BaseSchema):
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
     call_pickup_user_targets_flat = fields.Nested(
-        'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], many=True, dump_only=True
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
     )
 
     fallbacks = fields.Nested('UserFallbackSchema', dump_only=True)

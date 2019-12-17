@@ -33,7 +33,9 @@ class TestUserLineNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.user = Mock(uuid=USER_UUID, id=1, tenant_uuid=TENANT_UUID)
         self.serialized_user = {
-            'uuid': self.user.uuid, 'id': self.user.id, 'tenant_uuid': self.user.tenant_uuid
+            'uuid': self.user.uuid,
+            'id': self.user.id,
+            'tenant_uuid': self.user.tenant_uuid,
         }
         self.line = Mock(
             id=2, endpoint_sip={'id': 3}, endpoint_sccp=None, endpoint_custom=None
