@@ -16,6 +16,9 @@ services:
     volumes:
       - "./etc/wazo-confd/conf.d/ari.yml:/etc/wazo-confd/conf.d/ari.yml"
 
+  postgres:
+    command: "-c 'log_min_duration_statement=0'"
+
   ari:
     image: p0bailey/docker-flask
     ports:

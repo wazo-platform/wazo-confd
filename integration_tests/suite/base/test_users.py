@@ -17,7 +17,7 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
+from . import confd, BaseIntegrationTest
 from ..helpers import associations as a, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
@@ -517,6 +517,13 @@ def test_list_multi_tenant(main, sub):
 def test_list_by_multiple_uuids(_, user2, user3):
     response = confd.users.get(uuid=','.join([user2['uuid'], user3['uuid']]))
     assert_that(response.items, contains_inanyorder(user2, user3))
+
+
+@fixtures.user(firstname='Alice')
+@fixtures.user(firstname='Bob')
+@fixtures.user(firstname='Charles')
+def test_list_db_requests(*_):
+    s.check_db_requests(BaseIntegrationTest, confd.users.get, nb_requests=1)
 
 
 @fixtures.user(
