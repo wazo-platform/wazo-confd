@@ -27,7 +27,6 @@ services:
     image: wazopbx/postgres-test
     ports:
       - "5432"
-    command: "-c 'log_min_duration_statement=0'"
 
   rabbitmq:
     image: rabbitmq
