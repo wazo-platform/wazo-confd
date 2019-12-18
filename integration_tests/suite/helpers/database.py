@@ -272,14 +272,14 @@ class DatabaseQueries:
     ):
         query = text(
             """
-        INSERT INTO groupfeatures (name, number, context, tenant_uuid)
-        VALUES (:name, :number, :context, :tenant_uuid)
+        INSERT INTO groupfeatures (name, tenant_uuid)
+        VALUES (:name, :tenant_uuid)
         RETURNING id
         """
         )
 
         group_id = self.connection.execute(
-            query, name=name, number=number, context=context, tenant_uuid=tenant_uuid
+            query, name=name, tenant_uuid=tenant_uuid
         ).scalar()
         self.insert_extension(number, context, 'group', group_id)
 
