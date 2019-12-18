@@ -19,6 +19,8 @@ from .helpers import setup_provd as setup_provd_helpers
 from .provd import create_helper as provd_create_helper
 from .sysconfd import SysconfdMock
 
+OVERHEAD_DB_REQUESTS = 4  # BEGIN, COMMIT, SELECT 1, COMMIT
+
 
 class IntegrationTest(AssetLaunchingTestCase):
     service = 'confd'

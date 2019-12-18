@@ -1,6 +1,7 @@
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from datetime import datetime
 from hamcrest import (
     all_of,
     assert_that,
@@ -17,8 +18,9 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
+from . import confd, BaseIntegrationTest
 from ..helpers import associations as a, fixtures, scenarios as s
+from ..helpers.base import OVERHEAD_DB_REQUESTS
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FULL_USER = {
@@ -517,6 +519,18 @@ def test_list_multi_tenant(main, sub):
 def test_list_by_multiple_uuids(_, user2, user3):
     response = confd.users.get(uuid=','.join([user2['uuid'], user3['uuid']]))
     assert_that(response.items, contains_inanyorder(user2, user3))
+
+
+@fixtures.user(firstname='Alice')
+@fixtures.user(firstname='Bob')
+@fixtures.user(firstname='Charles')
+def test_list_db_requests(*_):
+    time_start = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    nb_logs_start = BaseIntegrationTest.count_database_logs(since=time_start)
+    confd.users.get()
+    nb_logs_end = BaseIntegrationTest.count_database_logs(since=time_start)
+    nb_db_requests = nb_logs_end - nb_logs_start
+    assert_that(nb_db_requests, equal_to(OVERHEAD_DB_REQUESTS + 1))
 
 
 @fixtures.user(
