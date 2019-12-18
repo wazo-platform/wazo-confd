@@ -1,7 +1,7 @@
 # Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+from marshmallow import fields, post_dump, pre_dump
 from marshmallow.validate import Length, Range, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
@@ -53,6 +53,13 @@ class UserSchema(BaseSchema):
     call_permissions = fields.Nested(
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
+    call_pickup_user_targets_flat = fields.Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )
+
     fallbacks = fields.Nested('UserFallbackSchema', dump_only=True)
     groups = fields.Nested(
         'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
@@ -88,6 +95,34 @@ class UserSchema(BaseSchema):
     queues = fields.Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
+
+    @pre_dump
+    def flatten_call_pickup_targets(self, data, **kwargs):
+        all_ = [
+            list(data.users_from_call_pickup_group_interceptors_user_targets),
+            list(data.users_from_call_pickup_group_interceptors_group_targets),
+            list(data.users_from_call_pickup_user_targets),
+            list(data.users_from_call_pickup_group_targets),
+        ]
+        data.call_pickup_user_targets_flat = list(set(self._flatten(all_)))
+
+        return data
+
+    @post_dump
+    def format_call_pickup_targets(self, data):
+        if not self.only or 'call_pickup_target_users' in self.only:
+            call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
+            data['call_pickup_target_users'] = call_pickup_user_targets
+        return data
+
+    @classmethod
+    def _flatten(cls, iterable_of_iterable):
+        for item in iterable_of_iterable:
+            try:
+                itercheck = iter(item)
+                yield from cls._flatten(itercheck)
+            except TypeError:
+                yield item
 
 
 class UserDirectorySchema(BaseSchema):

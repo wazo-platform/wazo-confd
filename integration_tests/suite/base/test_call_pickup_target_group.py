@@ -107,6 +107,71 @@ def test_associate_multi_tenant(
 
 
 @fixtures.call_pickup()
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.group()
+@fixtures.group()
+def test_get_user_interceptor_user_relation(
+    call_pickup, user1, user2, user3, line1, line2, line3, group1, group2
+):
+    with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(
+        user3, line3
+    ), a.group_member_user(group1, user2), a.group_member_user(group2, user3):
+
+        with a.call_pickup_interceptor_user(call_pickup, user1):
+            with a.call_pickup_target_group(call_pickup, group1, group2):
+                response = confd.users(user1['id']).get()
+                assert_that(
+                    response.item,
+                    has_entries(
+                        call_pickup_target_users=contains_inanyorder(
+                            has_entries(uuid=user2['uuid']),
+                            has_entries(uuid=user3['uuid']),
+                        ),
+                    ),
+                )
+
+
+@fixtures.call_pickup()
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.group()
+@fixtures.group()
+@fixtures.group()
+def test_get_group_interceptor_user_relation(
+    call_pickup, user1, user2, user3, line1, line2, line3, group1, group2, group3
+):
+    with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(
+        user3, line3
+    ), a.group_member_user(group1, user1), a.group_member_user(
+        group2, user2
+    ), a.group_member_user(
+        group3, user3
+    ):
+
+        with a.call_pickup_interceptor_group(call_pickup, group1):
+            with a.call_pickup_target_group(call_pickup, group2, group3):
+                response = confd.users(user1['id']).get()
+                assert_that(
+                    response.item,
+                    has_entries(
+                        call_pickup_target_users=contains_inanyorder(
+                            has_entries(uuid=user2['uuid']),
+                            has_entries(uuid=user3['uuid']),
+                        ),
+                    ),
+                )
+
+
+@fixtures.call_pickup()
 @fixtures.group()
 @fixtures.group()
 def test_get_groups_associated_to_call_pickup(call_pickup, group1, group2):

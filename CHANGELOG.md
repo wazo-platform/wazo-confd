@@ -1,5 +1,11 @@
 # Changelog
 
+## 19.18
+
+* A new read-only parameter has been added to the users resource:
+
+  * `call_pickup_target_users`
+
 ## 19.17
 
 * Legacy search parameter with `q` has been removed from user resource
