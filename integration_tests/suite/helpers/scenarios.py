@@ -5,12 +5,21 @@ import re
 import random
 import string
 
-from hamcrest import assert_that, contains, has_length, has_entries
+from datetime import datetime
+from hamcrest import (
+    assert_that,
+    contains,
+    equal_to,
+    has_entries,
+    has_length,
+)
 from xivo_test_helpers import until
 
 from .bus import BusClient
 
 from . import errors as e
+
+OVERHEAD_DB_REQUESTS = 4  # BEGIN, COMMIT, SELECT 1, COMMIT
 
 
 def check_resource_not_found(request, resource):
@@ -102,3 +111,12 @@ def check_limit(url, resource1, resource2, field, search, id_field='id'):
     assert_that(
         response.items, contains(has_entries(**{id_field: resource1[id_field]}))
     )
+
+
+def check_db_requests(cls, url, nb_requests):
+    time_start = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+    nb_logs_start = cls.count_database_logs(since=time_start)
+    url()
+    nb_logs_end = cls.count_database_logs(since=time_start)
+    nb_db_requests = nb_logs_end - nb_logs_start
+    assert_that(nb_db_requests, equal_to(OVERHEAD_DB_REQUESTS + nb_requests))
