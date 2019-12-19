@@ -20,7 +20,7 @@ from hamcrest import (
     not_,
 )
 
-from . import confd, provd
+from . import confd, provd, BaseIntegrationTest
 from ..helpers import (
     associations as a,
     errors as e,
@@ -550,6 +550,13 @@ def test_search_extensions_by_type(internal, incall):
     response = confd.extensions.get(type="incall")
     assert_that(response.items, not_(expected_internal))
     assert_that(response.items, expected_incall)
+
+
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.extension()
+def test_list_db_requests(*_):
+    s.check_db_requests(BaseIntegrationTest, confd.extensions.get, nb_requests=1)
 
 
 @fixtures.extension()
