@@ -244,3 +244,17 @@ def test_delete_endpoint_dissociates_line(line, custom):
 
         response = confd.lines(line['id']).endpoints.custom.get()
         response.assert_status(404)
+
+
+@fixtures.line()
+@fixtures.custom()
+def test_bus_events(line, custom):
+    url = confd.lines(line['id']).endpoints.custom(custom['id'])
+    routing_key = 'config.lines.{}.endpoints.custom.{}.updated'.format(
+        line['id'], custom['id']
+    )
+    yield s.check_bus_event, routing_key, url.put
+    routing_key = 'config.lines.{}.endpoints.custom.{}.deleted'.format(
+        line['id'], custom['id']
+    )
+    yield s.check_bus_event, routing_key, url.delete

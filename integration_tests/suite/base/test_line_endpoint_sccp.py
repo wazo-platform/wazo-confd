@@ -224,3 +224,17 @@ def test_delete_endpoint_dissociates_line(line, sccp):
 
         response = confd.lines(line['id']).endpoints.sccp.get()
         response.assert_status(404)
+
+
+@fixtures.line()
+@fixtures.sccp()
+def test_bus_events(line, sccp):
+    url = confd.lines(line['id']).endpoints.sccp(sccp['id'])
+    routing_key = 'config.lines.{}.endpoints.sccp.{}.updated'.format(
+        line['id'], sccp['id']
+    )
+    yield s.check_bus_event, routing_key, url.put
+    routing_key = 'config.lines.{}.endpoints.sccp.{}.deleted'.format(
+        line['id'], sccp['id']
+    )
+    yield s.check_bus_event, routing_key, url.delete
