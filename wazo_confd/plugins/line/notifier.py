@@ -8,6 +8,14 @@ from xivo_bus.resources.line.event import (
 )
 
 from wazo_confd import bus, sysconfd
+from wazo_confd.plugins.line.schema import LineSchema
+
+LINE_FIELDS = [
+    'id',
+    'protocol',
+    'name',
+    'tenant_uuid',
+]
 
 
 class LineNotifier:
@@ -28,18 +36,21 @@ class LineNotifier:
 
     def created(self, line):
         self.send_sysconfd_handlers()
-        event = CreateLineEvent(line.id)
+        serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
+        event = CreateLineEvent(serialized_line)
         self.bus.send_bus_event(event)
 
     def edited(self, line, updated_fields):
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers()
-        event = EditLineEvent(line.id)
+        serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
+        event = EditLineEvent(serialized_line)
         self.bus.send_bus_event(event)
 
     def deleted(self, line):
         self.send_sysconfd_handlers()
-        event = DeleteLineEvent(line.id)
+        serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
+        event = DeleteLineEvent(serialized_line)
         self.bus.send_bus_event(event)
 
 
