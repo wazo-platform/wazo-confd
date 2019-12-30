@@ -27,7 +27,14 @@ class TestLineNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.line = Mock(Line, id=1234)
+        self.line = Mock(Line, id=1234, protocol='sip', tenant_uuid='uuid')
+        self.line.name = 'limitation of mock instantiation with name ...'
+        self.line_serialized = {
+            'id': self.line.id,
+            'name': self.line.name,
+            'tenant_uuid': self.line.tenant_uuid,
+            'protocol': self.line.protocol,
+        }
 
         self.notifier = LineNotifier(self.sysconfd, self.bus)
 
@@ -37,7 +44,7 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_line_created_then_event_sent_on_bus(self):
-        expected_event = CreateLineEvent(self.line.id)
+        expected_event = CreateLineEvent(self.line_serialized)
 
         self.notifier.created(self.line)
 
@@ -61,7 +68,7 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_line_edited_then_event_sent_on_bus(self):
-        expected_event = EditLineEvent(self.line.id)
+        expected_event = EditLineEvent(self.line_serialized)
 
         self.notifier.edited(self.line, None)
 
@@ -73,7 +80,7 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_line_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteLineEvent(self.line.id)
+        expected_event = DeleteLineEvent(self.line_serialized)
 
         self.notifier.deleted(self.line)
 
