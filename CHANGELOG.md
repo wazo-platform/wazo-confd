@@ -1,5 +1,9 @@
 # Changelog
 
+## 20.01
+
+* The voicemail `name` no longer change according to the user `firstname`/`lastname`
+
 ## 19.18
 
 * A new read-only parameter has been added to the users resource:
