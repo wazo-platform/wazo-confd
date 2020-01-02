@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, has_key, is_not
@@ -268,6 +268,40 @@ def test_when_move_funckey_position_then_no_duplicate_error(
         check_provd_has_funckey(
             device, 2, {'label': '', 'type': 'blf', 'line': 1, 'value': '1234'}
         )
+
+
+@fixtures.user()
+@fixtures.user()
+@fixtures.user()
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.extension()
+@fixtures.extension()
+@fixtures.device()
+@fixtures.device()
+def test_deleting_user_updates_devices_with_funckeys_pointing_to_it(
+    user1, user2, user3, line_sip1, line_sip2, extension1, extension2, device1, device2
+):
+    with a.line_extension(line_sip1, extension1), a.user_line(
+        user1, line_sip1
+    ), a.line_device(line_sip1, device1), a.line_extension(
+        line_sip2, extension2
+    ), a.user_line(
+        user2, line_sip2
+    ), a.line_device(
+        line_sip2, device2
+    ):
+        destination = {'type': 'user', 'user_id': user3['id']}
+        confd.users(user1['id']).funckeys.put(
+            keys={'1': {'destination': destination}}
+        ).assert_updated()
+        confd.users(user2['id']).funckeys.put(
+            keys={'1': {'destination': destination}}
+        ).assert_updated()
+
+        confd.users(user3['id']).delete().assert_deleted()
+        check_provd_does_not_have_funckey(device1, 1)
+        check_provd_does_not_have_funckey(device2, 1)
 
 
 def test_edit_all_parameters():
