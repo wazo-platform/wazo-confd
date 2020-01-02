@@ -1,7 +1,8 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.func_key import dao as func_key_dao
 
 from wazo_confd.helpers.resource import CRUDService
 from wazo_confd.helpers.validator import ValidationGroup
@@ -17,18 +18,29 @@ class UserBaseService(CRUDService):
 
 
 class UserService(UserBaseService):
-    def __init__(self, dao, validator, notifier, device_updater):
+    def __init__(self, dao, validator, notifier, device_updater, func_key_dao):
         super(UserService, self).__init__(dao, validator, notifier)
         self.device_updater = device_updater
+        self.func_key_dao = func_key_dao
 
     def edit(self, user, updated_fields=None):
         super(UserService, self).edit(user, updated_fields)
         self.device_updater.update_for_user(user)
 
+    def delete(self, user):
+        self.validator.validate_delete(user)
+        users = self.func_key_dao.find_users_having_user_destination(user)
+        self.dao.delete(user)
+        self.notifier.deleted(user)
+        for user in users:
+            self.device_updater.update_for_user(user)
+
 
 def build_service(provd_client):
     updater = build_device_updater(provd_client)
-    return UserService(user_dao, build_validator(), build_notifier(), updater)
+    return UserService(
+        user_dao, build_validator(), build_notifier(), updater, func_key_dao
+    )
 
 
 class UserCallServiceService(UserBaseService):
