@@ -29,11 +29,11 @@ class UserService(UserBaseService):
 
     def delete(self, user):
         self.validator.validate_delete(user)
-        users = self.func_key_dao.find_users_having_user_destination(user)
+        users_with_fk = self.func_key_dao.find_users_having_user_destination(user)
         self.dao.delete(user)
         self.notifier.deleted(user)
-        for user in users:
-            self.device_updater.update_for_user(user)
+        for user_with_fk in users_with_fk:
+            self.device_updater.update_for_user(user_with_fk)
 
 
 def build_service(provd_client):
