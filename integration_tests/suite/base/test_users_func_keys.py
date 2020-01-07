@@ -59,17 +59,17 @@ def test_list(user, line_sip, extension, device):
         destination_2 = {'type': 'custom', 'exten': '456'}
         destination_3 = {'type': 'custom', 'exten': '789'}
         destination_4 = {'type': 'custom', 'exten': '012'}
-        confd.users(user['id']).funckeys(1).put(destination=destination_1)
-        confd.users(user['id']).funckeys(2).put(destination=destination_2)
-        confd.users(user['id']).funckeys(3).put(destination=destination_3)
+        confd.users(user['uuid']).funckeys(1).put(destination=destination_1)
+        confd.users(user['uuid']).funckeys(2).put(destination=destination_2)
+        confd.users(user['uuid']).funckeys(3).put(destination=destination_3)
         template_parameters = {
             'name': 'pos4',
             'keys': {'4': {'destination': destination_4}},
         }
         template = confd.funckeys.templates.post(**template_parameters).item
-        confd.users(user['id']).funckeys.templates(template['id']).put()
+        confd.users(user['uuid']).funckeys.templates(template['id']).put()
 
-        response = confd.users(user['id']).funckeys.get()
+        response = confd.users(user['uuid']).funckeys.get()
         assert_that(
             response.item,
             has_entries(
@@ -119,7 +119,7 @@ def test_put_position(user, line_sip, extension, device):
         user, line_sip
     ), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
-        confd.users(user['id']).funckeys(position).put(destination=destination)
+        confd.users(user['uuid']).funckeys(position).put(destination=destination)
 
         response = confd.users(user['id']).funckeys(position).put(modified_funckey)
         response.assert_updated()
@@ -151,10 +151,10 @@ def test_delete_position(user, line_sip, extension, device):
     with a.line_extension(line_sip, extension), a.user_line(
         user, line_sip
     ), a.line_device(line_sip, device):
-        confd.users(user['id']).funckeys(position_id).put(
+        confd.users(user['uuid']).funckeys(position_id).put(
             destination=destination_id
         ).assert_updated()
-        confd.users(user['id']).funckeys(position_uuid).put(
+        confd.users(user['uuid']).funckeys(position_uuid).put(
             destination=destination_uuid
         ).assert_updated()
 
@@ -189,7 +189,7 @@ def test_get_position(user):
         'destination': {'type': 'custom', 'exten': '1234'},
     }
 
-    confd.users(user['id']).funckeys(1).put(funckey).assert_updated()
+    confd.users(user['uuid']).funckeys(1).put(funckey).assert_updated()
 
     expected_funckey = funckey
     expected_funckey['destination']['href'] = None
@@ -212,7 +212,7 @@ def test_put_error_on_duplicate_destination(user):
         },
     }
 
-    response = confd.users(user['id']).funckeys.put(**parameters)
+    response = confd.users(user['uuid']).funckeys.put(**parameters)
     response.assert_status(400)
 
 
@@ -223,7 +223,7 @@ def test_error_when_user_are_not_bs_filter_member(user):
         'keys': {'1': {'destination': {'type': 'bsfilter', 'filter_member_id': '123'}}},
     }
 
-    response = confd.users(user['id']).funckeys.put(**parameters)
+    response = confd.users(user['uuid']).funckeys.put(**parameters)
     response.assert_match(400, e.missing_association('User', 'BSFilter'))
 
 
@@ -238,10 +238,10 @@ def test_when_line_has_another_position_then_func_key_generated(
         user, line_sip
     ), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
-        confd.users(user['id']).funckeys(1).put(
+        confd.users(user['uuid']).funckeys(1).put(
             destination=destination
         ).assert_updated()
-        response = confd.users(user['id']).funckeys(1).get()
+        response = confd.users(user['uuid']).funckeys(1).get()
         assert_that(response.item['destination'], has_entries(destination))
 
 
@@ -256,11 +256,11 @@ def test_when_move_funckey_position_then_no_duplicate_error(
         user, line_sip
     ), a.line_device(line_sip, device):
         destination = {'type': 'custom', 'exten': '1234'}
-        confd.users(user['id']).funckeys(1).put(
+        confd.users(user['uuid']).funckeys(1).put(
             destination=destination
         ).assert_updated()
 
-        response = confd.users(user['id']).funckeys.put(
+        response = confd.users(user['uuid']).funckeys.put(
             keys={'2': {'destination': destination}}
         )
         response.assert_updated()
@@ -292,14 +292,14 @@ def test_deleting_user_updates_devices_with_funckeys_pointing_to_it(
         line_sip2, device2
     ):
         destination = {'type': 'user', 'user_id': user3['id']}
-        confd.users(user1['id']).funckeys.put(
+        confd.users(user1['uuid']).funckeys.put(
             keys={'1': {'destination': destination}}
         ).assert_updated()
-        confd.users(user2['id']).funckeys.put(
+        confd.users(user2['uuid']).funckeys.put(
             keys={'1': {'destination': destination}}
         ).assert_updated()
 
-        confd.users(user3['id']).delete().assert_deleted()
+        confd.users(user3['uuid']).delete().assert_deleted()
         check_provd_does_not_have_funckey(device1, 1)
         check_provd_does_not_have_funckey(device2, 1)
 
