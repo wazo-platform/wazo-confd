@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -18,7 +18,7 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
+from . import confd, BaseIntegrationTest
 from ..helpers import associations as a, config, errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
@@ -149,6 +149,13 @@ def test_list_multi_tenant(_, __, main, sub):
 
     response = confd.lines.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(response.items, has_items(main, sub))
+
+
+@fixtures.line()
+@fixtures.line()
+@fixtures.line()
+def test_list_db_requests(*_):
+    s.check_db_requests(BaseIntegrationTest, confd.lines.get, nb_requests=1)
 
 
 def test_create_line_with_fake_context():
