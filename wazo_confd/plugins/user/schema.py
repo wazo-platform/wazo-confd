@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump, pre_dump
@@ -98,6 +98,9 @@ class UserSchema(BaseSchema):
 
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
+        if self.only and 'call_pickup_target_users' not in self.only:
+            return data
+
         all_ = [
             list(data.users_from_call_pickup_group_interceptors_user_targets),
             list(data.users_from_call_pickup_group_interceptors_group_targets),

@@ -151,11 +151,13 @@ def test_list_multi_tenant(_, __, main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
+@fixtures.user()
+@fixtures.line_sip()
 @fixtures.line()
 @fixtures.line()
-@fixtures.line()
-def test_list_db_requests(*_):
-    s.check_db_requests(BaseIntegrationTest, confd.lines.get, nb_requests=1)
+def test_list_db_requests(user1, line1, *_):
+    with a.user_line(user1, line1):
+        s.check_db_requests(BaseIntegrationTest, confd.lines.get, nb_requests=1)
 
 
 def test_create_line_with_fake_context():
