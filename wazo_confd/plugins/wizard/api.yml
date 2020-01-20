@@ -95,6 +95,9 @@ definitions:
       configured:
         type: boolean
         description: Whether Wazo has already been configured or not
+      provd_ready:
+        type: boolean
+        description: Whether wazo-provd is ready to receive requests or not
   WizardDiscover:
     title: WizardDiscover
     properties:

@@ -1,5 +1,9 @@
 # Changelog
 
+## 20.02
+
+* The GET on `1.1/wizard` not returns the `provd_ready` field
+
 ## 20.01
 
 * The voicemail `name` no longer change according to the user `firstname`/`lastname`

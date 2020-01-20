@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
@@ -8,7 +8,6 @@ import re
 from hamcrest import (
     assert_that,
     contains_inanyorder,
-    equal_to,
     empty,
     has_entry,
     has_entries,
@@ -269,18 +268,37 @@ class TestWizardDefaultValue(IntegrationTest):
 class TestWizard(IntegrationTest):
     @mocks.sysconfd()
     @mocks.auth()
-    def test_post(self, sysconfd, auth):
+    def test_get(self, sysconfd, auth):
         data = copy.deepcopy(COMPLETE_POST_BODY)
-        bus_events = self.bus.accumulator('config.wizard.created')
 
         response = self.confd.wizard.get()
-        assert_that(response.item, equal_to({'configured': False}))
+        assert_that(response.item, has_entries(configured=False, provd_ready=True))
 
         response = self.confd.wizard.post(data)
         response.assert_ok()
 
         response = self.confd.wizard.get()
-        assert_that(response.item, equal_to({'configured': True}))
+        assert_that(response.item, has_entries(configured=True))
+
+        self.stop_service('provd')
+
+        response = self.confd.wizard.get()
+        assert_that(response.item, has_entries(provd_ready=False))
+
+    @mocks.sysconfd()
+    @mocks.auth()
+    def test_post(self, sysconfd, auth):
+        data = copy.deepcopy(COMPLETE_POST_BODY)
+        bus_events = self.bus.accumulator('config.wizard.created')
+
+        response = self.confd.wizard.get()
+        assert_that(response.item, has_entries(configured=False))
+
+        response = self.confd.wizard.post(data)
+        response.assert_ok()
+
+        response = self.confd.wizard.get()
+        assert_that(response.item, has_entries(configured=True))
 
         self.validate_db(data)
         self.validate_auth(auth, data)
@@ -433,13 +451,13 @@ class TestWizardSteps(IntegrationTest):
         bus_events = self.bus.accumulator('config.wizard.created')
 
         response = self.confd.wizard.get()
-        assert_that(response.item, equal_to({'configured': False}))
+        assert_that(response.item, has_entries(configured=False))
 
         response = self.confd.wizard.post(data)
         response.assert_ok()
 
         response = self.confd.wizard.get()
-        assert_that(response.item, equal_to({'configured': True}))
+        assert_that(response.item, has_entries(configured=True))
 
         self.validate_auth(auth, data)
         self.validate_sysconfd(sysconfd, data)
