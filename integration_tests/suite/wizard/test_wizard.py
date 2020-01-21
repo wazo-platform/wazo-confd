@@ -265,7 +265,7 @@ class TestWizardDefaultValue(IntegrationTest):
             assert_that(queries.sccp_has_language('en_US'))
 
 
-class TestWizard(IntegrationTest):
+class TestWizardGet(IntegrationTest):
     @mocks.sysconfd()
     @mocks.auth()
     def test_get(self, sysconfd, auth):
@@ -285,6 +285,8 @@ class TestWizard(IntegrationTest):
         response = self.confd.wizard.get()
         assert_that(response.item, has_entries(provd_ready=False))
 
+
+class TestWizardPost(IntegrationTest):
     @mocks.sysconfd()
     @mocks.auth()
     def test_post(self, sysconfd, auth):
