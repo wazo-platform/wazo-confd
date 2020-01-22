@@ -60,7 +60,8 @@ class WizardSchema(BaseSchema):
 
 class ConfiguredSchema(BaseSchema):
     configured = fields.Boolean()
-    provd_ready = fields.Boolean()
+    configurable = fields.Boolean()
+    configurable_status = fields.Dict()
 
 
 class WizardResource(ErrorCatchingResource):

@@ -272,7 +272,11 @@ class TestWizardGet(IntegrationTest):
         data = copy.deepcopy(COMPLETE_POST_BODY)
 
         response = self.confd.wizard.get()
-        assert_that(response.item, has_entries(configured=False, provd_ready=True))
+        assert_that(response.item, has_entries(
+            configured=False,
+            configurable=True,
+            configurable_status=has_entries({'wazo-auth': 'ok', 'wazo-provd': 'ok'}),
+        ))
 
         response = self.confd.wizard.post(data)
         response.assert_ok()
@@ -283,7 +287,10 @@ class TestWizardGet(IntegrationTest):
         self.stop_service('provd')
 
         response = self.confd.wizard.get()
-        assert_that(response.item, has_entries(provd_ready=False))
+        assert_that(response.item, has_entries(
+            configurable=False,
+            configurable_status=has_entries({'wazo-provd': 'fail'}),
+        ))
 
 
 class TestWizardPost(IntegrationTest):

@@ -2,7 +2,7 @@
 
 ## 20.02
 
-* The GET on `1.1/wizard` not returns the `provd_ready` field
+* The GET on `1.1/wizard` now returns the `configurable` and `configurable_status`' fields
 
 ## 20.01
 

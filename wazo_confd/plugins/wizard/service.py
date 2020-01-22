@@ -52,17 +52,25 @@ class WizardService:
         self._auth_client = auth_client
 
     def get(self):
+        auth_status = 'fail'
         token = self._auth_client.token.new(expiration=60)['token']
+        auth_status = 'ok'
         self.provd_client.set_token(token)
         try:
-            provd_ready = self.provd_client.status.get()['rest_api'] == 'ok'
+            provd_status = self.provd_client.status.get()['rest_api']
         except Exception as e:
             logger.info('failed to fetch provd status %s', e)
-            provd_ready = False
+            provd_status = 'fail'
+
+        configurable_status = {
+            'wazo-provd': provd_status,
+            'wazo-auth': auth_status,
+        }
 
         return {
             'configured': wizard_db.get_xivo_configured().configured,
-            'provd_ready': provd_ready,
+            'configurable': all([state == 'ok' for state in configurable_status.values()]),
+            'configurable_status': configurable_status,
         }
 
     def create(self, wizard):
