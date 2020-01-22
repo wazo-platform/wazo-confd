@@ -69,7 +69,9 @@ class WizardService:
 
         return {
             'configured': wizard_db.get_xivo_configured().configured,
-            'configurable': all([state == 'ok' for state in configurable_status.values()]),
+            'configurable': all(
+                [state == 'ok' for state in configurable_status.values()]
+            ),
             'configurable_status': configurable_status,
         }
 
