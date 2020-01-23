@@ -95,6 +95,12 @@ definitions:
       configured:
         type: boolean
         description: Whether Wazo has already been configured or not
+      configurable:
+        type: boolean
+        description: Whether all services which the wizard depends on are started or not
+      configurable_status:
+        type: object
+        description: A mapping of all dependencies and there statuses
   WizardDiscover:
     title: WizardDiscover
     properties:

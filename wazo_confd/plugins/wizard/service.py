@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -52,7 +52,28 @@ class WizardService:
         self._auth_client = auth_client
 
     def get(self):
-        return wizard_db.get_xivo_configured()
+        auth_status = 'fail'
+        token = self._auth_client.token.new(expiration=60)['token']
+        auth_status = 'ok'
+        self.provd_client.set_token(token)
+        try:
+            provd_status = self.provd_client.status.get()['rest_api']
+        except Exception as e:
+            logger.info('failed to fetch provd status %s', e)
+            provd_status = 'fail'
+
+        configurable_status = {
+            'wazo-provd': provd_status,
+            'wazo-auth': auth_status,
+        }
+
+        return {
+            'configured': wizard_db.get_xivo_configured().configured,
+            'configurable': all(
+                [state == 'ok' for state in configurable_status.values()]
+            ),
+            'configurable_status': configurable_status,
+        }
 
     def create(self, wizard):
         self.validator.validate_create(wizard)
