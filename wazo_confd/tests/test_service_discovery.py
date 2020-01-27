@@ -13,7 +13,11 @@ class TestSelfCheck(unittest.TestCase):
     def setUp(self):
         self.https_port = 4243
         self.config = {
-            'rest_api': {'port': self.https_port, 'certificate': 'my-certificate'}
+            "rest_api": {
+                "port": self.https_port,
+                "certificate": "my-certificate",
+                "private_key": "my-key",
+            }
         }
 
     @patch(
