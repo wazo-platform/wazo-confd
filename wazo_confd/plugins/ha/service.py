@@ -16,18 +16,14 @@ class HAService:
 
     def edit(self, form):
         if form['node_type'] == 'disabled':
-            self._update_sip_general_options({
-                'minexpiry': '60',
-                'maxexpiry': '3600',
-                'defaultexpiry': '120',
-            })
+            self._update_sip_general_options(
+                {'minexpiry': '60', 'maxexpiry': '3600', 'defaultexpiry': '120'}
+            )
             self._update_provisioning_options(remote_address=None)
         elif form['node_type'] == 'master':
-            self._update_sip_general_options({
-                'minexpiry': '180',
-                'maxexpiry': '300',
-                'defaultexpiry': '240',
-            })
+            self._update_sip_general_options(
+                {'minexpiry': '180', 'maxexpiry': '300', 'defaultexpiry': '240'}
+            )
             self._update_provisioning_options(form['remote_address'])
         self.notifier.edited(form)
 

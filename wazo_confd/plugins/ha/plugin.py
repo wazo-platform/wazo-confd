@@ -4,7 +4,9 @@
 from wazo_provd_client import Client as ProvdClient
 
 from wazo_confd import bus, sysconfd
-from wazo_confd.plugins.sip_general.service import build_service as build_sip_general_service
+from wazo_confd.plugins.sip_general.service import (
+    build_service as build_sip_general_service,
+)
 from wazo_confd.plugins.registrar import builder as registrar_builder
 
 from .notifier import HANotifier

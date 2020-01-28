@@ -47,16 +47,29 @@ def test_put():
         json={'node_type': 'master', 'remote_address': '10.10.10.10'},
     )
     sip_general_options = confd.asterisk.sip.general.get().json
-    assert_that(sip_general_options, has_entry('options', has_length(greater_than(3))))  # other options are still present
-    assert_that(sip_general_options, has_entry('options', has_entries({
-        'minexpiry': '180',
-        'maxexpiry': '300',
-        'defaultexpiry': '240',
-    })))
-    assert_that(confd.registrars.get().json, has_entry('items', only_contains(has_entries({
-        'backup_host': '10.10.10.10',
-        'proxy_backup_host': '10.10.10.10',
-    }))))
+    assert_that(
+        sip_general_options, has_entry('options', has_length(greater_than(3)))
+    )  # other options are still present
+    assert_that(
+        sip_general_options,
+        has_entry(
+            'options',
+            has_entries(
+                {'minexpiry': '180', 'maxexpiry': '300', 'defaultexpiry': '240'}
+            ),
+        ),
+    )
+    assert_that(
+        confd.registrars.get().json,
+        has_entry(
+            'items',
+            only_contains(
+                has_entries(
+                    {'backup_host': '10.10.10.10', 'proxy_backup_host': '10.10.10.10'}
+                )
+            ),
+        ),
+    )
 
     # Disable HA = reset sip/provd options to default
     body = {'node_type': 'disabled'}
@@ -69,16 +82,27 @@ def test_put():
         json={'node_type': 'disabled', 'remote_address': ''},
     )
     sip_general_options = confd.asterisk.sip.general.get().json
-    assert_that(sip_general_options, has_entry('options', has_length(greater_than(3))))  # other options are still present
-    assert_that(sip_general_options, has_entry('options', has_entries({
-        'minexpiry': '60',
-        'maxexpiry': '3600',
-        'defaultexpiry': '120',
-    })))
-    assert_that(confd.registrars.get().json, has_entry('items', only_contains(has_entries({
-        'backup_host': None,
-        'proxy_backup_host': None,
-    }))))
+    assert_that(
+        sip_general_options, has_entry('options', has_length(greater_than(3)))
+    )  # other options are still present
+    assert_that(
+        sip_general_options,
+        has_entry(
+            'options',
+            has_entries(
+                {'minexpiry': '60', 'maxexpiry': '3600', 'defaultexpiry': '120'}
+            ),
+        ),
+    )
+    assert_that(
+        confd.registrars.get().json,
+        has_entry(
+            'items',
+            only_contains(
+                has_entries({'backup_host': None, 'proxy_backup_host': None})
+            ),
+        ),
+    )
 
 
 def test_put_errors():

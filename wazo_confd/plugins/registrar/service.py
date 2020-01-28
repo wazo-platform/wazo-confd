@@ -9,7 +9,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-
 class RegistrarService(CRUDService):
     def __init__(
         self, dao, validator, notifier, line_service, device_updater, provd_client
@@ -38,7 +37,9 @@ class RegistrarService(CRUDService):
                 try:
                     self.device_updater.update_for_line(line)
                 except NotFoundError:
-                    logger.error(f'Could not update device "{line.device_id}": device not found')
+                    logger.error(
+                        f'Could not update device "{line.device_id}": device not found'
+                    )
                     continue
                 devices_updated.add(line.device_id)
 
