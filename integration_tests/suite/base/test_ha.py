@@ -4,15 +4,12 @@
 import re
 
 from hamcrest import (
-    any_of,
     assert_that,
     only_contains,
     greater_than,
     has_entry,
     has_entries,
-    has_key,
     has_length,
-    not_,
 )
 
 from . import confd
