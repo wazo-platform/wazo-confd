@@ -1,7 +1,12 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.helpers.resource import CRUDService
+from xivo_dao.helpers.exception import NotFoundError
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RegistrarService(CRUDService):
@@ -29,7 +34,13 @@ class RegistrarService(CRUDService):
         # Update all affected devices
         for line in lines:
             if line.device_id not in devices_updated:
-                self.device_updater.update_for_line(line)
+                try:
+                    self.device_updater.update_for_line(line)
+                except NotFoundError:
+                    logger.error(
+                        'Could not update device "%s": device not found', line.device_id
+                    )
+                    continue
                 devices_updated.add(line.device_id)
 
         # Update default autoprov config
