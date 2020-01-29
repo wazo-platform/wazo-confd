@@ -38,7 +38,7 @@ class RegistrarService(CRUDService):
                     self.device_updater.update_for_line(line)
                 except NotFoundError:
                     logger.error(
-                        f'Could not update device "{line.device_id}": device not found'
+                        'Could not update device "%s": device not found', line.device_id
                     )
                     continue
                 devices_updated.add(line.device_id)
