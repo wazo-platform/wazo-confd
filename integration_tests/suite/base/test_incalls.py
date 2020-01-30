@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -136,6 +136,20 @@ def test_get(incall):
             destination=incall['destination'],
             extensions=empty(),
         ),
+    )
+
+
+@fixtures.user()
+@fixtures.incall()
+def test_get_when_destination_is_deleted(user, incall):
+    confd.incalls(incall['id']).put(
+        destination={'type': 'user', 'user_id': user['id']}
+    ).assert_updated()
+    response = confd.users(user['uuid']).delete()
+
+    response = confd.incalls(incall['id']).get()
+    assert_that(
+        response.item, has_entries(destination={'type': 'none'}),
     )
 
 
