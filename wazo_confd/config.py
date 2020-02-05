@@ -89,6 +89,7 @@ DEFAULT_CONFIG = {
         'endpoint_iax': True,
         'endpoint_sccp': True,
         'endpoint_sip': True,
+        'endpoint_pjsip': True,
         'extension': True,
         'extension_feature': True,
         'features': True,

@@ -42,6 +42,7 @@ setup(
             'endpoint_iax = wazo_confd.plugins.endpoint_iax.plugin:Plugin',
             'endpoint_sccp = wazo_confd.plugins.endpoint_sccp.plugin:Plugin',
             'endpoint_sip = wazo_confd.plugins.endpoint_sip.plugin:Plugin',
+            'endpoint_pjsip = wazo_confd.plugins.endpoint_pjsip.plugin:Plugin',
             'extension = wazo_confd.plugins.extension.plugin:Plugin',
             'extension_feature = wazo_confd.plugins.extension_feature.plugin:Plugin',
             'features = wazo_confd.plugins.features.plugin:Plugin',

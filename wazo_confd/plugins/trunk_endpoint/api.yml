@@ -20,16 +20,16 @@ paths:
             $ref: '#/definitions/Error'
         '404':
           $ref: '#/responses/NotFoundError'
-  /endpoints/sip/{sip_id}/trunks:
+  /endpoints/sip/{sip_uuid}/trunks:
     get:
       operationId: get_endpoint_sip_trunk
       summary: Get Trunk associated to SIP endpoint
-      description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.trunks.read`'
+      description: '**Required ACL:** `confd.endpoints.sip.{sip_uuid}.trunks.read`'
       deprecated: true
       tags:
       - deprecated
       parameters:
-      - $ref: '#/parameters/sipid'
+      - $ref: '#/parameters/sipuuid'
       responses:
         '200':
           description: Association between SIP Endpoint and Trunk
@@ -157,18 +157,18 @@ paths:
             $ref: '#/definitions/Error'
         '404':
           $ref: '#/responses/NotFoundError'
-  /trunks/{trunk_id}/endpoints/sip/{sip_id}:
+  /trunks/{trunk_id}/endpoints/sip/{sip_uuid}:
     put:
       operationId: associate_trunk_endpoint_sip
       summary: Associate trunk and SIP endpoint
-      description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.{sip_id}.update`'
+      description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.{sip_uuid}.update`'
       tags:
       - trunks
       - endpoints
       - sip
       parameters:
       - $ref: '#/parameters/trunkid'
-      - $ref: '#/parameters/sipid'
+      - $ref: '#/parameters/sipuuid'
       responses:
         '204':
           description: Trunk and SIP endpoint associated
@@ -179,14 +179,14 @@ paths:
     delete:
       operationId: dissociate_trunk_endpoint_sip
       summary: Dissociate trunk and SIP endpoint
-      description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.{sip_id}.delete`'
+      description: '**Required ACL:** `confd.trunks.{trunk_id}.endpoints.sip.{sip_uuid}.delete`'
       tags:
       - trunks
       - endpoints
       - sip
       parameters:
       - $ref: '#/parameters/trunkid'
-      - $ref: '#/parameters/sipid'
+      - $ref: '#/parameters/sipuuid'
       responses:
         '204':
           description: Trunk and SIP endpoint dissociated
