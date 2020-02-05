@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -82,6 +82,7 @@ def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
 def test_given_csv_has_all_fields_for_a_user_then_user_imported():
     csv = [
         {
+            "subscription_type": "2",
             "firstname": "Rîchard",
             "lastname": "Lâpointe",
             "email": "richard@lapointe.org",
@@ -130,6 +131,7 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             uuid=user_uuid,
             username=None,
             password=None,
+            subscription_type=2,
         ),
     )
 
