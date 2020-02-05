@@ -1,5 +1,13 @@
 # Changelog
 
+## 20.03
+
+* The `subscription_type` field is not available in the following resources
+
+  * POST `/1.1/users/import`
+  * GET `/1.1/users/export`
+
+
 ## 20.02
 
 * The GET on `1.1/wizard` now returns the `configurable` and `configurable_status`' fields

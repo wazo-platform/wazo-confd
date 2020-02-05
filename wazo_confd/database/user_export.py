@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -22,6 +22,7 @@ from xivo_dao.alchemy.rightcallmember import RightCallMember
 
 COLUMNS = (
     'uuid',
+    'subscription_type',
     'firstname',
     'lastname',
     'email',
@@ -115,6 +116,7 @@ def export_query(tenant_uuid, separator=";"):
 
     columns = (
         User.uuid,
+        User.subscription_type,
         User.firstname,
         User.lastname,
         User.email,
