@@ -203,7 +203,7 @@ definitions:
         items:
           $ref: '#/definitions/SIPAuthSectionOptions'
         description: A list of PJSIP auth section options for this endpoint
-      parent_uuids:
+      parents:
         type: array
         items:
           $ref: '#/definitions/EndpointSIP'
