@@ -94,13 +94,12 @@ paths:
           $ref: '#/responses/UpdateError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /asterisk/sip/transports:
+  /sip/transports:
     get:
       operationId: list_sip_transports
       summary: List all configured SIP transports
-      description: '**Required ACL:** `confd.asterisk.sip.transports.read`'
+      description: '**Required ACL:** `confd.sip.transports.read`'
       tags:
-        - asterisk
         - sip
       parameters:
         - $ref: '#/parameters/order'
@@ -117,7 +116,7 @@ paths:
       operationId: create_sip_transport
       summary: Create SIP transport
       description: |
-        **Required ACL:** `confd.asterisk.sip.transports.create`
+        **Required ACL:** `confd.sip.transports.create`
 
         Transports are shared between all tenants and should be readable to the
         tenants' administrators. The `default` field indicate if this transport
@@ -126,7 +125,6 @@ paths:
         The default transport cannot be deleted. When a transport is deleted all
         associated endpoints will fallback to the default transport.
       tags:
-        - asterisk
         - sip
       parameters:
         - name: body
@@ -143,13 +141,12 @@ paths:
         '400':
           $ref: '#/responses/CreateError'
 
-  /asterisk/sip/transports/{transport_uuid}:
+  /sip/transports/{transport_uuid}:
     get:
       operationId: get_sip_transport
       summary: Get SIP transport
-      description: '**Required ACL**: `confd.asterisk.sip.transports.{transport_uuid}.read`'
+      description: '**Required ACL**: `confd.sip.transports.{transport_uuid}.read`'
       tags:
-        - asterisk
         - sip
       parameters:
         - $ref: '#/parameters/transportuuid'
@@ -164,9 +161,8 @@ paths:
     put:
       operationId: update_sip_transport
       summary: Update SIP transport
-      description: '**Required ACL**: `confd.asterisk.sip.transports.{transport_uuid}.update`'
+      description: '**Required ACL**: `confd.sip.transports.{transport_uuid}.update`'
       tags:
-        - asterisk
         - sip
       parameters:
         - $ref: '#/parameters/transportuuid'
@@ -187,12 +183,11 @@ paths:
       operationId: delete_sip_transport
       summary: Delete SIP transport
       description: |
-        **Required ACL:** `confd.asterisk.sip.transports.{transport_uuid}.delete`
+        **Required ACL:** `confd.sip.transports.{transport_uuid}.delete`
 
         Deletes a transport, all associated configuration will be assigned to
         the default transport. Deleting the default transport will fail
       tags:
-        - asterisk
         - sip
       parameters:
         - $ref: '#/parameters/transportuuid'
