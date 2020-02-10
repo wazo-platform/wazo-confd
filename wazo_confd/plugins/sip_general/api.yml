@@ -1,10 +1,10 @@
 paths:
-  /asterisk/sip/doc:
+  /asterisk/pjsip/doc:
     get:
-      operationId: show_sip_doc
+      operationId: show_pjsip_doc
       summary: List all PJSIP configuration options
       description: |
-        **Required ACL:**: `confd.asterisk.sip.doc.read`
+        **Required ACL:**: `confd.asterisk.pjsip.doc.read`
 
         List all available configuration options for PJSIP, those values are
         used to validate to content of POST and PUT requests.
@@ -16,28 +16,26 @@ paths:
           description: A list of all PJSIP configuration options
           schema:
             $ref: '#/definitions/PJSIPConfigurationOptions'
-  /asterisk/sip/general:
+  /asterisk/pjsip/global:
     get:
-      operationId: list_asterisk_sip_general
-      summary: List SIP shared sip options
-      description: '**Required ACL:** `confd.asterisk.sip.general.read`'
+      operationId: list_asterisk_pjsip_global
+      summary: List of PJSIP options for the `global` section
+      description: '**Required ACL:** `confd.asterisk.pjsip.global.read`'
       tags:
         - asterisk
         - sip
       responses:
         '200':
-          description: SIP general
+          description: SIP global
           schema:
-            $ref: '#/definitions/SIPGeneral'
+            $ref: '#/definitions/PJSIPGlobal'
     put:
-      operationId: update_asterisk_sip_general
-      summary: Update SIP general option
+      operationId: update_asterisk_pjsip_global
+      summary: Update PJSIP section options
       description: |
-        **Required ACL:** `confd.asterisk.sip.general.update`
+        **Required ACL:** `confd.asterisk.pjsip.global.update`
 
-        The SIP general configuration is shared among all tenants of an instance.
-
-        This configuration contains the `global` and `system` part of the PJSIP configuration.
+        The PJSIP global configuration is shared among all tenants of an instance.
 
         **WARNING** This endpoint restore to default value or delete all fields that
         are not defined.
@@ -49,7 +47,46 @@ paths:
         in: body
         required: true
         schema:
-          $ref: '#/definitions/SIPGeneral'
+          $ref: '#/definitions/PJSIPGlobal'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /asterisk/pjsip/system:
+    get:
+      operationId: list_asterisk_pjsip_system
+      summary: List of PJSIP options for the `system` section
+      description: '**Required ACL:** `confd.asterisk.pjsip.system.read`'
+      tags:
+        - asterisk
+        - sip
+      responses:
+        '200':
+          description: SIP system
+          schema:
+            $ref: '#/definitions/PJSIPSystem'
+    put:
+      operationId: update_asterisk_pjsip_system
+      summary: Update PJSIP section options
+      description: |
+        **Required ACL:** `confd.asterisk.pjsip.system.update`
+
+        The PJSIP system configuration is shared among all tenants of an instance.
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.
+      tags:
+        - sip
+        - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PJSIPSystem'
       responses:
         '204':
           $ref: '#/responses/ResourceUpdated'
@@ -175,25 +212,18 @@ definitions:
       type: string
     maxItems: 2
     minItems: 2
-  SIPGeneral:
-    title: SIPGeneral
+  PJSIPGlobal:
     description: |
-      SIP general configuration.
+      PJSIP global configuration.
 
       This configuration will be in the file ''pjsip.conf'' used by asterisk.
     properties:
-      global:
-        description: '`global` section options'
-        type: array
-        items:
-          $ref: '#/definitions/KeyValueOption'
-      system:
-        description: '`system` section options'
+      options:
         type: array
         items:
           $ref: '#/definitions/KeyValueOption'
     example:
-      global:
+      options:
         -
           - max_forwards
           - 5
@@ -206,7 +236,18 @@ definitions:
         -
           - debug
           - no
-      system:
+  PJSIPSystem:
+    description: |
+      PJSIP system configuration.
+
+      This configuration will be in the file ''pjsip.conf'' used by asterisk.
+    properties:
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/KeyValueOption'
+    example:
+      options:
         -
           - compact_headers
           - no
