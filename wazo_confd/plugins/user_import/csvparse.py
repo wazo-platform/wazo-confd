@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -95,6 +95,7 @@ class CsvRow:
         BooleanRule('online_call_record_enabled', 'online_call_record_enabled'),
         IntRule('ring_seconds', 'ring_seconds'),
         IntRule('simultaneous_calls', 'simultaneous_calls'),
+        IntRule('subscription_type', 'subscription_type'),
     )
 
     CONTEXT_RULES = (UnicodeRule('context', 'context'),)

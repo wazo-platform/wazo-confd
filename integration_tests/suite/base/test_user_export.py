@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries, has_item
@@ -12,6 +12,7 @@ UNKNOWN_TENANT = '00000000-0000-0000-0000-000000000000'
 
 @database.reset(db)
 @fixtures.user(
+    subscription_type=2,
     firstname="Ûrsule",
     lastname="Wèrber",
     email="ursule@werber.com",
@@ -39,6 +40,7 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
         response.csv(),
         has_item(
             has_entries(
+                subscription_type="2",
                 uuid=user['uuid'],
                 firstname="Ûrsule",
                 lastname="Wèrber",
