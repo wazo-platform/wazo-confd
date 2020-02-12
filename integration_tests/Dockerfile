@@ -8,5 +8,6 @@ RUN true && \
     true
 
 COPY . /usr/src/wazo-confd
+COPY integration_tests/assets/doc /usr/share/doc/asterisk-doc/json
 WORKDIR /usr/src/wazo-confd
 RUN python setup.py develop

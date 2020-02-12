@@ -11,4 +11,4 @@ class PJSIPDocList(ConfdResource):
 
     @required_acl('confd.asterisk.pjsip.doc.read')
     def get(self):
-        pass
+        return self._pjsip_doc.get()
