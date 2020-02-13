@@ -21,6 +21,44 @@ paths:
         - asterisk
         - sip
 
+  /asterisk/pjsip/global:
+    get:
+      operationId: list_asterisk_pjsip_global
+      summary: List of PJSIP options for the `global` section
+      description: '**Required ACL:** `confd.asterisk.pjsip.global.read`'
+      tags:
+        - asterisk
+        - sip
+      responses:
+        '200':
+          description: SIP global
+          schema:
+            $ref: '#/definitions/PJSIPGlobal'
+    put:
+      operationId: update_asterisk_pjsip_global
+      summary: Update PJSIP section options
+      description: |
+        **Required ACL:** `confd.asterisk.pjsip.global.update`
+        The PJSIP global configuration is shared among all tenants of an instance.
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.
+      tags:
+        - sip
+        - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PJSIPGlobal'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
 definitions:
   PJSIPConfigurationOption:
     properties:
@@ -83,3 +121,16 @@ definitions:
         items:
           $ref: '#/definitions/PJSIPConfigurationOption'
         type: array
+  PJSIPGlobal:
+    description: |
+      PJSIP global configuration.
+      This configuration will be in the file ''pjsip.conf'' used by asterisk.
+    properties:
+      options:
+        type: object
+    example:
+      options:
+        max_forwards: "5"
+        keep_alive_interval: "30"
+        user_agent: Wazo
+        debug: no
