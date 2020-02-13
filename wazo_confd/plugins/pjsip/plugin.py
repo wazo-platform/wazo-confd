@@ -16,8 +16,25 @@ class PJSIPDoc:
     def __init__(self, filename):
         logger.debug('%s initialized with file %s', self.__class__.__name__, filename)
         self._filename = filename
+        self._content = None
 
     def get(self):
+        return self.content
+
+    def is_valid_in_section(self, section_name, variable):
+        return variable in self.get_section_variables(section_name)
+
+    def get_section_variables(self, section_name):
+        return self.content.get(section_name, {}).keys()
+
+    @property
+    def content(self):
+        # TODO(pc-m): reload the file after some time...
+        if self._content is None:
+            self._content = self._fetch()
+        return self._content
+
+    def _fetch(self):
         try:
             with gzip.open(self._filename, 'rb') as f:
                 return json.load(f)

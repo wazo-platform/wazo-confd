@@ -20,6 +20,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', [['ordered', 'option']]
     yield s.check_bogus_field_returns_error, url, 'options', {'wrong_value': 23}
     yield s.check_bogus_field_returns_error, url, 'options', {'none_value': None}
+    yield s.check_bogus_field_returns_error, url, 'options', {'compact_headers': 'yes'}  # Not a global option
 
 
 def test_get():
