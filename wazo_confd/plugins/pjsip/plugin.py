@@ -4,6 +4,7 @@
 import logging
 import gzip
 import json
+import time
 
 from .service import build_service
 from .resource import PJSIPDocList, PJSIPGlobalList
@@ -14,11 +15,14 @@ logger = logging.getLogger(__name__)
 
 class PJSIPDoc:
     _internal_fields = set(['type'])
+    # Time between each read of the JSON spec for PJSIP on the filesystem
+    _cache_reload_time = 60.0
 
     def __init__(self, filename):
         logger.debug('%s initialized with file %s', self.__class__.__name__, filename)
         self._filename = filename
         self._content = None
+        self._last_load_time = time.time()
 
     def get(self):
         return self.content
@@ -31,13 +35,25 @@ class PJSIPDoc:
 
     @property
     def content(self):
-        # TODO(pc-m): reload the file after some time...
-        if self._content is None:
-            self._content = self._fetch()
+        if (
+            self._content is None
+            or (time.time() - self._last_load_time) > self._cache_reload_time
+        ):
+            try:
+                self._content = self._fetch()
+            finally:
+                # If we fail indicate the last_load_time such that we don't
+                # fail multiple time if a cached value exist
+                self._last_load_time = time.time()
         return self._content
 
     def _fetch(self):
         try:
+            logger.debug(
+                'refreshing %s cached file from %s',
+                self.__class__.__name__,
+                self._filename,
+            )
             with gzip.open(self._filename, 'rb') as f:
                 return json.load(f)
         except Exception as e:
