@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class PJSIPDoc:
+    _internal_fields = set(['type'])
+
     def __init__(self, filename):
         logger.debug('%s initialized with file %s', self.__class__.__name__, filename)
         self._filename = filename
@@ -25,7 +27,7 @@ class PJSIPDoc:
         return variable in self.get_section_variables(section_name)
 
     def get_section_variables(self, section_name):
-        return self.content.get(section_name, {}).keys()
+        return self.content.get(section_name, {}).keys() - self._internal_fields
 
     @property
     def content(self):
