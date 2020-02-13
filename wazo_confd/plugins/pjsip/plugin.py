@@ -5,7 +5,8 @@ import logging
 import gzip
 import json
 
-from .resource import PJSIPDocList
+from .service import build_service
+from .resource import PJSIPDocList, PJSIPGlobalList
 from .exceptions import PJSIPDocError
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,12 @@ class Plugin:
         config = dependencies['config']
 
         pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
+        service = build_service(pjsip_doc)
 
         api.add_resource(
             PJSIPDocList, '/asterisk/pjsip/doc', resource_class_args=(pjsip_doc,),
+        )
+
+        api.add_resource(
+            PJSIPGlobalList, '/asterisk/pjsip/global', resource_class_args=(service,),
         )
