@@ -14,6 +14,7 @@ Replaces: xivo-confd
 Depends:
   ${python3:Depends},
   ${misc:Depends},
+  asterisk-doc,
   python3-cheroot,
   python3-consul,
   python3-flask,

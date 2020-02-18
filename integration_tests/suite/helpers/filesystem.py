@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -29,6 +29,15 @@ class FileSystemClient:
             ]
         )
         self.execute(['chmod', mode, os.path.join(self.base_path, name)])
+
+    def move_file(self, old_name, new_name):
+        self.execute(
+            [
+                'mv',
+                os.path.join(self.base_path, old_name),
+                os.path.join(self.base_path, new_name),
+            ]
+        )
 
 
 class TenantFileSystemClient:

@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -124,6 +124,7 @@ DEFAULT_CONFIG = {
         'paging_user': True,
         'parking_lot': True,
         'parking_lot_extension': True,
+        'pjsip': True,
         'provisioning_networking': True,
         'queue': True,
         'queue_extension': True,
@@ -174,6 +175,7 @@ DEFAULT_CONFIG = {
         'extra_tags': [],
     },
     'wizard': {'service_id': None, 'service_key': None},
+    'pjsip_config_doc_filename': '/usr/share/doc/asterisk-doc/json/pjsip.json.gz',
 }
 
 

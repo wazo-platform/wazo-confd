@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
@@ -70,4 +70,8 @@ wazo_sound = SingletonProxy(
 )
 asterisk_sound = SingletonProxy(
     BaseIntegrationTest.create_filesystem, '/usr/share/asterisk/sounds'
+)
+
+asterisk_json_doc = SingletonProxy(
+    BaseIntegrationTest.create_filesystem, '/usr/share/doc/asterisk-doc/json',
 )

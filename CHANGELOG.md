@@ -2,6 +2,10 @@
 
 ## 20.03
 
+* Add the following resources
+
+  * GET `/1.1/asterisk/pjsip/doc`
+
 * The `subscription_type` field is not available in the following resources
 
   * POST `/1.1/users/import`
