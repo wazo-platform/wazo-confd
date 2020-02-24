@@ -6,7 +6,7 @@
 
   * GET `/1.1/asterisk/pjsip/doc`
 
-* The `subscription_type` field is not available in the following resources
+* The `subscription_type` field is now available in the following resources
 
   * POST `/1.1/users/import`
   * GET `/1.1/users/export`
@@ -14,11 +14,11 @@
 
 ## 20.02
 
-* The GET on `1.1/wizard` now returns the `configurable` and `configurable_status`' fields
+* The GET on `1.1/wizard` now returns the `configurable` and `configurable_status` fields
 
 ## 20.01
 
-* The voicemail `name` no longer change according to the user `firstname`/`lastname`
+* The voicemail `name` no longer changes according to the user `firstname`/`lastname`
 
 ## 19.18
 
