@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -41,6 +41,7 @@ class QueueSchema(BaseSchema):
         validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True
     )
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
+    mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('queues'))
