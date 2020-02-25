@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -93,6 +93,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'ring_in_use', 123
     yield s.check_bogus_field_returns_error, url, 'ring_in_use', {}
     yield s.check_bogus_field_returns_error, url, 'ring_in_use', []
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', 123
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', {}
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', []
     yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'enabled', 123
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
@@ -170,6 +174,7 @@ def test_get(group):
             ring_strategy=group['ring_strategy'],
             user_timeout=group['user_timeout'],
             retry_delay=group['retry_delay'],
+            mark_answered_elsewhere=group['mark_answered_elsewhere'],
             enabled=group['enabled'],
             extensions=empty(),
             members=has_entries(users=empty(), extensions=empty()),
@@ -211,6 +216,7 @@ def test_create_all_parameters():
         'preprocess_subroutine': 'subroutien',
         'ring_in_use': False,
         'ring_strategy': 'weight_random',
+        'mark_answered_elsewhere': False,
         'user_timeout': 24,
         'retry_delay': 12,
         'enabled': False,
@@ -248,6 +254,7 @@ def test_edit_all_parameters(group):
         'preprocess_subroutine': 'subroutien',
         'ring_in_use': False,
         'ring_strategy': 'random',
+        'mark_answered_elsewhere': False,
         'user_timeout': 24,
         'retry_delay': 12,
         'enabled': False,

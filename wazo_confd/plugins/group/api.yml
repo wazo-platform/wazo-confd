@@ -148,6 +148,10 @@ definitions:
         caller_id_name:
           type: string
           description: Name to display
+        mark_answered_elsewhere:
+          type: boolean
+          default: false
+          description: Mark all calls as "answered elsewhere" when cancelled
         enabled:
           type: boolean
           default: true
