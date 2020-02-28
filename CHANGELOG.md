@@ -6,6 +6,7 @@
 
   * GET `/1.1/asterisk/pjsip/global`
 
+* A new `mark_answered_elsewhere` parameter has been added to the groups and queues resources
 
 ## 20.03
 
@@ -17,7 +18,6 @@
 
   * POST `/1.1/users/import`
   * GET `/1.1/users/export`
-
 
 ## 20.02
 

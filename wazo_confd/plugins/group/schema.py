@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -39,6 +39,7 @@ class GroupSchema(BaseSchema):
     retry_delay = fields.Integer(validate=Range(min=0), allow_none=True)
     music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
     ring_in_use = StrictBoolean()
+    mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
     links = ListLink(Link('groups'))
 

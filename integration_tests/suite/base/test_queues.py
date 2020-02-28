@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -150,6 +150,10 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'ignore_forward', 123
     yield s.check_bogus_field_returns_error, url, 'ignore_forward', {}
     yield s.check_bogus_field_returns_error, url, 'ignore_forward', []
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', 123
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', {}
+    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
         40
@@ -302,6 +306,7 @@ def test_get(queue):
             timeout=queue['timeout'],
             music_on_hold=queue['music_on_hold'],
             preprocess_subroutine=queue['preprocess_subroutine'],
+            mark_answered_elsewhere=queue['mark_answered_elsewhere'],
             enabled=queue['enabled'],
             options=not_(empty()),
             extensions=empty(),
@@ -355,6 +360,7 @@ def test_create_all_parameters():
         'timeout': 42,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutine',
+        'mark_answered_elsewhere': True,
         'enabled': False,
     }
 
@@ -445,6 +451,7 @@ def test_edit_all_parameters(queue):
         'timeout': 42,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutine',
+        'mark_answered_elsewhere': True,
         'enabled': False,
     }
 
