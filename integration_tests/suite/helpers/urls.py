@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -30,6 +30,9 @@ class UrlFragment:
 
     def _add(self, fragment):
         fragment = str(fragment)
+        # If a fragment is a python keyword (ex: global) it can be suffixed by a '_'
+        if fragment.endswith('_'):
+            fragment = fragment[:-1]
         self.fragments.append(fragment)
         return self
 

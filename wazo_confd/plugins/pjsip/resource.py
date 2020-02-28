@@ -3,6 +3,7 @@
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.helpers.asterisk import AsteriskConfigurationList
 
 
 class PJSIPDocList(ConfdResource):
@@ -12,3 +13,15 @@ class PJSIPDocList(ConfdResource):
     @required_acl('confd.asterisk.pjsip.doc.read')
     def get(self):
         return self._pjsip_doc.get()
+
+
+class PJSIPGlobalList(AsteriskConfigurationList):
+    section_name = 'global'
+
+    @required_acl('confd.asterisk.pjsip.global.read')
+    def get(self):
+        return super().get()
+
+    @required_acl('confd.asterisk.pjsip.global.update')
+    def put(self):
+        return super().put()

@@ -1,5 +1,12 @@
 # Changelog
 
+## 20.04
+
+* Add the following resources
+
+  * GET `/1.1/asterisk/pjsip/global`
+
+
 ## 20.03
 
 * Add the following resources

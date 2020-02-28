@@ -1,8 +1,8 @@
 # Copyright 2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from . import confd, asterisk_json_doc
 from hamcrest import assert_that, has_entries, starts_with
+from . import confd
 
 
 def test_get():
@@ -29,15 +29,3 @@ def test_get():
             transport=has_entries(),
         ),
     )
-
-
-def test_get_file_error():
-    config_filename = 'pjsip.json.gz'
-    temp_filename = 'foo.json.gz'
-    asterisk_json_doc.move_file(config_filename, temp_filename)
-
-    try:
-        response = confd.asterisk.pjsip.doc.get()
-        response.assert_status(400)
-    finally:
-        asterisk_json_doc.move_file(temp_filename, config_filename)
