@@ -5,6 +5,7 @@
 * Add the following resources
 
   * GET `/1.1/asterisk/pjsip/global`
+  * GET `/1.1/asterisk/pjsip/system`
 
 * A new `mark_answered_elsewhere` parameter has been added to the groups and queues resources
 

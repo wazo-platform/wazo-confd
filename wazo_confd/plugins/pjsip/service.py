@@ -21,7 +21,7 @@ class PJSIPConfigurationService(AsteriskConfigurationService):
         for variable in variables:
             if not self.pjsip_doc.is_valid_in_section(section_name, variable.key):
                 raise errors.invalid_choice(
-                    field='variable ({})'.format(variable.key),
+                    field='options: invalid variable ({})'.format(variable.key),
                     choices=self.pjsip_doc.get_section_variables(section_name),
                 )
 
