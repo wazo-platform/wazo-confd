@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
@@ -78,6 +78,9 @@ class SysconfdPublisher:
 
     def restart_provd(self):
         self.service_action('wazo-provd', 'restart')
+
+    def restart_phoned(self):
+        self.service_action('wazo-phoned', 'restart')
 
     def dhcpd_update(self):
         url = "{}/dhcpd_update".format(self.base_url)
