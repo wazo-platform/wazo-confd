@@ -121,7 +121,12 @@ class CsvRow:
         UnicodeRule('sip_secret', 'secret'),
     )
 
-    EXTENSION_RULES = (UnicodeRule('exten', 'exten'), UnicodeRule('context', 'context'))
+    EXTENSION_RULES = (
+        UnicodeRule('exten', 'exten'),
+        UnicodeRule('context', 'context'),
+        UnicodeRule('firstname', 'firstname'),
+        UnicodeRule('line_protocol', 'endpoint'),
+    )
 
     INCALL_RULES = (
         UnicodeRule('incall_exten', 'exten'),
