@@ -1,5 +1,16 @@
 # Changelog
 
+## 20.05
+
+* Add the following resources
+
+  * POST `/1.1/sip/transports`
+  * GET `/1.1/sip/transports`
+  * GET `/1.1/sip/transports/{transport_uuid}`
+  * PUT `/1.1/sip/transports/{transport_uuid}`
+  * DELETE `/1.1/sip/transports/{transport_uuid}`
+
+
 ## 20.04
 
 * Add the following resources
