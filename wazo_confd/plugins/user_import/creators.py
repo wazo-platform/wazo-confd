@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -12,6 +12,7 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.voicemail import Voicemail
 
+from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.extension import dao as extension_dao
 
@@ -187,6 +188,14 @@ class ExtensionCreator(Creator):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
+            exten_for_user = fields.get('firstname')
+            if exten_for_user:
+                line_protocol = fields.get('line_protocol')
+                if not line_protocol:
+                    raise errors.missing('line_protocol')
+                if line_protocol not in ('sip', 'sccp'):
+                    raise errors.invalid_choice('line_protocol', ('sip', 'sccp'))
+
             form = self.schema(handle_error=False).load(fields)
             tenant_uuids = [tenant_uuid] if tenant_uuid is not None else None
             return self.service.create(Extension(**form), tenant_uuids=tenant_uuids)

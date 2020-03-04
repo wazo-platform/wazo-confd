@@ -419,6 +419,27 @@ def test_given_csv_extension_has_errors_then_errors_returned():
     assert_error(response, has_error_field('Context was not found'))
 
 
+def test_given_csv_extension_without_line_protocol_then_errors_returned():
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    csv = [{"firstname": "Géorge", "exten": exten, "context": config.CONTEXT}]
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field('missing parameters: line_protocol'))
+
+
+def test_given_csv_extension_with_invalid_line_protocol_then_errors_returned():
+    exten = h.extension.find_available_exten(config.CONTEXT)
+    csv = [
+        {
+            "firstname": "Géorge",
+            "line_protocol": "invalid",
+            "exten": exten,
+            "context": config.CONTEXT,
+        }
+    ]
+    response = client.post("/users/import", csv)
+    assert_error(response, has_error_field("'line_protocol' must be one of"))
+
+
 def test_given_csv_has_minimal_incall_fields_then_incall_created():
     exten = h.extension.find_available_exten(config.INCALL_CONTEXT)
     csv = [
