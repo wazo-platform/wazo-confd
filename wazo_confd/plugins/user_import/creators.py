@@ -188,12 +188,12 @@ class ExtensionCreator(Creator):
         exten = fields.get('exten')
         context = fields.get('context')
         if exten and context:
-            firstname = fields.get('firstname')
-            if firstname:
-                endpoint = fields.get('endpoint')
-                if not endpoint:
+            exten_for_user = fields.get('firstname')
+            if exten_for_user:
+                line_protocol = fields.get('line_protocol')
+                if not line_protocol:
                     raise errors.missing('line_protocol')
-                if endpoint not in ('sip', 'sccp'):
+                if line_protocol not in ('sip', 'sccp'):
                     raise errors.invalid_choice('line_protocol', ('sip', 'sccp'))
 
             form = self.schema(handle_error=False).load(fields)

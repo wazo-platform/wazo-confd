@@ -125,7 +125,7 @@ class CsvRow:
         UnicodeRule('exten', 'exten'),
         UnicodeRule('context', 'context'),
         UnicodeRule('firstname', 'firstname'),
-        UnicodeRule('line_protocol', 'endpoint'),
+        UnicodeRule('line_protocol', 'line_protocol'),
     )
 
     INCALL_RULES = (
