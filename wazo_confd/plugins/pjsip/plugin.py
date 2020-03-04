@@ -6,7 +6,7 @@ import gzip
 import json
 
 from .service import build_service
-from .resource import PJSIPDocList, PJSIPGlobalList
+from .resource import PJSIPDocList, PJSIPGlobalList, PJSIPSystemList
 from .exceptions import PJSIPDocError
 
 logger = logging.getLogger(__name__)
@@ -63,4 +63,8 @@ class Plugin:
 
         api.add_resource(
             PJSIPGlobalList, '/asterisk/pjsip/global', resource_class_args=(service,),
+        )
+
+        api.add_resource(
+            PJSIPSystemList, '/asterisk/pjsip/system', resource_class_args=(service,),
         )

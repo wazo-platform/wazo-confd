@@ -25,3 +25,15 @@ class PJSIPGlobalList(AsteriskConfigurationList):
     @required_acl('confd.asterisk.pjsip.global.update')
     def put(self):
         return super().put()
+
+
+class PJSIPSystemList(AsteriskConfigurationList):
+    section_name = 'system'
+
+    @required_acl('confd.asterisk.pjsip.system.read')
+    def get(self):
+        return super().get()
+
+    @required_acl('confd.asterisk.pjsip.system.update')
+    def put(self):
+        return super().put()

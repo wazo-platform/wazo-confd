@@ -21,6 +21,44 @@ paths:
         - asterisk
         - sip
 
+  /asterisk/pjsip/system:
+    get:
+      operationId: list_asterisk_pjsip_system
+      summary: List of PJSIP options for the `system` section
+      description: '**Required ACL:** `confd.asterisk.pjsip.system.read`'
+      tags:
+        - asterisk
+        - sip
+      responses:
+        '200':
+          description: SIP system
+          schema:
+            $ref: '#/definitions/PJSIPSystem'
+    put:
+      operationId: update_asterisk_pjsip_system
+      summary: Update PJSIP section options
+      description: |
+        **Required ACL:** `confd.asterisk.pjsip.system.update`
+        The PJSIP system configuration is shared among all tenants of an instance.
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.
+      tags:
+        - sip
+        - asterisk
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PJSIPSystem'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
   /asterisk/pjsip/global:
     get:
       operationId: list_asterisk_pjsip_global
@@ -134,3 +172,16 @@ definitions:
         keep_alive_interval: "30"
         user_agent: Wazo
         debug: no
+  PJSIPSystem:
+    description: |
+      PJSIP system configuration.
+      This configuration will be in the file ''pjsip.conf'' used by asterisk.
+    properties:
+      options:
+        type: object
+    example:
+      options:
+        accept_multiple_sdp_answers: "yes"
+        compact_headers: "yes"
+        disable_tcp_switch: "yes"
+        follow_early_media_fork: "no"
