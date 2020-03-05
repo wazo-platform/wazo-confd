@@ -1,38 +1,4 @@
 paths:
-  /callpermissions/{callpermission_id}/users:
-    get:
-      operationId: get_callpermission_user_association
-      summary: Get users associated to call permission
-      description: '**Required ACL:** `confd.callpermissions.{callpermission_id}.users.read`'
-      deprecated: true
-      tags:
-      - deprecated
-      parameters:
-      - $ref: '#/parameters/callpermissionid'
-      responses:
-        '200':
-          description: User-CallPermission association
-          schema:
-            $ref: '#/definitions/UserCallPermissionItems'
-        '404':
-          $ref: '#/responses/NotFoundError'
-  /users/{user_id}/callpermissions:
-    get:
-      operationId: get_user_callpermission_association
-      summary: Get call permissions associated to user
-      description: '**Required ACL:** `confd.users.{user_id}.callpermissions.read`'
-      deprecated: true
-      tags:
-      - deprecated
-      parameters:
-      - $ref: '#/parameters/useriduuid'
-      responses:
-        '200':
-          description: User-CallPermission association
-          schema:
-            $ref: '#/definitions/UserCallPermissionItems'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /users/{user_id}/callpermissions/{callpermission_id}:
     put:
       operationId: associate_user_callpermission

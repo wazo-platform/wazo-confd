@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries, not_
@@ -8,7 +8,6 @@ from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
-    helpers as h,
     scenarios as s,
 )
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
@@ -31,14 +30,6 @@ def test_associate_errors(user, call_permission):
 def test_dissociate_errors(user, call_permission):
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).delete
-
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
-
-
-def test_get_errors():
-    fake_user = confd.users(FAKE_ID).callpermissions.get
-    fake_call_permission = confd.callpermissions(FAKE_ID).users.get
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
@@ -130,46 +121,6 @@ def test_get_call_permissions_associated_to_user(user, perm1, perm2):
                 ),
             )
 
-            # deprecated
-            response = confd.users(user['id']).callpermissions.get()
-            assert_that(
-                response.items,
-                contains(
-                    has_entries(
-                        {'user_id': user['id'], 'call_permission_id': perm1['id']}
-                    ),
-                    has_entries(
-                        {'user_id': user['id'], 'call_permission_id': perm2['id']}
-                    ),
-                ),
-            )
-
-            response = confd.users(user['uuid']).callpermissions.get()
-            assert_that(
-                response.items,
-                contains(
-                    has_entries(
-                        {'user_id': user['id'], 'call_permission_id': perm1['id']}
-                    ),
-                    has_entries(
-                        {'user_id': user['id'], 'call_permission_id': perm2['id']}
-                    ),
-                ),
-            )
-
-
-@fixtures.user()
-@fixtures.call_permission()
-def test_get_call_permission_after_dissociation(user, call_permission):
-    h.user_call_permission.associate(user['id'], call_permission['id'])
-    h.user_call_permission.dissociate(user['id'], call_permission['id'])
-
-    response = confd.users(user['id']).callpermissions.get()
-    assert_that(response.items, empty())
-
-    response = confd.users(user['uuid']).callpermissions.get()
-    assert_that(response.items, empty())
-
 
 @fixtures.user()
 @fixtures.user()
@@ -193,26 +144,6 @@ def test_get_users_associated_to_call_permission(user1, user2, call_permission):
                             lastname=user2['lastname'],
                         ),
                     )
-                ),
-            )
-
-            # deprecated
-            response = confd.callpermissions(call_permission['id']).users.get()
-            assert_that(
-                response.items,
-                contains(
-                    has_entries(
-                        {
-                            'user_id': user1['id'],
-                            'call_permission_id': call_permission['id'],
-                        }
-                    ),
-                    has_entries(
-                        {
-                            'user_id': user2['id'],
-                            'call_permission_id': call_permission['id'],
-                        }
-                    ),
                 ),
             )
 
@@ -268,11 +199,11 @@ def test_dissociate_multi_tenant(main_user, sub_user, main_perm, sub_perm):
 @fixtures.call_permission()
 def test_delete_user_when_user_and_call_permission_associated(user, call_permission):
     with a.user_call_permission(user, call_permission, check=False):
-        response = confd.users(user['id']).callpermissions.get()
-        assert_that(response.items, not_(empty()))
-        confd.users(user['id']).delete().assert_deleted()
-        invalid_user = confd.users(user['id']).callpermissions.get
-        yield s.check_resource_not_found, invalid_user, 'User'
+        response = confd.callpermissions(call_permission['id']).get()
+        assert_that(response.item['users'], not_(empty()))
+        confd.users(user['uuid']).delete().assert_deleted()
+        response = confd.callpermissions(call_permission['id']).get()
+        assert_that(response.item['users'], empty())
 
 
 @fixtures.user()
@@ -281,8 +212,8 @@ def test_delete_call_permission_when_user_and_call_permission_associated(
     user, call_permission
 ):
     with a.user_call_permission(user, call_permission, check=False):
-        response = confd.users(user['id']).callpermissions.get()
-        assert_that(response.items, not_(empty()))
+        response = confd.users(user['uuid']).get()
+        assert_that(response.item['call_permissions'], not_(empty()))
         confd.callpermissions(call_permission['id']).delete().assert_deleted()
-        response = confd.users(user['id']).callpermissions.get()
-        assert_that(response.items, empty())
+        response = confd.users(user['uuid']).get()
+        assert_that(response.item['call_permissions'], empty())

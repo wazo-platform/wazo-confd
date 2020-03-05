@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user_call_permission import dao as user_call_permission_dao
@@ -12,12 +12,6 @@ class UserCallPermissionService:
         self.dao = dao
         self.notifier = notifier
         self.validator = validator
-
-    def find_all_by(self, **criteria):
-        return self.dao.find_all_by(**criteria)
-
-    def find_by(self, **criteria):
-        return self.dao.find_by(**criteria)
 
     def get(self, user, call_permission):
         return self.dao.get_by(user_id=user.id, call_permission_id=call_permission.id)
