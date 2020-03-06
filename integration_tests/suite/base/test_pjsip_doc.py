@@ -1,7 +1,7 @@
 # Copyright 2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_entries, starts_with
+from hamcrest import all_of, assert_that, has_entries, starts_with, not_
 from . import confd
 
 
@@ -14,16 +14,21 @@ def test_get():
             aor=has_entries(),
             auth=has_entries(),
             contact=has_entries(),
-            endpoint=has_entries(
-                direct_media_method=has_entries(
-                    name='direct_media_method',
-                    default='invite',
-                    synopsis='Direct Media method type',
-                    description=starts_with('Method for setting up'),
-                    choices=has_entries(
-                        invite='', reinvite='Alias for the "invite" value.', update='',
-                    ),
-                )
+            endpoint=all_of(
+                has_entries(
+                    direct_media_method=has_entries(
+                        name='direct_media_method',
+                        default='invite',
+                        synopsis='Direct Media method type',
+                        description=starts_with('Method for setting up'),
+                        choices=has_entries(
+                            invite='',
+                            reinvite='Alias for the "invite" value.',
+                            update='',
+                        ),
+                    )
+                ),
+                not_(has_entries(type='endpoint')),
             ),
             system=has_entries(),
             transport=has_entries(),
