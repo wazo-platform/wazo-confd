@@ -27,12 +27,15 @@ class PJSIPDoc:
         return variable in self.get_section_variables(section_name)
 
     def get_section_variables(self, section_name):
-        return self.content.get(section_name, {}).keys() - self._internal_fields
+        return self.content.get(section_name, {}).keys()
 
     @property
     def content(self):
         if self._content is None:
             self._content = self._fetch()
+            for section_name in self._content.keys():
+                for field in self._internal_fields:
+                    self._content[section_name].pop(field, None)
         return self._content
 
     def _fetch(self):
