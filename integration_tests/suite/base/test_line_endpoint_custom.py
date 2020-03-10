@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -8,7 +8,6 @@ from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
-    helpers as h,
     scenarios as s,
 )
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
@@ -32,56 +31,6 @@ def test_dissociate_errors(line, custom):
 
     yield s.check_resource_not_found, fake_line, 'Line'
     yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
-
-
-def test_get_errors():
-    fake_line = confd.lines(999999999).endpoints.custom.get
-    fake_custom = confd.endpoints.custom(999999999).lines.get
-
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
-
-
-@fixtures.line()
-@fixtures.custom()
-def test_get_custom_endpoint_associated_to_line(line, custom):
-    response = confd.lines(line['id']).endpoints.custom.get()
-    response.assert_status(404)
-
-    with a.line_endpoint_custom(line, custom):
-        response = confd.lines(line['id']).endpoints.custom.get()
-        assert_that(
-            response.item,
-            has_entries(
-                line_id=line['id'], endpoint_id=custom['id'], endpoint='custom'
-            ),
-        )
-
-
-@fixtures.line()
-@fixtures.custom()
-def test_get_custom_endpoint_after_dissociation(line, custom):
-    h.line_endpoint_custom.associate(line['id'], custom['id'])
-    h.line_endpoint_custom.dissociate(line['id'], custom['id'])
-
-    response = confd.lines(line['id']).endpoints.custom.get()
-    response.assert_status(404)
-
-
-@fixtures.line()
-@fixtures.custom()
-def test_get_line_associated_to_a_custom_endpoint(line, custom):
-    response = confd.endpoints.custom(custom['id']).lines.get()
-    response.assert_status(404)
-
-    with a.line_endpoint_custom(line, custom):
-        response = confd.endpoints.custom(custom['id']).lines.get()
-        assert_that(
-            response.item,
-            has_entries(
-                line_id=line['id'], endpoint_id=custom['id'], endpoint='custom'
-            ),
-        )
 
 
 @fixtures.line()
@@ -242,8 +191,8 @@ def test_delete_endpoint_dissociates_line(line, custom):
         response = confd.endpoints.custom(custom['id']).delete()
         response.assert_deleted()
 
-        response = confd.lines(line['id']).endpoints.custom.get()
-        response.assert_status(404)
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries(endpoint_custom=None))
 
 
 @fixtures.line()

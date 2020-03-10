@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -8,7 +8,6 @@ from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
-    helpers as h,
     scenarios as s,
 )
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
@@ -32,52 +31,6 @@ def test_dissociate_errors(line, sip):
 
     yield s.check_resource_not_found, fake_line, 'Line'
     yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
-
-
-def test_get_errors():
-    fake_line = confd.lines(999999999).endpoints.sip.get
-    fake_sip = confd.endpoints.sip(999999999).lines.get
-
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
-
-
-@fixtures.line()
-@fixtures.sip()
-def test_get_sip_endpoint_associated_to_line(line, sip):
-    response = confd.lines(line['id']).endpoints.sip.get()
-    response.assert_status(404)
-
-    with a.line_endpoint_sip(line, sip):
-        response = confd.lines(line['id']).endpoints.sip.get()
-        assert_that(
-            response.item,
-            has_entries(line_id=line['id'], endpoint_id=sip['id'], endpoint='sip'),
-        )
-
-
-@fixtures.line()
-@fixtures.sip()
-def test_get_sip_endpoint_after_dissociation(line, sip):
-    h.line_endpoint_sip.associate(line['id'], sip['id'])
-    h.line_endpoint_sip.dissociate(line['id'], sip['id'])
-
-    response = confd.lines(line['id']).endpoints.sip.get()
-    response.assert_status(404)
-
-
-@fixtures.line()
-@fixtures.sip()
-def test_get_line_associated_to_a_sip_endpoint(line, sip):
-    response = confd.endpoints.sip(sip['id']).lines.get()
-    response.assert_status(404)
-
-    with a.line_endpoint_sip(line, sip):
-        response = confd.endpoints.sip(sip['id']).lines.get()
-        assert_that(
-            response.item,
-            has_entries(line_id=line['id'], endpoint_id=sip['id'], endpoint='sip'),
-        )
 
 
 @fixtures.line()
@@ -236,8 +189,8 @@ def test_delete_endpoint_dissociates_line(line, sip):
         response = confd.endpoints.sip(sip['id']).delete()
         response.assert_deleted()
 
-        response = confd.lines(line['id']).endpoints.sip.get()
-        response.assert_status(404)
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries(endpoint_sip=None))
 
 
 @fixtures.line()

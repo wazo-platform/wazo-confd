@@ -747,8 +747,8 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail_id))
 
-    response = confd.lines(line_id).endpoints.sip.get()
-    assert_that(response.item, has_entries(endpoint='sip', endpoint_id=sip_id))
+    response = confd.lines(line_id).get()
+    assert_that(response.item['endpoint_sip'], has_entries(id=sip_id))
 
 
 @fixtures.sip()
@@ -792,8 +792,8 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     response = confd.users(user_id).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
 
-    response = confd.lines(line_id).endpoints.sip.get()
-    assert_that(response.item, has_entries(endpoint='sip', endpoint_id=sip['id']))
+    response = confd.lines(line_id).get()
+    assert_that(response.item['endpoint_sip'], has_entries(id=sip['id']))
 
     response = confd.users(user_id).get()
     assert_that(
@@ -1477,8 +1477,8 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     response = confd.users(entry['user_id']).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
 
-    response = confd.lines(entry['line_id']).endpoints.sip.get()
-    assert_that(response.item, has_entries(endpoint='sip', endpoint_id=entry['sip_id']))
+    response = confd.lines(entry['line_id']).get()
+    assert_that(response.item['endpoint_sip'], has_entries(id=entry['sip_id']))
 
     response = confd.users(entry['user_id']).get()
     assert_that(
