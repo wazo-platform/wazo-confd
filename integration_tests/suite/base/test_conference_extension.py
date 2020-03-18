@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -36,9 +36,9 @@ def test_dissociate_errors(conference, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
-@fixtures.conference()
 @fixtures.extension(exten=gen_conference_exten())
-def test_associate(conference, extension):
+@fixtures.conference()
+def test_associate(extension, conference):
     response = confd.conferences(conference['id']).extensions(extension['id']).put()
     response.assert_updated()
 
@@ -138,9 +138,9 @@ def test_associate_when_exten_outside_range(conference, extension):
     response.assert_status(400)
 
 
-@fixtures.conference()
 @fixtures.extension(exten='_1234')
-def test_associate_when_exten_pattern(conference, extension):
+@fixtures.conference()
+def test_associate_when_exten_pattern(extension, conference):
     response = confd.conferences(conference['id']).extensions(extension['id']).put()
     response.assert_updated()
 
