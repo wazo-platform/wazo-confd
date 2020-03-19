@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user.event import (
@@ -75,7 +75,7 @@ class UserServiceNotifier:
         services = schema.dump(user)
         for type_ in schema.types:
             service = services.get(type_, services)
-            event = EditUserServiceEvent(user.uuid, type_, service['enabled'])
+            event = EditUserServiceEvent(user.id, user.uuid, type_, service['enabled'])
             self.bus.send_bus_event(
                 event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
             )
@@ -94,7 +94,7 @@ class UserForwardNotifier:
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
             event = EditUserForwardEvent(
-                user.uuid, type_, forward['enabled'], forward['destination']
+                user.id, user.uuid, type_, forward['enabled'], forward['destination']
             )
             self.bus.send_bus_event(
                 event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
