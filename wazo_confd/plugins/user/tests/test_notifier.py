@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -118,7 +118,7 @@ class TestUserServiceNotifier(unittest.TestCase):
     def test_when_user_service_dnd_edited_then_event_sent_on_bus(self):
         schema = ServiceDNDSchema()
         expected_event = EditUserServiceEvent(
-            self.user.uuid, schema.types[0], self.user.dnd_enabled
+            self.user.id, self.user.uuid, schema.types[0], self.user.dnd_enabled
         )
 
         self.notifier.edited(self.user, schema)
@@ -131,7 +131,10 @@ class TestUserServiceNotifier(unittest.TestCase):
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
         schema = ServiceIncallFilterSchema()
         expected_event = EditUserServiceEvent(
-            self.user.uuid, schema.types[0], self.user.incallfilter_enabled
+            self.user.id,
+            self.user.uuid,
+            schema.types[0],
+            self.user.incallfilter_enabled,
         )
 
         self.notifier.edited(self.user, schema)
@@ -147,6 +150,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.bus = Mock()
         self.user = Mock(
             User,
+            id='1234',
             uuid='1234-abcd',
             busy_enabled=True,
             busy_destination='123',
@@ -161,7 +165,11 @@ class TestUserForwardNotifier(unittest.TestCase):
     def test_when_user_forward_busy_edited_then_event_sent_on_bus(self):
         schema = ForwardBusySchema()
         expected_event = EditUserForwardEvent(
-            self.user.uuid, 'busy', self.user.busy_enabled, self.user.busy_destination
+            self.user.id,
+            self.user.uuid,
+            'busy',
+            self.user.busy_enabled,
+            self.user.busy_destination,
         )
 
         self.notifier.edited(self.user, schema)
@@ -174,6 +182,7 @@ class TestUserForwardNotifier(unittest.TestCase):
     def test_when_user_forward_noanswer_edited_then_event_sent_on_bus(self):
         schema = ForwardNoAnswerSchema()
         expected_event = EditUserForwardEvent(
+            self.user.id,
             self.user.uuid,
             'noanswer',
             self.user.noanswer_enabled,
@@ -190,6 +199,7 @@ class TestUserForwardNotifier(unittest.TestCase):
     def test_when_user_forward_unconditional_edited_then_event_sent_on_bus(self):
         schema = ForwardUnconditionalSchema()
         expected_event = EditUserForwardEvent(
+            self.user.id,
             self.user.uuid,
             'unconditional',
             self.user.unconditional_enabled,
@@ -208,15 +218,21 @@ class TestUserForwardNotifier(unittest.TestCase):
         self.notifier.edited(self.user, schema)
 
         expected_busy_event = EditUserForwardEvent(
-            self.user.uuid, 'busy', self.user.busy_enabled, self.user.busy_destination
+            self.user.id,
+            self.user.uuid,
+            'busy',
+            self.user.busy_enabled,
+            self.user.busy_destination,
         )
         expected_noanswer_event = EditUserForwardEvent(
+            self.user.id,
             self.user.uuid,
             'noanswer',
             self.user.noanswer_enabled,
             self.user.noanswer_destination,
         )
         expected_unconditional_event = EditUserForwardEvent(
+            self.user.id,
             self.user.uuid,
             'unconditional',
             self.user.unconditional_enabled,
