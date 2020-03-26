@@ -121,6 +121,11 @@ class CsvRow:
         UnicodeRule('sip_secret', 'secret'),
     )
 
+    WEBRTC_RULES = (
+        UnicodeRule('sip_username', 'username'),
+        UnicodeRule('sip_secret', 'secret'),
+    )
+
     EXTENSION_RULES = (
         UnicodeRule('exten', 'exten'),
         UnicodeRule('context', 'context'),
@@ -162,6 +167,7 @@ class CsvRow:
             'call_permissions': self.parse_rules(self.CALL_PERMISSION_RULES),
             'sccp': {},
             'context': self.parse_rules(self.CONTEXT_RULES),
+            'webrtc': self.parse_rules(self.WEBRTC_RULES),
         }
 
     def parse_rules(self, rules):

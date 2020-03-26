@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import OrderedDict
@@ -67,6 +67,7 @@ from .creators import (
     UserCreator,
     VoicemailCreator,
     WazoUserCreator,
+    WebRTCCreator,
 )
 from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
 from .resource import UserImportResource, UserExportResource
@@ -109,6 +110,7 @@ class Plugin:
             'line': LineCreator(line_service),
             'voicemail': VoicemailCreator(voicemail_service),
             'sip': SipCreator(sip_service),
+            'webrtc': WebRTCCreator(sip_service),
             'sccp': SccpCreator(sccp_service),
             'extension': ExtensionCreator(extension_service),
             'extension_incall': ExtensionCreator(extension_service),
@@ -124,6 +126,7 @@ class Plugin:
                 ('wazo_user', WazoUserAssociator(wazo_user_service)),
                 ('voicemail', VoicemailAssociator(user_voicemail_service)),
                 ('sip', SipAssociator(line_sip_service)),
+                ('webrtc', SipAssociator(line_sip_service)),
                 ('sccp', SccpAssociator(line_sccp_service)),
                 ('line', LineAssociator(user_line_service)),
                 ('extension', ExtensionAssociator(line_extension_service)),
