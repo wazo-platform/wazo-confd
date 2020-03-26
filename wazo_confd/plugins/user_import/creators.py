@@ -22,6 +22,7 @@ from wazo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
 from wazo_confd.plugins.voicemail.schema import VoicemailSchema
 
 from .wazo_user_schema import WazoUserSchema
+from .constants import VALID_ENDPOINT_TYPES
 
 
 class Creator(metaclass=abc.ABCMeta):
@@ -144,7 +145,7 @@ class LineCreator(Creator):
         fields = dict(fields)
         context = fields.get('context')
         endpoint = fields.pop('endpoint', None)
-        if context and endpoint in ('sip', 'sccp'):
+        if context and endpoint in VALID_ENDPOINT_TYPES:
             return self.service.create(Line(**fields), None)
 
 
@@ -161,6 +162,26 @@ class SipCreator(Creator):
     def create(self, fields, tenant_uuid):
         form = self.schema_nullable(handle_error=False).load(fields)
         return self.service.create(SIP(tenant_uuid=tenant_uuid, **form))
+
+
+class WebRTCCreator(SipCreator):
+    def create(self, fields, tenant_uuid):
+        #  TODO(pc-m): This will need to get changed to "transport-wss" when PJSIP transport gets merged
+        fields.update(
+            {
+                'options': [
+                    ['transport', 'wss'],
+                    ['directmedia', 'no'],
+                    ['dtlsverify', 'no'],
+                    ['dtlscertfile', '/usr/share/xivo-certs/server.crt'],
+                    ['dtlsprivatekey', '/usr/share/xivo-certs/server.key'],
+                    ['nat', 'force_rport,comedia'],
+                    ['webrtc', 'yes'],
+                    ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
+                ],
+            }
+        )
+        return super().create(fields, tenant_uuid)
 
 
 class SccpCreator(Creator):
@@ -193,8 +214,8 @@ class ExtensionCreator(Creator):
                 line_protocol = fields.get('line_protocol')
                 if not line_protocol:
                     raise errors.missing('line_protocol')
-                if line_protocol not in ('sip', 'sccp'):
-                    raise errors.invalid_choice('line_protocol', ('sip', 'sccp'))
+                if line_protocol not in VALID_ENDPOINT_TYPES:
+                    raise errors.invalid_choice('line_protocol', VALID_ENDPOINT_TYPES)
 
             form = self.schema(handle_error=False).load(fields)
             tenant_uuids = [tenant_uuid] if tenant_uuid is not None else None

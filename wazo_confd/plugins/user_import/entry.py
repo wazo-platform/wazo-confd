@@ -1,7 +1,9 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
+
+from .constants import VALID_ENDPOINT_TYPES
 
 
 class Entry:
@@ -15,19 +17,27 @@ class Entry:
         self.line = None
         self.sip = None
         self.sccp = None
+        self.webrtc = None
         self.extension = None
         self.extension_incall = None
         self.incall = None
         self.call_permissions = []
 
     def extract_ids(self):
+        if self.sip:
+            sip_id = self.sip.id
+        elif self.webrtc:
+            sip_id = self.webrtc.id
+        else:
+            sip_id = None
+
         return {
             'row_number': self.number,
             'user_id': self.user.id if self.user else None,
             'user_uuid': self.user.uuid if self.user else None,
             'voicemail_id': self.voicemail.id if self.voicemail else None,
             'line_id': self.line.id if self.line else None,
-            'sip_id': self.sip.id if self.sip else None,
+            'sip_id': sip_id,
             'sccp_id': self.sccp.id if self.sccp else None,
             'extension_id': self.extension.id if self.extension else None,
             'incall_extension_id': self.extension_incall.id
@@ -98,10 +108,9 @@ class EntryCreator:
 
     def create_endpoint(self, entry, tenant_uuid):
         endpoint = entry.extract_field('line', 'endpoint')
-        if endpoint == 'sip':
-            entry.find_or_create('sip', self.creators['sip'], tenant_uuid)
-        elif endpoint == 'sccp':
-            entry.find_or_create('sccp', self.creators['sccp'], tenant_uuid)
+        if endpoint not in VALID_ENDPOINT_TYPES:
+            return
+        entry.find_or_create(endpoint, self.creators[endpoint], tenant_uuid)
 
 
 class EntryAssociator:
@@ -229,10 +238,9 @@ class EntryUpdater:
 
     def find_or_create_endpoint(self, entry, tenant_uuid):
         endpoint = entry.extract_field('line', 'endpoint')
-        if endpoint == 'sip':
-            entry.find_or_create('sip', self.creators['sip'], tenant_uuid)
-        elif endpoint == 'sccp':
-            entry.find_or_create('sccp', self.creators['sccp'], tenant_uuid)
+        if endpoint not in VALID_ENDPOINT_TYPES:
+            return
+        entry.find_or_create(endpoint, self.creators[endpoint], tenant_uuid)
 
     def associate_resources(self, entry):
         for associator in self.associators.values():

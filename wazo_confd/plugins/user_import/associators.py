@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -73,7 +73,7 @@ class ExtensionAssociator(Associator):
 class SipAssociator(Associator):
     def associate(self, entry):
         line = entry.get_resource('line')
-        sip = entry.get_resource('sip')
+        sip = entry.get_resource('sip') or entry.get_resource('webrtc')
         if line and sip:
             self.service.associate(line, sip)
 
