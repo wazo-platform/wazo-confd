@@ -1,5 +1,9 @@
 # Changelog
 
+## 20.12
+
+* The body of `/1.1/endpoints/sip` has been modified to be used with PJSIP
+
 ## 20.11
 * The following endpoints are now multi-tenant.
 
