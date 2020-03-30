@@ -1,5 +1,9 @@
 # Changelog
 
+## 20.06
+
+* The body of `/1.1/endpoints/sip` has been modified to be used with PJSIP
+
 ## 20.05
 
 * `/1.1/users/import` now accepts `webrtc` in the `line_protocol` column
@@ -10,7 +14,6 @@
   * GET `/1.1/sip/transports/{transport_uuid}`
   * PUT `/1.1/sip/transports/{transport_uuid}`
   * DELETE `/1.1/sip/transports/{transport_uuid}`
-
 
 ## 20.04
 
