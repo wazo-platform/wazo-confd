@@ -212,9 +212,9 @@ definitions:
         type: string
         description: The UUID of the tenant
         readOnly: true
-      slave_only:
-        type: boolean
-        description: When true this configuration will only be applied if the host is configured as a slave
+      asterisk_id:
+        type: string
+        description: The ID of the Asterisk onto which this configuration applies.
   EndpointSIPItems:
     title: SIP Endpoints
     properties:
