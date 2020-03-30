@@ -1,5 +1,9 @@
 # Changelog
 
+## 20.10
+
+* The body of `/1.1/endpoints/sip` has been modified to be used with PJSIP
+
 ## 20.09
 
 * The `rest_host` and `rest_https_port` fields have been removed from the
