@@ -67,8 +67,9 @@ class ExportService:
         wazo_users = self._auth_client.users.list(tenant_uuid=tenant_uuid)['items']
         wazo_users = {user['uuid']: user for user in wazo_users}
         for user in users:
-            wazo_user = wazo_users[user['uuid']]
-            user['username'] = wazo_user['username']
+            if user['uuid'] in wazo_users:
+                wazo_user = wazo_users[user['uuid']]
+                user['username'] = wazo_user['username']
 
         csv_header = csv_header + ('username',)
 
