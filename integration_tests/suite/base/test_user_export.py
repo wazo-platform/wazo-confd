@@ -65,6 +65,23 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
 
 
 @database.reset(db)
+@fixtures.user()
+def test_given_user_with_no_authentication_when_exporting_then_no_username(
+    user,
+):
+    response = confd_csv.users.export.get()
+    assert_that(
+        response.csv(),
+        has_item(
+            has_entries(
+                uuid=user['uuid'],
+                username="",
+            )
+        ),
+    )
+
+
+@database.reset(db)
 @fixtures.user(firstname='main', wazo_tenant=MAIN_TENANT)
 @fixtures.user(firstname='sub', wazo_tenant=SUB_TENANT)
 def test_given_user_in_another_tenant(user_main, user_sub):
