@@ -12,7 +12,8 @@ ASTERISK_OPTION_VALUE_NAME_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
 class PJSIPTransportSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     name = fields.String(
-        validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(max=128)), required=True,
+        validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(min=1, max=128)),
+        required=True,
     )
     options = fields.List(
         fields.List(

@@ -102,7 +102,7 @@ class TestTransportSchema(TestCase):
         )
 
     def test_that_name_is_not_empty(self):
-        body = {'name': ''}
+        body = {'name': '', 'options': []}
         assert_that(
             calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
         )
