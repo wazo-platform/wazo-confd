@@ -43,7 +43,6 @@ def error_checks(url):
 
 def test_create_minimal_parameters():
     response = confd.sip.transports.post(name='my-transport', options=[])
-    # TODO(pc-m) assert_created('transports')?
     response.assert_created()
 
     assert_that(
@@ -64,7 +63,6 @@ def test_create_all_parameters():
         ],
     }
     response = confd.sip.transports.post(parameters)
-    # TODO(pc-m) assert_created('transports')?
     response.assert_created()
 
     assert_that(response.item, has_entries(parameters))
