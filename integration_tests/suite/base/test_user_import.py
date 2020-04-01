@@ -361,6 +361,35 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
     assert_that(sip, has_entries(username="sipusername", secret="sipsecret"))
 
 
+def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
+    csv = [
+        {"firstname": "Chârles", "line_protocol": "webrtc", "context": config.CONTEXT}
+    ]
+
+    response = client.post("/users/import", csv)
+    sip_id = get_import_field(response, 'sip_id')
+    line_id = get_import_field(response, 'line_id')
+
+    sip = confd.endpoints.sip(sip_id).get().item
+    assert_that(
+        sip,
+        has_entries(
+            id=sip_id,
+            line=has_entries(id=line_id),
+            options=has_items(
+                contains('allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'),
+                contains('directmedia', 'no'),
+                contains('dtlscertfile', '/usr/share/xivo-certs/server.crt'),
+                contains('dtlsprivatekey', '/usr/share/xivo-certs/server.key'),
+                contains('dtlsverify', 'no'),
+                contains('nat', 'force_rport,comedia'),
+                contains('transport', 'transport-wss'),
+                contains('webrtc', 'yes'),
+            ),
+        ),
+    )
+
+
 def test_given_csv_has_sip_error_then_error_raised():
     csv = [
         {
