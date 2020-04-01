@@ -89,3 +89,20 @@ class TestTransportSchema(TestCase):
         assert_that(
             calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
         )
+
+    def test_empty_options_key_or_value(self):
+        body = {'name': 'my-transport', 'options': ['', 'value']}
+        assert_that(
+            calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
+        )
+
+        body = {'name': 'my-transport', 'options': ['key', '']}
+        assert_that(
+            calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
+        )
+
+    def test_that_name_is_not_empty(self):
+        body = {'name': ''}
+        assert_that(
+            calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
+        )
