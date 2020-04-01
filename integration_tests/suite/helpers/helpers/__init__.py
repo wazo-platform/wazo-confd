@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..client import ConfdClient
@@ -153,6 +153,7 @@ from . import skill  # noqa
 from . import skill_rule  # noqa
 from . import switchboard  # noqa
 from . import switchboard_member_user  # noqa
+from . import transport  # noqa
 from . import trunk  # noqa
 from . import trunk_endpoint_custom  # noqa
 from . import trunk_endpoint_iax  # noqa
@@ -244,6 +245,7 @@ __all__ = [
     'skill_rule',
     'switchboard',
     'switchboard_member_user',
+    'transport',
     'trunk',
     'trunk_endpoint_custom',
     'trunk_endpoint_iax',

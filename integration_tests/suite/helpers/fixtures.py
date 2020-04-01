@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .wrappers import IsolatedAction
@@ -291,4 +291,13 @@ class access_feature(IsolatedAction):
     actions = {
         'generate': h.access_feature.generate_access_feature,
         'delete': h.access_feature.delete_access_feature,
+    }
+
+
+class transport(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {
+        'generate': h.transport.generate_transport,
+        'delete': h.transport.delete_transport,
     }

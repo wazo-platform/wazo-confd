@@ -97,6 +97,111 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
 
+  /sip/transports:
+    get:
+      operationId: list_sip_transports
+      summary: List all configured SIP transports
+      description: '**Required ACL:** `confd.sip.transports.read`'
+      tags:
+        - sip
+      parameters:
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: The SIP transport list
+          schema:
+            $ref: '#/definitions/SIPTransportItems'
+    post:
+      operationId: create_sip_transport
+      summary: Create SIP transport
+      description: |
+        **Required ACL:** `confd.sip.transports.create`
+
+        Transports are shared between all tenants and should be readable to the
+        tenants' administrators.
+
+        There should always be atleast one transport configured on the system.
+      tags:
+        - sip
+      parameters:
+        - name: body
+          in: body
+          description: Transport to create
+          required: true
+          schema:
+            $ref: '#/definitions/SIPTransport'
+      responses:
+        '201':
+          description: SIP transport created
+          schema:
+            $ref: '#/definitions/SIPTransport'
+        '400':
+          $ref: '#/responses/CreateError'
+
+  /sip/transports/{transport_uuid}:
+    get:
+      operationId: get_sip_transport
+      summary: Get SIP transport
+      description: '**Required ACL**: `confd.sip.transports.{transport_uuid}.read`'
+      tags:
+        - sip
+      parameters:
+        - $ref: '#/parameters/transportuuid'
+      responses:
+        '200':
+          description: A SIP transport
+          schema:
+            $ref: '#/definitions/SIPTransport'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+    put:
+      operationId: update_sip_transport
+      summary: Update SIP transport
+      description: '**Required ACL**: `confd.sip.transports.{transport_uuid}.update`'
+      tags:
+        - sip
+      parameters:
+        - $ref: '#/parameters/transportuuid'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/SIPTransport'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+    delete:
+      operationId: delete_sip_transport
+      summary: Delete SIP transport
+      description: |
+        **Required ACL:** `confd.sip.transports.{transport_uuid}.delete`
+
+        Deletes a transport, all associated configuration will be assigned to
+        the `fallback` transport.
+      tags:
+        - sip
+      parameters:
+        - $ref: '#/parameters/transportuuid'
+        - $ref: '#/parameters/fallback_transport'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+
 definitions:
   PJSIPConfigurationOption:
     properties:
@@ -185,3 +290,51 @@ definitions:
         compact_headers: "yes"
         disable_tcp_switch: "yes"
         follow_early_media_fork: "no"
+  SIPTransport:
+    properties:
+      uuid:
+        type: string
+        readOnly: true
+      name:
+        type: string
+      options:
+        type: array
+        items:
+          $ref: '#/definitions/KeyValueOption'
+    required:
+      - name
+      - options
+    example:
+      name: transport-udp
+      options:
+        -
+          - protocol
+          - udp
+        -
+          - bind
+          - 0.0.0.0:5060
+  SIPTransportItems:
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/SIPTransport'
+      total:
+        type: integer
+
+parameters:
+  fallback_transport:
+    required: false
+    name: fallback
+    in: query
+    type: string
+    description: |
+      The UUID of the transport that should be associated to orphaned
+      SIP configurations
+
+  transportuuid:
+    required: true
+    type: string
+    name: transport_uuid
+    in: path
+    description: The UUID of the transport
