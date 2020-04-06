@@ -42,7 +42,7 @@ def error_checks(url):
 
 
 def test_create_minimal_parameters():
-    response = confd.sip.transports.post(name='my-transport', options=[])
+    response = confd.sip.transports.post(name='my-transport')
     response.assert_created()
 
     assert_that(
@@ -120,9 +120,7 @@ def test_delete(transport):
 
 @fixtures.transport(name='duplicate-me')
 def unique_error_checks(url, transport):
-    yield s.check_bogus_field_returns_error, url, 'name', transport['name'], {
-        'options': []
-    }
+    yield s.check_bogus_field_returns_error, url, 'name', transport['name']
 
 
 @fixtures.transport(name='hidden')
@@ -160,11 +158,10 @@ def test_sorting_offset_limit(transport1, transport2):
 def test_bus_events(transport):
     yield s.check_bus_event, 'config.sip.transports.created', confd.sip.transports.post, {
         'name': 'a-leaked-transport',
-        'options': [],
     }
     yield s.check_bus_event, 'config.sip.transports.edited', confd.sip.transports(
         transport['uuid']
-    ).put, {'name': 'new', 'options': []}
+    ).put, {'name': 'new'}
     yield s.check_bus_event, 'config.sip.transports.deleted', confd.sip.transports(
         transport['uuid']
     ).delete
