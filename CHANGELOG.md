@@ -2,6 +2,7 @@
 
 ## 20.05
 
+* `/1.1/users/import` now accepts `webrtc` in the `line_protocol` column
 * Add the following resources
 
   * POST `/1.1/sip/transports`
