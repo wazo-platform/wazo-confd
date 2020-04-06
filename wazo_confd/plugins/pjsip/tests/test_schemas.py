@@ -3,7 +3,7 @@
 
 from unittest import TestCase
 
-from hamcrest import assert_that, calling, has_entries, contains, raises
+from hamcrest import assert_that, calling, empty, has_entries, contains, raises
 from werkzeug.exceptions import BadRequest
 
 from ..schema import PJSIPTransportSchema
@@ -69,8 +69,10 @@ class TestTransportSchema(TestCase):
 
     def test_no_options(self):
         body = {'name': 'my-transport'}
+
+        result = PJSIPTransportSchema().load(body)
         assert_that(
-            calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
+            result, has_entries(name='my-transport', options=empty(),),
         )
 
     def test_injection_in_optoins(self):

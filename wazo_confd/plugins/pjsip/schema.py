@@ -26,6 +26,6 @@ class PJSIPTransportSchema(BaseSchema):
             validate=Length(min=2, max=2),
         ),
         many=True,
-        required=True,
         validate=Length(max=128),
+        missing=[],
     )
