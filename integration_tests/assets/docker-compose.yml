@@ -48,14 +48,7 @@ services:
     command: "wazo-confd -d"
     volumes:
       - "../..:/usr/src/wazo-confd"
-      - "./etc/wazo-confd/conf.d/uuid.yml:/etc/wazo-confd/conf.d/uuid.yml"
-      - "./etc/wazo-confd/conf.d/debug.yml:/etc/wazo-confd/conf.d/debug.yml"
-      - "./etc/wazo-confd/conf.d/postgres.yml:/etc/wazo-confd/conf.d/postgres.yml"
-      - "./etc/wazo-confd/conf.d/auth.yml:/etc/wazo-confd/conf.d/auth.yml"
-      - "./etc/wazo-confd/conf.d/rabbitmq.yml:/etc/wazo-confd/conf.d/rabbitmq.yml"
-      - "./etc/wazo-confd/conf.d/provd.yml:/etc/wazo-confd/conf.d/provd.yml"
-      - "./etc/wazo-confd/conf.d/sysconfd.yml:/etc/wazo-confd/conf.d/sysconfd.yml"
-      - "./etc/wazo-confd/conf.d/disable_service_discovery.yml:/etc/wazo-confd/conf.d/disable_service_discovery.yml"
+      - "./etc/wazo-confd/conf.d/50-default.yml:/etc/wazo-confd/conf.d/50-default.yml"
       - "./keys/wazo-confd-key.yml:/var/lib/wazo-auth-keys/wazo-confd-key.yml"
       - "./doc/pjsip.json.gz:/usr/share/doc/asterisk-doc/json/pjsip.json.gz"
 

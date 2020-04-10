@@ -1,0 +1,25 @@
+debug: true
+db_uri: postgresql://asterisk:proformatique@postgres/asterisk
+uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c
+auth:
+    host: auth
+ari:
+    host: ari
+    port: 5039
+bus:
+    username: guest
+    password: guest
+    host: rabbitmq
+    port: 5672
+    exchange_name: xivo
+    exchange_type: topic
+    exchange_durable: True
+provd:
+    host: provd
+    port: 8666
+    verify_certificate: False
+sysconfd:
+    host: sysconfd
+    port: 8668
+service_discovery:
+  enabled: false
