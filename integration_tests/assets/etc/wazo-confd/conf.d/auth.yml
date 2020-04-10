@@ -1,4 +1,2 @@
 auth:
     host: auth
-    port: 9497
-    verify_certificate: False

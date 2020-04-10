@@ -33,8 +33,8 @@ DEFAULT_CONFIG = {
     'auth': {
         'host': 'localhost',
         'port': 9497,
-        'https': True,
-        'verify_certificate': '/usr/share/xivo-certs/server.crt',
+        'prefix': None,
+        'https': False,
         'key_file': '/var/lib/wazo-auth-keys/wazo-confd-key.yml',
     },
     'ari': {

@@ -2,4 +2,3 @@ rest_api:
   ip: 0.0.0.0
 auth:
   host: auth
-  verify_certificate: /usr/local/share/ssl/auth/server.crt
