@@ -41,8 +41,8 @@ rest_api:
 auth:
     host: localhost
     port: 9497
-    https: true
-    verify_certificate: /usr/share/xivo-certs/server.crt
+    prefix: null
+    https: false
 
 # Asterisk ARI connection informations
 ari:

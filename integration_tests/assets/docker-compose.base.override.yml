@@ -12,10 +12,6 @@ services:
     environment:
       TARGETS: "ari:5039,postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
 
-  confd:
-    volumes:
-      - "./etc/wazo-confd/conf.d/ari.yml:/etc/wazo-confd/conf.d/ari.yml"
-
   postgres:
     command: "-c 'log_min_duration_statement=0'"
 

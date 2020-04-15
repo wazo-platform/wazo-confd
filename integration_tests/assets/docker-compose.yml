@@ -9,8 +9,6 @@ services:
     image: wazopbx/wazo-auth-mock
     ports:
       - 9497
-    volumes:
-      - ./ssl:/usr/local/share/ssl
 
   provd:
     image: wazopbx/wazo-provd
@@ -19,7 +17,6 @@ services:
     volumes:
       - "./etc/wazo-provd/config.yml:/etc/wazo-provd/config.yml"
       - "./keys/wazo-provd-key.yml:/var/lib/wazo-auth-keys/wazo-provd-key.yml"
-      - "./ssl:/usr/local/share/ssl"
       - "./provd/null:/var/lib/wazo-provd/plugins/null"
       - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
 
@@ -51,14 +48,7 @@ services:
     command: "wazo-confd -d"
     volumes:
       - "../..:/usr/src/wazo-confd"
-      - "./etc/wazo-confd/conf.d/uuid.yml:/etc/wazo-confd/conf.d/uuid.yml"
-      - "./etc/wazo-confd/conf.d/debug.yml:/etc/wazo-confd/conf.d/debug.yml"
-      - "./etc/wazo-confd/conf.d/postgres.yml:/etc/wazo-confd/conf.d/postgres.yml"
-      - "./etc/wazo-confd/conf.d/auth.yml:/etc/wazo-confd/conf.d/auth.yml"
-      - "./etc/wazo-confd/conf.d/rabbitmq.yml:/etc/wazo-confd/conf.d/rabbitmq.yml"
-      - "./etc/wazo-confd/conf.d/provd.yml:/etc/wazo-confd/conf.d/provd.yml"
-      - "./etc/wazo-confd/conf.d/sysconfd.yml:/etc/wazo-confd/conf.d/sysconfd.yml"
-      - "./etc/wazo-confd/conf.d/disable_service_discovery.yml:/etc/wazo-confd/conf.d/disable_service_discovery.yml"
+      - "./etc/wazo-confd/conf.d/50-default.yml:/etc/wazo-confd/conf.d/50-default.yml"
       - "./keys/wazo-confd-key.yml:/var/lib/wazo-auth-keys/wazo-confd-key.yml"
       - "./doc/pjsip.json.gz:/usr/share/doc/asterisk-doc/json/pjsip.json.gz"
 
