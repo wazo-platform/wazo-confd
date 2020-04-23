@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, empty, has_entries, none, not_
@@ -32,7 +32,10 @@ def test_put_errors(register_sip):
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'transport', 'invalid'
+    yield s.check_bogus_field_returns_error, url, 'transport', 'invalid', {
+        'remote_host': 'foo',
+        'sip_username': 'foo',
+    }
     yield s.check_bogus_field_returns_error, url, 'transport', 123
     yield s.check_bogus_field_returns_error, url, 'transport', True
     yield s.check_bogus_field_returns_error, url, 'transport', []
@@ -119,7 +122,8 @@ def test_create_minimal_parameters():
     )
 
 
-def test_create_all_parameters():
+@fixtures.transport(name='tcp')
+def test_create_all_parameters(transport):
     parameters = dict(
         transport='tcp',
         sip_username='sip-username',
@@ -145,8 +149,9 @@ def test_edit_minimal_parameters(register_sip):
     response.assert_updated()
 
 
+@fixtures.transport(name='tcp')
 @fixtures.register_sip()
-def test_edit_all_parameters(register_sip):
+def test_edit_all_parameters(transport, register_sip):
     parameters = dict(
         transport='tcp',
         sip_username='sip-username',
