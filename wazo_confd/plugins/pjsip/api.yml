@@ -290,6 +290,12 @@ definitions:
         compact_headers: "yes"
         disable_tcp_switch: "yes"
         follow_early_media_fork: "no"
+  SIPTransportRelation:
+    properties:
+      uuid:
+        type: string
+    required:
+      - uuid
   SIPTransport:
     properties:
       uuid:

@@ -5,8 +5,8 @@ import re
 import string
 import logging
 
-from marshmallow import fields, post_load
-from marshmallow.validate import Length, Regexp, OneOf
+from marshmallow import fields, EXCLUDE
+from marshmallow.validate import Length, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
@@ -14,40 +14,55 @@ logger = logging.getLogger(__name__)
 
 USERNAME_REGEX = r"^[a-zA-Z0-9_+-]{1,40}$"
 SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
+ASTERISK_SECTION_NAME_REGEX = r"^[a-zA-Z0-9-_]*$"
+ASTERISK_OPTION_VALUE_NAME_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
+
+options_field = fields.List(
+    fields.List(
+        fields.String(validate=Length(min=1, max=4092)), validate=Length(min=1, max=2),
+    ),
+    missing=[],
+)
 
 
-class SipSchema(BaseSchema):
-    id = fields.Integer(dump_only=True)
-    tenant_uuid = fields.String(dump_only=True)
-    username = fields.String(validate=Regexp(USERNAME_REGEX))
-    name = fields.String(validate=Regexp(USERNAME_REGEX))
-    secret = fields.String(validate=Regexp(SECRET_REGEX))
-    type = fields.String(validate=OneOf(['friend', 'peer', 'user']))
-    host = fields.String(validate=Length(max=255))
-    options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
-    links = ListLink(Link('endpoint_sip'))
+class EndpointSIPRelationSchema(BaseSchema):
+    uuid = fields.UUID(required=True)
+
+
+class TransportRelationSchema(BaseSchema):
+    uuid = fields.UUID(required=True)
+
+
+class ContextRelationSchema(BaseSchema):
+    id = fields.Integer(required=True)
+
+
+class EndpointSIPSchema(BaseSchema):
+
+    uuid = fields.UUID(dump_only=True)
+    tenant_uuid = fields.UUID(dump_only=True)
+    name = fields.String(
+        validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(min=1, max=128)),
+    )
+    display_name = fields.String(validate=Length(max=128))
+    template = fields.Boolean(missing=False)
+
+    aor_section_options = options_field
+    auth_section_options = options_field
+    endpoint_section_options = options_field
+    identify_section_options = options_field
+    registration_section_options = options_field
+    registration_outbound_auth_section_options = options_field
+    outbound_auth_section_options = options_field
+
+    parents = fields.List(
+        fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
+    )
+    transport = fields.Nested('TransportRelationSchema', unknown=EXCLUDE)
+    context = fields.Nested('ContextRelationSchema', unknown=EXCLUDE)
+    asterisk_id = fields.String(validate=Length(max=1024))
+
+    links = ListLink(Link('endpoint_sip', field='uuid'))
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
-
-    # The set_name_to_username_if_missing method is a compatibility method that
-    # was added in 19.15 to avoid breaking the API. In the old version, the name
-    # could not be specified in the API the username was always copied.
-    @post_load
-    def set_name_to_username_if_missing(self, data, **kwargs):
-        name = data.get('name')
-        if not name and 'username' in data:
-            logger.warning(
-                'DEPRECATION: creating a SIP endpoint with a "username" and no "name" is'
-                ' deprecated. Populate the name field if it is required'
-            )
-            data['name'] = data['username']
-        return data
-
-
-class SipSchemaNullable(SipSchema):
-    def on_bind_field(self, field_name, field_obj):
-        super().on_bind_field(field_name, field_obj)
-        nullable_fields = ['username', 'host', 'secret']
-        if field_name in nullable_fields:
-            field_obj.allow_none = True

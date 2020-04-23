@@ -3,21 +3,21 @@
 
 from flask import url_for
 
-from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import SipSchema, SipSchemaNullable
+from .schema import EndpointSIPSchema
 
 
 class SipList(ListResource):
 
-    model = SIPEndpoint
-    schema = SipSchemaNullable
+    model = EndpointSIP
+    schema = EndpointSIPSchema
 
     def build_headers(self, sip):
-        return {'Location': url_for('endpoint_sip', id=sip.id, _external=True)}
+        return {'Location': url_for('endpoint_sip', uuid=sip.uuid, _external=True)}
 
     @required_acl('confd.endpoints.sip.read')
     def get(self):
@@ -30,17 +30,17 @@ class SipList(ListResource):
 
 class SipItem(ItemResource):
 
-    schema = SipSchema
+    schema = EndpointSIPSchema
     has_tenant_uuid = True
 
-    @required_acl('confd.endpoints.sip.{id}.read')
-    def get(self, id):
-        return super().get(id)
+    @required_acl('confd.endpoints.sip.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
 
-    @required_acl('confd.endpoints.sip.{id}.update')
-    def put(self, id):
-        return super().put(id)
+    @required_acl('confd.endpoints.sip.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
 
-    @required_acl('confd.endpoints.sip.{id}.delete')
-    def delete(self, id):
-        return super().delete(id)
+    @required_acl('confd.endpoints.sip.{uuid}.delete')
+    def delete(self, uuid):
+        return super().delete(uuid)

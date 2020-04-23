@@ -14,6 +14,9 @@ class CRUDService:
     def search(self, parameters, tenant_uuids=None):
         return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
 
+    def fetch_relations(self, form):
+        return form
+
     def get(self, resource_id, **kwargs):
         return self.dao.get(resource_id, **kwargs)
 
