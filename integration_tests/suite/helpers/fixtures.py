@@ -22,6 +22,7 @@ class line_sip(IsolatedAction):
 
 class sip(IsolatedAction):
 
+    id_field = 'uuid'
     actions = {
         'generate': h.endpoint_sip.generate_sip,
         'delete': h.endpoint_sip.delete_sip,

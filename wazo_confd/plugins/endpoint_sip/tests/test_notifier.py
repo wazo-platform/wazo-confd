@@ -10,7 +10,7 @@ from xivo_bus.resources.endpoint_sip.event import (
     DeleteSipEndpointEvent,
     EditSipEndpointEvent,
 )
-from xivo_dao.alchemy.usersip import UserSIP as SIP
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP as SIP
 
 from ..notifier import SipEndpointNotifier
 
@@ -27,7 +27,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sip = Mock(
             SIP,
-            id=1,
+            uuid=1,
             tenant_uuid=str(uuid.uuid4),
             username='username',
             trunk={'id': 2},
@@ -35,10 +35,10 @@ class TestSipEndpointNotifier(unittest.TestCase):
         )
         self.sip.name = 'limitation of mock instantiation with name ...'
         self.sip_serialized = {
-            'id': self.sip.id,
+            'uuid': self.sip.uuid,
             'tenant_uuid': self.sip.tenant_uuid,
             'name': self.sip.name,
-            'username': self.sip.username,
+            'display_name': self.sip.display_name,
             'trunk': self.sip.trunk,
             'line': self.sip.line,
         }
