@@ -156,6 +156,13 @@ definitions:
     title: PJSIP Registration Section Options
     allOf:
       - $ref: '#/definitions/SIPSectionOptions'
+  EndpointSIPRelation:
+    properties:
+      uuid:
+        type: string
+        description: The UUID of this resource
+    required:
+      - uuid
   EndpointSIP:
     title: SIP Endpoint
     properties:
@@ -204,10 +211,16 @@ definitions:
         items:
           $ref: '#/definitions/SIPAuthSectionOptions'
         description: A list of PJSIP auth section options for this endpoint
+      transport:
+        description: The transport used by this endpoint
+        $ref: '#/definitions/SIPTransportRelation'
+      context:
+        description: The context used by this endpoint
+        $ref: '#/definitions/ContextRelation'
       parents:
         type: array
         items:
-          $ref: '#/definitions/EndpointSIP'
+          $ref: '#/definitions/EndpointSIPRelation'
         description: |
           A list of parents this endpoint will inherit from.
 

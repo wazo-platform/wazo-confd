@@ -117,6 +117,7 @@ class ListResource(ConfdResource):
     def post(self):
         form = self.schema().load(request.get_json())
         form = self.add_tenant_to_form(form)
+        form = self.service.fetch_relations(form)
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
