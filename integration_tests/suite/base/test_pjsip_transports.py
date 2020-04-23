@@ -15,6 +15,9 @@ from ..helpers import errors as e, fixtures, scenarios as s
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
+# TODO(pc-m): add a test where an assigned transport is deleted
+
+
 def test_post_errors():
     url = confd.sip.transports.post
     for check in error_checks(url):
