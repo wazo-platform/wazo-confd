@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -6,7 +6,7 @@ import re
 from flask import url_for, request
 from marshmallow import fields, post_load, pre_dump, validates_schema
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import OneOf, Range, Regexp
+from marshmallow.validate import Range, Regexp
 
 from xivo_dao.alchemy.staticsip import StaticSIP
 
@@ -36,9 +36,7 @@ INVALID_CALLBACK_EXTENSION = r'^[^~ ]*$'
 
 class RegisterSIPSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    transport = fields.String(
-        validate=OneOf(['udp', 'tcp', 'tls', 'ws', 'wss']), allow_none=True
-    )
+    transport = fields.String(allow_none=True)
     sip_username = fields.String(validate=Regexp(INVALID_CHAR), required=True)
     auth_username = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
     auth_password = fields.String(validate=Regexp(INVALID_CHAR), allow_none=True)
