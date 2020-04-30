@@ -50,6 +50,10 @@ def error_checks(url):
     )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
+    yield s.check_bogus_field_returns_error, url, 'greeting_sound', 123
+    yield s.check_bogus_field_returns_error, url, 'greeting_sound', s.random_string(256)
+    yield s.check_bogus_field_returns_error, url, 'greeting_sound', []
+    yield s.check_bogus_field_returns_error, url, 'greeting_sound', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 1234
@@ -130,6 +134,7 @@ def test_get(incall):
         has_entries(
             id=incall['id'],
             preprocess_subroutine=incall['preprocess_subroutine'],
+            greeting_sound=incall['greeting_sound'],
             description=incall['description'],
             caller_id_mode=incall['caller_id_mode'],
             caller_id_name=incall['caller_id_name'],
@@ -163,6 +168,7 @@ def test_create_minimal_parameters():
 def test_create_all_parameters():
     response = confd.incalls.post(
         preprocess_subroutine='default',
+        greeting_sound='sound',
         description='description',
         caller_id_mode='prepend',
         caller_id_name='name_',
@@ -175,6 +181,7 @@ def test_create_all_parameters():
         response.item,
         has_entries(
             preprocess_subroutine='default',
+            greeting_sound='sound',
             description='description',
             caller_id_mode='prepend',
             caller_id_name='name_',
@@ -198,6 +205,7 @@ def test_edit_all_parameters(incall):
     parameters = {
         'destination': {'type': 'none'},
         'preprocess_subroutine': 'default',
+        'greeting_sound': 'sound',
         'caller_id_mode': 'append',
         'caller_id_name': '_name',
         'description': 'description',

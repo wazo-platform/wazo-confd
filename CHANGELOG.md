@@ -1,5 +1,11 @@
 # Changelog
 
+## 20.07
+
+* A new parameter has been added to the incalls resource:
+
+  * `greeting_sound`
+
 ## 20.05
 
 * `/1.1/users/import` now accepts `webrtc` in the `line_protocol` column
