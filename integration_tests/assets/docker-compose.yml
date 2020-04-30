@@ -51,8 +51,6 @@ services:
       - "./etc/wazo-confd/conf.d/50-default.yml:/etc/wazo-confd/conf.d/50-default.yml"
       - "./keys/wazo-confd-key.yml:/var/lib/wazo-auth-keys/wazo-confd-key.yml"
       - "./doc/pjsip.json.gz:/usr/share/doc/asterisk-doc/json/pjsip.json.gz"
-
-      - "./etc/ssl:/usr/share/xivo-certs"
       # - "${LOCAL_GIT_REPOS}/wazo-auth-client/wazo_auth_client:/usr/local/lib/python3.7/site-packages/wazo_auth_client"
       # - "${LOCAL_GIT_REPOS}/wazo-provd-client/wazo_provd_client:/usr/local/lib/python3.7/site-packages/wazo_provd_client"
       # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/usr/local/lib/python3.7/site-packages/xivo_bus"

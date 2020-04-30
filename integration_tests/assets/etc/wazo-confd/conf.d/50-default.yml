@@ -1,6 +1,8 @@
 debug: true
 db_uri: postgresql://asterisk:proformatique@postgres/asterisk
 uuid: 25a8940f-b563-4537-81d0-ccd40c841a2c
+rest_api:
+  listen: 0.0.0.0
 auth:
     host: auth
 ari:

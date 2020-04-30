@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -38,25 +38,16 @@ class ConfdClient:
 
     @classmethod
     def from_options(
-        cls,
-        host,
-        port,
-        username=None,
-        password=None,
-        https=True,
-        headers=None,
-        encoder=None,
+        cls, host, port, https=False, headers=None, encoder=None,
     ):
         url = '{}://{}:{}/1.1'.format('https' if https else 'http', host, port)
         logger.info('CONFD URL: %s', url)
-        return cls(url, username, password, headers, encoder)
+        return cls(url, headers, encoder)
 
-    def __init__(self, base_url, username, password, headers=None, encoder=None):
+    def __init__(self, base_url, headers=None, encoder=None):
         self.base_url = base_url
         self.encode = encoder or self._encode_dict
         self.session = requests.Session()
-        self.session.verify = False
-        self.session.auth = requests.auth.HTTPDigestAuth(username, password)
         self.session.headers.update(headers or self.DEFAULT_HEADERS)
 
     def request(self, method, url, parameters=None, data=None, headers=None):
