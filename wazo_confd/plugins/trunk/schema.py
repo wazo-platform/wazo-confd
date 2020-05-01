@@ -27,6 +27,3 @@ class TrunkSchema(BaseSchema):
     register_iax = fields.Nested(
         'RegisterIAXSchema', only=['id', 'links'], dump_only=True
     )
-    register_sip = fields.Nested(
-        'RegisterSIPSchema', only=['id', 'links'], dump_only=True
-    )

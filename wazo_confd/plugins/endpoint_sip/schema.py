@@ -4,8 +4,9 @@
 import re
 import string
 import logging
+import random
 
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, EXCLUDE, post_load
 from marshmallow.validate import Length, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -43,6 +44,7 @@ class EndpointSIPSchema(BaseSchema):
     tenant_uuid = fields.UUID(dump_only=True)
     name = fields.String(
         validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(min=1, max=128)),
+        missing=None,
     )
     display_name = fields.String(validate=Length(max=128))
     template = fields.Boolean(missing=False)
@@ -66,3 +68,23 @@ class EndpointSIPSchema(BaseSchema):
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+
+
+class EndpointSIPSchemaNullable(EndpointSIPSchema):
+
+    username = fields.String(validate=Regexp(USERNAME_REGEX), missing=None)
+    secret = fields.String(validate=Regexp(SECRET_REGEX), missing=None)
+
+    @post_load
+    def assign_username_and_password(self, data):
+        username = data.pop('username', None) or random_string(8)
+        password = data.pop('secret', None) or random_string(8)
+        data['auth_section_options'] = [
+            ['username', username],
+            ['password', password],
+        ]
+        return data
+
+
+def random_string(length):
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))

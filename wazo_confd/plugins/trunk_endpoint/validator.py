@@ -33,9 +33,9 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
         if trunk.is_associated():
             protocol = 'unknown'
             protocol_id = 0
-            if trunk.endpoint_sip_id:
+            if trunk.endpoint_sip_uuid:
                 protocol = 'sip'
-                protocol_id = trunk.endpoint_sip_id
+                protocol_id = trunk.endpoint_sip_uuid
             elif trunk.endpoint_iax_id:
                 protocol = 'iax'
                 protocol_id = trunk.endpoint_iax_id
@@ -52,11 +52,14 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
 
     def validate_not_associated_to_trunk(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            trunk = self.trunk_dao.find_by(endpoint_sip_id=endpoint.id)
+            id_ = endpoint.uuid
+            trunk = self.trunk_dao.find_by(endpoint_sip_uuid=id_)
         elif self.endpoint == 'iax':
-            trunk = self.trunk_dao.find_by(endpoint_iax_id=endpoint.id)
+            id_ = endpoint.id
+            trunk = self.trunk_dao.find_by(endpoint_iax_id=id_)
         elif self.endpoint == 'custom':
-            trunk = self.trunk_dao.find_by(endpoint_custom_id=endpoint.id)
+            id_ = endpoint.id
+            trunk = self.trunk_dao.find_by(endpoint_custom_id=id_)
         else:
             trunk = None
         if trunk:
@@ -65,16 +68,19 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
                 'Endpoint',
                 trunk_id=trunk.id,
                 endpoint=self.endpoint,
-                endpoint_id=endpoint.id,
+                endpoint_id=id_,
             )
 
     def validate_not_associated_to_line(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            line = self.line_dao.find_by(endpoint_sip_id=endpoint.id)
+            id_ = endpoint.uuid
+            line = self.line_dao.find_by(endpoint_sip_uuid=id_)
         elif self.endpoint == 'sccp':
-            line = self.line_dao.find_by(endpoint_sccp_id=endpoint.id)
+            id_ = endpoint.id
+            line = self.line_dao.find_by(endpoint_sccp_id=id_)
         elif self.endpoint == 'custom':
-            line = self.line_dao.find_by(endpoint_custom_id=endpoint.id)
+            id_ = endpoint.id
+            line = self.line_dao.find_by(endpoint_custom_id=id_)
         else:
             line = None
 
@@ -84,39 +90,24 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
                 'Endpoint',
                 trunk_id=line.id,
                 endpoint=self.endpoint,
-                endpoint_id=endpoint.id,
+                endpoint_id=id_,
             )
 
     def validate_associate_to_register(self, trunk, endpoint):
-        if self.endpoint == 'iax' and trunk.register_sip:
-            raise errors.resource_associated(
-                'Trunk',
-                'SIPRegister',
-                trunk_id=trunk.id,
-                register_iax_id=trunk.register_sip.id,
-            )
         if self.endpoint == 'sip' and trunk.register_iax:
             raise errors.resource_associated(
                 'Trunk',
                 'IAXRegister',
                 trunk_id=trunk.id,
-                register_sip_id=trunk.register_iax.id,
+                register_iax_id=trunk.register_iax.id,
             )
-        if self.endpoint == 'custom':
-            if trunk.register_iax:
-                raise errors.resource_associated(
-                    'Trunk',
-                    'IAXRegister',
-                    trunk_id=trunk.id,
-                    register_iax_id=trunk.register_iax.id,
-                )
-            if trunk.register_sip:
-                raise errors.resource_associated(
-                    'Trunk',
-                    'SIPRegister',
-                    trunk_id=trunk.id,
-                    register_sip_id=trunk.register_sip.id,
-                )
+        if self.endpoint == 'custom' and trunk.register_iax:
+            raise errors.resource_associated(
+                'Trunk',
+                'IAXRegister',
+                trunk_id=trunk.id,
+                register_iax_id=trunk.register_iax.id,
+            )
 
 
 def build_validator(endpoint):

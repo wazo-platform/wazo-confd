@@ -3,12 +3,12 @@
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
-from wazo_confd.plugins.endpoint_sip.schema import SipSchema
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
 
 
 class UserLineAssociatedEndpointSipItem(ConfdResource):
 
-    schema = SipSchema
+    schema = EndpointSIPSchema
 
     def __init__(self, user_dao, line_dao):
         super().__init__()

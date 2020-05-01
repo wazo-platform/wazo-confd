@@ -20,5 +20,5 @@ def build_validator():
                 UniqueField('name', lambda v: sip_dao.find_by(name=v), 'SIPEndpoint'),
             ),
         ],
-        edit=[Optional('name', UniqueFieldChanged('name', sip_dao, 'SIPEndpoint'))],
+        edit=[Optional('name', UniqueFieldChanged('name', sip_dao, 'SIPEndpoint', id_field='uuid'))],
     )
