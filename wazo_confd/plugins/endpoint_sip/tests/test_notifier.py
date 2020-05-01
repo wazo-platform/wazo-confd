@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -26,9 +26,9 @@ class TestSipEndpointNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.bus = Mock()
         self.sip = Mock(
-            SIP,
-            uuid=1,
-            tenant_uuid=str(uuid.uuid4),
+            uuid=str(uuid.uuid4()),
+            tenant_uuid=str(uuid.uuid4()),
+            display_name='display-name',
             username='username',
             trunk={'id': 2},
             line=None,

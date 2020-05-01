@@ -113,9 +113,9 @@ definitions:
             line_id:
               type: integer
               description: Line ID
-            sip_id:
-              type: integer
-              description: SIP ID
+            sip_uuid:
+              type: string
+              description: SIP UUID
             voicemail_id:
               type: integer
               description: Voicemail ID
@@ -144,9 +144,9 @@ definitions:
             line_id:
               type: integer
               description: Line ID
-            sip_id:
-              type: integer
-              description: SIP ID
+            sip_uuid:
+              type: string
+              description: SIP UUID
             voicemail_id:
               type: integer
               description: Voicemail ID
