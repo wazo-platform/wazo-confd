@@ -28,7 +28,7 @@ class TrunkNotifier:
         self.bus.send_bus_event(event)
 
     def edited(self, trunk):
-        if trunk.endpoint_sip_id:
+        if trunk.endpoint_sip_uuid:
             self.send_sysconfd_handlers(self._SIP_IPBX_COMMANDS)
         if trunk.endpoint_iax_id:
             self.send_sysconfd_handlers(self._IAX_IPBX_COMMANDS)
@@ -36,7 +36,7 @@ class TrunkNotifier:
         self.bus.send_bus_event(event)
 
     def deleted(self, trunk):
-        if trunk.endpoint_sip_id:
+        if trunk.endpoint_sip_uuid:
             self.send_sysconfd_handlers(self._SIP_IPBX_COMMANDS)
         if trunk.endpoint_iax_id:
             self.send_sysconfd_handlers(self._IAX_IPBX_COMMANDS)

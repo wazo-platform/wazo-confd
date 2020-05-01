@@ -8,13 +8,14 @@ from ..helpers import associations as a, errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
+FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
 @fixtures.trunk()
 @fixtures.sip()
 def test_associate_errors(trunk, sip):
-    fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['id']).put
-    fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_ID).put
+    fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['uuid']).put
+    fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_UUID).put
 
     yield s.check_resource_not_found, fake_trunk, 'Trunk'
     yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
@@ -23,8 +24,8 @@ def test_associate_errors(trunk, sip):
 @fixtures.trunk()
 @fixtures.sip()
 def test_dissociate_errors(trunk, sip):
-    fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['id']).delete
-    fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_ID).delete
+    fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['uuid']).delete
+    fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_UUID).delete
 
     yield s.check_resource_not_found, fake_trunk, 'Trunk'
     yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
@@ -33,7 +34,7 @@ def test_dissociate_errors(trunk, sip):
 @fixtures.trunk()
 @fixtures.sip()
 def test_associate(trunk, sip):
-    response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
+    response = confd.trunks(trunk['id']).endpoints.sip(sip['uuid']).put()
     response.assert_updated()
 
 
@@ -41,7 +42,7 @@ def test_associate(trunk, sip):
 @fixtures.sip()
 def test_associate_already_associated(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
-        response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
+        response = confd.trunks(trunk['id']).endpoints.sip(sip['uuid']).put()
         response.assert_updated()
 
 
@@ -50,7 +51,7 @@ def test_associate_already_associated(trunk, sip):
 @fixtures.sip()
 def test_associate_multiple_sip_to_trunk(trunk, sip1, sip2):
     with a.trunk_endpoint_sip(trunk, sip1):
-        response = confd.trunks(trunk['id']).endpoints.sip(sip2['id']).put()
+        response = confd.trunks(trunk['id']).endpoints.sip(sip2['uuid']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
@@ -59,7 +60,7 @@ def test_associate_multiple_sip_to_trunk(trunk, sip1, sip2):
 @fixtures.sip()
 def test_associate_multiple_trunks_to_sip(trunk1, trunk2, sip):
     with a.trunk_endpoint_sip(trunk1, sip):
-        response = confd.trunks(trunk2['id']).endpoints.sip(sip['id']).put()
+        response = confd.trunks(trunk2['id']).endpoints.sip(sip['uuid']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
@@ -68,7 +69,7 @@ def test_associate_multiple_trunks_to_sip(trunk1, trunk2, sip):
 @fixtures.sip()
 def test_associate_when_line_already_associated(trunk, line, sip):
     with a.line_endpoint_sip(line, sip):
-        response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
+        response = confd.trunks(trunk['id']).endpoints.sip(sip['uuid']).put()
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
 
 
@@ -77,7 +78,7 @@ def test_associate_when_line_already_associated(trunk, line, sip):
 @fixtures.register_iax()
 def test_associate_when_register_iax(trunk, sip, register):
     with a.trunk_register_iax(trunk, register):
-        response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).put()
+        response = confd.trunks(trunk['id']).endpoints.sip(sip['uuid']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'IAXRegister'))
 
 
@@ -88,21 +89,21 @@ def test_associate_when_register_iax(trunk, sip, register):
 def test_associate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
     response = (
         confd.trunks(main_trunk['id'])
-        .endpoints.sip(sub_sip['id'])
+        .endpoints.sip(sub_sip['uuid'])
         .put(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('Trunk'))
 
     response = (
         confd.trunks(sub_trunk['id'])
-        .endpoints.sip(main_sip['id'])
+        .endpoints.sip(main_sip['uuid'])
         .put(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('SIPEndpoint'))
 
     response = (
         confd.trunks(main_trunk['id'])
-        .endpoints.sip(sub_sip['id'])
+        .endpoints.sip(sub_sip['uuid'])
         .put(wazo_tenant=MAIN_TENANT)
     )
     response.assert_match(400, e.different_tenant())
@@ -112,14 +113,14 @@ def test_associate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
 @fixtures.sip()
 def test_dissociate(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
-        response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
+        response = confd.trunks(trunk['id']).endpoints.sip(sip['uuid']).delete()
         response.assert_deleted()
 
 
 @fixtures.trunk()
 @fixtures.sip()
 def test_dissociate_not_associated(trunk, sip):
-    response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
+    response = confd.trunks(trunk['id']).endpoints.sip(sip['uuid']).delete()
     response.assert_deleted()
 
 
@@ -130,21 +131,21 @@ def test_dissociate_not_associated(trunk, sip):
 def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
     response = (
         confd.trunks(main_trunk['id'])
-        .endpoints.sip(sub_sip['id'])
+        .endpoints.sip(sub_sip['uuid'])
         .delete(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('Trunk'))
 
     response = (
         confd.trunks(sub_trunk['id'])
-        .endpoints.sip(main_sip['id'])
+        .endpoints.sip(main_sip['uuid'])
         .delete(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('SIPEndpoint'))
 
 
 @fixtures.trunk()
-@fixtures.sip()
+@fixtures.sip(display_name='display')
 def test_get_endpoint_sip_relation(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).get()
@@ -152,8 +153,8 @@ def test_get_endpoint_sip_relation(trunk, sip):
             response.item,
             has_entries(
                 endpoint_sip=has_entries(
-                    id=sip['id'], username=sip['username'], name=sip['name'],
-                ),
+                    uuid=sip['uuid'], display_name=sip['display_name']
+                )
             ),
         )
 
@@ -162,7 +163,7 @@ def test_get_endpoint_sip_relation(trunk, sip):
 @fixtures.sip()
 def test_get_trunk_relation(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
-        response = confd.endpoints.sip(sip['id']).get()
+        response = confd.endpoints.sip(sip['uuid']).get()
         assert_that(response.item, has_entries(trunk=has_entries(id=trunk['id'])))
 
 
@@ -173,7 +174,7 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, sip):
         confd.trunks(trunk['id']).delete().assert_deleted()
 
         deleted_trunk = confd.trunks(trunk['id']).get
-        deleted_sip = confd.endpoints.sip(sip['id']).get
+        deleted_sip = confd.endpoints.sip(sip['uuid']).get
         yield s.check_resource_not_found, deleted_trunk, 'Trunk'
         yield s.check_resource_not_found, deleted_sip, 'SIPEndpoint'
 
@@ -182,7 +183,7 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, sip):
 @fixtures.sip()
 def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
-        confd.endpoints.sip(sip['id']).delete().assert_deleted()
+        confd.endpoints.sip(sip['uuid']).delete().assert_deleted()
 
         response = confd.trunks(trunk['id']).get()
         assert_that(response.item, has_entries(endpoint_sip=None))
@@ -191,12 +192,12 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
 @fixtures.trunk()
 @fixtures.sip()
 def test_bus_events(trunk, sip):
-    url = confd.trunks(trunk['id']).endpoints.sip(sip['id'])
+    url = confd.trunks(trunk['id']).endpoints.sip(sip['uuid'])
     routing_key = 'config.trunks.{}.endpoints.sip.{}.updated'.format(
-        trunk['id'], sip['id']
+        trunk['id'], sip['uuid']
     )
     yield s.check_bus_event, routing_key, url.put
     routing_key = 'config.trunks.{}.endpoints.sip.{}.deleted'.format(
-        trunk['id'], sip['id']
+        trunk['id'], sip['uuid']
     )
     yield s.check_bus_event, routing_key, url.delete
