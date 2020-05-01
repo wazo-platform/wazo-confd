@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -43,9 +43,9 @@ def line_device(line, device, check=True):
 
 @contextmanager
 def line_endpoint_sip(line, sip, check=True):
-    h.line_endpoint_sip.associate(line['id'], sip['id'], check)
+    h.line_endpoint_sip.associate(line['id'], sip['uuid'], check)
     yield
-    h.line_endpoint_sip.dissociate(line['id'], sip['id'], check)
+    h.line_endpoint_sip.dissociate(line['id'], sip['uuid'], check)
 
 
 @contextmanager
@@ -92,9 +92,9 @@ def queue_extension(queue, extension, check=True):
 
 @contextmanager
 def trunk_endpoint_sip(trunk, sip, check=True):
-    h.trunk_endpoint_sip.associate(trunk['id'], sip['id'], check)
+    h.trunk_endpoint_sip.associate(trunk['id'], sip['uuid'], check)
     yield
-    h.trunk_endpoint_sip.dissociate(trunk['id'], sip['id'], check)
+    h.trunk_endpoint_sip.dissociate(trunk['id'], sip['uuid'], check)
 
 
 @contextmanager
@@ -273,13 +273,6 @@ def trunk_register_iax(trunk, iax, check=True):
     h.trunk_register_iax.associate(trunk['id'], iax['id'], check)
     yield
     h.trunk_register_iax.dissociate(trunk['id'], iax['id'], check)
-
-
-@contextmanager
-def trunk_register_sip(trunk, sip, check=True):
-    h.trunk_register_sip.associate(trunk['id'], sip['id'], check)
-    yield
-    h.trunk_register_sip.dissociate(trunk['id'], sip['id'], check)
 
 
 @contextmanager

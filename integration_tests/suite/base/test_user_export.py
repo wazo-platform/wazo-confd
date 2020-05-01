@@ -121,7 +121,9 @@ def test_given_user_has_voicemail_when_exporting_then_csv_has_voicemail_fields(
 @database.reset(db)
 @fixtures.user()
 @fixtures.line()
-@fixtures.sip()
+@fixtures.sip(
+    auth_section_options=[['username', 'my-username'], ['password', 'secret']]
+)
 def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(
     user, line, sip
 ):
@@ -136,8 +138,8 @@ def test_given_user_has_sip_line_when_exporting_then_csv_has_line_fields(
                     line_protocol="sip",
                     provisioning_code=line['provisioning_code'],
                     context=line['context'],
-                    sip_username=sip['username'],
-                    sip_secret=sip['secret'],
+                    sip_username='my-username',
+                    sip_secret='secret',
                 )
             ),
         )

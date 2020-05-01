@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -17,7 +17,7 @@ from xivo_bus.resources.trunk_endpoint.event import (
 
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
-from xivo_dao.alchemy.usersip import UserSIP as Sip
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.useriax import UserIAX as IAX
 
 from ..notifier import TrunkEndpointNotifier
@@ -28,7 +28,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         tenant_uuid = str(uuid.uuid4())
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.sip = Mock(Sip, id=1, username='username', tenant_uuid=tenant_uuid)
+        self.sip = Mock(EndpointSIP, uuid=1, auth_section_options=[['username', 'username']], tenant_uuid=tenant_uuid)
         self.sip.name = 'limitation of mock instantiation with name ...'
         self.custom = Mock(Custom, id=2, tenant_uuid=tenant_uuid, interface='custom')
         self.iax = Mock(IAX, id=3, tenant_uuid=tenant_uuid)
@@ -43,10 +43,10 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         expected_event = TrunkEndpointSIPAssociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
             sip={
-                'id': self.sip.id,
+                'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': self.sip.username,
+                'username': self.sip.auth_section_options.find('username')[0],
             },
         )
 

@@ -21,7 +21,7 @@ class TestTrunkNotifier(unittest.TestCase):
         self.trunk = Mock(
             Trunk,
             id=1234,
-            endpoint_sip_id=None,
+            endpoint_sip_uuid=None,
             endpoint_iax_id=None,
             endpoint_custom_id=None,
         )
@@ -50,7 +50,7 @@ class TestTrunkNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_sip_edited_then_sip_reloaded(self):
-        self.trunk.endpoint_sip_id = 123
+        self.trunk.endpoint_sip_uuid = 123
 
         self.notifier.edited(self.trunk)
 
@@ -80,7 +80,7 @@ class TestTrunkNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_trunk_sip_deleted_then_sip_reloaded(self):
-        self.trunk.endpoint_sip_id = 123
+        self.trunk.endpoint_sip_uuid = 123
 
         self.notifier.deleted(self.trunk)
 
@@ -110,7 +110,7 @@ class TestTrunkNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def _sysconfd_handlers(self):
-        if self.trunk.endpoint_sip_id:
+        if self.trunk.endpoint_sip_uuid:
             ipbx_commands = ['module reload res_pjsip.so']
         elif self.trunk.endpoint_iax_id:
             ipbx_commands = ['iax2 reload']

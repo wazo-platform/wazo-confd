@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, none
@@ -62,15 +62,6 @@ def test_associate_multiple_trunks_to_iax(trunk1, trunk2, iax):
     with a.trunk_endpoint_iax(trunk1, iax):
         response = confd.trunks(trunk2['id']).endpoints.iax(iax['id']).put()
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
-
-
-@fixtures.trunk()
-@fixtures.iax()
-@fixtures.register_sip()
-def test_associate_when_register_sip(trunk, iax, register):
-    with a.trunk_register_sip(trunk, register):
-        response = confd.trunks(trunk['id']).endpoints.iax(iax['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
 
 
 @fixtures.trunk(wazo_tenant=MAIN_TENANT)

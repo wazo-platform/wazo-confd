@@ -13,7 +13,7 @@ from xivo_bus.resources.line_device.event import (
 LINE_FIELDS = [
     'id',
     'name',
-    'endpoint_sip.id',
+    'endpoint_sip.uuid',
     'endpoint_sccp.id',
     'endpoint_custom.id',
 ]
