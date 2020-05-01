@@ -123,7 +123,6 @@ DEFAULT_CONFIG = {
         'queue_member': True,
         'queue_schedule': True,
         'register_iax': True,
-        'register_sip': True,
         'registrar': True,
         'rtp': True,
         'schedule': True,

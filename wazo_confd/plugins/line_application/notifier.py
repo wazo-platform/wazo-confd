@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd import bus, sysconfd
@@ -13,7 +13,7 @@ from xivo_bus.resources.line_application.event import (
 LINE_FIELDS = [
     'id',
     'name',
-    'endpoint_sip.id',
+    'endpoint_sip.uuid',
     'endpoint_sccp.id',
     'endpoint_custom.id',
 ]

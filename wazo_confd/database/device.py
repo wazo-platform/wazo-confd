@@ -6,10 +6,10 @@ from sqlalchemy.sql import or_
 
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.alchemy.linefeatures import LineFeatures
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.user_line import UserLine
 from xivo_dao.alchemy.line_extension import LineExtension
-from xivo_dao.alchemy.usersip import UserSIP
 from xivo_dao.alchemy.sccpdevice import SCCPDevice
 
 from xivo_dao.helpers.db_manager import Session
@@ -29,7 +29,7 @@ def profile_for_device(device_id):
 
 def sip_lines_for_device(device_id):
     query = (
-        Session.query(LineFeatures, UserSIP, Extension)
+        Session.query(LineFeatures, EndpointSIP, Extension)
         .join(LineFeatures.endpoint_sip)
         .join(LineFeatures.user_lines)
         .join(UserLine.main_user_rel)
@@ -38,7 +38,9 @@ def sip_lines_for_device(device_id):
         .filter(LineFeatures.device == device_id)
         .options(
             Load(LineFeatures).load_only("id", "configregistrar"),
-            Load(UserSIP).load_only("id", "callerid", "name", "secret"),
+            Load(EndpointSIP).load_only(
+                "uuid", "name"
+            ),  # TODO(pc-m): add the load_only
             Load(Extension).load_only("id", "exten"),
         )
     )

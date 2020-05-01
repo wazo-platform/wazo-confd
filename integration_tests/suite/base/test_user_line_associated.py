@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries, has_length, instance_of
@@ -16,14 +16,7 @@ def test_get_user_line_id_associated_endpoints_sip(user, line, sip):
             confd.users(user['uuid']).lines(line['id']).associated.endpoints.sip.get()
         )
         assert_that(
-            response.item,
-            has_entries(
-                username=has_length(8),
-                secret=has_length(8),
-                type='friend',
-                host='dynamic',
-                options=instance_of(list),
-            ),
+            response.item, has_entries(uuid=sip['uuid']),
         )
 
 
@@ -67,16 +60,7 @@ def test_get_user_line_id_associated_endpoints_sip_when_user_line_not_associated
 def test_get_user_line_main_associated_endpoints_sip(user, line, sip):
     with a.line_endpoint_sip(line, sip), a.user_line(user, line):
         response = confd.users(user['uuid']).lines.main.associated.endpoints.sip.get()
-        assert_that(
-            response.item,
-            has_entries(
-                username=has_length(8),
-                secret=has_length(8),
-                type='friend',
-                host='dynamic',
-                options=instance_of(list),
-            ),
-        )
+        assert_that(response.item, has_entries(uuid=sip['uuid']))
 
 
 @fixtures.user()

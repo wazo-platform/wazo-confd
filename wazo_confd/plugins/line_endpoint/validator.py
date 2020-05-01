@@ -36,9 +36,9 @@ class ValidateLineAssociation(ValidatorAssociation):
         if line.is_associated():
             protocol = 'unknown'
             protocol_id = 0
-            if line.endpoint_sip_id:
+            if line.endpoint_sip_uuid:
                 protocol = 'sip'
-                protocol_id = line.endpoint_sip_id
+                protocol_id = line.endpoint_sip_uuid
             elif line.endpoint_sccp_id:
                 protocol = 'sccp'
                 protocol_id = line.endpoint_sccp_id
@@ -56,11 +56,14 @@ class ValidateLineAssociation(ValidatorAssociation):
 
     def validate_not_associated_to_line(self, line, endpoint):
         if self.endpoint == 'sip':
-            line = self.line_dao.find_by(endpoint_sip_id=endpoint.id)
+            id_ = endpoint.uuid
+            line = self.line_dao.find_by(endpoint_sip_uuid=id_)
         elif self.endpoint == 'sccp':
-            line = self.line_dao.find_by(endpoint_sccp_id=endpoint.id)
+            id_ = endpoint.id
+            line = self.line_dao.find_by(endpoint_sccp_id=id_)
         elif self.endpoint == 'custom':
-            line = self.line_dao.find_by(endpoint_custom_id=endpoint.id)
+            id_ = endpoint.id
+            line = self.line_dao.find_by(endpoint_custom_id=id_)
         else:
             line = None
 
@@ -70,16 +73,19 @@ class ValidateLineAssociation(ValidatorAssociation):
                 'Endpoint',
                 line_id=line.id,
                 endpoint=self.endpoint,
-                endpoint_id=endpoint.id,
+                endpoint_id=id_,
             )
 
     def validate_not_associated_to_trunk(self, trunk, endpoint):
         if self.endpoint == 'sip':
-            trunk = self.trunk_dao.find_by(endpoint_sip_id=endpoint.id)
+            id_ = endpoint.uuid
+            trunk = self.trunk_dao.find_by(endpoint_sip_uuid=id_)
         elif self.endpoint == 'iax':
-            trunk = self.trunk_dao.find_by(endpoint_iax_id=endpoint.id)
+            id_ = endpoint.id
+            trunk = self.trunk_dao.find_by(endpoint_iax_id=id_)
         elif self.endpoint == 'custom':
-            trunk = self.trunk_dao.find_by(endpoint_custom_id=endpoint.id)
+            id_ = endpoint.id
+            trunk = self.trunk_dao.find_by(endpoint_custom_id=id_)
         else:
             trunk = None
 
@@ -89,7 +95,7 @@ class ValidateLineAssociation(ValidatorAssociation):
                 'Endpoint',
                 trunk_id=trunk.id,
                 endpoint=self.endpoint,
-                endpoint_id=endpoint.id,
+                endpoint_id=id_,
             )
 
 

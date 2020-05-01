@@ -87,7 +87,6 @@ setup(
             'queue_schedule = wazo_confd.plugins.queue_schedule.plugin:Plugin',
             'rtp = wazo_confd.plugins.rtp.plugin:Plugin',
             'register_iax = wazo_confd.plugins.register_iax.plugin:Plugin',
-            'register_sip = wazo_confd.plugins.register_sip.plugin:Plugin',
             'registrar = wazo_confd.plugins.registrar.plugin:Plugin',
             'schedule = wazo_confd.plugins.schedule.plugin:Plugin',
             'sccp_general = wazo_confd.plugins.sccp_general.plugin:Plugin',

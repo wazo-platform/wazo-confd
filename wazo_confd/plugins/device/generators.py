@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -133,14 +133,23 @@ class SipGenerator:
 
     def generate_sip_line(self, row):
         line = row.LineFeatures
-        sip = row.UserSIP
+        sip = row.EndpointSIP
         extension = row.Extension
         registrar = self.registrar_dao.get(line.configregistrar)
+        username, password = '', ''
+        if sip._auth_section:
+            for _, value in sip._auth_section.find('username'):
+                username = value
+                break
+            for _, value in sip._auth_section.find('password'):
+                password = value
+                break
 
         config = {
-            'auth_username': sip.name,
-            'username': sip.name,
-            'password': sip.secret,
+            # 'auth_username': sip.name,  # TODO(pc-m): What does this map to?
+            'auth_username': username,
+            'username': username,
+            'password': password,
             'display_name': line.caller_id_name,
             'number': extension.exten,
             'registrar_ip': registrar.main_host,

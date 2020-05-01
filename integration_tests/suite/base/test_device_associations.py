@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -90,8 +90,8 @@ def test_when_sip_username_and_password_are_updated_then_provd_is_updated(
         line, extension
     ), a.line_device(line, device):
 
-        response = confd.endpoints.sip(sip['id']).put(
-            username="myusername", secret="mysecret"
+        response = confd.endpoints.sip(sip['uuid']).put(
+            auth_section_options=[['username', 'myusername'], ['password', 'mysecret']],
         )
         response.assert_updated()
 
@@ -135,7 +135,7 @@ def test_updating_user_line_or_extension_associated_with_autoprov_device_does_no
         with db.queries() as queries:
             queries.associate_line_device(line['id'], device['id'])
 
-        response = confd.endpoints.sip(sip['id']).put()
+        response = confd.endpoints.sip(sip['uuid']).put()
         response.assert_ok()
 
         response = confd.lines(line['id']).put()
@@ -201,7 +201,7 @@ def test_dissociate_sip_endpoint_associated_to_device(
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(
         line, extension
     ), a.line_device(line, device):
-        response = confd.lines(line['id']).endpoints.sip(sip['id']).delete()
+        response = confd.lines(line['id']).endpoints.sip(sip['uuid']).delete()
         response.assert_match(400, e.resource_associated())
 
 

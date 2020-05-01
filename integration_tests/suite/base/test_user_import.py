@@ -173,7 +173,7 @@ def test_given_csv_has_all_fields_for_a_user_then_resources_are_in_the_same_tena
     extension = confd.extensions(entry['extension_id']).get().item
     assert_that(extension, has_entries(tenant_uuid=config.MAIN_TENANT))
 
-    sip_endpoint = confd.endpoints.sip(entry['sip_id']).get().item
+    sip_endpoint = confd.endpoints.sip(entry['sip_uuid']).get().item
     assert_that(sip_endpoint, has_entries(tenant_uuid=config.MAIN_TENANT))
 
     incall_extension = confd.extensions(entry['incall_extension_id']).get().item
@@ -319,10 +319,10 @@ def test_given_csv_has_minimal_sip_fields_then_sip_endpoint_created():
     csv = [{"firstname": "Chârles", "line_protocol": "sip", "context": config.CONTEXT}]
 
     response = client.post("/users/import", csv)
-    sip_id = get_import_field(response, 'sip_id')
+    sip_uuid = get_import_field(response, 'sip_uuid')
 
-    sip = confd.endpoints.sip(sip_id).get().item
-    assert_that(sip, has_entries(id=sip_id))
+    sip = confd.endpoints.sip(sip_uuid).get().item
+    assert_that(sip, has_entries(uuid=sip_uuid))
 
 
 def test_given_csv_has_none_sip_fields_then_sip_endpoint_created():
@@ -337,10 +337,10 @@ def test_given_csv_has_none_sip_fields_then_sip_endpoint_created():
     ]
 
     response = client.post("/users/import", csv)
-    sip_id = get_import_field(response, 'sip_id')
+    sip_uuid = get_import_field(response, 'sip_uuid')
 
-    sip = confd.endpoints.sip(sip_id).get().item
-    assert_that(sip, has_entries(id=sip_id))
+    sip = confd.endpoints.sip(sip_uuid).get().item
+    assert_that(sip, has_entries(uuid=sip_uuid))
 
 
 def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
@@ -355,10 +355,17 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
     ]
 
     response = client.post("/users/import", csv)
-    sip_id = get_import_field(response, 'sip_id')
+    sip_uuid = get_import_field(response, 'sip_uuid')
 
-    sip = confd.endpoints.sip(sip_id).get().item
-    assert_that(sip, has_entries(username="sipusername", secret="sipsecret"))
+    sip = confd.endpoints.sip(sip_uuid).get().item
+    assert_that(
+        sip,
+        has_entries(
+            auth_section_options=contains_inanyorder(
+                contains('username', 'sipusername'), contains("password", "sipsecret"),
+            )
+        ),
+    )
 
 
 def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
@@ -367,24 +374,21 @@ def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
     ]
 
     response = client.post("/users/import", csv)
-    sip_id = get_import_field(response, 'sip_id')
+    sip_uuid = get_import_field(response, 'sip_uuid')
     line_id = get_import_field(response, 'line_id')
 
-    sip = confd.endpoints.sip(sip_id).get().item
+    sip = confd.endpoints.sip(sip_uuid).get().item
     assert_that(
         sip,
         has_entries(
-            id=sip_id,
+            uuid=sip_uuid,
             line=has_entries(id=line_id),
-            options=has_items(
+            endpoint_section_options=contains_inanyorder(
+                contains('callerid', '"Chârles"'),
                 contains('allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'),
-                contains('directmedia', 'no'),
-                contains('dtlscertfile', '/usr/share/xivo-certs/server.crt'),
-                contains('dtlsprivatekey', '/usr/share/xivo-certs/server.key'),
-                contains('dtlsverify', 'no'),
-                contains('nat', 'force_rport,comedia'),
-                contains('transport', 'transport-wss'),
+                contains('dtls_auto_generate_cert', 'yes'),
                 contains('webrtc', 'yes'),
+                contains('transport', 'transport-wss'),
             ),
         ),
     )
@@ -731,7 +735,7 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     voicemail_id = get_import_field(response, 'voicemail_id')
     extension_id = get_import_field(response, 'extension_id')
     extension_incall_id = get_import_field(response, 'incall_extension_id')
-    sip_id = get_import_field(response, 'sip_id')
+    sip_uuid = get_import_field(response, 'sip_uuid')
 
     response = confd.users(user_id).get()
     assert_that(
@@ -741,7 +745,7 @@ def test_given_csv_has_all_resources_then_all_relations_created():
                 has_entries(
                     id=line_id,
                     extensions=contains(has_entries(id=extension_id)),
-                    endpoint_sip=has_entries(id=sip_id),
+                    endpoint_sip=has_entries(uuid=sip_uuid),
                 )
             ),
             incalls=contains(
@@ -752,7 +756,9 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     )
 
 
-@fixtures.sip()
+@fixtures.sip(
+    auth_section_options=[['username', 'my-username'], ['password', 'my-password']]
+)
 @fixtures.extension()
 @fixtures.extension(context=config.INCALL_CONTEXT)
 @fixtures.voicemail()
@@ -766,7 +772,7 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
             "exten": extension['exten'],
             "context": extension['context'],
             "line_protocol": "sip",
-            "sip_username": sip['username'],
+            "sip_username": 'my-username',
             "incall_exten": extension_incall['exten'],
             "incall_context": extension_incall['context'],
             "voicemail_number": voicemail['number'],
@@ -789,7 +795,7 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
                 has_entries(
                     id=line_id,
                     extensions=contains(has_entries(id=extension['id'])),
-                    endpoint_sip=has_entries(id=sip['id']),
+                    endpoint_sip=has_entries(uuid=sip['uuid']),
                 )
             ),
             call_permissions=contains(has_entries(id=call_permission['id'])),
@@ -1080,9 +1086,9 @@ def test_when_updating_sip_line_fields_then_sip_updated(entry):
     ]
 
     response = client.put("/users/import", csv)
-    sip_id = get_update_field(response, 'sip_id')
+    sip_uuid = get_update_field(response, 'sip_uuid')
 
-    sip = confd.endpoints.sip(sip_id).get().item
+    sip = confd.endpoints.sip(sip_uuid).get().item
     assert_that(
         sip, has_entries(username="mynewsipusername", secret="mynewsippassword")
     )
@@ -1111,9 +1117,9 @@ def test_when_adding_sip_line_then_sip_created(entry):
     ]
 
     response = client.put("/users/import", csv)
-    sip_id = get_update_field(response, 'sip_id')
+    sip_uuid = get_update_field(response, 'sip_uuid')
 
-    sip = confd.endpoints.sip(sip_id).get().item
+    sip = confd.endpoints.sip(sip_uuid).get().item
     assert_that(
         sip, has_entries(username="createdsipusername", secret="createdsippassword")
     )
@@ -1414,7 +1420,7 @@ def test_given_2_entries_in_csv_then_2_entries_updated(entry1, entry2):
                 line_id=entry1['line_id'],
                 extension_id=entry1['extension_id'],
                 voicemail_id=entry1['voicemail_id'],
-                sip_id=entry1['sip_id'],
+                sip_uuid=entry1['sip_uuid'],
                 incall_extension_id=entry1['incall_extension_id'],
             ),
             has_entries(
@@ -1475,7 +1481,7 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
 
     response = confd.lines(entry['line_id']).get()
-    assert_that(response.item['endpoint_sip'], has_entries(id=entry['sip_id']))
+    assert_that(response.item['endpoint_sip'], has_entries(id=entry['sip_uuid']))
 
     response = confd.users(entry['user_id']).get()
     assert_that(

@@ -1,5 +1,7 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+import logging
 
 from xivo_bus.resources.trunk_endpoint.event import (
     TrunkEndpointCustomAssociatedEvent,
@@ -14,7 +16,9 @@ from wazo_confd import bus, sysconfd
 from wazo_confd.plugins.trunk.schema import TrunkSchema
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
 from wazo_confd.plugins.endpoint_iax.schema import IAXSchema
-from wazo_confd.plugins.endpoint_sip.schema import SipSchema
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+
+logger = logging.getLogger(__name__)
 
 TRUNK_FIELDS = [
     'id',
@@ -22,10 +26,10 @@ TRUNK_FIELDS = [
 ]
 
 ENDPOINT_SIP_FIELDS = [
-    'id',
+    'uuid',
     'tenant_uuid',
     'name',
-    'username',
+    # 'username',  # TODO(pc-m): add a property to the model?
 ]
 
 ENDPOINT_IAX_FIELDS = [
@@ -51,7 +55,7 @@ class TrunkEndpointNotifier:
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         if self.endpoint == 'sip':
             self.send_sysconfd_handlers(['module reload res_pjsip.so'])
-            sip_serialized = SipSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
+            sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
             event = TrunkEndpointSIPAssociatedEvent(
                 trunk=trunk_serialized, sip=sip_serialized,
             )
@@ -72,7 +76,7 @@ class TrunkEndpointNotifier:
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         if self.endpoint == 'sip':
             self.send_sysconfd_handlers(['module reload res_pjsip.so'])
-            sip_serialized = SipSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
+            sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
             event = TrunkEndpointSIPDissociatedEvent(
                 trunk=trunk_serialized, sip=sip_serialized,
             )

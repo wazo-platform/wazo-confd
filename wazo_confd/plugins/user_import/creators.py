@@ -4,19 +4,22 @@
 import abc
 
 from xivo_dao.alchemy.dialaction import Dialaction
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.incall import Incall
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.voicemail import Voicemail
 
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.extension import dao as extension_dao
 
-from wazo_confd.plugins.endpoint_sip.schema import SipSchema, SipSchemaNullable
+from wazo_confd.plugins.endpoint_sip.schema import (
+    EndpointSIPSchema,
+    EndpointSIPSchemaNullable,
+)
 from wazo_confd.plugins.extension.schema import ExtensionSchema
 from wazo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
 from wazo_confd.plugins.voicemail.schema import VoicemailSchema
@@ -151,35 +154,31 @@ class LineCreator(Creator):
 
 class SipCreator(Creator):
 
-    schema = SipSchema
-    schema_nullable = SipSchemaNullable
+    schema = EndpointSIPSchema
+    schema_nullable = EndpointSIPSchemaNullable
 
     def find(self, fields, tenant_uuid):
-        name = fields.get('username')
-        if name:
-            return self.service.find_by(name=name)
+        username = fields.get('username')
+        if username:
+            return self.service.find_by(username=username)
 
     def create(self, fields, tenant_uuid):
+        import logging
+
+        logger = logging.getLogger(__name__)
         form = self.schema_nullable(handle_error=False).load(fields)
-        return self.service.create(SIP(tenant_uuid=tenant_uuid, **form))
+        return self.service.create(EndpointSIP(tenant_uuid=tenant_uuid, **form))
 
 
 class WebRTCCreator(SipCreator):
     def create(self, fields, tenant_uuid):
-        fields.update(
-            {
-                'options': [
-                    ['transport', 'transport-wss'],
-                    ['directmedia', 'no'],
-                    ['dtlsverify', 'no'],
-                    ['dtlscertfile', '/usr/share/xivo-certs/server.crt'],
-                    ['dtlsprivatekey', '/usr/share/xivo-certs/server.key'],
-                    ['nat', 'force_rport,comedia'],
-                    ['webrtc', 'yes'],
-                    ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
-                ],
-            }
-        )
+        endpoint_section_options = fields.get('endpoint_section_options', [])
+        fields['endpoint_section_options'] = endpoint_section_options + [
+            ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
+            ['dtls_auto_generate_cert', 'yes'],
+            ['webrtc', 'yes'],
+            ['transport', 'transport-wss'],
+        ]
         return super().create(fields, tenant_uuid)
 
 

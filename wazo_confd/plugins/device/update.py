@@ -57,7 +57,7 @@ class DeviceUpdater:
             self.update_for_line(line)
 
     def update_for_endpoint_sip(self, sip):
-        line = self.line_dao.find_by(endpoint_sip_id=sip.id)
+        line = self.line_dao.find_by(endpoint_sip_uuid=sip.uuid)
         if line:
             self.update_for_line(line)
 

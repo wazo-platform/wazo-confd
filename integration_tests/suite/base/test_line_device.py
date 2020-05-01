@@ -233,6 +233,12 @@ def assert_sip_config(user, sip, extension, provd_config, position=1):
     position = str(position)
     fullname = "{u[firstname]} {u[lastname]}".format(u=user)
     registrar = confd.registrars('default').get().item
+    username, password = None, None
+    for key, value in sip['auth_section_options']:
+        if key == 'username':
+            username = value
+        elif key == 'password':
+            password = value
 
     assert_that(
         provd_config['raw_config'],
@@ -241,9 +247,9 @@ def assert_sip_config(user, sip, extension, provd_config, position=1):
             sip_lines=has_entries(
                 {
                     position: has_entries(
-                        auth_username=sip['username'],
-                        username=sip['username'],
-                        password=sip['secret'],
+                        auth_username=username,
+                        username=username,
+                        password=password,
                         display_name=fullname,
                         number=extension['exten'],
                         proxy_ip=registrar['proxy_main_host'],
@@ -281,7 +287,12 @@ def test_associate_sip_line(device):
     registrar['backup_host'] = '127.0.0.2'
     confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sip') as (user, line, extension, sip):
+    with line_fellowship('sip', generate_username_password=True) as (
+        user,
+        line,
+        extension,
+        sip,
+    ):
         response = confd.lines(line['id']).devices(device['id']).put()
         response.assert_updated()
 
@@ -300,7 +311,9 @@ def test_associate_sip_line_change_tenant(device):
     registrar['backup_host'] = '127.0.0.2'
     confd.registrars(registrar['id']).put(registrar)
 
-    with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (user, line, extension, sip):
+    with line_fellowship(
+        'sip', generate_username_password=True, wazo_tenant=SUB_TENANT
+    ) as (user, line, extension, sip):
         response = confd.lines(line['id']).devices(device['id']).put()
         response.assert_updated()
 
@@ -315,9 +328,17 @@ def test_associate_2_sip_lines(device):
     registrar['backup_host'] = '127.0.0.2'
     confd.registrars(registrar['id']).put(registrar).assert_updated()
 
-    with line_fellowship('sip') as (user1, line1, extension1, sip1), line_fellowship(
-        'sip'
-    ) as (user2, line2, extension2, sip2):
+    with line_fellowship('sip', generate_username_password=True) as (
+        user1,
+        line1,
+        extension1,
+        sip1,
+    ), line_fellowship('sip', generate_username_password=True) as (
+        user2,
+        line2,
+        extension2,
+        sip2,
+    ):
 
         confd.lines(line2['id']).put(position=2).assert_updated()
         confd.lines(line1['id']).devices(device['id']).put().assert_updated()
@@ -332,7 +353,9 @@ def test_associate_2_sip_lines(device):
 @fixtures.device(wazo_tenant=MAIN_TENANT)
 @fixtures.device(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_device, sub_device):
-    with line_fellowship('sip', wazo_tenant=MAIN_TENANT) as (
+    with line_fellowship(
+        'sip', generate_username_password=True, wazo_tenant=MAIN_TENANT
+    ) as (
         user,
         main_line,
         extension,
@@ -345,7 +368,9 @@ def test_associate_multi_tenant(main_device, sub_device):
         )
         response.assert_match(404, e.not_found('Line'))
 
-    with line_fellowship('sip', wazo_tenant=SUB_TENANT) as (
+    with line_fellowship(
+        'sip', generate_username_password=True, wazo_tenant=SUB_TENANT
+    ) as (
         user,
         sub_line,
         extension,
@@ -387,9 +412,12 @@ def test_associate_2_sccp_lines(device):
 
 @fixtures.device()
 def test_associate_lines_with_different_endpoints(device):
-    with line_fellowship('sip') as (user1, line1, extension1, sip), line_fellowship(
-        'sccp'
-    ) as (user2, line2, extension2, sccp):
+    with line_fellowship('sip', generate_username_password=True) as (
+        user1,
+        line1,
+        extension1,
+        sip,
+    ), line_fellowship('sccp') as (user2, line2, extension2, sccp):
 
         confd.lines(line2['id']).put(position=2).assert_updated()
         confd.lines(line1['id']).devices(device['id']).put().assert_updated()

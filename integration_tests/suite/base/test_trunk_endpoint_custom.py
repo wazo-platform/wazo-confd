@@ -81,15 +81,6 @@ def test_associate_when_register_iax(trunk, custom, register):
         response.assert_match(400, e.resource_associated('Trunk', 'IAXRegister'))
 
 
-@fixtures.trunk()
-@fixtures.custom()
-@fixtures.register_sip()
-def test_associate_when_register_sip(trunk, custom, register):
-    with a.trunk_register_sip(trunk, register):
-        response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).put()
-        response.assert_match(400, e.resource_associated('Trunk', 'SIPRegister'))
-
-
 @fixtures.trunk(wazo_tenant=MAIN_TENANT)
 @fixtures.trunk(wazo_tenant=SUB_TENANT)
 @fixtures.custom(wazo_tenant=MAIN_TENANT)

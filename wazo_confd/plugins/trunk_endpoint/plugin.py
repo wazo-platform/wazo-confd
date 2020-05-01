@@ -26,7 +26,7 @@ class Plugin:
 
         api.add_resource(
             TrunkEndpointAssociationSip,
-            '/trunks/<int:trunk_id>/endpoints/sip/<int:endpoint_id>',
+            '/trunks/<int:trunk_id>/endpoints/sip/<uuid:endpoint_uuid>',
             endpoint='trunk_endpoint_sip',
             resource_class_args=(service, trunk_dao, endpoint_sip_dao),
         )

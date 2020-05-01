@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+import uuid
 
 from mock import Mock
 
@@ -27,10 +28,10 @@ class TestLineDeviceNotifier(unittest.TestCase):
         self.line = Mock(
             Line,
             id=1,
-            endpoint_sip={'id': 2},
+            endpoint_sip={'uuid': str(uuid.uuid4())},
             endpoint_sccp=None,
             endpoint_custom=None,
-            endpoint_sip_id=None,
+            endpoint_sip_uuid=None,
             endpoint_sccp_id=None,
             endpoint_custom_id=None,
         )
@@ -40,13 +41,13 @@ class TestLineDeviceNotifier(unittest.TestCase):
         self.notifier = LineDeviceNotifier(self.bus, self.sysconfd)
 
     def test_given_line_is_not_sccp_when_associated_then_sccp_not_reloaded(self):
-        self.line.endpoint_sip_id = 1
+        self.line.endpoint_sip_uuid = 1
         self.notifier.associated(self.line, self.device)
 
         assert_that(self.sysconfd.exec_request_handlers.call_count, equal_to(0))
 
     def test_given_line_is_not_sccp_when_dissociated_then_sccp_not_reloaded(self):
-        self.line.endpoint_sip_id = 1
+        self.line.endpoint_sip_uuid = 1
         self.notifier.dissociated(self.line, self.device)
 
         assert_that(self.sysconfd.exec_request_handlers.call_count, equal_to(0))
