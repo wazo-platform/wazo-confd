@@ -31,13 +31,13 @@ class LineEndpointAssociation(ConfdResource):
 
 
 class LineEndpointAssociationSip(LineEndpointAssociation):
-    @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.update')
-    def put(self, line_id, endpoint_id):
-        return super().put(line_id, endpoint_id)
+    @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_uuid}.update')
+    def put(self, line_id, endpoint_uuid):
+        return super().put(line_id, endpoint_uuid)
 
-    @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.delete')
-    def delete(self, line_id, endpoint_id):
-        return super().delete(line_id, endpoint_id)
+    @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_uuid}.delete')
+    def delete(self, line_id, endpoint_uuid):
+        return super().delete(line_id, endpoint_uuid)
 
 
 class LineEndpointAssociationSccp(LineEndpointAssociation):

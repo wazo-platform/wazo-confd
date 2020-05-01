@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -15,7 +15,7 @@ from ..notifier import UserLineNotifier
 
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema  # noqa
 from wazo_confd.plugins.endpoint_sccp.resource import SccpSchema  # noqa
-from wazo_confd.plugins.endpoint_sip.schema import SipSchema  # noqa
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema  # noqa
 
 
 EXPECTED_SYSCONFD_HANDLERS = {

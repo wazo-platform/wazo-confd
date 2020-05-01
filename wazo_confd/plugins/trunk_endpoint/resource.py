@@ -1,8 +1,12 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import logging
+
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
+
+logger = logging.getLogger(__name__)
 
 
 class TrunkEndpointAssociation(ConfdResource):
@@ -31,13 +35,13 @@ class TrunkEndpointAssociation(ConfdResource):
 
 
 class TrunkEndpointAssociationSip(TrunkEndpointAssociation):
-    @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_id}.update')
-    def put(self, trunk_id, endpoint_id):
-        return super().put(trunk_id, endpoint_id)
+    @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_uuid}.update')
+    def put(self, trunk_id, endpoint_uuid):
+        return super().put(trunk_id, endpoint_uuid)
 
-    @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_id}.delete')
-    def delete(self, trunk_id, endpoint_id):
-        return super().delete(trunk_id, endpoint_id)
+    @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_uuid}.delete')
+    def delete(self, trunk_id, endpoint_uuid):
+        return super().delete(trunk_id, endpoint_uuid)
 
 
 class TrunkEndpointAssociationCustom(TrunkEndpointAssociation):
