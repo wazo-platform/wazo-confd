@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -509,9 +509,7 @@ def check_sccp_reset_to_autoprov(device):
         assert_that(q.sccp_device_exists(sccp_device), equal_to(False))
 
 
-@fixtures.device(wazo_tenant=MAIN_TENANT)
-@fixtures.device(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(main_device, sub_device):
+def test_dissociate_multi_tenant():
     with line_and_device('sip', wazo_tenant=MAIN_TENANT) as (
         main_line,
         main_device,

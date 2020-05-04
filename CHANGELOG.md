@@ -2,6 +2,7 @@
 
 ## 20.07
 
+* Deprecate SSL configuration
 * A new parameter has been added to the incalls resource:
 
   * `greeting_sound`

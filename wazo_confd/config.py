@@ -21,10 +21,10 @@ DEFAULT_CONFIG = {
     'pid_filename': '/run/wazo-confd/wazo-confd.pid',
     'rest_api': {
         'profile': None,
-        'listen': '0.0.0.0',
+        'listen': '127.0.0.1',
         'port': 9486,
-        'certificate': '/usr/share/xivo-certs/server.crt',
-        'private_key': '/usr/share/xivo-certs/server.key',
+        'certificate': None,
+        'private_key': None,
         'cors': {
             'enabled': True,
             'allow_headers': ['Content-Type', 'X-Auth-Token', 'Wazo-Tenant'],

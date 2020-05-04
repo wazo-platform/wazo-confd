@@ -10,12 +10,6 @@ RUN true && \
     chown www-data /run/wazo-confd /var/lib/asterisk/moh && \
     true
 
-# Add certificates
-ADD ./contribs/docker/certs /usr/share/xivo-certs
-WORKDIR /usr/share/xivo-certs
-RUN openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -config openssl.cfg -days 3650
-RUN chown -R www-data /usr/share/xivo-certs
-
 # Install wazo-confd
 ADD . /usr/src/wazo-confd
 WORKDIR /usr/src/wazo-confd
