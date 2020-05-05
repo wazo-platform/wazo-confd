@@ -39,6 +39,22 @@
   * POST `/1.1/lines/<line_id>/extension`
   * DELETE `/1.1/lines/<line_id>/extension`
 
+  * GET `/1.1/users/<user_id>/lines`
+  * GET `/1.1/lines/<line_id>/users`
+  * POST `/1.1/lines/<line_id>/users`
+
+  * POST `/1.1/queues/<queue_id>/members/agents`
+  * GET `/1.1/queues/<queue_id>/members/agents/<agent_id>`
+
+  * GET `/1.1/users/<user_id>/agents`
+
+  * GET `/1.1/users/<user_id>/voicemails`
+  * GET `/1.1/voicemails/<voicemail_id>/users`
+
+  * GET `/1.1/users/<user_id>/voicemail`
+  * POST `/1.1/users/<user_id>/voicemail`
+  * DELETE `/1.1/users/<user_id>/voicemail`
+
 ## 20.05
 
 * `/1.1/users/import` now accepts `webrtc` in the `line_protocol` column
