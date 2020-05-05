@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -144,7 +144,7 @@ class BaseTestFuncKey(unittest.TestCase):
         self.device = self.setup_device(self.user['id'], '1000')
 
     def setup_device(self, user_id, exten):
-        line = helpers.line_sip.generate_line()
+        line = helpers.line_sip.generate_line_sip()
         extension = helpers.extension.add_extension(exten=exten, context='default')
         device = helpers.device.generate_device()
 

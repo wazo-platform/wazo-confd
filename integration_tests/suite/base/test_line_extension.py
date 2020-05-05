@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries, has_item, has_items
@@ -27,8 +27,8 @@ def test_associate_errors(line, extension):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal')
-@fixtures.line_sip(context='sub-internal')
+@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
+@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
 def test_associate_multi_tenant(
@@ -68,8 +68,8 @@ def test_dissociate_errors(line, extension):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal')
-@fixtures.line_sip(context='sub-internal')
+@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
+@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
 def test_dissociate_multi_tenant(

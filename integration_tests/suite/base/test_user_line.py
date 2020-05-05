@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -72,8 +72,8 @@ def test_associate_user_line(user, line):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal')
-@fixtures.line_sip(context='sub-internal')
+@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
+@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user):
@@ -445,8 +445,8 @@ def test_dissociate_not_associated(user, line):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal')
-@fixtures.line_sip(context='sub-internal')
+@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
+@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user):
