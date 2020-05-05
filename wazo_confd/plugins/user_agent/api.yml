@@ -1,22 +1,5 @@
 paths:
   /users/{user_id}/agents:
-    get:
-      operationId: get_user_agent_association
-      summary: Get agent of a user
-      description: '**Required ACL:** `confd.users.{user_id}.agents.read`'
-      deprecated: true
-      tags:
-      - deprecated
-      parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/useriduuid'
-      responses:
-        '200':
-          description: User-Agent association
-          schema:
-            $ref: '#/definitions/UserAgent'
-        '404':
-          $ref: '#/responses/NotFoundError'
     delete:
       operationId: dissociate_user_agent
       summary: Dissociate user and agent
@@ -53,14 +36,3 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-
-definitions:
-  UserAgent:
-    title: UserAgent
-    properties:
-      user_id:
-        type: integer
-        description: User's ID
-      agent_id:
-        type: integer
-        description: Agent's ID

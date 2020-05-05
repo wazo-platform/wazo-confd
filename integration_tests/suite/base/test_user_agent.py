@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, empty, has_entries, not_
@@ -8,11 +8,6 @@ from ..helpers import associations as a, errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
-
-
-def test_get_errors():
-    fake_user = confd.users(FAKE_ID).agents.get
-    yield s.check_resource_not_found, fake_user, 'User'
 
 
 @fixtures.agent()
@@ -71,19 +66,6 @@ def test_associate_multi_tenant(main_user, sub_user, main_agent, sub_agent):
         .put(wazo_tenant=MAIN_TENANT)
     )
     response.assert_match(400, e.different_tenant())
-
-
-@fixtures.agent()
-@fixtures.user()
-def test_get_agent_associated_to_user(agent, user):
-    expected = has_entries({'user_id': user['id'], 'agent_id': agent['id']})
-
-    with a.user_agent(user, agent):
-        response = confd.users(user['id']).agents.get()
-        assert_that(response.item, expected)
-
-        response = confd.users(user['uuid']).agents.get()
-        assert_that(response.item, expected)
 
 
 @fixtures.agent()
@@ -170,11 +152,11 @@ def test_get_users_relation(agent, user1, user2):
 @fixtures.user()
 def test_delete_user_when_user_and_agent_associated(agent, user):
     with a.user_agent(user, agent, check=False):
-        response = confd.users(user['id']).agents.get()
-        assert_that(response.item, not_(empty()))
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item['users'], not_(empty()))
         confd.users(user['id']).delete().assert_deleted()
-        invalid_user = confd.users(user['id']).agents.get
-        s.check_resource_not_found(invalid_user, 'User')
+        response = confd.agents(agent['id']).get()
+        assert_that(response.item['users'], empty())
 
 
 @fixtures.agent()
