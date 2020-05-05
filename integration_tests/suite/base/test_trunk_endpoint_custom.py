@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -25,14 +25,6 @@ def test_associate_errors(trunk, custom):
 def test_dissociate_errors(trunk, custom):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom(custom['id']).delete
     fake_custom = confd.trunks(trunk['id']).endpoints.custom(FAKE_ID).delete
-
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
-
-
-def test_get_errors():
-    fake_trunk = confd.trunks(FAKE_ID).endpoints.custom.get
-    fake_custom = confd.endpoints.custom(FAKE_ID).trunks.get
 
     yield s.check_resource_not_found, fake_trunk, 'Trunk'
     yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
@@ -127,38 +119,6 @@ def test_associate_multi_tenant(main_trunk, sub_trunk, main_custom, sub_custom):
 
 @fixtures.trunk()
 @fixtures.custom()
-def test_get_endpoint_associated_to_trunk(trunk, custom):
-    with a.trunk_endpoint_custom(trunk, custom):
-        response = confd.trunks(trunk['id']).endpoints.custom.get()
-        assert_that(
-            response.item,
-            has_entries(
-                trunk_id=trunk['id'], endpoint='custom', endpoint_id=custom['id']
-            ),
-        )
-
-
-@fixtures.trunk()
-@fixtures.custom()
-def test_get_trunk_associated_to_endpoint(trunk, custom):
-    with a.trunk_endpoint_custom(trunk, custom):
-        response = confd.endpoints.custom(custom['id']).trunks.get()
-        assert_that(
-            response.item,
-            has_entries(
-                trunk_id=trunk['id'], endpoint='custom', endpoint_id=custom['id']
-            ),
-        )
-
-
-@fixtures.trunk()
-def test_get_no_endpoint(trunk):
-    response = confd.trunks(trunk['id']).endpoints.custom.get()
-    response.assert_match(404, e.not_found('TrunkEndpoint'))
-
-
-@fixtures.trunk()
-@fixtures.custom()
 def test_dissociate(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom, check=False):
         response = confd.trunks(trunk['id']).endpoints.custom(custom['id']).delete()
@@ -221,8 +181,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom, check=False):
         confd.trunks(trunk['id']).delete().assert_deleted()
 
-        deleted_trunk = confd.trunks(custom['id']).endpoints.custom.get
-        deleted_custom = confd.endpoints.custom(custom['id']).trunks.get
+        deleted_trunk = confd.trunks(trunk['id']).get
+        deleted_custom = confd.endpoints.custom(custom['id']).get
         yield s.check_resource_not_found, deleted_trunk, 'Trunk'
         yield s.check_resource_not_found, deleted_custom, 'CustomEndpoint'
 
@@ -233,8 +193,8 @@ def test_delete_custom_when_trunk_and_custom_associated(trunk, custom):
     with a.trunk_endpoint_custom(trunk, custom, check=False):
         confd.endpoints.custom(custom['id']).delete().assert_deleted()
 
-        response = confd.trunks(trunk['id']).endpoints.custom.get()
-        response.assert_match(404, e.not_found('TrunkEndpoint'))
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(endpoint_custom=None))
 
 
 @fixtures.trunk()
