@@ -1,52 +1,5 @@
 paths:
-  /queues/{queue_id}/members/agents:
-    post:
-      operationId: associate_agent_queue
-      summary: Associate an agent and queue
-      deprecated: true
-      description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.create`
-
-
-        Position in queue is set to max position + 1 or 0 if it is the first member
-        of the queue'
-      tags:
-      - deprecated
-      parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/queueid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/QueueMemberAgentLegacy'
-      responses:
-        '200':
-          description: Agent and Queue associated
-          schema:
-            $ref: '#/definitions/QueueMemberAgentLegacy'
-        '400':
-          $ref: '#/responses/GenericError'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /queues/{queue_id}/members/agents/{agent_id}:
-    get:
-      operationId: get_agent_queue_association
-      summary: Get Agent-Queue association
-      deprecated: true
-      description: '**Required ACL:** `confd.queues.{queue_id}.members.agents.{agent_id}.read`'
-      tags:
-      - deprecated
-      parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/queueid'
-      - $ref: '#/parameters/agentid'
-      responses:
-        '200':
-          description: Agent-Queue association
-          schema:
-            $ref: '#/definitions/QueueMemberAgentLegacy'
-        '404':
-          $ref: '#/responses/NotFoundError'
     put:
       operationId: update_agent_queue_association
       summary: Update Agent-Queue association
@@ -130,24 +83,6 @@ paths:
           $ref: '#/responses/NotFoundError'
 
 definitions:
-  QueueMemberAgentLegacy:
-    title: QueueMemberAgentLegacy
-    description: An association between an agent and a queue. Agents associated to
-      a Queue will receive calls when they are logged in.
-    required:
-    - agent_id
-    properties:
-      agent_id:
-        type: integer
-        description: Agent's ID
-      queue_id:
-        type: integer
-        description: Queue's ID
-        readOnly: true
-      penalty:
-        type: integer
-        minimum: 0
-        description: Agent's penalty. A priority used for distributing calls.
   QueueMemberAgent:
     title: QueueMemberAgent
     description: An association between an agent and a queue. Agents associated to

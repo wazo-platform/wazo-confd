@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -47,16 +47,6 @@ class QueueMemberService:
             if member.user == user:
                 return member
         return None
-
-    def associate_legacy(self, queue, member):
-        if member in queue.agent_queue_members:
-            raise errors.resource_associated(
-                'Agent', 'Queue', member.agent.id, queue.id
-            )
-
-        self.validator_member_agent.validate_association(queue, member)
-        self.queue_dao.associate_member_agent(queue, member)
-        self.notifier.agent_associated(queue, member)
 
     def associate_member_agent(self, queue, member):
         if member in queue.agent_queue_members:
