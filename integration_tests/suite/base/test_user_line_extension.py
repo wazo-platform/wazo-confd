@@ -1,7 +1,7 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_items, has_entries
+from hamcrest import assert_that, has_entries
 
 from . import confd
 from ..helpers import associations as a, fixtures
@@ -14,16 +14,16 @@ def test_associate_user_then_line_then_extension(user, line, extension):
     response = confd.users(user['id']).lines.post(line_id=line['id'])
     response.assert_created('users', 'lines')
 
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
 
 @fixtures.user()
 @fixtures.line_sip()
 @fixtures.extension()
 def test_associate_extension_then_line_then_user(user, line, extension):
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
     response = confd.users(user['id']).lines.post(line_id=line['id'])
     response.assert_created('users', 'lines')
@@ -57,18 +57,6 @@ def test_dissociate_extension_then_line_then_user(user, line, extension):
 
         response = confd.users(user['id']).lines(line['id']).delete()
         response.assert_deleted()
-
-
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension(context='default')
-def test_get_line_extension_associations(user, line, extension):
-    with a.user_line(user, line), a.line_extension(line, extension):
-        response = confd.lines(line['id']).extensions.get()
-        assert_that(
-            response.items,
-            has_items(has_entries(line_id=line['id'], extension_id=extension['id'])),
-        )
 
 
 @fixtures.user(firstname="Jôhn", lastname="Smîth")
