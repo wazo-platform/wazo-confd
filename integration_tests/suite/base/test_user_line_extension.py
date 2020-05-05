@@ -11,8 +11,8 @@ from ..helpers import associations as a, fixtures
 @fixtures.line_sip()
 @fixtures.extension()
 def test_associate_user_then_line_then_extension(user, line, extension):
-    response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_created('users', 'lines')
+    response = confd.users(user['id']).lines(line['id']).put()
+    response.assert_updated()
 
     response = confd.lines(line['id']).extensions(extension['id']).put()
     response.assert_updated()
@@ -25,8 +25,8 @@ def test_associate_extension_then_line_then_user(user, line, extension):
     response = confd.lines(line['id']).extensions(extension['id']).put()
     response.assert_updated()
 
-    response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_created('users', 'lines')
+    response = confd.users(user['id']).lines(line['id']).put()
+    response.assert_updated()
 
 
 @fixtures.user()
@@ -137,8 +137,8 @@ def test_associating_two_sccp_lines_with_users_does_not_make_the_db_fail(
     with a.line_endpoint_sccp(line1, sccp1, check=False), a.line_endpoint_sccp(
         line2, sccp2, check=False
     ):
-        response = confd.users(user1['id']).lines.post(line_id=line1['id'])
+        response = confd.users(user1['id']).lines(line1['id']).put()
         response.assert_ok()
 
-        response = confd.users(user2['id']).lines.post(line_id=line2['id'])
+        response = confd.users(user2['id']).lines(line2['id']).put()
         response.assert_ok()

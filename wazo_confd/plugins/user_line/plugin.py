@@ -1,10 +1,10 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
 
-from .resource import UserLineList, UserLineItem, LineUserList
+from .resource import UserLineList, UserLineItem
 from .service import build_service
 
 
@@ -24,10 +24,5 @@ class Plugin:
             UserLineList,
             '/users/<int:user_id>/lines',
             '/users/<uuid:user_id>/lines',
-            resource_class_args=(service, user_dao, line_dao),
-        )
-        api.add_resource(
-            LineUserList,
-            '/lines/<int:line_id>/users',
             resource_class_args=(service, user_dao, line_dao),
         )

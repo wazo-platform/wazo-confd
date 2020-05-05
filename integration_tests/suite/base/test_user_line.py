@@ -6,11 +6,8 @@ import re
 from hamcrest import (
     assert_that,
     contains,
-    contains_inanyorder,
     empty,
     has_entries,
-    has_entry,
-    has_item,
 )
 
 from . import confd
@@ -18,7 +15,6 @@ from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
-    helpers as h,
     scenarios as s,
 )
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
@@ -32,12 +28,6 @@ FAKE_ID = 999999999
 @fixtures.user()
 @fixtures.line_sip()
 def test_associate_errors(user, line):
-    fake_user = confd.users(FAKE_ID).lines(line_id=line['id']).post
-    fake_line = confd.users(user['id']).lines(line_id=FAKE_ID).post
-
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_bogus_field_returns_error, fake_line, 'line_id', FAKE_ID
-
     fake_user = confd.users(FAKE_ID).lines(line['id']).put
     fake_line = confd.users(user['id']).lines(FAKE_ID).put
 
@@ -50,14 +40,6 @@ def test_associate_errors(user, line):
 def test_dissociate_errors(user, line):
     fake_user = confd.users(FAKE_ID).lines(line['id']).delete
     fake_line = confd.users(user['id']).lines(FAKE_ID).delete
-
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
-
-
-def test_get_errors():
-    fake_user = confd.users(FAKE_ID).lines.get
-    fake_line = confd.lines(FAKE_ID).users.get
 
     yield s.check_resource_not_found, fake_user, 'User'
     yield s.check_resource_not_found, fake_line, 'Line'
@@ -95,23 +77,9 @@ def test_associate_multi_tenant(_, __, main_line, sub_line, main_user, sub_user)
 
 @fixtures.user()
 @fixtures.line_sip()
-def test_associate_user_line_using_deprecated(user, line):
-    response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_created('users', 'lines')
-
-
-@fixtures.user()
-@fixtures.line_sip()
 def test_associate_using_uuid(user, line):
     response = confd.users(user['uuid']).lines(line['id']).put()
     response.assert_updated()
-
-
-@fixtures.user()
-@fixtures.line_sip()
-def test_associate_user_line_using_uuid_and_deprecated(user, line):
-    response = confd.users(user['uuid']).lines.post(line_id=line['id'])
-    response.assert_created('users', 'lines')
 
 
 @fixtures.user()
@@ -129,74 +97,6 @@ def test_associate_muliple_users_to_line(user1, user2, user3, line, extension):
 
         response = confd.users(user3['id']).lines(line['id']).put()
         response.assert_updated()
-
-
-@fixtures.user()
-@fixtures.line_sip()
-def test_get_line_associated_to_user(user, line):
-    expected = {
-        'user_id': user['id'],
-        'line_id': line['id'],
-        'main_user': True,
-        'main_line': True,
-    }
-
-    with a.user_line(user, line):
-        response = confd.users(user['id']).lines.get()
-        assert_that(response.items, contains(has_entries(expected)))
-
-        response = confd.users(user['uuid']).lines.get()
-        assert_that(response.items, contains(has_entries(expected)))
-
-
-@fixtures.user()
-@fixtures.line_sip()
-def test_get_line_after_dissociation(user, line):
-    h.user_line.associate(user['id'], line['id'])
-    h.user_line.dissociate(user['id'], line['id'])
-
-    response = confd.users(user['id']).lines.get()
-    assert_that(response.items, empty())
-
-    response = confd.users(user['uuid']).lines.get()
-    assert_that(response.items, empty())
-
-
-@fixtures.user()
-@fixtures.line_sip()
-def test_get_user_associated_to_line(user, line):
-    with a.user_line(user, line):
-        response = confd.lines(line['id']).users.get()
-        assert_that(
-            response.items,
-            contains(
-                has_entries(
-                    user_id=user['id'],
-                    line_id=line['id'],
-                    main_user=True,
-                    main_line=True,
-                )
-            ),
-        )
-
-
-@fixtures.user()
-@fixtures.user()
-@fixtures.line_sip()
-def test_get_secondary_user_associated_to_line(main_user, other_user, line):
-    with a.user_line(main_user, line), a.user_line(other_user, line):
-        response = confd.lines(line['id']).users.get()
-        assert_that(
-            response.items,
-            has_item(
-                has_entries(
-                    user_id=other_user['id'],
-                    line_id=line['id'],
-                    main_user=False,
-                    main_line=True,
-                )
-            ),
-        )
 
 
 @fixtures.user()
@@ -221,13 +121,15 @@ def test_associate_user_to_multiple_lines(user, line1, line2, line3):
     response = confd.users(user['id']).lines(line3['id']).put()
     response.assert_updated()
 
-    response = confd.users(user['id']).lines.get()
+    response = confd.users(user['id']).get()
     assert_that(
-        response.items,
-        contains_inanyorder(
-            has_entries(line_id=line1['id'], main_line=True),
-            has_entries(line_id=line2['id'], main_line=False),
-            has_entries(line_id=line3['id'], main_line=False),
+        response.item,
+        has_entries(
+            lines=contains(
+                has_entries(id=line1['id']),
+                has_entries(id=line2['id']),
+                has_entries(id=line3['id']),
+            )
         ),
     )
 
@@ -294,10 +196,9 @@ def test_associate_user_to_line_with_endpoint(user, line, sip):
         response = confd.users(user['id']).lines(line['id']).put()
         response.assert_updated()
 
-        response = confd.users(user['id']).lines.get()
+        response = confd.users(user['id']).get()
         assert_that(
-            response.items,
-            contains(has_entries(user_id=user['id'], line_id=line['id'])),
+            response.item['lines'], contains(has_entries(id=line['id'])),
         )
 
 
@@ -404,27 +305,44 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(
     with a.user_line(user, line1, check=False), a.user_line(
         user, line2, check=False
     ), a.user_line(user, line3, check=False):
-        response = confd.users(user['id']).lines.get()
+        response = confd.users(user['id']).get()
         assert_that(
-            response.items,
-            contains_inanyorder(
-                has_entries(line_id=line1['id'], main_line=True),
-                has_entries(line_id=line2['id'], main_line=False),
-                has_entries(line_id=line3['id'], main_line=False),
+            response.item,
+            has_entries(
+                lines=contains(
+                    has_entries(id=line1['id']),
+                    has_entries(id=line2['id']),
+                    has_entries(id=line3['id']),
+                )
             ),
         )
 
         confd.users(user['uuid']).lines(line1['id']).delete().assert_deleted()
-        response = confd.users(user['uuid']).lines.get()
-        assert_that(response.items, has_item(has_entry('main_line', True)))
+        response = confd.users(user['uuid']).get()
+        assert_that(
+            response.item,
+            has_entries(
+                lines=contains(
+                    has_entries(id=line2['id']),
+                    has_entries(id=line3['id']),
+                )
+            ),
+        )
 
         confd.users(user['uuid']).lines(line2['id']).delete().assert_deleted()
-        response = confd.users(user['uuid']).lines.get()
-        assert_that(response.items, has_item(has_entry('main_line', True)))
+        response = confd.users(user['uuid']).get()
+        assert_that(
+            response.item,
+            has_entries(
+                lines=contains(
+                    has_entries(id=line3['id']),
+                )
+            ),
+        )
 
         confd.users(user['uuid']).lines(line3['id']).delete().assert_deleted()
-        response = confd.users(user['uuid']).lines.get()
-        assert_that(response.items, empty())
+        response = confd.users(user['uuid']).get()
+        assert_that(response.item, has_entries(lines=empty()))
 
 
 @fixtures.user()

@@ -7,6 +7,38 @@
 
   * `greeting_sound`
 
+* The following deprecated endpoints are removed.
+
+  * GET `/1.1/callpermissions/<call_permission_id>/users`
+  * GET `/1.1/users/<user_uuid>/callpermissions`
+
+  * GET `/1.1/endpoints/custom/<endpoint_id>/lines`
+  * GET `/1.1/endpoints/sccp/<endpoint_id>/lines`
+  * GET `/1.1/endpoints/sip/<endpoint_id>/lines`
+  * GET `/1.1/lines/<line_id>/endpoints/custom`
+  * GET `/1.1/lines/<line_id>/endpoints/sccp`
+  * GET `/1.1/lines/<line_id>/endpoints/sip`
+
+  * GET `/1.1/endpoints/custom/<endpoint_id>/trunks`
+  * GET `/1.1/endpoints/sip/<endpoint_id>/trunks`
+  * GET `/1.1/trunks/<line_id>/endpoints/custom`
+  * GET `/1.1/trunks/<line_id>/endpoints/sip`
+
+  * GET `/1.1/lines_sip`
+  * POST `/1.1/lines_sip`
+  * DELETE `/1.1/lines_sip/<line_id>`
+  * GET `/1.1/lines_sip/<line_id>`
+  * PUT `/1.1/lines_sip/<line_id>`
+
+  * GET `/1.1/extensions/<extension_id>/lines`
+  * GET `/1.1/lines/<line_id>/extensions`
+  * POST `/1.1/lines/<line_id>/extensions`
+
+  * GET `/1.1/extensions/<extension_id>/line`
+  * GET `/1.1/lines/<line_id>/extension`
+  * POST `/1.1/lines/<line_id>/extension`
+  * DELETE `/1.1/lines/<line_id>/extension`
+
 ## 20.05
 
 * `/1.1/users/import` now accepts `webrtc` in the `line_protocol` column
@@ -17,7 +49,6 @@
   * GET `/1.1/sip/transports/{transport_uuid}`
   * PUT `/1.1/sip/transports/{transport_uuid}`
   * DELETE `/1.1/sip/transports/{transport_uuid}`
-
 
 ## 20.04
 

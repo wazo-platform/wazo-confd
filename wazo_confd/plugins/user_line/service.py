@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -14,14 +14,8 @@ class UserLineService:
         self.validator = validator
         self.notifier = notifier
 
-    def find_all_by(self, **criteria):
-        return self.dao.find_all_by(**criteria)
-
     def find_by(self, **criteria):
         return self.dao.find_by(**criteria)
-
-    def get(self, user, line):
-        return self.dao.get_by(user_id=user.id, line_id=line.id)
 
     def associate(self, user, line):
         if line in user.lines:
