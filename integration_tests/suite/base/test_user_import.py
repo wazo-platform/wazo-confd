@@ -686,9 +686,7 @@ def test_given_csv_has_multiple_call_permissions_then_all_call_permission_associ
     response = confd.users(user_id).get()
     assert_that(
         response.item['call_permissions'],
-        contains_inanyorder(
-            has_entries(id=perm1['id']), has_entries(id=perm2['id']),
-        ),
+        contains_inanyorder(has_entries(id=perm1['id']), has_entries(id=perm2['id'])),
     )
 
 
@@ -747,12 +745,10 @@ def test_given_csv_has_all_resources_then_all_relations_created():
                 )
             ),
             incalls=contains(
-                has_entries(
-                    extensions=contains(has_entries(id=extension_incall_id))
-                )
+                has_entries(extensions=contains(has_entries(id=extension_incall_id)))
             ),
             voicemail=has_entries(id=voicemail_id),
-        )
+        ),
     )
 
 
@@ -798,12 +794,10 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
             ),
             call_permissions=contains(has_entries(id=call_permission['id'])),
             incalls=contains(
-                has_entries(
-                    extensions=contains(has_entries(id=extension_incall_id))
-                )
+                has_entries(extensions=contains(has_entries(id=extension_incall_id)))
             ),
             voicemail=has_entries(id=voicemail['id']),
-        )
+        ),
     )
 
 
@@ -1267,9 +1261,7 @@ def test_when_updating_call_permission_field_then_call_permissions_updated(
     response = confd.users(user_id).get()
     assert_that(
         response.item['call_permissions'],
-        contains_inanyorder(
-            has_entries(id=perm1['id']), has_entries(id=perm2['id']),
-        ),
+        contains_inanyorder(has_entries(id=perm1['id']), has_entries(id=perm2['id'])),
     )
 
 

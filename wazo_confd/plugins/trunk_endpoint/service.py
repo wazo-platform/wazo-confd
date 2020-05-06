@@ -35,8 +35,5 @@ class TrunkEndpointService:
 
 def build_service(endpoint):
     return TrunkEndpointService(
-        endpoint,
-        trunk_dao_module,
-        build_validator(endpoint),
-        build_notifier(endpoint),
+        endpoint, trunk_dao_module, build_validator(endpoint), build_notifier(endpoint),
     )

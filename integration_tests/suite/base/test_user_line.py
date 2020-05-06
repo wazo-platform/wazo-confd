@@ -323,8 +323,7 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(
             response.item,
             has_entries(
                 lines=contains(
-                    has_entries(id=line2['id']),
-                    has_entries(id=line3['id']),
+                    has_entries(id=line2['id']), has_entries(id=line3['id']),
                 )
             ),
         )
@@ -332,12 +331,7 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(
         confd.users(user['uuid']).lines(line2['id']).delete().assert_deleted()
         response = confd.users(user['uuid']).get()
         assert_that(
-            response.item,
-            has_entries(
-                lines=contains(
-                    has_entries(id=line3['id']),
-                )
-            ),
+            response.item, has_entries(lines=contains(has_entries(id=line3['id']))),
         )
 
         confd.users(user['uuid']).lines(line3['id']).delete().assert_deleted()

@@ -335,10 +335,11 @@ def test_delete_line_then_associatons_are_removed(
         response = confd.users(user['id']).get()
         assert_that(
             response.item,
-            has_entries(lines=contains(
-                has_entries(id=line1['id']),
-                has_entries(id=line2['id']),
-            ))
+            has_entries(
+                lines=contains(
+                    has_entries(id=line1['id']), has_entries(id=line2['id']),
+                )
+            ),
         )
 
         response = confd.devices(device['id']).lines.get()

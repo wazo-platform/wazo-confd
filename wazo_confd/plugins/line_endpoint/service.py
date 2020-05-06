@@ -37,6 +37,4 @@ def build_service(provd_client, endpoint):
     validator = build_validator(endpoint)
     line_service = build_line_service(provd_client)
     notifier = build_notifier(endpoint)
-    return LineEndpointService(
-        endpoint, line_service, validator, notifier
-    )
+    return LineEndpointService(endpoint, line_service, validator, notifier)
