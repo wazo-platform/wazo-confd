@@ -735,20 +735,25 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     extension_incall_id = get_import_field(response, 'incall_extension_id')
     sip_id = get_import_field(response, 'sip_id')
 
-    response = confd.users(user_id).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=line_id)))
-
-    response = confd.lines(line_id).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension_id)))
-
-    response = confd.extensions(extension_incall_id).get()
-    assert_that(response.item['incall'], has_key('id'))
-
-    response = confd.users(user_id).voicemail.get()
-    assert_that(response.item, has_entries(voicemail_id=voicemail_id))
-
-    response = confd.lines(line_id).get()
-    assert_that(response.item['endpoint_sip'], has_entries(id=sip_id))
+    response = confd.users(user_id).get()
+    assert_that(
+        response.item,
+        has_entries(
+            lines=contains(
+                has_entries(
+                    id=line_id,
+                    extensions=contains(has_entries(id=extension_id)),
+                    endpoint_sip=has_entries(id=sip_id),
+                )
+            ),
+            incalls=contains(
+                has_entries(
+                    extensions=contains(has_entries(id=extension_incall_id))
+                )
+            ),
+            voicemail=has_entries(id=voicemail_id),
+        )
+    )
 
 
 @fixtures.sip()
@@ -780,25 +785,25 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     line_id = get_import_field(response, 'line_id')
     extension_incall_id = get_import_field(response, 'incall_extension_id')
 
-    response = confd.users(user_id).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=line_id)))
-
-    response = confd.lines(line_id).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension['id'])))
-
-    response = confd.extensions(extension_incall_id).get()
-    assert_that(response.item['incall'], has_key('id'))
-
-    response = confd.users(user_id).voicemail.get()
-    assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
-
-    response = confd.lines(line_id).get()
-    assert_that(response.item['endpoint_sip'], has_entries(id=sip['id']))
-
     response = confd.users(user_id).get()
     assert_that(
-        response.item['call_permissions'],
-        contains(has_entries(id=call_permission['id'])),
+        response.item,
+        has_entries(
+            lines=contains(
+                has_entries(
+                    id=line_id,
+                    extensions=contains(has_entries(id=extension['id'])),
+                    endpoint_sip=has_entries(id=sip['id']),
+                )
+            ),
+            call_permissions=contains(has_entries(id=call_permission['id'])),
+            incalls=contains(
+                has_entries(
+                    extensions=contains(has_entries(id=extension_incall_id))
+                )
+            ),
+            voicemail=has_entries(id=voicemail['id']),
+        )
     )
 
 

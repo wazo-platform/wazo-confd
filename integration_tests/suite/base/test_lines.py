@@ -7,7 +7,6 @@ from hamcrest import (
     all_of,
     assert_that,
     contains,
-    contains_inanyorder,
     empty,
     has_entries,
     has_entry,
@@ -333,29 +332,30 @@ def test_delete_line_then_associatons_are_removed(
     ), a.line_extension(line1, extension, check=False), a.line_device(
         line1, device, check=False
     ):
-        response = confd.users(user['id']).lines.get()
+        response = confd.users(user['id']).get()
         assert_that(
-            response.items,
-            contains_inanyorder(
-                has_entries(line_id=line1['id'], main_line=True),
-                has_entries(line_id=line2['id'], main_line=False),
-            ),
+            response.item,
+            has_entries(lines=contains(
+                has_entries(id=line1['id']),
+                has_entries(id=line2['id']),
+            ))
         )
 
         response = confd.devices(device['id']).lines.get()
         assert_that(response.items, not_(empty()))
 
-        response = confd.extensions(extension['id']).lines.get()
-        assert_that(response.items, not_(empty()))
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, has_entries(lines=not_(empty())))
 
         confd.lines(line1['id']).delete()
 
-        response = confd.users(user['id']).lines.get()
+        response = confd.users(user['id']).get()
         assert_that(
-            response.items, contains(has_entries(line_id=line2['id'], main_line=True))
+            response.item, has_entries(lines=contains(has_entries(id=line2['id'])))
         )
+
         response = confd.devices(device['id']).lines.get()
         assert_that(response.items, empty())
 
-        response = confd.extensions(extension['id']).lines.get()
-        assert_that(response.items, empty())
+        response = confd.extensions(extension['id']).get()
+        assert_that(response.item, has_entries(lines=empty()))
