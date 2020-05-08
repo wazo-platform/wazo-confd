@@ -657,12 +657,10 @@ def test_given_csv_has_call_permission_then_call_permission_associated(call_perm
     )
 
     user_id = response.item['created'][0]['user_id']
-    user_call_permissions = confd.users(user_id).callpermissions.get().items
+    response = confd.users(user_id).get()
     assert_that(
-        user_call_permissions,
-        contains(
-            has_entries(call_permission_id=call_permission['id'], user_id=user_id)
-        ),
+        response.item['call_permissions'],
+        contains(has_entries(id=call_permission['id'])),
     )
 
 
@@ -685,13 +683,10 @@ def test_given_csv_has_multiple_call_permissions_then_all_call_permission_associ
     )
 
     user_id = response.item['created'][0]['user_id']
-    user_call_permissions = confd.users(user_id).callpermissions.get().items
+    response = confd.users(user_id).get()
     assert_that(
-        user_call_permissions,
-        contains_inanyorder(
-            has_entries(call_permission_id=perm1['id'], user_id=user_id),
-            has_entries(call_permission_id=perm2['id'], user_id=user_id),
-        ),
+        response.item['call_permissions'],
+        contains_inanyorder(has_entries(id=perm1['id']), has_entries(id=perm2['id'])),
     )
 
 
@@ -738,20 +733,23 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     extension_incall_id = get_import_field(response, 'incall_extension_id')
     sip_id = get_import_field(response, 'sip_id')
 
-    response = confd.users(user_id).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=line_id)))
-
-    response = confd.lines(line_id).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension_id)))
-
-    response = confd.extensions(extension_incall_id).get()
-    assert_that(response.item['incall'], has_key('id'))
-
-    response = confd.users(user_id).voicemail.get()
-    assert_that(response.item, has_entries(voicemail_id=voicemail_id))
-
-    response = confd.lines(line_id).endpoints.sip.get()
-    assert_that(response.item, has_entries(endpoint='sip', endpoint_id=sip_id))
+    response = confd.users(user_id).get()
+    assert_that(
+        response.item,
+        has_entries(
+            lines=contains(
+                has_entries(
+                    id=line_id,
+                    extensions=contains(has_entries(id=extension_id)),
+                    endpoint_sip=has_entries(id=sip_id),
+                )
+            ),
+            incalls=contains(
+                has_entries(extensions=contains(has_entries(id=extension_incall_id)))
+            ),
+            voicemail=has_entries(id=voicemail_id),
+        ),
+    )
 
 
 @fixtures.sip()
@@ -783,26 +781,22 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     line_id = get_import_field(response, 'line_id')
     extension_incall_id = get_import_field(response, 'incall_extension_id')
 
-    response = confd.users(user_id).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=line_id)))
-
-    response = confd.lines(line_id).extensions.get()
-    assert_that(response.items, has_items(has_entries(extension_id=extension['id'])))
-
-    response = confd.extensions(extension_incall_id).get()
-    assert_that(response.item['incall'], has_key('id'))
-
-    response = confd.users(user_id).voicemail.get()
-    assert_that(response.item, has_entries(voicemail_id=voicemail['id']))
-
-    response = confd.lines(line_id).endpoints.sip.get()
-    assert_that(response.item, has_entries(endpoint='sip', endpoint_id=sip['id']))
-
-    response = confd.users(user_id).callpermissions.get()
+    response = confd.users(user_id).get()
     assert_that(
-        response.items,
-        contains(
-            has_entries(call_permission_id=call_permission['id'], user_id=user_id)
+        response.item,
+        has_entries(
+            lines=contains(
+                has_entries(
+                    id=line_id,
+                    extensions=contains(has_entries(id=extension['id'])),
+                    endpoint_sip=has_entries(id=sip['id']),
+                )
+            ),
+            call_permissions=contains(has_entries(id=call_permission['id'])),
+            incalls=contains(
+                has_entries(extensions=contains(has_entries(id=extension_incall_id)))
+            ),
+            voicemail=has_entries(id=voicemail['id']),
         ),
     )
 
@@ -1264,13 +1258,10 @@ def test_when_updating_call_permission_field_then_call_permissions_updated(
     old_perm_id1, old_perm_id2 = entry['call_permission_ids']
     user_id = response.item['updated'][0]['user_id']
 
-    response = confd.users(user_id).callpermissions.get()
+    response = confd.users(user_id).get()
     assert_that(
-        response.items,
-        contains_inanyorder(
-            has_entries(call_permission_id=perm1['id'], user_id=user_id),
-            has_entries(call_permission_id=perm2['id'], user_id=user_id),
-        ),
+        response.item['call_permissions'],
+        contains_inanyorder(has_entries(id=perm1['id']), has_entries(id=perm2['id'])),
     )
 
 
@@ -1288,8 +1279,8 @@ def test_when_call_permission_column_is_empty_then_call_permission_is_removed(en
 
     user_id = response.item['updated'][0]['user_id']
 
-    response = confd.users(user_id).callpermissions.get()
-    assert_that(response.items, empty())
+    response = confd.users(user_id).get()
+    assert_that(response.item['call_permissions'], empty())
 
 
 @unittest.skip('PUT has been disabled')
@@ -1483,17 +1474,13 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     response = confd.users(entry['user_id']).voicemail.get()
     assert_that(response.item, has_entries(voicemail_id=entry['voicemail_id']))
 
-    response = confd.lines(entry['line_id']).endpoints.sip.get()
-    assert_that(response.item, has_entries(endpoint='sip', endpoint_id=entry['sip_id']))
+    response = confd.lines(entry['line_id']).get()
+    assert_that(response.item['endpoint_sip'], has_entries(id=entry['sip_id']))
 
-    response = confd.users(entry['user_id']).callpermissions.get()
+    response = confd.users(entry['user_id']).get()
     assert_that(
-        response.items,
-        contains_inanyorder(
-            has_entries(
-                call_permission_id=call_permission['id'], user_id=entry['user_id']
-            )
-        ),
+        response.item['call_permissions'],
+        contains_inanyorder(has_entries(id=call_permission['id'])),
     )
 
 

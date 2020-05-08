@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
@@ -18,9 +18,6 @@ class UserVoicemailService:
 
     def find_by(self, **criteria):
         return self.dao.find_by(**criteria)
-
-    def find_all_by(self, **criteria):
-        return self.dao.find_all_by(**criteria)
 
     def associate(self, user, voicemail):
         if voicemail is user.voicemail:

@@ -1,4 +1,4 @@
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -11,6 +11,6 @@ def associate(user_id, voicemail_id, check=True):
 
 
 def dissociate(user_id, voicemail_id, check=True):
-    response = confd.users(user_id).voicemail.delete()
+    response = confd.users(user_id).voicemails.delete()
     if check:
         response.assert_ok()

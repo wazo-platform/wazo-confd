@@ -17,7 +17,10 @@ class line(IsolatedAction):
 
 class line_sip(IsolatedAction):
 
-    actions = {'generate': h.line_sip.generate_line, 'delete': h.line_sip.delete_line}
+    actions = {
+        'generate': h.line_sip.generate_line_sip,
+        'delete': h.line_sip.delete_line_sip,
+    }
 
 
 class sip(IsolatedAction):

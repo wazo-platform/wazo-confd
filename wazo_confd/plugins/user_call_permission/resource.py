@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -48,33 +48,3 @@ class UserCallPermissionAssociation(UserCallPermission):
         )
         self.service.dissociate(user, call_permission)
         return '', 204
-
-
-class UserCallPermissionGet(UserCallPermission):
-
-    schema = UserCallPermissionSchema
-
-    @required_acl('confd.users.{user_id}.callpermissions.read')
-    def get(self, user_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
-        user_call_permissions = self.service.find_all_by(user_id=user.id)
-        return {
-            'total': len(user_call_permissions),
-            'items': self.schema().dump(user_call_permissions, many=True),
-        }
-
-
-class CallPermissionUserGet(UserCallPermission):
-
-    schema = UserCallPermissionSchema
-
-    @required_acl('confd.callpermissions.{call_permission_id}.users.read')
-    def get(self, call_permission_id):
-        call_permission = self.call_permission_dao.get(call_permission_id)
-        user_call_permissions = self.service.find_all_by(
-            call_permission_id=call_permission.id
-        )
-        return {
-            'total': len(user_call_permissions),
-            'items': self.schema().dump(user_call_permissions, many=True),
-        }

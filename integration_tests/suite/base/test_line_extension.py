@@ -1,7 +1,7 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries, has_item, has_items
+from hamcrest import assert_that, contains, contains_inanyorder, empty, has_entries
 
 from ..helpers import scenarios as s, errors as e, associations as a, fixtures
 from ..helpers.config import (
@@ -27,8 +27,8 @@ def test_associate_errors(line, extension):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal')
-@fixtures.line_sip(context='sub-internal')
+@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
+@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
 def test_associate_multi_tenant(
@@ -68,8 +68,8 @@ def test_dissociate_errors(line, extension):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal')
-@fixtures.line_sip(context='sub-internal')
+@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
+@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
 def test_dissociate_multi_tenant(
@@ -84,50 +84,15 @@ def test_dissociate_multi_tenant(
     response.assert_match(404, e.not_found('Line'))
 
 
-def test_get_errors():
-    fake_line = confd.lines(FAKE_ID).extensions.get
-    fake_extension = confd.extensions(FAKE_ID).lines.get
-
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
-
-
-@fixtures.extension()
-def test_get_errors_deprecated(extension):
-    fake_extension_deprecated = confd.extensions(FAKE_ID).line.get
-    not_associated_extension_deprecated = confd.extensions(extension['id']).line.get
-
-    yield s.check_resource_not_found, fake_extension_deprecated, 'Extension'
-    yield s.check_resource_not_found, not_associated_extension_deprecated, 'LineExtension'
-
-
-@fixtures.line_sip()
-@fixtures.extension()
-def test_get_associations_when_not_associated(line, extension):
-    response = confd.lines(line['id']).extensions.get()
-    assert_that(response.items, empty())
-
-    response = confd.extensions(extension['id']).lines.get()
-    assert_that(response.items, empty())
-
-
-@fixtures.line_sip()
-@fixtures.extension()
-def test_associate_deprecated(line, extension):
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
-
-
 @fixtures.line_sip()
 @fixtures.extension()
 def test_associate_line_and_internal_extension(line, extension):
     response = confd.lines(line['id']).extensions(extension['id']).put()
     response.assert_updated()
 
-    response = confd.lines(line['id']).extensions.get()
+    response = confd.lines(line['id']).get()
     assert_that(
-        response.items,
-        contains(has_entries(line_id=line['id'], extension_id=extension['id'])),
+        response.item['extensions'], contains(has_entries({'id': extension['id']}))
     )
 
 
@@ -258,10 +223,9 @@ def test_associate_line_with_endpoint(line, sip, extension):
     with a.line_endpoint_sip(line, sip, check=False):
         response = confd.lines(line['id']).extensions(extension['id']).put()
         response.assert_updated()
-        response = confd.lines(line['id']).extensions.get()
+        response = confd.lines(line['id']).get()
         assert_that(
-            response.items,
-            contains(has_entries(line_id=line['id'], extension_id=extension['id'])),
+            response.item['extensions'], contains(has_entries({'id': extension['id']})),
         )
 
 
@@ -303,29 +267,17 @@ def test_delete_extension_associated_to_line(line, extension):
 
 
 @fixtures.line_sip()
-@fixtures.extension()
-def test_get_line_extension(line, extension):
-    expected = has_item(has_entries(line_id=line['id'], extension_id=extension['id']))
-
-    with a.line_extension(line, extension):
-        response = confd.lines(line['id']).extensions.get()
-        assert_that(response.items, expected)
-
-        response = confd.extensions(extension['id']).lines.get()
-        assert_that(response.items, expected)
-
-
-@fixtures.line_sip()
 @fixtures.line_sip()
 @fixtures.extension()
 def test_get_multi_lines_extension(line1, line2, extension):
     with a.line_extension(line1, extension), a.line_extension(line2, extension):
-        response = confd.extensions(extension['id']).lines.get()
+        response = confd.extensions(extension['id']).get()
         assert_that(
-            response.items,
-            has_items(
-                has_entries(line_id=line1['id'], extension_id=extension['id']),
-                has_entries(line_id=line2['id'], extension_id=extension['id']),
+            response.item,
+            has_entries(
+                lines=contains_inanyorder(
+                    has_entries({'id': line1['id']}), has_entries({'id': line2['id']}),
+                ),
             ),
         )
 
@@ -335,8 +287,8 @@ def test_get_multi_lines_extension(line1, line2, extension):
 def test_dissociation(line, extension):
     with a.line_extension(line, extension, check=False):
         confd.lines(line['id']).extensions(extension['id']).delete().assert_deleted()
-        response = confd.lines(line['id']).extensions.get()
-        assert_that(response.items, empty())
+        response = confd.lines(line['id']).get()
+        assert_that(response.item['extensions'], empty())
 
 
 @fixtures.line_sip()

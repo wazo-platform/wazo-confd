@@ -1,7 +1,7 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_items, has_entries
+from hamcrest import assert_that, has_entries
 
 from . import confd
 from ..helpers import associations as a, fixtures
@@ -11,22 +11,22 @@ from ..helpers import associations as a, fixtures
 @fixtures.line_sip()
 @fixtures.extension()
 def test_associate_user_then_line_then_extension(user, line, extension):
-    response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_created('users', 'lines')
+    response = confd.users(user['id']).lines(line['id']).put()
+    response.assert_updated()
 
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
 
 @fixtures.user()
 @fixtures.line_sip()
 @fixtures.extension()
 def test_associate_extension_then_line_then_user(user, line, extension):
-    response = confd.lines(line['id']).extensions.post(extension_id=extension['id'])
-    response.assert_created('lines', 'extensions')
+    response = confd.lines(line['id']).extensions(extension['id']).put()
+    response.assert_updated()
 
-    response = confd.users(user['id']).lines.post(line_id=line['id'])
-    response.assert_created('users', 'lines')
+    response = confd.users(user['id']).lines(line['id']).put()
+    response.assert_updated()
 
 
 @fixtures.user()
@@ -57,18 +57,6 @@ def test_dissociate_extension_then_line_then_user(user, line, extension):
 
         response = confd.users(user['id']).lines(line['id']).delete()
         response.assert_deleted()
-
-
-@fixtures.user()
-@fixtures.line_sip()
-@fixtures.extension(context='default')
-def test_get_line_extension_associations(user, line, extension):
-    with a.user_line(user, line), a.line_extension(line, extension):
-        response = confd.lines(line['id']).extensions.get()
-        assert_that(
-            response.items,
-            has_items(has_entries(line_id=line['id'], extension_id=extension['id'])),
-        )
 
 
 @fixtures.user(firstname="Jôhn", lastname="Smîth")
@@ -149,8 +137,8 @@ def test_associating_two_sccp_lines_with_users_does_not_make_the_db_fail(
     with a.line_endpoint_sccp(line1, sccp1, check=False), a.line_endpoint_sccp(
         line2, sccp2, check=False
     ):
-        response = confd.users(user1['id']).lines.post(line_id=line1['id'])
+        response = confd.users(user1['id']).lines(line1['id']).put()
         response.assert_ok()
 
-        response = confd.users(user2['id']).lines.post(line_id=line2['id'])
+        response = confd.users(user2['id']).lines(line2['id']).put()
         response.assert_ok()

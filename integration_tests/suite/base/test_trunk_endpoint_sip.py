@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -25,14 +25,6 @@ def test_associate_errors(trunk, sip):
 def test_dissociate_errors(trunk, sip):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['id']).delete
     fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_ID).delete
-
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
-
-
-def test_get_errors():
-    fake_trunk = confd.trunks(FAKE_ID).endpoints.sip.get
-    fake_sip = confd.endpoints.sip(FAKE_ID).trunks.get
 
     yield s.check_resource_not_found, fake_trunk, 'Trunk'
     yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
@@ -118,34 +110,6 @@ def test_associate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
 
 @fixtures.trunk()
 @fixtures.sip()
-def test_get_endpoint_associated_to_trunk(trunk, sip):
-    with a.trunk_endpoint_sip(trunk, sip):
-        response = confd.trunks(trunk['id']).endpoints.sip.get()
-        assert_that(
-            response.item,
-            has_entries(trunk_id=trunk['id'], endpoint='sip', endpoint_id=sip['id']),
-        )
-
-
-@fixtures.trunk()
-@fixtures.sip()
-def test_get_trunk_associated_to_endpoint(trunk, sip):
-    with a.trunk_endpoint_sip(trunk, sip):
-        response = confd.endpoints.sip(sip['id']).trunks.get()
-        assert_that(
-            response.item,
-            has_entries(trunk_id=trunk['id'], endpoint='sip', endpoint_id=sip['id']),
-        )
-
-
-@fixtures.trunk()
-def test_get_no_endpoint(trunk):
-    response = confd.trunks(trunk['id']).endpoints.sip.get()
-    response.assert_match(404, e.not_found('TrunkEndpoint'))
-
-
-@fixtures.trunk()
-@fixtures.sip()
 def test_dissociate(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
         response = confd.trunks(trunk['id']).endpoints.sip(sip['id']).delete()
@@ -208,8 +172,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
         confd.trunks(trunk['id']).delete().assert_deleted()
 
-        deleted_trunk = confd.trunks(trunk['id']).endpoints.sip.get
-        deleted_sip = confd.endpoints.sip(sip['id']).trunks.get
+        deleted_trunk = confd.trunks(trunk['id']).get
+        deleted_sip = confd.endpoints.sip(sip['id']).get
         yield s.check_resource_not_found, deleted_trunk, 'Trunk'
         yield s.check_resource_not_found, deleted_sip, 'SIPEndpoint'
 
@@ -220,8 +184,8 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip, check=False):
         confd.endpoints.sip(sip['id']).delete().assert_deleted()
 
-        response = confd.trunks(trunk['id']).endpoints.sip.get()
-        response.assert_match(404, e.not_found('TrunkEndpoint'))
+        response = confd.trunks(trunk['id']).get()
+        assert_that(response.item, has_entries(endpoint_sip=None))
 
 
 @fixtures.trunk()

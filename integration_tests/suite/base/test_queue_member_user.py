@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -168,7 +168,7 @@ def test_dissociate_not_associated(queue, user, line):
 
 @fixtures.queue(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
-@fixtures.line_sip(wazo_tenant=SUB_TENANT)
+@fixtures.line_sip(wazo_tenant=MAIN_TENANT)
 def test_dissociate_multi_tenant(queue, user, line):
     with a.user_line(user, line):
         response = (
