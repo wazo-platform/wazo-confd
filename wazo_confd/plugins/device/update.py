@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -57,7 +57,7 @@ class DeviceUpdater:
             self.update_for_line(line)
 
     def update_for_endpoint_sip(self, sip):
-        line = self.line_dao.find_by(protocol='sip', protocolid=sip.id)
+        line = self.line_dao.find_by(endpoint_sip_id=sip.id)
         if line:
             self.update_for_line(line)
 
