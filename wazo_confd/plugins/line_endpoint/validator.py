@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -34,23 +34,43 @@ class ValidateLineAssociation(ValidatorAssociation):
 
     def validate_not_already_associated(self, line, endpoint):
         if line.is_associated():
+            protocol = 'unknown'
+            protocol_id = 0
+            if line.endpoint_sip_id:
+                protocol = 'sip'
+                protocol_id = line.endpoint_sip_id
+            elif line.endpoint_sccp_id:
+                protocol = 'sccp'
+                protocol_id = line.endpoint_sccp_id
+            elif line.endpoint_custom_id:
+                protocol = 'custom'
+                protocol_id = line.endpoint_custom_id
+
             raise errors.resource_associated(
                 'Line',
                 'Endpoint',
                 line_id=line.id,
-                endpoint=line.endpoint,
-                endpoint_id=line.endpoint_id,
+                endpoint=protocol,
+                endpoint_id=protocol_id,
             )
 
     def validate_not_associated_to_line(self, line, endpoint):
-        line = self.line_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
+        if self.endpoint == 'sip':
+            line = self.line_dao.find_by(endpoint_sip_id=endpoint.id)
+        elif self.endpoint == 'sccp':
+            line = self.line_dao.find_by(endpoint_sccp_id=endpoint.id)
+        elif self.endpoint == 'custom':
+            line = self.line_dao.find_by(endpoint_custom_id=endpoint.id)
+        else:
+            line = None
+
         if line:
             raise errors.resource_associated(
                 'Line',
                 'Endpoint',
                 line_id=line.id,
-                endpoint=line.endpoint,
-                endpoint_id=line.endpoint_id,
+                endpoint=self.endpoint,
+                endpoint_id=endpoint.id,
             )
 
     def validate_not_associated_to_trunk(self, trunk, endpoint):

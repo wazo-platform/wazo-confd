@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -80,14 +80,14 @@ class ValidateMultipleLines(ValidatorAssociation):
         if lines:
             existing = lines[0]
             # Multiple lines associated to a SCCP device is not supported
-            if existing.endpoint == "sccp" or line.endpoint == "sccp":
+            if existing.endpoint_sccp_id or line.endpoint_sccp_id:
                 raise errors.resource_associated(
                     'Line',
                     'Device',
                     line_id=line.id,
                     device_id=device.id,
-                    endpoint=line.endpoint,
-                    endpoint_id=line.endpoint_id,
+                    endpoint='sccp',
+                    endpoint_id=line.endpoint_sccp_id,
                 )
 
 

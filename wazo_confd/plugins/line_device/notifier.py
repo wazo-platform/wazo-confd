@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd import bus, sysconfd
@@ -50,7 +50,7 @@ class LineDeviceNotifier:
         self._bus.send_bus_event(event)
 
     def _reload_sccp(self, line):
-        if line.endpoint == "sccp":
+        if line.endpoint_sccp_id:
             self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
 
 

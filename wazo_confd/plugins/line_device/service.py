@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -38,7 +38,7 @@ class LineDeviceService:
     def associate_line_device(self, line, device):
         line.associate_device(device)
         self.device_updater.update_device(device, tenant_uuid=line.tenant_uuid)
-        if line.endpoint == "sccp":
+        if line.endpoint_sccp_id:
             device_db.associate_sccp_device(line, device)
 
     def dissociate(self, line, device):
@@ -53,7 +53,7 @@ class LineDeviceService:
     def dissociate_line_device(self, line, device):
         line.remove_device()
         self.device_updater.update_device(device, tenant_uuid=line.tenant_uuid)
-        if line.endpoint == "sccp":
+        if line.endpoint_sccp_id:
             device_db.dissociate_sccp_device(line, device)
 
     def get_association_from_line(self, line):
