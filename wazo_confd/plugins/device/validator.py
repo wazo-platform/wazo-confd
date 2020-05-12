@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -20,7 +20,7 @@ class DeviceNotAssociated(Validator):
     def validate(self, device):
         lines = self.line_dao.find_all_by(device=device.id)
         if lines:
-            ids = tuple(l.id for l in lines)
+            ids = tuple(line.id for line in lines)
             raise errors.resource_associated(
                 'Device', 'Line', device_id=device.id, line_ids=ids
             )
