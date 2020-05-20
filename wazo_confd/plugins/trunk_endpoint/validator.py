@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -51,14 +51,22 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
             )
 
     def validate_not_associated_to_line(self, trunk, endpoint):
-        line = self.line_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
+        if self.endpoint == 'sip':
+            line = self.line_dao.find_by(endpoint_sip_id=endpoint.id)
+        elif self.endpoint == 'sccp':
+            line = self.line_dao.find_by(endpoint_sccp_id=endpoint.id)
+        elif self.endpoint == 'custom':
+            line = self.line_dao.find_by(endpoint_custom_id=endpoint.id)
+        else:
+            line = None
+
         if line:
             raise errors.resource_associated(
                 'Line',
                 'Endpoint',
                 trunk_id=line.id,
-                endpoint=line.endpoint,
-                endpoint_id=line.endpoint_id,
+                endpoint=self.endpoint,
+                endpoint_id=endpoint.id,
             )
 
     def validate_associate_to_register(self, trunk, endpoint):

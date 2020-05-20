@@ -204,10 +204,10 @@ class EntryFinder:
         if line_extension:
             entry.extension = self.extension_dao.get(line_extension.extension_id)
 
-        if entry.line.endpoint == "sip":
-            entry.sip = self.sip_dao.get(entry.line.endpoint_id)
-        elif entry.line.endpoint == "sccp":
-            entry.sccp = self.sccp_dao.get(entry.line.endpoint_id)
+        if entry.line.endpoint_sip_id:
+            entry.sip = self.sip_dao.get(entry.line.endpoint_sip_id)
+        elif entry.line.endpoint_sccp_id:
+            entry.sccp = self.sccp_dao.get(entry.line.endpoint_sccp_id)
 
 
 class EntryUpdater:

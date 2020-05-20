@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -452,8 +452,7 @@ class DatabaseQueries:
             """SELECT COUNT(*)
                      FROM linefeatures
                         INNER JOIN sccpline
-                            ON linefeatures.protocol = 'sccp'
-                            AND linefeatures.protocolid = sccpline.id
+                            ON linefeatures.endpoint_sccp_id = sccpline.id
                             INNER JOIN sccpdevice ON sccpdevice.line = linefeatures.name
                      WHERE
                         linefeatures.id = :line_id

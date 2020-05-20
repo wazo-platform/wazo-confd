@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -25,7 +25,14 @@ class TestLineDeviceNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.line = Mock(
-            Line, id=1, endpoint_sip={'id': 2}, endpoint_sccp=None, endpoint_custom=None
+            Line,
+            id=1,
+            endpoint_sip={'id': 2},
+            endpoint_sccp=None,
+            endpoint_custom=None,
+            endpoint_sip_id=None,
+            endpoint_sccp_id=None,
+            endpoint_custom_id=None,
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.device = Mock(Device, id='custom-id')
@@ -33,19 +40,19 @@ class TestLineDeviceNotifier(unittest.TestCase):
         self.notifier = LineDeviceNotifier(self.bus, self.sysconfd)
 
     def test_given_line_is_not_sccp_when_associated_then_sccp_not_reloaded(self):
-        self.line.endpoint = "sip"
+        self.line.endpoint_sip_id = 1
         self.notifier.associated(self.line, self.device)
 
         assert_that(self.sysconfd.exec_request_handlers.call_count, equal_to(0))
 
     def test_given_line_is_not_sccp_when_dissociated_then_sccp_not_reloaded(self):
-        self.line.endpoint = "sip"
+        self.line.endpoint_sip_id = 1
         self.notifier.dissociated(self.line, self.device)
 
         assert_that(self.sysconfd.exec_request_handlers.call_count, equal_to(0))
 
     def test_given_line_is_sccp_when_associated_then_sccp_reloaded(self):
-        self.line.endpoint = "sccp"
+        self.line.endpoint_sccp_id = 1
         self.notifier.associated(self.line, self.device)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(
@@ -53,7 +60,7 @@ class TestLineDeviceNotifier(unittest.TestCase):
         )
 
     def test_given_line_is_sccp_when_dissociated_then_sccp_reloaded(self):
-        self.line.endpoint = "sccp"
+        self.line.endpoint_sccp_id = 1
         self.notifier.dissociated(self.line, self.device)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from sqlalchemy.orm import Load
@@ -83,7 +83,7 @@ def template_has_sccp_device(template_id):
                 UserFeatures.func_key_private_template_id == template_id,
             )
         )
-        .filter(LineFeatures.endpoint == "sccp")
+        .filter(LineFeatures.endpoint_sccp_id != None)  # noqa
         .exists()
     )
 
