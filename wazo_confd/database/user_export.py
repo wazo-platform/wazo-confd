@@ -141,7 +141,14 @@ def export_query(tenant_uuid, separator=";"):
         cast(Voicemail.attach, String),
         cast(Voicemail.deletevoicemail, String),
         cast(cast(Voicemail.ask_password, Integer), String),
-        Line.endpoint,
+        case(
+            [
+                (Line.endpoint_sip_id != None, 'sip'),  # noqa
+                (Line.endpoint_sccp_id != None, 'sccp'),  # noqa
+                (Line.endpoint_custom_id != None, 'custom'),  # noqa
+            ],
+            else_='',
+        ),
         Line.provisioning_code,
         func.coalesce(Extension.context, Line.context),
         SIP.name,
