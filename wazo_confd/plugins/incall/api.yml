@@ -131,6 +131,9 @@ definitions:
         destination:
           description: The destination where the incoming call will be redirected
           $ref: '#/definitions/DestinationType'
+        greeting_sound:
+          type: string
+          description: The name of the sound file to be played before redirecting the caller to the destination
     - $ref: '#/definitions/IncallRelationExtensions'
     - $ref: '#/definitions/IncallRelationSchedules'
     - required:
