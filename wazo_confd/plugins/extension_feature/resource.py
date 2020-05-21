@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -13,7 +13,7 @@ class ExtensionFeatureList(ListResource):
 
     @required_acl('confd.extensions.features.read')
     def get(self):
-        return super(ExtensionFeatureList, self).get()
+        return super().get()
 
     def post(self):
         return '', 405
@@ -25,11 +25,11 @@ class ExtensionFeatureItem(ItemResource):
 
     @required_acl('confd.extensions.features.{id}.read')
     def get(self, id):
-        return super(ExtensionFeatureItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.extensions.features.{id}.update')
     def put(self, id):
-        return super(ExtensionFeatureItem, self).put(id)
+        return super().put(id)
 
     def delete(self, id):
         return '', 405

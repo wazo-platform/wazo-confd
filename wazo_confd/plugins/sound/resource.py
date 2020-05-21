@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -22,11 +22,11 @@ class SoundList(ListResource):
 
     @required_acl('confd.sounds.create')
     def post(self):
-        return super(SoundList, self).post()
+        return super().post()
 
     @required_acl('confd.sounds.read')
     def get(self):
-        return super(SoundList, self).get()
+        return super().get()
 
 
 class SoundItem(ItemResource):

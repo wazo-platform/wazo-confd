@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -29,7 +29,7 @@ class ProvCodeChanged(ProvCodeAvailable):
     def validate(self, line):
         old_line = self.dao.get(line.id)
         if old_line.provisioning_code != line.provisioning_code:
-            super(ProvCodeChanged, self).validate(line)
+            super().validate(line)
 
 
 def build_validator(registrar_dao):

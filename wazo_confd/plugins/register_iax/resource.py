@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -133,7 +133,7 @@ class RegisterIAXList(ListResource):
 
     @required_acl('confd.registers.read')
     def get(self):
-        return super(RegisterIAXList, self).get()
+        return super().get()
 
 
 class RegisterIAXItem(ItemResource):
@@ -142,7 +142,7 @@ class RegisterIAXItem(ItemResource):
 
     @required_acl('confd.registers.{id}.read')
     def get(self, id):
-        return super(RegisterIAXItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.registers.{id}.update')
     def put(self, id):
@@ -161,4 +161,4 @@ class RegisterIAXItem(ItemResource):
 
     @required_acl('confd.registers.{id}.delete')
     def delete(self, id):
-        return super(RegisterIAXItem, self).delete(id)
+        return super().delete(id)

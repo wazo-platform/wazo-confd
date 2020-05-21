@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class PagingList(ListResource):
 
     @required_acl('confd.pagings.create')
     def post(self):
-        return super(PagingList, self).post()
+        return super().post()
 
     @required_acl('confd.pagings.read')
     def get(self):
-        return super(PagingList, self).get()
+        return super().get()
 
 
 class PagingItem(ItemResource):
@@ -35,12 +35,12 @@ class PagingItem(ItemResource):
 
     @required_acl('confd.pagings.{id}.read')
     def get(self, id):
-        return super(PagingItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.pagings.{id}.update')
     def put(self, id):
-        return super(PagingItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.pagings.{id}.delete')
     def delete(self, id):
-        return super(PagingItem, self).delete(id)
+        return super().delete(id)

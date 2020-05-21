@@ -10,7 +10,7 @@ class LineExtensionItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, line_dao, extension_dao):
-        super(LineExtensionItem, self).__init__()
+        super().__init__()
         self.service = service
         self.line_dao = line_dao
         self.extension_dao = extension_dao

@@ -174,7 +174,7 @@ class BaseTestFuncKey(unittest.TestCase):
 
 class TestAllFuncKeyDestinations(BaseTestFuncKey):
     def setUp(self):
-        super(TestAllFuncKeyDestinations, self).setUp()
+        super().setUp()
 
         user_exten = '1000'
         group_exten = '2000'
@@ -550,7 +550,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
 
 class TestTemplateAssociation(BaseTestFuncKey):
     def setUp(self):
-        super(TestTemplateAssociation, self).setUp()
+        super().setUp()
 
         self.funckeys = {
             '1': {'destination': {'type': 'custom', 'exten': '9999'}},
@@ -862,7 +862,7 @@ def test_get_group_destination_relation(user, group):
 
 class TestBlfFuncKeys(BaseTestFuncKey):
     def setUp(self):
-        super(TestBlfFuncKeys, self).setUp()
+        super().setUp()
 
         user_exten = '1000'
         group_exten = '2000'

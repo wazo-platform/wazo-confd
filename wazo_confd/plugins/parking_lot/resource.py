@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class ParkingLotList(ListResource):
 
     @required_acl('confd.parkinglots.create')
     def post(self):
-        return super(ParkingLotList, self).post()
+        return super().post()
 
     @required_acl('confd.parkinglots.read')
     def get(self):
-        return super(ParkingLotList, self).get()
+        return super().get()
 
 
 class ParkingLotItem(ItemResource):
@@ -35,12 +35,12 @@ class ParkingLotItem(ItemResource):
 
     @required_acl('confd.parkinglots.{id}.read')
     def get(self, id):
-        return super(ParkingLotItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.parkinglots.{id}.update')
     def put(self, id):
-        return super(ParkingLotItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.parkinglots.{id}.delete')
     def delete(self, id):
-        return super(ParkingLotItem, self).delete(id)
+        return super().delete(id)

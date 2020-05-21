@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -82,15 +82,15 @@ class DeviceItem(SingleTenantMixin, ItemResource):
 
     @required_acl('confd.devices.{id}.read')
     def get(self, id):
-        return super(DeviceItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.devices.{id}.update')
     def put(self, id):
-        return super(DeviceItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.devices.{id}.delete')
     def delete(self, id):
-        return super(DeviceItem, self).delete(id)
+        return super().delete(id)
 
 
 class DeviceAutoprov(SingleTenantConfdResource):

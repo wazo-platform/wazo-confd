@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class QueueList(ListResource):
 
     @required_acl('confd.queues.create')
     def post(self):
-        return super(QueueList, self).post()
+        return super().post()
 
     @required_acl('confd.queues.read')
     def get(self):
-        return super(QueueList, self).get()
+        return super().get()
 
 
 class QueueItem(ItemResource):
@@ -35,12 +35,12 @@ class QueueItem(ItemResource):
 
     @required_acl('confd.queues.{id}.read')
     def get(self, id):
-        return super(QueueItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.queues.{id}.update')
     def put(self, id):
-        return super(QueueItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.queues.{id}.delete')
     def delete(self, id):
-        return super(QueueItem, self).delete(id)
+        return super().delete(id)

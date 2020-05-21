@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -10,11 +10,11 @@ class RTPGeneralList(AsteriskConfigurationList):
 
     @required_acl('confd.asterisk.rtp.general.get')
     def get(self):
-        return super(RTPGeneralList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.rtp.general.update')
     def put(self):
-        return super(RTPGeneralList, self).put()
+        return super().put()
 
 
 class RTPIceHostCandidatesList(AsteriskConfigurationList):
@@ -22,8 +22,8 @@ class RTPIceHostCandidatesList(AsteriskConfigurationList):
 
     @required_acl('confd.asterisk.rtp.ice_host_candidates.get')
     def get(self):
-        return super(RTPIceHostCandidatesList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.rtp.ice_host_candidates.update')
     def put(self):
-        return super(RTPIceHostCandidatesList, self).put()
+        return super().put()

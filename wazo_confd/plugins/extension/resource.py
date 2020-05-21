@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -21,7 +21,7 @@ class ExtensionList(ListResource):
 
     @required_acl('confd.extensions.read')
     def get(self):
-        return super(ExtensionList, self).get()
+        return super().get()
 
     @required_acl('confd.extensions.create')
     def post(self):
@@ -44,7 +44,7 @@ class ExtensionItem(ItemResource):
 
     @required_acl('confd.extensions.{id}.read')
     def get(self, id):
-        return super(ExtensionItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.extensions.{id}.update')
     def put(self, id):
@@ -55,4 +55,4 @@ class ExtensionItem(ItemResource):
 
     @required_acl('confd.extensions.{id}.delete')
     def delete(self, id):
-        return super(ExtensionItem, self).delete(id)
+        return super().delete(id)

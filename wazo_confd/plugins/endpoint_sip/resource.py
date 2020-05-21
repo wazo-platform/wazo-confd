@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class SipList(ListResource):
 
     @required_acl('confd.endpoints.sip.read')
     def get(self):
-        return super(SipList, self).get()
+        return super().get()
 
     @required_acl('confd.endpoints.sip.create')
     def post(self):
-        return super(SipList, self).post()
+        return super().post()
 
 
 class SipItem(ItemResource):
@@ -35,12 +35,12 @@ class SipItem(ItemResource):
 
     @required_acl('confd.endpoints.sip.{id}.read')
     def get(self, id):
-        return super(SipItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.endpoints.sip.{id}.update')
     def put(self, id):
-        return super(SipItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.endpoints.sip.{id}.delete')
     def delete(self, id):
-        return super(SipItem, self).delete(id)
+        return super().delete(id)

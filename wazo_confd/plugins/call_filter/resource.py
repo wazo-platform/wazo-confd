@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class CallFilterList(ListResource):
 
     @required_acl('confd.callfilters.create')
     def post(self):
-        return super(CallFilterList, self).post()
+        return super().post()
 
     @required_acl('confd.callfilters.read')
     def get(self):
-        return super(CallFilterList, self).get()
+        return super().get()
 
 
 class CallFilterItem(ItemResource):
@@ -35,12 +35,12 @@ class CallFilterItem(ItemResource):
 
     @required_acl('confd.callfilters.{id}.read')
     def get(self, id):
-        return super(CallFilterItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.callfilters.{id}.update')
     def put(self, id):
-        return super(CallFilterItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.callfilters.{id}.delete')
     def delete(self, id):
-        return super(CallFilterItem, self).delete(id)
+        return super().delete(id)

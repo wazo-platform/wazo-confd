@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -21,11 +21,11 @@ class MohList(ListResource):
 
     @required_acl('confd.moh.create')
     def post(self):
-        return super(MohList, self).post()
+        return super().post()
 
     @required_acl('confd.moh.read')
     def get(self):
-        return super(MohList, self).get()
+        return super().get()
 
 
 class MohItem(ItemResource):
@@ -35,15 +35,15 @@ class MohItem(ItemResource):
 
     @required_acl('confd.moh.{uuid}.read')
     def get(self, uuid):
-        return super(MohItem, self).get(uuid)
+        return super().get(uuid)
 
     @required_acl('confd.moh.{uuid}.update')
     def put(self, uuid):
-        return super(MohItem, self).put(uuid)
+        return super().put(uuid)
 
     @required_acl('confd.moh.{uuid}.delete')
     def delete(self, uuid):
-        return super(MohItem, self).delete(uuid)
+        return super().delete(uuid)
 
 
 class MohFileItem(ConfdResource):

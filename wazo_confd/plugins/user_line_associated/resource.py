@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -11,7 +11,7 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
     schema = SipSchema
 
     def __init__(self, user_dao, line_dao):
-        super(UserLineAssociatedEndpointSipItem, self).__init__()
+        super().__init__()
         self.user_dao = user_dao
         self.line_dao = line_dao
 

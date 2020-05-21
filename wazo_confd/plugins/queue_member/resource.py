@@ -27,7 +27,7 @@ class QueueMemberAgentItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, queue_dao, agent_dao):
-        super(QueueMemberAgentItem, self).__init__()
+        super().__init__()
         self.service = service
         self.queue_dao = queue_dao
         self.agent_dao = agent_dao
@@ -66,7 +66,7 @@ class QueueMemberUserItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, queue_dao, user_dao):
-        super(QueueMemberUserItem, self).__init__()
+        super().__init__()
         self.service = service
         self.queue_dao = queue_dao
         self.user_dao = user_dao

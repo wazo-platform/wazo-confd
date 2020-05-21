@@ -100,7 +100,7 @@ class ConfdClient:
 
 class RestUrlClient(UrlFragment):
     def __init__(self, client, fragments, body=None):
-        super(RestUrlClient, self).__init__(fragments)
+        super().__init__(fragments)
         self.client = client
         self.body = body or {}
 

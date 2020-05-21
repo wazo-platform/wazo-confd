@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -18,7 +18,7 @@ class Info(ConfdResource):
     schema = InfoSchema
 
     def __init__(self, service):
-        super(Info, self).__init__()
+        super().__init__()
         self.service = service
 
     @required_acl('confd.infos.read')

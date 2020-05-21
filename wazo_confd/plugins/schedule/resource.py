@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class ScheduleList(ListResource):
 
     @required_acl('confd.schedules.create')
     def post(self):
-        return super(ScheduleList, self).post()
+        return super().post()
 
     @required_acl('confd.schedules.read')
     def get(self):
-        return super(ScheduleList, self).get()
+        return super().get()
 
 
 class ScheduleItem(ItemResource):
@@ -35,12 +35,12 @@ class ScheduleItem(ItemResource):
 
     @required_acl('confd.schedules.{id}.read')
     def get(self, id):
-        return super(ScheduleItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.schedules.{id}.update')
     def put(self, id):
-        return super(ScheduleItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.schedules.{id}.delete')
     def delete(self, id):
-        return super(ScheduleItem, self).delete(id)
+        return super().delete(id)

@@ -19,7 +19,7 @@ class UserCallPermissionSchema(BaseSchema):
 
 class UserCallPermission(ConfdResource):
     def __init__(self, service, user_dao, call_permission_dao):
-        super(UserCallPermission, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.call_permission_dao = call_permission_dao

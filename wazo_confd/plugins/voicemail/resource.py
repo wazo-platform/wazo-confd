@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -30,7 +30,7 @@ class VoicemailList(ListResource):
 
     @required_acl('confd.voicemails.read')
     def get(self):
-        return super(VoicemailList, self).get()
+        return super().get()
 
 
 class VoicemailItem(ItemResource):
@@ -40,7 +40,7 @@ class VoicemailItem(ItemResource):
 
     @required_acl('confd.voicemails.{id}.read')
     def get(self, id):
-        return super(VoicemailItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.voicemails.{id}.update')
     def put(self, id):
@@ -51,4 +51,4 @@ class VoicemailItem(ItemResource):
 
     @required_acl('confd.voicemails.{id}.delete')
     def delete(self, id):
-        return super(VoicemailItem, self).delete(id)
+        return super().delete(id)

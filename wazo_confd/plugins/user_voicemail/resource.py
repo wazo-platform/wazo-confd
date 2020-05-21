@@ -10,7 +10,7 @@ class UserVoicemailResource(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, user_dao, voicemail_dao):
-        super(UserVoicemailResource, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao

@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class SccpList(ListResource):
 
     @required_acl('confd.endpoints.sccp.read')
     def get(self):
-        return super(SccpList, self).get()
+        return super().get()
 
     @required_acl('confd.endpoints.sccp.create')
     def post(self):
-        return super(SccpList, self).post()
+        return super().post()
 
 
 class SccpItem(ItemResource):
@@ -35,12 +35,12 @@ class SccpItem(ItemResource):
 
     @required_acl('confd.endpoints.sccp.{id}.read')
     def get(self, id):
-        return super(SccpItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.endpoints.sccp.{id}.update')
     def put(self, id):
-        return super(SccpItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.endpoints.sccp.{id}.delete')
     def delete(self, id):
-        return super(SccpItem, self).delete(id)
+        return super().delete(id)

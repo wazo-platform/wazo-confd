@@ -10,7 +10,7 @@ class BaseIntegrationTest(IntegrationTest):
 
     @classmethod
     def setUpClass(cls):
-        super(IntegrationTest, cls).setUpClass()
+        super().setUpClass()
         cls.setup_provd()
         cls.setup_database()
         cls.setup_helpers()

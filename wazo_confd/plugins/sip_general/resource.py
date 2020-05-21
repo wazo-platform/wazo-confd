@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -83,7 +83,7 @@ class SIPGeneralList(ConfdResource):
     schema = SIPGeneralSchema
 
     def __init__(self, service):
-        super(SIPGeneralList, self).__init__()
+        super().__init__()
         self.service = service
 
     @required_acl('confd.asterisk.sip.general.get')

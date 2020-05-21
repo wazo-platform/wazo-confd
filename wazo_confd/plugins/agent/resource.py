@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class AgentList(ListResource):
 
     @required_acl('confd.agents.create')
     def post(self):
-        return super(AgentList, self).post()
+        return super().post()
 
     @required_acl('confd.agents.read')
     def get(self):
-        return super(AgentList, self).get()
+        return super().get()
 
 
 class AgentItem(ItemResource):
@@ -35,12 +35,12 @@ class AgentItem(ItemResource):
 
     @required_acl('confd.agents.{id}.read')
     def get(self, id):
-        return super(AgentItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.agents.{id}.update')
     def put(self, id):
-        return super(AgentItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.agents.{id}.delete')
     def delete(self, id):
-        return super(AgentItem, self).delete(id)
+        return super().delete(id)

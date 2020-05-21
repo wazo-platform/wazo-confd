@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -92,7 +92,7 @@ class FeaturesConfigurationList(ConfdResource):
     section_name = None
 
     def __init__(self, service):
-        super(FeaturesConfigurationList, self).__init__()
+        super().__init__()
         self.service = service
 
     def get(self):
@@ -111,11 +111,11 @@ class FeaturesApplicationmapList(FeaturesConfigurationList):
 
     @required_acl('confd.asterisk.features.applicationmap.get')
     def get(self):
-        return super(FeaturesApplicationmapList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.features.applicationmap.update')
     def put(self):
-        return super(FeaturesApplicationmapList, self).put()
+        return super().put()
 
 
 class FeaturesFeaturemapList(FeaturesConfigurationList):
@@ -124,11 +124,11 @@ class FeaturesFeaturemapList(FeaturesConfigurationList):
 
     @required_acl('confd.asterisk.features.featuremap.get')
     def get(self):
-        return super(FeaturesFeaturemapList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.features.featuremap.update')
     def put(self):
-        return super(FeaturesFeaturemapList, self).put()
+        return super().put()
 
 
 class FeaturesGeneralList(FeaturesConfigurationList):
@@ -137,8 +137,8 @@ class FeaturesGeneralList(FeaturesConfigurationList):
 
     @required_acl('confd.asterisk.features.general.get')
     def get(self):
-        return super(FeaturesGeneralList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.features.general.update')
     def put(self):
-        return super(FeaturesGeneralList, self).put()
+        return super().put()

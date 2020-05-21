@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class CustomList(ListResource):
 
     @required_acl('confd.endpoints.custom.read')
     def get(self):
-        return super(CustomList, self).get()
+        return super().get()
 
     @required_acl('confd.endpoints.custom.create')
     def post(self):
-        return super(CustomList, self).post()
+        return super().post()
 
 
 class CustomItem(ItemResource):
@@ -35,12 +35,12 @@ class CustomItem(ItemResource):
 
     @required_acl('confd.endpoints.custom.{id}.read')
     def get(self, id):
-        return super(CustomItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.endpoints.custom.{id}.update')
     def put(self, id):
-        return super(CustomItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.endpoints.custom.{id}.delete')
     def delete(self, id):
-        return super(CustomItem, self).delete(id)
+        return super().delete(id)

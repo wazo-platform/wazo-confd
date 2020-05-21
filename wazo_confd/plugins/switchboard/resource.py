@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -23,11 +23,11 @@ class SwitchboardList(ListResource):
 
     @required_acl('confd.switchboards.create')
     def post(self):
-        return super(SwitchboardList, self).post()
+        return super().post()
 
     @required_acl('confd.switchboards.read')
     def get(self):
-        return super(SwitchboardList, self).get()
+        return super().get()
 
 
 class SwitchboardItem(ItemResource):
@@ -37,12 +37,12 @@ class SwitchboardItem(ItemResource):
 
     @required_acl('confd.switchboards.{uuid}.read')
     def get(self, uuid):
-        return super(SwitchboardItem, self).get(uuid)
+        return super().get(uuid)
 
     @required_acl('confd.switchboards.{uuid}.update')
     def put(self, uuid):
-        return super(SwitchboardItem, self).put(uuid)
+        return super().put(uuid)
 
     @required_acl('confd.switchboards.{uuid}.delete')
     def delete(self, uuid):
-        return super(SwitchboardItem, self).delete(uuid)
+        return super().delete(uuid)

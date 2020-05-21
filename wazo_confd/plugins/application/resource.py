@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -25,11 +25,11 @@ class ApplicationList(ListResource):
 
     @required_acl('confd.applications.create')
     def post(self):
-        return super(ApplicationList, self).post()
+        return super().post()
 
     @required_acl('confd.applications.read')
     def get(self):
-        return super(ApplicationList, self).get()
+        return super().get()
 
 
 class ApplicationItem(ItemResource):
@@ -39,12 +39,12 @@ class ApplicationItem(ItemResource):
 
     @required_acl('confd.applications.{application_uuid}.read')
     def get(self, application_uuid):
-        return super(ApplicationItem, self).get(application_uuid)
+        return super().get(application_uuid)
 
     @required_acl('confd.applications.{application_uuid}.update')
     def put(self, application_uuid):
-        return super(ApplicationItem, self).put(application_uuid)
+        return super().put(application_uuid)
 
     @required_acl('confd.applications.{application_uuid}.delete')
     def delete(self, application_uuid):
-        return super(ApplicationItem, self).delete(application_uuid)
+        return super().delete(application_uuid)

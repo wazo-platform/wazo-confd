@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -21,7 +21,7 @@ class LineDeviceSchema(BaseSchema):
 
 class LineDevice(ConfdResource):
     def __init__(self, line_dao, device_dao, service):
-        super(LineDevice, self).__init__()
+        super().__init__()
         self.line_dao = line_dao
         self.device_dao = device_dao
         self.service = service

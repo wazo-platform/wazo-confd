@@ -10,7 +10,7 @@ class UserAgentItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, user_dao, agent_dao):
-        super(UserAgentItem, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.agent_dao = agent_dao
@@ -29,7 +29,7 @@ class UserAgentList(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, user_dao):
-        super(UserAgentList, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
 
