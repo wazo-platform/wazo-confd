@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -18,7 +18,13 @@ class TestTrunkNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.trunk = Mock(Trunk, id=1234)
+        self.trunk = Mock(
+            Trunk,
+            id=1234,
+            endpoint_sip_id=None,
+            endpoint_iax_id=None,
+            endpoint_custom_id=None,
+        )
 
         self.notifier = TrunkNotifier(self.bus, self.sysconfd)
 
@@ -44,7 +50,7 @@ class TestTrunkNotifier(unittest.TestCase):
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_sip_edited_then_sip_reloaded(self):
-        self.trunk.endpoint = 'sip'
+        self.trunk.endpoint_sip_id = 123
 
         self.notifier.edited(self.trunk)
 
@@ -53,7 +59,7 @@ class TestTrunkNotifier(unittest.TestCase):
         )
 
     def test_when_trunk_iax_edited_then_iax_reloaded(self):
-        self.trunk.endpoint = 'iax'
+        self.trunk.endpoint_iax_id = 123
 
         self.notifier.edited(self.trunk)
 
@@ -62,7 +68,7 @@ class TestTrunkNotifier(unittest.TestCase):
         )
 
     def test_when_trunk_custom_edited_then_no_reload(self):
-        self.trunk.endpoint = 'custom'
+        self.trunk.endpoint_custom_id = 123
 
         self.notifier.edited(self.trunk)
 
@@ -74,7 +80,7 @@ class TestTrunkNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_trunk_sip_deleted_then_sip_reloaded(self):
-        self.trunk.endpoint = 'sip'
+        self.trunk.endpoint_sip_id = 123
 
         self.notifier.deleted(self.trunk)
 
@@ -83,7 +89,7 @@ class TestTrunkNotifier(unittest.TestCase):
         )
 
     def test_when_trunk_iax_deleted_then_iax_reloaded(self):
-        self.trunk.endpoint = 'iax'
+        self.trunk.endpoint_iax_id = 123
 
         self.notifier.deleted(self.trunk)
 
@@ -92,7 +98,7 @@ class TestTrunkNotifier(unittest.TestCase):
         )
 
     def test_when_trunk_custom_deleted_then_no_reload(self):
-        self.trunk.endpoint = 'custom'
+        self.trunk.endpoint_custom_id = 123
 
         self.notifier.deleted(self.trunk)
 
@@ -104,9 +110,9 @@ class TestTrunkNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def _sysconfd_handlers(self):
-        if self.trunk.endpoint == 'sip':
+        if self.trunk.endpoint_sip_id:
             ipbx_commands = ['module reload res_pjsip.so']
-        elif self.trunk.endpoint == 'iax':
+        elif self.trunk.endpoint_iax_id:
             ipbx_commands = ['iax2 reload']
         else:
             raise AssertionError(

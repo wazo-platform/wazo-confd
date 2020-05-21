@@ -74,14 +74,22 @@ class ValidateLineAssociation(ValidatorAssociation):
             )
 
     def validate_not_associated_to_trunk(self, trunk, endpoint):
-        trunk = self.trunk_dao.find_by(endpoint=self.endpoint, endpoint_id=endpoint.id)
+        if self.endpoint == 'sip':
+            trunk = self.trunk_dao.find_by(endpoint_sip_id=endpoint.id)
+        elif self.endpoint == 'iax':
+            trunk = self.trunk_dao.find_by(endpoint_iax_id=endpoint.id)
+        elif self.endpoint == 'custom':
+            trunk = self.trunk_dao.find_by(endpoint_custom_id=endpoint.id)
+        else:
+            trunk = None
+
         if trunk:
             raise errors.resource_associated(
                 'Trunk',
                 'Endpoint',
                 trunk_id=trunk.id,
-                endpoint=trunk.endpoint,
-                endpoint_id=trunk.endpoint_id,
+                endpoint=self.endpoint,
+                endpoint_id=endpoint.id,
             )
 
 
