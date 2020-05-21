@@ -21,7 +21,9 @@ RUN true \
     && mkdir -p /etc/wazo-confd/conf.d \
     && install -o www-data -g www-data /dev/null /var/log/wazo-confd.log \
     && install -d -o www-data -g www-data /run/wazo-confd/ \
-    && install -d -o www-data -g www-data /var/lib/asterisk/moh
+    && install -d -o www-data -g www-data /var/lib/asterisk/moh \
+    && install -dm775 -o www-data -g www-data /var/lib/wazo/sounds/tenants \
+    && install -dm777 /usr/share/asterisk/sounds
 
 EXPOSE 9486
 
