@@ -12,10 +12,9 @@ from wazo_confd.helpers.validator import ValidatorAssociation
 from wazo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 
-class ValidateLineAssociation(ValidatorAssociation):
-    def __init__(self, endpoint, line_dao, trunk_dao):
+class _ValidateLineAssociation(ValidatorAssociation):
+    def __init__(self, line_dao, trunk_dao):
         super().__init__()
-        self.endpoint = endpoint
         self.line_dao = line_dao
         self.trunk_dao = trunk_dao
 
@@ -33,19 +32,18 @@ class ValidateLineAssociation(ValidatorAssociation):
             )
 
     def validate_not_already_associated(self, line, endpoint):
-        if line.is_associated():
-            protocol = 'unknown'
-            protocol_id = 0
-            if line.endpoint_sip_uuid:
-                protocol = 'sip'
-                protocol_id = line.endpoint_sip_uuid
-            elif line.endpoint_sccp_id:
-                protocol = 'sccp'
-                protocol_id = line.endpoint_sccp_id
-            elif line.endpoint_custom_id:
-                protocol = 'custom'
-                protocol_id = line.endpoint_custom_id
+        protocol = None
+        if line.endpoint_sip_id:
+            protocol = 'sip'
+            protocol_id = line.endpoint_sip_id
+        elif line.endpoint_sccp_id:
+            protocol = 'sccp'
+            protocol_id = line.endpoint_sccp_id
+        elif line.endpoint_custom_id:
+            protocol = 'custom'
+            protocol_id = line.endpoint_custom_id
 
+        if protocol:
             raise errors.resource_associated(
                 'Line',
                 'Endpoint',
@@ -55,47 +53,70 @@ class ValidateLineAssociation(ValidatorAssociation):
             )
 
     def validate_not_associated_to_line(self, line, endpoint):
-        if self.endpoint == 'sip':
-            id_ = endpoint.uuid
-            line = self.line_dao.find_by(endpoint_sip_uuid=id_)
-        elif self.endpoint == 'sccp':
-            id_ = endpoint.id
-            line = self.line_dao.find_by(endpoint_sccp_id=id_)
-        elif self.endpoint == 'custom':
-            id_ = endpoint.id
-            line = self.line_dao.find_by(endpoint_custom_id=id_)
-        else:
-            line = None
+        pass
 
+    def validate_not_associated_to_trunk(self, trunk, endpoint):
+        pass
+
+
+class ValidateLineSIPAssociation(_ValidateLineAssociation):
+    def validate_not_associated_to_line(self, line, endpoint):
+        line = self.line_dao.find_by(endpoint_sip_uuid=endpoint.uuid)
         if line:
             raise errors.resource_associated(
                 'Line',
                 'Endpoint',
                 line_id=line.id,
-                endpoint=self.endpoint,
-                endpoint_id=id_,
+                endpoint='sip',
+                endpoint_uuid=endpoint.uuid,
             )
 
     def validate_not_associated_to_trunk(self, trunk, endpoint):
-        if self.endpoint == 'sip':
-            id_ = endpoint.uuid
-            trunk = self.trunk_dao.find_by(endpoint_sip_uuid=id_)
-        elif self.endpoint == 'iax':
-            id_ = endpoint.id
-            trunk = self.trunk_dao.find_by(endpoint_iax_id=id_)
-        elif self.endpoint == 'custom':
-            id_ = endpoint.id
-            trunk = self.trunk_dao.find_by(endpoint_custom_id=id_)
-        else:
-            trunk = None
-
+        trunk = self.trunk_dao.find_by(endpoint_sip_uuid=endpoint.uuid)
         if trunk:
             raise errors.resource_associated(
                 'Trunk',
                 'Endpoint',
                 trunk_id=trunk.id,
-                endpoint=self.endpoint,
-                endpoint_id=id_,
+                endpoint='sip',
+                endpoint_uuid=endpoint.uuid,
+            )
+
+
+class ValidateLineSCCPAssociation(_ValidateLineAssociation):
+    def validate_not_associated_to_line(self, line, endpoint):
+        line = self.line_dao.find_by(endpoint_sccp_id=endpoint.id)
+        if line:
+            raise errors.resource_associated(
+                'Line',
+                'Endpoint',
+                line_id=line.id,
+                endpoint='sccp',
+                endpoint_id=endpoint.id,
+            )
+
+
+class ValidateLineCustomAssociation(_ValidateLineAssociation):
+    def validate_not_associated_to_line(self, line, endpoint):
+        line = self.line_dao.find_by(endpoint_custom_id=endpoint.id)
+        if line:
+            raise errors.resource_associated(
+                'Line',
+                'Endpoint',
+                line_id=line.id,
+                endpoint='custom',
+                endpoint_id=endpoint.id,
+            )
+
+    def validate_not_associated_to_trunk(self, trunk, endpoint):
+        trunk = self.trunk_dao.find_by(endpoint_custom_id=endpoint.id)
+        if trunk:
+            raise errors.resource_associated(
+                'Trunk',
+                'Endpoint',
+                trunk_id=trunk.id,
+                endpoint='custom',
+                endpoint_id=endpoint.id,
             )
 
 
@@ -132,10 +153,32 @@ class ValidateLineDissociation(ValidatorAssociation):
             )
 
 
-def build_validator(endpoint):
+def build_validator_sip():
     return ValidationAssociation(
         association=[
-            ValidateLineAssociation(endpoint, line_dao_module, trunk_dao_module)
+            ValidateLineSIPAssociation(line_dao_module, trunk_dao_module)
+        ],
+        dissociation=[
+            ValidateLineDissociation(user_line_dao_module, line_extension_dao_module)
+        ],
+    )
+
+
+def build_validator_sccp():
+    return ValidationAssociation(
+        association=[
+            ValidateLineSCCPAssociation(line_dao_module, trunk_dao_module)
+        ],
+        dissociation=[
+            ValidateLineDissociation(user_line_dao_module, line_extension_dao_module)
+        ],
+    )
+
+
+def build_validator_custom():
+    return ValidationAssociation(
+        association=[
+            ValidateLineCustomAssociation(line_dao_module, trunk_dao_module)
         ],
         dissociation=[
             ValidateLineDissociation(user_line_dao_module, line_extension_dao_module)
