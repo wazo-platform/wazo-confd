@@ -32,7 +32,10 @@ from wazo_confd.plugins.incall_extension.service import (
     build_service as build_incall_extension_service,
 )
 from wazo_confd.plugins.line.service import build_service as build_line_service
-from wazo_confd.plugins.line_endpoint.service import build_service as build_le_service
+from wazo_confd.plugins.line_endpoint.service import (
+    build_service_sip as build_le_sip_service,
+    build_service_sccp as build_le_sccp_service,
+)
 from wazo_confd.plugins.line_extension.service import (
     build_service as build_line_extension_service,
 )
@@ -93,8 +96,8 @@ class Plugin:
         line_service = build_line_service(provd_client)
         sip_service = build_sip_service(provd_client)
         sccp_service = build_sccp_service()
-        line_sip_service = build_le_service(provd_client, 'sip')
-        line_sccp_service = build_le_service(provd_client, 'sccp')
+        line_sip_service = build_le_sip_service(provd_client)
+        line_sccp_service = build_le_sccp_service(provd_client)
         extension_service = build_extension_service(provd_client)
         user_line_service = build_ul_service()
         line_extension_service = build_line_extension_service()
