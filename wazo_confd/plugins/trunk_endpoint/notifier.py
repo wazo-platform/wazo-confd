@@ -42,8 +42,7 @@ ENDPOINT_CUSTOM_FIELDS = ['id', 'tenant_uuid', 'interface']
 
 
 class TrunkEndpointNotifier:
-    def __init__(self, endpoint, bus, sysconfd):
-        self.endpoint = endpoint
+    def __init__(self, bus, sysconfd):
         self.bus = bus
         self.sysconfd = sysconfd
 
@@ -51,48 +50,76 @@ class TrunkEndpointNotifier:
         handlers = {'ipbx': ipbx, 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
+
+class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
+    def associated(self, trunk, endpoint):
+        self.send_sysconfd_handlers(['module reload res_pjsip.so'])
+
+        trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
+        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
+        event = TrunkEndpointSIPAssociatedEvent(
+            trunk=trunk_serialized, sip=sip_serialized,
+        )
+        self.bus.send_bus_event(event)
+
+    def dissociated(self, trunk, endpoint):
+        self.send_sysconfd_handlers(['module reload res_pjsip.so'])
+
+        trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
+        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
+        event = TrunkEndpointSIPDissociatedEvent(
+            trunk=trunk_serialized, sip=sip_serialized,
+        )
+        self.bus.send_bus_event(event)
+
+
+class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
+    def associated(self, trunk, endpoint):
+        self.send_sysconfd_handlers(['iax2 reload'])
+
+        trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
+        iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
+        event = TrunkEndpointIAXAssociatedEvent(
+            trunk=trunk_serialized, iax=iax_serialized,
+        )
+        self.bus.send_bus_event(event)
+
+    def dissociated(self, trunk, endpoint):
+        self.send_sysconfd_handlers(['iax2 reload'])
+
+        trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
+        iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
+        event = TrunkEndpointIAXDissociatedEvent(
+            trunk=trunk_serialized, iax=iax_serialized,
+        )
+        self.bus.send_bus_event(event)
+
+
+class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
     def associated(self, trunk, endpoint):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
-        if self.endpoint == 'sip':
-            self.send_sysconfd_handlers(['module reload res_pjsip.so'])
-            sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
-            event = TrunkEndpointSIPAssociatedEvent(
-                trunk=trunk_serialized, sip=sip_serialized,
-            )
-        elif self.endpoint == 'iax':
-            self.send_sysconfd_handlers(['iax2 reload'])
-            iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
-            event = TrunkEndpointIAXAssociatedEvent(
-                trunk=trunk_serialized, iax=iax_serialized,
-            )
-        else:
-            custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
-            event = TrunkEndpointCustomAssociatedEvent(
-                trunk=trunk_serialized, custom=custom_serialized,
-            )
+        custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
+        event = TrunkEndpointCustomAssociatedEvent(
+            trunk=trunk_serialized, custom=custom_serialized,
+        )
         self.bus.send_bus_event(event)
 
     def dissociated(self, trunk, endpoint):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
-        if self.endpoint == 'sip':
-            self.send_sysconfd_handlers(['module reload res_pjsip.so'])
-            sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
-            event = TrunkEndpointSIPDissociatedEvent(
-                trunk=trunk_serialized, sip=sip_serialized,
-            )
-        elif self.endpoint == 'iax':
-            self.send_sysconfd_handlers(['iax2 reload'])
-            iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
-            event = TrunkEndpointIAXDissociatedEvent(
-                trunk=trunk_serialized, iax=iax_serialized,
-            )
-        else:
-            custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
-            event = TrunkEndpointCustomDissociatedEvent(
-                trunk=trunk_serialized, custom=custom_serialized,
-            )
+        custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
+        event = TrunkEndpointCustomDissociatedEvent(
+            trunk=trunk_serialized, custom=custom_serialized,
+        )
         self.bus.send_bus_event(event)
 
 
-def build_notifier(endpoint):
-    return TrunkEndpointNotifier(endpoint, bus, sysconfd)
+def build_notifier_sip():
+    return TrunkEndpointSIPNotifier(bus, sysconfd)
+
+
+def build_notifier_iax():
+    return TrunkEndpointIAXNotifier(bus, sysconfd)
+
+
+def build_notifier_custom():
+    return TrunkEndpointCustomNotifier(bus, sysconfd)
