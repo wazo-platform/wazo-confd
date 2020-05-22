@@ -1,24 +1,32 @@
-FROM python:3.7-buster
-MAINTAINER Wazo Maintainers <dev@wazo.community>
+FROM python:3.7-slim-buster AS compile-image
+LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 
-# Configure environment
-RUN true && \
-    mkdir -p /etc/wazo-confd/conf.d && \
-    touch /var/log/wazo-confd.log && \
-    chown www-data /var/log/wazo-confd.log && \
-    mkdir -p /run/wazo-confd /var/lib/asterisk/moh && \
-    chown www-data /run/wazo-confd /var/lib/asterisk/moh && \
-    true
+RUN python -m venv /opt/venv
+# Activate virtual env
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Install wazo-confd
+RUN apt-get -q update
+RUN apt-get -yq install gcc
+
 ADD . /usr/src/wazo-confd
 WORKDIR /usr/src/wazo-confd
-RUN true && \
-    pip install -r requirements.txt && \
-    python setup.py install && \
-    cp -av etc/wazo-confd /etc && \
-    true
+RUN pip install -r requirements.txt
+RUN python setup.py install
+
+FROM python:3.7-slim-buster AS build-image
+COPY --from=compile-image /opt/venv /opt/venv
+
+COPY ./etc/wazo-confd /etc/wazo-confd
+RUN true \
+    && mkdir -p /etc/wazo-confd/conf.d \
+    && install -o www-data -g www-data /dev/null /var/log/wazo-confd.log \
+    && install -d -o www-data -g www-data /run/wazo-confd/ \
+    && install -d -o www-data -g www-data /var/lib/asterisk/moh \
+    && install -dm775 -o www-data -g www-data /var/lib/wazo/sounds/tenants \
+    && install -dm777 /usr/share/asterisk/sounds
 
 EXPOSE 9486
 
+# Activate virtual env
+ENV PATH="/opt/venv/bin:$PATH"
 CMD ["wazo-confd", "-d"]

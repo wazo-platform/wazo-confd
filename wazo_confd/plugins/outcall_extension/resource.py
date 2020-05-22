@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -32,7 +32,7 @@ class OutcallExtensionItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, outcall_dao, extension_dao):
-        super(OutcallExtensionItem, self).__init__()
+        super().__init__()
         self.service = service
         self.outcall_dao = outcall_dao
         self.extension_dao = extension_dao

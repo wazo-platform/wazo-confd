@@ -129,7 +129,7 @@ class RegisterSIPList(ListResource):
 
     @required_acl('confd.registers.read')
     def get(self):
-        return super(RegisterSIPList, self).get()
+        return super().get()
 
 
 class RegisterSIPItem(ItemResource):
@@ -138,7 +138,7 @@ class RegisterSIPItem(ItemResource):
 
     @required_acl('confd.registers.{id}.read')
     def get(self, id):
-        return super(RegisterSIPItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.registers.{id}.update')
     def put(self, id):
@@ -157,4 +157,4 @@ class RegisterSIPItem(ItemResource):
 
     @required_acl('confd.registers.{id}.delete')
     def delete(self, id):
-        return super(RegisterSIPItem, self).delete(id)
+        return super().delete(id)

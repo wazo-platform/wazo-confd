@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -10,11 +10,11 @@ class ConfBridgeWazoDefaultBridgeList(AsteriskConfigurationList):
 
     @required_acl('confd.asterisk.confbridge.wazo_default_bridge.get')
     def get(self):
-        return super(ConfBridgeWazoDefaultBridgeList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.confbridge.wazo_default_bridge.update')
     def put(self):
-        return super(ConfBridgeWazoDefaultBridgeList, self).put()
+        return super().put()
 
 
 class ConfBridgeWazoDefaultUserList(AsteriskConfigurationList):
@@ -22,8 +22,8 @@ class ConfBridgeWazoDefaultUserList(AsteriskConfigurationList):
 
     @required_acl('confd.asterisk.confbridge.wazo_default_user.get')
     def get(self):
-        return super(ConfBridgeWazoDefaultUserList, self).get()
+        return super().get()
 
     @required_acl('confd.asterisk.confbridge.wazo_default_user.update')
     def put(self):
-        return super(ConfBridgeWazoDefaultUserList, self).put()
+        return super().put()

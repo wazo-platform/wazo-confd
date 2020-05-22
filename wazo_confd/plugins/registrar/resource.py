@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -19,11 +19,11 @@ class RegistrarList(ListResource):
 
     @required_acl('confd.registrars.read')
     def get(self):
-        return super(RegistrarList, self).get()
+        return super().get()
 
     @required_acl('confd.registrars.create')
     def post(self):
-        return super(RegistrarList, self).post()
+        return super().post()
 
 
 class RegistrarItem(ItemResource):
@@ -32,12 +32,12 @@ class RegistrarItem(ItemResource):
 
     @required_acl('confd.registrars.{id}.read')
     def get(self, id):
-        return super(RegistrarItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.registrars.{id}.update')
     def put(self, id):
-        return super(RegistrarItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.registrars.{id}.delete')
     def delete(self, id):
-        return super(RegistrarItem, self).delete(id)
+        return super().delete(id)

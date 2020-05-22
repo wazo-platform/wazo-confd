@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -25,7 +25,7 @@ class UserGroupItem(ConfdResource):
     schema = GroupsIDSchema
 
     def __init__(self, service, user_dao, group_dao):
-        super(UserGroupItem, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.group_dao = group_dao

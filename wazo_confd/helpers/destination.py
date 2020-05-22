@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -500,11 +500,11 @@ class DestinationField(fields.Nested):
         # This of dynamic nesterd stuffs should not done like this.
         self.kwargs = kwargs
         self.kwargs["unknown"] = EXCLUDE
-        super(DestinationField, self).__init__(BaseDestinationSchema, **self.kwargs)
+        super().__init__(BaseDestinationSchema, **self.kwargs)
 
     def _deserialize(self, value, attr, data):
         self.schema.context = self.context
-        base = super(DestinationField, self)._deserialize(value, attr, data)
+        base = super()._deserialize(value, attr, data)
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
@@ -518,7 +518,7 @@ class DestinationField(fields.Nested):
         return fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
 
     def _serialize(self, nested_obj, attr, obj):
-        base = super(DestinationField, self)._serialize(nested_obj, attr, obj)
+        base = super()._serialize(nested_obj, attr, obj)
         if not base:
             return base
         schema = self.destination_schemas[base['type']]

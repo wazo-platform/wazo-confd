@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -7,7 +7,7 @@ from wazo_confd.helpers.restful import ConfdResource
 
 class TrunkRegisterAssociation(ConfdResource):
     def __init__(self, service, trunk_dao, register_dao):
-        super(TrunkRegisterAssociation, self).__init__()
+        super().__init__()
         self.service = service
         self.trunk_dao = trunk_dao
         self.register_dao = register_dao
@@ -28,18 +28,18 @@ class TrunkRegisterAssociation(ConfdResource):
 class TrunkRegisterAssociationIAX(TrunkRegisterAssociation):
     @required_acl('confd.trunks.{trunk_id}.registers.iax.{register_id}.update')
     def put(self, trunk_id, register_id):
-        return super(TrunkRegisterAssociationIAX, self).put(trunk_id, register_id)
+        return super().put(trunk_id, register_id)
 
     @required_acl('confd.trunks.{trunk_id}.registers.iax.{register_id}.delete')
     def delete(self, trunk_id, register_id):
-        return super(TrunkRegisterAssociationIAX, self).delete(trunk_id, register_id)
+        return super().delete(trunk_id, register_id)
 
 
 class TrunkRegisterAssociationSIP(TrunkRegisterAssociation):
     @required_acl('confd.trunks.{trunk_id}.registers.sip.{register_id}.update')
     def put(self, trunk_id, register_id):
-        return super(TrunkRegisterAssociationSIP, self).put(trunk_id, register_id)
+        return super().put(trunk_id, register_id)
 
     @required_acl('confd.trunks.{trunk_id}.registers.sip.{register_id}.delete')
     def delete(self, trunk_id, register_id):
-        return super(TrunkRegisterAssociationSIP, self).delete(trunk_id, register_id)
+        return super().delete(trunk_id, register_id)

@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -52,7 +52,7 @@ class AsteriskConfigurationList(ConfdResource):
     section_name = None
 
     def __init__(self, service):
-        super(AsteriskConfigurationList, self).__init__()
+        super().__init__()
         self.service = service
 
     def get(self):

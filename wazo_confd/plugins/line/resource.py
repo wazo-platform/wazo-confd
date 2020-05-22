@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -21,7 +21,7 @@ class LineList(ListResource):
 
     @required_acl('confd.lines.read')
     def get(self):
-        return super(LineList, self).get()
+        return super().get()
 
     @required_acl('confd.lines.create')
     def post(self):
@@ -39,7 +39,7 @@ class LineItem(ItemResource):
 
     @required_acl('confd.lines.{id}.read')
     def get(self, id):
-        return super(LineItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.lines.{id}.update')
     def put(self, id):
@@ -50,4 +50,4 @@ class LineItem(ItemResource):
 
     @required_acl('confd.lines.{id}.delete')
     def delete(self, id):
-        return super(LineItem, self).delete(id)
+        return super().delete(id)

@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -18,7 +18,7 @@ class SoundLanguageList(ListResource):
 
     @required_acl('confd.sounds.languages.get')
     def get(self):
-        return super(SoundLanguageList, self).get()
+        return super().get()
 
     def post(self, id):
         return '', 405

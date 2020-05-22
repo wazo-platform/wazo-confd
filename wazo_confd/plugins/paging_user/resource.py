@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -17,7 +17,7 @@ class PagingUserItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, paging_dao, user_dao):
-        super(PagingUserItem, self).__init__()
+        super().__init__()
         self.service = service
         self.paging_dao = paging_dao
         self.user_dao = user_dao

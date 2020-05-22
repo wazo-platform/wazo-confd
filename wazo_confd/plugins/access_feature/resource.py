@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -23,11 +23,11 @@ class AccessFeatureList(ListResource):
 
     @required_acl('confd.access_features.create')
     def post(self):
-        return super(AccessFeatureList, self).post()
+        return super().post()
 
     @required_acl('confd.access_features.read')
     def get(self):
-        return super(AccessFeatureList, self).get()
+        return super().get()
 
 
 class AccessFeatureItem(ItemResource):
@@ -36,12 +36,12 @@ class AccessFeatureItem(ItemResource):
 
     @required_acl('confd.access_features.{id}.read')
     def get(self, id):
-        return super(AccessFeatureItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.access_features.{id}.update')
     def put(self, id):
-        return super(AccessFeatureItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.access_features.{id}.delete')
     def delete(self, id):
-        return super(AccessFeatureItem, self).delete(id)
+        return super().delete(id)

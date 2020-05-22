@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -15,7 +15,7 @@ class CallFilterFallbackList(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, call_filter_dao):
-        super(CallFilterFallbackList, self).__init__()
+        super().__init__()
         self.service = service
         self.call_filter_dao = call_filter_dao
 

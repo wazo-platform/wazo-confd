@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -42,7 +42,7 @@ class VoicemailGeneralList(ConfdResource):
     schema = VoicemailGeneralSchema
 
     def __init__(self, service):
-        super(VoicemailGeneralList, self).__init__()
+        super().__init__()
         self.service = service
 
     @required_acl('confd.asterisk.voicemail.general.get')

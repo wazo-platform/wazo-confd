@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class ContextList(ListResource):
 
     @required_acl('confd.contexts.create')
     def post(self):
-        return super(ContextList, self).post()
+        return super().post()
 
     @required_acl('confd.contexts.read')
     def get(self):
-        return super(ContextList, self).get()
+        return super().get()
 
 
 class ContextItem(ItemResource):
@@ -35,12 +35,12 @@ class ContextItem(ItemResource):
 
     @required_acl('confd.contexts.{id}.read')
     def get(self, id):
-        return super(ContextItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.contexts.{id}.update')
     def put(self, id):
-        return super(ContextItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.contexts.{id}.delete')
     def delete(self, id):
-        return super(ContextItem, self).delete(id)
+        return super().delete(id)

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class BaseSchema(Schema):
     def __init__(self, handle_error=True, *args, **kwargs):
-        super(BaseSchema, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if handle_error:
 
@@ -38,7 +38,7 @@ class BaseSchema(Schema):
 
     def _inherit_handle_error(self, field_obj):
         if isinstance(field_obj, fields.Nested):
-            field_obj.schema.handle_error = super(BaseSchema, self).handle_error
+            field_obj.schema.handle_error = super().handle_error
         if isinstance(field_obj, fields.List):
             self._inherit_handle_error(field_obj.container)
 
@@ -78,7 +78,7 @@ class Link(fields.Field):
     _CHECK_ATTRIBUTE = False
 
     def __init__(self, resource, route=None, field='id', target=None, **kwargs):
-        super(Link, self).__init__(dump_only=True, **kwargs)
+        super().__init__(dump_only=True, **kwargs)
         self.resource = resource
         self.route = route or resource
         self.field = field
@@ -102,7 +102,7 @@ class ListLink(fields.Field):
     _CHECK_ATTRIBUTE = False
 
     def __init__(self, *links, **kwargs):
-        super(ListLink, self).__init__(dump_only=True, **kwargs)
+        super().__init__(dump_only=True, **kwargs)
         self.links = links
 
     def _serialize(self, value, key, obj):

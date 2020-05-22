@@ -14,7 +14,7 @@ from wazo_confd.plugins.line_device.validator import ValidateLineHasNoDevice
 
 class ValidateLineAssociation(ValidatorAssociation):
     def __init__(self, endpoint, line_dao, trunk_dao):
-        super(ValidateLineAssociation, self).__init__()
+        super().__init__()
         self.endpoint = endpoint
         self.line_dao = line_dao
         self.trunk_dao = trunk_dao

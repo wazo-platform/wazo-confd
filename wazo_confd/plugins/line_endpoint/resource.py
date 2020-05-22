@@ -10,7 +10,7 @@ class LineEndpointAssociation(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, line_dao, endpoint_dao):
-        super(LineEndpointAssociation, self).__init__()
+        super().__init__()
         self.service = service
         self.line_dao = line_dao
         self.endpoint_dao = endpoint_dao
@@ -33,28 +33,28 @@ class LineEndpointAssociation(ConfdResource):
 class LineEndpointAssociationSip(LineEndpointAssociation):
     @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
-        return super(LineEndpointAssociationSip, self).put(line_id, endpoint_id)
+        return super().put(line_id, endpoint_id)
 
     @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_id}.delete')
     def delete(self, line_id, endpoint_id):
-        return super(LineEndpointAssociationSip, self).delete(line_id, endpoint_id)
+        return super().delete(line_id, endpoint_id)
 
 
 class LineEndpointAssociationSccp(LineEndpointAssociation):
     @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
-        return super(LineEndpointAssociationSccp, self).put(line_id, endpoint_id)
+        return super().put(line_id, endpoint_id)
 
     @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.delete')
     def delete(self, line_id, endpoint_id):
-        return super(LineEndpointAssociationSccp, self).delete(line_id, endpoint_id)
+        return super().delete(line_id, endpoint_id)
 
 
 class LineEndpointAssociationCustom(LineEndpointAssociation):
     @required_acl('confd.lines.{line_id}.endpoints.custom.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
-        return super(LineEndpointAssociationCustom, self).put(line_id, endpoint_id)
+        return super().put(line_id, endpoint_id)
 
     @required_acl('confd.lines.{line_id}.endpoints.custom.{endpoint_id}.delete')
     def delete(self, line_id, endpoint_id):
-        return super(LineEndpointAssociationCustom, self).delete(line_id, endpoint_id)
+        return super().delete(line_id, endpoint_id)

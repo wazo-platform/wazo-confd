@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class IvrList(ListResource):
 
     @required_acl('confd.ivr.create')
     def post(self):
-        return super(IvrList, self).post()
+        return super().post()
 
     @required_acl('confd.ivr.read')
     def get(self):
-        return super(IvrList, self).get()
+        return super().get()
 
 
 class IvrItem(ItemResource):
@@ -35,12 +35,12 @@ class IvrItem(ItemResource):
 
     @required_acl('confd.ivr.{id}.read')
     def get(self, id):
-        return super(IvrItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.ivr.{id}.update')
     def put(self, id):
-        return super(IvrItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.ivr.{id}.delete')
     def delete(self, id):
-        return super(IvrItem, self).delete(id)
+        return super().delete(id)

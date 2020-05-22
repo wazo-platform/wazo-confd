@@ -153,7 +153,7 @@ class IncallAssociator(Associator):
 
 class CallPermissionAssociator(Associator):
     def __init__(self, service, call_permission_service):
-        super(CallPermissionAssociator, self).__init__(service)
+        super().__init__(service)
         self.call_permission_service = call_permission_service
 
     def associate(self, entry):

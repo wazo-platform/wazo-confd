@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -67,11 +67,11 @@ class UserServiceDND(UserSubResource):
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
     def get(self, user_id):
-        return super(UserServiceDND, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.services.dnd.update')
     def put(self, user_id):
-        return super(UserServiceDND, self).put(user_id)
+        return super().put(user_id)
 
 
 class UserServiceIncallFilter(UserSubResource):
@@ -80,11 +80,11 @@ class UserServiceIncallFilter(UserSubResource):
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
     def get(self, user_id):
-        return super(UserServiceIncallFilter, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.services.dnd.update')
     def put(self, user_id):
-        return super(UserServiceIncallFilter, self).put(user_id)
+        return super().put(user_id)
 
 
 class UserServiceList(UserSubResource):
@@ -93,11 +93,11 @@ class UserServiceList(UserSubResource):
 
     @required_acl('confd.users.{user_id}.services.read')
     def get(self, user_id):
-        return super(UserServiceList, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.services.update')
     def put(self, user_id):
-        return super(UserServiceList, self).put(user_id)
+        return super().put(user_id)
 
 
 class ForwardBusySchema(BaseSchema):
@@ -153,11 +153,11 @@ class UserForwardBusy(UserSubResource):
 
     @required_acl('confd.users.{user_id}.forwards.busy.read')
     def get(self, user_id):
-        return super(UserForwardBusy, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.forwards.busy.update')
     def put(self, user_id):
-        return super(UserForwardBusy, self).put(user_id)
+        return super().put(user_id)
 
 
 class UserForwardNoAnswer(UserSubResource):
@@ -166,11 +166,11 @@ class UserForwardNoAnswer(UserSubResource):
 
     @required_acl('confd.users.{user_id}.forwards.noanswer.read')
     def get(self, user_id):
-        return super(UserForwardNoAnswer, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.forwards.noanswer.update')
     def put(self, user_id):
-        return super(UserForwardNoAnswer, self).put(user_id)
+        return super().put(user_id)
 
 
 class UserForwardUnconditional(UserSubResource):
@@ -179,11 +179,11 @@ class UserForwardUnconditional(UserSubResource):
 
     @required_acl('confd.users.{user_id}.forwards.unconditional.read')
     def get(self, user_id):
-        return super(UserForwardUnconditional, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.forwards.unconditional.update')
     def put(self, user_id):
-        return super(UserForwardUnconditional, self).put(user_id)
+        return super().put(user_id)
 
 
 class UserForwardList(UserSubResource):
@@ -192,8 +192,8 @@ class UserForwardList(UserSubResource):
 
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):
-        return super(UserForwardList, self).get(user_id)
+        return super().get(user_id)
 
     @required_acl('confd.users.{user_id}.forwards.update')
     def put(self, user_id):
-        return super(UserForwardList, self).put(user_id)
+        return super().put(user_id)

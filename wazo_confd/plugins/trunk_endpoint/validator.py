@@ -10,7 +10,7 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 class TrunkEndpointAssociationValidator(ValidatorAssociation):
     def __init__(self, endpoint, trunk_dao, line_dao):
-        super(TrunkEndpointAssociationValidator, self).__init__()
+        super().__init__()
         self.endpoint = endpoint
         self.trunk_dao = trunk_dao
         self.line_dao = line_dao

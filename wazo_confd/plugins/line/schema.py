@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -52,7 +52,7 @@ class LineSchema(BaseSchema):
 
 class LineSchemaNullable(LineSchema):
     def on_bind_field(self, field_name, field_obj):
-        super(LineSchemaNullable, self).on_bind_field(field_name, field_obj)
+        super().on_bind_field(field_name, field_obj)
         nullable_fields = ['provisioning_code', 'position', 'registrar']
         if field_name in nullable_fields:
             field_obj.allow_none = True

@@ -13,7 +13,7 @@ class RegistrarService(CRUDService):
     def __init__(
         self, dao, validator, notifier, line_service, device_updater, provd_client
     ):
-        super(RegistrarService, self).__init__(dao, validator, notifier)
+        super().__init__(dao, validator, notifier)
         self.line_service = line_service
         self.device_updater = device_updater
         self.provd_client = provd_client
@@ -28,7 +28,7 @@ class RegistrarService(CRUDService):
         return created_resource
 
     def edit(self, registrar, updated_fields=None):
-        super(RegistrarService, self).edit(registrar, updated_fields=updated_fields)
+        super().edit(registrar, updated_fields=updated_fields)
         lines = self.line_service.find_all_by(registrar=registrar.id)
         devices_updated = set()
         # Update all affected devices

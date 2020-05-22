@@ -159,7 +159,7 @@ class UserSummarySchema(BaseSchema):
 
 class UserSchemaNullable(UserSchema):
     def on_bind_field(self, field_name, field_obj):
-        super(UserSchemaNullable, self).on_bind_field(field_name, field_obj)
+        super().on_bind_field(field_name, field_obj)
         nullable_fields = [
             'call_record_enabled',
             'call_transfer_enabled',

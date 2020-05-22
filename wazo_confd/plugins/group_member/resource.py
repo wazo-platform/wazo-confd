@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -21,7 +21,7 @@ class Extension:
 
 class GroupMemberItem(ConfdResource):
     def __init__(self, service, group_dao):
-        super(GroupMemberItem, self).__init__()
+        super().__init__()
         self.service = service
         self.group_dao = group_dao
 
@@ -32,7 +32,7 @@ class GroupMemberUserItem(GroupMemberItem):
     has_tenant_uuid = True
 
     def __init__(self, service, group_dao, user_dao):
-        super(GroupMemberUserItem, self).__init__(service, group_dao)
+        super().__init__(service, group_dao)
         self.user_dao = user_dao
 
     @required_acl('confd.groups.{group_id}.members.users.update')

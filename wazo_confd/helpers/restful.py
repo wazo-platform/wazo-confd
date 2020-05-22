@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -88,7 +88,7 @@ class ConfdResource(ErrorCatchingResource):
 
 class ListResource(ConfdResource):
     def __init__(self, service):
-        super(ListResource, self).__init__()
+        super().__init__()
         self.service = service
 
     def get(self):
@@ -130,7 +130,7 @@ class ItemResource(ConfdResource):
     has_tenant_uuid = False
 
     def __init__(self, service):
-        super(ItemResource, self).__init__()
+        super().__init__()
         self.service = service
 
     def get(self, id):

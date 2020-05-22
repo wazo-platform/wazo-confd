@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -223,17 +223,17 @@ class FuncKeyDestinationField(fields.Nested):
 
     def __init__(self, *args, **kwargs):
         kwargs['unknown'] = EXCLUDE
-        super(FuncKeyDestinationField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _deserialize(self, value, attr, data):
         self.schema.context = self.context
-        base = super(FuncKeyDestinationField, self)._deserialize(value, attr, data)
+        base = super()._deserialize(value, attr, data)
         return fields.Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
         )._deserialize(value, attr, data)
 
     def _serialize(self, nested_obj, attr, obj):
-        base = super(FuncKeyDestinationField, self)._serialize(nested_obj, attr, obj)
+        base = super()._serialize(nested_obj, attr, obj)
         return fields.Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
         )._serialize(nested_obj, attr, obj)
@@ -249,7 +249,7 @@ class FuncKeySchema(BaseSchema):
 
 class FuncKeyPositionField(fields.Field):
     def __init__(self, key_field, nested_field, *args, **kwargs):
-        super(FuncKeyPositionField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.key_field = key_field
         self.nested_field = nested_field
         self.nested_field.schema.handle_error = lambda _, __: None

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -21,11 +21,11 @@ class TrunkList(ListResource):
 
     @required_acl('confd.trunks.create')
     def post(self):
-        return super(TrunkList, self).post()
+        return super().post()
 
     @required_acl('confd.trunks.read')
     def get(self):
-        return super(TrunkList, self).get()
+        return super().get()
 
 
 class TrunkItem(ItemResource):
@@ -35,12 +35,12 @@ class TrunkItem(ItemResource):
 
     @required_acl('confd.trunks.{id}.read')
     def get(self, id):
-        return super(TrunkItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.trunks.{id}.update')
     def put(self, id):
-        return super(TrunkItem, self).put(id)
+        return super().put(id)
 
     @required_acl('confd.trunks.{id}.delete')
     def delete(self, id):
-        return super(TrunkItem, self).delete(id)
+        return super().delete(id)

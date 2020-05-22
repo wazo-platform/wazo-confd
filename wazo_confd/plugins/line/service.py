@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -29,7 +29,7 @@ class LineService(CRUDService):
         user_line_service,
         line_device_service,
     ):
-        super(LineService, self).__init__(dao, validator, notifier)
+        super().__init__(dao, validator, notifier)
         self.device_updater = device_updater
         self.device_dao = device_dao
         self.user_line_service = user_line_service

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -32,7 +32,7 @@ class IncallList(ListResource):
 
     @required_acl('confd.incalls.read')
     def get(self):
-        return super(IncallList, self).get()
+        return super().get()
 
 
 class IncallItem(ItemResource):
@@ -42,11 +42,11 @@ class IncallItem(ItemResource):
 
     @required_acl('confd.incalls.{id}.read')
     def get(self, id):
-        return super(IncallItem, self).get(id)
+        return super().get(id)
 
     @required_acl('confd.incalls.{id}.update')
     def put(self, id):
-        return super(IncallItem, self).put(id)
+        return super().put(id)
 
     def parse_and_update(self, model):
         form = self.schema().load(request.get_json(), partial=True)
@@ -74,4 +74,4 @@ class IncallItem(ItemResource):
 
     @required_acl('confd.incalls.{id}.delete')
     def delete(self, id):
-        return super(IncallItem, self).delete(id)
+        return super().delete(id)

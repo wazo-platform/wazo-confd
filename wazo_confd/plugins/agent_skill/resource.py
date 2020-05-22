@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -22,7 +22,7 @@ class AgentSkillItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, agent_dao, skill_dao):
-        super(AgentSkillItem, self).__init__()
+        super().__init__()
         self.service = service
         self.agent_dao = agent_dao
         self.skill_dao = skill_dao

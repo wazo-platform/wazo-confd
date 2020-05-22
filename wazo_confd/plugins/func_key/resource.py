@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -134,7 +134,7 @@ class FuncKeyTemplateItem(ConfdResource, FindUpdateFieldsMixin):
     schema = FuncKeyTemplateSchema
 
     def __init__(self, service):
-        super(FuncKeyTemplateItem, self).__init__()
+        super().__init__()
         self.service = service
 
     @required_acl('confd.funckeys.templates.{id}.read')
@@ -193,7 +193,7 @@ class FuncKeyTemplateItemPosition(ItemResource):
 
 class UserFuncKey(ConfdResource):
     def __init__(self, service, user_dao, template_dao):
-        super(UserFuncKey, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.template_dao = template_dao
@@ -259,7 +259,7 @@ class UserFuncKeyItemPosition(UserFuncKey):
 
 class UserFuncKeyTemplate(ConfdResource):
     def __init__(self, service, user_dao, template_dao):
-        super(UserFuncKeyTemplate, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.template_dao = template_dao

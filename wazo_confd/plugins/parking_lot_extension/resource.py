@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -10,7 +10,7 @@ class ParkingLotExtensionItem(ConfdResource):
     has_tenant_uuid = True
 
     def __init__(self, service, parking_lot_dao, extension_dao):
-        super(ParkingLotExtensionItem, self).__init__()
+        super().__init__()
         self.service = service
         self.parking_lot_dao = parking_lot_dao
         self.extension_dao = extension_dao

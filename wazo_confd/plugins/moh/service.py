@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.moh import dao as moh_dao
@@ -11,7 +11,7 @@ from .validator import build_validator
 
 class MohService(CRUDService):
     def __init__(self, dao, validator, notifier, storage):
-        super(MohService, self).__init__(dao, validator, notifier)
+        super().__init__(dao, validator, notifier)
         self._storage = storage
 
     def search(self, parameters, tenant_uuids=None):

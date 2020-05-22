@@ -22,7 +22,7 @@ class LinesIDSchema(BaseSchema):
 
 class UserLineResource(ConfdResource):
     def __init__(self, service, user_dao, line_dao):
-        super(UserLineResource, self).__init__()
+        super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.line_dao = line_dao

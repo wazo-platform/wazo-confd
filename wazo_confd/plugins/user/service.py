@@ -19,12 +19,12 @@ class UserBaseService(CRUDService):
 
 class UserService(UserBaseService):
     def __init__(self, dao, validator, notifier, device_updater, func_key_dao):
-        super(UserService, self).__init__(dao, validator, notifier)
+        super().__init__(dao, validator, notifier)
         self.device_updater = device_updater
         self.func_key_dao = func_key_dao
 
     def edit(self, user, updated_fields=None):
-        super(UserService, self).edit(user, updated_fields)
+        super().edit(user, updated_fields)
         self.device_updater.update_for_user(user)
 
     def delete(self, user):
