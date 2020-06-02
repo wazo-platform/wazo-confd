@@ -3,7 +3,7 @@ wazo-confd
 
 [![Build Status](https://jenkins.wazo.community/buildStatus/icon?job=wazo-confd)](https://jenkins.wazo.community/job/wazo-confd)
 
-XiVO CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
+Wazo CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
 service for configuring and managing a Wazo server. Further details on how to use the API can be found on
 the [Wazo API web site](http://api.wazo.community)
 
