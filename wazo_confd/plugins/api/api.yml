@@ -23,7 +23,7 @@ info:
     url: http://wazo.community
     email: dev@wazo.community
 schemes:
-- https
+- http
 basePath: /1.1
 consumes:
 - application/json
