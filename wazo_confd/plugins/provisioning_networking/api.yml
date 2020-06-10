@@ -37,9 +37,3 @@ definitions:
       provision_http_port:
         type: integer
         description: The port used by the HTTP provisioning server.
-      rest_host:
-        type: string
-        description: The hostname or IP address used for the HTTPS REST API server.
-      rest_https_port:
-        type: integer
-        description: The port used by the HTTPS REST API server.

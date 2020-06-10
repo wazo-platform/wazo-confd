@@ -1,5 +1,10 @@
 # Changelog
 
+## 20.09
+
+* The `rest_host` and `rest_https_port` fields have been removed from the
+  `/1.1/provisioning/networking` resource.
+
 ## 20.07
 
 * Deprecate SSL configuration
