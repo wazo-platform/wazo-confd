@@ -54,11 +54,7 @@ DEFAULT_CONFIG = {
         'exchange_durable': True,
     },
     'consul': {'scheme': 'http', 'host': 'localhost', 'port': 8500},
-    'provd': {
-        'host': 'localhost',
-        'port': 8666,
-        'verify_certificate': '/usr/share/xivo-certs/server.crt',
-    },
+    'provd': {'host': 'localhost', 'port': 8666, 'prefix': None, 'https': False},
     'sysconfd': {'host': 'localhost', 'port': '8668'},
     'enabled_plugins': {
         'access_feature': True,
