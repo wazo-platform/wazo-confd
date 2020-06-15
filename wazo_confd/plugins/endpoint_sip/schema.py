@@ -46,7 +46,7 @@ class EndpointSIPSchema(BaseSchema):
         validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(min=1, max=128)),
         missing=None,
     )
-    display_name = fields.String(validate=Length(max=128))
+    label = fields.String(validate=Length(max=128))
     template = fields.Boolean(missing=False)
 
     aor_section_options = options_field
