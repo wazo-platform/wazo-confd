@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.line_endpoint.event import (
@@ -25,7 +25,7 @@ LINE_FIELDS = [
 ENDPOINT_SIP_FIELDS = [
     'uuid',
     'tenant_uuid',
-    'display_name',
+    'label',
 ]
 
 ENDPOINT_SCCP_FIELDS = [
