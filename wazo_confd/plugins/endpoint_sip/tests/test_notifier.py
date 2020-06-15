@@ -28,7 +28,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
         self.sip = Mock(
             uuid=str(uuid.uuid4()),
             tenant_uuid=str(uuid.uuid4()),
-            display_name='display-name',
+            label='label',
             username='username',
             trunk={'id': 2},
             line=None,
@@ -38,7 +38,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
             'uuid': self.sip.uuid,
             'tenant_uuid': self.sip.tenant_uuid,
             'name': self.sip.name,
-            'display_name': self.sip.display_name,
+            'label': self.sip.label,
             'trunk': self.sip.trunk,
             'line': self.sip.line,
         }
