@@ -77,7 +77,7 @@ def test_get(sip):
         has_entries(
             uuid=not_none(),
             name=has_length(8),
-            display_name=None,
+            label=None,
             aor_section_options=instance_of(list),
             auth_section_options=instance_of(list),
             endpoint_section_options=instance_of(list),
@@ -128,7 +128,7 @@ def test_create_minimal_parameters():
             uuid=not_none(),
             tenant_uuid=MAIN_TENANT,
             name=not_none(),
-            display_name=none(),
+            label=none(),
             aor_section_options=empty(),
             auth_section_options=empty(),
             endpoint_section_options=empty(),
@@ -150,7 +150,7 @@ def test_create_minimal_parameters():
 def test_create_all_parameters(context, transport, endpoint_1, endpoint_2):
     response = confd.endpoints.sip.post(
         name="name",
-        display_name="display_name",
+        label="label",
         template=True,
         aor_section_options=[
             ['qualify_frequency', '60'],
@@ -193,7 +193,7 @@ def test_create_all_parameters(context, transport, endpoint_1, endpoint_2):
         has_entries(
             tenant_uuid=MAIN_TENANT,
             name='name',
-            display_name='display_name',
+            label='label',
             template=True,
             aor_section_options=[
                 ['qualify_frequency', '60'],
@@ -256,7 +256,7 @@ def test_update_required_parameters(sip):
             uuid=not_none(),
             tenant_uuid=MAIN_TENANT,
             name=not_none(),
-            display_name=none(),
+            label=none(),
             aor_section_options=empty(),
             auth_section_options=empty(),
             endpoint_section_options=empty(),
@@ -301,7 +301,7 @@ def test_update_required_parameters(sip):
     outbound_auth_section_options=[
         ['username', 'outbound-auth'],
         ['password', 'outbound-password'],
-    ]
+    ],
 )
 def test_update_options(sip):
     url = confd.endpoints.sip(sip['uuid'])
@@ -335,7 +335,7 @@ def test_update_options(sip):
         outbound_auth_section_options=[
             ['username', 'outbound-auth'],
             ['password', 'outbound-password'],
-        ]
+        ],
     )
     response.assert_updated()
 
@@ -348,7 +348,9 @@ def test_update_options(sip):
                 ['remove_existing', 'yes'],
                 ['max_contacts', '1'],
             ),
-            auth_section_options=contains_inanyorder(['username', 'yiq8yej0'], ['password', '1337']),
+            auth_section_options=contains_inanyorder(
+                ['username', 'yiq8yej0'], ['password', '1337']
+            ),
             endpoint_section_options=contains_inanyorder(
                 ['force_rport', 'no'],
                 ['rewrite_contact', 'yes'],
@@ -370,10 +372,10 @@ def test_update_options(sip):
                 ['password', 'outbound-registration-password'],
             ),
             outbound_auth_section_options=contains_inanyorder(
-                ['username', 'outbound-auth'],
-                ['password', 'outbound-password'],
+                ['username', 'outbound-auth'], ['password', 'outbound-password'],
             ),
-        ))
+        ),
+    )
 
 
 @fixtures.sip(wazo_tenant=MAIN_TENANT)

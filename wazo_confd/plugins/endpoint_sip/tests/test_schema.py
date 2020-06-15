@@ -44,9 +44,7 @@ class TestEndpointSIPSchema(TestCase):
 
     def test_parents(self):
         parent_uuid = uuid.uuid4()
-        body = self.new(
-            parents=[{'uuid': str(parent_uuid), 'display_name': 'ignored'}],
-        )
+        body = self.new(parents=[{'uuid': str(parent_uuid), 'label': 'ignored'}],)
         loaded = self.schema.load(body)
         assert_that(
             loaded, has_entries(parents=contains({'uuid': parent_uuid})),

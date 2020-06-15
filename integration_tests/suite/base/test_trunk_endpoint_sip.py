@@ -145,17 +145,13 @@ def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
 
 
 @fixtures.trunk()
-@fixtures.sip(display_name='display')
+@fixtures.sip(label='label')
 def test_get_endpoint_sip_relation(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).get()
         assert_that(
             response.item,
-            has_entries(
-                endpoint_sip=has_entries(
-                    uuid=sip['uuid'], display_name=sip['display_name']
-                )
-            ),
+            has_entries(endpoint_sip=has_entries(uuid=sip['uuid'], label=sip['label'])),
         )
 
 

@@ -164,7 +164,7 @@ def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sip, sub_sip):
 
 @fixtures.line()
 @fixtures.sip(
-    display_name='my-endpoint',
+    label='my-endpoint',
     auth_section_options=[['username', 'my-username'], ['password', 'my-password']],
 )
 def test_get_endpoint_sip_relation(line, sip):
@@ -175,7 +175,7 @@ def test_get_endpoint_sip_relation(line, sip):
             has_entries(
                 endpoint_sip=has_entries(
                     uuid=sip['uuid'],
-                    display_name=sip['display_name'],
+                    label=sip['my-endpoint'],
                     auth_section_options=contains_inanyorder(
                         contains('username', 'my-username'),
                         contains('password', 'my-password'),

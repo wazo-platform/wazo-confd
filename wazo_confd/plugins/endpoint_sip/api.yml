@@ -173,7 +173,7 @@ definitions:
       name:
         type: string
         description: The name of the PJSIP entity, auto-generated if missing
-      display_name:
+      label:
         type: string
         description: The human readable name for this configuration
       aor_section_options:
@@ -224,7 +224,7 @@ definitions:
         description: |
           A list of parents this endpoint will inherit from.
 
-          The inheritance only applies to option sections. Not to the name, display_name and other fields.
+          The inheritance only applies to option sections. Not to the name, label and other fields.
           For a given list of parents [A, B, C] A will be applied over B. C will be applied over (A,B) etc.
       tenant_uuid:
         type: string
