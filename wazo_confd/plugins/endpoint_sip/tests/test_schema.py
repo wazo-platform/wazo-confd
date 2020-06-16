@@ -30,38 +30,38 @@ class TestEndpointSIPSchema(TestCase):
 
     def test_transport(self):
         transport_uuid = uuid.uuid4()
-        body = self.new(transport={'uuid': str(transport_uuid), 'name': 'ignored'})
+        body = {'transport': {'uuid': str(transport_uuid), 'name': 'ignored'}}
 
         loaded = self.schema.load(body)
         assert_that(
             loaded, has_entries(transport={'uuid': transport_uuid}),
         )
 
-        body = self.new(transport={'name': 'no uuid?'})
+        body = {'transport': {'name': 'no uuid?'}}
         assert_that(
             calling(self.schema.load).with_args(body), raises(BadRequest),
         )
 
     def test_parents(self):
         parent_uuid = uuid.uuid4()
-        body = self.new(parents=[{'uuid': str(parent_uuid), 'label': 'ignored'}],)
+        body = {'parents': [{'uuid': str(parent_uuid), 'label': 'ignored'}]}
         loaded = self.schema.load(body)
         assert_that(
             loaded, has_entries(parents=contains({'uuid': parent_uuid})),
         )
 
-        body = self.new(parents=[{'name': 'no uuid?'}])
+        body = {'parents': [{'name': 'no uuid'}]}
         assert_that(
             calling(self.schema.load).with_args(body), raises(BadRequest),
         )
 
     def test_context(self):
         context_id = 42
-        body = self.new(context={'id': context_id})
+        body = {'context': {'id': context_id}}
         loaded = self.schema.load(body)
         assert_that(loaded, has_entries(context={'id': context_id}))
 
-        body = self.new(context={'name': 'no id'})
+        body = {'context': {'name': 'no id'}}
         assert_that(calling(self.schema.load).with_args(body), raises(BadRequest))
 
     def test_name(self):
@@ -74,10 +74,6 @@ class TestEndpointSIPSchema(TestCase):
         assert_that(
             calling(self.schema.load).with_args({'name': ''}), raises(BadRequest),
         )
-
-    # TODO(pc-m): remove this function if it's not useful
-    def new(self, **kwargs):
-        return kwargs
 
 
 class TestEndpointSIPSchemaNullable(TestCase):
