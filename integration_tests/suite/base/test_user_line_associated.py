@@ -1,7 +1,7 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, equal_to, has_entries, has_length, instance_of
+from hamcrest import assert_that, equal_to, has_entries
 
 from . import confd
 from ..helpers import associations as a, fixtures
