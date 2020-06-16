@@ -10,7 +10,6 @@ from xivo_bus.resources.endpoint_sip.event import (
     DeleteSipEndpointEvent,
     EditSipEndpointEvent,
 )
-from xivo_dao.alchemy.endpoint_sip import EndpointSIP as SIP
 
 from ..notifier import SipEndpointNotifier
 
