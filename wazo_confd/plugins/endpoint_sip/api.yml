@@ -5,6 +5,7 @@ paths:
       summary: List SIP endpoints
       description: |
         **Required ACL:** `confd.endpoints.sip.read`
+
         List all SIP configurations, each individual configuration includes only fields that it
         defines. Inherited fields from the parents or default values are not returned here.
       tags:
@@ -28,6 +29,7 @@ paths:
       summary: Create a SIP endpoint
       description: |
         **Required ACL:** `confd.endpoints.sip.create`
+
         Create a new SIP endpoint. This endpoint can inherit from other endpoints, only modify
         fields that have to be modified.
       tags:
