@@ -3,7 +3,7 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
-from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
+from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao_module
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.resources.voicemail import dao as voicemail_dao_module
@@ -69,11 +69,11 @@ class ContextDeleteValidator(Validator):
         endpoint_sip = self.endpoint_sip_dao.find_by(context_id=context.id)
         if endpoint_sip:
             raise errors.resource_associated(
-            'Context',
-            'EndpointSIP',
-            context_id=context.id,
-            endpoint_sip_uuid=endpoint_sip.uuid
-        )
+                'Context',
+                'EndpointSIP',
+                context_id=context.id,
+                endpoint_sip_uuid=endpoint_sip.uuid,
+            )
 
 
 def build_validator():
@@ -87,7 +87,7 @@ def build_validator():
                 extension_dao_module,
                 trunk_dao_module,
                 voicemail_dao_module,
-                endpoint_sip_dao,
+                endpoint_sip_dao_module,
             )
         ],
     )

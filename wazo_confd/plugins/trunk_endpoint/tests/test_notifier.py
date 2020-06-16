@@ -28,7 +28,12 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         tenant_uuid = str(uuid.uuid4())
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.sip = Mock(EndpointSIP, uuid=1, auth_section_options=[['username', 'username']], tenant_uuid=tenant_uuid)
+        self.sip = Mock(
+            EndpointSIP,
+            uuid=1,
+            auth_section_options=[['username', 'username']],
+            tenant_uuid=tenant_uuid,
+        )
         self.sip.name = 'limitation of mock instantiation with name ...'
         self.custom = Mock(Custom, id=2, tenant_uuid=tenant_uuid, interface='custom')
         self.iax = Mock(IAX, id=3, tenant_uuid=tenant_uuid)

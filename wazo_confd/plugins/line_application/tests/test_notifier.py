@@ -23,7 +23,11 @@ class TestLineApplicationNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.line = Mock(
-            Line, id=1, endpoint_sip={'uuid': str(uuid.uuid4())}, endpoint_sccp=None, endpoint_custom=None
+            Line,
+            id=1,
+            endpoint_sip={'uuid': str(uuid.uuid4())},
+            endpoint_sccp=None,
+            endpoint_custom=None,
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.application = Mock(Application, uuid='custom-uuid')
@@ -58,9 +62,6 @@ class TestLineApplicationNotifier(unittest.TestCase):
 
         self.notifier.associated(self.line, self.application)
 
-        from pprint import pprint
-        pprint(expected_event._body)
-        pprint(dict(self.bus.send_bus_event.call_args_list[0].args[0]._body))
         self.bus.send_bus_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):

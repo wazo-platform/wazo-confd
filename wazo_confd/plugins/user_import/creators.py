@@ -163,9 +163,6 @@ class SipCreator(Creator):
             return self.service.find_by(username=username)
 
     def create(self, fields, tenant_uuid):
-        import logging
-
-        logger = logging.getLogger(__name__)
         form = self.schema_nullable(handle_error=False).load(fields)
         return self.service.create(EndpointSIP(tenant_uuid=tenant_uuid, **form))
 
