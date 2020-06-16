@@ -4,7 +4,7 @@
 from xivo_dao.resources.register_iax import dao as register_iax_dao
 from xivo_dao.resources.trunk import dao as trunk_dao
 
-from .resource import TrunkRegisterAssociationSIP, TrunkRegisterAssociationIAX
+from .resource import TrunkRegisterAssociationIAX
 from .service import build_service_iax
 
 
