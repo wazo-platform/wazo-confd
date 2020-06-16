@@ -5,10 +5,8 @@ location ^~ /api/confd/ {
     # endpoints on slow host (e.i. /devices)
     proxy_read_timeout 180s;
 
-    location ~ /api/confd/1.1/(moh|sounds)/(.*) {
-        proxy_pass http://127.0.0.1:9486/1.1/$1/$2;
-        client_max_body_size 16m;
-    }
+    # Mostly used for /moh and /sounds
+    client_max_body_size 16m;
 
     proxy_set_header    Host                $http_host;
     proxy_set_header    X-Script-Name       /api/confd;
