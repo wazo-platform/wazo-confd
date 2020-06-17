@@ -6,7 +6,7 @@ import logging
 
 from flask import url_for
 from flask_restful import abort
-from marshmallow import EXCLUDE, Schema, fields, pre_load
+from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
 from marshmallow.exceptions import RegistryError, ValidationError
 
 logger = logging.getLogger(__name__)
@@ -112,6 +112,21 @@ class ListLink(fields.Field):
             if link_obj:
                 output.append(link_obj)
         return output
+
+
+class PJSIPSectionOption(fields.List):
+
+    DEFAULT_OPTION_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
+
+    def __init__(self, option_regex=DEFAULT_OPTION_REGEX, **kwargs):
+        kwargs['validate'] = [validate.Length(min=1, max=4092)]
+        if option_regex:
+            kwargs['validate'].append(validate.Regexp(option_regex))
+
+        super().__init__(
+            fields.String(**kwargs),
+            validate=validate.Length(min=2, max=2),
+        )
 
 
 class AsteriskSection:
