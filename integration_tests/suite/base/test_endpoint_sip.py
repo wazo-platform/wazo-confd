@@ -48,6 +48,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 'a' * 80
     yield s.check_bogus_field_returns_error, url, 'name', 'global'
     yield s.check_bogus_field_returns_error, url, 'name', 'system'
+    yield s.check_bogus_field_returns_error, url, 'aor_section_options', [
+        ['one', 'two', 'three']
+    ]
     # TODO(pc-m): add check for fields in the right section
 
 
