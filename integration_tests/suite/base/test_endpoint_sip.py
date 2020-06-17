@@ -45,7 +45,9 @@ def test_put_errors(sip):
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 42
-    yield s.check_bogus_field_returns_error, url, 'name', 'a' * 129
+    yield s.check_bogus_field_returns_error, url, 'name', 'a' * 80
+    yield s.check_bogus_field_returns_error, url, 'name', 'global'
+    yield s.check_bogus_field_returns_error, url, 'name', 'system'
     # TODO(pc-m): add check for fields in the right section
 
 
