@@ -9,9 +9,11 @@ from hamcrest import (
     empty,
     has_entries,
     has_entry,
+    has_item,
     has_items,
     has_length,
     instance_of,
+    is_not,
     none,
     not_,
     not_none,
@@ -30,6 +32,13 @@ def test_get_errors():
     yield s.check_resource_not_found, fake_sip_get, 'SIPEndpoint'
 
 
+@fixtures.sip()
+def test_delete_errors(sip):
+    url = confd.endpoints.sip(sip['uuid'])
+    url.delete()
+    yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+
+
 def test_post_errors():
     url = confd.endpoints.sip.post
     for check in error_checks(url):
@@ -42,6 +51,8 @@ def test_put_errors(sip):
     for check in error_checks(url):
         yield check
 
+    yield s.check_bogus_field_returns_error, url, 'name', None
+
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 42
@@ -53,12 +64,46 @@ def error_checks(url):
     ]
     # TODO(pc-m): add check for fields in the right section
 
+    for check in unique_error_checks(url):
+        yield check
+
+
+@fixtures.sip(name='unique')
+def unique_error_checks(url, sip):
+    yield s.check_bogus_field_returns_error, url, 'name', sip['name']
+
+
+@fixtures.sip(name='hidden', label='hidden', asterisk_id='hidden')
+@fixtures.sip(name='search', label='search', asterisk_id='search')
+def test_search(hidden, sip):
+    url = confd.endpoints.sip
+    searches = {'name': 'search', 'label': 'search', 'asterisk_id': 'search'}
+
+    for field, term in searches.items():
+        yield check_search, url, sip, hidden, field, term
+
+
+def check_search(url, sip, hidden, field, term):
+    response = url.get(search=term)
+    assert_that(response.items, has_item(has_entry(field, sip[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
+
+    response = url.get(**{field: sip[field]})
+    assert_that(response.items, has_item(has_entry('uuid', sip['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
+
 
 @fixtures.sip()
-def test_delete_errors(sip):
-    url = confd.endpoints.sip(sip['uuid'])
-    url.delete()
-    yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+@fixtures.sip()
+def test_list(sip1, sip2):
+    response = confd.endpoints.sip.get()
+    assert_that(
+        response.items,
+        has_items(has_entry('uuid', sip1['uuid']), has_entry('uuid', sip2['uuid'])),
+    )
+
+    response = confd.endpoints.sip.get(search=sip1['name'])
+    assert_that(response.items, contains(has_entry('uuid', sip1['uuid'])))
 
 
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
@@ -72,6 +117,17 @@ def test_list_multi_tenant(main, sub):
 
     response = confd.endpoints.sip.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(response.items, has_items(main, sub))
+
+
+@fixtures.sip(name='sort1', label='sort1')
+@fixtures.sip(name='sort2', label='sort2')
+def test_sorting_offset_limit(sip1, sip2):
+    url = confd.endpoints.sip.get
+    yield s.check_sorting, url, sip1, sip2, 'name', 'sort', 'uuid'
+    yield s.check_sorting, url, sip1, sip2, 'label', 'sort', 'uuid'
+
+    yield s.check_offset, url, sip1, sip2, 'name', 'sort', 'uuid'
+    yield s.check_limit, url, sip1, sip2, 'name', 'sort', 'uuid'
 
 
 @fixtures.sip()
@@ -98,19 +154,6 @@ def test_get(sip):
             asterisk_id=None,
         ),
     )
-
-
-@fixtures.sip()
-@fixtures.sip()
-def test_list(sip1, sip2):
-    response = confd.endpoints.sip.get()
-    assert_that(
-        response.items,
-        has_items(has_entry('uuid', sip1['uuid']), has_entry('uuid', sip2['uuid'])),
-    )
-
-    response = confd.endpoints.sip.get(search=sip1['name'])
-    assert_that(response.items, contains(has_entry('uuid', sip1['uuid'])))
 
 
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
@@ -241,39 +284,17 @@ def test_create_all_parameters(context, transport, endpoint_1, endpoint_2):
     )
 
 
-@fixtures.sip(name="dupname")
-def test_create_name_already_taken(sip):
-    response = confd.endpoints.sip.post(name="dupname")
-    response.assert_match(400, e.resource_exists('SIPEndpoint'))
+def test_create_multi_tenant():
+    response = confd.endpoints.sip.post(wazo_tenant=SUB_TENANT)
+    response.assert_created()
+
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
 @fixtures.sip()
-def test_update_required_parameters(sip):
-    url = confd.endpoints.sip(sip['uuid'])
-
-    response = url.put()
+def test_edit_minimal_parameters(sip):
+    response = confd.endpoints.sip(sip['uuid']).put()
     response.assert_updated()
-
-    response = url.get()
-    assert_that(
-        response.item,
-        has_entries(
-            uuid=not_none(),
-            tenant_uuid=MAIN_TENANT,
-            name=not_none(),
-            label=none(),
-            aor_section_options=empty(),
-            auth_section_options=empty(),
-            endpoint_section_options=empty(),
-            identify_section_options=empty(),
-            registration_section_options=empty(),
-            registration_outbound_auth_section_options=empty(),
-            outbound_auth_section_options=empty(),
-            parents=empty(),
-            asterisk_id=none(),
-            template=False,
-        ),
-    )
 
 
 @fixtures.sip(
@@ -308,77 +329,61 @@ def test_update_required_parameters(sip):
         ['password', 'outbound-password'],
     ],
 )
-def test_update_options(sip):
-    url = confd.endpoints.sip(sip['uuid'])
-    response = url.put(
-        aor_section_options=[
-            ['maximum_expiration', '3600'],
-            ['remove_existing', 'yes'],
-            ['max_contacts', '1'],
-        ],
-        auth_section_options=[['username', 'yiq8yej0'], ['password', '1337']],
-        endpoint_section_options=[
-            ['force_rport', 'no'],
-            ['rewrite_contact', 'yes'],
-            ['callerid', '"Firstname Lastname" <666>'],
-        ],
-        identify_section_options=[
-            ['match', '54.172.60.0'],
-            ['match', '54.172.60.1'],
-            ['match', '54.172.60.2'],
-            ['match', '54.172.60.3'],
-        ],
-        registration_section_options=[
-            ['client_uri', 'sip:peer@proxy.example.com'],
-            ['server_uri', 'sip:proxy.example.com'],
-            ['expiration', '90'],
-        ],
-        registration_outbound_auth_section_options=[
-            ['username', 'outbound-registration-username'],
-            ['password', 'outbound-registration-password'],
-        ],
-        outbound_auth_section_options=[
-            ['username', 'outbound-auth'],
-            ['password', 'outbound-password'],
-        ],
+def test_edit_all_parameters(sip):
+    aor = [
+        ['maximum_expiration', '3600'],
+        ['remove_existing', 'yes'],
+        ['max_contacts', '1'],
+    ]
+    auth = [['username', 'yiq8yej0'], ['password', '1337']]
+    endpoint = [
+        ['force_rport', 'no'],
+        ['rewrite_contact', 'yes'],
+        ['callerid', '"Firstname Lastname" <666>'],
+    ]
+    identify = [
+        ['match', '54.172.60.0'],
+        ['match', '54.172.60.1'],
+        ['match', '54.172.60.2'],
+        ['match', '54.172.60.3'],
+    ]
+    registration = [
+        ['client_uri', 'sip:peer@proxy.example.com'],
+        ['server_uri', 'sip:proxy.example.com'],
+        ['expiration', '90'],
+    ]
+    registration_outbound_auth = [
+        ['username', 'outbound-registration-username'],
+        ['password', 'outbound-registration-password'],
+    ]
+    outbound_auth = [
+        ['username', 'outbound-auth'],
+        ['password', 'outbound-password'],
+    ]
+    response = confd.endpoints.sip(sip['uuid']).put(
+        aor_section_options=aor,
+        auth_section_options=auth,
+        endpoint_section_options=endpoint,
+        identify_section_options=identify,
+        registration_section_options=registration,
+        registration_outbound_auth_section_options=registration_outbound_auth,
+        outbound_auth_section_options=outbound_auth,
     )
     response.assert_updated()
 
-    response = url.get()
+    response = confd.endpoints.sip(sip['uuid']).get()
     assert_that(
         response.item,
         has_entries(
-            aor_section_options=contains_inanyorder(
-                ['maximum_expiration', '3600'],
-                ['remove_existing', 'yes'],
-                ['max_contacts', '1'],
-            ),
-            auth_section_options=contains_inanyorder(
-                ['username', 'yiq8yej0'], ['password', '1337']
-            ),
-            endpoint_section_options=contains_inanyorder(
-                ['force_rport', 'no'],
-                ['rewrite_contact', 'yes'],
-                ['callerid', '"Firstname Lastname" <666>'],
-            ),
-            identify_section_options=contains_inanyorder(
-                ['match', '54.172.60.0'],
-                ['match', '54.172.60.1'],
-                ['match', '54.172.60.2'],
-                ['match', '54.172.60.3'],
-            ),
-            registration_section_options=contains_inanyorder(
-                ['client_uri', 'sip:peer@proxy.example.com'],
-                ['server_uri', 'sip:proxy.example.com'],
-                ['expiration', '90'],
-            ),
+            aor_section_options=contains_inanyorder(*aor),
+            auth_section_options=contains_inanyorder(*auth),
+            endpoint_section_options=contains_inanyorder(*endpoint),
+            identify_section_options=contains_inanyorder(*identify),
+            registration_section_options=contains_inanyorder(*registration),
             registration_outbound_auth_section_options=contains_inanyorder(
-                ['username', 'outbound-registration-username'],
-                ['password', 'outbound-registration-password'],
+                *registration_outbound_auth
             ),
-            outbound_auth_section_options=contains_inanyorder(
-                ['username', 'outbound-auth'], ['password', 'outbound-password'],
-            ),
+            outbound_auth_section_options=contains_inanyorder(*outbound_auth),
         ),
     )
 
@@ -407,3 +412,10 @@ def test_delete_multi_tenant(main, sub):
 
     response = confd.endpoints.sip(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
+
+
+@fixtures.sip()
+def test_bus_events(sip):
+    yield s.check_bus_event, 'config.sip_endpoint.created', confd.endpoints.sip.post
+    yield s.check_bus_event, 'config.sip_endpoint.updated', confd.endpoints.sip(sip['uuid']).put
+    yield s.check_bus_event, 'config.sip_endpoint.deleted', confd.endpoints.sip(sip['uuid']).delete
