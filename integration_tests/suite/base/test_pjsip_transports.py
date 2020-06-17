@@ -36,6 +36,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', None, {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', True, {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'transport'}
+    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'system'}
+    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'global'}
     yield s.check_bogus_field_returns_error, url, 'options', [
         ['not-a-transport-option', '42'],
     ], {'name': 'transport'}
