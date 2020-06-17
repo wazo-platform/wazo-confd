@@ -120,11 +120,16 @@ class AsteriskSection:
     DEFAULT_RESERVED_NAMES = ['general']
 
     def __init__(
-        self, max_length=79, regex=DEFAULT_REGEX, reserved_names=DEFAULT_RESERVED_NAMES
+        self, max_length=79, regex=None, reserved_names=None
     ):
         self._max_length = max_length
+        regex = regex if regex is not None else self.DEFAULT_REGEX
         self._regex = re.compile(regex) if isinstance(regex, str) else regex
-        self._reserved_names = reserved_names
+
+        if reserved_names is not None:
+            self._reserved_names = reserved_names
+        else:
+            self._reserved_names = self.DEFAULT_RESERVED_NAMES
 
     def __call__(self, value):
         if not value:
@@ -138,3 +143,8 @@ class AsteriskSection:
         if self._regex.match(value) is None:
             raise ValidationError('Not a valid Asterisk section name')
         return value
+
+
+class PJSIPSection(AsteriskSection):
+
+    DEFAULT_RESERVED_NAMES = ['global', 'system']
