@@ -3,18 +3,14 @@
 
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, PJSIPSection
 
-ASTERISK_SECTION_NAME_REGEX = r"^[a-zA-Z0-9-_]*$"
 ASTERISK_OPTION_VALUE_NAME_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
 
 
 class PJSIPTransportSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
-    name = fields.String(
-        validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(min=1, max=128)),
-        required=True,
-    )
+    name = fields.String(validate=PJSIPSection(), required=True)
     options = fields.List(
         fields.List(
             fields.String(
