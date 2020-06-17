@@ -40,7 +40,6 @@ paths:
         - name: body
           in: body
           description: SIP Endpoint to create
-          required: true
           schema:
             $ref: '#/definitions/EndpointSIP'
       responses:
