@@ -30,7 +30,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.sip = Mock(
             EndpointSIP,
-            uuid=1,
+            uuid=str(uuid.uuid4()),
             auth_section_options=[['username', 'username']],
             tenant_uuid=tenant_uuid,
         )
@@ -51,7 +51,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': self.sip.auth_section_options.find('username')[0],
+                'username': 'username',
             },
         )
 
@@ -108,10 +108,10 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         expected_event = TrunkEndpointSIPDissociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
             sip={
-                'id': self.sip.id,
+                'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': self.sip.username,
+                'username': 'username',
             },
         )
 
