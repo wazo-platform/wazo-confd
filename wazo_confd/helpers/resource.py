@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -13,9 +13,6 @@ class CRUDService:
 
     def search(self, parameters, tenant_uuids=None):
         return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
-
-    def fetch_relations(self, form):
-        return form
 
     def get(self, resource_id, **kwargs):
         return self.dao.get(resource_id, **kwargs)
