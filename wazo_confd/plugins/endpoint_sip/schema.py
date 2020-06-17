@@ -9,13 +9,12 @@ import random
 from marshmallow import fields, EXCLUDE, post_load
 from marshmallow.validate import Length, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, PJSIPSection
 
 logger = logging.getLogger(__name__)
 
 USERNAME_REGEX = r"^[a-zA-Z0-9_+-]{1,40}$"
 SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
-ASTERISK_SECTION_NAME_REGEX = r"^[a-zA-Z0-9-_]*$"
 ASTERISK_OPTION_VALUE_NAME_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
 
 options_field = fields.List(
@@ -42,10 +41,7 @@ class EndpointSIPSchema(BaseSchema):
 
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.UUID(dump_only=True)
-    name = fields.String(
-        validate=(Regexp(ASTERISK_SECTION_NAME_REGEX), Length(min=1, max=128)),
-        missing=None,
-    )
+    name = fields.String(validate=PJSIPSection(), missing=None)
     label = fields.String(validate=Length(max=128))
     template = fields.Boolean(missing=False)
 
