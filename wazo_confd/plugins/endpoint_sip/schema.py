@@ -9,18 +9,21 @@ import random
 from marshmallow import fields, EXCLUDE, post_load
 from marshmallow.validate import Length, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, PJSIPSection
+from wazo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+    PJSIPSection,
+    PJSIPSectionOption,
+)
 
 logger = logging.getLogger(__name__)
 
 USERNAME_REGEX = r"^[a-zA-Z0-9_+-]{1,40}$"
 SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
-ASTERISK_OPTION_VALUE_NAME_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
 
 options_field = fields.List(
-    fields.List(
-        fields.String(validate=Length(min=1, max=4092)), validate=Length(min=1, max=2),
-    ),
+    PJSIPSectionOption(option_regex=None),
     missing=[],
 )
 
