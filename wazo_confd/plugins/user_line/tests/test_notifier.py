@@ -38,7 +38,10 @@ class TestUserLineNotifier(unittest.TestCase):
             'tenant_uuid': self.user.tenant_uuid,
         }
         self.line = Mock(
-            id=2, endpoint_sip={'id': 3}, endpoint_sccp=None, endpoint_custom=None
+            id=2,
+            endpoint_sip={'uuid': str(uuid.uuid4())},
+            endpoint_sccp=None,
+            endpoint_custom=None,
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.user_line = Mock(
