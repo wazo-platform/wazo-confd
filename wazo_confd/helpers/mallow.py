@@ -6,7 +6,7 @@ import logging
 
 from flask import url_for
 from flask_restful import abort
-from marshmallow import EXCLUDE, Schema, fields, pre_load
+from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
 from marshmallow.exceptions import RegistryError, ValidationError
 
 logger = logging.getLogger(__name__)
@@ -114,17 +114,37 @@ class ListLink(fields.Field):
         return output
 
 
+class PJSIPSectionOption(fields.List):
+
+    DEFAULT_OPTION_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
+
+    def __init__(self, option_regex=DEFAULT_OPTION_REGEX, **kwargs):
+        kwargs['validate'] = [validate.Length(min=1, max=4092)]
+        if option_regex:
+            kwargs['validate'].append(validate.Regexp(option_regex))
+
+        super().__init__(
+            fields.String(**kwargs),
+            validate=validate.Length(min=2, max=2),
+        )
+
+
 class AsteriskSection:
 
     DEFAULT_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
     DEFAULT_RESERVED_NAMES = ['general']
 
     def __init__(
-        self, max_length=79, regex=DEFAULT_REGEX, reserved_names=DEFAULT_RESERVED_NAMES
+        self, max_length=79, regex=None, reserved_names=None
     ):
         self._max_length = max_length
+        regex = regex if regex is not None else self.DEFAULT_REGEX
         self._regex = re.compile(regex) if isinstance(regex, str) else regex
-        self._reserved_names = reserved_names
+
+        if reserved_names is not None:
+            self._reserved_names = reserved_names
+        else:
+            self._reserved_names = self.DEFAULT_RESERVED_NAMES
 
     def __call__(self, value):
         if not value:
@@ -138,3 +158,8 @@ class AsteriskSection:
         if self._regex.match(value) is None:
             raise ValidationError('Not a valid Asterisk section name')
         return value
+
+
+class PJSIPSection(AsteriskSection):
+
+    DEFAULT_RESERVED_NAMES = ['global', 'system']

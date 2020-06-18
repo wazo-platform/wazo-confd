@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -13,7 +13,7 @@ class TrunkSchema(BaseSchema):
     links = ListLink(Link('trunks'))
 
     endpoint_sip = fields.Nested(
-        'SipSchema', only=['id', 'username', 'name', 'links'], dump_only=True
+        'EndpointSIPSchema', only=['uuid', 'label', 'links'], dump_only=True
     )
     endpoint_custom = fields.Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
@@ -26,7 +26,4 @@ class TrunkSchema(BaseSchema):
     )
     register_iax = fields.Nested(
         'RegisterIAXSchema', only=['id', 'links'], dump_only=True
-    )
-    register_sip = fields.Nested(
-        'RegisterSIPSchema', only=['id', 'links'], dump_only=True
     )

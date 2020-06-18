@@ -15,6 +15,9 @@ from ..helpers import errors as e, fixtures, scenarios as s
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
+# TODO(pc-m): add a test where an assigned transport is deleted
+
+
 def test_post_errors():
     url = confd.sip.transports.post
     for check in error_checks(url):
@@ -33,6 +36,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', None, {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', True, {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'transport'}
+    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'system'}
+    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'global'}
     yield s.check_bogus_field_returns_error, url, 'options', [
         ['not-a-transport-option', '42'],
     ], {'name': 'transport'}

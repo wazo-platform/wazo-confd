@@ -1,23 +1,29 @@
 # Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+from flask import url_for, request
 
-from xivo_dao.alchemy.usersip import UserSIP as SIPEndpoint
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
+from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import SipSchema, SipSchemaNullable
+from .schema import EndpointSIPSchema
 
 
 class SipList(ListResource):
 
-    model = SIPEndpoint
-    schema = SipSchemaNullable
+    model = EndpointSIP
+    schema = EndpointSIPSchema
+
+    def __init__(self, service, dao):
+        super().__init__(service)
+        self.dao = dao
 
     def build_headers(self, sip):
-        return {'Location': url_for('endpoint_sip', id=sip.id, _external=True)}
+        return {'Location': url_for('endpoint_sip', uuid=sip.uuid, _external=True)}
 
     @required_acl('confd.endpoints.sip.read')
     def get(self):
@@ -25,22 +31,37 @@ class SipList(ListResource):
 
     @required_acl('confd.endpoints.sip.create')
     def post(self):
-        return super().post()
+        form = self.schema().load(request.get_json())
+        form = self.add_tenant_to_form(form)
+        parents = []
+
+        for parent in form['parents']:
+            try:
+                model = self.dao.get(parent['uuid'], tenant_uuids=[form['tenant_uuid']])
+                parents.append(model)
+            except NotFoundError:
+                metadata = {'parents': parent}
+                raise errors.param_not_found('parents', 'endpoint_sip', **metadata)
+
+        form['parents'] = parents
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
 
 class SipItem(ItemResource):
 
-    schema = SipSchema
+    schema = EndpointSIPSchema
     has_tenant_uuid = True
 
-    @required_acl('confd.endpoints.sip.{id}.read')
-    def get(self, id):
-        return super().get(id)
+    @required_acl('confd.endpoints.sip.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
 
-    @required_acl('confd.endpoints.sip.{id}.update')
-    def put(self, id):
-        return super().put(id)
+    @required_acl('confd.endpoints.sip.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
 
-    @required_acl('confd.endpoints.sip.{id}.delete')
-    def delete(self, id):
-        return super().delete(id)
+    @required_acl('confd.endpoints.sip.{uuid}.delete')
+    def delete(self, uuid):
+        return super().delete(uuid)

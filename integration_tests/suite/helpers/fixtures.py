@@ -25,6 +25,7 @@ class line_sip(IsolatedAction):
 
 class sip(IsolatedAction):
 
+    id_field = 'uuid'
     actions = {
         'generate': h.endpoint_sip.generate_sip,
         'delete': h.endpoint_sip.delete_sip,
@@ -227,14 +228,6 @@ class moh(IsolatedAction):
 class voicemail_zonemessages(IsolatedAction):
 
     actions = {'generate': h.voicemail_zonemessages.generate_voicemail_zonemessages}
-
-
-class register_sip(IsolatedAction):
-
-    actions = {
-        'generate': h.register_sip.generate_register_sip,
-        'delete': h.register_sip.delete_register_sip,
-    }
 
 
 class register_iax(IsolatedAction):

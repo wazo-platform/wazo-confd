@@ -197,3 +197,10 @@ definitions:
         readOnly: true
         items:
           $ref: '#/definitions/ContextRelationContext'
+  ContextRelation:
+    properties:
+      id:
+        type: integer
+        description: The ID of the context
+    required:
+      - id

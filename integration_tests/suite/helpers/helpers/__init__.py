@@ -145,7 +145,6 @@ from . import queue_member_agent  # noqa
 from . import queue_member_user  # noqa
 from . import queue_schedule  # noqa
 from . import register_iax  # noqa
-from . import register_sip  # noqa
 from . import registrar  # noqa
 from . import sound  # noqa
 from . import schedule  # noqa
@@ -159,7 +158,6 @@ from . import trunk_endpoint_custom  # noqa
 from . import trunk_endpoint_iax  # noqa
 from . import trunk_endpoint_sip  # noqa
 from . import trunk_register_iax  # noqa
-from . import trunk_register_sip  # noqa
 from . import user  # noqa
 from . import user_agent  # noqa
 from . import user_call_permission  # noqa
@@ -238,7 +236,6 @@ __all__ = [
     'queue_schedule',
     'registrar',
     'register_iax',
-    'register_sip',
     'sound',
     'schedule',
     'skill',
@@ -251,7 +248,6 @@ __all__ = [
     'trunk_endpoint_iax',
     'trunk_endpoint_sip',
     'trunk_register_iax',
-    'trunk_register_sip',
     'user',
     'user_agent',
     'user_call_permission',
