@@ -1,7 +1,9 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
+
+from xivo_dao.resources.endpoint_sip import dao as sip_dao
 
 from .resource import SipItem, SipList
 from .service import build_service
@@ -20,8 +22,12 @@ class Plugin:
 
         api.add_resource(
             SipItem,
-            '/endpoints/sip/<int:id>',
+            '/endpoints/sip/<uuid:uuid>',
             endpoint='endpoint_sip',
             resource_class_args=(service,),
         )
-        api.add_resource(SipList, '/endpoints/sip', resource_class_args=(service,))
+        api.add_resource(
+            SipList,
+            '/endpoints/sip',
+            resource_class_args=(service, sip_dao)
+        )

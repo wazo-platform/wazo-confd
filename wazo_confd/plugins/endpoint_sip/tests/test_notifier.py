@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -10,7 +10,6 @@ from xivo_bus.resources.endpoint_sip.event import (
     DeleteSipEndpointEvent,
     EditSipEndpointEvent,
 )
-from xivo_dao.alchemy.usersip import UserSIP as SIP
 
 from ..notifier import SipEndpointNotifier
 
@@ -26,19 +25,19 @@ class TestSipEndpointNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.bus = Mock()
         self.sip = Mock(
-            SIP,
-            id=1,
-            tenant_uuid=str(uuid.uuid4),
+            uuid=str(uuid.uuid4()),
+            tenant_uuid=str(uuid.uuid4()),
+            label='label',
             username='username',
             trunk={'id': 2},
             line=None,
         )
         self.sip.name = 'limitation of mock instantiation with name ...'
         self.sip_serialized = {
-            'id': self.sip.id,
+            'uuid': self.sip.uuid,
             'tenant_uuid': self.sip.tenant_uuid,
             'name': self.sip.name,
-            'username': self.sip.username,
+            'label': self.sip.label,
             'trunk': self.sip.trunk,
             'line': self.sip.line,
         }

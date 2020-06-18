@@ -7,10 +7,10 @@ from sqlalchemy import String, Integer
 from sqlalchemy.orm import aliased
 
 from xivo_dao.helpers.db_manager import Session
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
-from xivo_dao.alchemy.usersip import UserSIP as SIP
 from xivo_dao.alchemy.user_line import UserLine
 from xivo_dao.alchemy.line_extension import LineExtension
 from xivo_dao.alchemy.extension import Extension
@@ -143,7 +143,7 @@ def export_query(tenant_uuid, separator=";"):
         cast(cast(Voicemail.ask_password, Integer), String),
         case(
             [
-                (Line.endpoint_sip_id != None, 'sip'),  # noqa
+                (Line.endpoint_sip_uuid != None, 'sip'),  # noqa
                 (Line.endpoint_sccp_id != None, 'sccp'),  # noqa
                 (Line.endpoint_custom_id != None, 'custom'),  # noqa
             ],
@@ -151,8 +151,8 @@ def export_query(tenant_uuid, separator=";"):
         ),
         Line.provisioning_code,
         func.coalesce(Extension.context, Line.context),
-        SIP.name,
-        SIP.secret,
+        EndpointSIP.username,
+        EndpointSIP.password,
         Extension.exten,
         grouped_incalls.c.exten,
         grouped_incalls.c.context,
