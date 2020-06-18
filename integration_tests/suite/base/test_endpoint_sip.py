@@ -19,7 +19,7 @@ from hamcrest import (
     not_none,
 )
 
-from . import confd
+from . import confd, BaseIntegrationTest
 from ..helpers import errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
@@ -128,6 +128,12 @@ def test_sorting_offset_limit(sip1, sip2):
 
     yield s.check_offset, url, sip1, sip2, 'name', 'sort', 'uuid'
     yield s.check_limit, url, sip1, sip2, 'name', 'sort', 'uuid'
+
+
+@fixtures.sip()
+@fixtures.sip()
+def test_list_db_requests(*_):
+    s.check_db_requests(BaseIntegrationTest, confd.endpoints.sip.get, nb_requests=1)
 
 
 @fixtures.sip()
