@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -9,15 +9,7 @@ from . import confd
 def test_get():
     response = confd.provisioning.networking.get()
     assert_that(
-        response.item,
-        has_entries(
-            {
-                'provision_host': '',
-                'provision_http_port': 8667,
-                'rest_host': 'provd',
-                'rest_https_port': 8666,
-            }
-        ),
+        response.item, has_entries({'provision_host': '', 'provision_http_port': 8667}),
     )
 
 
@@ -27,15 +19,7 @@ def test_put_minimal_parameters():
     result.assert_status(204)
     response = confd.provisioning.networking.get()
     assert_that(
-        response.item,
-        has_entries(
-            {
-                'provision_host': '',
-                'provision_http_port': 8667,
-                'rest_host': 'provd',
-                'rest_https_port': 8666,
-            }
-        ),
+        response.item, has_entries({'provision_host': '', 'provision_http_port': 8667}),
     )
 
     body = {'provision_host': '127.0.0.1'}
@@ -44,14 +28,7 @@ def test_put_minimal_parameters():
     response = confd.provisioning.networking.get()
     assert_that(
         response.item,
-        has_entries(
-            {
-                'provision_host': '127.0.0.1',
-                'provision_http_port': 8667,
-                'rest_host': 'provd',
-                'rest_https_port': 8666,
-            }
-        ),
+        has_entries({'provision_host': '127.0.0.1', 'provision_http_port': 8667}),
     )
 
     body = {'provision_host': None}
@@ -60,14 +37,7 @@ def test_put_minimal_parameters():
     response = confd.provisioning.networking.get()
     assert_that(
         response.item,
-        has_entries(
-            {
-                'provision_host': None,
-                'provision_http_port': 8667,
-                'rest_host': 'provd',
-                'rest_https_port': 8666,
-            }
-        ),
+        has_entries({'provision_host': None, 'provision_http_port': 8667}),
     )
 
 
@@ -75,8 +45,6 @@ def test_put_all_parameters():
     body = {
         'provision_host': '127.0.0.1',
         'provision_http_port': 8665,
-        'rest_host': '127.0.0.1',
-        'rest_https_port': 8664,
     }
     result = confd.provisioning.networking.put(body)
     result.assert_status(204)

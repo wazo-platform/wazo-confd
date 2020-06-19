@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -10,5 +10,3 @@ class ProvisioningNetworkingSchema(BaseSchema):
 
     provision_host = fields.String(attribute='net4_ip', allow_none=True)
     provision_http_port = fields.Integer(attribute='http_port')
-    rest_host = fields.String(attribute='net4_ip_rest', allow_none=True)
-    rest_https_port = fields.Integer(attribute='rest_port')
