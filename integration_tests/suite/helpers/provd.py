@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import docker
@@ -165,5 +165,5 @@ class ProvdHelper:
 
 
 def create_helper(host='localhost', port='8666', token='valid-token-multitenant'):
-    client = ProvdClient(host=host, port=port, verify_certificate=False, token=token)
+    client = ProvdClient(host=host, port=port, prefix='', https=False, token=token)
     return ProvdHelper(client)

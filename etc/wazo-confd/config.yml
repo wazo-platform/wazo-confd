@@ -68,6 +68,8 @@ consul:
 provd:
     host: localhost
     port: 8666
+    prefix: null
+    https: false
 
 #xivo-sysconfd connection information
 sysconfd:
