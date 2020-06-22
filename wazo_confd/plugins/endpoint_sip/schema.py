@@ -23,8 +23,7 @@ USERNAME_REGEX = r"^[a-zA-Z0-9_+-]{1,40}$"
 SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 
 options_field = fields.List(
-    PJSIPSectionOption(option_regex=None),
-    missing=[],
+    PJSIPSectionOption(option_regex=None), missing=[], validate=Length(max=512),
 )
 
 
