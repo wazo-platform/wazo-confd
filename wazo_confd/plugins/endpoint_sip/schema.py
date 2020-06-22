@@ -43,7 +43,7 @@ class EndpointSIPSchema(BaseSchema):
 
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.UUID(dump_only=True)
-    name = fields.String(validate=PJSIPSection(), missing=None)
+    name = fields.String(validate=PJSIPSection())
     label = fields.String(validate=Length(max=128))
     template = fields.Boolean(missing=False)
 
