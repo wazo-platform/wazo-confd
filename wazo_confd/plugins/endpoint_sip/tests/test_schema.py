@@ -11,6 +11,7 @@ from hamcrest import (
     contains_inanyorder,
     has_entries,
     has_length,
+    not_,
 )
 
 from xivo_test_helpers.hamcrest.raises import raises
@@ -74,6 +75,21 @@ class TestEndpointSIPSchema(TestCase):
         assert_that(
             calling(self.schema.load).with_args({'name': ''}), raises(BadRequest),
         )
+
+    def test_option_length(self):
+        body = {
+            'aor_section_options': [
+                ['key_{}'.format(i), '{}'.format(i)] for i in range(513)
+            ],
+        }
+        assert_that(calling(self.schema.load).with_args(body), raises(BadRequest))
+
+        body = {
+            'aor_section_options': [
+                ['key_{}'.format(i), '{}'.format(i)] for i in range(512)
+            ],
+        }
+        assert_that(calling(self.schema.load).with_args(body), not_(raises(BadRequest)))
 
 
 class TestEndpointSIPSchemaNullable(TestCase):
