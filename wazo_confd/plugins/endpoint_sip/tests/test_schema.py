@@ -67,10 +67,11 @@ class TestEndpointSIPSchema(TestCase):
 
     def test_name(self):
         loaded = self.schema.load({})
-        assert_that(loaded, has_entries(name=None))
+        assert_that(loaded, not_(has_entries(name=None)))
 
-        loaded = self.schema.load({'name': None})
-        assert_that(loaded, has_entries(name=None))
+        assert_that(
+            calling(self.schema.load).with_args({'name': None}), raises(BadRequest),
+        )
 
         assert_that(
             calling(self.schema.load).with_args({'name': ''}), raises(BadRequest),
