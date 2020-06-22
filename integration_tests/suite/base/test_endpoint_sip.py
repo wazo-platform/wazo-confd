@@ -423,5 +423,9 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.sip()
 def test_bus_events(sip):
     yield s.check_bus_event, 'config.sip_endpoint.created', confd.endpoints.sip.post
-    yield s.check_bus_event, 'config.sip_endpoint.updated', confd.endpoints.sip(sip['uuid']).put
-    yield s.check_bus_event, 'config.sip_endpoint.deleted', confd.endpoints.sip(sip['uuid']).delete
+    yield s.check_bus_event, 'config.sip_endpoint.updated', confd.endpoints.sip(
+        sip['uuid']
+    ).put
+    yield s.check_bus_event, 'config.sip_endpoint.deleted', confd.endpoints.sip(
+        sip['uuid']
+    ).delete
