@@ -4,6 +4,7 @@
 from wazo_provd_client import Client as ProvdClient
 
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
+from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
 from .resource import SipItem, SipList
 from .service import build_service
@@ -24,7 +25,7 @@ class Plugin:
             SipItem,
             '/endpoints/sip/<uuid:uuid>',
             endpoint='endpoint_sip',
-            resource_class_args=(service,),
+            resource_class_args=(service, transport_dao),
         )
         api.add_resource(
             SipList,
