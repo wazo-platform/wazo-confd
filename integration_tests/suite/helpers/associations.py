@@ -343,3 +343,10 @@ def agent_skill(agent, skill, **kwargs):
     h.agent_skill.associate(agent['id'], skill['id'], **kwargs)
     yield
     h.agent_skill.dissociate(agent['id'], skill['id'], **kwargs)
+
+
+@contextmanager
+def transport_endpoint_sip(transport, sip, check=True):
+    h.transport_endpoint_sip.associate(transport['uuid'], sip['uuid'], check)
+    yield
+    h.transport_endpoint_sip.dissociate(transport['uuid'], sip['uuid'], check)
