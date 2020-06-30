@@ -41,7 +41,7 @@ class SipList(ListResource):
                 parents.append(model)
             except NotFoundError:
                 metadata = {'parents': parent}
-                raise errors.param_not_found('parents', 'endpoint_sip', **metadata)
+                raise errors.param_not_found('parents', 'EndpointSIP', **metadata)
 
         form['parents'] = parents
         model = self.model(**form)
@@ -54,13 +54,29 @@ class SipItem(ItemResource):
     schema = EndpointSIPSchema
     has_tenant_uuid = True
 
+    def __init__(self, service, transport_dao):
+        super().__init__(service)
+        self.transport_dao = transport_dao
+
     @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
         return super().get(uuid)
 
     @required_acl('confd.endpoints.sip.{uuid}.update')
     def put(self, uuid):
-        return super().put(uuid)
+        kwargs = self._add_tenant_uuid()
+        sip = self.service.get(uuid, **kwargs)
+        form = self.schema().load(request.get_json(), partial=True)
+        if form.get('transport'):
+            transport_uuid = form['transport']['uuid']
+            try:
+                form['transport'] = self.transport_dao.get(transport_uuid)
+            except NotFoundError as e:
+                raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
+        for name, value in form.items():
+            setattr(sip, name, value)
+        self.service.edit(sip)
+        return '', 204
 
     @required_acl('confd.endpoints.sip.{uuid}.delete')
     def delete(self, uuid):
