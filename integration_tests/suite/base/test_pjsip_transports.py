@@ -134,7 +134,9 @@ def test_delete_fallback(transport, fallback, sip):
         response = confd.sip.transports(transport['uuid']).delete()
         response.assert_status(400)
 
-        response = confd.sip.transports(transport['uuid']).delete(fallback=fallback['uuid'])
+        response = confd.sip.transports(transport['uuid']).delete(
+            fallback=fallback['uuid']
+        )
         response.assert_deleted()
 
         response = confd.endpoints.sip(sip['uuid']).get()
