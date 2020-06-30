@@ -13,7 +13,7 @@ from wazo_confd.helpers.restful import ListResource, ItemResource
 from .schema import EndpointSIPSchema
 
 
-class SipList(ListResource):
+class _BaseSipList(ListResource):
 
     model = EndpointSIP
     schema = EndpointSIPSchema
@@ -26,11 +26,9 @@ class SipList(ListResource):
     def build_headers(self, sip):
         return {'Location': url_for('endpoint_sip', uuid=sip.uuid, _external=True)}
 
-    @required_acl('confd.endpoints.sip.read')
     def get(self):
         return super().get()
 
-    @required_acl('confd.endpoints.sip.create')
     def post(self):
         form = self.schema().load(request.get_json())
         form = self.add_tenant_to_form(form)
@@ -38,7 +36,9 @@ class SipList(ListResource):
 
         for parent in form['parents']:
             try:
-                model = self.dao.get(parent['uuid'], tenant_uuids=[form['tenant_uuid']])
+                model = self.dao.get(
+                    parent['uuid'], template=True, tenant_uuids=[form['tenant_uuid']],
+                )
                 parents.append(model)
             except NotFoundError:
                 metadata = {'parents': parent}
@@ -57,7 +57,7 @@ class SipList(ListResource):
         return self.schema().dump(model), 201, self.build_headers(model)
 
 
-class SipItem(ItemResource):
+class _BaseSipItem(ItemResource):
 
     schema = EndpointSIPSchema
     has_tenant_uuid = True
@@ -65,6 +65,31 @@ class SipItem(ItemResource):
     def __init__(self, service, transport_dao):
         super().__init__(service)
         self.transport_dao = transport_dao
+
+    def get(self, uuid):
+        return super().get(uuid)
+
+    def put(self, uuid):
+        return super().put(uuid)
+
+    def delete(self, uuid):
+        return super().delete(uuid)
+
+
+class SipList(_BaseSipList):
+    template = False
+
+    @required_acl('confd.endpoints.sip.read')
+    def get(self):
+        return super().get()
+
+    @required_acl('confd.endpoints.sip.create')
+    def post(self):
+        return super().post()
+
+
+class SipItem(_BaseSipItem):
+    template = False
 
     @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
@@ -87,5 +112,37 @@ class SipItem(ItemResource):
         return '', 204
 
     @required_acl('confd.endpoints.sip.{uuid}.delete')
+    def delete(self, uuid):
+        return super().delete(uuid)
+
+
+class SipTemplateList(_BaseSipList):
+    template = True
+
+    @required_acl('confd.endpoints.sip.templates.read')
+    def get(self):
+        return super().get()
+
+    @required_acl('confd.endpoints.sip.templates.create')
+    def post(self):
+        return super().post()
+
+
+class SipTemplateItem(_BaseSipItem):
+    template = True
+
+    @required_acl('confd.endpoints.sip.templates.{uuid}.read')
+    def get(self, uuid):
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.critical('Searching for template')
+        return super().get(uuid)
+
+    @required_acl('confd.endpoints.sip.templates.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
+
+    @required_acl('confd.endpoints.sip.templates.{uuid}.delete')
     def delete(self, uuid):
         return super().delete(uuid)
