@@ -45,7 +45,6 @@ class EndpointSIPSchema(BaseSchema):
     tenant_uuid = fields.UUID(dump_only=True)
     name = fields.String(validate=PJSIPSection())
     label = fields.String(validate=Length(max=128))
-    template = fields.Boolean(missing=False)
 
     aor_section_options = options_field
     auth_section_options = options_field
