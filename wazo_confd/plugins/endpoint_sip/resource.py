@@ -41,7 +41,7 @@ class SipList(ListResource):
                 parents.append(model)
             except NotFoundError:
                 metadata = {'parents': parent}
-                raise errors.param_not_found('parents', 'endpoint_sip', **metadata)
+                raise errors.param_not_found('parents', 'EndpointSIP', **metadata)
 
         form['parents'] = parents
         model = self.model(**form)
