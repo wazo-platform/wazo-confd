@@ -3,6 +3,7 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.pjsip_transport import dao
+from xivo_dao.resources.endpoint_sip import dao as sip_dao_module
 
 from wazo_confd.helpers.validator import (
     UniqueField,
@@ -32,6 +33,25 @@ class PJSIPDocValidator(Validator):
                 )
 
 
+class TransportDeleteValidator(Validator):
+    def __init__(self, sip_dao):
+        self.sip_dao = sip_dao
+
+    def validate(self, transport, fallback):
+        if not fallback:
+            self._validate_not_associated(transport)
+
+    def _validate_not_associated(self, transport):
+        sip = self.sip_dao.find_by(tenant_uuids=None, transport_uuid=transport.uuid)
+        if sip:
+            raise errors.resource_associated(
+                'Transport',
+                'EndpointSIP',
+                transport_uuid=transport.uuid,
+                endpoint_sip_uuid=sip.uuid,
+            )
+
+
 def build_pjsip_transport_validator(pjsip_doc):
     return ValidationGroup(
         create=[
@@ -42,4 +62,5 @@ def build_pjsip_transport_validator(pjsip_doc):
             UniqueFieldChanged('name', dao, 'Transport', id_field='uuid'),
             PJSIPDocValidator('options', 'transport', pjsip_doc),
         ],
+        delete=[TransportDeleteValidator(sip_dao_module)],
     )
