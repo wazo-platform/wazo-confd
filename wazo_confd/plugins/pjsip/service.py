@@ -39,8 +39,17 @@ def build_service(pjsip_doc):
     return PJSIPConfigurationService(asterisk_file_dao, build_notifier(), pjsip_doc)
 
 
+class PJSIPTransportService(CRUDService):
+
+    def delete(self, transport, fallback):
+        for validator in self.validator.delete:
+            validator.validate(transport, fallback)
+        self.dao.delete(transport, fallback)
+        self.notifier.deleted(transport)
+
+
 def build_pjsip_transport_service(pjsip_doc, schema):
-    return CRUDService(
+    return PJSIPTransportService(
         pjsip_transport_dao,
         build_pjsip_transport_validator(pjsip_doc),
         build_pjsip_transport_notifier(schema),
