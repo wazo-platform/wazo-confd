@@ -28,7 +28,5 @@ class Plugin:
             resource_class_args=(service, transport_dao),
         )
         api.add_resource(
-            SipList,
-            '/endpoints/sip',
-            resource_class_args=(service, sip_dao)
+            SipList, '/endpoints/sip', resource_class_args=(service, sip_dao)
         )

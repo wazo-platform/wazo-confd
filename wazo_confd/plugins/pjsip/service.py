@@ -40,7 +40,6 @@ def build_service(pjsip_doc):
 
 
 class PJSIPTransportService(CRUDService):
-
     def delete(self, transport, fallback):
         for validator in self.validator.delete:
             validator.validate(transport, fallback)

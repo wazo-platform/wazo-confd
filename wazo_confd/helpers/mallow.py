@@ -124,8 +124,7 @@ class PJSIPSectionOption(fields.List):
             kwargs['validate'].append(validate.Regexp(option_regex))
 
         super().__init__(
-            fields.String(**kwargs),
-            validate=validate.Length(min=2, max=2),
+            fields.String(**kwargs), validate=validate.Length(min=2, max=2),
         )
 
 
@@ -134,9 +133,7 @@ class AsteriskSection:
     DEFAULT_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
     DEFAULT_RESERVED_NAMES = ['general']
 
-    def __init__(
-        self, max_length=79, regex=None, reserved_names=None
-    ):
+    def __init__(self, max_length=79, regex=None, reserved_names=None):
         self._max_length = max_length
         regex = regex if regex is not None else self.DEFAULT_REGEX
         self._regex = re.compile(regex) if isinstance(regex, str) else regex
