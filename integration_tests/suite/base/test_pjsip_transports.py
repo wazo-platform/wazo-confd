@@ -3,19 +3,22 @@
 
 from hamcrest import (
     assert_that,
+    empty,
+    equal_to,
     has_entries,
     has_items,
     is_not,
-    empty,
     not_none,
 )
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
-
-
-# TODO(pc-m): add a test where an assigned transport is deleted
 
 
 def test_post_errors():
@@ -121,6 +124,21 @@ def test_delete(transport):
 
     response = confd.sip.transports(transport['uuid']).get()
     response.assert_match(404, e.not_found(resource='Transport'))
+
+
+@fixtures.transport()
+@fixtures.transport()
+@fixtures.sip()
+def test_delete_fallback(transport, fallback, sip):
+    with a.transport_endpoint_sip(transport, sip, check=False):
+        response = confd.sip.transports(transport['uuid']).delete()
+        response.assert_status(400)
+
+        response = confd.sip.transports(transport['uuid']).delete(fallback=fallback['uuid'])
+        response.assert_deleted()
+
+        response = confd.endpoints.sip(sip['uuid']).get()
+        assert_that(response.item['transport']['uuid'], equal_to(fallback['uuid']))
 
 
 @fixtures.transport(name='duplicate-me')
