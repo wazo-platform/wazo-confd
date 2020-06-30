@@ -107,6 +107,114 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
 
+  /endpoints/sip/templates:
+    get:
+      operationId: list_endpoints_sip_templates
+      summary: List SIP endpoints templates
+      description: |
+        **Required ACL:** `confd.endpoints.sip.templates.read`
+
+        List all SIP configuration templates, each individual configuration includes only fields that it
+        defines. Inherited fields from the parents or default values are not returned here.
+      tags:
+        - endpoints
+        - sip
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: SIP endpoint template list
+          schema:
+            $ref: '#/definitions/EndpointSIPItems'
+    post:
+      operationId: create_endpoint_sip_template
+      summary: Create a SIP endpoint template
+      description: |
+        **Required ACL:** `confd.endpoints.sip.templates.create`
+
+        Create a new SIP endpoint configuration template. This endpoint can inherit from other templates,
+        only modify fields that have to be modified.
+      tags:
+        - endpoints
+        - sip
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: SIP Endpoint to create
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+      responses:
+        '201':
+          description: SIP endpoint created
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+        '400':
+          $ref: '#/responses/CreateError'
+  /endpoints/sip/templates/{template_uuid}:
+    get:
+      operationId: get_endpoint_sip_template
+      summary: Get SIP Endpoint template
+      description: '**Required ACL:** `confd.endpoints.sip.templates.{template_uuid}.read`'
+      tags:
+        - sip
+        - endpoints
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sipuuid'
+      responses:
+        '200':
+          description: SIP Endpoint template
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_endpoint_sip_template
+      summary: Update SIP Endpoint Template
+      description: '**Required ACL:** `confd.endpoints.sip.templates.{template_uuid}.update`'
+      tags:
+        - endpoints
+        - sip
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sipuuid'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_endpoint_sip_template
+      summary: Delete SIP Endpoint Template
+      description: '**Required ACL:** `confd.endpoints.sip.templates.{template_uuid}.delete`'
+      tags:
+        - endpoints
+        - sip
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/sipuuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
 parameters:
   sipuuid:
     required: true
@@ -223,7 +331,7 @@ definitions:
         items:
           $ref: '#/definitions/EndpointSIPRelation'
         description: |
-          A list of parents this endpoint will inherit from.
+          A list of parent templates this configuration will inherit from.
 
           The inheritance only applies to option sections. Not to the name, label and other fields.
           For a given list of parents [A, B, C] A will be applied over B. C will be applied over (A,B) etc.
