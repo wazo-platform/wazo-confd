@@ -153,6 +153,7 @@ from . import skill_rule  # noqa
 from . import switchboard  # noqa
 from . import switchboard_member_user  # noqa
 from . import transport  # noqa
+from . import transport_endpoint_sip  # noqa
 from . import trunk  # noqa
 from . import trunk_endpoint_custom  # noqa
 from . import trunk_endpoint_iax  # noqa
@@ -243,6 +244,7 @@ __all__ = [
     'switchboard',
     'switchboard_member_user',
     'transport',
+    'transport_endpoint_sip',
     'trunk',
     'trunk_endpoint_custom',
     'trunk_endpoint_iax',

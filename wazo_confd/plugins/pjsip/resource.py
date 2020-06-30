@@ -1,12 +1,15 @@
 # Copyright 2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+from flask import url_for, request
 from xivo_dao.alchemy.pjsip_transport import PJSIPTransport
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 from wazo_confd.helpers.asterisk import AsteriskConfigurationList
-from .schema import PJSIPTransportSchema
+from .schema import (
+    PJSIPTransportSchema,
+    PJSIPTransportDeleteRequestSchema,
+)
 
 
 class PJSIPDocList(ConfdResource):
@@ -53,7 +56,7 @@ class PJSIPTransportList(ListResource):
     def build_headers(self, transport):
         return {
             'Location': url_for(
-                'pjsiptransportlist', transport_uuid=transport.uuid, _external=True,
+                'SIPTransport', transport_uuid=transport.uuid, _external=True,
             )
         }
 
@@ -83,4 +86,10 @@ class PJSIPTransportItem(ItemResource):
 
     @required_acl('confd.sip.transports.{transport_uuid}.delete')
     def delete(self, transport_uuid):
-        return super().delete(transport_uuid)
+        transport = self.service.get(transport_uuid)
+        params = PJSIPTransportDeleteRequestSchema().load(request.args)
+        fallback = params['fallback']
+        if fallback:
+            fallback = self.service.get(fallback)
+        self.service.delete(transport, fallback=fallback)
+        return '', 204
