@@ -59,6 +59,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 'a' * 80
     yield s.check_bogus_field_returns_error, url, 'name', 'global'
     yield s.check_bogus_field_returns_error, url, 'name', 'system'
+    yield s.check_bogus_field_returns_error, url, 'transport', {'uuid': FAKE_UUID}
     yield s.check_bogus_field_returns_error, url, 'aor_section_options', [
         ['one', 'two', 'three']
     ]
@@ -303,6 +304,7 @@ def test_edit_minimal_parameters(sip):
     response.assert_updated()
 
 
+@fixtures.transport()
 @fixtures.sip(
     aor_section_options=[
         ['qualify_frequency', '60'],
@@ -335,7 +337,7 @@ def test_edit_minimal_parameters(sip):
         ['password', 'outbound-password'],
     ],
 )
-def test_edit_all_parameters(sip):
+def test_edit_all_parameters(transport, sip):
     aor = [
         ['maximum_expiration', '3600'],
         ['remove_existing', 'yes'],
@@ -374,6 +376,7 @@ def test_edit_all_parameters(sip):
         registration_section_options=registration,
         registration_outbound_auth_section_options=registration_outbound_auth,
         outbound_auth_section_options=outbound_auth,
+        transport=transport,
     )
     response.assert_updated()
 
@@ -390,6 +393,7 @@ def test_edit_all_parameters(sip):
                 *registration_outbound_auth
             ),
             outbound_auth_section_options=contains_inanyorder(*outbound_auth),
+            transport=has_entries(uuid=transport['uuid']),
         ),
     )
 
