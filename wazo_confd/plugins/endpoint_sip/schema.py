@@ -54,7 +54,7 @@ class EndpointSIPSchema(BaseSchema):
     registration_outbound_auth_section_options = options_field
     outbound_auth_section_options = options_field
 
-    parents = fields.List(
+    templates = fields.List(
         fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
     )
     transport = fields.Nested('TransportRelationSchema', unknown=EXCLUDE)
