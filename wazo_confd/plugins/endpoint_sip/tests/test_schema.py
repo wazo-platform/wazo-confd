@@ -43,15 +43,15 @@ class TestEndpointSIPSchema(TestCase):
             calling(self.schema.load).with_args(body), raises(BadRequest),
         )
 
-    def test_parents(self):
-        parent_uuid = uuid.uuid4()
-        body = {'parents': [{'uuid': str(parent_uuid), 'label': 'ignored'}]}
+    def test_templates(self):
+        template_uuid = uuid.uuid4()
+        body = {'templates': [{'uuid': str(template_uuid), 'label': 'ignored'}]}
         loaded = self.schema.load(body)
         assert_that(
-            loaded, has_entries(parents=contains({'uuid': parent_uuid})),
+            loaded, has_entries(templates=contains({'uuid': template_uuid})),
         )
 
-        body = {'parents': [{'name': 'no uuid'}]}
+        body = {'templates': [{'name': 'no uuid'}]}
         assert_that(
             calling(self.schema.load).with_args(body), raises(BadRequest),
         )
