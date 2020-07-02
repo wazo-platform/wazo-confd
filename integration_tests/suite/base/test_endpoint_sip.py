@@ -189,7 +189,7 @@ def test_get(sip):
             registration_section_options=instance_of(list),
             registration_outbound_auth_section_options=instance_of(list),
             outbound_auth_section_options=instance_of(list),
-            parents=instance_of(list),
+            templates=instance_of(list),
             trunk=None,
             line=None,
             transport=None,
@@ -216,7 +216,7 @@ def test_get_templates(template, sip):
             registration_section_options=instance_of(list),
             registration_outbound_auth_section_options=instance_of(list),
             outbound_auth_section_options=instance_of(list),
-            parents=instance_of(list),
+            templates=instance_of(list),
             trunk=None,
             line=None,
             transport=None,
@@ -257,7 +257,7 @@ def test_create_template_minimal_parameters():
             registration_section_options=empty(),
             registration_outbound_auth_section_options=empty(),
             outbound_auth_section_options=empty(),
-            parents=empty(),
+            templates=empty(),
             asterisk_id=none(),
         ),
     )
@@ -281,7 +281,7 @@ def test_create_minimal_parameters():
             registration_section_options=empty(),
             registration_outbound_auth_section_options=empty(),
             outbound_auth_section_options=empty(),
-            parents=empty(),
+            templates=empty(),
             asterisk_id=none(),
         ),
     )
@@ -327,7 +327,7 @@ def test_create_template_all_parameters(context, transport, endpoint_1, endpoint
         ],
         context=context,
         transport=transport,
-        parents=[endpoint_1, endpoint_2],
+        templates=[endpoint_1, endpoint_2],
         asterisk_id='asterisk_id',
     )
 
@@ -369,7 +369,7 @@ def test_create_template_all_parameters(context, transport, endpoint_1, endpoint
             ],
             context=has_entries(id=context['id']),
             transport=has_entries(uuid=transport['uuid']),
-            parents=contains(
+            templates=contains(
                 has_entries(uuid=endpoint_1['uuid']),
                 has_entries(uuid=endpoint_2['uuid']),
             ),
@@ -418,7 +418,7 @@ def test_create_endpoint_all_parameters(context, transport, endpoint_1, endpoint
         ],
         context=context,
         transport=transport,
-        parents=[endpoint_1, endpoint_2],
+        templates=[endpoint_1, endpoint_2],
         asterisk_id='asterisk_id',
     )
 
@@ -460,7 +460,7 @@ def test_create_endpoint_all_parameters(context, transport, endpoint_1, endpoint
             ],
             context=has_entries(id=context['id']),
             transport=has_entries(uuid=transport['uuid']),
-            parents=contains(
+            templates=contains(
                 has_entries(uuid=endpoint_1['uuid']),
                 has_entries(uuid=endpoint_2['uuid']),
             ),
