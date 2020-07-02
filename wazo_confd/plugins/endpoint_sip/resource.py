@@ -32,17 +32,18 @@ class _BaseSipList(ListResource):
     def post(self):
         form = self.schema().load(request.get_json())
         form = self.add_tenant_to_form(form)
-        parents = []
 
-        for parent in form['parents']:
+        templates = []
+        for template in form['templates']:
             try:
                 model = self.dao.get(
-                    parent['uuid'], template=True, tenant_uuids=[form['tenant_uuid']],
+                    template['uuid'], template=True, tenant_uuids=[form['tenant_uuid']],
                 )
-                parents.append(model)
+                templates.append(model)
             except NotFoundError:
-                metadata = {'parents': parent}
-                raise errors.param_not_found('parents', 'EndpointSIP', **metadata)
+                metadata = {'templates': template}
+                raise errors.param_not_found('templates', 'endpoint_sip', **metadata)
+        form['templates'] = templates
 
         if form.get('transport'):
             transport_uuid = form['transport']['uuid']
@@ -51,7 +52,6 @@ class _BaseSipList(ListResource):
             except NotFoundError as e:
                 raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
 
-        form['parents'] = parents
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)

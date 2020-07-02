@@ -7,7 +7,7 @@ paths:
         **Required ACL:** `confd.endpoints.sip.read`
 
         List all SIP configurations, each individual configuration includes only fields that it
-        defines. Inherited fields from the parents or default values are not returned here.
+        defines. Inherited fields from the templates or default values are not returned here.
       tags:
         - endpoints
         - sip
@@ -115,7 +115,7 @@ paths:
         **Required ACL:** `confd.endpoints.sip.templates.read`
 
         List all SIP configuration templates, each individual configuration includes only fields that it
-        defines. Inherited fields from the parents or default values are not returned here.
+        defines. Inherited fields from the templates or default values are not returned here.
       tags:
         - endpoints
         - sip
@@ -326,15 +326,15 @@ definitions:
       context:
         description: The context used by this endpoint
         $ref: '#/definitions/ContextRelation'
-      parents:
+      templatess:
         type: array
         items:
           $ref: '#/definitions/EndpointSIPRelation'
         description: |
-          A list of parent templates this configuration will inherit from.
+          A list of templates this configuration will inherit from.
 
           The inheritance only applies to option sections. Not to the name, label and other fields.
-          For a given list of parents [A, B, C] A will be applied over B. C will be applied over (A,B) etc.
+          For a given list of templates [A, B, C] A will be applied over B. C will be applied over (A,B) etc.
       tenant_uuid:
         type: string
         description: The UUID of the tenant
