@@ -91,5 +91,6 @@ class Plugin:
         api.add_resource(
             PJSIPTransportItem,
             '/sip/transports/<uuid:transport_uuid>',
+            endpoint='sip_transports',
             resource_class_args=(transport_service,),
         )
