@@ -175,7 +175,7 @@ def test_get_endpoint_sip_relation(line, sip):
             has_entries(
                 endpoint_sip=has_entries(
                     uuid=sip['uuid'],
-                    label=sip['my-endpoint'],
+                    label='my-endpoint',
                     auth_section_options=contains_inanyorder(
                         contains('username', 'my-username'),
                         contains('password', 'my-password'),
