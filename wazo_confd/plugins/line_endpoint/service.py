@@ -24,7 +24,7 @@ class LineEndpointSIPService:
         self.notifier = notifier
 
     def associate(self, line, endpoint):
-        if line.endpoint_sip_id == endpoint.id:
+        if line.endpoint_sip_uuid == endpoint.uuid:
             return
 
         self.validator.validate_association(line, endpoint)
@@ -33,7 +33,7 @@ class LineEndpointSIPService:
         self.notifier.associated(line, endpoint)
 
     def dissociate(self, line, endpoint):
-        if line.endpoint_sip_id != endpoint.id:
+        if line.endpoint_sip_uuid != endpoint.uuid:
             return
 
         self.validator.validate_dissociation(line, endpoint)
