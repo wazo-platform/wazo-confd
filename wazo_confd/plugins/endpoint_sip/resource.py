@@ -70,7 +70,19 @@ class _BaseSipItem(ItemResource):
         return super().get(uuid)
 
     def put(self, uuid):
-        return super().put(uuid)
+        kwargs = self._add_tenant_uuid()
+        sip = self.service.get(uuid, **kwargs)
+        form = self.schema().load(request.get_json(), partial=True)
+        if form.get('transport'):
+            transport_uuid = form['transport']['uuid']
+            try:
+                form['transport'] = self.transport_dao.get(transport_uuid)
+            except NotFoundError as e:
+                raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
+        for name, value in form.items():
+            setattr(sip, name, value)
+        self.service.edit(sip)
+        return '', 204
 
     def delete(self, uuid):
         return super().delete(uuid)
@@ -97,19 +109,7 @@ class SipItem(_BaseSipItem):
 
     @required_acl('confd.endpoints.sip.{uuid}.update')
     def put(self, uuid):
-        kwargs = self._add_tenant_uuid()
-        sip = self.service.get(uuid, **kwargs)
-        form = self.schema().load(request.get_json(), partial=True)
-        if form.get('transport'):
-            transport_uuid = form['transport']['uuid']
-            try:
-                form['transport'] = self.transport_dao.get(transport_uuid)
-            except NotFoundError as e:
-                raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
-        for name, value in form.items():
-            setattr(sip, name, value)
-        self.service.edit(sip)
-        return '', 204
+        return super().put(uuid)
 
     @required_acl('confd.endpoints.sip.{uuid}.delete')
     def delete(self, uuid):
