@@ -32,6 +32,15 @@ class sip(IsolatedAction):
     }
 
 
+class sip_template(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {
+        'generate': h.endpoint_sip.generate_sip_template,
+        'delete': h.endpoint_sip.delete_sip_template,
+    }
+
+
 class sccp(IsolatedAction):
 
     actions = {

@@ -13,7 +13,7 @@ from wazo_confd.helpers.restful import ListResource, ItemResource
 from .schema import EndpointSIPSchema
 
 
-class SipList(ListResource):
+class _BaseSipList(ListResource):
 
     model = EndpointSIP
     schema = EndpointSIPSchema
@@ -26,23 +26,24 @@ class SipList(ListResource):
     def build_headers(self, sip):
         return {'Location': url_for('endpoint_sip', uuid=sip.uuid, _external=True)}
 
-    @required_acl('confd.endpoints.sip.read')
     def get(self):
         return super().get()
 
-    @required_acl('confd.endpoints.sip.create')
     def post(self):
         form = self.schema().load(request.get_json())
         form = self.add_tenant_to_form(form)
-        parents = []
 
-        for parent in form['parents']:
+        templates = []
+        for template in form['templates']:
             try:
-                model = self.dao.get(parent['uuid'], tenant_uuids=[form['tenant_uuid']])
-                parents.append(model)
+                model = self.dao.get(
+                    template['uuid'], template=True, tenant_uuids=[form['tenant_uuid']],
+                )
+                templates.append(model)
             except NotFoundError:
-                metadata = {'parents': parent}
-                raise errors.param_not_found('parents', 'EndpointSIP', **metadata)
+                metadata = {'templates': template}
+                raise errors.param_not_found('templates', 'endpoint_sip', **metadata)
+        form['templates'] = templates
 
         if form.get('transport'):
             transport_uuid = form['transport']['uuid']
@@ -51,13 +52,12 @@ class SipList(ListResource):
             except NotFoundError as e:
                 raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
 
-        form['parents'] = parents
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 
 
-class SipItem(ItemResource):
+class _BaseSipItem(ItemResource):
 
     schema = EndpointSIPSchema
     has_tenant_uuid = True
@@ -66,11 +66,9 @@ class SipItem(ItemResource):
         super().__init__(service)
         self.transport_dao = transport_dao
 
-    @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
         return super().get(uuid)
 
-    @required_acl('confd.endpoints.sip.{uuid}.update')
     def put(self, uuid):
         kwargs = self._add_tenant_uuid()
         sip = self.service.get(uuid, **kwargs)
@@ -86,6 +84,61 @@ class SipItem(ItemResource):
         self.service.edit(sip)
         return '', 204
 
+    def delete(self, uuid):
+        return super().delete(uuid)
+
+
+class SipList(_BaseSipList):
+    template = False
+
+    @required_acl('confd.endpoints.sip.read')
+    def get(self):
+        return super().get()
+
+    @required_acl('confd.endpoints.sip.create')
+    def post(self):
+        return super().post()
+
+
+class SipItem(_BaseSipItem):
+    template = False
+
+    @required_acl('confd.endpoints.sip.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
+
+    @required_acl('confd.endpoints.sip.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
+
     @required_acl('confd.endpoints.sip.{uuid}.delete')
+    def delete(self, uuid):
+        return super().delete(uuid)
+
+
+class SipTemplateList(_BaseSipList):
+    template = True
+
+    @required_acl('confd.endpoints.sip.templates.read')
+    def get(self):
+        return super().get()
+
+    @required_acl('confd.endpoints.sip.templates.create')
+    def post(self):
+        return super().post()
+
+
+class SipTemplateItem(_BaseSipItem):
+    template = True
+
+    @required_acl('confd.endpoints.sip.templates.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
+
+    @required_acl('confd.endpoints.sip.templates.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
+
+    @required_acl('confd.endpoints.sip.templates.{uuid}.delete')
     def delete(self, uuid):
         return super().delete(uuid)
