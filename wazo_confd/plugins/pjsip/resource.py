@@ -56,7 +56,7 @@ class PJSIPTransportList(ListResource):
     def build_headers(self, transport):
         return {
             'Location': url_for(
-                'SIPTransport', transport_uuid=transport.uuid, _external=True,
+                'sip_transports', transport_uuid=transport.uuid, _external=True,
             )
         }
 
