@@ -39,7 +39,7 @@ class ContextRelationSchema(BaseSchema):
     id = fields.Integer(required=True)
 
 
-class EndpointSIPSchema(BaseSchema):
+class _BaseSIPSchema(BaseSchema):
 
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.UUID(dump_only=True)
@@ -61,10 +61,18 @@ class EndpointSIPSchema(BaseSchema):
     context = fields.Nested('ContextRelationSchema', unknown=EXCLUDE)
     asterisk_id = fields.String(validate=Length(max=1024))
 
+
+class EndpointSIPSchema(_BaseSIPSchema):
+
     links = ListLink(Link('endpoint_sip', field='uuid'))
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+
+
+class TemplateSIPSchema(_BaseSIPSchema):
+
+    links = ListLink(Link('endpoint_sip_templates', field='uuid'))
 
 
 class EndpointSIPSchemaNullable(EndpointSIPSchema):
