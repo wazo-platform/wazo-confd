@@ -154,7 +154,7 @@ def test_list_db_requests(*_):
 
 @fixtures.sip_template()
 @fixtures.sip()
-def test_get_templates(template, sip):
+def test_get(template, sip):
     response = confd.endpoints.sip.templates(template['uuid']).get()
     assert_that(
         response.item,
