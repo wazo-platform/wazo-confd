@@ -10,7 +10,7 @@ from xivo_dao.helpers.exception import NotFoundError
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import EndpointSIPSchema
+from .schema import EndpointSIPSchema, TemplateSIPSchema
 
 
 class _BaseSipList(ListResource):
@@ -59,7 +59,6 @@ class _BaseSipList(ListResource):
 
 class _BaseSipItem(ItemResource):
 
-    schema = EndpointSIPSchema
     has_tenant_uuid = True
 
     def __init__(self, service, transport_dao):
@@ -90,6 +89,7 @@ class _BaseSipItem(ItemResource):
 
 class SipList(_BaseSipList):
     template = False
+    schema = EndpointSIPSchema
 
     @required_acl('confd.endpoints.sip.read')
     def get(self):
@@ -102,6 +102,7 @@ class SipList(_BaseSipList):
 
 class SipItem(_BaseSipItem):
     template = False
+    schema = EndpointSIPSchema
 
     @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
@@ -118,6 +119,7 @@ class SipItem(_BaseSipItem):
 
 class SipTemplateList(_BaseSipList):
     template = True
+    schema = TemplateSIPSchema
 
     @required_acl('confd.endpoints.sip.templates.read')
     def get(self):
@@ -130,6 +132,7 @@ class SipTemplateList(_BaseSipList):
 
 class SipTemplateItem(_BaseSipItem):
     template = True
+    schema = TemplateSIPSchema
 
     @required_acl('confd.endpoints.sip.templates.{uuid}.read')
     def get(self, uuid):
