@@ -61,14 +61,13 @@ class _BaseSIPSchema(BaseSchema):
     context = fields.Nested('ContextRelationSchema', unknown=EXCLUDE)
     asterisk_id = fields.String(validate=Length(max=1024))
 
-    # TODO REMOVE FROM TEMPLATE
-    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
-    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
-
 
 class EndpointSIPSchema(_BaseSIPSchema):
 
     links = ListLink(Link('endpoint_sip', field='uuid'))
+
+    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
 
 class TemplateSIPSchema(_BaseSIPSchema):

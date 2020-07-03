@@ -170,8 +170,6 @@ def test_get(template, sip):
             registration_outbound_auth_section_options=instance_of(list),
             outbound_auth_section_options=instance_of(list),
             templates=instance_of(list),
-            trunk=None,
-            line=None,
             transport=None,
             context=None,
             asterisk_id=None,
