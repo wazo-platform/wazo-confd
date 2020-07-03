@@ -133,10 +133,6 @@ class SipTemplateItem(_BaseSipItem):
 
     @required_acl('confd.endpoints.sip.templates.{uuid}.read')
     def get(self, uuid):
-        import logging
-
-        logger = logging.getLogger(__name__)
-        logger.critical('Searching for template')
         return super().get(uuid)
 
     @required_acl('confd.endpoints.sip.templates.{uuid}.update')
