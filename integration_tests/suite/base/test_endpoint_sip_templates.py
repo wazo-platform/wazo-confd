@@ -29,14 +29,14 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 def test_get_errors():
     fake_sip_get = confd.endpoints.sip.templates(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_sip_get, 'SIPEndpoint'
+    yield s.check_resource_not_found, fake_sip_get, 'SIPEndpointTemplate'
 
 
 @fixtures.sip_template()
 def test_delete_errors(sip):
     url = confd.endpoints.sip.templates(sip['uuid'])
     url.delete()
-    yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+    yield s.check_resource_not_found, url.get, 'SIPEndpointTemplate'
 
 
 def test_post_errors():
@@ -186,7 +186,7 @@ def test_get_templates(template, sip):
 @fixtures.sip_template(wazo_tenant=SUB_TENANT)
 def test_get_multi_tenant(main, sub):
     response = confd.endpoints.sip.templates(main['uuid']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+    response.assert_match(404, e.not_found(resource='SIPEndpointTemplate'))
 
     response = confd.endpoints.sip.templates(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
     assert_that(response.item, has_entries(**sub))
@@ -422,7 +422,7 @@ def test_edit_all_parameters(transport, sip):
 @fixtures.sip_template(wazo_tenant=SUB_TENANT)
 def test_edit_multi_tenant(main, sub):
     response = confd.endpoints.sip.templates(main['uuid']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+    response.assert_match(404, e.not_found(resource='SIPEndpointTemplate'))
 
     response = confd.endpoints.sip.templates(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
@@ -452,7 +452,7 @@ def test_delete(sip, template):
 @fixtures.sip_template(wazo_tenant=SUB_TENANT)
 def test_delete_multi_tenant(main, sub):
     response = confd.endpoints.sip.templates(main['uuid']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='SIPEndpoint'))
+    response.assert_match(404, e.not_found(resource='SIPEndpointTemplate'))
 
     response = confd.endpoints.sip.templates(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
