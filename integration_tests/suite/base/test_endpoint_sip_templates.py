@@ -149,7 +149,9 @@ def test_sorting_offset_limit(sip1, sip2):
 @fixtures.sip()
 @fixtures.sip()
 def test_list_db_requests(*_):
-    s.check_db_requests(BaseIntegrationTest, confd.endpoints.sip.templates.get, nb_requests=1)
+    s.check_db_requests(
+        BaseIntegrationTest, confd.endpoints.sip.templates.get, nb_requests=1
+    )
 
 
 @fixtures.sip_template()
@@ -171,7 +173,6 @@ def test_get(template, sip):
             outbound_auth_section_options=instance_of(list),
             templates=instance_of(list),
             transport=None,
-            context=None,
             asterisk_id=None,
         ),
     )
@@ -214,11 +215,10 @@ def test_create_minimal_parameters():
     )
 
 
-@fixtures.context()
 @fixtures.transport()
 @fixtures.sip_template()
 @fixtures.sip_template()
-def test_create_all_parameters(context, transport, endpoint_1, endpoint_2):
+def test_create_all_parameters(transport, endpoint_1, endpoint_2):
     response = confd.endpoints.sip.templates.post(
         name="template_name",
         label="label",
@@ -252,7 +252,6 @@ def test_create_all_parameters(context, transport, endpoint_1, endpoint_2):
             ['username', 'outbound-auth'],
             ['password', 'outbound-password'],
         ],
-        context=context,
         transport=transport,
         templates=[endpoint_1, endpoint_2],
         asterisk_id='asterisk_id',
@@ -294,7 +293,6 @@ def test_create_all_parameters(context, transport, endpoint_1, endpoint_2):
                 ['username', 'outbound-auth'],
                 ['password', 'outbound-password'],
             ],
-            context=has_entries(id=context['id']),
             transport=has_entries(uuid=transport['uuid']),
             templates=contains(
                 has_entries(uuid=endpoint_1['uuid']),
@@ -449,10 +447,14 @@ def test_delete(sip, template):
 @fixtures.sip_template(wazo_tenant=MAIN_TENANT)
 @fixtures.sip_template(wazo_tenant=SUB_TENANT)
 def test_delete_multi_tenant(main, sub):
-    response = confd.endpoints.sip.templates(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response = confd.endpoints.sip.templates(main['uuid']).delete(
+        wazo_tenant=SUB_TENANT
+    )
     response.assert_match(404, e.not_found(resource='SIPEndpointTemplate'))
 
-    response = confd.endpoints.sip.templates(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+    response = confd.endpoints.sip.templates(sub['uuid']).delete(
+        wazo_tenant=MAIN_TENANT
+    )
     response.assert_deleted()
 
 
@@ -471,15 +473,15 @@ def test_bus_events(sip):
     yield (
         s.check_bus_event,
         'config.sip_endpoint_template.created',
-        confd.endpoints.sip.templates.post
+        confd.endpoints.sip.templates.post,
     )
     yield (
         s.check_bus_event,
         'config.sip_endpoint_template.updated',
-        confd.endpoints.sip.templates(sip['uuid']).put
+        confd.endpoints.sip.templates(sip['uuid']).put,
     )
     yield (
         s.check_bus_event,
         'config.sip_endpoint_template.deleted',
-        confd.endpoints.sip.templates(sip['uuid']).delete
+        confd.endpoints.sip.templates(sip['uuid']).delete,
     )
