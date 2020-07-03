@@ -18,9 +18,10 @@ class SipList(ListResource):
     model = EndpointSIP
     schema = EndpointSIPSchema
 
-    def __init__(self, service, dao):
+    def __init__(self, service, dao, transport_dao):
         super().__init__(service)
         self.dao = dao
+        self.transport_dao = transport_dao
 
     def build_headers(self, sip):
         return {'Location': url_for('endpoint_sip', uuid=sip.uuid, _external=True)}
@@ -42,6 +43,13 @@ class SipList(ListResource):
             except NotFoundError:
                 metadata = {'parents': parent}
                 raise errors.param_not_found('parents', 'EndpointSIP', **metadata)
+
+        if form.get('transport'):
+            transport_uuid = form['transport']['uuid']
+            try:
+                form['transport'] = self.transport_dao.get(transport_uuid)
+            except NotFoundError as e:
+                raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
 
         form['parents'] = parents
         model = self.model(**form)
