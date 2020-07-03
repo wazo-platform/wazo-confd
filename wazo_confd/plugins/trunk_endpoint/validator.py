@@ -8,7 +8,7 @@ from xivo_dao.resources.trunk import dao as trunk_dao_module
 from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
 
-class TrunkEndpointAssociationValidator(ValidatorAssociation):
+class _TrunkEndpointAssociationValidator(ValidatorAssociation):
     def __init__(self, trunk_dao, line_dao):
         super().__init__()
         self.trunk_dao = trunk_dao
@@ -49,8 +49,14 @@ class TrunkEndpointAssociationValidator(ValidatorAssociation):
                 endpoint_id=protocol_id,
             )
 
+    def validate_not_associated_to_line(self, trunk, endpoint):
+        pass
 
-class TrunkEndpointSIPAssociationValidator(TrunkEndpointAssociationValidator):
+    def validate_associate_to_register(self, trunk, endpoint):
+        pass
+
+
+class TrunkEndpointSIPAssociationValidator(_TrunkEndpointAssociationValidator):
     def validate_not_associated_to_trunk(self, trunk, endpoint):
         other_trunk = self.trunk_dao.find_by(endpoint_sip_uuid=endpoint.uuid)
         if other_trunk:
@@ -83,7 +89,7 @@ class TrunkEndpointSIPAssociationValidator(TrunkEndpointAssociationValidator):
             )
 
 
-class TrunkEndpointIAXAssociationValidator(TrunkEndpointAssociationValidator):
+class TrunkEndpointIAXAssociationValidator(_TrunkEndpointAssociationValidator):
     def validate_not_associated_to_trunk(self, trunk, endpoint):
         other_trunk = self.trunk_dao.find_by(endpoint_iax_id=endpoint.id)
         if other_trunk:
@@ -95,19 +101,8 @@ class TrunkEndpointIAXAssociationValidator(TrunkEndpointAssociationValidator):
                 endpoint_id=endpoint.id,
             )
 
-    def validate_not_associated_to_line(self, trunk, endpoint):
-        line = self.line_dao.find_by(endpoint_iax_id=endpoint.id)
-        if line:
-            raise errors.resource_associated(
-                'Line',
-                'Endpoint',
-                trunk_id=line.id,
-                endpoint='iax',
-                endpoint_id=endpoint.id,
-            )
 
-
-class TrunkEndpointCustomAssociationValidator(TrunkEndpointAssociationValidator):
+class TrunkEndpointCustomAssociationValidator(_TrunkEndpointAssociationValidator):
     def validate_not_associated_to_trunk(self, trunk, endpoint):
         other_trunk = self.trunk_dao.find_by(endpoint_custom_id=endpoint.id)
         if other_trunk:
