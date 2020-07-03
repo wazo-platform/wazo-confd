@@ -69,8 +69,10 @@ def error_checks(url):
         yield check
 
 
-@fixtures.sip(name='unique')
-def unique_error_checks(url, sip):
+@fixtures.sip(name='endpoint_unique')
+@fixtures.sip_template(name='template_unique')
+def unique_error_checks(url, sip, template):
+    yield s.check_bogus_field_returns_error, url, 'name', template['name']
     yield s.check_bogus_field_returns_error, url, 'name', sip['name']
 
 
@@ -96,7 +98,7 @@ def check_search(url, sip, hidden, field, term):
 
 @fixtures.sip()
 @fixtures.sip()
-def test_list_endpoints(sip1, sip2):
+def test_list(sip1, sip2):
     response = confd.endpoints.sip.get()
     assert_that(
         response.items,
@@ -211,7 +213,7 @@ def test_create_minimal_parameters():
 @fixtures.transport()
 @fixtures.sip_template()
 @fixtures.sip_template()
-def test_create_endpoint_all_parameters(context, transport, endpoint_1, endpoint_2):
+def test_create_all_parameters(context, transport, template_1, template_2):
     response = confd.endpoints.sip.post(
         name="name",
         label="label",
@@ -247,7 +249,7 @@ def test_create_endpoint_all_parameters(context, transport, endpoint_1, endpoint
         ],
         context=context,
         transport=transport,
-        templates=[endpoint_1, endpoint_2],
+        templates=[template_1, template_2],
         asterisk_id='asterisk_id',
     )
 
@@ -290,8 +292,8 @@ def test_create_endpoint_all_parameters(context, transport, endpoint_1, endpoint
             context=has_entries(id=context['id']),
             transport=has_entries(uuid=transport['uuid']),
             templates=contains(
-                has_entries(uuid=endpoint_1['uuid']),
-                has_entries(uuid=endpoint_2['uuid']),
+                has_entries(uuid=template_1['uuid']),
+                has_entries(uuid=template_2['uuid']),
             ),
             asterisk_id='asterisk_id',
         ),
@@ -307,7 +309,7 @@ def test_create_multi_tenant():
 
 @fixtures.sip()
 @fixtures.sip_template()
-def test_edit_endpoint_minimal_parameters(sip, template):
+def test_edit_minimal_parameters(sip, template):
     response = confd.endpoints.sip(sip['uuid']).put()
     response.assert_updated()
 
