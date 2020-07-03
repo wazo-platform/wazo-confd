@@ -7,11 +7,14 @@ from mock import Mock
 
 from xivo_bus.resources.endpoint_sip.event import (
     CreateSipEndpointEvent,
+    CreateSipEndpointTemplateEvent,
     DeleteSipEndpointEvent,
+    DeleteSipEndpointTemplateEvent,
     EditSipEndpointEvent,
+    EditSipEndpointTemplateEvent,
 )
 
-from ..notifier import SipEndpointNotifier
+from ..notifier import SipEndpointNotifier, SipTemplateNotifier
 
 
 SYSCONFD_HANDLERS = {
@@ -70,6 +73,45 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
     def test_when_sip_endpoint_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteSipEndpointEvent(self.sip_serialized)
+
+        self.notifier.deleted(self.sip)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+
+class TestSipTemplateNotifier(unittest.TestCase):
+    def setUp(self):
+        self.sysconfd = Mock()
+        self.bus = Mock()
+        self.sip = Mock()
+        self.notifier = SipTemplateNotifier(self.sysconfd, self.bus)
+
+    def test_when_sip_template_created_then_event_sent_on_bus(self):
+        expected_event = CreateSipEndpointTemplateEvent({})
+
+        self.notifier.created(self.sip)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_when_sip_template_edited_then_sip_reloaded(self):
+        self.notifier.edited(self.sip)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
+
+    def test_when_sip_template_edited_then_event_sent_on_bus(self):
+        expected_event = EditSipEndpointTemplateEvent({})
+
+        self.notifier.edited(self.sip)
+
+        self.bus.send_bus_event.assert_called_once_with(expected_event)
+
+    def test_when_sip_template_deleted_then_sip_reloaded(self):
+        self.notifier.deleted(self.sip)
+
+        self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
+
+    def test_when_sip_template_deleted_then_event_sent_on_bus(self):
+        expected_event = DeleteSipEndpointTemplateEvent({})
 
         self.notifier.deleted(self.sip)
 

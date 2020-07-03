@@ -6,7 +6,7 @@ from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao_module
 from wazo_confd.plugins.device import builder as device_builder
 from wazo_confd.helpers.resource import CRUDService
 
-from .notifier import build_notifier
+from .notifier import build_endpoint_notifier, build_template_notifier
 from .validator import build_validator
 
 
@@ -55,7 +55,7 @@ def build_endpoint_service(provd_client):
     return SipEndpointService(
         endpoint_sip_dao_module,
         build_validator(),
-        build_notifier(),
+        build_endpoint_notifier(),
         device_updater,
         template=False,
     )
@@ -67,7 +67,7 @@ def build_template_service(provd_client):
     return SipEndpointService(
         endpoint_sip_dao_module,
         build_validator(),
-        build_notifier(),
+        build_template_notifier(),
         device_updater,
         template=True,
     )
