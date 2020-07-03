@@ -56,15 +56,6 @@ class TestEndpointSIPSchema(TestCase):
             calling(self.schema.load).with_args(body), raises(BadRequest),
         )
 
-    def test_context(self):
-        context_id = 42
-        body = {'context': {'id': context_id}}
-        loaded = self.schema.load(body)
-        assert_that(loaded, has_entries(context={'id': context_id}))
-
-        body = {'context': {'name': 'no id'}}
-        assert_that(calling(self.schema.load).with_args(body), raises(BadRequest))
-
     def test_name(self):
         loaded = self.schema.load({})
         assert_that(loaded, not_(has_entries(name=None)))

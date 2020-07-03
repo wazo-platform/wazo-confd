@@ -167,7 +167,6 @@ def test_get(sip):
             outbound_auth_section_options=instance_of(list),
             templates=instance_of(list),
             transport=None,
-            context=None,
             asterisk_id=None,
             trunk=None,
             line=None,
@@ -209,11 +208,10 @@ def test_create_minimal_parameters():
     )
 
 
-@fixtures.context()
 @fixtures.transport()
 @fixtures.sip_template()
 @fixtures.sip_template()
-def test_create_all_parameters(context, transport, template_1, template_2):
+def test_create_all_parameters(transport, template_1, template_2):
     response = confd.endpoints.sip.post(
         name="name",
         label="label",
@@ -247,7 +245,6 @@ def test_create_all_parameters(context, transport, template_1, template_2):
             ['username', 'outbound-auth'],
             ['password', 'outbound-password'],
         ],
-        context=context,
         transport=transport,
         templates=[template_1, template_2],
         asterisk_id='asterisk_id',
@@ -289,7 +286,6 @@ def test_create_all_parameters(context, transport, template_1, template_2):
                 ['username', 'outbound-auth'],
                 ['password', 'outbound-password'],
             ],
-            context=has_entries(id=context['id']),
             transport=has_entries(uuid=transport['uuid']),
             templates=contains(
                 has_entries(uuid=template_1['uuid']),
