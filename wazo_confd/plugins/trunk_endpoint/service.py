@@ -25,7 +25,7 @@ class TrunkEndpointService:
 class TrunkEndpointSIPService(TrunkEndpointService):
 
     def associate(self, trunk, endpoint):
-        if trunk.endpoint_sip_id == endpoint.id:
+        if trunk.endpoint_sip_uuid == endpoint.uuid:
             return
 
         self.validator.validate_association(trunk, endpoint)
@@ -33,7 +33,7 @@ class TrunkEndpointSIPService(TrunkEndpointService):
         self.notifier.associated(trunk, endpoint)
 
     def dissociate(self, trunk, endpoint):
-        if trunk.endpoint_sip_id != endpoint.id:
+        if trunk.endpoint_sip_uuid != endpoint.uuid:
             return
 
         self.validator.validate_dissociation(trunk, endpoint)
