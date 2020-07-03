@@ -3,8 +3,11 @@
 
 from xivo_bus.resources.endpoint_sip.event import (
     CreateSipEndpointEvent,
+    CreateSipEndpointTemplateEvent,
     DeleteSipEndpointEvent,
+    DeleteSipEndpointTemplateEvent,
     EditSipEndpointEvent,
+    EditSipEndpointTemplateEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -51,5 +54,36 @@ class SipEndpointNotifier:
         self.bus.send_bus_event(event)
 
 
-def build_notifier():
+class SipTemplateNotifier:
+    def __init__(self, sysconfd, bus):
+        self.sysconfd = sysconfd
+        self.bus = bus
+
+    def send_sysconfd_handlers(self):
+        handlers = {
+            'ipbx': ['module reload res_pjsip.so', 'dialplan reload'],
+            'agentbus': [],
+        }
+        self.sysconfd.exec_request_handlers(handlers)
+
+    def created(self, sip):
+        event = CreateSipEndpointTemplateEvent({})
+        self.bus.send_bus_event(event)
+
+    def edited(self, sip):
+        self.send_sysconfd_handlers()
+        event = EditSipEndpointTemplateEvent({})
+        self.bus.send_bus_event(event)
+
+    def deleted(self, sip):
+        self.send_sysconfd_handlers()
+        event = DeleteSipEndpointTemplateEvent({})
+        self.bus.send_bus_event(event)
+
+
+def build_endpoint_notifier():
     return SipEndpointNotifier(sysconfd, bus)
+
+
+def build_template_notifier():
+    return SipTemplateNotifier(sysconfd, bus)
