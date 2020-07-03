@@ -33,9 +33,9 @@ class _ValidateLineAssociation(ValidatorAssociation):
 
     def validate_not_already_associated(self, line, endpoint):
         protocol = None
-        if line.endpoint_sip_id:
+        if line.endpoint_sip_uuid:
             protocol = 'sip'
-            protocol_id = line.endpoint_sip_id
+            protocol_id = line.endpoint_sip_uuid
         elif line.endpoint_sccp_id:
             protocol = 'sccp'
             protocol_id = line.endpoint_sccp_id
