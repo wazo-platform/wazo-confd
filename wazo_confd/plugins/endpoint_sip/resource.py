@@ -47,8 +47,7 @@ class SipList(ListResource):
         if form.get('transport'):
             transport_uuid = form['transport']['uuid']
             try:
-                # TODO pass object
-                self.transport_dao.get(transport_uuid)
+                form['transport'] = self.transport_dao.get(transport_uuid)
             except NotFoundError as e:
                 raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
 
