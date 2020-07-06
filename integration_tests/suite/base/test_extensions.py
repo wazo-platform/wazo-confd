@@ -1,8 +1,10 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
 import re
+
+from contextlib import ExitStack
 
 from hamcrest import (
     all_of,
@@ -140,6 +142,8 @@ def test_create_minimal_parameters():
         ),
     )
 
+    confd.extensions(response.item['id']).delete()
+
 
 def test_create_with_enabled_parameter():
     exten = h.extension.find_available_exten(CONTEXT)
@@ -153,6 +157,8 @@ def test_create_with_enabled_parameter():
             exten=exten, context=CONTEXT, enabled=False, tenant_uuid=not_(none())
         ),
     )
+
+    confd.extensions(response.item['id']).delete()
 
 
 def test_create_extension_in_different_ranges():
@@ -169,16 +175,18 @@ def test_create_extension_in_different_ranges():
 
 
 def create_in_range(exten, context):
-    response = confd.extensions.create(exten=exten, context=context)
+    response = confd.extensions.post(exten=exten, context=context)
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
 
 @fixtures.context(
     incall_ranges=[{'start': '4185550000', 'end': '4185559999', 'did_length': 4}]
 )
 def test_create_extension_in_context_with_did_length(context):
-    response = confd.extensions.create(exten='1000', context=context['name'])
+    response = confd.extensions.post(exten='1000', context=context['name'])
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
 
 @fixtures.extension()
@@ -198,6 +206,8 @@ def test_create_pattern():
     response = confd.extensions.post(exten='_XXXX', context='default')
     response.assert_created('extensions')
 
+    confd.extensions(response.item['id']).delete()
+
 
 def test_create_outcall_pattern():
     response = confd.extensions.post(exten='_+XXXX', context='to-extern')
@@ -212,9 +222,11 @@ def test_create_2_extensions_same_exten_different_context(context):
 
     response = confd.extensions.post(exten=exten, context=CONTEXT)
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
     response = confd.extensions.post(exten=exten, context=context['name'])
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
@@ -381,19 +393,16 @@ def test_edit_extension_then_funckeys_updated(
     device2,
 ):
     timestamp = datetime.datetime.utcnow()
-    with a.line_extension(line_sip1, extension1), a.user_line(
-        user1, line_sip1
-    ), a.line_device(line_sip1, device1), a.line_extension(
-        line_sip2, extension2
-    ), a.user_line(
-        user2, line_sip2
-    ), a.line_device(
-        line_sip2, device2
-    ), a.line_extension(
-        line_sip3, extension3
-    ), a.user_line(
-        user3, line_sip3
-    ):
+    with ExitStack() as es:
+        es.enter_context(a.line_extension(line_sip1, extension1))
+        es.enter_context(a.user_line(user1, line_sip1))
+        es.enter_context(a.line_device(line_sip1, device1))
+        es.enter_context(a.line_extension(line_sip2, extension2))
+        es.enter_context(a.user_line(user2, line_sip2))
+        es.enter_context(a.line_device(line_sip2, device2))
+        es.enter_context(a.line_extension(line_sip3, extension3))
+        es.enter_context(a.user_line(user3, line_sip3))
+
         device2_updated_count = provd.updated_count(device2['id'], timestamp)
 
         destination = {'type': 'user', 'user_id': user3['id']}
@@ -422,13 +431,12 @@ def test_edit_extension_with_no_change_device_not_updated(
     user1, user2, line_sip1, line_sip2, extension1, extension2, device
 ):
     timestamp = datetime.datetime.utcnow()
-    with a.line_extension(line_sip1, extension1), a.user_line(
-        user1, line_sip1
-    ), a.line_device(line_sip1, device), a.line_extension(
-        line_sip2, extension2
-    ), a.user_line(
-        user2, line_sip2
-    ):
+    with ExitStack() as es:
+        es.enter_context(a.line_extension(line_sip1, extension1))
+        es.enter_context(a.user_line(user1, line_sip1))
+        es.enter_context(a.line_device(line_sip1, device))
+        es.enter_context(a.line_extension(line_sip2, extension2))
+
         destination = {'type': 'user', 'user_id': user2['id']}
         confd.users(user1['id']).funckeys(1).put(
             destination=destination
@@ -514,24 +522,32 @@ def test_sorting_offset_limit(extension1, extension2):
 def test_search_extensions_in_context():
     exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
+    exten3 = h.extension.find_available_exten('from-extern', exclude=[exten2])
 
-    with fixtures.extension(exten=exten1, context='default'), fixtures.extension(
-        exten=exten1, context='from-extern'
-    ) as extension2, fixtures.extension(exten=exten2, context='from-extern'):
+    with ExitStack() as es:
+        es.enter_context(fixtures.extension(exten=exten1, context='default'))
+        extension2 = es.enter_context(
+            fixtures.extension(exten=exten2, context='from-extern')
+        )
+        es.enter_context(fixtures.extension(exten=exten3, context='from-extern'))
 
-        response = confd.extensions.get(search=exten1, context='from-extern')
+        response = confd.extensions.get(search=exten2, context='from-extern')
         assert_that(response.items, contains(extension2))
 
 
 def test_search_list_extensions_in_context():
     exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
+    exten3 = h.extension.find_available_exten('from-extern', exclude=[exten2])
 
-    with fixtures.extension(exten=exten1, context='default'), fixtures.extension(
-        exten=exten1, context='from-extern'
-    ) as extension2, fixtures.extension(
-        exten=exten2, context='from-extern'
-    ) as extension3:
+    with ExitStack() as es:
+        es.enter_context(fixtures.extension(exten=exten1, context='default'))
+        extension2 = es.enter_context(
+            fixtures.extension(exten=exten2, context='from-extern')
+        )
+        extension3 = es.enter_context(
+            fixtures.extension(exten=exten3, context='from-extern')
+        )
 
         response = confd.extensions.get(context='from-extern')
         assert_that(response.items, contains_inanyorder(extension2, extension3))
