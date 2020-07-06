@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -140,6 +140,8 @@ def test_create_minimal_parameters():
         ),
     )
 
+    confd.extensions(response.item['id']).delete()
+
 
 def test_create_with_enabled_parameter():
     exten = h.extension.find_available_exten(CONTEXT)
@@ -153,6 +155,8 @@ def test_create_with_enabled_parameter():
             exten=exten, context=CONTEXT, enabled=False, tenant_uuid=not_(none())
         ),
     )
+
+    confd.extensions(response.item['id']).delete()
 
 
 def test_create_extension_in_different_ranges():
@@ -171,6 +175,7 @@ def test_create_extension_in_different_ranges():
 def create_in_range(exten, context):
     response = confd.extensions.create(exten=exten, context=context)
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
 
 @fixtures.context(
@@ -179,6 +184,7 @@ def create_in_range(exten, context):
 def test_create_extension_in_context_with_did_length(context):
     response = confd.extensions.create(exten='1000', context=context['name'])
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
 
 @fixtures.extension()
@@ -198,6 +204,8 @@ def test_create_pattern():
     response = confd.extensions.post(exten='_XXXX', context='default')
     response.assert_created('extensions')
 
+    confd.extensions(response.item['id']).delete()
+
 
 def test_create_outcall_pattern():
     response = confd.extensions.post(exten='_+XXXX', context='to-extern')
@@ -212,9 +220,11 @@ def test_create_2_extensions_same_exten_different_context(context):
 
     response = confd.extensions.post(exten=exten, context=CONTEXT)
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
     response = confd.extensions.post(exten=exten, context=context['name'])
     response.assert_created('extensions')
+    confd.extensions(response.item['id']).delete()
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
