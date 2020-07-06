@@ -173,7 +173,7 @@ def test_create_extension_in_different_ranges():
 
 
 def create_in_range(exten, context):
-    response = confd.extensions.create(exten=exten, context=context)
+    response = confd.extensions.post(exten=exten, context=context)
     response.assert_created('extensions')
     confd.extensions(response.item['id']).delete()
 
@@ -182,7 +182,7 @@ def create_in_range(exten, context):
     incall_ranges=[{'start': '4185550000', 'end': '4185559999', 'did_length': 4}]
 )
 def test_create_extension_in_context_with_did_length(context):
-    response = confd.extensions.create(exten='1000', context=context['name'])
+    response = confd.extensions.post(exten='1000', context=context['name'])
     response.assert_created('extensions')
     confd.extensions(response.item['id']).delete()
 
@@ -524,24 +524,23 @@ def test_sorting_offset_limit(extension1, extension2):
 def test_search_extensions_in_context():
     exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
+    exten3 = h.extension.find_available_exten('from-extern', exclude=[exten2])
 
-    with fixtures.extension(exten=exten1, context='default'), fixtures.extension(
-        exten=exten1, context='from-extern'
-    ) as extension2, fixtures.extension(exten=exten2, context='from-extern'):
+        exten=exten2, context='from-extern'
+    ) as extension2, fixtures.extension(exten=exten3, context='from-extern'):
 
-        response = confd.extensions.get(search=exten1, context='from-extern')
+        response = confd.extensions.get(search=exten2, context='from-extern')
         assert_that(response.items, contains(extension2))
 
 
 def test_search_list_extensions_in_context():
     exten1 = h.extension.find_available_exten('default')
     exten2 = h.extension.find_available_exten('from-extern')
+    exten3 = h.extension.find_available_exten('from-extern', exclude=[exten2])
 
-    with fixtures.extension(exten=exten1, context='default'), fixtures.extension(
-        exten=exten1, context='from-extern'
-    ) as extension2, fixtures.extension(
         exten=exten2, context='from-extern'
-    ) as extension3:
+    ) as extension2, fixtures.extension(
+        exten=exten3, context='from-extern'
 
         response = confd.extensions.get(context='from-extern')
         assert_that(response.items, contains_inanyorder(extension2, extension3))
