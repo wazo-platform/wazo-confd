@@ -373,10 +373,7 @@ def _new_moh_file_client():
         return data['content']
 
     return BaseIntegrationTest.new_client(
-        headers={
-            "Content-Type": "application/octet-stream",
-            "X-Auth-Token": TOKEN,
-        },
+        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": TOKEN},
         encoder=encoder,
     )
 

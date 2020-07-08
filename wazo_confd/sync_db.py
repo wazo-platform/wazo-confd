@@ -21,16 +21,10 @@ logger = logging.getLogger('wazo-confd-sync-db')
 def parse_cli_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-d',
-        '--debug',
-        action='store_true',
-        help="Log debug messages",
+        '-d', '--debug', action='store_true', help="Log debug messages",
     )
     parser.add_argument(
-        '-q',
-        '--quiet',
-        action='store_true',
-        help='Only print warnings and errors',
+        '-q', '--quiet', action='store_true', help='Only print warnings and errors',
     )
     parsed_args = parser.parse_args()
     result = {}

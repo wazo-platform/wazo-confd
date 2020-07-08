@@ -616,10 +616,7 @@ def _new_sound_file_client():
         return data.get('content', default_content)
 
     return BaseIntegrationTest.new_client(
-        headers={
-            "Content-Type": "application/octet-stream",
-            "X-Auth-Token": TOKEN,
-        },
+        headers={"Content-Type": "application/octet-stream", "X-Auth-Token": TOKEN},
         encoder=encoder,
     )
 
