@@ -20,7 +20,11 @@ from xivo_dao.alchemy.usercustom import UserCustom as Custom
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.useriax import UserIAX as IAX
 
-from ..notifier import TrunkEndpointNotifier
+from ..notifier import (
+    TrunkEndpointSIPNotifier,
+    TrunkEndpointIAXNotifier,
+    TrunkEndpointCustomNotifier,
+)
 
 
 class TestTrunkEndpointNotifier(unittest.TestCase):
@@ -40,9 +44,9 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         self.iax.name = 'limitation of mock instantiation with name ...'
         self.trunk = Mock(Trunk, id=4, tenant_uuid=tenant_uuid)
 
-        self.notifier_custom = TrunkEndpointNotifier('custom', self.bus, self.sysconfd)
-        self.notifier_sip = TrunkEndpointNotifier('sip', self.bus, self.sysconfd)
-        self.notifier_iax = TrunkEndpointNotifier('iax', self.bus, self.sysconfd)
+        self.notifier_custom = TrunkEndpointCustomNotifier(self.bus, self.sysconfd)
+        self.notifier_sip = TrunkEndpointSIPNotifier(self.bus, self.sysconfd)
+        self.notifier_iax = TrunkEndpointIAXNotifier(self.bus, self.sysconfd)
 
     def test_associate_sip_then_bus_event(self):
         expected_event = TrunkEndpointSIPAssociatedEvent(

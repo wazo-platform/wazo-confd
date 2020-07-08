@@ -11,42 +11,35 @@ from .resource import (
     TrunkEndpointAssociationSip,
     TrunkEndpointAssociationIAX,
 )
-from .service import build_service
+from .service import (
+    build_service_sip,
+    build_service_iax,
+    build_service_custom,
+)
 
 
 class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
-        self.load_sip(api)
-        self.load_custom(api)
-        self.load_iax(api)
-
-    def load_sip(self, api):
-        service = build_service('sip')
+        service_sip = build_service_sip()
+        service_iax = build_service_iax()
+        service_custom = build_service_custom()
 
         api.add_resource(
             TrunkEndpointAssociationSip,
             '/trunks/<int:trunk_id>/endpoints/sip/<uuid:endpoint_uuid>',
             endpoint='trunk_endpoint_sip',
-            resource_class_args=(service, trunk_dao, endpoint_sip_dao),
+            resource_class_args=(service_sip, trunk_dao, endpoint_sip_dao),
         )
-
-    def load_custom(self, api):
-        service = build_service('custom')
-
-        api.add_resource(
-            TrunkEndpointAssociationCustom,
-            '/trunks/<int:trunk_id>/endpoints/custom/<int:endpoint_id>',
-            endpoint='trunk_endpoint_custom',
-            resource_class_args=(service, trunk_dao, endpoint_custom_dao),
-        )
-
-    def load_iax(self, api):
-        service = build_service('iax')
-
         api.add_resource(
             TrunkEndpointAssociationIAX,
             '/trunks/<int:trunk_id>/endpoints/iax/<int:endpoint_id>',
             endpoint='trunk_endpoint_iax',
-            resource_class_args=(service, trunk_dao, endpoint_iax_dao),
+            resource_class_args=(service_iax, trunk_dao, endpoint_iax_dao),
+        )
+        api.add_resource(
+            TrunkEndpointAssociationCustom,
+            '/trunks/<int:trunk_id>/endpoints/custom/<int:endpoint_id>',
+            endpoint='trunk_endpoint_custom',
+            resource_class_args=(service_custom, trunk_dao, endpoint_custom_dao),
         )

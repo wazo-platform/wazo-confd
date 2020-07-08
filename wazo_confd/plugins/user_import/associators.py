@@ -80,7 +80,7 @@ class SipAssociator(Associator):
     def update(self, entry):
         line = entry.get_resource('line')
         sip = entry.get_resource('sip')
-        if line and sip and not line.is_associated_with(sip):
+        if line and sip:
             self.service.associate(line, sip)
 
 
@@ -94,7 +94,7 @@ class SccpAssociator(Associator):
     def update(self, entry):
         line = entry.get_resource('line')
         sccp = entry.get_resource('sccp')
-        if line and sccp and not line.is_associated_with(sccp):
+        if line and sccp:
             self.service.associate(line, sccp)
 
 
