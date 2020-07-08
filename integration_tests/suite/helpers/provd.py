@@ -9,6 +9,8 @@ from hamcrest import assert_that, equal_to, has_item, starts_with
 from wazo_provd_client import Client as ProvdClient
 from wazo_provd_client.exceptions import ProvdError
 
+from .config import TOKEN
+
 
 class ProvdHelper:
 
@@ -164,6 +166,6 @@ class ProvdHelper:
                 return client.logs(container['Id'], since=timestamp).decode('utf-8')
 
 
-def create_helper(host='localhost', port='8666', token='valid-token-multitenant'):
+def create_helper(host='localhost', port='8666', token=TOKEN):
     client = ProvdClient(host=host, port=port, prefix='', https=False, token=token)
     return ProvdHelper(client)

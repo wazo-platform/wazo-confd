@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -13,7 +13,7 @@ from . import new_client
 def csv_client():
     new_client.headers = {
         "Content-Type": "text/csv; charset=utf-8",
-        "X-Auth-Token": "valid-token-multitenant",
+        "X-Auth-Token": config.TOKEN,
     }
     new_client.encoder = generate_csv
     return new_client

@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -16,7 +16,7 @@ from hamcrest import (
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, TOKEN
 from . import BaseIntegrationTest
 from . import confd, ari, wazo_sound, asterisk_sound
 
@@ -618,7 +618,7 @@ def _new_sound_file_client():
     return BaseIntegrationTest.new_client(
         headers={
             "Content-Type": "application/octet-stream",
-            "X-Auth-Token": "valid-token-multitenant",
+            "X-Auth-Token": TOKEN,
         },
         encoder=encoder,
     )
