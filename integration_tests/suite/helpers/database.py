@@ -288,15 +288,12 @@ class DatabaseQueries:
 
         return group_id
 
-    def insert_agent(
-        self, number='1000', context='default', group_name='default', tenant_uuid=None
-    ):
+    def insert_agent(self, number='1000', context='default', tenant_uuid=None):
         query = text(
             """
         INSERT INTO agentfeatures
-        (numgroup, number, passwd, context, language, description, tenant_uuid)
+        (number, passwd, context, language, description, tenant_uuid)
         VALUES (
-            (SELECT groupid FROM agentgroup WHERE name = :group_name),
             :number,
             '',
             :context,
@@ -323,7 +320,6 @@ class DatabaseQueries:
             query,
             number=number,
             context=context,
-            group_name=group_name,
             tenant_uuid=tenant_uuid,
         ).scalar()
 
