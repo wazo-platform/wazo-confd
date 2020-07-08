@@ -45,6 +45,30 @@ class IntegrationTest(AssetLaunchingTestCase):
         cls.mock_auth.set_tenants(
             {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
             {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
+            {'uuid': DELETED_TENANT, 'name': 'name3', 'parent_uuid': MAIN_TENANT},
+        )
+
+    @classmethod
+    def sync_db(cls):
+        cls.delete_auth_tenant()
+        cls.docker_exec(['wazo-confd-sync-db', '--debug'])
+        # NOTE(fblackburn): re-add DELETED_TENANT to be able to make
+        # get through API and detect if sync-db doesn't work.
+        cls.reset_auth_tenants()
+
+    @classmethod
+    def delete_auth_tenant(cls):
+        cls.mock_auth.set_tenants(
+            {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
+            {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
+        )
+
+    @classmethod
+    def reset_auth_tenants(cls):
+        cls.mock_auth.set_tenants(
+            {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
+            {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
+            {'uuid': DELETED_TENANT, 'name': 'name3', 'parent_uuid': MAIN_TENANT},
         )
 
     @classmethod
