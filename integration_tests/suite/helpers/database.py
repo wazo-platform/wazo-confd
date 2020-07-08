@@ -317,10 +317,7 @@ class DatabaseQueries:
         )
 
         agent_id = self.connection.execute(
-            query,
-            number=number,
-            context=context,
-            tenant_uuid=tenant_uuid,
+            query, number=number, context=context, tenant_uuid=tenant_uuid,
         ).scalar()
 
         func_key_id = self.insert_func_key('speeddial', 'agent')
