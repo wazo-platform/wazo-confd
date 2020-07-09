@@ -1,6 +1,6 @@
 PROVD_DIR ?= ../../provd/
 MANAGE_DB_DIR ?= ../../manage-db/
-POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/postgres-test/Dockerfile
+POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/docker/wazo-confd-db-test/Dockerfile
 
 test-setup: egg-info build-confd
 
@@ -9,7 +9,7 @@ build-confd:
 	docker build --no-cache -t wazo-confd-test -f Dockerfile ..
 
 update-db:
-	docker build --no-cache -t wazopbx/postgres-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
+	docker build --no-cache -t wazopbx/wazo-confd-db-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
 	docker build -t wazopbx/wazo-provd $(PROVD_DIR)
