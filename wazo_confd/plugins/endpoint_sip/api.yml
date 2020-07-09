@@ -342,14 +342,6 @@ definitions:
       asterisk_id:
         type: string
         description: The ID of the Asterisk onto which this configuration applies.
-      template:
-        type: boolean
-        description: |
-          Indicate if this configuration is a template or not.
-
-          If a configuration is a template, it's configuration will not be generated.
-
-          Some fields are also generated only when a configuration is NOT a template, the username and password are examples.
   EndpointSIPItems:
     title: SIP Endpoints
     properties:
