@@ -21,7 +21,7 @@ services:
       - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
 
   postgres:
-    image: wazopbx/postgres-test
+    image: wazopbx/wazo-confd-db-test
     ports:
       - "5432"
 
