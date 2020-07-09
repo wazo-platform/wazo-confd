@@ -326,7 +326,7 @@ definitions:
       context:
         description: The context used by this endpoint
         $ref: '#/definitions/ContextRelation'
-      templatess:
+      templates:
         type: array
         items:
           $ref: '#/definitions/EndpointSIPRelation'
