@@ -23,7 +23,9 @@ from wazo_confd.plugins.call_permission.service import (
 )
 from wazo_confd.plugins.context.service import build_service as build_context_service
 from wazo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
-from wazo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
+from wazo_confd.plugins.endpoint_sip.service import (
+    build_endpoint_service as build_sip_service,
+)
 from wazo_confd.plugins.extension.service import (
     build_service as build_extension_service,
 )
