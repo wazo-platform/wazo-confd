@@ -22,14 +22,18 @@ class TrunkEndpointAssociation(ConfdResource):
     def put(self, trunk_id, endpoint_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
-        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
+        endpoint = self.endpoint_dao.get(
+            endpoint_id, template=False, tenant_uuids=tenant_uuids
+        )
         self.service.associate(trunk, endpoint)
         return '', 204
 
     def delete(self, trunk_id, endpoint_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
-        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
+        endpoint = self.endpoint_dao.get(
+            endpoint_id, template=False, tenant_uuids=tenant_uuids
+        )
         self.service.dissociate(trunk, endpoint)
         return '', 204
 
