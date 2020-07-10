@@ -509,10 +509,10 @@ class DatabaseQueries:
 
         return count > 0
 
-    def general_has_timezone(self, timezone):
+    def infos_has_timezone(self, timezone):
         query = text(
             """SELECT COUNT(*)
-                     FROM general
+                     FROM infos
                      WHERE
                         timezone = :timezone
                      """
