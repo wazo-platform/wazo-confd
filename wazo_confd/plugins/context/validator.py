@@ -3,7 +3,6 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
-from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao_module
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.resources.voicemail import dao as voicemail_dao_module
@@ -14,25 +13,18 @@ from wazo_confd.database import agent_status_login as agent_login_status_dao_mod
 
 class ContextDeleteValidator(Validator):
     def __init__(
-        self,
-        agent_login_status_dao,
-        extension_dao,
-        trunk_dao,
-        voicemail_dao,
-        endpoint_sip_dao,
+        self, agent_login_status_dao, extension_dao, trunk_dao, voicemail_dao,
     ):
         self.agent_login_status_dao = agent_login_status_dao
         self.extension_dao = extension_dao
         self.trunk_dao = trunk_dao
         self.voicemail_dao = voicemail_dao
-        self.endpoint_sip_dao = endpoint_sip_dao
 
     def validate(self, context):
         self.validate_has_no_extensions(context)
         self.validate_has_no_voicemails(context)
         self.validate_has_no_trunks(context)
         self.validate_has_no_agent_status(context)
-        self.validate_has_no_endpoint_sip(context)
 
     def validate_has_no_extensions(self, context):
         extension = self.extension_dao.find_by(context=context.name)
@@ -65,16 +57,6 @@ class ContextDeleteValidator(Validator):
                 agent_id=agent_status.agent_id,
             )
 
-    def validate_has_no_endpoint_sip(self, context):
-        endpoint_sip = self.endpoint_sip_dao.find_by(context_id=context.id)
-        if endpoint_sip:
-            raise errors.resource_associated(
-                'Context',
-                'EndpointSIP',
-                context_id=context.id,
-                endpoint_sip_uuid=endpoint_sip.uuid,
-            )
-
 
 def build_validator():
     return ValidationGroup(
@@ -87,7 +69,6 @@ def build_validator():
                 extension_dao_module,
                 trunk_dao_module,
                 voicemail_dao_module,
-                endpoint_sip_dao_module,
             )
         ],
     )
