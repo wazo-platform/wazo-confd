@@ -167,7 +167,7 @@ paths:
         - endpoints
       parameters:
         - $ref: '#/parameters/tenantuuid'
-        - $ref: '#/parameters/sipuuid'
+        - $ref: '#/parameters/template_uuid'
       responses:
         '200':
           description: SIP Endpoint template
@@ -184,7 +184,7 @@ paths:
         - sip
       parameters:
         - $ref: '#/parameters/tenantuuid'
-        - $ref: '#/parameters/sipuuid'
+        - $ref: '#/parameters/template_uuid'
         - name: body
           in: body
           required: true
@@ -206,7 +206,7 @@ paths:
         - sip
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/sipuuid'
+      - $ref: '#/parameters/template_uuid'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
@@ -220,6 +220,11 @@ parameters:
     required: true
     type: string
     name: sip_uuid
+    in: path
+  template_uuid:
+    required: true
+    type: string
+    name: template_uuid
     in: path
 
 definitions:
