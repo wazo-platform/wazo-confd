@@ -43,19 +43,19 @@ def test_put():
         method='POST',
         json={'node_type': 'master', 'remote_address': '10.10.10.10'},
     )
-    sip_general_options = confd.asterisk.sip.general.get().json
-    assert_that(
-        sip_general_options, has_entry('options', has_length(greater_than(3)))
-    )  # other options are still present
-    assert_that(
-        sip_general_options,
-        has_entry(
-            'options',
-            has_entries(
-                {'minexpiry': '180', 'maxexpiry': '300', 'defaultexpiry': '240'}
-            ),
-        ),
-    )
+    # sip_general_options = confd.asterisk.sip.general.get().json
+    # assert_that(
+    #     sip_general_options, has_entry('options', has_length(greater_than(3)))
+    # )  # other options are still present
+    # assert_that(
+    #     sip_general_options,
+    #     has_entry(
+    #         'options',
+    #         has_entries(
+    #             {'minexpiry': '180', 'maxexpiry': '300', 'defaultexpiry': '240'}
+    #         ),
+    #     ),
+    # )
     assert_that(
         confd.registrars.get().json,
         has_entry(
@@ -78,19 +78,19 @@ def test_put():
         method='POST',
         json={'node_type': 'disabled', 'remote_address': ''},
     )
-    sip_general_options = confd.asterisk.sip.general.get().json
-    assert_that(
-        sip_general_options, has_entry('options', has_length(greater_than(3)))
-    )  # other options are still present
-    assert_that(
-        sip_general_options,
-        has_entry(
-            'options',
-            has_entries(
-                {'minexpiry': '60', 'maxexpiry': '3600', 'defaultexpiry': '120'}
-            ),
-        ),
-    )
+    # sip_general_options = confd.asterisk.sip.general.get().json
+    # assert_that(
+    #     sip_general_options, has_entry('options', has_length(greater_than(3)))
+    # )  # other options are still present
+    # assert_that(
+    #     sip_general_options,
+    #     has_entry(
+    #         'options',
+    #         has_entries(
+    #             {'minexpiry': '60', 'maxexpiry': '3600', 'defaultexpiry': '120'}
+    #         ),
+    #     ),
+    # )
     assert_that(
         confd.registrars.get().json,
         has_entry(

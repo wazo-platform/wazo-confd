@@ -90,7 +90,6 @@ setup(
             'registrar = wazo_confd.plugins.registrar.plugin:Plugin',
             'schedule = wazo_confd.plugins.schedule.plugin:Plugin',
             'sccp_general = wazo_confd.plugins.sccp_general.plugin:Plugin',
-            'sip_general = wazo_confd.plugins.sip_general.plugin:Plugin',
             'skill = wazo_confd.plugins.skill.plugin:Plugin',
             'skill_rule = wazo_confd.plugins.skill_rule.plugin:Plugin',
             'sound = wazo_confd.plugins.sound.plugin:Plugin',
