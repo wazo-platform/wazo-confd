@@ -8,6 +8,7 @@
   * `/1.1/registers/sip/<register_id>`
   * `/1.1/registers/sip`
   * `/1.1/trunks/<trunk_id>/registers/sip/<register_id>`
+  * `/1.1/asterisk/sip/general`
 
 * The identifier of `/1.1/endpoints/sip` is now a UUID
 * The following resources have been added:

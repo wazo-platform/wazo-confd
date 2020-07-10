@@ -126,7 +126,6 @@ DEFAULT_CONFIG = {
         'rtp': True,
         'schedule': True,
         'sccp_general': True,
-        'sip_general': True,
         'skill': True,
         'skill_rule': True,
         'sound': True,
