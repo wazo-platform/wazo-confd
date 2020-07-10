@@ -1,7 +1,7 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.alchemy.general import General
+from xivo_dao.alchemy.infos import Infos
 from xivo_dao.alchemy.netiface import Netiface
 from xivo_dao.alchemy.resolvconf import Resolvconf
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
@@ -30,7 +30,7 @@ def set_language(language):
 
 
 def set_timezone(timezone):
-    row = Session.query(General).first()
+    row = Session.query(Infos).first()
     row.timezone = timezone
     Session.add(row)
 
@@ -70,14 +70,14 @@ def set_netiface(interface, address, netmask, gateway):
     )
 
 
-def set_xivo_configured():
-    row = Session.query(General).first()
+def set_wazo_configured():
+    row = Session.query(Infos).first()
     row.configured = True
     Session.add(row)
 
 
-def get_xivo_configured():
-    return Session.query(General).first()
+def get_wazo_configured():
+    return Session.query(Infos).first()
 
 
 def create(wizard):

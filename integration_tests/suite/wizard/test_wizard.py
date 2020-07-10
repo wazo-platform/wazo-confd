@@ -332,7 +332,7 @@ class TestWizardPost(IntegrationTest):
             assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
-            assert_that(queries.general_has_timezone(data['timezone']))
+            assert_that(queries.infos_has_timezone(data['timezone']))
             assert_that(
                 queries.resolvconf_is_configured(
                     data['network']['hostname'],

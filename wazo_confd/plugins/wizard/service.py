@@ -68,7 +68,7 @@ class WizardService:
         }
 
         return {
-            'configured': wizard_db.get_xivo_configured().configured,
+            'configured': wizard_db.get_wazo_configured().configured,
             'configurable': all(
                 [state == 'ok' for state in configurable_status.values()]
             ),
@@ -109,7 +109,7 @@ class WizardService:
         if wizard['steps']['admin']:
             self._initialize_admin('root', wizard['admin_password'])
 
-        wizard_db.set_xivo_configured()
+        wizard_db.set_wazo_configured()
         self.notifier.created()
         wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
