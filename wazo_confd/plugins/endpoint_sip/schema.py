@@ -35,10 +35,6 @@ class TransportRelationSchema(BaseSchema):
     uuid = fields.UUID(required=True)
 
 
-class ContextRelationSchema(BaseSchema):
-    id = fields.Integer(required=True)
-
-
 class _BaseSIPSchema(BaseSchema):
 
     uuid = fields.UUID(dump_only=True)
@@ -58,7 +54,6 @@ class _BaseSIPSchema(BaseSchema):
         fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
     )
     transport = fields.Nested('TransportRelationSchema', unknown=EXCLUDE)
-    context = fields.Nested('ContextRelationSchema', unknown=EXCLUDE)
     asterisk_id = fields.String(validate=Length(max=1024))
 
 
