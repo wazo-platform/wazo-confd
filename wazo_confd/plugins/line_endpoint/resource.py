@@ -18,18 +18,14 @@ class LineEndpointAssociation(ConfdResource):
     def put(self, line_id, endpoint_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-        endpoint = self.endpoint_dao.get(
-            endpoint_id, template=False, tenant_uuids=tenant_uuids
-        )
+        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
         self.service.associate(line, endpoint)
         return '', 204
 
     def delete(self, line_id, endpoint_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-        endpoint = self.endpoint_dao.get(
-            endpoint_id, template=False, tenant_uuids=tenant_uuids
-        )
+        endpoint = self.endpoint_dao.get(endpoint_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(line, endpoint)
         return '', 204
 
@@ -37,11 +33,23 @@ class LineEndpointAssociation(ConfdResource):
 class LineEndpointAssociationSip(LineEndpointAssociation):
     @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_uuid}.update')
     def put(self, line_id, endpoint_uuid):
-        return super().put(line_id, endpoint_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        sip = self.endpoint_dao.get(
+            endpoint_uuid, template=False, tenant_uuids=tenant_uuids
+        )
+        self.service.associate(line, sip)
+        return '', 204
 
     @required_acl('confd.lines.{line_id}.endpoints.sip.{endpoint_uuid}.delete')
     def delete(self, line_id, endpoint_uuid):
-        return super().delete(line_id, endpoint_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        sip = self.endpoint_dao.get(
+            endpoint_uuid, template=False, tenant_uuids=tenant_uuids
+        )
+        self.service.dissociate(line, sip)
+        return '', 204
 
 
 class LineEndpointAssociationSccp(LineEndpointAssociation):
