@@ -6,10 +6,11 @@ import re
 from hamcrest import (
     assert_that,
     only_contains,
-    greater_than,
+    # TODO clean after pjsip migration
+    # greater_than,
+    # has_length,
     has_entry,
     has_entries,
-    has_length,
 )
 
 from . import confd
@@ -43,6 +44,7 @@ def test_put():
         method='POST',
         json={'node_type': 'master', 'remote_address': '10.10.10.10'},
     )
+    # TODO clean after pjsip migration
     # sip_general_options = confd.asterisk.sip.general.get().json
     # assert_that(
     #     sip_general_options, has_entry('options', has_length(greater_than(3)))
@@ -78,6 +80,7 @@ def test_put():
         method='POST',
         json={'node_type': 'disabled', 'remote_address': ''},
     )
+    # TODO clean after pjsip migration
     # sip_general_options = confd.asterisk.sip.general.get().json
     # assert_that(
     #     sip_general_options, has_entry('options', has_length(greater_than(3)))
