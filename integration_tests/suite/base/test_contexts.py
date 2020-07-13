@@ -358,16 +358,6 @@ def test_delete_when_agent_is_logged(context, agent_login_status):
 
 
 @fixtures.context()
-def test_when_endpoint_sip_associated(context):
-    endpoint_sip = confd.endpoints.sip.post(context=context).json
-    try:
-        response = confd.contexts(context['id']).delete()
-        response.assert_match(400, e.resource_associated('Context', 'EndpointSIP'))
-    finally:
-        confd.endpoints.sip(endpoint_sip['uuid']).delete()
-
-
-@fixtures.context()
 def test_bus_events(context):
     yield s.check_bus_event, 'config.contexts.created', confd.contexts.post, {
         'name': 'bus_event'

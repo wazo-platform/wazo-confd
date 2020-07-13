@@ -37,11 +37,23 @@ class TrunkEndpointAssociation(ConfdResource):
 class TrunkEndpointAssociationSip(TrunkEndpointAssociation):
     @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_uuid}.update')
     def put(self, trunk_id, endpoint_uuid):
-        return super().put(trunk_id, endpoint_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
+        sip = self.endpoint_dao.get(
+            endpoint_uuid, template=False, tenant_uuids=tenant_uuids
+        )
+        self.service.associate(trunk, sip)
+        return '', 204
 
     @required_acl('confd.trunks.{trunk_id}.endpoints.sip.{endpoint_uuid}.delete')
     def delete(self, trunk_id, endpoint_uuid):
-        return super().delete(trunk_id, endpoint_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
+        sip = self.endpoint_dao.get(
+            endpoint_uuid, template=False, tenant_uuids=tenant_uuids
+        )
+        self.service.dissociate(trunk, sip)
+        return '', 204
 
 
 class TrunkEndpointAssociationCustom(TrunkEndpointAssociation):
