@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
+from ..helpers.config import TOKEN
 from ..helpers.wrappers import IsolatedAction
 
 
@@ -11,6 +12,7 @@ class BaseIntegrationTest(IntegrationTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.setup_token()
         cls.setup_provd()
         cls.setup_database()
         cls.setup_helpers()
@@ -57,7 +59,7 @@ class SingletonProxy:
 confd = SingletonProxy(BaseIntegrationTest.create_confd)
 confd_csv = SingletonProxy(
     BaseIntegrationTest.create_confd,
-    {'Accept': 'text/csv; charset=utf-8', 'X-Auth-Token': 'valid-token-multitenant'},
+    {'Accept': 'text/csv; charset=utf-8', 'X-Auth-Token': TOKEN},
 )
 auth = SingletonProxy(BaseIntegrationTest.create_auth)
 ari = SingletonProxy(BaseIntegrationTest.create_ari)

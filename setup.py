@@ -17,7 +17,10 @@ setup(
     package_data={'wazo_confd.plugins': ['*/api.yml']},
     zip_safe=False,
     entry_points={
-        'console_scripts': ['wazo-confd=wazo_confd.main:main'],
+        'console_scripts': [
+            'wazo-confd=wazo_confd.main:main',
+            'wazo-confd-sync-db=wazo_confd.sync_db:main',
+        ],
         'wazo_confd.plugins': [
             'access_feature = wazo_confd.plugins.access_feature.plugin:Plugin',
             'agent = wazo_confd.plugins.agent.plugin:Plugin',

@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -10,6 +10,8 @@ EXTEN_OUTSIDE_RANGE = str('99999')
 USER_EXTENSION_RANGE = list(range(1000, 2000))
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
+TOKEN = '00000000-0000-4000-9000-000000070435'
+DELETED_TENANT = '66666666-6666-4666-8666-666666666666'
 
 
 def gen_line_exten():

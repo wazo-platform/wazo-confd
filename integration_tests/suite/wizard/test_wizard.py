@@ -102,6 +102,7 @@ class IntegrationTest(BaseIntegrationTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.setup_token()
         cls.setup_helpers()
         cls.confd = cls.create_confd()
         cls.provd = cls.create_provd()

@@ -19,6 +19,7 @@ from hamcrest import (
     only_contains,
 )
 
+from .config import TOKEN
 from .urls import UrlFragment
 
 
@@ -32,7 +33,7 @@ class ConfdClient:
 
     DEFAULT_HEADERS = {
         'Accept': 'application/json',
-        'X-Auth-Token': 'valid-token-multitenant',  # hardcoded in wazo-auth-mock
+        'X-Auth-Token': TOKEN,
         'Content-Type': 'application/json',
     }
 
