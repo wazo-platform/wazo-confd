@@ -174,6 +174,16 @@ def test_get_multi_tenant(main, sub):
     assert_that(response.item, has_entries(**sub))
 
 
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
 @fixtures.funckey_template()
 def test_delete(funckey_template):
     response = confd.funckeys.templates(funckey_template['id']).delete()

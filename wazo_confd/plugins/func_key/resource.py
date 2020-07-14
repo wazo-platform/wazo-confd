@@ -144,7 +144,8 @@ class FuncKeyTemplateItem(ItemResource, FindUpdateFieldsMixin):
 
     @required_acl('confd.funckeys.templates.{id}.update')
     def put(self, id):
-        template = self.service.get(id)
+        kwargs = self._add_tenant_uuid()
+        template = self.service.get(id, **kwargs)
         template_form = self.schema().load(request.get_json())
         updated_fields = self.find_updated_fields_position(
             template.keys, template_form.get('keys', {})
