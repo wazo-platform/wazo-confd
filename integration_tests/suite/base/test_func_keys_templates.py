@@ -5,12 +5,14 @@ from hamcrest import (
     all_of,
     assert_that,
     contains,
+    empty,
     has_entries,
     has_entry,
     has_item,
     has_items,
     is_not,
     not_,
+    none,
 )
 
 from . import confd
@@ -143,7 +145,15 @@ def test_list_multi_tenant(main, sub):
 @fixtures.funckey_template(name='template')
 def test_get(funckey_template):
     response = confd.funckeys.templates(funckey_template['id']).get()
-    assert_that(response.item, has_entries(name='template'))
+    assert_that(
+        response.item,
+        has_entries(
+            id=not_(none()),
+            tenant_uuid=MAIN_TENANT,
+            name='template',
+            keys=empty(),
+        )
+    )
 
 
 @fixtures.funckey_template(
@@ -186,7 +196,7 @@ def test_create_funckey_template_minimal_parameters():
     response = confd.funckeys.templates.post()
     response.assert_created('templates')
 
-    assert_that(response.item, has_entries(keys={}, name=None))
+    assert_that(response.item, has_entries(keys={}, tenant_uuid=MAIN_TENANT, name=None))
 
 
 def test_post_error_on_duplicate_destination():

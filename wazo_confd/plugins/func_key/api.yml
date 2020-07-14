@@ -371,6 +371,12 @@ definitions:
     title: FuncKeyTemplate
     description: Further documentation at http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
     properties:
+      id:
+        type: integer
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
       name:
         type: string
       keys:
