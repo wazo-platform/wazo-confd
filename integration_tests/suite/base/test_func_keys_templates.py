@@ -15,7 +15,11 @@ from hamcrest import (
 
 from . import confd
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
-from ..helpers import fixtures, scenarios as s
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s
+)
 from ..helpers.config import (
     MAIN_TENANT,
     SUB_TENANT,
@@ -148,6 +152,16 @@ def test_get(funckey_template):
 def test_get_position(funckey_template):
     response = confd.funckeys.templates(funckey_template['id'])(3).get()
     assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
+
+
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 @fixtures.funckey_template()

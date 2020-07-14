@@ -130,18 +130,16 @@ class FuncKeyTemplateList(ListResource):
         return self.model(**template)
 
 
-class FuncKeyTemplateItem(ConfdResource, FindUpdateFieldsMixin):
+class FuncKeyTemplateItem(ItemResource, FindUpdateFieldsMixin):
 
     context = {'exclude_destination': ['agent', 'bsfilter']}
     schema = FuncKeyTemplateSchema
-
-    def __init__(self, service):
-        super().__init__()
-        self.service = service
+    has_tenant_uuid = True
 
     @required_acl('confd.funckeys.templates.{id}.read')
     def get(self, id):
-        template = self.service.get(id)
+        kwargs = self._add_tenant_uuid()
+        template = self.service.get(id, **kwargs)
         return self.schema(context=self.context).dump(template)
 
     @required_acl('confd.funckeys.templates.{id}.update')

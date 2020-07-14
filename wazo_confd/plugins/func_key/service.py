@@ -42,8 +42,8 @@ class TemplateService:
         self.device_updater = device_updater
         self.validator_bsfilter = validator_bsfilter
 
-    def get(self, template_id):
-        return self.template_dao.get(template_id)
+    def get(self, template_id, tenant_uuids=None):
+        return self.template_dao.get(template_id, tenant_uuids=tenant_uuids)
 
     def get_unified_template(self, user_id):
         user = self.user_dao.get_by_id_uuid(user_id)
