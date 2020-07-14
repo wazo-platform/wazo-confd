@@ -202,6 +202,16 @@ def test_delete_position(funckey_template):
     s.check_resource_not_found(url_get, 'FuncKey')
 
 
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 def test_create_funckey_template_minimal_parameters():
     response = confd.funckeys.templates.post()
     response.assert_created('templates')

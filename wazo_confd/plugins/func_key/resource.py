@@ -162,9 +162,7 @@ class FuncKeyTemplateItem(ItemResource, FindUpdateFieldsMixin):
 
     @required_acl('confd.funckeys.templates.{id}.delete')
     def delete(self, id):
-        template = self.service.get(id)
-        self.service.delete(template)
-        return '', 204
+        return super().delete(id)
 
 
 class FuncKeyTemplateItemPosition(ItemResource):
