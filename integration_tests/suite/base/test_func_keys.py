@@ -889,6 +889,50 @@ def test_edit_user_funckeys_multi_tenant(main, sub):
     response.assert_updated()
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_get_user_funckeys_position_multi_tenant(main, sub):
+    body = {'destination': {'type': 'custom', 'exten': '123'}}
+    confd.users(main['uuid']).funckeys(1).put(body).assert_updated()
+    confd.users(sub['uuid']).funckeys(1).put(body).assert_updated()
+
+    response = confd.users(main['uuid']).funckeys(1).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(sub['uuid']).funckeys(1).get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_edit_user_funckeys_position_multi_tenant(main, sub):
+    body = {'destination': {'type': 'custom', 'exten': '123'}}
+    confd.users(main['uuid']).funckeys(1).put(body).assert_updated()
+    confd.users(sub['uuid']).funckeys(1).put(body).assert_updated()
+
+    response = confd.users(main['uuid']).funckeys(1).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(sub['uuid']).funckeys(1).put(
+        wazo_tenant=MAIN_TENANT, **body
+    )
+    response.assert_updated()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_delete_user_funckeys_position_multi_tenant(main, sub):
+    body = {'destination': {'type': 'custom', 'exten': '123'}}
+    confd.users(main['uuid']).funckeys(1).put(body).assert_updated()
+    confd.users(sub['uuid']).funckeys(1).put(body).assert_updated()
+
+    response = confd.users(main['uuid']).funckeys(1).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(sub['uuid']).funckeys(1).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 class TestBlfFuncKeys(BaseTestFuncKey):
     def setUp(self):
         super().setUp()

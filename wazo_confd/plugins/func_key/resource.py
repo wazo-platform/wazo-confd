@@ -239,10 +239,12 @@ class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
 class UserFuncKeyItemPosition(UserFuncKey):
 
     schema = FuncKeySchema
+    has_tenant_uuid = True
 
     @required_acl('confd.users.{user_id}.funckeys.{position}.update')
     def put(self, user_id, position):
-        user = self.user_dao.get_by_id_uuid(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         template = self.template_dao.get(user.private_template_id)
         funckey = self.schema().load(request.get_json())
         funckey_model = _create_funckey_model(funckey)
@@ -251,14 +253,16 @@ class UserFuncKeyItemPosition(UserFuncKey):
 
     @required_acl('confd.users.{user_id}.funckeys.{position}.delete')
     def delete(self, user_id, position):
-        user = self.user_dao.get_by_id_uuid(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         template = self.template_dao.get(user.private_template_id)
         self.service.delete_funckey(template, position)
         return '', 204
 
     @required_acl('confd.users.{user_id}.funckeys.{position}.read')
     def get(self, user_id, position):
-        template = self.service.get_unified_template(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        template = self.service.get_unified_template(user_id, tenant_uuids=tenant_uuids)
         funckey = template.get(position)
         return self.schema().dump(funckey)
 

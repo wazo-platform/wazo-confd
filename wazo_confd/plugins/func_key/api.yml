@@ -226,6 +226,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/funckeyposition'
       responses:
@@ -243,6 +244,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/funckeyposition'
       - name: body
@@ -263,6 +265,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/funckeyposition'
       responses:
