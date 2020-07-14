@@ -52,6 +52,13 @@ def test_associate_when_endpoint_already_associated(line, sip):
 
 
 @fixtures.line()
+@fixtures.sip_template()
+def test_associate_with_sip_template(line, sip_template):
+    response = confd.lines(line['id']).endpoints.sip(sip_template['uuid']).put()
+    response.assert_match(404, e.not_found('SIPEndpoint'))
+
+
+@fixtures.line()
 @fixtures.sip()
 @fixtures.sip()
 def test_associate_with_another_endpoint_when_already_associated(line, sip1, sip2):
