@@ -169,15 +169,18 @@ class FuncKeyTemplateItemPosition(ItemResource):
 
     context = {'exclude_destination': ['agent', 'bsfilter']}
     schema = FuncKeySchema
+    has_tenant_uuid = True
 
     @required_acl('confd.funckeys.templates.{id}.{position}.read')
     def get(self, id, position):
-        funckey = self.service.get(id).get(position)
+        kwargs = self._add_tenant_uuid()
+        funckey = self.service.get(id, **kwargs).get(position)
         return self.schema(context=self.context).dump(funckey)
 
     @required_acl('confd.funckeys.templates.{id}.{position}.update')
     def put(self, id, position):
-        template = self.service.get(id)
+        kwargs = self._add_tenant_uuid()
+        template = self.service.get(id, **kwargs)
         funckey = self.schema(context=self.context).load(request.get_json())
         funckey_model = _create_funckey_model(funckey)
         self.service.edit_funckey(funckey_model, template, position)
@@ -185,7 +188,8 @@ class FuncKeyTemplateItemPosition(ItemResource):
 
     @required_acl('confd.funckeys.templates.{id}.{position}.delete')
     def delete(self, id, position):
-        template = self.service.get(id)
+        kwargs = self._add_tenant_uuid()
+        template = self.service.get(id, **kwargs)
         self.service.delete_funckey(template, position)
         return '', 204
 

@@ -130,6 +130,7 @@ paths:
       tags:
       - funckeys
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/templateid'
       - $ref: '#/parameters/funckeyposition'
       responses:
@@ -146,6 +147,7 @@ paths:
       tags:
       - funckeys
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/templateid'
       - $ref: '#/parameters/funckeyposition'
       - name: body
@@ -165,6 +167,7 @@ paths:
       tags:
       - funckeys
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/templateid'
       - $ref: '#/parameters/funckeyposition'
       responses:

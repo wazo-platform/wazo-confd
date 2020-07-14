@@ -156,14 +156,6 @@ def test_get(funckey_template):
     )
 
 
-@fixtures.funckey_template(
-    keys={'3': {'destination': {'type': 'custom', 'exten': '123'}}}
-)
-def test_get_position(funckey_template):
-    response = confd.funckeys.templates(funckey_template['id'])(3).get()
-    assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
-
-
 @fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
 @fixtures.funckey_template(wazo_tenant=SUB_TENANT)
 def test_get_multi_tenant(main, sub):
@@ -172,6 +164,30 @@ def test_get_multi_tenant(main, sub):
 
     response = confd.funckeys.templates(sub['id']).get(wazo_tenant=MAIN_TENANT)
     assert_that(response.item, has_entries(**sub))
+
+
+@fixtures.funckey_template(
+    keys={'3': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+def test_get_position(funckey_template):
+    response = confd.funckeys.templates(funckey_template['id'])(3).get()
+    assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
+
+
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=SUB_TENANT,
+)
+def test_get_position_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id'])(1).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id'])(1).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub['keys']['1']))
 
 
 @fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
@@ -184,12 +200,41 @@ def test_edit_multi_tenant(main, sub):
     response.assert_updated()
 
 
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=SUB_TENANT,
+)
+def test_edit_position_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id'])(1).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id'])(1).put(
+        wazo_tenant=MAIN_TENANT,
+        destination={'type': 'custom', 'exten': '456'},
+    )
+    response.assert_updated()
+
+
 @fixtures.funckey_template()
 def test_delete(funckey_template):
     response = confd.funckeys.templates(funckey_template['id']).delete()
     response.assert_deleted()
     url_get = confd.funckeys.templates(funckey_template['id']).get
     s.check_resource_not_found(url_get, 'FuncKeyTemplate')
+
+
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.funckey_template(
@@ -202,13 +247,19 @@ def test_delete_position(funckey_template):
     s.check_resource_not_found(url_get, 'FuncKey')
 
 
-@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
-@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
-    response = confd.funckeys.templates(main['id']).delete(wazo_tenant=SUB_TENANT)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=SUB_TENANT,
+)
+def test_delete_position_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id'])(1).delete(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
 
-    response = confd.funckeys.templates(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response = confd.funckeys.templates(sub['id'])(1).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
 
 
