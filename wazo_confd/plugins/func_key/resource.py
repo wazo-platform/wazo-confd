@@ -106,7 +106,8 @@ class FuncKeyTemplateList(ListResource):
     @required_acl('confd.funckeys.templates.read')
     def get(self):
         params = self.search_params()
-        result = self.service.search(params)
+        tenant_uuids = self._build_tenant_list(params)
+        result = self.service.search(params, tenant_uuids)
         return {
             'total': result.total,
             'items': [
@@ -118,6 +119,7 @@ class FuncKeyTemplateList(ListResource):
     def post(self):
         schema = self.schema(context=self.context)
         template = schema.load(request.get_json())
+        template = self.add_tenant_to_form(template)
         template_model = self._create_template_model(template)
         model = self.service.create(template_model)
         return schema.dump(model), 201, self.build_headers(model)

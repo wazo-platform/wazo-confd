@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -54,8 +54,8 @@ class TemplateService:
         else:
             return self.get(user.private_template_id)
 
-    def search(self, parameters):
-        return self.template_dao.search(**parameters)
+    def search(self, parameters, tenant_uuids):
+        return self.template_dao.search(tenant_uuids=tenant_uuids, **parameters)
 
     def create(self, template):
         self.validator.validate_create(template)
