@@ -14,8 +14,17 @@ from hamcrest import (
 )
 
 from . import confd, db, provd
-from ..helpers import associations as a, fixtures, helpers, scenarios as s
-from ..helpers.config import MAIN_TENANT
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    helpers,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 FAKE_ID = 999999999
 
@@ -858,6 +867,26 @@ def test_get_group_destination_relation(user, group):
             destination=has_entries(group_id=group['id'], group_name=group['name'])
         ),
     )
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_get_user_funckeys_multi_tenant(main, sub):
+    response = confd.users(main['uuid']).funckeys.get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(sub['uuid']).funckeys.get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_edit_user_funckeys_multi_tenant(main, sub):
+    response = confd.users(main['uuid']).funckeys.put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(sub['uuid']).funckeys.put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
 
 
 class TestBlfFuncKeys(BaseTestFuncKey):

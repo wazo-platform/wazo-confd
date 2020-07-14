@@ -186,6 +186,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       responses:
         '200':
@@ -204,6 +205,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - name: body
         in: body

@@ -45,8 +45,8 @@ class TemplateService:
     def get(self, template_id, tenant_uuids=None):
         return self.template_dao.get(template_id, tenant_uuids=tenant_uuids)
 
-    def get_unified_template(self, user_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
+    def get_unified_template(self, user_id, tenant_uuids=None):
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         if user.func_key_template_id:
             public_template = self.get(user.func_key_template_id)
             private_template = self.get(user.private_template_id)

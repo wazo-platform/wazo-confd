@@ -208,15 +208,18 @@ class UserFuncKey(ConfdResource):
 class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
 
     schema = FuncKeyUnifiedTemplateSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.users.{user_id}.funckeys.read')
     def get(self, user_id):
-        template = self.service.get_unified_template(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        template = self.service.get_unified_template(user_id, tenant_uuids=tenant_uuids)
         return self.schema().dump(template)
 
     @required_acl('confd.users.{user_id}.funckeys.update')
     def put(self, user_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         template = self.template_dao.get(user.private_template_id)
         template_form = self.schema().load(request.get_json())
         updated_fields = self.find_updated_fields_position(
