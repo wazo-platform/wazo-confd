@@ -953,6 +953,53 @@ def test_get_user_templates_multi_tenant(main, sub):
     response.assert_ok()
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_user, sub_user, main_template, sub_template):
+    response = (
+        confd.users(main_user['uuid'])
+        .funckeys.templates(sub_template['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('User'))
+
+    response = (
+        confd.users(sub_user['uuid'])
+        .funckeys.templates(main_template['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('FuncKeyTemplate'))
+
+    response = (
+        confd.users(main_user['uuid'])
+        .funckeys.templates(sub_template['id'])
+        .put(wazo_tenant=MAIN_TENANT)
+    )
+    response.assert_match(400, e.different_tenant())
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_dissociate_multi_tenant(main_user, sub_user, main_template, sub_template):
+    response = (
+        confd.users(main_user['uuid'])
+        .funckeys.templates(sub_template['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('User'))
+
+    response = (
+        confd.users(sub_user['uuid'])
+        .funckeys.templates(main_template['id'])
+        .delete(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('FuncKeyTemplate'))
+
+
 class TestBlfFuncKeys(BaseTestFuncKey):
     def setUp(self):
         super().setUp()

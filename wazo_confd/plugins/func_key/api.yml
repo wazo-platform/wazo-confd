@@ -303,6 +303,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/templateid'
       responses:
@@ -320,6 +321,7 @@ paths:
       - funckeys
       - users
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
       - $ref: '#/parameters/templateid'
       responses:

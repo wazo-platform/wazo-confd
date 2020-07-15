@@ -39,6 +39,15 @@ class AssociatePrivateTemplateValidator(Validator):
             )
 
 
+class AssociateSameTenant(Validator):
+    def validate(self, user, template):
+        if user.tenant_uuid != template.tenant_uuid:
+            raise errors.different_tenants(
+                user_tenant_uuid=user.tenant_uuid,
+                template_tenant_uuid=template.tenant_uuid,
+            )
+
+
 class SimilarFuncKeyValidator(Validator):
     def validate(self, template):
         counter = Counter(
@@ -166,5 +175,6 @@ def build_user_template_validator():
     return ValidationAssociation(
         association=[
             AssociatePrivateTemplateValidator(),
+            AssociateSameTenant(),
         ],
     )

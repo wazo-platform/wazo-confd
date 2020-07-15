@@ -276,17 +276,22 @@ class UserFuncKeyTemplate(ConfdResource):
 
 
 class UserFuncKeyTemplateAssociation(UserFuncKeyTemplate):
+
+    has_tenant_uuid = True
+
     @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.update')
     def put(self, user_id, template_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
-        template = self.template_dao.get(template_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        template = self.template_dao.get(template_id, tenant_uuids=tenant_uuids)
         self.service.associate(user, template)
         return '', 204
 
     @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.delete')
     def delete(self, user_id, template_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
-        template = self.template_dao.get(template_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        template = self.template_dao.get(template_id, tenant_uuids=tenant_uuids)
         self.service.dissociate(user, template)
         return '', 204
 
