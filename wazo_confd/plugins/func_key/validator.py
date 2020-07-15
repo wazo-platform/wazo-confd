@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -17,6 +17,7 @@ from wazo_confd.helpers.validator import (
     Validator,
     GetResource,
     ResourceExists,
+    ValidationAssociation,
     ValidationGroup,
 )
 
@@ -26,6 +27,15 @@ class PrivateTemplateValidator(Validator):
         if template.private:
             raise errors.not_permitted(
                 "Deleting private templates is not allowed", template_id=template.id
+            )
+
+
+class AssociatePrivateTemplateValidator(Validator):
+    def validate(self, user, template):
+        if template.private:
+            raise errors.not_permitted(
+                "Cannot associate a private template with a user",
+                template_id=template.id
             )
 
 
@@ -150,3 +160,11 @@ def build_validator():
 
 def build_validator_bsfilter():
     return BSFilterValidator()
+
+
+def build_user_template_validator():
+    return ValidationAssociation(
+        association=[
+            AssociatePrivateTemplateValidator(),
+        ],
+    )

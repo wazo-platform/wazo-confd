@@ -1,14 +1,17 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.helpers import errors
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.func_key_template import dao as template_dao_module
 from xivo_dao.resources.user import dao as user_dao_module
 
 from wazo_confd.plugins.device import builder as device_builder
 from .notifier import build_notifier
-from .validator import build_validator, build_validator_bsfilter
+from .validator import (
+    build_validator,
+    build_validator_bsfilter,
+    build_user_template_validator,
+)
 
 
 class TemplateService:
@@ -138,12 +141,7 @@ class UserFuncKeyTemplateService:
         return [user] if user.func_key_template_id else []
 
     def associate(self, user, template):
-        if template.private:
-            raise errors.not_permitted(
-                "Cannot associate a private template with a user",
-                template_id=template.id,
-            )
-
+        self.validator.validate_association(user, template)
         user.func_key_template_id = template.id
         self.user_dao.edit(user)
         self.device_updater.update_for_user(user)
@@ -152,6 +150,7 @@ class UserFuncKeyTemplateService:
         if user.func_key_template_id != template.id:
             return
 
+        self.validator.validate_dissociation(user, template)
         user.func_key_template_id = None
         self.user_dao.edit(user)
         self.device_updater.update_for_user(user)
@@ -161,5 +160,8 @@ def build_user_funckey_template_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
     return UserFuncKeyTemplateService(
-        user_dao_module, build_validator(), build_notifier(), device_updater
+        user_dao_module,
+        build_user_template_validator(),
+        build_notifier(),
+        device_updater,
     )
