@@ -933,6 +933,26 @@ def test_delete_user_funckeys_position_multi_tenant(main, sub):
     response.assert_deleted()
 
 
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_get_template_users_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).users.get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).users.get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_get_user_templates_multi_tenant(main, sub):
+    response = confd.users(main['uuid']).funckeys.templates.get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(sub['uuid']).funckeys.templates.get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
+
+
 class TestBlfFuncKeys(BaseTestFuncKey):
     def setUp(self):
         super().setUp()

@@ -274,21 +274,18 @@ class UserFuncKeyTemplate(ConfdResource):
         self.user_dao = user_dao
         self.template_dao = template_dao
 
-    def get_user(self, user_id):
-        return self.user_dao.get_by_id_uuid(user_id)
-
 
 class UserFuncKeyTemplateAssociation(UserFuncKeyTemplate):
     @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.update')
     def put(self, user_id, template_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         template = self.template_dao.get(template_id)
         self.service.associate(user, template)
         return '', 204
 
     @required_acl('confd.users.{user_id}.funckeys.templates.{template_id}.delete')
     def delete(self, user_id, template_id):
-        user = self.get_user(user_id)
+        user = self.user_dao.get_by_id_uuid(user_id)
         template = self.template_dao.get(template_id)
         self.service.dissociate(user, template)
         return '', 204
@@ -297,10 +294,12 @@ class UserFuncKeyTemplateAssociation(UserFuncKeyTemplate):
 class UserFuncKeyTemplateGet(UserFuncKeyTemplate):
 
     schema = FuncKeyTemplateUserSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.users.{user_id}.funckeys.templates.read')
     def get(self, user_id):
-        user = self.get_user(user_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         result = self.service.find_all_by_user_id(user.id)
         return {
             'total': len(result),
@@ -311,10 +310,12 @@ class UserFuncKeyTemplateGet(UserFuncKeyTemplate):
 class FuncKeyTemplateUserGet(UserFuncKeyTemplate):
 
     schema = FuncKeyTemplateUserSchema
+    has_tenant_uuid = True
 
     @required_acl('confd.funckeys.templates.{template_id}.users.read')
     def get(self, template_id):
-        template = self.template_dao.get(template_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        template = self.template_dao.get(template_id, tenant_uuids=tenant_uuids)
         result = self.service.find_all_by_template_id(template.id)
         return {
             'total': len(result),
