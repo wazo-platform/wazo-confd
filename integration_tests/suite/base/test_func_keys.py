@@ -913,9 +913,7 @@ def test_edit_user_funckeys_position_multi_tenant(main, sub):
     response = confd.users(main['uuid']).funckeys(1).put(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='User'))
 
-    response = confd.users(sub['uuid']).funckeys(1).put(
-        wazo_tenant=MAIN_TENANT, **body
-    )
+    response = confd.users(sub['uuid']).funckeys(1).put(wazo_tenant=MAIN_TENANT, **body)
     response.assert_updated()
 
 
@@ -1066,15 +1064,13 @@ def test_func_key_destinations_multi_tenant(
         response.assert_updated()
 
         if position not in exclude_for_template:
-            response = (
-                confd.funckeys.templates(main_template['id'])(position)
-                .put(fk_args)
+            response = confd.funckeys.templates(main_template['id'])(position).put(
+                fk_args
             )
             response.assert_status(400)
 
-            response = (
-                confd.funckeys.templates(sub_template['id'])(position)
-                .put(fk_args)
+            response = confd.funckeys.templates(sub_template['id'])(position).put(
+                fk_args
             )
             response.assert_updated()
 
@@ -1087,7 +1083,9 @@ def test_func_key_destinations_multi_tenant(
             response = confd.funckeys.templates(sub_template['id']).put(template_args)
             response.assert_updated()
 
-            response = confd.funckeys.templates.post(template_args, wazo_tenant=SUB_TENANT)
+            response = confd.funckeys.templates.post(
+                template_args, wazo_tenant=SUB_TENANT
+            )
             response.assert_created()
 
             response = confd.funckeys.templates(response.item['id']).delete()

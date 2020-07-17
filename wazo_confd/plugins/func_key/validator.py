@@ -35,7 +35,7 @@ class AssociatePrivateTemplateValidator(Validator):
         if template.private:
             raise errors.not_permitted(
                 "Cannot associate a private template with a user",
-                template_id=template.id
+                template_id=template.id,
             )
 
 
@@ -179,8 +179,5 @@ def build_validator_bsfilter():
 
 def build_user_template_validator():
     return ValidationAssociation(
-        association=[
-            AssociatePrivateTemplateValidator(),
-            AssociateSameTenant(),
-        ],
+        association=[AssociatePrivateTemplateValidator(), AssociateSameTenant()],
     )
