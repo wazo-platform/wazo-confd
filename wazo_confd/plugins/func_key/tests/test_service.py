@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -25,8 +25,11 @@ class TestTemplateService(unittest.TestCase):
 
         self.notifier = Mock()
         self.device_updater = Mock(DeviceUpdater)
+        self.tenant_uuid = '1234'
 
-        self.template = FuncKeyTemplate(id=sentinel.template_id, name=sentinel.name)
+        self.template = FuncKeyTemplate(
+            id=sentinel.template_id, name=sentinel.name, tenant_uuid=self.tenant_uuid
+        )
         self.service = TemplateService(
             self.template_dao,
             self.user_dao,
@@ -39,10 +42,12 @@ class TestTemplateService(unittest.TestCase):
     def test_when_searching_then_returns_search_from_database(self):
         expected_search = self.template_dao.search.return_value
 
-        result = self.service.search({'search': 'search'})
+        result = self.service.search({'search': 'search'}, tenant_uuids=None)
 
         assert_that(expected_search, equal_to(result))
-        self.template_dao.search.assert_called_once_with(search='search')
+        self.template_dao.search.assert_called_once_with(
+            search='search', tenant_uuids=None
+        )
 
     def test_when_getting_then_returns_template_from_database(self):
         expected_template = self.template_dao.get.return_value
@@ -50,12 +55,16 @@ class TestTemplateService(unittest.TestCase):
         result = self.service.get(sentinel.template_id)
 
         assert_that(expected_template, equal_to(result))
-        self.template_dao.get.assert_called_once_with(sentinel.template_id)
+        self.template_dao.get.assert_called_once_with(
+            sentinel.template_id, tenant_uuids=None
+        )
 
     def test_when_creating_then_validates_template(self):
         self.service.create(self.template)
 
-        self.validator.validate_create.assert_called_once_with(self.template)
+        self.validator.validate_create.assert_called_once_with(
+            self.template, tenant_uuids=[self.tenant_uuid]
+        )
 
     def test_when_creating_then_creates_template_in_database(self):
         created_template = self.template_dao.create.return_value
@@ -75,7 +84,9 @@ class TestTemplateService(unittest.TestCase):
     def test_when_editing_then_validates_template(self):
         self.service.edit(self.template)
 
-        self.validator.validate_edit.assert_called_once_with(self.template)
+        self.validator.validate_edit.assert_called_once_with(
+            self.template, tenant_uuids=[self.tenant_uuid]
+        )
 
     def test_when_editing_then_updates_template_in_database(self):
         self.service.edit(self.template)
@@ -95,7 +106,9 @@ class TestTemplateService(unittest.TestCase):
     def test_when_deleting_then_validates_template(self):
         self.service.delete(self.template)
 
-        self.validator.validate_delete.assert_called_once_with(self.template)
+        self.validator.validate_delete.assert_called_once_with(
+            self.template, tenant_uuids=[self.tenant_uuid]
+        )
 
     @patch('xivo_dao.helpers.db_manager.Session.expire')
     def test_when_deleting_then_updates_devices_associated_to_users(
