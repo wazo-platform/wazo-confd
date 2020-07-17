@@ -1,5 +1,37 @@
 # Changelog
 
+## 20.11
+* The following endpoints are now multi-tenant.
+
+  This means that created resources will be in the same tenant as the creator or in the tenant
+  specified by the Wazo-Tenant HTTP header. Listing resources will also only list the ones in the
+  user's tenant unless a sub-tenant is specified using the Wazo-Tenant header. The `recurse=true`
+  query string can be used to list from multiple tenants. GET, DELETE and PUT on a resource that is
+  not tenant accessible will result in a 404. New readonly parameter has also been added:
+  `tenant_uuid`.
+
+  * POST `/1.1/funckeys/templates`
+  * GET `/1.1/funckeys/templates`
+  * GET `/1.1/funckeys/templates/<template_id>`
+  * PUT `/1.1/funckeys/templates/<template_id>`
+  * DELETE `/1.1/funckeys/templates/<template_id>`
+
+  * GET `/1.1/funckeys/templates/<template_id>/<position>`
+  * PUT `/1.1/funckeys/templates/<template_id>/<position>`
+  * DELETE `/1.1/funckeys/templates/<template_id>/<position>`
+
+  * GET `/1.1/funckeys/templates/<template_id>/users`
+  * GET `/1.1/users/<user_uuid>/funckeys`
+  * PUT `/1.1/users/<user_uuid>/funckeys`
+
+  * GET `/1.1/users/<user_uuid>/funckeys/<position>`
+  * PUT `/1.1/users/<user_uuid>/funckeys/<position>`
+  * DELETE `/1.1/users/<user_uuid>/funckeys/<position>`
+
+  * GET `/1.1/users/<user_uuid>/funckeys/templates`
+  * PUT `/1.1/users/<user_uuid>/funckeys/templates/<template_id>`
+  * DELETE `/1.1/users/<user_uuid>/funckeys/templates/<template_id>`
+
 ## 20.09
 
 * The `rest_host` and `rest_https_port` fields have been removed from the
