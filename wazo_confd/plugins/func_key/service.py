@@ -89,7 +89,7 @@ class TemplateService:
         self.edit(template, updated_fields)
 
     def delete(self, template):
-        self.validator.validate_delete(template)
+        self.validator.validate_delete(template, tenant_uuids=[template.tenant_uuid])
         users = self.user_dao.find_all_by(func_key_template_id=template.id)
         self.template_dao.delete(template)
         for user in users:

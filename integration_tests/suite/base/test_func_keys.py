@@ -1078,11 +1078,20 @@ def test_func_key_destinations_multi_tenant(
             )
             response.assert_updated()
 
+            response = confd.funckeys.templates.post(template_args)
+            response.assert_status(400)
+
             response = confd.funckeys.templates(main_template['id']).put(template_args)
             response.assert_status(400)
 
             response = confd.funckeys.templates(sub_template['id']).put(template_args)
             response.assert_updated()
+
+            response = confd.funckeys.templates.post(template_args, wazo_tenant=SUB_TENANT)
+            response.assert_created()
+
+            response = confd.funckeys.templates(response.item['id']).delete()
+            response.assert_deleted()
 
 
 class TestBlfFuncKeys(BaseTestFuncKey):
