@@ -61,14 +61,14 @@ class TemplateService:
         return self.template_dao.search(tenant_uuids=tenant_uuids, **parameters)
 
     def create(self, template):
-        self.validator.validate_create(template)
+        self.validator.validate_create(template, tenant_uuids=[template.tenant_uuid])
         self._adjust_blfs(template)
         created_template = self.template_dao.create(template)
         self.notifier.created(created_template)
         return created_template
 
     def edit(self, template, updated_fields=None):
-        self.validator.validate_edit(template)
+        self.validator.validate_edit(template, tenant_uuids=[template.tenant_uuid])
         self._adjust_blfs(template)
         self.template_dao.edit(template)
         self.device_updater.update_for_template(template)

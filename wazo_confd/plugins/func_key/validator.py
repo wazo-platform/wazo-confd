@@ -65,8 +65,11 @@ class FuncKeyMappingValidator(Validator):
         self.funckey_validator = funckey_validator
 
     def validate(self, template):
+        raise NotImplementedError()
+
+    def validate_with_tenant_uuids(self, template, tenant_uuids):
         for pos, funckey in template.keys.items():
-            self.funckey_validator.validate(funckey)
+            self.funckey_validator.validate_with_tenant_uuids(funckey, tenant_uuids)
 
 
 class FuncKeyValidator(Validator):
@@ -88,15 +91,18 @@ class FuncKeyModelValidator(FuncKeyValidator):
         self.destinations = destinations
 
     def validate(self, funckey):
-        self.validate_text(funckey.label, 'label')
-        self.validate_destination(funckey)
+        raise NotImplementedError()
 
-    def validate_destination(self, funckey):
+    def validate_with_tenant_uuids(self, funckey, tenant_uuids):
+        self.validate_text(funckey.label, 'label')
+        self.validate_destination(funckey, tenant_uuids)
+
+    def validate_destination(self, funckey, tenant_uuids):
         dest_type = funckey.destination.type
         if dest_type not in self.destinations:
             raise errors.invalid_destination_type(dest_type)
         for validator in self.destinations[dest_type]:
-            validator.validate(funckey.destination)
+            validator.validate_with_tenant_uuids(funckey.destination, tenant_uuids)
 
 
 class ForwardValidator(FuncKeyValidator):

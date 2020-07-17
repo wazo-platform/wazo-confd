@@ -1000,6 +1000,91 @@ def test_dissociate_multi_tenant(main_user, sub_user, main_template, sub_templat
     response.assert_match(404, e.not_found('FuncKeyTemplate'))
 
 
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+@fixtures.agent(wazo_tenant=SUB_TENANT)
+@fixtures.paging(wazo_tenant=SUB_TENANT)
+@fixtures.call_filter(wazo_tenant=SUB_TENANT)
+@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
+def test_func_key_destinations_multi_tenant(
+    main_user,
+    main_template,
+    sub_user,
+    sub_template,
+    user,
+    group,
+    queue,
+    conference,
+    agent,
+    paging,
+    call_filter,
+    parking,
+):
+    confd.callfilters(call_filter['id']).surrogates.users.put(users=[sub_user])
+    response = confd.callfilters(call_filter['id']).get()
+    filter_member_id = response.item['surrogates']['users'][0]['member_id']
+
+    funckeys = {
+        '1': {'type': 'user', 'user_id': user['id']},
+        '2': {'type': 'group', 'group_id': group['id']},
+        '3': {'type': 'queue', 'queue_id': queue['id']},
+        # FIXME: conference is meetme and not multi-tenant
+        # '4': {'type': 'conference', 'conference_id': conference['id']},
+        '6': {'type': 'agent', 'action': 'login', 'agent_id': agent['id']},
+        '7': {'type': 'agent', 'action': 'logout', 'agent_id': agent['id']},
+        '8': {'type': 'agent', 'action': 'toggle', 'agent_id': agent['id']},
+        # FIXME: park_position use old hardcoded system and not multi-tenant
+        # '9': {'type': 'park_position', 'position': parking['slots_start']},
+        '10': {'type': 'paging', 'paging_id': paging['id']},
+        '11': {'type': 'bsfilter', 'filter_member_id': filter_member_id},
+        '12': {'type': 'groupmember', 'action': 'join', 'group_id': group['id']},
+        '13': {'type': 'groupmember', 'action': 'leave', 'group_id': group['id']},
+        '14': {'type': 'groupmember', 'action': 'toggle', 'group_id': group['id']},
+    }
+    exclude_for_template = ['6', '7', '8', '11']
+
+    for position, destination in funckeys.items():
+        template_args = {'keys': {position: {'destination': destination}}}
+        fk_args = template_args['keys'][position]
+
+        response = confd.users(main_user['uuid']).funckeys(position).put(fk_args)
+        response.assert_status(400)
+
+        response = confd.users(sub_user['uuid']).funckeys(position).put(fk_args)
+        response.assert_updated()
+
+        response = confd.users(main_user['uuid']).funckeys.put(template_args)
+        response.assert_status(400)
+
+        response = confd.users(sub_user['uuid']).funckeys.put(template_args)
+        response.assert_updated()
+
+        if position not in exclude_for_template:
+            response = (
+                confd.funckeys.templates(main_template['id'])(position)
+                .put(fk_args)
+            )
+            response.assert_status(400)
+
+            response = (
+                confd.funckeys.templates(sub_template['id'])(position)
+                .put(fk_args)
+            )
+            response.assert_updated()
+
+            response = confd.funckeys.templates(main_template['id']).put(template_args)
+            response.assert_status(400)
+
+            response = confd.funckeys.templates(sub_template['id']).put(template_args)
+            response.assert_updated()
+
+
 class TestBlfFuncKeys(BaseTestFuncKey):
     def setUp(self):
         super().setUp()
