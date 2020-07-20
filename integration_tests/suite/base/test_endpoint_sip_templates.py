@@ -69,9 +69,11 @@ def error_checks(url):
         yield check
 
 
+@fixtures.transport(name='transport_unique')
 @fixtures.sip(name='endpoint_unique')
 @fixtures.sip_template(name='template_unique')
-def unique_error_checks(url, sip, template):
+def unique_error_checks(url, transport, sip, template):
+    yield s.check_bogus_field_returns_error, url, 'name', transport['name']
     yield s.check_bogus_field_returns_error, url, 'name', template['name']
     yield s.check_bogus_field_returns_error, url, 'name', sip['name']
 
