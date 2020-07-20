@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -31,7 +31,7 @@ def build_validator():
             GroupValidator(),
         ],
         edit=[
-            Optional('name', UniqueFieldChanged('name', group_dao, 'Group')),
+            Optional('name', UniqueFieldChanged('name', group_dao.find_by, 'Group')),
             GroupValidator(),
         ],
     )

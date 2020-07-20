@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -66,20 +66,20 @@ class TestUniqueField(unittest.TestCase):
 
 class TestUniqueFieldChanged(unittest.TestCase):
     def setUp(self):
-        self.dao = Mock()
-        self.validator = UniqueFieldChanged('field', self.dao)
+        self.dao_find = Mock()
+        self.validator = UniqueFieldChanged('field', self.dao_find)
 
     def test_given_model_with_field_not_found_then_validation_passes(self):
         model = Mock(field=sentinel.field)
 
-        self.dao.find_by.return_value = None
+        self.dao_find.return_value = None
 
         self.validator.validate(model)
 
     def test_given_model_with_same_id_was_found_then_validation_passes(self):
         model = Mock(field=sentinel.field, id=sentinel.id)
 
-        self.dao.find_by.return_value = model
+        self.dao_find.return_value = model
 
         self.validator.validate(model)
 
@@ -87,7 +87,7 @@ class TestUniqueFieldChanged(unittest.TestCase):
         model = Mock(field=sentinel.field, id=sentinel.id)
         other_model = Mock(field=sentinel.field, id=sentinel.other_id)
 
-        self.dao.find_by.return_value = other_model
+        self.dao_find.return_value = other_model
 
         assert_that(
             calling(self.validator.validate).with_args(model), raises(ResourceError)
