@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.pjsip_transport import dao
+from xivo_dao.resources.pjsip_transport import dao as transport_dao_module
 from xivo_dao.resources.endpoint_sip import dao as sip_dao_module
 
 from wazo_confd.helpers.validator import (
@@ -55,11 +55,13 @@ class TransportDeleteValidator(Validator):
 def build_pjsip_transport_validator(pjsip_doc):
     return ValidationGroup(
         create=[
-            UniqueField('name', lambda name: dao.find_by(name=name), 'name'),
+            UniqueField(
+                'name', lambda name: transport_dao_module.find_by(name=name), 'name'
+            ),
             PJSIPDocValidator('options', 'transport', pjsip_doc),
         ],
         edit=[
-            UniqueFieldChanged('name', dao, 'Transport', id_field='uuid'),
+            UniqueFieldChanged('name', transport_dao_module.find_by, 'Transport', id_field='uuid'),
             PJSIPDocValidator('options', 'transport', pjsip_doc),
         ],
         delete=[TransportDeleteValidator(sip_dao_module)],

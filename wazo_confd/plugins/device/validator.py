@@ -45,6 +45,6 @@ def build_validator(device_dao, line_dao):
                 UniqueField('mac', lambda mac: device_dao.find_by(mac=mac), 'Device'),
             )
         ],
-        edit=[Optional('mac', UniqueFieldChanged('mac', device_dao, 'Device'))],
+        edit=[Optional('mac', UniqueFieldChanged('mac', device_dao.find_by, 'Device'))],
         delete=[DeviceNotAssociated(line_dao)],
     )

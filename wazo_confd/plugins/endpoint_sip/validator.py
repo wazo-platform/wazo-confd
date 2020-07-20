@@ -23,7 +23,7 @@ def build_validator():
         edit=[
             Optional(
                 'name',
-                UniqueFieldChanged('name', sip_dao, 'SIPEndpoint', id_field='uuid'),
+                UniqueFieldChanged('name', sip_dao.find_by, 'SIPEndpoint', id_field='uuid'),
             )
         ],
     )
