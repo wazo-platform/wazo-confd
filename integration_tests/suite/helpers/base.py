@@ -42,11 +42,6 @@ class IntegrationTest(AssetLaunchingTestCase):
         )
         cls.mock_auth.set_token(token)
         cls.reset_auth_tenants()
-        cls.mock_auth.set_tenants(
-            {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
-            {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
-            {'uuid': DELETED_TENANT, 'name': 'name3', 'parent_uuid': MAIN_TENANT},
-        )
 
     @classmethod
     def sync_db(cls):
