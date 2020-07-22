@@ -74,9 +74,9 @@ class UniqueField(Validator):
 
 
 class UniqueFieldChanged(Validator):
-    def __init__(self, field, dao, resource='Resource', id_field='id'):
+    def __init__(self, field, dao_find, resource='Resource', id_field='id'):
         self.field = field
-        self.dao = dao
+        self.dao_find = dao_find
         self.resource = resource
         self.id_field = id_field
 
@@ -91,7 +91,7 @@ class UniqueFieldChanged(Validator):
         query = {self.field: value}
         if tenant_uuids is not None:
             query['tenant_uuids'] = tenant_uuids
-        found = self.dao.find_by(**query)
+        found = self.dao_find(**query)
 
         if not found:
             return

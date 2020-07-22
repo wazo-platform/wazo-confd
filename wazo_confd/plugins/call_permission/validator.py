@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.call_permission import dao as call_permission_dao
@@ -23,7 +23,7 @@ def build_validator():
         edit=[
             Optional(
                 'name',
-                UniqueFieldChanged('name', call_permission_dao, 'CallPermission'),
+                UniqueFieldChanged('name', call_permission_dao.find_by, 'CallPermission'),
             )
         ],
     )
