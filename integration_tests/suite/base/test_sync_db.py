@@ -26,13 +26,13 @@ def test_remove_user_with_voicemail(_, user, voicemail):
 
 @fixtures.context(name='DELETED', wazo_tenant=DELETED_TENANT)
 @fixtures.user(wazo_tenant=DELETED_TENANT)
-@fixtures.line_sip(context='DELETED', wazo_tenant=DELETED_TENANT)
-def test_remove_user_with_line(_, user, line):
-    with a.user_line(user, line, check=False):
-        BaseIntegrationTest.sync_db()
+def test_remove_user_with_line(context, user):
+    with fixtures.line_sip(context=context, wazo_tenant=DELETED_TENANT) as line:
+        with a.user_line(user, line, check=False):
+            BaseIntegrationTest.sync_db()
 
-        response = confd.users(user['uuid']).get()
-        response.assert_status(404)
+            response = confd.users(user['uuid']).get()
+            response.assert_status(404)
 
-        response = confd.lines(line['id']).get()
-        assert_that(response.item, has_entries(users=empty()))
+            response = confd.lines(line['id']).get()
+            assert_that(response.item, has_entries(users=empty()))
