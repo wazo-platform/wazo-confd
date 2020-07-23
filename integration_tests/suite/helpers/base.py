@@ -27,6 +27,7 @@ from .config import (
     MAIN_TENANT,
     SUB_TENANT,
     DELETED_TENANT,
+    CREATED_TENANT,
 )
 
 
@@ -50,10 +51,10 @@ class IntegrationTest(AssetLaunchingTestCase):
         cls.docker_exec(['wazo-confd-sync-db', '--debug'])
 
     @classmethod
-    def delete_auth_tenant(cls):
+    def _create_auth_tenant(cls):
         cls.mock_auth.set_tenants(
             {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
-            {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
+            {'uuid': CREATED_TENANT, 'name': 'name4', 'parent_uuid': MAIN_TENANT},
         )
 
     @classmethod
@@ -68,6 +69,7 @@ class IntegrationTest(AssetLaunchingTestCase):
             {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
             {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
             {'uuid': DELETED_TENANT, 'name': 'name3', 'parent_uuid': MAIN_TENANT},
+            {'uuid': CREATED_TENANT, 'name': 'name4', 'parent_uuid': MAIN_TENANT},
         )
 
     @classmethod
@@ -77,6 +79,13 @@ class IntegrationTest(AssetLaunchingTestCase):
         yield
         # NOTE(fblackburn): re-add DELETED_TENANT to be able to make
         # get through API and detect if sync-db doesn't work.
+        cls._reset_auth_tenants()
+
+    @classmethod
+    @contextmanager
+    def create_auth_tenant(cls, tenant_uuid):  # tenant_uuid improve readability
+        cls._create_auth_tenant()  # FIXME pass tenant_uuid
+        yield
         cls._reset_auth_tenants()
 
     @classmethod
