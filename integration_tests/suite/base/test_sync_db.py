@@ -99,3 +99,23 @@ def test_not_reset_default_templates_when_exist():
 
         response = confd.endpoints.sip.templates(uuid_1).get(wazo_tenant=CREATED_TENANT)
         assert_that(response.item, has_entries(asterisk_id='42'))
+
+
+def test_reset_default_templates_when_toggle_sip_template_generated_bool():
+    with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
+        BaseIntegrationTest.sync_db()
+        response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
+        assert_that(response.items, has_length(4))
+        uuid_1 = response.items[0]['uuid']
+
+        response = confd.endpoints.sip.templates(uuid_1).put(
+            asterisk_id='42', wazo_tenant=CREATED_TENANT,
+        )
+
+        with db.queries() as queries:
+            queries.toggle_sip_templates_generated(CREATED_TENANT, generated=False)
+
+        BaseIntegrationTest.sync_db()
+
+        response = confd.endpoints.sip.templates(uuid_1).get(wazo_tenant=CREATED_TENANT)
+        assert_that(response.item, has_entries(asterisk_id=None))

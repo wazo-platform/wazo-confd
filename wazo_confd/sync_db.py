@@ -86,29 +86,29 @@ def remove_tenant(tenant_uuid):
 
 
 @daosession
-def create_or_merge_sip_template(session, template, existing_template_uuid):
+def create_or_merge_sip_template(session, template_config, existing_template_uuid):
     if not existing_template_uuid:
         logger.info(
             'Creating "%s" SIPEndpointTemplate for tenant: %s',
-            template.label,
-            template.tenant_uuid,
+            template_config['label'],
+            template_config['tenant_uuid'],
         )
+        template = EndpointSIP(**template_config)
         sip_dao.create(template)
-        return
+        return template
 
     logger.info(
         'Resetting "%s" SIPEndpointTemplate for tenant: %s',
-        template.label,
-        template.tenant_uuid
+        template_config['label'],
+        template_config['tenant_uuid'],
     )
-    existing_template = sip_dao.get(existing_template_uuid, template=True)
+    # NOTE(fblackburn): Allow to reset default values without breaking foreign key
+    template = sip_dao.get(existing_template_uuid, template=True)
+    for key, value in template_config.items():
+        setattr(template, key, value)
+    sip_dao.edit(template)
 
-    # NOTE(fblackburn): Allow to reset default template without breaking foreign key
-    existing_template.reset_properties()
-    session.flush()
-    template.uuid = existing_template.uuid
-    session.merge(template)
-    session.flush()
+    return template
 
 
 def generate_sip_templates(tenant):
@@ -121,17 +121,20 @@ def generate_sip_templates(tenant):
     transport_udp = transport_dao.find_by(name='transport-udp')
     transport_wss = transport_dao.find_by(name='transport-wss')
 
-    global_template = EndpointSIP(
-        label='global',
-        template=True,
-        tenant_uuid=tenant.uuid,
-        aor_section_options=[
+    global_config = {
+        'label': 'global',
+        'template': True,
+        'tenant_uuid': tenant.uuid,
+        'asterisk_id': None,
+        'transport': transport_udp,
+        'aor_section_options': [
             ['maximum_expiration', '3600'],
             ['default_expiration', '120'],
             ['minimum_expiration', '60'],
             ['qualify_frequency', '60'],
         ],
-        endpoint_section_options=[
+        'auth_section_options': [],
+        'endpoint_section_options': [
             ['rtp_timeout', '7200'],
             ['allow_transfer', 'yes'],
             ['use_ptime', 'yes'],
@@ -146,46 +149,76 @@ def generate_sip_templates(tenant):
             ['trust_id_inbound', 'no'],
             ['allow_subscribe', 'yes'],
         ],
-        transport_uuid=transport_udp.uuid if transport_udp else None,
+        'registration_section_options': [],
+        'registration_outbound_auth_section_options': [],
+        'identify_section_options': [],
+        'outbound_auth_section_options': [],
+        'templates': [],
+    }
+    global_template = create_or_merge_sip_template(
+        global_config, tenant.global_sip_template_uuid,
     )
-    create_or_merge_sip_template(global_template, tenant.global_sip_template_uuid)
 
-    webrtc_template = EndpointSIP(
-        label='webrtc',
-        template=True,
-        tenant_uuid=tenant.uuid,
-        endpoint_section_options=[
+    webrtc_config = {
+        'label': 'webrtc',
+        'template': True,
+        'tenant_uuid': tenant.uuid,
+        'transport': transport_wss,
+        'asterisk_id': None,
+        'aor_section_options': [],
+        'auth_section_options': [],
+        'endpoint_section_options': [
             ['webrtc', 'yes'],
             ['dtls_auto_generate_cert', 'yes'],
             ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
         ],
-        transport_uuid=transport_wss.uuid if transport_wss else None,
-        templates=[global_template],
+        'registration_section_options': [],
+        'registration_outbound_auth_section_options': [],
+        'identify_section_options': [],
+        'outbound_auth_section_options': [],
+        'templates': [global_template],
+    }
+    webrtc_template = create_or_merge_sip_template(
+        webrtc_config, tenant.webrtc_sip_template_uuid,
     )
-    create_or_merge_sip_template(webrtc_template, tenant.webrtc_sip_template_uuid)
 
-    global_trunk_template = EndpointSIP(
-        label='global_trunk',
-        template=True,
-        tenant_uuid=tenant.uuid,
-        registration_section_options=[
+    global_trunk_config = {
+        'label': 'global_trunk',
+        'template': True,
+        'tenant_uuid': tenant.uuid,
+        'transport': None,
+        'asterisk_id': None,
+        'aor_section_options': [],
+        'auth_section_options': [],
+        'endpoint_section_options': [],
+        'registration_section_options': [
             ['forbidden_retry_interval', '30'],
             ['retry_interval', '20'],
             ['max_retries', '10000'],
             ['auth_rejection_permanent', 'no'],
             ['fatal_retry_interval', '30'],
         ],
-        templates=[global_template],
-    )
-    create_or_merge_sip_template(
-        global_trunk_template, tenant.global_trunk_sip_template_uuid,
+        'registration_outbound_auth_section_options': [],
+        'identify_section_options': [],
+        'outbound_auth_section_options': [],
+        'templates': [global_template],
+    }
+    global_trunk_template = create_or_merge_sip_template(
+        global_trunk_config, tenant.global_trunk_sip_template_uuid,
     )
 
-    twilio_trunk_template = EndpointSIP(
-        label='twilio_trunk',
-        template=True,
-        tenant_uuid=tenant.uuid,
-        identify_section_options=[
+    twilio_trunk_config = {
+        'label': 'twilio_trunk',
+        'template': True,
+        'tenant_uuid': tenant.uuid,
+        'transport': None,
+        'asterisk_id': None,
+        'aor_section_options': [],
+        'auth_section_options': [],
+        'endpoint_section_options': [],
+        'registration_section_options': [],
+        'registration_outbound_auth_section_options': [],
+        'identify_section_options': [
             ['match', '54.172.60.0'],
             ['match', '54.172.60.3'],
             ['match', '54.172.60.2'],
@@ -219,10 +252,11 @@ def generate_sip_templates(tenant):
             ['match', '54.244.51.1'],
             ['match', '54.244.51.0'],
         ],
-        templates=[global_trunk_template],
-    )
-    create_or_merge_sip_template(
-        twilio_trunk_template, tenant.twilio_trunk_sip_template_uuid,
+        'outbound_auth_section_options': [],
+        'templates': [global_trunk_template],
+    }
+    twilio_trunk_template = create_or_merge_sip_template(
+        twilio_trunk_config, tenant.twilio_trunk_sip_template_uuid,
     )
 
     tenant.global_sip_template_uuid = global_template.uuid
