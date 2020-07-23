@@ -15,7 +15,8 @@ from ..helpers.config import DELETED_TENANT
 @fixtures.voicemail(context='DELETED')
 def test_remove_user_with_voicemail(_, user, voicemail):
     with a.user_voicemail(user, voicemail, check=False):
-        BaseIntegrationTest.sync_db()
+        with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+            BaseIntegrationTest.sync_db()
 
         response = confd.users(user['uuid']).get()
         response.assert_status(404)
@@ -29,7 +30,8 @@ def test_remove_user_with_voicemail(_, user, voicemail):
 def test_remove_user_with_line(context, user):
     with fixtures.line_sip(context=context, wazo_tenant=DELETED_TENANT) as line:
         with a.user_line(user, line, check=False):
-            BaseIntegrationTest.sync_db()
+            with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+                BaseIntegrationTest.sync_db()
 
             response = confd.users(user['uuid']).get()
             response.assert_status(404)
