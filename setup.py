@@ -117,6 +117,8 @@ setup(
             'voicemail_general = wazo_confd.plugins.voicemail_general.plugin:Plugin',
             'voicemail_zonemessages = wazo_confd.plugins.voicemail_zonemessages.plugin:Plugin',
             'wizard = wazo_confd.plugins.wizard.plugin:Plugin',
+
+            'event_handlers = wazo_confd.plugins.event_handlers.plugin:Plugin',
         ],
     },
 )

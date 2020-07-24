@@ -51,6 +51,7 @@ DEFAULT_CONFIG = {
         'exchange_name': 'xivo',
         'exchange_type': 'topic',
         'exchange_durable': True,
+        'subscribe_exchange_name': 'wazo-headers',
     },
     'consul': {'scheme': 'http', 'host': 'localhost', 'port': 8500},
     'provd': {'host': 'localhost', 'port': 8666, 'prefix': None, 'https': False},
@@ -150,6 +151,8 @@ DEFAULT_CONFIG = {
         'voicemail_general': True,
         'voicemail_zonemessages': True,
         'wizard': True,
+
+        'event_handlers': True,
     },
     'service_discovery': {
         'enabled': True,

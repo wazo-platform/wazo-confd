@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -13,6 +13,7 @@ from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo.token_renewer import TokenRenewer
 
+from ._bus import BusConsumer, bus_consumer_thread
 from .http_server import api, HTTPServer
 from .service_discovery import self_check
 
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 class Controller:
     def __init__(self, config):
         self.config = config
+        self._bus_consumer = BusConsumer(config['bus'])
         self._service_discovery_args = [
             'wazo-confd',
             config['uuid'],
@@ -43,6 +45,7 @@ class Controller:
                 'api': api,
                 'config': config,
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
+                'bus_consumer': self._bus_consumer,
             },
         )
 
@@ -53,7 +56,8 @@ class Controller:
 
         with self.token_renewer:
             with ServiceCatalogRegistration(*self._service_discovery_args):
-                self.http_server.run()
+                with bus_consumer_thread(self._bus_consumer):
+                    self.http_server.run()
 
     def stop(self, reason):
         logger.warning('Stopping wazo-confd: %s', reason)
