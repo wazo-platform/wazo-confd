@@ -9,7 +9,6 @@ from xivo.config_helper import read_config_file_hierarchy
 from xivo_dao import init_db_from_config
 from xivo_dao.alchemy.tenant import Tenant
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
-from xivo_dao.helpers.db_manager import daosession
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
@@ -85,8 +84,7 @@ def remove_tenant(tenant_uuid):
     # * Reset device to autoprov
 
 
-@daosession
-def create_or_merge_sip_template(session, template_config, existing_template_uuid):
+def create_or_merge_sip_template(template_config, existing_template_uuid):
     if not existing_template_uuid:
         logger.info(
             'Creating "%s" SIPEndpointTemplate for tenant: %s',
