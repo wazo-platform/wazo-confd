@@ -318,9 +318,6 @@ definitions:
       transport:
         description: The transport used by this endpoint
         $ref: '#/definitions/SIPTransportRelation'
-      context:
-        description: The context used by this endpoint
-        $ref: '#/definitions/ContextRelation'
       templates:
         type: array
         items:
