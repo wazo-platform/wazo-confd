@@ -1,6 +1,8 @@
 # Copyright 2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
+
 from hamcrest import (
     all_of,
     assert_that,
@@ -76,6 +78,12 @@ def unique_error_checks(url, transport, sip, template):
     yield s.check_bogus_field_returns_error, url, 'name', transport['name']
     yield s.check_bogus_field_returns_error, url, 'name', template['name']
     yield s.check_bogus_field_returns_error, url, 'name', sip['name']
+
+
+@fixtures.sip_template()
+def test_put_templates_itself(sip):
+    result = confd.endpoints.sip.templates(sip['uuid']).put(templates=[sip])
+    result.assert_match(400, re.compile(re.escape('itself')))
 
 
 @fixtures.sip_template(name='hidden', label='hidden', asterisk_id='hidden')
