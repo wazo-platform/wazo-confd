@@ -86,6 +86,17 @@ def test_put_templates_itself(sip):
     result.assert_match(400, re.compile(re.escape('itself')))
 
 
+@fixtures.sip_template()
+@fixtures.sip_template()
+def test_put_templates_loop(template1, template2):
+    body = {'templates': [template2]}
+    confd.endpoints.sip.templates(template1['uuid']).put(body).assert_updated()
+
+    body = {'templates': [template1]}
+    result = confd.endpoints.sip.templates(template2['uuid']).put(body)
+    result.assert_match(400, re.compile(re.escape(template1['uuid'])))
+
+
 @fixtures.sip_template(name='hidden', label='hidden', asterisk_id='hidden')
 @fixtures.sip_template(name='search', label='search', asterisk_id='search')
 def test_search(hidden, sip):

@@ -19,11 +19,22 @@ from wazo_confd.helpers.validator import (
 
 class EndpointSIPTemplatesValidator(Validator):
     def validate(self, template):
-        self.validate_not_itself(template)
+        self.validate_not_include_itself(template)
 
-    def validate_not_itself(self, template):
+    def validate_not_include_itself(self, template):
         if template in template.templates:
             raise errors.not_permitted('Cannot use itself as template')
+
+        self.validate_all_sub_templates(template, template)
+
+    def validate_all_sub_templates(self, original, template):
+        if original in template.templates:
+            raise errors.not_permitted(
+                f'SIPEndpointTemplate({template.uuid}) already include this template'
+            )
+
+        for template in template.templates:
+            self.validate_all_sub_templates(original, template)
 
 
 def build_validator():
