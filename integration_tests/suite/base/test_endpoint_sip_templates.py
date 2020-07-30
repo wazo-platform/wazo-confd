@@ -323,6 +323,7 @@ def test_edit_minimal_parameters(sip, template):
 
 
 @fixtures.transport()
+@fixtures.sip_template()
 @fixtures.sip_template(
     aor_section_options=[
         ['qualify_frequency', '60'],
@@ -355,7 +356,7 @@ def test_edit_minimal_parameters(sip, template):
         ['password', 'outbound-password'],
     ],
 )
-def test_edit_all_parameters(transport, sip):
+def test_edit_all_parameters(transport, template, sip):
     aor = [
         ['maximum_expiration', '3600'],
         ['remove_existing', 'yes'],
@@ -394,6 +395,7 @@ def test_edit_all_parameters(transport, sip):
         registration_section_options=registration,
         registration_outbound_auth_section_options=registration_outbound_auth,
         outbound_auth_section_options=outbound_auth,
+        templates=[template],
         transport=transport,
     )
     response.assert_updated()
@@ -411,6 +413,7 @@ def test_edit_all_parameters(transport, sip):
                 *registration_outbound_auth
             ),
             outbound_auth_section_options=contains_inanyorder(*outbound_auth),
+            templates=contains_inanyorder(has_entries(uuid=template['uuid'])),
             transport=has_entries(uuid=transport['uuid']),
         ),
     )

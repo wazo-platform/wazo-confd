@@ -26,7 +26,7 @@ class Plugin:
             SipItem,
             '/endpoints/sip/<uuid:uuid>',
             endpoint='endpoint_sip',
-            resource_class_args=(endpoint_service, transport_dao),
+            resource_class_args=(endpoint_service, sip_dao, transport_dao),
         )
         api.add_resource(
             SipList,
@@ -37,7 +37,7 @@ class Plugin:
             SipTemplateItem,
             '/endpoints/sip/templates/<uuid:uuid>',
             endpoint='endpoint_sip_templates',
-            resource_class_args=(template_service, transport_dao),
+            resource_class_args=(template_service, sip_dao, transport_dao),
         )
         api.add_resource(
             SipTemplateList,
