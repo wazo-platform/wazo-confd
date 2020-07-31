@@ -392,6 +392,8 @@ definitions:
     properties:
       id:
         type: integer
+        description: The ID of the funckey template
+        readOnly: true
       tenant_uuid:
         type: string
         description: The UUID of the tenant
