@@ -96,7 +96,12 @@ class UserForwardNotifier:
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
             event = EditUserForwardEvent(
-                user.id, user.uuid, type_, forward['enabled'], forward['destination']
+                user.id,
+                user.uuid,
+                user.tenant_uuid,
+                type_,
+                forward['enabled'],
+                forward['destination'],
             )
             self.bus.send_bus_event(
                 event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}

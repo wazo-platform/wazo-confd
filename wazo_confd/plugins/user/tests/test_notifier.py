@@ -157,6 +157,7 @@ class TestUserForwardNotifier(unittest.TestCase):
             User,
             id='1234',
             uuid='1234-abcd',
+            tenant_uuid='5678-efgh',
             busy_enabled=True,
             busy_destination='123',
             noanswer_enabled=False,
@@ -172,6 +173,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'busy',
             self.user.busy_enabled,
             self.user.busy_destination,
@@ -189,6 +191,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'noanswer',
             self.user.noanswer_enabled,
             self.user.noanswer_destination,
@@ -206,6 +209,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'unconditional',
             self.user.unconditional_enabled,
             self.user.unconditional_destination,
@@ -225,6 +229,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_busy_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'busy',
             self.user.busy_enabled,
             self.user.busy_destination,
@@ -232,6 +237,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_noanswer_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'noanswer',
             self.user.noanswer_enabled,
             self.user.noanswer_destination,
@@ -239,6 +245,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_unconditional_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'unconditional',
             self.user.unconditional_enabled,
             self.user.unconditional_destination,
