@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -95,6 +95,7 @@ class TestFuncKeyMappingValidator(unittest.TestCase):
     def setUp(self):
         self.funckey_validator = Mock(FuncKeyModelValidator)
         self.validator = FuncKeyMappingValidator(self.funckey_validator)
+        self.tenant_uuids = None
 
     def test_given_func_key_mapping_when_validating_then_validates_each_func_key(self):
         first_funckey = Mock(FuncKey)
@@ -102,16 +103,21 @@ class TestFuncKeyMappingValidator(unittest.TestCase):
 
         template = FuncKeyTemplate(keys={1: first_funckey, 2: second_funckey})
 
-        self.validator.validate(template)
+        self.validator.validate_with_tenant_uuids(template, self.tenant_uuids)
 
-        self.funckey_validator.validate.assert_any_call(first_funckey)
-        self.funckey_validator.validate.assert_any_call(second_funckey)
+        self.funckey_validator.validate_with_tenant_uuids.assert_any_call(
+            first_funckey, None
+        )
+        self.funckey_validator.validate_with_tenant_uuids.assert_any_call(
+            second_funckey, None
+        )
 
 
 class TestFuncKeyValidator(unittest.TestCase):
     def setUp(self):
         self.first_dest_validator = Mock(Validator)
         self.second_dest_validator = Mock(Validator)
+        self.tenant_uuids = None
         self.validator = FuncKeyModelValidator(
             {'foobar': [self.first_dest_validator, self.second_dest_validator]}
         )
@@ -122,7 +128,10 @@ class TestFuncKeyValidator(unittest.TestCase):
         model = FuncKey(destination=destination)
 
         assert_that(
-            calling(self.validator.validate).with_args(model), raises(InputError)
+            calling(self.validator.validate_with_tenant_uuids).with_args(
+                model, self.tenant_uuids
+            ),
+            raises(InputError),
         )
 
     def test_given_multiple_validators_for_destination_when_validating_then_calls_each_validator(
@@ -131,10 +140,14 @@ class TestFuncKeyValidator(unittest.TestCase):
         destination = Mock(type='foobar')
         model = FuncKey(destination=destination)
 
-        self.validator.validate(model)
+        self.validator.validate_with_tenant_uuids(model, self.tenant_uuids)
 
-        self.first_dest_validator.validate.assert_called_once_with(destination)
-        self.second_dest_validator.validate.assert_called_once_with(destination)
+        self.first_dest_validator.validate_with_tenant_uuids.assert_called_once_with(
+            destination, None
+        )
+        self.second_dest_validator.validate_with_tenant_uuids.assert_called_once_with(
+            destination, None
+        )
 
     def test_given_label_with_invalid_characters_when_validating_then_raises_error(
         self,
@@ -142,19 +155,28 @@ class TestFuncKeyValidator(unittest.TestCase):
         model = FuncKey(label='hello\n', destination=Mock(type='foobar'))
 
         assert_that(
-            calling(self.validator.validate).with_args(model), raises(InputError)
+            calling(self.validator.validate_with_tenant_uuids).with_args(
+                model, self.tenant_uuids
+            ),
+            raises(InputError),
         )
 
         model = FuncKey(label='\rhello', destination=Mock(type='foobar'))
 
         assert_that(
-            calling(self.validator.validate).with_args(model), raises(InputError)
+            calling(self.validator.validate_with_tenant_uuids).with_args(
+                model, self.tenant_uuids
+            ),
+            raises(InputError),
         )
 
         model = FuncKey(label='hel;lo', destination=Mock(type='foobar'))
 
         assert_that(
-            calling(self.validator.validate).with_args(model), raises(InputError)
+            calling(self.validator.validate_with_tenant_uuids).with_args(
+                model, self.tenant_uuids
+            ),
+            raises(InputError),
         )
 
 

@@ -1,14 +1,17 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.helpers import errors
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.func_key_template import dao as template_dao_module
 from xivo_dao.resources.user import dao as user_dao_module
 
 from wazo_confd.plugins.device import builder as device_builder
 from .notifier import build_notifier
-from .validator import build_validator, build_validator_bsfilter
+from .validator import (
+    build_validator,
+    build_validator_bsfilter,
+    build_user_template_validator,
+)
 
 
 class TemplateService:
@@ -42,11 +45,11 @@ class TemplateService:
         self.device_updater = device_updater
         self.validator_bsfilter = validator_bsfilter
 
-    def get(self, template_id):
-        return self.template_dao.get(template_id)
+    def get(self, template_id, tenant_uuids=None):
+        return self.template_dao.get(template_id, tenant_uuids=tenant_uuids)
 
-    def get_unified_template(self, user_id):
-        user = self.user_dao.get_by_id_uuid(user_id)
+    def get_unified_template(self, user_id, tenant_uuids=None):
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         if user.func_key_template_id:
             public_template = self.get(user.func_key_template_id)
             private_template = self.get(user.private_template_id)
@@ -54,18 +57,18 @@ class TemplateService:
         else:
             return self.get(user.private_template_id)
 
-    def search(self, parameters):
-        return self.template_dao.search(**parameters)
+    def search(self, parameters, tenant_uuids):
+        return self.template_dao.search(tenant_uuids=tenant_uuids, **parameters)
 
     def create(self, template):
-        self.validator.validate_create(template)
+        self.validator.validate_create(template, tenant_uuids=[template.tenant_uuid])
         self._adjust_blfs(template)
         created_template = self.template_dao.create(template)
         self.notifier.created(created_template)
         return created_template
 
     def edit(self, template, updated_fields=None):
-        self.validator.validate_edit(template)
+        self.validator.validate_edit(template, tenant_uuids=[template.tenant_uuid])
         self._adjust_blfs(template)
         self.template_dao.edit(template)
         self.device_updater.update_for_template(template)
@@ -86,7 +89,7 @@ class TemplateService:
         self.edit(template, updated_fields)
 
     def delete(self, template):
-        self.validator.validate_delete(template)
+        self.validator.validate_delete(template, tenant_uuids=[template.tenant_uuid])
         users = self.user_dao.find_all_by(func_key_template_id=template.id)
         self.template_dao.delete(template)
         for user in users:
@@ -138,12 +141,7 @@ class UserFuncKeyTemplateService:
         return [user] if user.func_key_template_id else []
 
     def associate(self, user, template):
-        if template.private:
-            raise errors.not_permitted(
-                "Cannot associate a private template with a user",
-                template_id=template.id,
-            )
-
+        self.validator.validate_association(user, template)
         user.func_key_template_id = template.id
         self.user_dao.edit(user)
         self.device_updater.update_for_user(user)
@@ -152,6 +150,7 @@ class UserFuncKeyTemplateService:
         if user.func_key_template_id != template.id:
             return
 
+        self.validator.validate_dissociation(user, template)
         user.func_key_template_id = None
         self.user_dao.edit(user)
         self.device_updater.update_for_user(user)
@@ -161,5 +160,8 @@ def build_user_funckey_template_service(provd_client):
     device_updater = device_builder.build_device_updater(provd_client)
 
     return UserFuncKeyTemplateService(
-        user_dao_module, build_validator(), build_notifier(), device_updater
+        user_dao_module,
+        build_user_template_validator(),
+        build_notifier(),
+        device_updater,
     )

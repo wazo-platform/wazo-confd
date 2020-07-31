@@ -1,11 +1,27 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, has_entries, has_entry, has_item, is_not
+from hamcrest import (
+    all_of,
+    assert_that,
+    contains,
+    empty,
+    has_entries,
+    has_entry,
+    has_item,
+    has_items,
+    is_not,
+    not_,
+    none,
+)
 
 from . import confd
-from ..helpers import fixtures, scenarios as s
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
+from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+)
 
 
 invalid_template_destinations = [
@@ -100,10 +116,44 @@ def check_funckey_template_sorting(funckey_template1, funckey_template2, field, 
     )
 
 
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main, sub):
+    response = confd.funckeys.templates.get(wazo_tenant=MAIN_TENANT)
+    assert_that(
+        response.items, all_of(has_item(main)), not_(has_item(sub)),
+    )
+
+    response = confd.funckeys.templates.get(wazo_tenant=SUB_TENANT)
+    assert_that(
+        response.items, all_of(has_item(sub), not_(has_item(main))),
+    )
+
+    response = confd.funckeys.templates.get(wazo_tenant=MAIN_TENANT, recurse=True)
+    assert_that(
+        response.items, has_items(main, sub),
+    )
+
+
 @fixtures.funckey_template(name='template')
 def test_get(funckey_template):
     response = confd.funckeys.templates(funckey_template['id']).get()
-    assert_that(response.item, has_entries(name='template'))
+    assert_that(
+        response.item,
+        has_entries(
+            id=not_(none()), tenant_uuid=MAIN_TENANT, name='template', keys=empty(),
+        ),
+    )
+
+
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
 
 
 @fixtures.funckey_template(
@@ -114,12 +164,66 @@ def test_get_position(funckey_template):
     assert_that(response.item['destination'], has_entries(type='custom', exten='123'))
 
 
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=SUB_TENANT,
+)
+def test_get_position_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id'])(1).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id'])(1).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub['keys']['1']))
+
+
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=SUB_TENANT,
+)
+def test_edit_position_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id'])(1).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id'])(1).put(
+        wazo_tenant=MAIN_TENANT, destination={'type': 'custom', 'exten': '456'},
+    )
+    response.assert_updated()
+
+
 @fixtures.funckey_template()
 def test_delete(funckey_template):
     response = confd.funckeys.templates(funckey_template['id']).delete()
     response.assert_deleted()
     url_get = confd.funckeys.templates(funckey_template['id']).get
     s.check_resource_not_found(url_get, 'FuncKeyTemplate')
+
+
+@fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
+@fixtures.funckey_template(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
 
 
 @fixtures.funckey_template(
@@ -132,11 +236,27 @@ def test_delete_position(funckey_template):
     s.check_resource_not_found(url_get, 'FuncKey')
 
 
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+    wazo_tenant=SUB_TENANT,
+)
+def test_delete_position_multi_tenant(main, sub):
+    response = confd.funckeys.templates(main['id'])(1).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
+
+    response = confd.funckeys.templates(sub['id'])(1).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 def test_create_funckey_template_minimal_parameters():
     response = confd.funckeys.templates.post()
     response.assert_created('templates')
 
-    assert_that(response.item, has_entries(keys={}, name=None))
+    assert_that(response.item, has_entries(keys={}, tenant_uuid=MAIN_TENANT, name=None))
 
 
 def test_post_error_on_duplicate_destination():

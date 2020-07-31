@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -17,6 +17,7 @@ from wazo_confd.helpers.validator import (
     Validator,
     GetResource,
     ResourceExists,
+    ValidationAssociation,
     ValidationGroup,
 )
 
@@ -26,6 +27,24 @@ class PrivateTemplateValidator(Validator):
         if template.private:
             raise errors.not_permitted(
                 "Deleting private templates is not allowed", template_id=template.id
+            )
+
+
+class AssociatePrivateTemplateValidator(Validator):
+    def validate(self, user, template):
+        if template.private:
+            raise errors.not_permitted(
+                "Cannot associate a private template with a user",
+                template_id=template.id,
+            )
+
+
+class AssociateSameTenant(Validator):
+    def validate(self, user, template):
+        if user.tenant_uuid != template.tenant_uuid:
+            raise errors.different_tenants(
+                user_tenant_uuid=user.tenant_uuid,
+                template_tenant_uuid=template.tenant_uuid,
             )
 
 
@@ -46,8 +65,11 @@ class FuncKeyMappingValidator(Validator):
         self.funckey_validator = funckey_validator
 
     def validate(self, template):
+        raise NotImplementedError()
+
+    def validate_with_tenant_uuids(self, template, tenant_uuids):
         for pos, funckey in template.keys.items():
-            self.funckey_validator.validate(funckey)
+            self.funckey_validator.validate_with_tenant_uuids(funckey, tenant_uuids)
 
 
 class FuncKeyValidator(Validator):
@@ -69,15 +91,18 @@ class FuncKeyModelValidator(FuncKeyValidator):
         self.destinations = destinations
 
     def validate(self, funckey):
-        self.validate_text(funckey.label, 'label')
-        self.validate_destination(funckey)
+        raise NotImplementedError()
 
-    def validate_destination(self, funckey):
+    def validate_with_tenant_uuids(self, funckey, tenant_uuids):
+        self.validate_text(funckey.label, 'label')
+        self.validate_destination(funckey, tenant_uuids)
+
+    def validate_destination(self, funckey, tenant_uuids):
         dest_type = funckey.destination.type
         if dest_type not in self.destinations:
             raise errors.invalid_destination_type(dest_type)
         for validator in self.destinations[dest_type]:
-            validator.validate(funckey.destination)
+            validator.validate_with_tenant_uuids(funckey.destination, tenant_uuids)
 
 
 class ForwardValidator(FuncKeyValidator):
@@ -150,3 +175,9 @@ def build_validator():
 
 def build_validator_bsfilter():
     return BSFilterValidator()
+
+
+def build_user_template_validator():
+    return ValidationAssociation(
+        association=[AssociatePrivateTemplateValidator(), AssociateSameTenant()],
+    )

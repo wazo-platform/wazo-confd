@@ -281,6 +281,7 @@ class FuncKeyPositionField(fields.Field):
 
 class FuncKeyTemplateSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
