@@ -110,7 +110,7 @@ class TestUserServiceNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.user = Mock(
-            User, uuid='1234-abcd', dnd_enabled=True, incallfilter_enabled=True
+            User, uuid='1234-abcd', tenant_uuid='5678-efgh', dnd_enabled=True, incallfilter_enabled=True
         )
 
         self.notifier = UserServiceNotifier(self.bus)
@@ -118,7 +118,11 @@ class TestUserServiceNotifier(unittest.TestCase):
     def test_when_user_service_dnd_edited_then_event_sent_on_bus(self):
         schema = ServiceDNDSchema()
         expected_event = EditUserServiceEvent(
-            self.user.id, self.user.uuid, schema.types[0], self.user.dnd_enabled
+            self.user.id,
+            self.user.uuid,
+            self.user.tenant_uuid,
+            schema.types[0],
+            self.user.dnd_enabled,
         )
 
         self.notifier.edited(self.user, schema)
@@ -133,6 +137,7 @@ class TestUserServiceNotifier(unittest.TestCase):
         expected_event = EditUserServiceEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             schema.types[0],
             self.user.incallfilter_enabled,
         )

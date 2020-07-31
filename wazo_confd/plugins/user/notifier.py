@@ -75,7 +75,9 @@ class UserServiceNotifier:
         services = schema.dump(user)
         for type_ in schema.types:
             service = services.get(type_, services)
-            event = EditUserServiceEvent(user.id, user.uuid, type_, service['enabled'])
+            event = EditUserServiceEvent(
+                user.id, user.uuid, user.tenant_uuid, type_, service['enabled']
+            )
             self.bus.send_bus_event(
                 event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
             )
