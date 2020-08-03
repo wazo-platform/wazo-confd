@@ -15,9 +15,6 @@ log_level: info
 # Log file.
 log_filename: /var/log/wazo-confd.log
 
-# PID file.
-pid_filename: /run/wazo-confd/wazo-confd.pid
-
 # REST API server
 rest_api:
 
