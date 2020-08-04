@@ -110,7 +110,11 @@ class TestUserServiceNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.user = Mock(
-            User, uuid='1234-abcd', tenant_uuid='5678-efgh', dnd_enabled=True, incallfilter_enabled=True
+            User,
+            uuid='1234-abcd',
+            tenant_uuid='5678-efgh',
+            dnd_enabled=True,
+            incallfilter_enabled=True,
         )
 
         self.notifier = UserServiceNotifier(self.bus)
