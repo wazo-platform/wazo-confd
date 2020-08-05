@@ -110,7 +110,11 @@ class TestUserServiceNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.user = Mock(
-            User, uuid='1234-abcd', dnd_enabled=True, incallfilter_enabled=True
+            User,
+            uuid='1234-abcd',
+            tenant_uuid='5678-efgh',
+            dnd_enabled=True,
+            incallfilter_enabled=True,
         )
 
         self.notifier = UserServiceNotifier(self.bus)
@@ -118,7 +122,11 @@ class TestUserServiceNotifier(unittest.TestCase):
     def test_when_user_service_dnd_edited_then_event_sent_on_bus(self):
         schema = ServiceDNDSchema()
         expected_event = EditUserServiceEvent(
-            self.user.id, self.user.uuid, schema.types[0], self.user.dnd_enabled
+            self.user.id,
+            self.user.uuid,
+            self.user.tenant_uuid,
+            schema.types[0],
+            self.user.dnd_enabled,
         )
 
         self.notifier.edited(self.user, schema)
@@ -133,6 +141,7 @@ class TestUserServiceNotifier(unittest.TestCase):
         expected_event = EditUserServiceEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             schema.types[0],
             self.user.incallfilter_enabled,
         )
@@ -152,6 +161,7 @@ class TestUserForwardNotifier(unittest.TestCase):
             User,
             id='1234',
             uuid='1234-abcd',
+            tenant_uuid='5678-efgh',
             busy_enabled=True,
             busy_destination='123',
             noanswer_enabled=False,
@@ -167,6 +177,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'busy',
             self.user.busy_enabled,
             self.user.busy_destination,
@@ -184,6 +195,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'noanswer',
             self.user.noanswer_enabled,
             self.user.noanswer_destination,
@@ -201,6 +213,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'unconditional',
             self.user.unconditional_enabled,
             self.user.unconditional_destination,
@@ -220,6 +233,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_busy_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'busy',
             self.user.busy_enabled,
             self.user.busy_destination,
@@ -227,6 +241,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_noanswer_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'noanswer',
             self.user.noanswer_enabled,
             self.user.noanswer_destination,
@@ -234,6 +249,7 @@ class TestUserForwardNotifier(unittest.TestCase):
         expected_unconditional_event = EditUserForwardEvent(
             self.user.id,
             self.user.uuid,
+            self.user.tenant_uuid,
             'unconditional',
             self.user.unconditional_enabled,
             self.user.unconditional_destination,
