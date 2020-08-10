@@ -1,6 +1,8 @@
 # Copyright 2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
+
 from hamcrest import (
     all_of,
     assert_that,
@@ -76,6 +78,23 @@ def unique_error_checks(url, transport, sip, template):
     yield s.check_bogus_field_returns_error, url, 'name', transport['name']
     yield s.check_bogus_field_returns_error, url, 'name', template['name']
     yield s.check_bogus_field_returns_error, url, 'name', sip['name']
+
+
+@fixtures.sip_template()
+def test_put_templates_itself(sip):
+    result = confd.endpoints.sip.templates(sip['uuid']).put(templates=[sip])
+    result.assert_match(400, re.compile(re.escape('itself')))
+
+
+@fixtures.sip_template()
+@fixtures.sip_template()
+def test_put_templates_loop(template1, template2):
+    body = {'templates': [template2]}
+    confd.endpoints.sip.templates(template1['uuid']).put(body).assert_updated()
+
+    body = {'templates': [template1]}
+    result = confd.endpoints.sip.templates(template2['uuid']).put(body)
+    result.assert_match(400, re.compile(re.escape(template1['uuid'])))
 
 
 @fixtures.sip_template(name='hidden', label='hidden', asterisk_id='hidden')
@@ -323,6 +342,7 @@ def test_edit_minimal_parameters(sip, template):
 
 
 @fixtures.transport()
+@fixtures.sip_template()
 @fixtures.sip_template(
     aor_section_options=[
         ['qualify_frequency', '60'],
@@ -355,7 +375,7 @@ def test_edit_minimal_parameters(sip, template):
         ['password', 'outbound-password'],
     ],
 )
-def test_edit_all_parameters(transport, sip):
+def test_edit_all_parameters(transport, template, sip):
     aor = [
         ['maximum_expiration', '3600'],
         ['remove_existing', 'yes'],
@@ -394,6 +414,7 @@ def test_edit_all_parameters(transport, sip):
         registration_section_options=registration,
         registration_outbound_auth_section_options=registration_outbound_auth,
         outbound_auth_section_options=outbound_auth,
+        templates=[template],
         transport=transport,
     )
     response.assert_updated()
@@ -411,6 +432,7 @@ def test_edit_all_parameters(transport, sip):
                 *registration_outbound_auth
             ),
             outbound_auth_section_options=contains_inanyorder(*outbound_auth),
+            templates=contains_inanyorder(has_entries(uuid=template['uuid'])),
             transport=has_entries(uuid=transport['uuid']),
         ),
     )
