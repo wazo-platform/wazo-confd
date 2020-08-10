@@ -120,6 +120,16 @@ class DatabaseQueries:
         )
         self.connection.execute(query, extension_id=extension_id)
 
+    def toggle_sip_templates_generated(self, tenant_uuid, generated=False):
+        query = text(
+            "UPDATE tenant SET sip_templates_generated = :generated WHERE uuid = :tenant_uuid"
+        )
+        self.connection.execute(
+            query,
+            generated='true' if generated else 'false',
+            tenant_uuid=tenant_uuid,
+        )
+
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
         query = text(
             """

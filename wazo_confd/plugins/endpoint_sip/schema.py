@@ -40,7 +40,7 @@ class _BaseSIPSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.UUID(dump_only=True)
     name = fields.String(validate=PJSIPSection())
-    label = fields.String(validate=Length(max=128))
+    label = fields.String(validate=Length(max=128), allow_none=True)
 
     aor_section_options = options_field
     auth_section_options = options_field
@@ -53,8 +53,8 @@ class _BaseSIPSchema(BaseSchema):
     templates = fields.List(
         fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
     )
-    transport = fields.Nested('TransportRelationSchema', unknown=EXCLUDE)
-    asterisk_id = fields.String(validate=Length(max=1024))
+    transport = fields.Nested('TransportRelationSchema', unknown=EXCLUDE, allow_none=True)
+    asterisk_id = fields.String(validate=Length(max=1024), allow_none=True)
 
 
 class EndpointSIPSchema(_BaseSIPSchema):

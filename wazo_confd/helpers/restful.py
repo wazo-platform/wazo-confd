@@ -110,7 +110,7 @@ class ListResource(ConfdResource):
             return form
 
         tenant = Tenant.autodetect()
-        tenant_dao.get_or_create_tenant(tenant.uuid)
+        tenant_dao.find_or_create_tenant(tenant.uuid)
         form['tenant_uuid'] = tenant.uuid
         return form
 
