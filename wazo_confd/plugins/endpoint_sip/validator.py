@@ -46,8 +46,12 @@ def build_validator(pjsip_doc):
             Optional(
                 'name',
                 UniqueField('name', lambda v: sip_find_by(name=v), 'SIPEndpoint'),
-                UniqueField('name', lambda v: template_find_by(name=v), 'SIPEndpointTemplate'),
-                UniqueField('name', lambda v: transport_dao.find_by(name=v), 'Transport'),
+                UniqueField(
+                    'name', lambda v: template_find_by(name=v), 'SIPEndpointTemplate'
+                ),
+                UniqueField(
+                    'name', lambda v: transport_dao.find_by(name=v), 'Transport'
+                ),
             ),
             Optional(
                 'aor_section_options',
@@ -67,7 +71,9 @@ def build_validator(pjsip_doc):
             ),
             Optional(
                 'registration_section_options',
-                PJSIPDocValidator('registration_section_options', 'registration', pjsip_doc),
+                PJSIPDocValidator(
+                    'registration_section_options', 'registration', pjsip_doc
+                ),
             ),
             Optional(
                 'registration_outbound_auth_section_options',
@@ -85,8 +91,12 @@ def build_validator(pjsip_doc):
             Optional(
                 'name',
                 UniqueFieldChanged('name', sip_find_by, 'SIPEndpoint', id_field='uuid'),
-                UniqueFieldChanged('name', template_find_by, 'SIPEndpointTemplate', id_field='uuid'),
-                UniqueFieldChanged('name', transport_dao.find_by, 'Transport', id_field='uuid'),
+                UniqueFieldChanged(
+                    'name', template_find_by, 'SIPEndpointTemplate', id_field='uuid'
+                ),
+                UniqueFieldChanged(
+                    'name', transport_dao.find_by, 'Transport', id_field='uuid'
+                ),
             ),
             Optional(
                 'aor_section_options',
@@ -106,7 +116,9 @@ def build_validator(pjsip_doc):
             ),
             Optional(
                 'registration_section_options',
-                PJSIPDocValidator('registration_section_options', 'registration', pjsip_doc),
+                PJSIPDocValidator(
+                    'registration_section_options', 'registration', pjsip_doc
+                ),
             ),
             Optional(
                 'registration_outbound_auth_section_options',

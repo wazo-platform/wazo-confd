@@ -21,5 +21,7 @@ def build_validator():
                 ),
             )
         ],
-        edit=[Optional('name', UniqueFieldChanged('name', iax_dao.find_by, 'IAXEndpoint'))],
+        edit=[
+            Optional('name', UniqueFieldChanged('name', iax_dao.find_by, 'IAXEndpoint'))
+        ],
     )

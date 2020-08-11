@@ -24,10 +24,14 @@ def test_create_default_templates_when_not_exist():
 
     def templates_created():
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-        assert_that(response.items, contains_inanyorder(
-            has_entries(label='global'),
-            has_entries(label='webrtc'),
-            has_entries(label='global_trunk'),
-            has_entries(label='twilio_trunk'),
-        ))
+        assert_that(
+            response.items,
+            contains_inanyorder(
+                has_entries(label='global'),
+                has_entries(label='webrtc'),
+                has_entries(label='global_trunk'),
+                has_entries(label='twilio_trunk'),
+            ),
+        )
+
     until.assert_(templates_created, tries=5)

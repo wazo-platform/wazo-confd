@@ -72,8 +72,14 @@ def error_checks(url):
         ('identify_section_options', [['@custom_variable', 'invalid-key']]),
         ('registration_section_options', [['auth_type', 'invalid-key']]),
         ('registration_section_options', [['@custom_variable', 'invalid-key']]),
-        ('registration_outbound_auth_section_options', [['max_contacts', 'invalid-key']]),
-        ('registration_outbound_auth_section_options', [['@custom_variable', 'invalid-key']]),
+        (
+            'registration_outbound_auth_section_options',
+            [['max_contacts', 'invalid-key']],
+        ),
+        (
+            'registration_outbound_auth_section_options',
+            [['@custom_variable', 'invalid-key']],
+        ),
         ('outbound_auth_section_options', [['max_contacts', 'invalid-key']]),
         ('outbound_auth_section_options', [['@custom_variable', 'invalid-key']]),
     ]

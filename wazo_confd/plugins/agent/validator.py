@@ -18,5 +18,7 @@ def build_validator():
                 'number', lambda number: agent_dao.find_by(number=number), 'Agent'
             )
         ],
-        edit=[Optional('number', UniqueFieldChanged('number', agent_dao.find_by, 'Agent'))],
+        edit=[
+            Optional('number', UniqueFieldChanged('number', agent_dao.find_by, 'Agent'))
+        ],
     )

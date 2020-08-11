@@ -55,12 +55,15 @@ def test_create_default_templates_when_not_exist():
         BaseIntegrationTest.sync_db()
 
     response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-    assert_that(response.items, contains_inanyorder(
-        has_entries(label='global'),
-        has_entries(label='webrtc'),
-        has_entries(label='global_trunk'),
-        has_entries(label='twilio_trunk'),
-    ))
+    assert_that(
+        response.items,
+        contains_inanyorder(
+            has_entries(label='global'),
+            has_entries(label='webrtc'),
+            has_entries(label='global_trunk'),
+            has_entries(label='twilio_trunk'),
+        ),
+    )
 
 
 def test_no_create_default_templates_when_exist():
@@ -76,12 +79,15 @@ def test_no_create_default_templates_when_exist():
         BaseIntegrationTest.sync_db()
 
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-        assert_that(response.items, contains_inanyorder(
-            has_entries(uuid=uuid_1),
-            has_entries(uuid=uuid_2),
-            has_entries(uuid=uuid_3),
-            has_entries(uuid=uuid_4),
-        ))
+        assert_that(
+            response.items,
+            contains_inanyorder(
+                has_entries(uuid=uuid_1),
+                has_entries(uuid=uuid_2),
+                has_entries(uuid=uuid_3),
+                has_entries(uuid=uuid_4),
+            ),
+        )
 
 
 def test_not_reset_default_templates_when_exist():

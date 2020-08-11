@@ -65,7 +65,9 @@ def build_validator():
         ],
         edit=[
             Optional('email', UniqueFieldChanged('email', user_dao.find_by, 'User')),
-            Optional('username', UniqueFieldChanged('username', user_dao.find_by, 'User')),
+            Optional(
+                'username', UniqueFieldChanged('username', user_dao.find_by, 'User')
+            ),
         ],
     )
 

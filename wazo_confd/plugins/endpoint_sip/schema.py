@@ -53,7 +53,9 @@ class _BaseSIPSchema(BaseSchema):
     templates = fields.List(
         fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
     )
-    transport = fields.Nested('TransportRelationSchema', unknown=EXCLUDE, allow_none=True)
+    transport = fields.Nested(
+        'TransportRelationSchema', unknown=EXCLUDE, allow_none=True
+    )
     asterisk_id = fields.String(validate=Length(max=1024), allow_none=True)
 
 

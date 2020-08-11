@@ -125,9 +125,7 @@ class DatabaseQueries:
             "UPDATE tenant SET sip_templates_generated = :generated WHERE uuid = :tenant_uuid"
         )
         self.connection.execute(
-            query,
-            generated='true' if generated else 'false',
-            tenant_uuid=tenant_uuid,
+            query, generated='true' if generated else 'false', tenant_uuid=tenant_uuid,
         )
 
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):

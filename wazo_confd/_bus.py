@@ -62,7 +62,9 @@ class BusConsumer(ConsumerMixin):
         self._bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(
             **bus_config
         )
-        self._exchange = kombu.Exchange(bus_config['subscribe_exchange_name'], type='headers')
+        self._exchange = kombu.Exchange(
+            bus_config['subscribe_exchange_name'], type='headers'
+        )
         self._queue = kombu.Queue(exclusive=True)
         self._pubsub = Pubsub()
 

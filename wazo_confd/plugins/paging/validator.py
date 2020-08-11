@@ -18,5 +18,9 @@ def build_validator():
                 'number', lambda number: paging_dao.find_by(number=number), 'Paging'
             )
         ],
-        edit=[Optional('number', UniqueFieldChanged('number', paging_dao.find_by, 'Paging'))],
+        edit=[
+            Optional(
+                'number', UniqueFieldChanged('number', paging_dao.find_by, 'Paging')
+            )
+        ],
     )

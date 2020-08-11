@@ -48,9 +48,13 @@ def build_pjsip_transport_validator(pjsip_doc):
             PJSIPDocValidator('options', 'transport', pjsip_doc),
         ],
         edit=[
-            UniqueFieldChanged('name', transport_dao_module.find_by, 'Transport', id_field='uuid'),
+            UniqueFieldChanged(
+                'name', transport_dao_module.find_by, 'Transport', id_field='uuid'
+            ),
             UniqueFieldChanged('name', sip_find_by, 'SIPEndpoint', id_field='uuid'),
-            UniqueFieldChanged('name', template_find_by, 'SIPEndpointTemplate', id_field='uuid'),
+            UniqueFieldChanged(
+                'name', template_find_by, 'SIPEndpointTemplate', id_field='uuid'
+            ),
             PJSIPDocValidator('options', 'transport', pjsip_doc),
         ],
         delete=[TransportDeleteValidator(sip_dao_module)],

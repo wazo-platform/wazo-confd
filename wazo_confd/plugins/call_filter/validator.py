@@ -19,6 +19,9 @@ def build_validator():
             )
         ],
         edit=[
-            Optional('name', UniqueFieldChanged('name', call_filter_dao.find_by, 'CallFilter'))
+            Optional(
+                'name',
+                UniqueFieldChanged('name', call_filter_dao.find_by, 'CallFilter'),
+            )
         ],
     )

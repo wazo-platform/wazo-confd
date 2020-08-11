@@ -23,7 +23,6 @@ class TrunkEndpointService:
 
 
 class TrunkEndpointSIPService(TrunkEndpointService):
-
     def associate(self, trunk, endpoint):
         if trunk.endpoint_sip_uuid == endpoint.uuid:
             return
@@ -42,7 +41,6 @@ class TrunkEndpointSIPService(TrunkEndpointService):
 
 
 class TrunkEndpointIAXService(TrunkEndpointService):
-
     def associate(self, trunk, endpoint):
         if trunk.endpoint_iax_id == endpoint.id:
             return
@@ -61,7 +59,6 @@ class TrunkEndpointIAXService(TrunkEndpointService):
 
 
 class TrunkEndpointCustomService(TrunkEndpointService):
-
     def associate(self, trunk, endpoint):
         if trunk.endpoint_custom_id == endpoint.id:
             return
