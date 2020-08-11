@@ -151,7 +151,6 @@ DEFAULT_CONFIG = {
         'voicemail_general': True,
         'voicemail_zonemessages': True,
         'wizard': True,
-
         'event_handlers': True,
     },
     'service_discovery': {

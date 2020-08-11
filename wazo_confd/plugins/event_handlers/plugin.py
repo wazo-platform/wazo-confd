@@ -10,7 +10,6 @@ from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
 
 class TenantEventHandler:
-
     def __init__(self, tenant_dao, service):
         self.tenant_dao = tenant_dao
         self.service = service

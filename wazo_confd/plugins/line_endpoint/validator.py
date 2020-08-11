@@ -155,9 +155,7 @@ class ValidateLineDissociation(ValidatorAssociation):
 
 def build_validator_sip():
     return ValidationAssociation(
-        association=[
-            ValidateLineSIPAssociation(line_dao_module, trunk_dao_module)
-        ],
+        association=[ValidateLineSIPAssociation(line_dao_module, trunk_dao_module)],
         dissociation=[
             ValidateLineDissociation(user_line_dao_module, line_extension_dao_module)
         ],
@@ -166,9 +164,7 @@ def build_validator_sip():
 
 def build_validator_sccp():
     return ValidationAssociation(
-        association=[
-            ValidateLineSCCPAssociation(line_dao_module, trunk_dao_module)
-        ],
+        association=[ValidateLineSCCPAssociation(line_dao_module, trunk_dao_module)],
         dissociation=[
             ValidateLineDissociation(user_line_dao_module, line_extension_dao_module)
         ],
@@ -177,9 +173,7 @@ def build_validator_sccp():
 
 def build_validator_custom():
     return ValidationAssociation(
-        association=[
-            ValidateLineCustomAssociation(line_dao_module, trunk_dao_module)
-        ],
+        association=[ValidateLineCustomAssociation(line_dao_module, trunk_dao_module)],
         dissociation=[
             ValidateLineDissociation(user_line_dao_module, line_extension_dao_module)
         ],

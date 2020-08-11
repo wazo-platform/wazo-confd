@@ -23,7 +23,9 @@ def build_validator():
         edit=[
             Optional(
                 'name',
-                UniqueFieldChanged('name', call_permission_dao.find_by, 'CallPermission'),
+                UniqueFieldChanged(
+                    'name', call_permission_dao.find_by, 'CallPermission'
+                ),
             )
         ],
     )

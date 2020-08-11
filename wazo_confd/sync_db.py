@@ -58,9 +58,7 @@ def main():
     logger.debug('wazo-auth tenants: %s', auth_tenants)
 
     init_db_from_config(config)
-    default_sip_template_service = DefaultSIPTemplateService(
-        sip_dao, transport_dao,
-    )
+    default_sip_template_service = DefaultSIPTemplateService(sip_dao, transport_dao,)
 
     with session_scope() as session:
         tenants = session.query(Tenant).all()
