@@ -65,16 +65,21 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'aor_section_options', [
         ['one', 'two', 'three']
     ]
-    sections = {
-        'aor_section_options': [['auth_type', 'invalid-key']],
-        'auth_section_options': [['max_contacts', 'invalid-key']],
-        'endpoint_section_options': [['auth_type', 'invalid-key']],
-        'identify_section_options': [['auth_type', 'invalid-key']],
-        'registration_section_options': [['auth_type', 'invalid-key']],
-        'registration_outbound_auth_section_options': [['max_contacts', 'invalid-key']],
-        'outbound_auth_section_options': [['max_contacts', 'invalid-key']],
-    }
-    for section, values in sections.items():
+    sections = [
+        ('aor_section_options', [['auth_type', 'invalid-key']]),
+        ('auth_section_options', [['max_contacts', 'invalid-key']]),
+        ('auth_section_options', [['@custom_variable', 'invalid-key']]),
+        ('endpoint_section_options', [['auth_type', 'invalid-key']]),
+        ('identify_section_options', [['auth_type', 'invalid-key']]),
+        ('identify_section_options', [['@custom_variable', 'invalid-key']]),
+        ('registration_section_options', [['auth_type', 'invalid-key']]),
+        ('registration_section_options', [['@custom_variable', 'invalid-key']]),
+        ('registration_outbound_auth_section_options', [['max_contacts', 'invalid-key']]),
+        ('registration_outbound_auth_section_options', [['@custom_variable', 'invalid-key']]),
+        ('outbound_auth_section_options', [['max_contacts', 'invalid-key']]),
+        ('outbound_auth_section_options', [['@custom_variable', 'invalid-key']]),
+    ]
+    for section, values in sections:
         yield s.check_bogus_field_returns_error, url, section, values
 
     for check in unique_error_checks(url):
@@ -254,6 +259,7 @@ def test_create_all_parameters(transport, endpoint_1, endpoint_2):
         name="template_name",
         label="label",
         aor_section_options=[
+            ['@custom_variable', 'custom'],
             ['qualify_frequency', '60'],
             ['maximum_expiration', '3600'],
             ['remove_existing', 'yes'],
@@ -261,6 +267,7 @@ def test_create_all_parameters(transport, endpoint_1, endpoint_2):
         ],
         auth_section_options=[['username', 'yiq8yej0'], ['password', 'yagq7x0w']],
         endpoint_section_options=[
+            ['@custom_variable', 'custom'],
             ['force_rport', 'yes'],
             ['rewrite_contact', 'yes'],
             ['callerid', '"Firstname Lastname" <100>'],
@@ -295,6 +302,7 @@ def test_create_all_parameters(transport, endpoint_1, endpoint_2):
             name='template_name',
             label='label',
             aor_section_options=[
+                ['@custom_variable', 'custom'],
                 ['qualify_frequency', '60'],
                 ['maximum_expiration', '3600'],
                 ['remove_existing', 'yes'],
@@ -302,6 +310,7 @@ def test_create_all_parameters(transport, endpoint_1, endpoint_2):
             ],
             auth_section_options=[['username', 'yiq8yej0'], ['password', 'yagq7x0w']],
             endpoint_section_options=[
+                ['@custom_variable', 'custom'],
                 ['force_rport', 'yes'],
                 ['rewrite_contact', 'yes'],
                 ['callerid', '"Firstname Lastname" <100>'],
@@ -355,6 +364,7 @@ def test_edit_minimal_parameters(sip, template):
 @fixtures.sip_template()
 @fixtures.sip_template(
     aor_section_options=[
+        ['@custom_variable', 'custom'],
         ['qualify_frequency', '60'],
         ['maximum_expiration', '3600'],
         ['remove_existing', 'yes'],
@@ -362,6 +372,7 @@ def test_edit_minimal_parameters(sip, template):
     ],
     auth_section_options=[['username', 'yiq8yej0'], ['password', 'yagq7x0w']],
     endpoint_section_options=[
+        ['@custom_variable', 'custom'],
         ['force_rport', 'yes'],
         ['rewrite_contact', 'yes'],
         ['callerid', '"Firstname Lastname" <100>'],

@@ -123,6 +123,10 @@ class PJSIPDoc:
         return self.content
 
     def is_valid_in_section(self, section_name, variable):
+        if section_name in ('aor', 'endpoint'):
+            if variable.startswith('@'):
+                return True
+
         return variable in self.get_section_variables(section_name)
 
     def get_section_variables(self, section_name):
