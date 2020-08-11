@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 
 class DefaultSIPTemplateService:
-
     def __init__(self, sip_dao, transport_dao):
         self.sip_dao = sip_dao
         self.transport_dao = sip_dao
@@ -40,7 +39,9 @@ class DefaultSIPTemplateService:
 
     def generate_sip_templates(self, tenant):
         if tenant.sip_templates_generated:
-            logger.debug('SIPEndpointTemplate already generated for tenant: %s', tenant.uuid)
+            logger.debug(
+                'SIPEndpointTemplate already generated for tenant: %s', tenant.uuid
+            )
             return
 
         transport_udp = self.transport_dao.find_by(name='transport-udp')
@@ -57,6 +58,8 @@ class DefaultSIPTemplateService:
                 ['default_expiration', '120'],
                 ['minimum_expiration', '60'],
                 ['qualify_frequency', '60'],
+                ['remove_existing', 'true'],
+                ['max_contacts', '1'],
             ],
             'auth_section_options': [],
             'endpoint_section_options': [
@@ -90,7 +93,10 @@ class DefaultSIPTemplateService:
             'tenant_uuid': tenant.uuid,
             'transport': transport_wss,
             'asterisk_id': None,
-            'aor_section_options': [],
+            'aor_section_options': [
+                ['remove_existing', 'false'],
+                ['max_contacts', '10'],
+            ],
             'auth_section_options': [],
             'endpoint_section_options': [
                 ['webrtc', 'yes'],
