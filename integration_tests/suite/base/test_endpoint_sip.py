@@ -229,41 +229,48 @@ def test_create_minimal_parameters():
 @fixtures.sip_template()
 @fixtures.sip_template()
 def test_create_all_parameters(transport, template_1, template_2):
+    aor_section_options = [
+        ['@custom_variable', 'custom'],
+        ['qualify_frequency', '60'],
+        ['maximum_expiration', '3600'],
+        ['remove_existing', 'yes'],
+        ['max_contacts', '1'],
+    ]
+    auth_section_options = [['username', 'yiq8yej0'], ['password', 'yagq7x0w']]
+    endpoint_section_options = [
+        ['@custom_variable', 'custom'],
+        ['force_rport', 'yes'],
+        ['rewrite_contact', 'yes'],
+        ['callerid', '"Firstname Lastname" <100>'],
+    ]
+    identify_section_options = [
+        ['match', '54.172.60.0'],
+        ['match', '54.172.60.1'],
+        ['match', '54.172.60.2'],
+    ]
+    registration_section_options = [
+        ['client_uri', 'sip:peer@proxy.example.com'],
+        ['server_uri', 'sip:proxy.example.com'],
+        ['expiration', '120'],
+    ]
+    registration_outbound_auth_section_options = [
+        ['username', 'outbound-registration-username'],
+        ['password', 'outbound-registration-password'],
+    ]
+    outbound_auth_section_options = [
+        ['username', 'outbound-auth'],
+        ['password', 'outbound-password'],
+    ]
     response = confd.endpoints.sip.post(
         name="name",
         label="label",
-        aor_section_options=[
-            ['@custom_variable', 'custom'],
-            ['qualify_frequency', '60'],
-            ['maximum_expiration', '3600'],
-            ['remove_existing', 'yes'],
-            ['max_contacts', '1'],
-        ],
-        auth_section_options=[['username', 'yiq8yej0'], ['password', 'yagq7x0w']],
-        endpoint_section_options=[
-            ['@custom_variable', 'custom'],
-            ['force_rport', 'yes'],
-            ['rewrite_contact', 'yes'],
-            ['callerid', '"Firstname Lastname" <100>'],
-        ],
-        identify_section_options=[
-            ['match', '54.172.60.0'],
-            ['match', '54.172.60.1'],
-            ['match', '54.172.60.2'],
-        ],
-        registration_section_options=[
-            ['client_uri', 'sip:peer@proxy.example.com'],
-            ['server_uri', 'sip:proxy.example.com'],
-            ['expiration', '120'],
-        ],
-        registration_outbound_auth_section_options=[
-            ['username', 'outbound-registration-username'],
-            ['password', 'outbound-registration-password'],
-        ],
-        outbound_auth_section_options=[
-            ['username', 'outbound-auth'],
-            ['password', 'outbound-password'],
-        ],
+        aor_section_options=aor_section_options,
+        auth_section_options=auth_section_options,
+        endpoint_section_options=endpoint_section_options,
+        identify_section_options=identify_section_options,
+        registration_section_options=registration_section_options,
+        registration_outbound_auth_section_options=registration_outbound_auth_section_options,
+        outbound_auth_section_options=outbound_auth_section_options,
         transport=transport,
         templates=[template_1, template_2],
         asterisk_id='asterisk_id',
@@ -275,38 +282,13 @@ def test_create_all_parameters(transport, template_1, template_2):
             tenant_uuid=MAIN_TENANT,
             name='name',
             label='label',
-            aor_section_options=[
-                ['@custom_variable', 'custom'],
-                ['qualify_frequency', '60'],
-                ['maximum_expiration', '3600'],
-                ['remove_existing', 'yes'],
-                ['max_contacts', '1'],
-            ],
-            auth_section_options=[['username', 'yiq8yej0'], ['password', 'yagq7x0w']],
-            endpoint_section_options=[
-                ['@custom_variable', 'custom'],
-                ['force_rport', 'yes'],
-                ['rewrite_contact', 'yes'],
-                ['callerid', '"Firstname Lastname" <100>'],
-            ],
-            identify_section_options=[
-                ['match', '54.172.60.0'],
-                ['match', '54.172.60.1'],
-                ['match', '54.172.60.2'],
-            ],
-            registration_section_options=[
-                ['client_uri', 'sip:peer@proxy.example.com'],
-                ['server_uri', 'sip:proxy.example.com'],
-                ['expiration', '120'],
-            ],
-            registration_outbound_auth_section_options=[
-                ['username', 'outbound-registration-username'],
-                ['password', 'outbound-registration-password'],
-            ],
-            outbound_auth_section_options=[
-                ['username', 'outbound-auth'],
-                ['password', 'outbound-password'],
-            ],
+            aor_section_options=aor_section_options,
+            auth_section_options=auth_section_options,
+            endpoint_section_options=endpoint_section_options,
+            identify_section_options=identify_section_options,
+            registration_section_options=registration_section_options,
+            registration_outbound_auth_section_options=registration_outbound_auth_section_options,
+            outbound_auth_section_options=outbound_auth_section_options,
             transport=has_entries(uuid=transport['uuid']),
             templates=contains(
                 has_entries(uuid=template_1['uuid']),
