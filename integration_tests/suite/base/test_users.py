@@ -17,7 +17,7 @@ from hamcrest import (
     not_,
 )
 
-from . import confd, BaseIntegrationTest
+from . import confd
 from ..helpers import associations as a, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
