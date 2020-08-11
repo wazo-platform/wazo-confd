@@ -126,6 +126,21 @@ class PJSIPDoc:
         return variable in self.get_section_variables(section_name)
 
     def get_section_variables(self, section_name):
+        # NOTE(fblackburn): Some sections are not documented and must be hardcoded
+        if section_name == 'identify':
+            return ['match', 'endpoint']
+        if section_name == 'registration':
+            return [
+                'auth_rejection_permanent',
+                'client_uri',
+                'contact_user',
+                'expiration',
+                'max_retries',
+                'outbound_proxy',
+                'retry_interval',
+                'server_uri',
+                'transport',
+            ]
         return self.content.get(section_name, {}).keys()
 
     @property

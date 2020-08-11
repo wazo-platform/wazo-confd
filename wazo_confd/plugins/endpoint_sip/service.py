@@ -49,24 +49,24 @@ class SipEndpointService(CRUDService):
         self.notifier.deleted(resource)
 
 
-def build_endpoint_service(provd_client):
+def build_endpoint_service(provd_client, pjsip_doc):
     device_updater = device_builder.build_device_updater(provd_client)
 
     return SipEndpointService(
         endpoint_sip_dao_module,
-        build_validator(),
+        build_validator(pjsip_doc),
         build_endpoint_notifier(),
         device_updater,
         template=False,
     )
 
 
-def build_template_service(provd_client):
+def build_template_service(provd_client, pjsip_doc):
     device_updater = device_builder.build_device_updater(provd_client)
 
     return SipEndpointService(
         endpoint_sip_dao_module,
-        build_validator(),
+        build_validator(pjsip_doc),
         build_template_notifier(),
         device_updater,
         template=True,

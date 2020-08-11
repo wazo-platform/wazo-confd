@@ -65,7 +65,17 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'aor_section_options', [
         ['one', 'two', 'three']
     ]
-    # TODO(pc-m): add check for fields in the right section
+    sections = {
+        'aor_section_options': [['auth_type', 'invalid-key']],
+        'auth_section_options': [['max_contacts', 'invalid-key']],
+        'endpoint_section_options': [['auth_type', 'invalid-key']],
+        'identify_section_options': [['auth_type', 'invalid-key']],
+        'registration_section_options': [['auth_type', 'invalid-key']],
+        'registration_outbound_auth_section_options': [['max_contacts', 'invalid-key']],
+        'outbound_auth_section_options': [['max_contacts', 'invalid-key']],
+    }
+    for section, values in sections.items():
+        yield s.check_bogus_field_returns_error, url, section, values
 
     for check in unique_error_checks(url):
         yield check
