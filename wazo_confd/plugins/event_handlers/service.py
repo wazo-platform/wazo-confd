@@ -76,6 +76,7 @@ class DefaultSIPTemplateService:
                 ['timers_min_se', '90'],
                 ['trust_id_inbound', 'no'],
                 ['allow_subscribe', 'yes'],
+                ['allow', '!all,ulaw'],
             ],
             'registration_section_options': [],
             'registration_outbound_auth_section_options': [],
