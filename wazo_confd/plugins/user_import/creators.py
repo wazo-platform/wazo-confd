@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
+import random
+import string
 
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
@@ -16,10 +18,7 @@ from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.extension import dao as extension_dao
 
-from wazo_confd.plugins.endpoint_sip.schema import (
-    EndpointSIPSchema,
-    EndpointSIPSchemaNullable,
-)
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
 from wazo_confd.plugins.extension.schema import ExtensionSchema
 from wazo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
 from wazo_confd.plugins.voicemail.schema import VoicemailSchema
@@ -155,7 +154,6 @@ class LineCreator(Creator):
 class SipCreator(Creator):
 
     schema = EndpointSIPSchema
-    schema_nullable = EndpointSIPSchemaNullable
 
     def find(self, fields, tenant_uuid):
         username = fields.get('username')
@@ -163,20 +161,33 @@ class SipCreator(Creator):
             return self.service.find_by(username=username)
 
     def create(self, fields, tenant_uuid):
-        form = self.schema_nullable(handle_error=False).load(fields)
+        form = self._extract_form(fields)
         return self.service.create(EndpointSIP(tenant_uuid=tenant_uuid, **form))
+
+    def _extract_form(self, fields):
+        if not fields.get('username'):
+            fields['username'] = self._random_string(8)
+        if not fields.get('password'):
+            fields['password'] = self._random_string(8)
+        form = {'auth_section_options': [[key, value] for key, value in fields.items()]}
+        return self.schema(handle_error=False).load(form)
+
+    def _random_string(self, length):
+        return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
 class WebRTCCreator(SipCreator):
-    def create(self, fields, tenant_uuid):
-        endpoint_section_options = fields.get('endpoint_section_options', [])
-        fields['endpoint_section_options'] = endpoint_section_options + [
-            ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
-            ['dtls_auto_generate_cert', 'yes'],
-            ['webrtc', 'yes'],
-            ['transport', 'transport-wss'],
-        ]
-        return super().create(fields, tenant_uuid)
+    def _extract_form(self, fields):
+        webrtc_form = {
+            'endpoint_section_options': [
+                ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
+                ['dtls_auto_generate_cert', 'yes'],
+                ['webrtc', 'yes'],
+                ['transport', 'transport-wss'],
+            ],
+        }
+        sip_form = super()._extract_form(fields)
+        return {**sip_form, **webrtc_form}
 
 
 class SccpCreator(Creator):
