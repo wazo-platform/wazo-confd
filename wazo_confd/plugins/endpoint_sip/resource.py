@@ -82,7 +82,9 @@ class _BaseSipItem(ItemResource):
                     templates.append(model)
                 except NotFoundError:
                     metadata = {'templates': template}
-                    raise errors.param_not_found('templates', 'endpoint_sip', **metadata)
+                    raise errors.param_not_found(
+                        'templates', 'endpoint_sip', **metadata
+                    )
             form['templates'] = templates
 
         if form.get('transport'):
