@@ -74,15 +74,16 @@ class _BaseSipItem(ItemResource):
         sip = self.service.get(uuid, **kwargs)
         form = self.schema().load(request.get_json(), partial=True)
 
-        templates = []
-        for template in form.get('templates', []):
-            try:
-                model = self.dao.get(template['uuid'], template=True, **kwargs)
-                templates.append(model)
-            except NotFoundError:
-                metadata = {'templates': template}
-                raise errors.param_not_found('templates', 'endpoint_sip', **metadata)
-        form['templates'] = templates
+        if form.get('templates'):
+            templates = []
+            for template in form['templates']:
+                try:
+                    model = self.dao.get(template['uuid'], template=True, **kwargs)
+                    templates.append(model)
+                except NotFoundError:
+                    metadata = {'templates': template}
+                    raise errors.param_not_found('templates', 'endpoint_sip', **metadata)
+            form['templates'] = templates
 
         if form.get('transport'):
             transport_uuid = form['transport']['uuid']
