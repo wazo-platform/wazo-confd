@@ -31,7 +31,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
             uuid=str(uuid.uuid4()),
             tenant_uuid=str(uuid.uuid4()),
             label='label',
-            username='username',
+            auth_section_options=[['username', 'username']],
             trunk={'id': 2},
             line=None,
         )
@@ -40,6 +40,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
             'uuid': self.sip.uuid,
             'tenant_uuid': self.sip.tenant_uuid,
             'name': self.sip.name,
+            'auth_section_options': self.sip.auth_section_options,
             'label': self.sip.label,
             'trunk': self.sip.trunk,
             'line': self.sip.line,

@@ -55,7 +55,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': 'username',
+                'auth_section_options': self.sip.auth_section_options,
             },
         )
 
@@ -115,7 +115,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': 'username',
+                'auth_section_options': self.sip.auth_section_options,
             },
         )
 
