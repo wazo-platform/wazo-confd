@@ -26,6 +26,7 @@ ENDPOINT_SIP_FIELDS = [
     'uuid',
     'tenant_uuid',
     'label',
+    'name',
 ]
 
 ENDPOINT_SCCP_FIELDS = [
