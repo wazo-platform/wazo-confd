@@ -8,9 +8,7 @@ from hamcrest import (
     assert_that,
     calling,
     contains,
-    contains_inanyorder,
     has_entries,
-    has_length,
     not_,
 )
 
@@ -22,7 +20,7 @@ from werkzeug.exceptions import BadRequest
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
 from wazo_confd.plugins.line.resource import LineSchema  # noqa
 
-from ..schema import EndpointSIPSchema, EndpointSIPSchemaNullable
+from ..schema import EndpointSIPSchema
 
 
 class TestEndpointSIPSchema(TestCase):
@@ -82,38 +80,3 @@ class TestEndpointSIPSchema(TestCase):
             ],
         }
         assert_that(calling(self.schema.load).with_args(body), not_(raises(BadRequest)))
-
-
-class TestEndpointSIPSchemaNullable(TestCase):
-
-    schema = EndpointSIPSchemaNullable()
-
-    def test_that_sip_username_and_sip_secret_are_read(self):
-        body = {'username': 'my-username', 'secret': 'my-password'}
-
-        loaded = self.schema.load(body)
-
-        assert_that(
-            loaded,
-            has_entries(
-                auth_section_options=contains_inanyorder(
-                    contains('username', 'my-username'),
-                    contains('password', 'my-password'),
-                )
-            ),
-        )
-
-    def test_that_a_username_and_a_password_are_generated(self):
-        body = {}
-
-        loaded = self.schema.load(body)
-
-        assert_that(
-            loaded,
-            has_entries(
-                auth_section_options=contains_inanyorder(
-                    contains('username', has_length(8)),
-                    contains('password', has_length(8)),
-                )
-            ),
-        )

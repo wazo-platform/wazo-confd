@@ -1,13 +1,10 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import re
-import string
 import logging
-import random
 
-from marshmallow import fields, EXCLUDE, post_load
-from marshmallow.validate import Length, Regexp
+from marshmallow import fields, EXCLUDE
+from marshmallow.validate import Length
 
 from wazo_confd.helpers.mallow import (
     BaseSchema,
@@ -18,9 +15,6 @@ from wazo_confd.helpers.mallow import (
 )
 
 logger = logging.getLogger(__name__)
-
-USERNAME_REGEX = r"^[a-zA-Z0-9_+-]{1,40}$"
-SECRET_REGEX = r"^[{}]{{1,80}}$".format(re.escape(string.printable))
 
 options_field = fields.List(
     PJSIPSectionOption(option_regex=None), missing=[], validate=Length(max=512),
@@ -70,23 +64,3 @@ class EndpointSIPSchema(_BaseSIPSchema):
 class TemplateSIPSchema(_BaseSIPSchema):
 
     links = ListLink(Link('endpoint_sip_templates', field='uuid'))
-
-
-class EndpointSIPSchemaNullable(EndpointSIPSchema):
-
-    username = fields.String(validate=Regexp(USERNAME_REGEX), missing=None)
-    secret = fields.String(validate=Regexp(SECRET_REGEX), missing=None)
-
-    @post_load
-    def assign_username_and_password(self, data):
-        username = data.pop('username', None) or random_string(8)
-        password = data.pop('secret', None) or random_string(8)
-        data['auth_section_options'] = [
-            ['username', username],
-            ['password', password],
-        ]
-        return data
-
-
-def random_string(length):
-    return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))

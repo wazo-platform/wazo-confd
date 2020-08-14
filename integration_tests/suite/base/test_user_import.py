@@ -394,22 +394,6 @@ def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
     )
 
 
-def test_given_csv_has_sip_error_then_error_raised():
-    csv = [
-        {
-            "firstname": "Chârles",
-            "line_protocol": "sip",
-            "context": config.CONTEXT,
-            "sip_username": "invalid^^",
-            "sip_secret": "\xe0",
-        }
-    ]
-
-    response = client.post("/users/import", csv)
-    assert_error(response, has_error_field('username'))
-    assert_error(response, has_error_field('secret'))
-
-
 def test_given_csv_has_minimal_sccp_fields_then_sccp_endpoint_created():
     csv = [{"firstname": "Chârles", "line_protocol": "sccp", "context": config.CONTEXT}]
 
