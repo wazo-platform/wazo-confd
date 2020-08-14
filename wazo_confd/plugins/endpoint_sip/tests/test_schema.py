@@ -8,6 +8,7 @@ from hamcrest import (
     assert_that,
     calling,
     contains,
+    empty,
     has_entries,
     not_,
 )
@@ -20,7 +21,7 @@ from werkzeug.exceptions import BadRequest
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
 from wazo_confd.plugins.line.resource import LineSchema  # noqa
 
-from ..schema import EndpointSIPSchema
+from ..schema import EndpointSIPSchema, EndpointSIPEventSchema
 
 
 class TestEndpointSIPSchema(TestCase):
@@ -80,3 +81,22 @@ class TestEndpointSIPSchema(TestCase):
             ],
         }
         assert_that(calling(self.schema.load).with_args(body), not_(raises(BadRequest)))
+
+
+class TestEndpointSIPEventSchema(TestCase):
+    def setUp(self):
+        self.schema = EndpointSIPEventSchema()
+
+    def test_auth_section_options_is_removed_except_username(self):
+        body = {
+            'auth_section_options': [['username', 'username'], ['password', 'password']]
+        }
+        loaded = self.schema.dump(body)
+        assert_that(
+            loaded,
+            has_entries(auth_section_options=contains(['username', 'username'])),
+        )
+
+        body = {'auth_section_options': [['password', 'password']]}
+        loaded = self.schema.dump(body)
+        assert_that(loaded, has_entries(auth_section_options=empty()))

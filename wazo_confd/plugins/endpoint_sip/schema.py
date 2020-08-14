@@ -3,7 +3,7 @@
 
 import logging
 
-from marshmallow import fields, EXCLUDE
+from marshmallow import fields, EXCLUDE, post_dump
 from marshmallow.validate import Length
 
 from wazo_confd.helpers.mallow import (
@@ -59,6 +59,21 @@ class EndpointSIPSchema(_BaseSIPSchema):
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+
+
+class EndpointSIPEventSchema(EndpointSIPSchema):
+
+    links = ListLink(Link('endpoint_sip', field='uuid'))
+
+    @post_dump
+    def keep_only_auth_username(self, data):
+        username = None
+        for key, value in data['auth_section_options']:
+            if key == 'username':
+                username = key
+                break
+        data['auth_section_options'] = [['username', username]] if username else []
+        return data
 
 
 class TemplateSIPSchema(_BaseSIPSchema):

@@ -16,7 +16,7 @@ from wazo_confd import bus, sysconfd
 from wazo_confd.plugins.trunk.schema import TrunkSchema
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
 from wazo_confd.plugins.endpoint_iax.schema import IAXSchema
-from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPEventSchema
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ ENDPOINT_SIP_FIELDS = [
     'uuid',
     'tenant_uuid',
     'name',
-    # 'username',  # TODO(pc-m): add a property to the model?
+    'auth_section_options',
 ]
 
 ENDPOINT_IAX_FIELDS = [
@@ -56,7 +56,7 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
 
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
-        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
+        sip_serialized = EndpointSIPEventSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = TrunkEndpointSIPAssociatedEvent(
             trunk=trunk_serialized, sip=sip_serialized,
         )
@@ -66,7 +66,7 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
 
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
-        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
+        sip_serialized = EndpointSIPEventSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = TrunkEndpointSIPDissociatedEvent(
             trunk=trunk_serialized, sip=sip_serialized,
         )
