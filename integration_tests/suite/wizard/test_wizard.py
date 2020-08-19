@@ -261,7 +261,7 @@ class TestWizardDefaultValue(IntegrationTest):
         response.assert_ok()
 
         with self.db.queries() as queries:
-            assert_that(queries.sip_has_language('en_US'))
+            assert_that(queries.autoprov_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))
 

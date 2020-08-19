@@ -20,22 +20,6 @@ from .validator import build_validator
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = r'^nameserver (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
 DEFAULT_ADMIN_POLICY = 'wazo_default_admin_policy'
-ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
-ASTERISK_AUTOPROV_CONFIG_TPL = '''\
-[global](+)
-default_outbound_endpoint = {username}
-
-[{username}](autoprov-endpoint)
-aors = {username}
-auth = {username}-auth
-
-[{username}](autoprov-aor)
-
-[{username}-auth]
-type = auth
-username = {username}
-password = {password}
-'''
 
 logger = logging.getLogger(__name__)
 
@@ -96,7 +80,9 @@ class WizardService:
             self._initialize_provd(
                 wizard['network']['ip_address'], autoprov_username, autoprov_password
             )
-            self._add_asterisk_autoprov_config(autoprov_username, autoprov_password)
+            self._add_pjsip_autoprov_config(
+                autoprov_username, autoprov_password, wizard['language'],
+            )
             self.sysconfd.exec_request_handlers({'chown_autoprov_config': []})
             self.sysconfd.flush()
             self.sysconfd.exec_request_handlers(
@@ -114,17 +100,34 @@ class WizardService:
         wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
 
-    def _add_asterisk_autoprov_config(self, autoprov_username, autoprov_password):
-        content = ASTERISK_AUTOPROV_CONFIG_TPL.format(
-            username=autoprov_username, password=autoprov_password
-        )
-
-        try:
-            with open(ASTERISK_AUTOPROV_CONFIG_FILENAME, 'w') as fobj:
-                fobj.write(content)
-        except IOError as e:
-            logger.info('%s', e)
-            logger.warning('failed to create the Asterisk autoprov configuration file')
+    def _add_pjsip_autoprov_config(
+        self, autoprov_username, autoprov_password, language,
+    ):
+        token_response = self._auth_client.token.new(expiration=1)
+        tenant_uuid = token_response['metadata']['tenant_uuid']
+        wizard_db.insert_tenant(tenant_uuid)
+        transport_udp = wizard_db.find_transport_udp()
+        endpoint_sip_body = {
+            'label': 'Wazo autoprov configuration',
+            'name': autoprov_username,
+            'aor_section_options': [
+                ['max_contacts', '100'],
+                ['remove_existing', 'false'],
+            ],
+            'auth_section_options': [
+                ['username', autoprov_username],
+                ['password', autoprov_password],
+            ],
+            'endpoint_section_options': [
+                ['allow', 'all'],
+                ['context', 'xivo-initconfig'],
+                ['language', language],
+            ],
+            'transport': transport_udp,
+            'tenant_uuid': token_response['metadata']['tenant_uuid'],
+        }
+        wizard_db.insert_endpoint_sip(endpoint_sip_body)
+        wizard_db.set_default_outbound_endpoint(autoprov_username)
 
     def _send_sysconfd_cmd(self, hostname, domain, nameserver, steps):
         if steps['manage_services']:
