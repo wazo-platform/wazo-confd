@@ -5,6 +5,7 @@ import logging
 
 from marshmallow import fields, EXCLUDE, post_dump
 from marshmallow.validate import Length
+from marshmallow.utils import get_value
 
 from wazo_confd.helpers.mallow import (
     BaseSchema,
@@ -30,6 +31,13 @@ class TransportRelationSchema(BaseSchema):
 
 
 class _BaseSIPSchema(BaseSchema):
+
+    def get_attribute(self, obj, attr, default):
+        only = getattr(self.declared_fields[attr], 'only', None)
+        if attr.endswith('_section_options') and only:
+            options = get_value(obj, attr)
+            return [[key, value] for key, value in options if key in only]
+        return super().get_attribute(obj, attr, default)
 
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.UUID(dump_only=True)
@@ -59,21 +67,6 @@ class EndpointSIPSchema(_BaseSIPSchema):
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
-
-
-class EndpointSIPEventSchema(EndpointSIPSchema):
-
-    links = ListLink(Link('endpoint_sip', field='uuid'))
-
-    @post_dump
-    def keep_only_auth_username(self, data):
-        username = None
-        for key, value in data['auth_section_options']:
-            if key == 'username':
-                username = key
-                break
-        data['auth_section_options'] = [['username', username]] if username else []
-        return data
 
 
 class TemplateSIPSchema(_BaseSIPSchema):

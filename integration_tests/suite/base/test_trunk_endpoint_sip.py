@@ -1,7 +1,7 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_entries
+from hamcrest import assert_that, has_entries, contains
 
 from . import confd
 from ..helpers import associations as a, errors as e, fixtures, scenarios as s
@@ -145,13 +145,26 @@ def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
 
 
 @fixtures.trunk()
-@fixtures.sip(label='label')
+@fixtures.sip(
+    label='label',
+    name='label',
+    auth_section_options=[['username', 'my-username'], ['password', 'my-password']],
+)
 def test_get_endpoint_sip_relation(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
         response = confd.trunks(trunk['id']).get()
         assert_that(
             response.item,
-            has_entries(endpoint_sip=has_entries(uuid=sip['uuid'], label=sip['label'])),
+            has_entries(
+                endpoint_sip=has_entries(
+                    uuid=sip['uuid'],
+                    label='label',
+                    name='label',
+                    auth_section_options=contains(
+                        contains('username', 'my-username'),
+                    ),
+                )
+            )
         )
 
 
