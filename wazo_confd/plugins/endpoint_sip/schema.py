@@ -3,7 +3,7 @@
 
 import logging
 
-from marshmallow import fields, EXCLUDE, post_dump
+from marshmallow import fields, EXCLUDE
 from marshmallow.validate import Length
 from marshmallow.utils import get_value
 
