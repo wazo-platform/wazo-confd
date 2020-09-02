@@ -12,14 +12,14 @@ from xivo_bus.resources.endpoint_sip.event import (
 
 from wazo_confd import bus, sysconfd
 
-from .schema import EndpointSIPEventSchema
+from .schema import EndpointSIPSchema
 
 ENDPOINT_SIP_FIELDS = [
     'uuid',
     'tenant_uuid',
     'name',
     'label',
-    'auth_section_options',
+    'auth_section_options.username',
     'trunk.id',
     'line.id',
 ]
@@ -38,19 +38,19 @@ class SipEndpointNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, sip):
-        sip_serialized = EndpointSIPEventSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
+        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = CreateSipEndpointEvent(sip_serialized)
         self.bus.send_bus_event(event)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
-        sip_serialized = EndpointSIPEventSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
+        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = EditSipEndpointEvent(sip_serialized)
         self.bus.send_bus_event(event)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
-        sip_serialized = EndpointSIPEventSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
+        sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = DeleteSipEndpointEvent(sip_serialized)
         self.bus.send_bus_event(event)
 
