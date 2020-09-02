@@ -20,7 +20,8 @@ class TrunkSchema(BaseSchema):
             'name',
             'auth_section_options.username',
             'links',
-        ], dump_only=True
+        ],
+        dump_only=True,
     )
     endpoint_custom = fields.Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True

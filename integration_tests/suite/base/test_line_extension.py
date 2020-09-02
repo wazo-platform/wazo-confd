@@ -227,7 +227,8 @@ def test_associate_line_with_endpoint(line, sip, extension):
         response.assert_updated()
         response = confd.lines(line['id']).get()
         assert_that(
-            response.item['extensions'], contains(has_entries({'id': extension['id']})),
+            response.item['extensions'],
+            contains(has_entries({'id': extension['id']})),
         )
 
 
@@ -278,7 +279,8 @@ def test_get_multi_lines_extension(line1, line2, extension):
             response.item,
             has_entries(
                 lines=contains_inanyorder(
-                    has_entries({'id': line1['id']}), has_entries({'id': line2['id']}),
+                    has_entries({'id': line1['id']}),
+                    has_entries({'id': line2['id']}),
                 ),
             ),
         )

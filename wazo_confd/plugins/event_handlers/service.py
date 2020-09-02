@@ -85,7 +85,8 @@ class DefaultSIPTemplateService:
             'templates': [],
         }
         global_template = self.create_or_merge_sip_template(
-            global_config, tenant.global_sip_template_uuid,
+            global_config,
+            tenant.global_sip_template_uuid,
         )
 
         webrtc_config = {
@@ -111,7 +112,8 @@ class DefaultSIPTemplateService:
             'templates': [global_template],
         }
         webrtc_template = self.create_or_merge_sip_template(
-            webrtc_config, tenant.webrtc_sip_template_uuid,
+            webrtc_config,
+            tenant.webrtc_sip_template_uuid,
         )
 
         global_trunk_config = {
@@ -136,7 +138,8 @@ class DefaultSIPTemplateService:
             'templates': [global_template],
         }
         global_trunk_template = self.create_or_merge_sip_template(
-            global_trunk_config, tenant.global_trunk_sip_template_uuid,
+            global_trunk_config,
+            tenant.global_trunk_sip_template_uuid,
         )
 
         twilio_trunk_config = {
@@ -188,7 +191,8 @@ class DefaultSIPTemplateService:
             'templates': [global_trunk_template],
         }
         twilio_trunk_template = self.create_or_merge_sip_template(
-            twilio_trunk_config, tenant.twilio_trunk_sip_template_uuid,
+            twilio_trunk_config,
+            tenant.twilio_trunk_sip_template_uuid,
         )
 
         tenant.global_sip_template_uuid = global_template.uuid

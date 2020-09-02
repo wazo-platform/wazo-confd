@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -9,8 +9,10 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from .storage import RESERVED_DIRECTORIES
 
 ASTERISK_CATEGORY = 'system'
-RESERVED_DIRECTORIES_ERROR = "The following name are reserved for internal usage: {}".format(
-    RESERVED_DIRECTORIES
+RESERVED_DIRECTORIES_ERROR = (
+    "The following name are reserved for internal usage: {}".format(
+        RESERVED_DIRECTORIES
+    )
 )
 DIRECTORY_REGEX = r'^[a-zA-Z0-9]{1}[-_.a-zA-Z0-9]+$'
 

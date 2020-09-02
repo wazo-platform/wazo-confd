@@ -30,15 +30,21 @@ class Plugin:
         )
 
         api.add_resource(
-            PJSIPDocList, '/asterisk/pjsip/doc', resource_class_args=(pjsip_doc,),
+            PJSIPDocList,
+            '/asterisk/pjsip/doc',
+            resource_class_args=(pjsip_doc,),
         )
 
         api.add_resource(
-            PJSIPGlobalList, '/asterisk/pjsip/global', resource_class_args=(service,),
+            PJSIPGlobalList,
+            '/asterisk/pjsip/global',
+            resource_class_args=(service,),
         )
 
         api.add_resource(
-            PJSIPSystemList, '/asterisk/pjsip/system', resource_class_args=(service,),
+            PJSIPSystemList,
+            '/asterisk/pjsip/system',
+            resource_class_args=(service,),
         )
 
         api.add_resource(

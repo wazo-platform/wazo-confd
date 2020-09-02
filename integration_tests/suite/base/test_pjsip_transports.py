@@ -67,7 +67,11 @@ def test_create_minimal_parameters():
 
     assert_that(
         response.item,
-        has_entries(uuid=not_none(), name='my-transport', options=empty(),),
+        has_entries(
+            uuid=not_none(),
+            name='my-transport',
+            options=empty(),
+        ),
     )
 
     confd.sip.transports(response.item['uuid']).delete().assert_deleted()

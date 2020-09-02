@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -24,7 +24,8 @@ class TestRollback(TestCase):
         self.auth_client.users.new.side_effect = HTTPError()
 
         assert_that(
-            calling(self.client.new_user), raises(ServiceError),
+            calling(self.client.new_user),
+            raises(ServiceError),
         )
 
     def test_that_rollback_deletes_created_users(self):

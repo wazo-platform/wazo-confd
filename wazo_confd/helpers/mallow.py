@@ -124,7 +124,8 @@ class PJSIPSectionOption(fields.List):
             kwargs['validate'].append(validate.Regexp(option_regex))
 
         super().__init__(
-            fields.String(**kwargs), validate=validate.Length(min=2, max=2),
+            fields.String(**kwargs),
+            validate=validate.Length(min=2, max=2),
         )
 
 

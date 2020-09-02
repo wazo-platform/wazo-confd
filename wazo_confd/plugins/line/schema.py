@@ -38,7 +38,8 @@ class LineSchema(BaseSchema):
             'name',
             'auth_section_options.username',
             'links',
-        ], dump_only=True
+        ],
+        dump_only=True,
     )
     endpoint_sccp = fields.Nested('SccpSchema', only=['id', 'links'], dump_only=True)
     endpoint_custom = fields.Nested(

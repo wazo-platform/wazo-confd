@@ -136,7 +136,8 @@ def test_list(sip1, sip2):
         response.items,
         not_(
             contains_inanyorder(
-                has_entry('uuid', sip1['uuid']), has_entry('uuid', sip2['uuid']),
+                has_entry('uuid', sip1['uuid']),
+                has_entry('uuid', sip2['uuid']),
             )
         ),
     )

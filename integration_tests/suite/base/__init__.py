@@ -75,5 +75,6 @@ asterisk_sound = SingletonProxy(
 )
 
 asterisk_json_doc = SingletonProxy(
-    BaseIntegrationTest.create_filesystem, '/usr/share/doc/asterisk-doc/json',
+    BaseIntegrationTest.create_filesystem,
+    '/usr/share/doc/asterisk-doc/json',
 )

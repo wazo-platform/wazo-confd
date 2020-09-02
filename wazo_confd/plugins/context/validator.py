@@ -13,7 +13,11 @@ from wazo_confd.database import agent_status_login as agent_login_status_dao_mod
 
 class ContextDeleteValidator(Validator):
     def __init__(
-        self, agent_login_status_dao, extension_dao, trunk_dao, voicemail_dao,
+        self,
+        agent_login_status_dao,
+        extension_dao,
+        trunk_dao,
+        voicemail_dao,
     ):
         self.agent_login_status_dao = agent_login_status_dao
         self.extension_dao = extension_dao

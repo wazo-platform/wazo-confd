@@ -78,17 +78,23 @@ class TrunkEndpointCustomService(TrunkEndpointService):
 
 def build_service_sip():
     return TrunkEndpointSIPService(
-        trunk_dao_module, build_validator_sip(), build_notifier_sip(),
+        trunk_dao_module,
+        build_validator_sip(),
+        build_notifier_sip(),
     )
 
 
 def build_service_iax():
     return TrunkEndpointIAXService(
-        trunk_dao_module, build_validator_iax(), build_notifier_iax(),
+        trunk_dao_module,
+        build_validator_iax(),
+        build_notifier_iax(),
     )
 
 
 def build_service_custom():
     return TrunkEndpointCustomService(
-        trunk_dao_module, build_validator_custom(), build_notifier_custom(),
+        trunk_dao_module,
+        build_validator_custom(),
+        build_notifier_custom(),
     )

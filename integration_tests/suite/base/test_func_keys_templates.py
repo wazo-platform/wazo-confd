@@ -121,17 +121,21 @@ def check_funckey_template_sorting(funckey_template1, funckey_template2, field, 
 def test_list_multi_tenant(main, sub):
     response = confd.funckeys.templates.get(wazo_tenant=MAIN_TENANT)
     assert_that(
-        response.items, all_of(has_item(main)), not_(has_item(sub)),
+        response.items,
+        all_of(has_item(main)),
+        not_(has_item(sub)),
     )
 
     response = confd.funckeys.templates.get(wazo_tenant=SUB_TENANT)
     assert_that(
-        response.items, all_of(has_item(sub), not_(has_item(main))),
+        response.items,
+        all_of(has_item(sub), not_(has_item(main))),
     )
 
     response = confd.funckeys.templates.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(
-        response.items, has_items(main, sub),
+        response.items,
+        has_items(main, sub),
     )
 
 
@@ -141,7 +145,10 @@ def test_get(funckey_template):
     assert_that(
         response.item,
         has_entries(
-            id=not_(none()), tenant_uuid=MAIN_TENANT, name='template', keys=empty(),
+            id=not_(none()),
+            tenant_uuid=MAIN_TENANT,
+            name='template',
+            keys=empty(),
         ),
     )
 
@@ -203,7 +210,8 @@ def test_edit_position_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='FuncKeyTemplate'))
 
     response = confd.funckeys.templates(sub['id'])(1).put(
-        wazo_tenant=MAIN_TENANT, destination={'type': 'custom', 'exten': '456'},
+        wazo_tenant=MAIN_TENANT,
+        destination={'type': 'custom', 'exten': '456'},
     )
     response.assert_updated()
 

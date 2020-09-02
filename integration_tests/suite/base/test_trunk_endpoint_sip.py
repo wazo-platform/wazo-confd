@@ -164,7 +164,7 @@ def test_get_endpoint_sip_relation(trunk, sip):
                         contains('username', 'my-username'),
                     ),
                 )
-            )
+            ),
         )
 
 

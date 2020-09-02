@@ -47,7 +47,8 @@ class TestPJSIPDoc(unittest.TestCase):
             calling(doc.get),
             raises(PJSIPDocError).matching(
                 has_properties(
-                    status_code=400, message='failed to read PJSIP JSON documentation',
+                    status_code=400,
+                    message='failed to read PJSIP JSON documentation',
                 )
             ),
         )

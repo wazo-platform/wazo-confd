@@ -16,7 +16,8 @@ def test_get_user_line_id_associated_endpoints_sip(user, line, sip):
             confd.users(user['uuid']).lines(line['id']).associated.endpoints.sip.get()
         )
         assert_that(
-            response.item, has_entries(uuid=sip['uuid']),
+            response.item,
+            has_entries(uuid=sip['uuid']),
         )
 
 

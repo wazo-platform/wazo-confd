@@ -72,7 +72,11 @@ class TestTransportSchema(TestCase):
 
         result = PJSIPTransportSchema().load(body)
         assert_that(
-            result, has_entries(name='my-transport', options=empty(),),
+            result,
+            has_entries(
+                name='my-transport',
+                options=empty(),
+            ),
         )
 
     def test_injection_in_optoins(self):

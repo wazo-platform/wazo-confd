@@ -362,7 +362,8 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
         sip,
         has_entries(
             auth_section_options=contains_inanyorder(
-                contains('username', 'sipusername'), contains("password", "sipsecret"),
+                contains('username', 'sipusername'),
+                contains("password", "sipsecret"),
             )
         ),
     )

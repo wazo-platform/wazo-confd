@@ -39,7 +39,12 @@ class ConfdClient:
 
     @classmethod
     def from_options(
-        cls, host, port, https=False, headers=None, encoder=None,
+        cls,
+        host,
+        port,
+        https=False,
+        headers=None,
+        encoder=None,
     ):
         url = '{}://{}:{}/1.1'.format('https' if https else 'http', host, port)
         logger.info('CONFD URL: %s', url)

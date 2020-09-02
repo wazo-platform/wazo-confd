@@ -18,7 +18,9 @@ from wazo_confd.helpers.mallow import (
 logger = logging.getLogger(__name__)
 
 options_field = fields.List(
-    PJSIPSectionOption(option_regex=None), missing=[], validate=Length(max=512),
+    PJSIPSectionOption(option_regex=None),
+    missing=[],
+    validate=Length(max=512),
 )
 
 
@@ -31,7 +33,6 @@ class TransportRelationSchema(BaseSchema):
 
 
 class _BaseSIPSchema(BaseSchema):
-
     def get_attribute(self, obj, attr, default):
         only = getattr(self.declared_fields[attr], 'only', None)
         if attr.endswith('_section_options') and only:

@@ -19,7 +19,9 @@ def main(argv=None):
     config = load_config(argv)
 
     xivo_logging.setup_logging(
-        config['log_filename'], debug=config['debug'], log_level=config['log_level'],
+        config['log_filename'],
+        debug=config['debug'],
+        log_level=config['log_level'],
     )
     xivo_logging.silence_loggers(['Flask-Cors'], logging.WARNING)
 

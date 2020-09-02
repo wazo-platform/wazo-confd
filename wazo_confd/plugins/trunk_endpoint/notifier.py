@@ -58,7 +58,8 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = TrunkEndpointSIPAssociatedEvent(
-            trunk=trunk_serialized, sip=sip_serialized,
+            trunk=trunk_serialized,
+            sip=sip_serialized,
         )
         self.bus.send_bus_event(event)
 
@@ -68,7 +69,8 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = TrunkEndpointSIPDissociatedEvent(
-            trunk=trunk_serialized, sip=sip_serialized,
+            trunk=trunk_serialized,
+            sip=sip_serialized,
         )
         self.bus.send_bus_event(event)
 
@@ -80,7 +82,8 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
         event = TrunkEndpointIAXAssociatedEvent(
-            trunk=trunk_serialized, iax=iax_serialized,
+            trunk=trunk_serialized,
+            iax=iax_serialized,
         )
         self.bus.send_bus_event(event)
 
@@ -90,7 +93,8 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
         event = TrunkEndpointIAXDissociatedEvent(
-            trunk=trunk_serialized, iax=iax_serialized,
+            trunk=trunk_serialized,
+            iax=iax_serialized,
         )
         self.bus.send_bus_event(event)
 
@@ -100,7 +104,8 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
         event = TrunkEndpointCustomAssociatedEvent(
-            trunk=trunk_serialized, custom=custom_serialized,
+            trunk=trunk_serialized,
+            custom=custom_serialized,
         )
         self.bus.send_bus_event(event)
 
@@ -108,7 +113,8 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
         event = TrunkEndpointCustomDissociatedEvent(
-            trunk=trunk_serialized, custom=custom_serialized,
+            trunk=trunk_serialized,
+            custom=custom_serialized,
         )
         self.bus.send_bus_event(event)
 

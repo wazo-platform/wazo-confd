@@ -25,10 +25,16 @@ logger = logging.getLogger('wazo-confd-sync-db')
 def parse_cli_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '-d', '--debug', action='store_true', help="Log debug messages",
+        '-d',
+        '--debug',
+        action='store_true',
+        help="Log debug messages",
     )
     parser.add_argument(
-        '-q', '--quiet', action='store_true', help='Only print warnings and errors',
+        '-q',
+        '--quiet',
+        action='store_true',
+        help='Only print warnings and errors',
     )
     parsed_args = parser.parse_args()
     result = {}
@@ -58,7 +64,10 @@ def main():
     logger.debug('wazo-auth tenants: %s', auth_tenants)
 
     init_db_from_config(config)
-    default_sip_template_service = DefaultSIPTemplateService(sip_dao, transport_dao,)
+    default_sip_template_service = DefaultSIPTemplateService(
+        sip_dao,
+        transport_dao,
+    )
 
     with session_scope() as session:
         tenants = session.query(Tenant).all()

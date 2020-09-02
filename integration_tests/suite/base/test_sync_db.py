@@ -98,7 +98,8 @@ def test_not_reset_default_templates_when_exist():
         uuid_1 = response.items[0]['uuid']
 
         response = confd.endpoints.sip.templates(uuid_1).put(
-            asterisk_id='42', wazo_tenant=CREATED_TENANT,
+            asterisk_id='42',
+            wazo_tenant=CREATED_TENANT,
         )
 
         BaseIntegrationTest.sync_db()
@@ -115,7 +116,8 @@ def test_reset_default_templates_when_toggle_sip_template_generated_bool():
         uuid_1 = response.items[0]['uuid']
 
         response = confd.endpoints.sip.templates(uuid_1).put(
-            asterisk_id='42', wazo_tenant=CREATED_TENANT,
+            asterisk_id='42',
+            wazo_tenant=CREATED_TENANT,
         )
 
         with db.queries() as queries:

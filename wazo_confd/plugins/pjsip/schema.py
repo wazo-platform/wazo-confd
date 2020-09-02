@@ -13,4 +13,8 @@ class PJSIPTransportDeleteRequestSchema(BaseSchema):
 class PJSIPTransportSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     name = fields.String(validate=PJSIPSection(), required=True)
-    options = fields.List(PJSIPSectionOption(), validate=Length(max=128), missing=[],)
+    options = fields.List(
+        PJSIPSectionOption(),
+        validate=Length(max=128),
+        missing=[],
+    )

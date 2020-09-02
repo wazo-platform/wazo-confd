@@ -81,7 +81,9 @@ class WizardService:
                 wizard['network']['ip_address'], autoprov_username, autoprov_password
             )
             self._add_pjsip_autoprov_config(
-                autoprov_username, autoprov_password, wizard['language'],
+                autoprov_username,
+                autoprov_password,
+                wizard['language'],
             )
             self.sysconfd.exec_request_handlers({'chown_autoprov_config': []})
             self.sysconfd.flush()
@@ -101,7 +103,10 @@ class WizardService:
         return wizard
 
     def _add_pjsip_autoprov_config(
-        self, autoprov_username, autoprov_password, language,
+        self,
+        autoprov_username,
+        autoprov_password,
+        language,
     ):
         token_response = self._auth_client.token.new(expiration=1)
         tenant_uuid = token_response['metadata']['tenant_uuid']

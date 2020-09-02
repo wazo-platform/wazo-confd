@@ -13,6 +13,8 @@ def associate(transport_uuid, endpoint_uuid, check=True):
 
 
 def dissociate(transport_uuid, endpoint_uuid, check=True):
-    response = confd.endpoints.sip(endpoint_uuid).put(transport=None,)
+    response = confd.endpoints.sip(endpoint_uuid).put(
+        transport=None,
+    )
     if check:
         response.assert_ok()
