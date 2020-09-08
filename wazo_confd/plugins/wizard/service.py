@@ -73,6 +73,8 @@ class WizardService:
             wizard['steps'],
         )
 
+        self._add_mandatory_contexts()
+
         if wizard['steps']['provisioning']:
             autoprov_username = self._generate_autoprov_username()
             autoprov_password = self._generate_phone_password(length=8)
@@ -100,12 +102,23 @@ class WizardService:
         wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
 
+    def _add_mandatory_contexts(self):
+        token_response = self._auth_client.token.new(expiration=1)
+        tenant_uuid = token_response['metadata']['tenant_uuid']
+        wizard_db.insert_tenant(tenant_uuid)
+        context_body = {
+            'name': 'xivo-initconfig',
+            'displayname': 'Autoprov',
+            'type': 'services',
+            'tenant_uuid': tenant_uuid,
+        }
+        wizard_db.insert_context(context_body)
+
     def _add_pjsip_autoprov_config(
         self, autoprov_username, autoprov_password, language,
     ):
         token_response = self._auth_client.token.new(expiration=1)
         tenant_uuid = token_response['metadata']['tenant_uuid']
-        wizard_db.insert_tenant(tenant_uuid)
         transport_udp = wizard_db.find_transport_udp()
         endpoint_sip_body = {
             'label': 'Wazo autoprov configuration',
@@ -126,8 +139,14 @@ class WizardService:
             'transport': transport_udp,
             'tenant_uuid': token_response['metadata']['tenant_uuid'],
         }
-        wizard_db.insert_endpoint_sip(endpoint_sip_body)
+        endpoint_sip_uuid = wizard_db.insert_endpoint_sip(endpoint_sip_body)
         wizard_db.set_default_outbound_endpoint(autoprov_username)
+        line_body = {
+            'context': 'xivo-initconfig',
+            'endpoint_sip_uuid': endpoint_sip_uuid,
+            'tenant_uuid': tenant_uuid,
+        }
+        wizard_db.insert_line(line_body)
 
     def _send_sysconfd_cmd(self, hostname, domain, nameserver, steps):
         if steps['manage_services']:

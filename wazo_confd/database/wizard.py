@@ -6,8 +6,10 @@ from sqlalchemy import and_
 from xivo_dao.alchemy.asterisk_file import AsteriskFile
 from xivo_dao.alchemy.asterisk_file_section import AsteriskFileSection
 from xivo_dao.alchemy.asterisk_file_variable import AsteriskFileVariable
+from xivo_dao.alchemy.context import Context
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.infos import Infos
+from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.netiface import Netiface
 from xivo_dao.alchemy.resolvconf import Resolvconf
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
@@ -26,14 +28,28 @@ def find_transport_udp():
                 return row
 
 
+def insert_context(body):
+    context = Context(**body)
+    Session.add(context)
+
+
 def insert_endpoint_sip(body):
     endpoint_sip = EndpointSIP(**body)
     Session.add(endpoint_sip)
+    Session.flush()
+    return str(endpoint_sip.uuid)
+
+
+def insert_line(body):
+    line = LineFeatures(provisioningid=0, context=body['context'])
+    line.endpoint_sip_uuid = body['endpoint_sip_uuid']
+    Session.add(line)
 
 
 def insert_tenant(tenant_uuid):
     tenant = Tenant(uuid=tenant_uuid)
     Session.add(tenant)
+    Session.flush()
 
 
 def set_default_outbound_endpoint(endpoint_name):
