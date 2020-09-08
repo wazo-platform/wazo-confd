@@ -500,6 +500,66 @@ class DatabaseQueries:
 
         return False
 
+    def has_autoprov_line(self, language):
+        query = text(
+            """
+            SELECT endpoint_sip_uuid FROM linefeatures WHERE context = 'xivo-initconfig'
+            """
+        )
+        endpoint_sip_uuid = self.connection.execute(query).scalar()
+
+        query = text(
+            """
+            SELECT name FROM endpoint_sip WHERE uuid = :endpoint_sip_uuid
+            """
+        )
+        endpoint_sip_name = self.connection.execute(
+            query, endpoint_sip_uuid=endpoint_sip_uuid
+        ).scalar()
+
+        query = text(
+            """
+            SELECT uuid FROM endpoint_sip_section WHERE endpoint_sip_uuid = :endpoint_sip_uuid AND type = 'endpoint'
+            """
+        )
+        endpoint_section_uuid = self.connection.execute(
+            query, endpoint_sip_uuid=endpoint_sip_uuid
+        ).scalar()
+
+        query = text(
+            """
+            SELECT key, value FROM endpoint_sip_section_option where endpoint_sip_section_uuid = :endpoint_sip_section_uuid
+            """
+        )
+        configured_language = None
+        for key, value in self.connection.execute(
+            query, endpoint_sip_section_uuid=endpoint_section_uuid
+        ):
+            if key == 'language':
+                configured_language = value
+                break
+
+        query = text(
+            """
+            SELECT key, value
+            FROM asterisk_file_variable
+            JOIN asterisk_file_section ON asterisk_file_variable.asterisk_file_section_id = asterisk_file_section.id
+            JOIN asterisk_file ON asterisk_file_section.asterisk_file_id = asterisk_file.id
+            WHERE asterisk_file.name = :file_name AND asterisk_file_section.name = :section_name
+            """
+        )
+        default_outbound_endpoint = None
+        for key, value in self.connection.execute(
+            query, file_name='pjsip.conf', section_name='global'
+        ):
+            if key == 'default_outbound_endpoint':
+                default_outbound_endpoint = value
+
+        return (
+            configured_language == language
+            and default_outbound_endpoint == endpoint_sip_name
+        )
+
     def iax_has_language(self, language):
         query = text(
             """SELECT COUNT(*)

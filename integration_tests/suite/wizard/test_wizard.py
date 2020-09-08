@@ -330,7 +330,6 @@ class TestWizardPost(IntegrationTest):
 
     def validate_db(self, data):
         with self.db.queries() as queries:
-            assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
             assert_that(queries.infos_has_timezone(data['timezone']))
@@ -346,6 +345,7 @@ class TestWizardPost(IntegrationTest):
                     data['network']['ip_address'], data['network']['gateway']
                 )
             )
+            assert_that(queries.has_autoprov_line(data['language']))
 
     def validate_auth(self, auth, data):
         auth.assert_request(
