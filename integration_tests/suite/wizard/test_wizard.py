@@ -261,7 +261,6 @@ class TestWizardDefaultValue(IntegrationTest):
         response.assert_ok()
 
         with self.db.queries() as queries:
-            assert_that(queries.autoprov_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))
 
@@ -345,7 +344,6 @@ class TestWizardPost(IntegrationTest):
                     data['network']['ip_address'], data['network']['gateway']
                 )
             )
-            assert_that(queries.has_autoprov_line(data['language']))
 
     def validate_auth(self, auth, data):
         auth.assert_request(

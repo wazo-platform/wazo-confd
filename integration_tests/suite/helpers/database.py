@@ -125,9 +125,7 @@ class DatabaseQueries:
             "UPDATE tenant SET sip_templates_generated = :generated WHERE uuid = :tenant_uuid"
         )
         self.connection.execute(
-            query,
-            generated='true' if generated else 'false',
-            tenant_uuid=tenant_uuid,
+            query, generated='true' if generated else 'false', tenant_uuid=tenant_uuid,
         )
 
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
@@ -327,10 +325,7 @@ class DatabaseQueries:
         )
 
         agent_id = self.connection.execute(
-            query,
-            number=number,
-            context=context,
-            tenant_uuid=tenant_uuid,
+            query, number=number, context=context, tenant_uuid=tenant_uuid,
         ).scalar()
 
         func_key_id = self.insert_func_key('speeddial', 'agent')
@@ -482,83 +477,6 @@ class DatabaseQueries:
         )
         count = self.connection.execute(query, sccp_device=sccp_device).scalar()
         return count > 0
-
-    def autoprov_has_language(self, language):
-        query = text(
-            """SELECT key, value
-                FROM endpoint_sip_section_option
-                WHERE endpoint_sip_section_option.endpoint_sip_section_uuid = (
-                    SELECT uuid FROM endpoint_sip_section WHERE type='endpoint' AND endpoint_sip_uuid = (
-                        SELECT uuid FROM endpoint_sip WHERE label = 'Wazo autoprov configuration'
-                    )
-                )
-            """
-        )
-        for key, value in self.connection.execute(query):
-            if key == 'language' and value == language:
-                return True
-
-        return False
-
-    def has_autoprov_line(self, language):
-        query = text(
-            """
-            SELECT endpoint_sip_uuid FROM linefeatures WHERE context = 'xivo-initconfig'
-            """
-        )
-        endpoint_sip_uuid = self.connection.execute(query).scalar()
-
-        query = text(
-            """
-            SELECT name FROM endpoint_sip WHERE uuid = :endpoint_sip_uuid
-            """
-        )
-        endpoint_sip_name = self.connection.execute(
-            query, endpoint_sip_uuid=endpoint_sip_uuid
-        ).scalar()
-
-        query = text(
-            """
-            SELECT uuid FROM endpoint_sip_section WHERE endpoint_sip_uuid = :endpoint_sip_uuid AND type = 'endpoint'
-            """
-        )
-        endpoint_section_uuid = self.connection.execute(
-            query, endpoint_sip_uuid=endpoint_sip_uuid
-        ).scalar()
-
-        query = text(
-            """
-            SELECT key, value FROM endpoint_sip_section_option where endpoint_sip_section_uuid = :endpoint_sip_section_uuid
-            """
-        )
-        configured_language = None
-        for key, value in self.connection.execute(
-            query, endpoint_sip_section_uuid=endpoint_section_uuid
-        ):
-            if key == 'language':
-                configured_language = value
-                break
-
-        query = text(
-            """
-            SELECT key, value
-            FROM asterisk_file_variable
-            JOIN asterisk_file_section ON asterisk_file_variable.asterisk_file_section_id = asterisk_file_section.id
-            JOIN asterisk_file ON asterisk_file_section.asterisk_file_id = asterisk_file.id
-            WHERE asterisk_file.name = :file_name AND asterisk_file_section.name = :section_name
-            """
-        )
-        default_outbound_endpoint = None
-        for key, value in self.connection.execute(
-            query, file_name='pjsip.conf', section_name='global'
-        ):
-            if key == 'default_outbound_endpoint':
-                default_outbound_endpoint = value
-
-        return (
-            configured_language == language
-            and default_outbound_endpoint == endpoint_sip_name
-        )
 
     def iax_has_language(self, language):
         query = text(
