@@ -125,9 +125,7 @@ class DatabaseQueries:
             "UPDATE tenant SET sip_templates_generated = :generated WHERE uuid = :tenant_uuid"
         )
         self.connection.execute(
-            query,
-            generated='true' if generated else 'false',
-            tenant_uuid=tenant_uuid,
+            query, generated='true' if generated else 'false', tenant_uuid=tenant_uuid,
         )
 
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
@@ -327,10 +325,7 @@ class DatabaseQueries:
         )
 
         agent_id = self.connection.execute(
-            query,
-            number=number,
-            context=context,
-            tenant_uuid=tenant_uuid,
+            query, number=number, context=context, tenant_uuid=tenant_uuid,
         ).scalar()
 
         func_key_id = self.insert_func_key('speeddial', 'agent')
@@ -481,19 +476,6 @@ class DatabaseQueries:
                      """
         )
         count = self.connection.execute(query, sccp_device=sccp_device).scalar()
-        return count > 0
-
-    def sip_has_language(self, language):
-        query = text(
-            """SELECT COUNT(*)
-                     FROM staticsip
-                     WHERE
-                        var_name = 'language'
-                        AND var_val = :language
-                     """
-        )
-        count = self.connection.execute(query, language=language).scalar()
-
         return count > 0
 
     def iax_has_language(self, language):

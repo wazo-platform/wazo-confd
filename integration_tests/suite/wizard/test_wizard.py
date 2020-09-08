@@ -261,7 +261,6 @@ class TestWizardDefaultValue(IntegrationTest):
         response.assert_ok()
 
         with self.db.queries() as queries:
-            assert_that(queries.sip_has_language('en_US'))
             assert_that(queries.iax_has_language('en_US'))
             assert_that(queries.sccp_has_language('en_US'))
 
@@ -330,7 +329,6 @@ class TestWizardPost(IntegrationTest):
 
     def validate_db(self, data):
         with self.db.queries() as queries:
-            assert_that(queries.sip_has_language(data['language']))
             assert_that(queries.iax_has_language(data['language']))
             assert_that(queries.sccp_has_language(data['language']))
             assert_that(queries.infos_has_timezone(data['timezone']))
