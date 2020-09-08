@@ -483,22 +483,18 @@ class DatabaseQueries:
         count = self.connection.execute(query, sccp_device=sccp_device).scalar()
         return count > 0
 
-    def autoprov_has_language(self, language):
+    def sip_has_language(self, language):
         query = text(
-            """SELECT key, value
-                FROM endpoint_sip_section_option
-                WHERE endpoint_sip_section_option.endpoint_sip_section_uuid = (
-                    SELECT uuid FROM endpoint_sip_section WHERE type='endpoint' AND endpoint_sip_uuid = (
-                        SELECT uuid FROM endpoint_sip WHERE label = 'Wazo autoprov configuration'
-                    )
-                )
-            """
+            """SELECT COUNT(*)
+                     FROM staticsip
+                     WHERE
+                        var_name = 'language'
+                        AND var_val = :language
+                     """
         )
-        for key, value in self.connection.execute(query):
-            if key == 'language' and value == language:
-                return True
+        count = self.connection.execute(query, language=language).scalar()
 
-        return False
+        return count > 0
 
     def iax_has_language(self, language):
         query = text(
