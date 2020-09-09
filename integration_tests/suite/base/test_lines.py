@@ -1,6 +1,7 @@
 # Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import unittest
 import re
 
 from hamcrest import (
@@ -159,6 +160,7 @@ def test_list_multi_tenant(_, __, main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
+@unittest.skip('webrtc option trigger many requests')
 @fixtures.user()
 @fixtures.sip_template(endpoint_section_options=[['webrtc', 'yes']])
 @fixtures.sip()
