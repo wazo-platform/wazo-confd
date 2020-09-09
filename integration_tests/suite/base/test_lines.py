@@ -106,8 +106,17 @@ def test_get(line):
             endpoint_custom=none(),
             extensions=empty(),
             users=empty(),
+            webrtc=False,
         ),
     )
+
+
+@fixtures.line()
+@fixtures.sip(endpoint_section_options=[['webrtc', 'yes']])
+def test_get_webrtc_true(line, sip):
+    with a.line_endpoint_sip(line, sip):
+        response = confd.lines(line['id']).get()
+        assert_that(response.item, has_entries(webrtc=True))
 
 
 @fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
@@ -151,12 +160,16 @@ def test_list_multi_tenant(_, __, main, sub):
 
 
 @fixtures.user()
-@fixtures.line_sip()
+@fixtures.sip_template(endpoint_section_options=[['webrtc', 'yes']])
+@fixtures.sip()
 @fixtures.line()
 @fixtures.line()
-def test_list_db_requests(user1, line1, *_):
-    with a.user_line(user1, line1):
-        s.check_db_requests(BaseIntegrationTest, confd.lines.get, nb_requests=1)
+@fixtures.line()
+def test_list_db_requests(user, template, sip, line, *_):
+    confd.endpoints.sip(sip['uuid']).put(templates=[template]).assert_updated()
+    with a.line_endpoint_sip(line, sip):
+        with a.user_line(user, line):
+            s.check_db_requests(BaseIntegrationTest, confd.lines.get, nb_requests=1)
 
 
 def test_create_line_with_fake_context():
@@ -183,6 +196,7 @@ def test_create_line_with_minimal_parameters():
             provisioning_code=has_length(6),
             provisioning_extension=has_length(6),
             tenant_uuid=MAIN_TENANT,
+            webrtc=False,
         ),
     )
 
@@ -211,6 +225,7 @@ def test_create_line_with_all_parameters(registrar):
             provisioning_code="887865",
             provisioning_extension="887865",
             tenant_uuid=MAIN_TENANT,
+            webrtc=False,
         ),
     )
 

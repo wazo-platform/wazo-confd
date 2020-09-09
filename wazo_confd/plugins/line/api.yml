@@ -228,5 +228,7 @@ definitions:
       registrar:
         type: string
         description: Name of the template line used by the device
+      webrtc:
+        type: string
     required:
     - context

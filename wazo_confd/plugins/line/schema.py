@@ -15,6 +15,7 @@ class LineSchema(BaseSchema):
     device_id = fields.String(dump_only=True)
     device_slot = fields.Integer(dump_only=True)
     provisioning_extension = fields.String(dump_only=True)
+    webrtc = fields.Boolean(dump_only=True)
 
     context = fields.String(required=True)
     provisioning_code = fields.String(validate=(Predicate('isdigit'), Length(equal=6)))
