@@ -1,14 +1,22 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from flask import request
+
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
-from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+from wazo_confd.plugins.endpoint_sip.schema import (
+    EndpointSIPSchema,
+    MergedEndpointSIPSchema,
+)
 
 
 class UserLineAssociatedEndpointSipItem(ConfdResource):
 
     schema = EndpointSIPSchema
+    view_schemas = {
+        'merged': MergedEndpointSIPSchema,
+    }
 
     def __init__(self, user_dao, line_dao):
         super().__init__()
@@ -20,6 +28,8 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
     )
     def get(self, user_uuid, line_id):
         user = self.user_dao.get_by(uuid=str(user_uuid))
+        view = request.args.get('view')
+        schema = self.view_schemas.get(view, self.schema)
 
         if line_id == 'main':
             if not user.lines:
@@ -33,4 +43,4 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
         if not line.endpoint_sip:
             return 'Resource Not Found.', 404
 
-        return self.schema().dump(line.endpoint_sip)
+        return schema().dump(line.endpoint_sip)
