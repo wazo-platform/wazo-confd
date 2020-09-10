@@ -13,7 +13,11 @@ from .resource import (
     LineEndpointAssociationSccp,
     LineEndpointAssociationCustom,
 )
-from .service import build_service
+from .service import (
+    build_service_sip,
+    build_service_sccp,
+    build_service_custom,
+)
 
 
 class Plugin:
@@ -25,45 +29,25 @@ class Plugin:
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
-        self.load_sip(api, provd_client)
-        self.load_sccp(api, provd_client)
-        self.load_custom(api, provd_client)
-
-    def load_sip(self, api, provd_client):
-        service = self.build_sip_service(provd_client)
+        service_sip = build_service_sip(provd_client)
+        service_sccp = build_service_sccp(provd_client)
+        service_custom = build_service_custom(provd_client)
 
         api.add_resource(
             LineEndpointAssociationSip,
-            '/lines/<int:line_id>/endpoints/sip/<int:endpoint_id>',
+            '/lines/<int:line_id>/endpoints/sip/<uuid:endpoint_uuid>',
             endpoint='line_endpoint_sip',
-            resource_class_args=(service, line_dao, endpoint_sip_dao),
+            resource_class_args=(service_sip, line_dao, endpoint_sip_dao),
         )
-
-    def load_sccp(self, api, provd_client):
-        service = self.build_sccp_service(provd_client)
-
         api.add_resource(
             LineEndpointAssociationSccp,
             '/lines/<int:line_id>/endpoints/sccp/<int:endpoint_id>',
             endpoint='line_endpoint_sccp',
-            resource_class_args=(service, line_dao, endpoint_sccp_dao),
+            resource_class_args=(service_sccp, line_dao, endpoint_sccp_dao),
         )
-
-    def load_custom(self, api, provd_client):
-        service = self.build_custom_service(provd_client)
-
         api.add_resource(
             LineEndpointAssociationCustom,
             '/lines/<int:line_id>/endpoints/custom/<int:endpoint_id>',
             endpoint='line_endpoint_custom',
-            resource_class_args=(service, line_dao, endpoint_custom_dao),
+            resource_class_args=(service_custom, line_dao, endpoint_custom_dao),
         )
-
-    def build_sip_service(self, provd_client):
-        return build_service(provd_client, 'sip')
-
-    def build_sccp_service(self, provd_client):
-        return build_service(provd_client, 'sccp')
-
-    def build_custom_service(self, provd_client):
-        return build_service(provd_client, 'custom')

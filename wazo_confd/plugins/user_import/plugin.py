@@ -18,12 +18,15 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 from wazo_provd_client import Client as ProvdClient
 
 from wazo_confd.database import user_export as user_export_dao
+from wazo_confd.helpers.asterisk import PJSIPDoc
 from wazo_confd.plugins.call_permission.service import (
     build_service as build_call_permission_service,
 )
 from wazo_confd.plugins.context.service import build_service as build_context_service
 from wazo_confd.plugins.endpoint_sccp.service import build_service as build_sccp_service
-from wazo_confd.plugins.endpoint_sip.service import build_service as build_sip_service
+from wazo_confd.plugins.endpoint_sip.service import (
+    build_endpoint_service as build_sip_service,
+)
 from wazo_confd.plugins.extension.service import (
     build_service as build_extension_service,
 )
@@ -32,7 +35,10 @@ from wazo_confd.plugins.incall_extension.service import (
     build_service as build_incall_extension_service,
 )
 from wazo_confd.plugins.line.service import build_service as build_line_service
-from wazo_confd.plugins.line_endpoint.service import build_service as build_le_service
+from wazo_confd.plugins.line_endpoint.service import (
+    build_service_sip as build_le_sip_service,
+    build_service_sccp as build_le_sccp_service,
+)
 from wazo_confd.plugins.line_extension.service import (
     build_service as build_line_extension_service,
 )
@@ -85,16 +91,17 @@ class Plugin:
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
+        pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
 
         user_service = build_user_service(provd_client)
         wazo_user_service = build_wazo_user_service()
         user_voicemail_service = build_uv_service()
         voicemail_service = build_voicemail_service()
         line_service = build_line_service(provd_client)
-        sip_service = build_sip_service(provd_client)
+        sip_service = build_sip_service(provd_client, pjsip_doc)
         sccp_service = build_sccp_service()
-        line_sip_service = build_le_service(provd_client, 'sip')
-        line_sccp_service = build_le_service(provd_client, 'sccp')
+        line_sip_service = build_le_sip_service(provd_client)
+        line_sccp_service = build_le_sccp_service(provd_client)
         extension_service = build_extension_service(provd_client)
         user_line_service = build_ul_service()
         line_extension_service = build_line_extension_service()

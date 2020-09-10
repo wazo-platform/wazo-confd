@@ -6,15 +6,10 @@ from xivo_dao.alchemy.netiface import Netiface
 from xivo_dao.alchemy.resolvconf import Resolvconf
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 from xivo_dao.alchemy.staticiax import StaticIAX
-from xivo_dao.alchemy.staticsip import StaticSIP
 from xivo_dao.helpers.db_manager import Session
 
 
 def set_language(language):
-
-    row = Session.query(StaticSIP).filter(StaticSIP.var_name == 'language').first()
-    row.var_val = language
-    Session.add(row)
 
     row = Session.query(StaticIAX).filter(StaticIAX.var_name == 'language').first()
     row.var_val = language

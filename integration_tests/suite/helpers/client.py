@@ -39,7 +39,12 @@ class ConfdClient:
 
     @classmethod
     def from_options(
-        cls, host, port, https=False, headers=None, encoder=None,
+        cls,
+        host,
+        port,
+        https=False,
+        headers=None,
+        encoder=None,
     ):
         url = '{}://{}:{}/1.1'.format('https' if https else 'http', host, port)
         logger.info('CONFD URL: %s', url)
@@ -83,8 +88,8 @@ class ConfdClient:
             'PUT', url, data=body, parameters=parameters, headers=headers
         )
 
-    def delete(self, url, headers=None):
-        return self.request('DELETE', url, headers=headers)
+    def delete(self, url, parameters=None, headers=None):
+        return self.request('DELETE', url, parameters=parameters, headers=headers)
 
     def _encode_dict(self, parameters=None):
         if parameters is not None:
@@ -132,12 +137,10 @@ class RestUrlClient(UrlFragment):
         headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
         return self.client.put(url, params, query_string, headers=headers)
 
-    def delete(self, wazo_tenant=None):
+    def delete(self, wazo_tenant=None, **params):
         url = str(self)
-        headers = {}
-        if wazo_tenant:
-            headers['Wazo-Tenant'] = wazo_tenant
-        return self.client.delete(url, headers=headers)
+        headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
+        return self.client.delete(url, params, headers=headers)
 
     def _copy(self):
         return self.__class__(self.client, list(self.fragments), dict(self.body))

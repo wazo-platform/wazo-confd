@@ -9,8 +9,7 @@ import json
 from hamcrest import assert_that, calling, equal_to, has_properties
 from xivo_test_helpers.hamcrest.raises import raises
 
-from ..plugin import PJSIPDoc
-from ..exceptions import PJSIPDocError
+from ..asterisk import PJSIPDoc, PJSIPDocError
 
 VALID_BODY = {
     'endpoint': {
@@ -48,7 +47,8 @@ class TestPJSIPDoc(unittest.TestCase):
             calling(doc.get),
             raises(PJSIPDocError).matching(
                 has_properties(
-                    status_code=400, message='failed to read PJSIP JSON documentation',
+                    status_code=400,
+                    message='failed to read PJSIP JSON documentation',
                 )
             ),
         )

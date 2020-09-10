@@ -73,18 +73,18 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /lines/{line_id}/endpoints/sip/{sip_id}:
+  /lines/{line_id}/endpoints/sip/{sip_uuid}:
     put:
       operationId: associate_line_endpoint_sip
       summary: Associate line and SIP endpoint
-      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_id}.update`'
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_uuid}.update`'
       tags:
       - lines
       - endpoints
       - sip
       parameters:
       - $ref: '#/parameters/lineid'
-      - $ref: '#/parameters/sipid'
+      - $ref: '#/parameters/sipuuid'
       responses:
         '204':
           description: Line and SIP endpoint associated
@@ -95,14 +95,14 @@ paths:
     delete:
       operationId: dissociate_line_endpoint_sip
       summary: Dissociate line and SIP endpoint
-      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_id}.delete`'
+      description: '**Required ACL:** `confd.lines.{line_id}.endpoints.sip.{sip_uuid}.delete`'
       tags:
       - lines
       - endpoints
       - sip
       parameters:
       - $ref: '#/parameters/lineid'
-      - $ref: '#/parameters/sipid'
+      - $ref: '#/parameters/sipuuid'
       responses:
         '204':
           description: Line and SIP endpoint dissociated

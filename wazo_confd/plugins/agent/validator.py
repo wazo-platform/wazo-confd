@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.agent import dao as agent_dao
@@ -18,5 +18,7 @@ def build_validator():
                 'number', lambda number: agent_dao.find_by(number=number), 'Agent'
             )
         ],
-        edit=[Optional('number', UniqueFieldChanged('number', agent_dao, 'Agent'))],
+        edit=[
+            Optional('number', UniqueFieldChanged('number', agent_dao.find_by, 'Agent'))
+        ],
     )

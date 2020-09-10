@@ -3,14 +3,20 @@
 
 from hamcrest import (
     assert_that,
+    empty,
+    equal_to,
     has_entries,
     has_items,
     is_not,
-    empty,
     not_none,
 )
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
@@ -33,12 +39,26 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', None, {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', True, {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'transport'}
+    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'system'}
+    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'global'}
     yield s.check_bogus_field_returns_error, url, 'options', [
         ['not-a-transport-option', '42'],
     ], {'name': 'transport'}
     yield s.check_bogus_field_returns_error, url, 'options', [
         ['one', 'two', 'three']
     ], {'name': 'transport'}
+
+    for check in unique_error_checks(url):
+        yield check
+
+
+@fixtures.transport(name='transport_unique')
+@fixtures.sip(name='endpoint_unique')
+@fixtures.sip_template(name='template_unique')
+def unique_error_checks(url, transport, sip, template):
+    yield s.check_bogus_field_returns_error, url, 'name', transport['name']
+    yield s.check_bogus_field_returns_error, url, 'name', template['name']
+    yield s.check_bogus_field_returns_error, url, 'name', sip['name']
 
 
 def test_create_minimal_parameters():
@@ -47,7 +67,11 @@ def test_create_minimal_parameters():
 
     assert_that(
         response.item,
-        has_entries(uuid=not_none(), name='my-transport', options=empty(),),
+        has_entries(
+            uuid=not_none(),
+            name='my-transport',
+            options=empty(),
+        ),
     )
 
     confd.sip.transports(response.item['uuid']).delete().assert_deleted()
@@ -118,9 +142,21 @@ def test_delete(transport):
     response.assert_match(404, e.not_found(resource='Transport'))
 
 
-@fixtures.transport(name='duplicate-me')
-def unique_error_checks(url, transport):
-    yield s.check_bogus_field_returns_error, url, 'name', transport['name']
+@fixtures.transport()
+@fixtures.transport()
+@fixtures.sip()
+def test_delete_fallback(transport, fallback, sip):
+    with a.transport_endpoint_sip(transport, sip, check=False):
+        response = confd.sip.transports(transport['uuid']).delete()
+        response.assert_status(400)
+
+        response = confd.sip.transports(transport['uuid']).delete(
+            fallback=fallback['uuid']
+        )
+        response.assert_deleted()
+
+        response = confd.endpoints.sip(sip['uuid']).get()
+        assert_that(response.item['transport']['uuid'], equal_to(fallback['uuid']))
 
 
 @fixtures.transport(name='hidden')

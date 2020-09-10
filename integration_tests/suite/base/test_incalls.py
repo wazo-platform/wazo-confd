@@ -154,7 +154,8 @@ def test_get_when_destination_is_deleted(user, incall):
 
     response = confd.incalls(incall['id']).get()
     assert_that(
-        response.item, has_entries(destination={'type': 'none'}),
+        response.item,
+        has_entries(destination={'type': 'none'}),
     )
 
 

@@ -1,5 +1,24 @@
 # Changelog
 
+## 20.12
+
+* The body of `/1.1/endpoints/sip` has been modified to be used with PJSIP
+* The following resources have been removed:
+
+  * `/1.1/registers/sip/<register_id>`
+  * `/1.1/registers/sip`
+  * `/1.1/trunks/<trunk_id>/registers/sip/<register_id>`
+  * `/1.1/asterisk/sip/general`
+
+* The identifier of `/1.1/endpoints/sip` is now a UUID
+* The following resources have been added:
+
+  * GET `/1.1/endpoints/sip/templates`
+  * POST `/1.1/endpoints/sip/templates`
+  * GET `/1.1/endpoints/sip/templates/<template_uuid>`
+  * PUT `/1.1/endpoints/sip/templates/<template_uuid>`
+  * DELETE `/1.1/endpoints/sip/templates/<template_uuid>`
+
 ## 20.11
 * The following endpoints are now multi-tenant.
 

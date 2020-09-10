@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -17,10 +17,14 @@ from xivo_bus.resources.trunk_endpoint.event import (
 
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
-from xivo_dao.alchemy.usersip import UserSIP as Sip
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.useriax import UserIAX as IAX
 
-from ..notifier import TrunkEndpointNotifier
+from ..notifier import (
+    TrunkEndpointSIPNotifier,
+    TrunkEndpointIAXNotifier,
+    TrunkEndpointCustomNotifier,
+)
 
 
 class TestTrunkEndpointNotifier(unittest.TestCase):
@@ -28,25 +32,30 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         tenant_uuid = str(uuid.uuid4())
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.sip = Mock(Sip, id=1, username='username', tenant_uuid=tenant_uuid)
+        self.sip = Mock(
+            EndpointSIP,
+            uuid=str(uuid.uuid4()),
+            auth_section_options=[['username', 'username']],
+            tenant_uuid=tenant_uuid,
+        )
         self.sip.name = 'limitation of mock instantiation with name ...'
         self.custom = Mock(Custom, id=2, tenant_uuid=tenant_uuid, interface='custom')
         self.iax = Mock(IAX, id=3, tenant_uuid=tenant_uuid)
         self.iax.name = 'limitation of mock instantiation with name ...'
         self.trunk = Mock(Trunk, id=4, tenant_uuid=tenant_uuid)
 
-        self.notifier_custom = TrunkEndpointNotifier('custom', self.bus, self.sysconfd)
-        self.notifier_sip = TrunkEndpointNotifier('sip', self.bus, self.sysconfd)
-        self.notifier_iax = TrunkEndpointNotifier('iax', self.bus, self.sysconfd)
+        self.notifier_custom = TrunkEndpointCustomNotifier(self.bus, self.sysconfd)
+        self.notifier_sip = TrunkEndpointSIPNotifier(self.bus, self.sysconfd)
+        self.notifier_iax = TrunkEndpointIAXNotifier(self.bus, self.sysconfd)
 
     def test_associate_sip_then_bus_event(self):
         expected_event = TrunkEndpointSIPAssociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
             sip={
-                'id': self.sip.id,
+                'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': self.sip.username,
+                'auth_section_options': self.sip.auth_section_options,
             },
         )
 
@@ -103,10 +112,10 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         expected_event = TrunkEndpointSIPDissociatedEvent(
             trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
             sip={
-                'id': self.sip.id,
+                'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
-                'username': self.sip.username,
+                'auth_section_options': self.sip.auth_section_options,
             },
         )
 

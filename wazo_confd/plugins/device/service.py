@@ -76,7 +76,9 @@ class SearchEngine:
         total = len(provd_devices)
 
         provd_devices = self.paginate_devices(
-            provd_devices, parameters.get('offset', 0), parameters.get('limit'),
+            provd_devices,
+            parameters.get('offset', 0),
+            parameters.get('limit'),
         )
 
         items = [self.dao.build_device(provd_device) for provd_device in provd_devices]

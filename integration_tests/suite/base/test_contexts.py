@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -355,15 +355,6 @@ def test_delete_when_voicemail_associated(context, voicemail):
 def test_delete_when_agent_is_logged(context, agent_login_status):
     response = confd.contexts(context['id']).delete()
     response.assert_match(400, e.resource_associated('Context', 'AgentLoginStatus'))
-
-
-@fixtures.context()
-def test_delete_when_sip_general_option_associated(context):
-    parameters = {'ordered_options': [], 'options': {'context': context['name']}}
-    confd.asterisk.sip.general.put(**parameters).assert_updated()
-
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'SIP General'))
 
 
 @fixtures.context()

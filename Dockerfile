@@ -8,9 +8,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN apt-get -q update
 RUN apt-get -yq install gcc
 
-ADD . /usr/src/wazo-confd
+COPY requirements.txt /usr/src/wazo-confd/requirements.txt
 WORKDIR /usr/src/wazo-confd
 RUN pip install -r requirements.txt
+
+COPY . /usr/src/wazo-confd
 RUN python setup.py install
 
 FROM python:3.7-slim-buster AS build-image

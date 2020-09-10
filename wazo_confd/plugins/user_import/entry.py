@@ -25,11 +25,11 @@ class Entry:
 
     def extract_ids(self):
         if self.sip:
-            sip_id = self.sip.id
+            sip_uuid = str(self.sip.uuid)
         elif self.webrtc:
-            sip_id = self.webrtc.id
+            sip_uuid = str(self.webrtc.uuid)
         else:
-            sip_id = None
+            sip_uuid = None
 
         return {
             'row_number': self.number,
@@ -37,7 +37,7 @@ class Entry:
             'user_uuid': self.user.uuid if self.user else None,
             'voicemail_id': self.voicemail.id if self.voicemail else None,
             'line_id': self.line.id if self.line else None,
-            'sip_id': sip_id,
+            'sip_uuid': sip_uuid,
             'sccp_id': self.sccp.id if self.sccp else None,
             'extension_id': self.extension.id if self.extension else None,
             'incall_extension_id': self.extension_incall.id
@@ -204,8 +204,8 @@ class EntryFinder:
         if line_extension:
             entry.extension = self.extension_dao.get(line_extension.extension_id)
 
-        if entry.line.endpoint_sip_id:
-            entry.sip = self.sip_dao.get(entry.line.endpoint_sip_id)
+        if entry.line.endpoint_sip_uuid:
+            entry.sip = self.sip_dao.get(entry.line.endpoint_sip_uuid)
         elif entry.line.endpoint_sccp_id:
             entry.sccp = self.sccp_dao.get(entry.line.endpoint_sccp_id)
 

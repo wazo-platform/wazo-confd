@@ -118,12 +118,12 @@ class CsvRow:
 
     SIP_RULES = (
         UnicodeRule('sip_username', 'username'),
-        UnicodeRule('sip_secret', 'secret'),
+        UnicodeRule('sip_secret', 'password'),
     )
 
     WEBRTC_RULES = (
         UnicodeRule('sip_username', 'username'),
-        UnicodeRule('sip_secret', 'secret'),
+        UnicodeRule('sip_secret', 'password'),
     )
 
     EXTENSION_RULES = (

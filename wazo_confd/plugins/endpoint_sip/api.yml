@@ -3,78 +3,85 @@ paths:
     get:
       operationId: list_endpoints_sip
       summary: List SIP endpoints
-      description: '**Required ACL:** `confd.endpoints.sip.read`'
+      description: |
+        **Required ACL:** `confd.endpoints.sip.read`
+
+        List all SIP configurations, each individual configuration includes only fields that it
+        defines. Inherited fields from the templates or default values are not returned here.
       tags:
-      - endpoints
-      - sip
+        - endpoints
+        - sip
       parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/recurse'
-      - $ref: '#/parameters/order'
-      - $ref: '#/parameters/direction'
-      - $ref: '#/parameters/limit'
-      - $ref: '#/parameters/offset'
-      - $ref: '#/parameters/search'
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
       responses:
         '200':
           description: SIP endpoint list
           schema:
-            $ref: '#/definitions/EndpointSipItems'
+            $ref: '#/definitions/EndpointSIPItems'
     post:
       operationId: create_endpoint_sip
-      summary: Create SIP endpoint
-      description: '**Required ACL:** `confd.endpoints.sip.create`'
+      summary: Create a SIP endpoint
+      description: |
+        **Required ACL:** `confd.endpoints.sip.create`
+
+        Create a new SIP endpoint. This endpoint can inherit from other endpoints, only modify
+        fields that have to be modified.
       tags:
-      - endpoints
-      - sip
+        - endpoints
+        - sip
       parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - name: body
-        in: body
-        description: SIP Endpoint to create
-        required: false
-        schema:
-          $ref: '#/definitions/EndpointSip'
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: SIP Endpoint to create
+          schema:
+            $ref: '#/definitions/EndpointSIP'
       responses:
         '201':
           description: SIP endpoint created
           schema:
-            $ref: '#/definitions/EndpointSip'
+            $ref: '#/definitions/EndpointSIP'
         '400':
           $ref: '#/responses/CreateError'
-  /endpoints/sip/{sip_id}:
+  /endpoints/sip/{sip_uuid}:
     get:
       operationId: get_endpoint_sip
       summary: Get SIP Endpoint
-      description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.read`'
+      description: '**Required ACL:** `confd.endpoints.sip.{sip_uuid}.read`'
       tags:
-      - endpoints
-      - sip
+        - sip
+        - endpoints
       parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/sipid'
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sipuuid'
       responses:
         '200':
           description: SIP Endpoint
           schema:
-            $ref: '#/definitions/EndpointSip'
+            $ref: '#/definitions/EndpointSIP'
         '404':
           $ref: '#/responses/NotFoundError'
     put:
       operationId: update_endpoint_sip
       summary: Update SIP Endpoint
-      description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.update`'
+      description: '**Required ACL:** `confd.endpoints.sip.{sip_uuid}.update`'
       tags:
-      - endpoints
-      - sip
+        - endpoints
+        - sip
       parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/sipid'
-      - name: body
-        in: body
-        required: true
-        schema:
-          $ref: '#/definitions/EndpointSip'
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/sipuuid'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EndpointSIP'
       responses:
         '204':
           $ref: '#/responses/ResourceUpdated'
@@ -85,13 +92,121 @@ paths:
     delete:
       operationId: delete_endpoint_sip
       summary: Delete SIP Endpoint
-      description: '**Required ACL:** `confd.endpoints.sip.{sip_id}.delete`'
+      description: '**Required ACL:** `confd.endpoints.sip.{sip_uuid}.delete`'
       tags:
-      - endpoints
-      - sip
+        - endpoints
+        - sip
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/sipid'
+      - $ref: '#/parameters/sipuuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /endpoints/sip/templates:
+    get:
+      operationId: list_endpoints_sip_templates
+      summary: List SIP endpoints templates
+      description: |
+        **Required ACL:** `confd.endpoints.sip.templates.read`
+
+        List all SIP configuration templates, each individual configuration includes only fields that it
+        defines. Inherited fields from the templates or default values are not returned here.
+      tags:
+        - endpoints
+        - sip
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: SIP endpoint template list
+          schema:
+            $ref: '#/definitions/EndpointSIPItems'
+    post:
+      operationId: create_endpoint_sip_template
+      summary: Create a SIP endpoint template
+      description: |
+        **Required ACL:** `confd.endpoints.sip.templates.create`
+
+        Create a new SIP endpoint configuration template. This endpoint can inherit from other templates,
+        only modify fields that have to be modified.
+      tags:
+        - endpoints
+        - sip
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: SIP Endpoint to create
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+      responses:
+        '201':
+          description: SIP endpoint created
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+        '400':
+          $ref: '#/responses/CreateError'
+  /endpoints/sip/templates/{template_uuid}:
+    get:
+      operationId: get_endpoint_sip_template
+      summary: Get SIP Endpoint template
+      description: '**Required ACL:** `confd.endpoints.sip.templates.{template_uuid}.read`'
+      tags:
+        - sip
+        - endpoints
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/template_uuid'
+      responses:
+        '200':
+          description: SIP Endpoint template
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_endpoint_sip_template
+      summary: Update SIP Endpoint Template
+      description: '**Required ACL:** `confd.endpoints.sip.templates.{template_uuid}.update`'
+      tags:
+        - endpoints
+        - sip
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/template_uuid'
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/EndpointSIP'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_endpoint_sip_template
+      summary: Delete SIP Endpoint Template
+      description: '**Required ACL:** `confd.endpoints.sip.templates.{template_uuid}.delete`'
+      tags:
+        - endpoints
+        - sip
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/template_uuid'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
@@ -101,159 +216,130 @@ paths:
           $ref: '#/responses/NotFoundError'
 
 parameters:
-  sipid:
+  sipuuid:
     required: true
-    type: integer
-    name: sip_id
+    type: string
+    name: sip_uuid
+    in: path
+  template_uuid:
+    required: true
+    type: string
+    name: template_uuid
     in: path
 
 definitions:
-  EndpointSip:
-    title: SIP Endpoint
-    allOf:
-    - $ref: '#/definitions/EndpointSipRelationBase'
-    - properties:
-        tenant_uuid:
-          type: string
-          description: The UUID of the tenant
-          readOnly: true
-        secret:
-          type: string
-          description: SIP secret/password
-          default: autogenerated
-        type:
-          type: string
-          enum:
-          - friend
-          - peer
-          - user
-          default: friend
-          description: Type of SIP account
-        host:
-          type: string
-          description: Hosts that are allowed to use this SIP account
-          default: dynamic
-        options:
-          description: |
-            Advanced configuration: options. Options are appended at the end of a SIP account in the file 'sip.conf' used by asterisk. Please consult the asterisk documentation for further details on available parameters. Because of database limitations, the following options can only be configured once:
-
-            * md5secret
-            * language
-            * accountcode
-            * amaflags
-            * allowtransfer
-            * fromuser
-            * fromdomain
-            * subscribemwi
-            * buggymwi
-            * call-limit
-            * callerid
-            * fullname
-            * cid_number
-            * maxcallbitrate
-            * insecure
-            * nat
-            * promiscredir
-            * usereqphone
-            * videosupport
-            * trustrpid
-            * sendrpid
-            * allowsubscribe
-            * allowoverlap
-            * dtmfmode
-            * rfc2833compensate
-            * qualify
-            * g726nonstandard
-            * disallow
-            * allow
-            * autoframing
-            * mohinterpret
-            * useclientcode
-            * progressinband
-            * t38pt_udptl
-            * t38pt_usertpsource
-            * rtptimeout
-            * rtpholdtimeout
-            * rtpkeepalive
-            * deny
-            * permit
-            * defaultip
-            * port
-            * regexten
-            * subscribecontext
-            * vmexten
-            * callingpres
-            * parkinglot
-            * protocol
-            * outboundproxy
-            * transport
-            * remotesecret
-            * directmedia
-            * callcounter
-            * busylevel
-            * ignoresdpversion
-            * session-timers
-            * session-expires
-            * session-minse
-            * session-refresher
-            * callbackextension
-            * timert1
-            * timerb
-            * qualifyfreq
-            * contactpermit
-            * contactdeny
-            * unsolicited_mailbox
-            * use_q850_reason
-            * encryption
-            * snom_aoc_enabled
-            * maxforwards
-            * disallowed_methods
-            * textsupport
-
-            Any other options may be repeated as many times as needed. Options must have the following form:
-            ```
-            {
-              "options": [
-                 ["name1", "value1"],
-                 ["name2", "value2"]
-              ]
-            }
-            ```
-
-            The resulting configuration in sip.conf will have the following form:
-            ```
-            [sipusername]
-            context=default
-            secret=sipsecret
-            name1=value1
-            name2=value2
-            ```
-          type: array
-          items:
-            $ref: '#/definitions/KeyValueOption'
-          default: []
-    - $ref: '#/definitions/EndpointRelationTrunk'
-    - $ref: '#/definitions/EndpointRelationLine'
   EndpointSipRelationBase:
     properties:
-      id:
-        type: integer
-        description: SIP Endpoint ID
+      uuid:
+        type: string
+        description: The UUID of this resource
         readOnly: true
       name:
         type: string
-        description: The name of the SIP user
-        default: username if specified or autogenerated
-      username:
+        description: The name of the PJSIP entity, auto-generated if missing
+      label:
         type: string
-        description: SIP username
-        default: autogenerated
-  EndpointSipItems:
+        description: The human readable name for this configuration
+      auth_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPAuthSectionOptions'
+        description: A list of PJSIP auth section options for this endpoint. Only `username` is supported
+  SIPAORSectionOptions:
+    title: PJSIP AOR Section Options
+    $ref: '#/definitions/KeyValueOption'
+  SIPAuthSectionOptions:
+    title: PJSIP Auth Section Options
+    $ref: '#/definitions/KeyValueOption'
+  SIPEndpointSectionOptions:
+    title: SIP Endpoint Section Options
+    $ref: '#/definitions/KeyValueOption'
+  SIPIdentifySectionOptions:
+    title: PJSIP Identify Section Options
+    $ref: '#/definitions/KeyValueOption'
+  SIPRegistrationSectionOptions:
+    title: PJSIP Registration Section Options
+    $ref: '#/definitions/KeyValueOption'
+  EndpointSIPRelation:
+    properties:
+      uuid:
+        type: string
+        description: The UUID of this resource
+    required:
+      - uuid
+  EndpointSIP:
+    title: SIP Endpoint
+    properties:
+      uuid:
+        type: string
+        description: The UUID of this resource
+        readOnly: true
+      name:
+        type: string
+        description: The name of the PJSIP entity, auto-generated if missing
+      label:
+        type: string
+        description: The human readable name for this configuration
+      aor_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPAORSectionOptions'
+        description: A list of PJSIP AOR section options for this endpoint
+      auth_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPAuthSectionOptions'
+        description: A list of PJSIP auth section options for this endpoint
+      endpoint_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPEndpointSectionOptions'
+        description: A list of PJSIP endpoint section options for this endpoint
+      identify_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPIdentifySectionOptions'
+        description: A list of PJSIP identify section options for this endpoint
+      registration_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPRegistrationSectionOptions'
+        description: A list of PJSIP registration section options for this endpoint
+      registration_outbound_auth_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPAuthSectionOptions'
+        description: A list of PJSIP auth section options for this endpoint
+      outbound_auth_section_options:
+        type: array
+        items:
+          $ref: '#/definitions/SIPAuthSectionOptions'
+        description: A list of PJSIP auth section options for this endpoint
+      transport:
+        description: The transport used by this endpoint
+        $ref: '#/definitions/SIPTransportRelation'
+      templates:
+        type: array
+        items:
+          $ref: '#/definitions/EndpointSIPRelation'
+        description: |
+          A list of templates this configuration will inherit from.
+
+          The inheritance only applies to option sections. Not to the name, label and other fields.
+          For a given list of templates [A, B, C] A will be applied over B. C will be applied over (A,B) etc.
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
+      asterisk_id:
+        type: string
+        description: The ID of the Asterisk onto which this configuration applies.
+  EndpointSIPItems:
     title: SIP Endpoints
     properties:
       items:
         items:
-          $ref: '#/definitions/EndpointSip'
+          $ref: '#/definitions/EndpointSIP'
         type: array
       total:
         type: integer

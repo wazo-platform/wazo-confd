@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -127,7 +127,9 @@ class RegistrarDao:
         if registrars:
             total = len(registrars)
             registrars = self._paginate_registrars(
-                registrars, criteria.get('offset', 0), criteria.get('limit'),
+                registrars,
+                criteria.get('offset', 0),
+                criteria.get('limit'),
             )
         else:
             registrars = []

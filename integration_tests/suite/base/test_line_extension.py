@@ -27,33 +27,34 @@ def test_associate_errors(line, extension):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
-@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
-def test_associate_multi_tenant(
-    main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten
-):
-    response = (
-        confd.lines(sub_line['id'])
-        .extensions(main_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_associate_multi_tenant(main_ctx, sub_ctx, main_exten, sub_exten):
+    @fixtures.line_sip(context=main_ctx, wazo_tenant=MAIN_TENANT)
+    @fixtures.line_sip(context=sub_ctx, wazo_tenant=SUB_TENANT)
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(sub_line['id'])
+            .extensions(main_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.lines(main_line['id'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+        response = (
+            confd.lines(main_line['id'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
 
-    response = (
-        confd.lines(main_line['id'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.lines(main_line['id'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.line()
@@ -68,20 +69,21 @@ def test_dissociate_errors(line, extension):
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line_sip(context='main-internal', wazo_tenant=MAIN_TENANT)
-@fixtures.line_sip(context='sub-internal', wazo_tenant=SUB_TENANT)
 @fixtures.extension(context='main-internal')
 @fixtures.extension(context='sub-internal')
-def test_dissociate_multi_tenant(
-    main_ctx, sub_ctx, main_line, sub_line, main_exten, sub_exten
-):
-    url = confd.lines(sub_line['id']).extensions(main_exten['id'])
-    response = url.delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Extension'))
+def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_exten, sub_exten):
+    @fixtures.line_sip(context=main_ctx, wazo_tenant=MAIN_TENANT)
+    @fixtures.line_sip(context=sub_ctx, wazo_tenant=SUB_TENANT)
+    def aux(main_line, sub_line):
+        url = confd.lines(sub_line['id']).extensions(main_exten['id'])
+        response = url.delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Extension'))
 
-    url = confd.lines(main_line['id']).extensions(sub_exten['id'])
-    response = url.delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Line'))
+        url = confd.lines(main_line['id']).extensions(sub_exten['id'])
+        response = url.delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Line'))
+
+    aux()
 
 
 @fixtures.line_sip()
@@ -225,7 +227,8 @@ def test_associate_line_with_endpoint(line, sip, extension):
         response.assert_updated()
         response = confd.lines(line['id']).get()
         assert_that(
-            response.item['extensions'], contains(has_entries({'id': extension['id']})),
+            response.item['extensions'],
+            contains(has_entries({'id': extension['id']})),
         )
 
 
@@ -276,7 +279,8 @@ def test_get_multi_lines_extension(line1, line2, extension):
             response.item,
             has_entries(
                 lines=contains_inanyorder(
-                    has_entries({'id': line1['id']}), has_entries({'id': line2['id']}),
+                    has_entries({'id': line1['id']}),
+                    has_entries({'id': line2['id']}),
                 ),
             ),
         )

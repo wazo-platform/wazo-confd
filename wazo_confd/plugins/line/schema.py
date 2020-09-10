@@ -30,7 +30,16 @@ class LineSchema(BaseSchema):
         'ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True
     )
     endpoint_sip = fields.Nested(
-        'SipSchema', only=['id', 'username', 'name', 'links'], dump_only=True
+        'EndpointSIPSchema',
+        # TODO(pc-m): Is it really useful to have the username/password on the relation?
+        only=[
+            'uuid',
+            'label',
+            'name',
+            'auth_section_options.username',
+            'links',
+        ],
+        dump_only=True,
     )
     endpoint_sccp = fields.Nested('SccpSchema', only=['id', 'links'], dump_only=True)
     endpoint_custom = fields.Nested(

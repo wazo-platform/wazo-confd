@@ -1,7 +1,8 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+import uuid
 
 from mock import Mock
 
@@ -22,7 +23,11 @@ class TestLineApplicationNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.line = Mock(
-            Line, id=1, endpoint_sip={'id': 2}, endpoint_sccp=None, endpoint_custom=None
+            Line,
+            id=1,
+            endpoint_sip={'uuid': str(uuid.uuid4())},
+            endpoint_sccp=None,
+            endpoint_custom=None,
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.application = Mock(Application, uuid='custom-uuid')

@@ -9,7 +9,8 @@ from . import confd
 def test_get():
     response = confd.provisioning.networking.get()
     assert_that(
-        response.item, has_entries({'provision_host': '', 'provision_http_port': 8667}),
+        response.item,
+        has_entries({'provision_host': '', 'provision_http_port': 8667}),
     )
 
 
@@ -19,7 +20,8 @@ def test_put_minimal_parameters():
     result.assert_status(204)
     response = confd.provisioning.networking.get()
     assert_that(
-        response.item, has_entries({'provision_host': '', 'provision_http_port': 8667}),
+        response.item,
+        has_entries({'provision_host': '', 'provision_http_port': 8667}),
     )
 
     body = {'provision_host': '127.0.0.1'}

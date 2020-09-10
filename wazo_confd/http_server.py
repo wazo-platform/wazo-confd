@@ -32,7 +32,10 @@ _do_not_log_data_endpoints = []
 def get_bus_publisher():
     publisher = g.get('bus_publisher')
     if not publisher:
-        publisher = g.bus_publisher = BusPublisher.from_config(app.config)
+        publisher = g.bus_publisher = BusPublisher.from_config(
+            app.config['bus'],
+            app.config['uuid'],
+        )
     return publisher
 
 
