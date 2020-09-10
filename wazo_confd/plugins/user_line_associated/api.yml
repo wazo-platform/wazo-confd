@@ -9,8 +9,9 @@ paths:
       - lines
       - users
       parameters:
-      - $ref: '#/parameters/useruuid'
-      - $ref: '#/parameters/lineid'
+        - $ref: '#/parameters/useruuid'
+        - $ref: '#/parameters/lineid'
+        - $ref: '#/parameters/endpoint_sip_view'
       responses:
         '200':
           description: SIP endpoint of a line for a user
@@ -27,7 +28,8 @@ paths:
       - lines
       - users
       parameters:
-      - $ref: '#/parameters/useruuid'
+        - $ref: '#/parameters/useruuid'
+        - $ref: '#/parameters/endpoint_sip_view'
       responses:
         '200':
           description: SIP endpoint of main line for a user
