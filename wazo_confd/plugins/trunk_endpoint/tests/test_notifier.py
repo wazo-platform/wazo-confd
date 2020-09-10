@@ -17,7 +17,6 @@ from xivo_bus.resources.trunk_endpoint.event import (
 
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
-from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.useriax import UserIAX as IAX
 
 from ..notifier import (
@@ -33,7 +32,6 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.sip = Mock(
-            EndpointSIP,
             uuid=str(uuid.uuid4()),
             auth_section_options=[['username', 'username']],
             tenant_uuid=tenant_uuid,
