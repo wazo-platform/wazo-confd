@@ -136,8 +136,7 @@ def test_list(sip1, sip2):
         response.items,
         not_(
             contains_inanyorder(
-                has_entry('uuid', sip1['uuid']),
-                has_entry('uuid', sip2['uuid']),
+                has_entry('uuid', sip1['uuid']), has_entry('uuid', sip2['uuid']),
             )
         ),
     )
@@ -194,6 +193,35 @@ def test_get(sip):
             asterisk_id=None,
             trunk=None,
             line=None,
+        ),
+    )
+
+
+@fixtures.sip_template(
+    aor_section_options=[['max_contacts', '1'], ['remove_existing', 'yes']],
+    endpoint_section_options=[['allow', '!all,ulaw']],
+)
+@fixtures.sip_template(
+    aor_section_options=[['max_contacts', '10']],
+    endpoint_section_options=[['allow', '!all,opus']],
+)
+def test_get_merged(template_1, template_2):
+    endpoint = confd.endpoints.sip.post(
+        label="Inherited",
+        endpoint_section_options=[['allow', '!all,alaw']],
+        templates=[template_1, template_2],
+    ).item
+
+    response = confd.endpoints.sip(endpoint['uuid']).get(view='merged')
+    print(response.item)
+
+    assert_that(
+        response.item,
+        has_entries(
+            aor_section_options=contains_inanyorder(
+                ['max_contacts', '10'], ['remove_existing', 'yes']
+            ),
+            endpoint_section_options=contains_inanyorder(['allow', '!all,alaw']),
         ),
     )
 
