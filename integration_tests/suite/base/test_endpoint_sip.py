@@ -1,6 +1,7 @@
 # Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
 from hamcrest import (
     all_of,
     assert_that,
@@ -213,7 +214,6 @@ def test_get_merged(template_1, template_2):
     ).item
 
     response = confd.endpoints.sip(endpoint['uuid']).get(view='merged')
-    print(response.item)
 
     assert_that(
         response.item,
@@ -224,6 +224,12 @@ def test_get_merged(template_1, template_2):
             endpoint_section_options=contains_inanyorder(['allow', '!all,alaw']),
         ),
     )
+
+
+@fixtures.sip()
+def test_get_merged_view_validation(endpoint):
+    response = confd.endpoints.sip(endpoint['uuid']).get(view='unknown')
+    response.assert_match(400, re.compile(re.escape('Not a valid choice')))
 
 
 @fixtures.sip(wazo_tenant=MAIN_TENANT)

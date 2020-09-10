@@ -4,7 +4,7 @@
 import logging
 
 from marshmallow import fields, EXCLUDE, post_dump
-from marshmallow.validate import Length
+from marshmallow.validate import Length, OneOf
 from marshmallow.utils import get_value
 
 from wazo_confd.helpers.mallow import (
@@ -18,10 +18,12 @@ from wazo_confd.helpers.mallow import (
 logger = logging.getLogger(__name__)
 
 options_field = fields.List(
-    PJSIPSectionOption(option_regex=None),
-    missing=[],
-    validate=Length(max=512),
+    PJSIPSectionOption(option_regex=None), missing=[], validate=Length(max=512),
 )
+
+
+class GETQueryStringSchema(BaseSchema):
+    view = fields.String(validate=OneOf(['merged']), missing=None)
 
 
 class EndpointSIPRelationSchema(BaseSchema):

@@ -17,6 +17,8 @@ paths:
           description: SIP endpoint of a line for a user
           schema:
             $ref: '#/definitions/EndpointSIP'
+        '400':
+          description: Invalid `view`
 
   /users/{user_uuid}/lines/main/associated/endpoints/sip:
     get:
@@ -35,6 +37,8 @@ paths:
           description: SIP endpoint of main line for a user
           schema:
             $ref: '#/definitions/EndpointSIP'
+        '400':
+            description: Invalid `view`
 
 parameters:
   useruuid:

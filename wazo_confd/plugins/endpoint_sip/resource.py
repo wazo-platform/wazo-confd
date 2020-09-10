@@ -10,7 +10,12 @@ from xivo_dao.helpers.exception import NotFoundError
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import EndpointSIPSchema, MergedEndpointSIPSchema, TemplateSIPSchema
+from .schema import (
+    EndpointSIPSchema,
+    MergedEndpointSIPSchema,
+    TemplateSIPSchema,
+    GETQueryStringSchema,
+)
 
 
 class _BaseSipList(ListResource):
@@ -37,9 +42,7 @@ class _BaseSipList(ListResource):
         for template in form['templates']:
             try:
                 model = self.dao.get(
-                    template['uuid'],
-                    template=True,
-                    tenant_uuids=[form['tenant_uuid']],
+                    template['uuid'], template=True, tenant_uuids=[form['tenant_uuid']],
                 )
                 templates.append(model)
             except NotFoundError:
@@ -126,7 +129,7 @@ class SipItem(_BaseSipItem):
 
     @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
-        view = request.args.get('view')
+        view = GETQueryStringSchema().load(request.args)['view']
         schema = self.view_schemas.get(view, self.schema)
         kwargs = self._add_tenant_uuid()
         model = self.service.get(uuid, **kwargs)

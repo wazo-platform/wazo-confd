@@ -8,6 +8,7 @@ from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.plugins.endpoint_sip.schema import (
     EndpointSIPSchema,
     MergedEndpointSIPSchema,
+    GETQueryStringSchema,
 )
 
 
@@ -28,7 +29,7 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
     )
     def get(self, user_uuid, line_id):
         user = self.user_dao.get_by(uuid=str(user_uuid))
-        view = request.args.get('view')
+        view = GETQueryStringSchema().load(request.args)['view']
         schema = self.view_schemas.get(view, self.schema)
 
         if line_id == 'main':
