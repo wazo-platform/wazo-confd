@@ -1,8 +1,6 @@
 # Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
-
 from xivo_test_helpers import bus
 
 
@@ -34,7 +32,7 @@ class BusClientWrapper:
         if self._bus is None:
             self._bus = self._create_client()
         event = {'name': 'auth_tenant_added', 'data': {'uuid': tenant_uuid}}
-        self._bus.publish(json.dumps(event), headers={'name': event['name']})
+        self._bus.publish(event, headers={'name': event['name']})
 
 
 BusClient = BusClientWrapper()
