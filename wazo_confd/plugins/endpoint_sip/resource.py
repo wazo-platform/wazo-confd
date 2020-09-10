@@ -10,7 +10,7 @@ from xivo_dao.helpers.exception import NotFoundError
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import EndpointSIPSchema, TemplateSIPSchema
+from .schema import EndpointSIPSchema, MergedEndpointSIPSchema, TemplateSIPSchema
 
 
 class _BaseSipList(ListResource):
@@ -120,10 +120,17 @@ class SipList(_BaseSipList):
 class SipItem(_BaseSipItem):
     template = False
     schema = EndpointSIPSchema
+    view_schemas = {
+        'merged': MergedEndpointSIPSchema,
+    }
 
     @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
-        return super().get(uuid)
+        view = request.args.get('view')
+        schema = self.view_schemas.get(view, self.schema)
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get(uuid, **kwargs)
+        return schema().dump(model)
 
     @required_acl('confd.endpoints.sip.{uuid}.update')
     def put(self, uuid):
