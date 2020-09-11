@@ -160,7 +160,7 @@ class TestMergedEndpointSIPSchema(TestCase):
         loaded = self.schema.dump(body)
         assert_that(
             loaded,
-            has_entries(auth_section_options=contains(['username', 'username'])),
+            has_entries(auth_section_options=contains(('username', 'username'))),
         )
 
     def test_get_attribute_with_attribute_and_only(self):
@@ -174,5 +174,5 @@ class TestMergedEndpointSIPSchema(TestCase):
         loaded = self.schema.dump(body)
         assert_that(
             loaded,
-            has_entries(auth_section_options=contains(['username', 'username'])),
+            has_entries(auth_section_options=contains(('username', 'username'))),
         )

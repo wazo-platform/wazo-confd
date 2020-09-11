@@ -112,7 +112,7 @@ class MergedEndpointSIPSchema(EndpointSIPSchema):
             'outbound_auth',
         ]
         for section in sections:
-            combined_options = data.pop('{}_section_options'.format(section))
+            combined_options = data.pop('{}_section_options'.format(section), [])
             accumulator = {}
             for key, value in combined_options:
                 accumulator[key] = value
