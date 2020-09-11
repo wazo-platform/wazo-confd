@@ -22,7 +22,11 @@ from werkzeug.exceptions import BadRequest
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
 from wazo_confd.plugins.line.resource import LineSchema  # noqa
 
-from ..schema import EndpointSIPSchema, GETQueryStringSchema
+from ..schema import (
+    EndpointSIPSchema,
+    GETQueryStringSchema,
+    MergedEndpointSIPSchema,
+)
 
 
 class TestGETQueryStringSchema(TestCase):
@@ -146,4 +150,29 @@ class TestEndpointSIPSchema(TestCase):
                     ['username', 'username2'],
                 )
             ),
+        )
+
+
+class TestMergedEndpointSIPSchema(TestCase):
+    def test_get_attribute_with_attribute(self):
+        self.schema = MergedEndpointSIPSchema()
+        body = {'combined_auth_section_options': [['username', 'username']]}
+        loaded = self.schema.dump(body)
+        assert_that(
+            loaded,
+            has_entries(auth_section_options=contains(['username', 'username'])),
+        )
+
+    def test_get_attribute_with_attribute_and_only(self):
+        self.schema = MergedEndpointSIPSchema(only=['auth_section_options.username'])
+        body = {
+            'combined_auth_section_options': [
+                ['username', 'username'],
+                ['password', 'password'],
+            ]
+        }
+        loaded = self.schema.dump(body)
+        assert_that(
+            loaded,
+            has_entries(auth_section_options=contains(['username', 'username'])),
         )
