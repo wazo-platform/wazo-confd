@@ -1,6 +1,7 @@
 # Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
 from hamcrest import (
     all_of,
     assert_that,
@@ -20,7 +21,12 @@ from hamcrest import (
 )
 
 from . import confd, BaseIntegrationTest
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
@@ -196,6 +202,39 @@ def test_get(sip):
             line=None,
         ),
     )
+
+
+@fixtures.sip_template(
+    aor_section_options=[['max_contacts', '1'], ['remove_existing', 'yes']],
+    endpoint_section_options=[['allow', '!all,ulaw']],
+)
+@fixtures.sip_template(
+    aor_section_options=[['max_contacts', '10']],
+    endpoint_section_options=[['allow', '!all,opus']],
+)
+@fixtures.sip(
+    label='Inherited',
+    endpoint_section_options=[['allow', '!all,alaw']],
+)
+def test_get_merged(template_1, template_2, sip):
+    with a.endpoint_sip_template_sip(sip, template_1, template_2):
+        response = confd.endpoints.sip(sip['uuid']).get(view='merged')
+
+        assert_that(
+            response.item,
+            has_entries(
+                aor_section_options=contains_inanyorder(
+                    ['max_contacts', '10'], ['remove_existing', 'yes']
+                ),
+                endpoint_section_options=contains_inanyorder(['allow', '!all,alaw']),
+            ),
+        )
+
+
+@fixtures.sip()
+def test_get_merged_view_validation(endpoint):
+    response = confd.endpoints.sip(endpoint['uuid']).get(view='unknown')
+    response.assert_match(400, re.compile(re.escape('Not a valid choice')))
 
 
 @fixtures.sip(wazo_tenant=MAIN_TENANT)

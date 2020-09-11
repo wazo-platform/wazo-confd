@@ -350,3 +350,11 @@ def transport_endpoint_sip(transport, sip, check=True):
     h.transport_endpoint_sip.associate(transport['uuid'], sip['uuid'], check)
     yield
     h.transport_endpoint_sip.dissociate(transport['uuid'], sip['uuid'], check)
+
+
+@contextmanager
+def endpoint_sip_template_sip(sip, *templates, **kwargs):
+    check = kwargs.get('check', True)
+    h.endpoint_sip_template_sip.associate(sip['uuid'], templates, check=check)
+    yield
+    h.endpoint_sip_template_sip.dissociate(sip['uuid'], check)

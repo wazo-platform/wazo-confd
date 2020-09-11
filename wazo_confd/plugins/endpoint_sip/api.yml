@@ -60,6 +60,7 @@ paths:
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/sipuuid'
+        - $ref: '#/parameters/endpoint_sip_view'
       responses:
         '200':
           description: SIP Endpoint
@@ -226,6 +227,20 @@ parameters:
     type: string
     name: template_uuid
     in: path
+  endpoint_sip_view:
+    required: false
+    type: string
+    name: view
+    enum:
+      - merged
+    in: query
+    description: |
+      Different view of the SIP endpoint
+
+      The `default` view, when the argument is ommited, is to include only options that
+      are defined on the specified endpoint.
+
+      The `merged` view includes all options from included templates.
 
 definitions:
   EndpointSipRelationBase:

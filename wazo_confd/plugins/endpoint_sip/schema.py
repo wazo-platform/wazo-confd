@@ -3,8 +3,8 @@
 
 import logging
 
-from marshmallow import fields, EXCLUDE
-from marshmallow.validate import Length
+from marshmallow import fields, EXCLUDE, post_dump
+from marshmallow.validate import Length, OneOf
 from marshmallow.utils import get_value
 
 from wazo_confd.helpers.mallow import (
@@ -17,11 +17,17 @@ from wazo_confd.helpers.mallow import (
 
 logger = logging.getLogger(__name__)
 
-options_field = fields.List(
-    PJSIPSectionOption(option_regex=None),
-    missing=[],
-    validate=Length(max=512),
-)
+
+class OptionsField(fields.List):
+    def __init__(self, **kwargs):
+        kwargs.setdefault('missing', [])
+        kwargs.setdefault('validate', Length(max=512))
+        option_schema = PJSIPSectionOption(option_regex=None)
+        super().__init__(option_schema, **kwargs)
+
+
+class GETQueryStringSchema(BaseSchema):
+    view = fields.String(validate=OneOf(['merged']), missing=None)
 
 
 class EndpointSIPRelationSchema(BaseSchema):
@@ -34,24 +40,29 @@ class TransportRelationSchema(BaseSchema):
 
 class _BaseSIPSchema(BaseSchema):
     def get_attribute(self, obj, attr, default):
-        only = getattr(self.declared_fields[attr], 'only', None)
+        only = getattr(self._find_field(attr), 'only', None)
         if attr.endswith('_section_options') and only:
             options = get_value(obj, attr)
             return [[key, value] for key, value in options if key in only]
         return super().get_attribute(obj, attr, default)
+
+    def _find_field(self, attr):
+        for name, field in self.declared_fields.items():
+            if name == attr or field.attribute == attr:
+                return field
 
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.UUID(dump_only=True)
     name = fields.String(validate=PJSIPSection())
     label = fields.String(validate=Length(max=128), allow_none=True)
 
-    aor_section_options = options_field
-    auth_section_options = options_field
-    endpoint_section_options = options_field
-    identify_section_options = options_field
-    registration_section_options = options_field
-    registration_outbound_auth_section_options = options_field
-    outbound_auth_section_options = options_field
+    aor_section_options = OptionsField()
+    auth_section_options = OptionsField()
+    endpoint_section_options = OptionsField()
+    identify_section_options = OptionsField()
+    registration_section_options = OptionsField()
+    registration_outbound_auth_section_options = OptionsField()
+    outbound_auth_section_options = OptionsField()
 
     templates = fields.List(
         fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
@@ -68,6 +79,45 @@ class EndpointSIPSchema(_BaseSIPSchema):
 
     trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
     line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+
+
+class MergedEndpointSIPSchema(EndpointSIPSchema):
+    aor_section_options = OptionsField(attribute='combined_aor_section_options')
+    auth_section_options = OptionsField(attribute='combined_auth_section_options')
+    endpoint_section_options = OptionsField(
+        attribute='combined_endpoint_section_options'
+    )
+    identify_section_options = OptionsField(
+        attribute='combined_identify_section_options'
+    )
+    registration_section_options = OptionsField(
+        attribute='combined_registration_section_options'
+    )
+    registration_outbound_auth_section_options = OptionsField(
+        attribute='combined_registration_outbound_auth_section_options',
+    )
+    outbound_auth_section_options = OptionsField(
+        attribute='combined_outbound_auth_section_options'
+    )
+
+    @post_dump
+    def merge_options(self, data):
+        sections = [
+            'aor',
+            'auth',
+            'endpoint',
+            'identify',
+            'registration',
+            'registration_outbound_auth',
+            'outbound_auth',
+        ]
+        for section in sections:
+            combined_options = data.pop('{}_section_options'.format(section), [])
+            accumulator = {}
+            for key, value in combined_options:
+                accumulator[key] = value
+            data['{}_section_options'.format(section)] = list(accumulator.items())
+        return data
 
 
 class TemplateSIPSchema(_BaseSIPSchema):

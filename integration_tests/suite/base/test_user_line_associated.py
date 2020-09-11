@@ -1,7 +1,9 @@
 # Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, equal_to, has_entries
+import re
+
+from hamcrest import assert_that, contains_inanyorder, equal_to, has_entries
 
 from . import confd
 from ..helpers import associations as a, fixtures
@@ -18,6 +20,41 @@ def test_get_user_line_id_associated_endpoints_sip(user, line, sip):
         assert_that(
             response.item,
             has_entries(uuid=sip['uuid']),
+        )
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip()
+def test_get_merged_view_validation(user, line, sip):
+    with a.line_endpoint_sip(line, sip), a.user_line(user, line):
+        response = (
+            confd.users(user['uuid'])
+            .lines(line['id'])
+            .associated.endpoints.sip.get(view='unknown')
+        )
+        response.assert_match(400, re.compile(re.escape('Not a valid choice')))
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip_template(aor_section_options=[['max_contacts', '42']])
+@fixtures.sip(label='Inherited')
+def test_get_merged_view(user, line, template, sip):
+    with a.line_endpoint_sip(line, sip), a.user_line(
+        user, line
+    ), a.endpoint_sip_template_sip(sip, template):
+        response = (
+            confd.users(user['uuid'])
+            .lines(line['id'])
+            .associated.endpoints.sip.get(view='merged')
+        )
+        assert_that(
+            response.item,
+            has_entries(
+                uuid=sip['uuid'],
+                aor_section_options=contains_inanyorder(['max_contacts', '42']),
+            ),
         )
 
 

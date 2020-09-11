@@ -9,13 +9,16 @@ paths:
       - lines
       - users
       parameters:
-      - $ref: '#/parameters/useruuid'
-      - $ref: '#/parameters/lineid'
+        - $ref: '#/parameters/useruuid'
+        - $ref: '#/parameters/lineid'
+        - $ref: '#/parameters/endpoint_sip_view'
       responses:
         '200':
           description: SIP endpoint of a line for a user
           schema:
             $ref: '#/definitions/EndpointSIP'
+        '400':
+          description: Invalid `view`
 
   /users/{user_uuid}/lines/main/associated/endpoints/sip:
     get:
@@ -27,12 +30,15 @@ paths:
       - lines
       - users
       parameters:
-      - $ref: '#/parameters/useruuid'
+        - $ref: '#/parameters/useruuid'
+        - $ref: '#/parameters/endpoint_sip_view'
       responses:
         '200':
           description: SIP endpoint of main line for a user
           schema:
             $ref: '#/definitions/EndpointSIP'
+        '400':
+            description: Invalid `view`
 
 parameters:
   useruuid:
