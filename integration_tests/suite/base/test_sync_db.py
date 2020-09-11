@@ -68,6 +68,7 @@ def test_create_default_templates_when_not_exist():
                 label='webrtc',
                 transport=has_entries(uuid=transport_wss['uuid']),
             ),
+            has_entries(label='webrtc_video'),
             has_entries(label='global_trunk'),
             has_entries(label='twilio_trunk'),
         ),
