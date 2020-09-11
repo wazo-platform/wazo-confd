@@ -104,6 +104,7 @@ from . import endpoint_custom  # noqa
 from . import endpoint_iax  # noqa
 from . import endpoint_sccp  # noqa
 from . import endpoint_sip  # noqa
+from . import endpoint_sip_template_sip  # noqa
 from . import extension  # noqa
 from . import extension_feature  # noqa
 from . import funckey_template  # noqa
@@ -195,6 +196,7 @@ __all__ = [
     'endpoint_iax',
     'endpoint_sccp',
     'endpoint_sip',
+    'endpoint_sip_template_sip',
     'extension',
     'extension_feature',
     'funckey_template',

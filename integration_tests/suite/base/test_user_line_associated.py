@@ -38,9 +38,11 @@ def test_get_merged_view_validation(user, line, sip):
 @fixtures.user()
 @fixtures.line()
 @fixtures.sip_template(aor_section_options=[['max_contacts', '42']])
-def test_get_user_line_id_associated_endpoints_sip_merged_view(user, line, template):
-    sip = confd.endpoints.sip.post(label='Inherited', templates=[template]).item
-    with a.line_endpoint_sip(line, sip), a.user_line(user, line):
+@fixtures.sip(label='Inherited')
+def test_get_merged_view(user, line, template, sip):
+    with a.line_endpoint_sip(line, sip), a.user_line(
+        user, line
+    ), a.endpoint_sip_template_sip(sip, template):
         response = (
             confd.users(user['uuid'])
             .lines(line['id'])

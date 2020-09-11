@@ -21,7 +21,12 @@ from hamcrest import (
 )
 
 from . import confd, BaseIntegrationTest
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
@@ -206,24 +211,23 @@ def test_get(sip):
     aor_section_options=[['max_contacts', '10']],
     endpoint_section_options=[['allow', '!all,opus']],
 )
-def test_get_merged(template_1, template_2):
-    endpoint = confd.endpoints.sip.post(
-        label="Inherited",
-        endpoint_section_options=[['allow', '!all,alaw']],
-        templates=[template_1, template_2],
-    ).item
+@fixtures.sip(
+    label='Inherited',
+    endpoint_section_options=[['allow', '!all,alaw']],
+)
+def test_get_merged(template_1, template_2, sip):
+    with a.endpoint_sip_template_sip(sip, template_1, template_2):
+        response = confd.endpoints.sip(sip['uuid']).get(view='merged')
 
-    response = confd.endpoints.sip(endpoint['uuid']).get(view='merged')
-
-    assert_that(
-        response.item,
-        has_entries(
-            aor_section_options=contains_inanyorder(
-                ['max_contacts', '10'], ['remove_existing', 'yes']
+        assert_that(
+            response.item,
+            has_entries(
+                aor_section_options=contains_inanyorder(
+                    ['max_contacts', '10'], ['remove_existing', 'yes']
+                ),
+                endpoint_section_options=contains_inanyorder(['allow', '!all,alaw']),
             ),
-            endpoint_section_options=contains_inanyorder(['allow', '!all,alaw']),
-        ),
-    )
+        )
 
 
 @fixtures.sip()
