@@ -61,12 +61,14 @@ class TestEndpointSIPSchema(TestCase):
 
         loaded = self.schema.load(body)
         assert_that(
-            loaded, has_entries(transport={'uuid': transport_uuid}),
+            loaded,
+            has_entries(transport={'uuid': transport_uuid}),
         )
 
         body = {'transport': {'name': 'no uuid?'}}
         assert_that(
-            calling(self.schema.load).with_args(body), raises(BadRequest),
+            calling(self.schema.load).with_args(body),
+            raises(BadRequest),
         )
 
     def test_templates(self):
@@ -74,12 +76,14 @@ class TestEndpointSIPSchema(TestCase):
         body = {'templates': [{'uuid': str(template_uuid), 'label': 'ignored'}]}
         loaded = self.schema.load(body)
         assert_that(
-            loaded, has_entries(templates=contains({'uuid': template_uuid})),
+            loaded,
+            has_entries(templates=contains({'uuid': template_uuid})),
         )
 
         body = {'templates': [{'name': 'no uuid'}]}
         assert_that(
-            calling(self.schema.load).with_args(body), raises(BadRequest),
+            calling(self.schema.load).with_args(body),
+            raises(BadRequest),
         )
 
     def test_name(self):
@@ -87,11 +91,13 @@ class TestEndpointSIPSchema(TestCase):
         assert_that(loaded, not_(has_entries(name=None)))
 
         assert_that(
-            calling(self.schema.load).with_args({'name': None}), raises(BadRequest),
+            calling(self.schema.load).with_args({'name': None}),
+            raises(BadRequest),
         )
 
         assert_that(
-            calling(self.schema.load).with_args({'name': ''}), raises(BadRequest),
+            calling(self.schema.load).with_args({'name': ''}),
+            raises(BadRequest),
         )
 
     def test_option_length(self):
@@ -136,7 +142,8 @@ class TestEndpointSIPSchema(TestCase):
             loaded,
             has_entries(
                 auth_section_options=contains(
-                    ['username', 'username1'], ['username', 'username2'],
+                    ['username', 'username1'],
+                    ['username', 'username2'],
                 )
             ),
         )

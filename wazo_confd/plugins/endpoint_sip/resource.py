@@ -42,7 +42,9 @@ class _BaseSipList(ListResource):
         for template in form['templates']:
             try:
                 model = self.dao.get(
-                    template['uuid'], template=True, tenant_uuids=[form['tenant_uuid']],
+                    template['uuid'],
+                    template=True,
+                    tenant_uuids=[form['tenant_uuid']],
                 )
                 templates.append(model)
             except NotFoundError:

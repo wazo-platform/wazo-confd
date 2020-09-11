@@ -18,7 +18,9 @@ from wazo_confd.helpers.mallow import (
 logger = logging.getLogger(__name__)
 
 options_field = fields.List(
-    PJSIPSectionOption(option_regex=None), missing=[], validate=Length(max=512),
+    PJSIPSectionOption(option_regex=None),
+    missing=[],
+    validate=Length(max=512),
 )
 
 
