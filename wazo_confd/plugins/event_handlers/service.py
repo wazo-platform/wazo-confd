@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class DefaultSIPTemplateService:
     def __init__(self, sip_dao, transport_dao):
         self.sip_dao = sip_dao
-        self.transport_dao = sip_dao
+        self.transport_dao = transport_dao
 
     def create_or_merge_sip_template(self, template_config, existing_template_uuid):
         if not existing_template_uuid:

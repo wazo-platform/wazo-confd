@@ -48,6 +48,8 @@ def test_remove_user_with_line(context, user):
 
 
 def test_create_default_templates_when_not_exist():
+    transport_udp = confd.sip.transports.get(name='transport-udp').items[0]
+    transport_wss = confd.sip.transports.get(name='transport-wss').items[0]
     response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
     assert_that(response.items, empty())
 
@@ -58,8 +60,14 @@ def test_create_default_templates_when_not_exist():
     assert_that(
         response.items,
         contains_inanyorder(
-            has_entries(label='global'),
-            has_entries(label='webrtc'),
+            has_entries(
+                label='global',
+                transport=has_entries(uuid=transport_udp['uuid']),
+            ),
+            has_entries(
+                label='webrtc',
+                transport=has_entries(uuid=transport_wss['uuid']),
+            ),
             has_entries(label='global_trunk'),
             has_entries(label='twilio_trunk'),
         ),
