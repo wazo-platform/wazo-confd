@@ -323,8 +323,8 @@ def test_create_all_parameters(transport, endpoint_1, endpoint_2):
             outbound_auth_section_options=outbound_auth_section_options,
             transport=has_entries(uuid=transport['uuid']),
             templates=contains(
-                has_entries(uuid=endpoint_1['uuid']),
-                has_entries(uuid=endpoint_2['uuid']),
+                has_entries(uuid=endpoint_1['uuid'], label=endpoint_1['label']),
+                has_entries(uuid=endpoint_2['uuid'], label=endpoint_2['label']),
             ),
             asterisk_id='asterisk_id',
         ),
@@ -441,7 +441,9 @@ def test_edit_all_parameters(transport, template, sip):
                 *registration_outbound_auth
             ),
             outbound_auth_section_options=contains_inanyorder(*outbound_auth),
-            templates=contains_inanyorder(has_entries(uuid=template['uuid'])),
+            templates=contains_inanyorder(
+                has_entries(uuid=template['uuid'], label=template['label'])
+            ),
             transport=has_entries(uuid=transport['uuid']),
         ),
     )
