@@ -116,6 +116,23 @@ class DefaultSIPTemplateService:
             tenant.webrtc_sip_template_uuid,
         )
 
+        webrtc_video_config = {
+            'label': 'webrtc_video',
+            'template': True,
+            'tenant_uuid': tenant.uuid,
+            'transport': None,
+            'asterisk_id': None,
+            'endpoint_section_options': [
+                ['max_video_streams', '25'],
+                ['max_audio_streams', '1'],
+            ],
+            'templates': [webrtc_template],
+        }
+        webrtc_video_template = self.create_or_merge_sip_template(
+            webrtc_video_config,
+            tenant.webrtc_video_sip_template_uuid,
+        )
+
         global_trunk_config = {
             'label': 'global_trunk',
             'template': True,
@@ -197,6 +214,7 @@ class DefaultSIPTemplateService:
 
         tenant.global_sip_template_uuid = global_template.uuid
         tenant.webrtc_sip_template_uuid = webrtc_template.uuid
+        tenant.webrtc_video_sip_template_uuid = webrtc_video_template.uuid
         tenant.global_trunk_sip_template_uuid = global_trunk_template.uuid
         tenant.twilio_trunk_sip_template_uuid = twilio_trunk_template.uuid
         tenant.sip_templates_generated = True
