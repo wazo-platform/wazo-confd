@@ -282,6 +282,17 @@ definitions:
         description: The UUID of this resource
     required:
       - uuid
+  EndpointSIPTemplatesRelation:
+    properties:
+      uuid:
+        type: string
+        description: The UUID of this resource
+      label:
+        type: string
+        description: The label of this resource
+        readOnly: true
+    required:
+      - uuid
   EndpointSIP:
     title: SIP Endpoint
     properties:
@@ -336,7 +347,7 @@ definitions:
       templates:
         type: array
         items:
-          $ref: '#/definitions/EndpointSIPRelation'
+          $ref: '#/definitions/EndpointSIPTemplatesRelation'
         description: |
           A list of templates this configuration will inherit from.
 

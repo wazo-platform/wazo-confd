@@ -32,6 +32,7 @@ class GETQueryStringSchema(BaseSchema):
 
 class EndpointSIPRelationSchema(BaseSchema):
     uuid = fields.UUID(required=True)
+    label = fields.String(dump_only=True)
 
 
 class TransportRelationSchema(BaseSchema):
