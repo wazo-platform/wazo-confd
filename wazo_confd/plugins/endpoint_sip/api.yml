@@ -290,6 +290,7 @@ definitions:
       label:
         type: string
         description: The label of this resource
+        readOnly: true
     required:
       - uuid
   EndpointSIP:
