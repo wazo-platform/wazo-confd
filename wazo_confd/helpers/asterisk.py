@@ -132,7 +132,7 @@ class PJSIPDoc:
     def get_section_variables(self, section_name):
         # NOTE(fblackburn): Some sections are not documented and must be hardcoded
         if section_name == 'identify':
-            return ['match', 'endpoint']
+            return ['match', 'endpoint', 'srv_lookups', 'match_header']
         if section_name == 'registration':
             return [
                 'auth_rejection_permanent',
