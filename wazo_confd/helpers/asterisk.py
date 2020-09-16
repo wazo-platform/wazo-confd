@@ -138,12 +138,18 @@ class PJSIPDoc:
                 'auth_rejection_permanent',
                 'client_uri',
                 'contact_user',
+                'contact_header_params',
                 'expiration',
                 'max_retries',
                 'outbound_proxy',
                 'retry_interval',
                 'server_uri',
+                'forbidden_retry_interval',
+                'fatal_retry_interval',
+                'line' 'server_uri',
                 'transport',
+                'support_path',
+                'support_outbound',
             ]
         return self.content.get(section_name, {}).keys()
 
