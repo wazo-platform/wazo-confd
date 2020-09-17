@@ -4,6 +4,7 @@
 import argparse
 import logging
 
+from xivo import xivo_logging
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 from xivo_dao import init_db_from_config
@@ -18,7 +19,6 @@ from wazo_auth_client import Client as AuthClient
 from wazo_confd.config import DEFAULT_CONFIG, _load_key_file
 from wazo_confd.plugins.event_handlers.service import DefaultSIPTemplateService
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('wazo-confd-sync-db')
 
 
@@ -37,11 +37,11 @@ def parse_cli_args():
         help='Only print warnings and errors',
     )
     parsed_args = parser.parse_args()
-    result = {}
+    result = {'log_level': logging.INFO}
     if parsed_args.quiet:
-        logger.setLevel(logging.WARNING)
+        result['log_level'] = logging.WARNING
     elif parsed_args.debug:
-        logger.setLevel(logging.DEBUG)
+        result['log_level'] = logging.DEBUG
     return result
 
 
@@ -52,8 +52,11 @@ def load_config():
 
 
 def main():
-    parse_cli_args()
+    cli_args = parse_cli_args()
     config = load_config()
+
+    xivo_logging.setup_logging('/dev/null', log_level=cli_args['log_level'])
+    xivo_logging.silence_loggers(['stevedore.extension'], logging.WARNING)
 
     token = AuthClient(**config['auth']).token.new(expiration=300)['token']
 
