@@ -30,7 +30,7 @@ def test_create_default_templates_when_not_exist():
                 has_entries(label='global'),
                 has_entries(label='webrtc'),
                 has_entries(label='webrtc_video'),
-                has_entries(label='global_trunk'),
+                has_entries(label='registration_trunk'),
                 has_entries(label='twilio_trunk'),
             ),
         )

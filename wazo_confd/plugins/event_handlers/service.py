@@ -133,8 +133,8 @@ class DefaultSIPTemplateService:
             tenant.webrtc_video_sip_template_uuid,
         )
 
-        global_trunk_config = {
-            'label': 'global_trunk',
+        registration_trunk_config = {
+            'label': 'registration_trunk',
             'template': True,
             'tenant_uuid': tenant.uuid,
             'transport': None,
@@ -154,9 +154,9 @@ class DefaultSIPTemplateService:
             'outbound_auth_section_options': [],
             'templates': [global_template],
         }
-        global_trunk_template = self.create_or_merge_sip_template(
-            global_trunk_config,
-            tenant.global_trunk_sip_template_uuid,
+        registration_trunk_template = self.create_or_merge_sip_template(
+            registration_trunk_config,
+            tenant.registration_trunk_sip_template_uuid,
         )
 
         twilio_trunk_config = {
@@ -205,7 +205,7 @@ class DefaultSIPTemplateService:
                 ['match', '54.244.51.0'],
             ],
             'outbound_auth_section_options': [],
-            'templates': [global_trunk_template],
+            'templates': [registration_trunk_template],
         }
         twilio_trunk_template = self.create_or_merge_sip_template(
             twilio_trunk_config,
@@ -215,6 +215,6 @@ class DefaultSIPTemplateService:
         tenant.global_sip_template_uuid = global_template.uuid
         tenant.webrtc_sip_template_uuid = webrtc_template.uuid
         tenant.webrtc_video_sip_template_uuid = webrtc_video_template.uuid
-        tenant.global_trunk_sip_template_uuid = global_trunk_template.uuid
+        tenant.registration_trunk_sip_template_uuid = registration_trunk_template.uuid
         tenant.twilio_trunk_sip_template_uuid = twilio_trunk_template.uuid
         tenant.sip_templates_generated = True
