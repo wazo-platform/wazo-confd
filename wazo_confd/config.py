@@ -134,6 +134,7 @@ DEFAULT_CONFIG = {
         'switchboard': True,
         'switchboard_member': True,
         'timezone': True,
+        'tenant': True,
         'trunk': True,
         'trunk_endpoint': True,
         'trunk_register': True,

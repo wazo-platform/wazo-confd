@@ -1,0 +1,77 @@
+paths:
+  /tenants:
+    get:
+        operationId: list_tenants
+        summary: List tenants
+        description: '**Required ACL**: `confd.tenants.read`'
+        tags:
+          - tenants
+        parameters:
+          - $ref: '#/parameters/tenantuuid'
+          - $ref: '#/parameters/recurse'
+          - $ref: '#/parameters/order'
+          - $ref: '#/parameters/direction'
+          - $ref: '#/parameters/limit'
+          - $ref: '#/parameters/offset'
+          - $ref: '#/parameters/search'
+        responses:
+          '200':
+            description: Trunks list
+            schema:
+                $ref: '#/definitions/TenantItems'
+  /tenants/{tenant_uuid}:
+    get:
+      operationId: get_tenant
+      summary: Get tenant
+      description: '**Required ACL:** `confd.tenants.{tenant_uuid}.read`'
+      tags:
+        - tenants
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/urltenantuuid'
+      responses:
+        '200':
+          description: Tenant
+          schema:
+            $ref: '#/definitions/Tenant'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  urltenantuuid:
+    description: Resource UUID
+    name: tenant_uuid
+    in: path
+    type: string
+    required: true
+definitions:
+  Tenant:
+    properties:
+      uuid:
+        type: string
+        readOnly: true
+        description: The UUID of the Tenant
+      sip_templates_generated:
+        type: boolean
+        readOnly: true
+        description: Wether or not the SIP templates have been generated
+      global_sip_template_uuid:
+        type: string
+        readOnly: true
+      webrtc_sip_template_uuid:
+        type: string
+        readOnly: true
+      webrtc_video_sip_template_uuid:
+        type: string
+        readOnly: true
+      registration_trunk_sip_template_uuid:
+        type: string
+        readOnly: true
+  TenantItems:
+    title: TenantItems
+    properties:
+      items:
+        type: array
+        items:
+            $ref: '#/definitions/Tenant'
+      total:
+        type: integer
