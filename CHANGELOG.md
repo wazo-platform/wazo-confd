@@ -1,6 +1,6 @@
 # Changelog
 
-## 20.12
+## 20.13
 
 * The body of `/1.1/endpoints/sip` has been modified to be used with PJSIP
 * The following resources have been removed:
