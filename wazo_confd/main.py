@@ -24,6 +24,7 @@ def main(argv=None):
         log_level=config['log_level'],
     )
     xivo_logging.silence_loggers(['Flask-Cors'], logging.WARNING)
+    xivo_logging.silence_loggers(['amqp'], logging.INFO)
 
     if config['user']:
         change_user(config['user'])
