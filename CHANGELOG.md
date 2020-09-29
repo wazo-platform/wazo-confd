@@ -1,5 +1,12 @@
 # Changelog
 
+## 20.14
+
+* Add the following resources
+
+  * GET `/1.1/tenants`
+  * GET `/1.1/tenants/<tenant_uuid>`
+
 ## 20.13
 
 * The body of `/1.1/endpoints/sip` has been modified to be used with PJSIP
