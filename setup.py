@@ -100,6 +100,7 @@ setup(
             'switchboard = wazo_confd.plugins.switchboard.plugin:Plugin',
             'switchboard_member = wazo_confd.plugins.switchboard_member.plugin:Plugin',
             'timezone = wazo_confd.plugins.timezone.plugin:Plugin',
+            'tenant = wazo_confd.plugins.tenant.plugin:Plugin',
             'trunk = wazo_confd.plugins.trunk.plugin:Plugin',
             'trunk_endpoint = wazo_confd.plugins.trunk_endpoint.plugin:Plugin',
             'trunk_register = wazo_confd.plugins.trunk_register.plugin:Plugin',
