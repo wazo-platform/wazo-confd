@@ -12,7 +12,7 @@ services:
       TARGETS: "postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"
 
   postgres:
-    image: wazopbx/wazo-confd-db
+    image: wazoplatform/wazo-confd-db
 
   confd:
     volumes:
