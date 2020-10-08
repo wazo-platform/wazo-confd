@@ -14,7 +14,7 @@ from .config import TOKEN
 
 class ProvdHelper:
 
-    DOCKER_PROVD_IMAGE = "wazopbx/wazo-provd"
+    DOCKER_PROVD_IMAGE = "wazoplatform/wazo-provd"
 
     DEFAULT_CONFIGS = [
         {

@@ -1,17 +1,17 @@
 version: '3.7'
 services:
   sync:
-    image: wazopbx/wait
+    image: wazoplatform/wait
     environment:
       TIMEOUT: ${INTEGRATION_TEST_TIMEOUT}
 
   auth:
-    image: wazopbx/wazo-auth-mock
+    image: wazoplatform/wazo-auth-mock
     ports:
       - 9497
 
   provd:
-    image: wazopbx/wazo-provd
+    image: wazoplatform/wazo-provd
     ports:
       - "8666"
     volumes:
@@ -21,7 +21,7 @@ services:
       - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
 
   postgres:
-    image: wazopbx/wazo-confd-db-test
+    image: wazoplatform/wazo-confd-db-test
     ports:
       - "5432"
 

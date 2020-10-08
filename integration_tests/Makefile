@@ -5,14 +5,14 @@ POSTGRES_DOCKER=$(MANAGE_DB_DIR)/contribs/docker/wazo-confd-db-test/Dockerfile
 test-setup: egg-info build-confd
 
 build-confd:
-	docker build -t wazopbx/wazo-confd ..
+	docker build -t wazoplatform/wazo-confd ..
 	docker build --no-cache -t wazo-confd-test -f Dockerfile ..
 
 update-db:
-	docker build --no-cache -t wazopbx/wazo-confd-db-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
+	docker build --no-cache -t wazoplatform/wazo-confd-db-test -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
-	docker build -t wazopbx/wazo-provd $(PROVD_DIR)
+	docker build -t wazoplatform/wazo-provd $(PROVD_DIR)
 
 test:
 	nosetests -x
