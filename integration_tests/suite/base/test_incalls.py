@@ -375,7 +375,7 @@ def test_get_voicemail_destination_relation(voicemail):
     )
 
 
-@fixtures.queue()
+@fixtures.queue(label='hello-world')
 def test_get_queue_destination_relation(queue):
     incall = confd.incalls.post(
         destination={'type': 'queue', 'queue_id': queue['id']}
