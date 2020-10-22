@@ -1,8 +1,8 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import Length, Predicate, Range
+from marshmallow.validate import Length, OneOf, Predicate, Range
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
@@ -25,6 +25,19 @@ class ConferenceSchema(BaseSchema):
     announce_user_count = fields.Boolean()
     announce_only_user = fields.Boolean()
     music_on_hold = fields.String(allow_none=True, validate=Length(max=128))
+    remb_send_interval = fields.Integer(validate=Range(min=0))
+    remb_behavior = fields.String(
+        validate=OneOf(
+            [
+                'average',
+                'average_all',
+                'force',
+                'highest',
+                'highest_all',
+                'lowest',
+            ]
+        )
+    )
     links = ListLink(Link('conferences'))
 
     extensions = fields.Nested(
