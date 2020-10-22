@@ -1,5 +1,13 @@
 # Changelog
 
+## 20.15
+
+* The following options have been added to conferences
+
+  * `remb_send_interval`
+  * `remb_behavior`
+  * `remb_estimated_bitrate`
+
 ## 20.14
 
 * Add the following resources

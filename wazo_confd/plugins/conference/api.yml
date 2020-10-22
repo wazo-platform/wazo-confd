@@ -164,6 +164,34 @@ definitions:
           type: boolean
           description: Record the conference
           default: false
+        remb_send_interval:
+          type: integer
+          description: Interval (in milliseconds) at which a combined REMB frame will be sent to sources of video.
+        remb_behavior:
+          type: string
+          description: \
+            How the combined REMB report for an SFU video bridge is constructed.
+
+            If set to "average" then the estimated maximum bitrate of each receiver is used to
+            construct an average bitrate. If set to "lowest" the lowest maximum bitrate is
+            forwarded to the sender. If set to "highest" the highest maximum bitrate is forwarded
+            to the sender. If set to "average_all" a single average is generated from every
+            receiver and the same value is sent to every sender. If set to "lowest_all" the lowest
+            maximum bitrate of all receivers is sent to every sender. If set to "highest_all" the
+            highest maximum bitrate of all receivers is sent to every sender. When set to "force",
+            the value set in remb_estimated_bitrate is sent to every sender.
+          enum:
+            - average
+            - average_all
+            - force
+            - highest
+            - highest_all
+            - lowest
+        remb_estimated_bitrate:
+          type: integer
+          description: \
+            When remb_behavior is set to 'force', this options sets the estimated bitrate (in bits
+            per second) sent to each participant in REMB reports.
         tenant_uuid:
           type: string
           description: The UUID of the tenant
