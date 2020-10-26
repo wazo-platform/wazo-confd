@@ -306,3 +306,12 @@ class transport(IsolatedAction):
         'generate': h.transport.generate_transport,
         'delete': h.transport.delete_transport,
     }
+
+
+class external_app(IsolatedAction):
+
+    id_field = 'name'
+    actions = {
+        'generate': h.external_app.generate_external_app,
+        'delete': h.external_app.delete_external_app,
+    }

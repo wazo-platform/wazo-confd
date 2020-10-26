@@ -107,6 +107,7 @@ from . import endpoint_sip  # noqa
 from . import endpoint_sip_template_sip  # noqa
 from . import extension  # noqa
 from . import extension_feature  # noqa
+from . import external_app  # noqa
 from . import funckey_template  # noqa
 from . import group  # noqa
 from . import group_call_permission  # noqa
@@ -199,6 +200,7 @@ __all__ = [
     'endpoint_sip_template_sip',
     'extension',
     'extension_feature',
+    'external_app',
     'funckey_template',
     'group',
     'group_call_permission',

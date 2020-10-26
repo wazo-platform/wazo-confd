@@ -1,0 +1,68 @@
+# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+from flask import url_for, request
+
+from xivo.tenant_flask_helpers import Tenant
+from xivo_dao import tenant_dao
+from xivo_dao.alchemy.external_app import ExternalApp
+
+from wazo_confd.auth import required_acl
+from wazo_confd.helpers.restful import ListResource, ItemResource
+
+from .schema import ExternalAppSchema, POSTExternalAppSchema
+
+
+class ExternalAppList(ListResource):
+
+    schema = ExternalAppSchema
+    has_tenant_uuid = True
+
+    @required_acl('confd.external.apps.read')
+    def get(self):
+        return super().get()
+
+    def post(self):
+        return '', 405
+
+
+class ExternalAppItem(ItemResource):
+
+    schema = ExternalAppSchema
+    post_schema = POSTExternalAppSchema
+    model = ExternalApp
+    has_tenant_uuid = True
+
+    def build_headers(self, app):
+        return {'Location': url_for('external_apps', name=app.name, _external=True)}
+
+    def add_tenant_to_form(self, form):
+        if not self._has_write_tenant_uuid():
+            return form
+
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        form['tenant_uuid'] = tenant.uuid
+        return form
+
+    @required_acl('confd.external.apps.{name}.create')
+    def post(self, name):
+        body = request.get_json()
+        body['name'] = name
+        form = self.post_schema().load(body)
+        form = self.add_tenant_to_form(form)
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
+
+    @required_acl('confd.external.apps.{name}.read')
+    def get(self, name):
+        return super().get(name)
+
+    @required_acl('confd.external.apps.{name}.update')
+    def put(self, name):
+        return super().put(name)
+
+    @required_acl('confd.external.apps.{name}.delete')
+    def delete(self, name):
+        return super().delete(name)
