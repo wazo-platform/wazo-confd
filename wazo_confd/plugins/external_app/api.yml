@@ -25,7 +25,7 @@ paths:
       summary: Create external app
       description: '**Required ACL:** `confd.external.apps.{app_name}.create`'
       tags:
-      - external
+      - external_apps
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/externalappname'
@@ -47,7 +47,7 @@ paths:
       summary: Get external app
       description: '**Required ACL:** `confd.external.apps.{app_name}.read`'
       tags:
-      - external
+      - external_apps
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/externalappname'
@@ -63,7 +63,7 @@ paths:
       summary: Update external app
       description: '**Required ACL:** `confd.external.apps.{app_name}.update`'
       tags:
-      - external
+      - external_apps
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/externalappname'
@@ -84,7 +84,7 @@ paths:
       summary: Delete external app
       description: '**Required ACL:** `confd.external.apps.{app_name}.delete`'
       tags:
-      - external
+      - external_apps
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/externalappname'
@@ -98,7 +98,7 @@ paths:
 parameters:
   externalappname:
     required: true
-    type: integer
+    type: string
     name: app_name
     in: path
     description: External App's name
