@@ -11,7 +11,9 @@ class Plugin:
         service = build_service()
 
         api.add_resource(
-            ExternalAppList, '/external/apps', resource_class_args=(service,)
+            ExternalAppList,
+            '/external/apps',
+            resource_class_args=(service,),
         )
 
         api.add_resource(
