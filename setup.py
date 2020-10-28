@@ -108,6 +108,7 @@ setup(
             'user = wazo_confd.plugins.user.plugin:Plugin',
             'user_agent = wazo_confd.plugins.user_agent.plugin:Plugin',
             'user_call_permission = wazo_confd.plugins.user_call_permission.plugin:Plugin',
+            'user_external_app = wazo_confd.plugins.user_external_app.plugin:Plugin',
             'user_fallback = wazo_confd.plugins.user_fallback.plugin:Plugin',
             'user_group = wazo_confd.plugins.user_group.plugin:Plugin',
             'user_import = wazo_confd.plugins.user_import.plugin:Plugin',

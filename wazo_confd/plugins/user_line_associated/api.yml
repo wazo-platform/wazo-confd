@@ -39,12 +39,3 @@ paths:
             $ref: '#/definitions/EndpointSIP'
         '400':
             description: Invalid `view`
-
-parameters:
-  useruuid:
-    required: true
-    type: string
-    format: uuid
-    name: user_uuid
-    in: path
-    description: the user's UUID

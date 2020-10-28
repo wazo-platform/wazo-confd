@@ -315,3 +315,12 @@ class external_app(IsolatedAction):
         'generate': h.external_app.generate_external_app,
         'delete': h.external_app.delete_external_app,
     }
+
+
+class user_external_app(IsolatedAction):
+
+    id_field = ('user_uuid', 'name')
+    actions = {
+        'generate': h.user_external_app.generate_user_external_app,
+        'delete': h.user_external_app.delete_user_external_app,
+    }

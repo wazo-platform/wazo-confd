@@ -163,6 +163,7 @@ from . import trunk_endpoint_sip  # noqa
 from . import trunk_register_iax  # noqa
 from . import user  # noqa
 from . import user_agent  # noqa
+from . import user_external_app  # noqa
 from . import user_call_permission  # noqa
 from . import user_funckey_template  # noqa
 from . import user_import  # noqa
@@ -256,6 +257,7 @@ __all__ = [
     'trunk_register_iax',
     'user',
     'user_agent',
+    'user_external_app',
     'user_call_permission',
     'user_funckey_template',
     'user_import',
