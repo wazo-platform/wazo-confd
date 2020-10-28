@@ -82,6 +82,7 @@ DEFAULT_CONFIG = {
         'endpoint_sip': True,
         'extension': True,
         'extension_feature': True,
+        'external_app': True,
         'features': True,
         'func_key': True,
         'group': True,

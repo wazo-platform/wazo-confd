@@ -1,5 +1,15 @@
 # Changelog
 
+## 20.15
+
+* The following resources have been added:
+
+  * GET `/1.1/external/apps`
+  * POST `/1.1/external/apps/<app_name>`
+  * GET `/1.1/external/apps/<app_name>`
+  * PUT `/1.1/external/apps/<app_name>`
+  * DELETE `/1.1/external/apps/<app_name>`
+
 ## 20.14
 
 * Add the following resources
