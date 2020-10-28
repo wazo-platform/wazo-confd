@@ -10,7 +10,7 @@ from xivo_dao.alchemy.external_app import ExternalApp
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import ExternalAppSchema, POSTExternalAppSchema
+from .schema import ExternalAppSchema, ExternalAppNameSchema
 
 
 class ExternalAppList(ListResource):
@@ -29,7 +29,7 @@ class ExternalAppList(ListResource):
 class ExternalAppItem(ItemResource):
 
     schema = ExternalAppSchema
-    post_schema = POSTExternalAppSchema
+    name_schema = ExternalAppNameSchema
     model = ExternalApp
     has_tenant_uuid = True
 
@@ -48,9 +48,10 @@ class ExternalAppItem(ItemResource):
     @required_acl('confd.external.apps.{name}.create')
     def post(self, name):
         body = request.get_json()
-        body['name'] = name
-        form = self.post_schema().load(body)
+        form_part = self.name_schema().load({'name': name})
+        form = self.schema().load(body)
         form = self.add_tenant_to_form(form)
+        form.update(form_part)
         model = self.model(**form)
         model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
