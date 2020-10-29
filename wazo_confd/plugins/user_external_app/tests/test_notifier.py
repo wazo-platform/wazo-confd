@@ -4,7 +4,7 @@
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.external_app.event import (
+from xivo_bus.resources.user_external_app.event import (
     CreateUserExternalAppEvent,
     DeleteUserExternalAppEvent,
     EditUserExternalAppEvent,
