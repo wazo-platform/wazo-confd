@@ -107,7 +107,7 @@ class RegistrarDao:
         return registrars
 
     def _paginate_registrars(self, registrars, offset=0, limit=None):
-        if limit:
+        if limit and (offset + limit) < len(registrars):
             return registrars[offset : offset + limit]
         return registrars[offset:]
 
@@ -123,14 +123,12 @@ class RegistrarDao:
         return registrar
 
     def search(self, **criteria):
+        offset = criteria.pop('offset', 0)
+        limit = criteria.pop('limit', None)
         registrars = self._find_registrars(criteria)
         if registrars:
             total = len(registrars)
-            registrars = self._paginate_registrars(
-                registrars,
-                criteria.get('offset', 0),
-                criteria.get('limit'),
-            )
+            registrars = self._paginate_registrars(registrars, offset, limit)
         else:
             registrars = []
             total = 0
