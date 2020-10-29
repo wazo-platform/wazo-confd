@@ -237,7 +237,7 @@ parameters:
     description: |
       Different view of the SIP endpoint
 
-      The `default` view, when the argument is ommited, is to include only options that
+      The `default` view, when the argument is omitted, is to include only options that
       are defined on the specified endpoint.
 
       The `merged` view includes all options from included templates.
