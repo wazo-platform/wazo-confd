@@ -2,9 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import Length
+from marshmallow.validate import Length, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema
+
+
+class GETQueryStringSchema(BaseSchema):
+    view = fields.String(validate=OneOf(['fallback']), missing=None)
 
 
 class UserExternalAppSchema(BaseSchema):
