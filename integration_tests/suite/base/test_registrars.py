@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -119,6 +119,9 @@ def test_sorting_offset_limit(registrar1, registrar2):
     yield s.check_sorting, url, registrar1, registrar2, 'proxy_main_host', '99.20.30.'
     yield s.check_sorting, url, registrar1, registrar2, 'name', 'SortRegistrar'
     yield s.check_sorting, url, registrar1, registrar2, 'main_port', 'SortRegistrar'
+
+    yield s.check_offset, url, registrar1, registrar2, 'name', 'Sort'
+    yield s.check_limit, url, registrar1, registrar2, 'name', 'Sort'
 
 
 @fixtures.registrar()
