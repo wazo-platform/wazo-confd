@@ -5,7 +5,7 @@ paths:
       summary: List external apps
       description: '**Required ACL:** `confd.external.apps.read`'
       tags:
-      - external
+      - external_apps
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/recurse'
@@ -118,7 +118,7 @@ definitions:
         type: string
         description: The label of the external app
       configuration:
-        type: string
+        type: object
         description: Arbitrary settings needed by an external app
   ExternalAppItems:
     title: ExternalAppItems
