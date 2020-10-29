@@ -9,6 +9,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -53,6 +54,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       responses:
         '200':
@@ -70,6 +72,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       - name: body
         in: body
@@ -92,6 +95,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       responses:
         '204':
