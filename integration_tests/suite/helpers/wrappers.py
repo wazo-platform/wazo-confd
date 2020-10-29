@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import inspect
@@ -97,4 +97,9 @@ class IsolatedAction:
         # reused by the decorator for deleting resources
         callback = self.actions.get('delete')
         if callback:
-            callback(self.resource[self.id_field], check=False)
+            fields = self.id_field
+            if isinstance(fields, str):
+                fields = [self.id_field]
+
+            args = [self.resource[key] for key in fields]
+            callback(*args, check=False)

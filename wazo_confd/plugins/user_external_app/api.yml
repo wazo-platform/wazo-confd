@@ -1,14 +1,15 @@
 paths:
-  /external/apps:
+  /users/{user_uuid}/external/apps:
     get:
-      operationId: list_external_apps
-      summary: List external apps
-      description: '**Required ACL:** `confd.external.apps.read`'
+      operationId: list_user_external_apps
+      summary: List user external apps
+      description: '**Required ACL:** `confd.users.{user_uuid}.external.apps.read`'
       tags:
       - external_apps
+      - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/recurse'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
@@ -16,62 +17,68 @@ paths:
       - $ref: '#/parameters/search'
       responses:
         '200':
-          description: External apps list
+          description: User external apps list
           schema:
-            $ref: '#/definitions/ExternalAppItems'
-  /external/apps/{app_name}:
+            $ref: '#/definitions/UserExternalAppItems'
+  /users/{user_uuid}/external/apps/{app_name}:
     post:
-      operationId: create_external_app
-      summary: Create external app
-      description: '**Required ACL:** `confd.external.apps.{app_name}.create`'
+      operationId: create_user_external_app
+      summary: Create user external app
+      description: '**Required ACL:** `confd.users.{user_uuid}.external.apps.{app_name}.create`'
       tags:
       - external_apps
+      - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       - name: body
         in: body
         description: External app to create
         required: true
         schema:
-          $ref: '#/definitions/ExternalApp'
+          $ref: '#/definitions/UserExternalApp'
       responses:
         '201':
           description: External app created
           schema:
-            $ref: '#/definitions/ExternalApp'
+            $ref: '#/definitions/UserExternalApp'
         '400':
           $ref: '#/responses/CreateError'
     get:
-      operationId: get_external_app
-      summary: Get external app
-      description: '**Required ACL:** `confd.external.apps.{app_name}.read`'
+      operationId: get_user_external_app
+      summary: Get user external app
+      description: '**Required ACL:** `confd.users.{user_uuid}.external.apps.{app_name}.read`'
       tags:
       - external_apps
+      - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       responses:
         '200':
           description: External App
           schema:
-            $ref: '#/definitions/ExternalApp'
+            $ref: '#/definitions/UserExternalApp'
         '404':
           $ref: '#/responses/NotFoundError'
     put:
-      operationId: update_external_app
-      summary: Update external app
-      description: '**Required ACL:** `confd.external.apps.{app_name}.update`'
+      operationId: update_user_external_app
+      summary: Update user external app
+      description: '**Required ACL:** `confd.users.{user_uuid}.external.apps.{app_name}.update`'
       tags:
       - external_apps
+      - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/ExternalApp'
+          $ref: '#/definitions/UserExternalApp'
       responses:
         '204':
           $ref: '#/responses/ResourceUpdated'
@@ -80,13 +87,15 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
     delete:
-      operationId: delete_external_app
-      summary: Delete external app
-      description: '**Required ACL:** `confd.external.apps.{app_name}.delete`'
+      operationId: delete_user_external_app
+      summary: Delete user external app
+      description: '**Required ACL:** `confd.users.{user_uuid}.external.apps.{app_name}.delete`'
       tags:
       - external_apps
+      - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
       responses:
         '204':
@@ -95,21 +104,10 @@ paths:
           $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
-parameters:
-  externalappname:
-    required: true
-    type: string
-    name: app_name
-    in: path
-    description: External App's name
 definitions:
-  ExternalApp:
-    title: ExternalApp
+  UserExternalApp:
+    title: UserExternalApp
     properties:
-      tenant_uuid:
-        type: string
-        description: The UUID of the tenant
-        readOnly: true
       name:
         type: string
         description: The name to identify the external app
@@ -120,13 +118,13 @@ definitions:
       configuration:
         type: object
         description: Arbitrary settings needed by an external app
-  ExternalAppItems:
-    title: ExternalAppItems
+  UserExternalAppItems:
+    title: UserExternalAppItems
     properties:
       items:
         type: array
         items:
-          $ref: '#/definitions/ExternalApp'
+          $ref: '#/definitions/UserExternalApp'
       total:
         type: integer
     required:

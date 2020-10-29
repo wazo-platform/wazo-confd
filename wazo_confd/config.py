@@ -141,6 +141,7 @@ DEFAULT_CONFIG = {
         'trunk_register': True,
         'user': True,
         'user_agent': True,
+        'user_external_app': True,
         'user_call_permission': True,
         'user_fallback': True,
         'user_group': True,

@@ -50,6 +50,13 @@ parameters:
     name: agent_id
     in: path
     description: Agent’s ID
+  useruuid:
+    required: true
+    type: string
+    format: uuid
+    name: user_uuid
+    in: path
+    description: the user's UUID
   direction:
     required: false
     name: direction
