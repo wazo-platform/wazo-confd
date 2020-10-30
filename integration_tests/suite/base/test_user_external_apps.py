@@ -7,6 +7,7 @@ from contextlib import ExitStack
 
 from hamcrest import (
     assert_that,
+    contains_inanyorder,
     has_entries,
     has_entry,
     has_item,
@@ -115,6 +116,36 @@ def test_sort_offset_limit(user):
         yield s.check_limit, url, external_app1, external_app2, 'name', 'sort', 'name'
 
 
+@fixtures.user()
+@fixtures.external_app(name='only-tenant')
+@fixtures.external_app(name='both', label='from-tenant')
+def test_list_with_fallback(user, *_):
+    with ExitStack() as es:
+        es.enter_context(
+            fixtures.user_external_app(
+                user_uuid=user['uuid'],
+                name='both',
+                label='from-user',
+            )
+        )
+        es.enter_context(
+            fixtures.user_external_app(
+                user_uuid=user['uuid'],
+                name='only-user',
+            ),
+        )
+
+        response = confd.users(user['uuid']).external.apps.get(view='fallback')
+        assert_that(
+            response.items,
+            contains_inanyorder(
+                has_entries(name='only-tenant'),
+                has_entries(name='only-user'),
+                has_entries(name='both', label='from-user'),
+            ),
+        )
+
+
 @fixtures.user_external_app()
 def test_get(app):
     response = confd.users(app['user_uuid']).external.apps(app['name']).get()
@@ -144,6 +175,24 @@ def test_get_multi_tenant(main, sub):
         .get(wazo_tenant=MAIN_TENANT)
     )
     assert_that(response.item, has_entries(name=sub['name']))
+
+
+@fixtures.user_external_app(name='both', label='from-user')
+@fixtures.external_app(name='both', label='from-tenant')
+def test_get_with_fallback(user_app, *_):
+    user_uuid = user_app['user_uuid']
+    response = confd.users(user_uuid).external.apps('both').get(view='fallback')
+    assert_that(response.item, has_entries(name='both', label='from-user'))
+
+    confd.users(user_uuid).external.apps('both').delete().assert_deleted()
+
+    response = confd.users(user_uuid).external.apps('both').get(view='fallback')
+    assert_that(response.item, has_entries(name='both', label='from-tenant'))
+
+    confd.external.apps('both').delete().assert_deleted()
+
+    response = confd.users(user_uuid).external.apps('both').get(view='fallback')
+    response.assert_match(404, e.not_found(resource='UserExternalApp'))
 
 
 @fixtures.user()

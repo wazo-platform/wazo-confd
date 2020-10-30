@@ -15,6 +15,7 @@ paths:
       - $ref: '#/parameters/limit'
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
+      - $ref: '#/parameters/user_external_app_view'
       responses:
         '200':
           description: User external apps list
@@ -56,6 +57,7 @@ paths:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useruuid'
       - $ref: '#/parameters/externalappname'
+      - $ref: '#/parameters/user_external_app_view'
       responses:
         '200':
           description: External App
@@ -104,6 +106,26 @@ paths:
           $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
+
+parameters:
+  user_external_app_view:
+    required: false
+    type: string
+    name: view
+    enum:
+      - fallback
+    in: query
+    description: |
+      Different view of the external app endpoint
+
+      The `default` view, when the argument is omitted, is to return the user value for this
+      external app
+
+      The `fallback` view return the user value for this external app, but if not found, will
+      fallback to the tenant configured value
+
+      **WARNING**: Using fallback view on list will disabled all pagination and search features
+
 definitions:
   UserExternalApp:
     title: UserExternalApp

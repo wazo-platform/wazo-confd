@@ -10,7 +10,11 @@ from xivo_dao.alchemy.user_external_app import UserExternalApp
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
-from .schema import UserExternalAppSchema, UserExternalAppNameSchema
+from .schema import (
+    GETQueryStringSchema,
+    UserExternalAppNameSchema,
+    UserExternalAppSchema,
+)
 
 
 class UserExternalAppList(ListResource):
@@ -25,9 +29,10 @@ class UserExternalAppList(ListResource):
     @required_acl('confd.users.{user_uuid}.external.apps.read')
     def get(self, user_uuid):
         params = self.search_params()
+        params.update(GETQueryStringSchema().load(request.args))
         tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.user_dao.get_by_id_uuid(user_uuid, tenant_uuids=tenant_uuids)
-        total, items = self.service.search(user.uuid, params)
+        total, items = self.service.search(user.uuid, user.tenant_uuid, params)
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     def post(self):
@@ -82,14 +87,15 @@ class UserExternalAppItem(ItemResource):
     def get(self, user_uuid, name):
         kwargs = self._add_tenant_uuid()
         user = self.user_dao.get_by_id_uuid(user_uuid, **kwargs)
-        model = self.service.get(user.uuid, name)
+        view = GETQueryStringSchema().load(request.args)['view']
+        model = self.service.get(user.uuid, user.tenant_uuid, name, view)
         return self.schema().dump(model)
 
     @required_acl('confd.users.{user_uuid}.external.apps.{name}.update')
     def put(self, user_uuid, name):
         kwargs = self._add_tenant_uuid()
         user = self.user_dao.get_by_id_uuid(user_uuid, **kwargs)
-        model = self.service.get(user.uuid, name)
+        model = self.service.get(user.uuid, user.tenant_uuid, name)
         self.parse_and_update(model)
         return '', 204
 
@@ -97,6 +103,6 @@ class UserExternalAppItem(ItemResource):
     def delete(self, user_uuid, name):
         kwargs = self._add_tenant_uuid()
         user = self.user_dao.get_by_id_uuid(user_uuid, **kwargs)
-        model = self.service.get(user.uuid, name)
+        model = self.service.get(user.uuid, user.tenant_uuid, name)
         self.service.delete(model)
         return '', 204
