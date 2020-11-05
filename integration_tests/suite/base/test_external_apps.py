@@ -153,6 +153,14 @@ def test_create_all_parameters():
     confd.external.apps(response.item['name']).delete().assert_deleted()
 
 
+@fixtures.external_app(wazo_tenant=MAIN_TENANT)
+def test_create_multi_tenant_with_same_name(main):
+    response = confd.external.apps(main['name']).post(wazo_tenant=SUB_TENANT)
+    response.assert_created('external_apps', location='external/apps')
+
+    confd.external.apps(main['name']).delete().assert_deleted()
+
+
 @fixtures.external_app()
 def test_edit_minimal_parameters(external_app):
     response = confd.external.apps(external_app['name']).put()
