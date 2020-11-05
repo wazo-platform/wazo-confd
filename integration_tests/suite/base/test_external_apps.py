@@ -125,7 +125,7 @@ def test_get_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='ExternalApp'))
 
     response = confd.external.apps(sub['name']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+    response.assert_match(404, e.not_found(resource='ExternalApp'))
 
 
 def test_create_minimal_parameters():
@@ -151,6 +151,14 @@ def test_create_all_parameters():
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.external.apps(response.item['name']).delete().assert_deleted()
+
+
+@fixtures.external_app(wazo_tenant=MAIN_TENANT)
+def test_create_multi_tenant_with_same_name(main):
+    response = confd.external.apps(main['name']).post(wazo_tenant=SUB_TENANT)
+    response.assert_created('external_apps', location='external/apps')
+
+    confd.external.apps(main['name']).delete().assert_deleted()
 
 
 @fixtures.external_app()
@@ -180,7 +188,7 @@ def test_edit_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='ExternalApp'))
 
     response = confd.external.apps(sub['name']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+    response.assert_match(404, e.not_found(resource='ExternalApp'))
 
 
 @fixtures.external_app()
@@ -198,7 +206,7 @@ def test_delete_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='ExternalApp'))
 
     response = confd.external.apps(sub['name']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+    response.assert_match(404, e.not_found(resource='ExternalApp'))
 
 
 def test_bus_events():

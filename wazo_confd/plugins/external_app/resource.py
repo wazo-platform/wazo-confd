@@ -37,9 +37,6 @@ class ExternalAppItem(ItemResource):
         return {'Location': url_for('external_apps', name=app.name, _external=True)}
 
     def add_tenant_to_form(self, form):
-        if not self._has_write_tenant_uuid():
-            return form
-
         tenant = Tenant.autodetect()
         tenant_dao.find_or_create_tenant(tenant.uuid)
         form['tenant_uuid'] = tenant.uuid
@@ -67,3 +64,8 @@ class ExternalAppItem(ItemResource):
     @required_acl('confd.external.apps.{name}.delete')
     def delete(self, name):
         return super().delete(name)
+
+    def _add_tenant_uuid(self):
+        # NOTE(fblackburn): Do not cross tenant when name is an identifier
+        tenant_uuids = self._build_tenant_list({'recurse': False})
+        return {'tenant_uuids': tenant_uuids}
