@@ -169,7 +169,10 @@ class SipCreator(Creator):
             fields['username'] = self._random_string(8)
         if not fields.get('password'):
             fields['password'] = self._random_string(8)
-        form = {'auth_section_options': [[key, value] for key, value in fields.items()]}
+        form = {
+            'name': fields['username'],
+            'auth_section_options': [[key, value] for key, value in fields.items()],
+        }
         return self.schema(handle_error=False).load(form)
 
     def _random_string(self, length):
