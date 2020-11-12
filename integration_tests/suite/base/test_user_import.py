@@ -357,14 +357,16 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
     response = client.post("/users/import", csv)
     sip_uuid = get_import_field(response, 'sip_uuid')
 
+    # The name of a sip endpoint needs to match it's username at the moment
     sip = confd.endpoints.sip(sip_uuid).get().item
     assert_that(
         sip,
         has_entries(
+            name='sipusername',
             auth_section_options=contains_inanyorder(
                 contains('username', 'sipusername'),
                 contains("password", "sipsecret"),
-            )
+            ),
         ),
     )
 
