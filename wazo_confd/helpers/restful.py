@@ -3,13 +3,12 @@
 
 from flask import request
 from flask_restful import Resource
-from requests import HTTPError
 
 import marshmallow
 
 from xivo.auth_verifier import AuthVerifier
 from xivo.mallow import fields, validate
-from xivo.tenant_flask_helpers import get_auth_client, get_token, Tenant
+from xivo.tenant_flask_helpers import Tenant, token
 from xivo_dao import tenant_dao
 
 from wazo_confd.helpers.common import handle_api_exception
@@ -65,25 +64,10 @@ class ConfdResource(ErrorCatchingResource):
             return
 
         tenant_uuid = Tenant.autodetect().uuid
-        recurse = params.get('recurse', False)
-        if not recurse:
+        if not params.get('recurse', False):
             return [tenant_uuid]
 
-        tenants = []
-        auth_client = get_auth_client()
-        token_object = get_token()
-        auth_client.set_token(token_object.uuid)
-
-        try:
-            tenants = auth_client.tenants.list(tenant_uuid=tenant_uuid)['items']
-        except HTTPError as e:
-            response = getattr(e, 'response', None)
-            status_code = getattr(response, 'status_code', None)
-            if status_code == 401:
-                return [tenant_uuid]
-            raise
-
-        return [t['uuid'] for t in tenants]
+        return [tenant.uuid for tenant in token.visible_tenants(tenant_uuid)]
 
 
 class ListResource(ConfdResource):
