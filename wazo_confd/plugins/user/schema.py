@@ -38,7 +38,7 @@ class UserSchema(BaseSchema):
     call_record_enabled = StrictBoolean()
     online_call_record_enabled = StrictBoolean()
     supervision_enabled = StrictBoolean()
-    ring_seconds = fields.Integer(validate=Range(min=0, max=60))
+    ring_seconds = fields.Integer(validate=Range(min=0, max=10800))
     simultaneous_calls = fields.Integer(validate=Range(min=1, max=20))
     call_permission_password = fields.String(
         validate=Regexp(CALL_PERMISSION_PASSWORD_REGEX), allow_none=True
