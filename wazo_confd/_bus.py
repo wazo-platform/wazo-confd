@@ -8,7 +8,7 @@ from contextlib import contextmanager
 from threading import Thread
 
 from kombu.mixins import ConsumerMixin
-from xivo_bus import Marshaler, Publisher
+from xivo_bus import Marshaler, FailFastPublisher
 from xivo.pubsub import Pubsub
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ class BusPublisher:
             bus_connection, exchange=bus_exchange, auto_declare=True
         )
         bus_marshaler = Marshaler(wazo_uuid)
-        bus_publisher = Publisher(bus_producer, bus_marshaler)
+        bus_publisher = FailFastPublisher(bus_producer, bus_marshaler)
         return cls(bus_publisher)
 
     def __init__(self, publisher):
