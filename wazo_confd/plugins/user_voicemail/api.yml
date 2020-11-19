@@ -1,5 +1,22 @@
 paths:
   /users/{user_id}/voicemails:
+    get:
+      operationId: get_user_voicemail
+      summary: Get user voicemails
+      description: '**Required ACL:** `confd.users.{user_id}.voicemails.read`'
+      tags:
+      - users
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User's voicemail list
+          schema:
+            $ref: '#/definitions/VoicemailItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
     delete:
       operationId: dissociate_user_voicemail
       summary: Dissociate user and voicemail
