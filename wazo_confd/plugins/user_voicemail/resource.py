@@ -4,8 +4,10 @@
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 
+from ..voicemail.schema import VoicemailSchema
 
-class UserVoicemailResource(ConfdResource):
+
+class UserVoicemailItem(ConfdResource):
 
     has_tenant_uuid = True
 
@@ -15,28 +17,42 @@ class UserVoicemailResource(ConfdResource):
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
 
-    def get_user(self, user_id, tenant_uuids=None):
-        return self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
-
-
-class UserVoicemailItem(UserVoicemailResource):
     @required_acl('confd.users.{user_id}.voicemails.{voicemail_id}.update')
     def put(self, user_id, voicemail_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
 
-        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
         voicemail = self.voicemail_dao.get(voicemail_id, tenant_uuids=tenant_uuids)
 
         self.service.associate(user, voicemail)
         return '', 204
 
 
-class UserVoicemailList(UserVoicemailResource):
+class UserVoicemailList(ConfdResource):
+
+    schema = VoicemailSchema
+    has_tenant_uuid = True
+
+    def __init__(self, service, user_dao, voicemail_dao):
+        super().__init__()
+        self.service = service
+        self.user_dao = user_dao
+        self.voicemail_dao = voicemail_dao
+
+    @required_acl('confd.users.{user_id}.voicemails.read')
+    def get(self, user_id):
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
+        voicemail = self.voicemail_dao.find(user.voicemail_id)
+        items = [voicemail] if voicemail else []
+        items = self.schema().dump(items, many=True)
+        return {'total': len(items), 'items': items}
+
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
 
-        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
+        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
 
         self.service.dissociate_all_by_user(user)
         return '', 204

@@ -1,5 +1,11 @@
 # Changelog
 
+## 20.16
+
+* The following resources have been added:
+
+  * GET `/1.1/users/<uuid>/voicemails`
+
 ## 20.15
 
 * The following resources have been added:

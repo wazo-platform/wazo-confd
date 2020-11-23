@@ -193,3 +193,27 @@ def test_bus_events(user, voicemail):
     yield s.check_bus_event, 'config.users.{}.voicemails.deleted'.format(
         user['uuid']
     ), url
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_list_user_voicemail(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.users(user['uuid']).voicemails.get()
+        del voicemail['users']
+        assert_that(response.items, contains_inanyorder(has_entries(voicemail)))
+
+
+@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.voicemail(context='main_ctx')
+@fixtures.voicemail(context='sub_ctx')
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_list_user_voicemail_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
+    with a.user_voicemail(main_user, main_vm), a.user_voicemail(sub_user, sub_vm):
+        response = confd.users(main_user['uuid']).voicemails.get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='User'))
+
+        response = confd.users(sub_user['uuid']).voicemails.get(wazo_tenant=MAIN_TENANT)
+        assert_that(response.items[0], has_entries(name=sub_vm['name']))
