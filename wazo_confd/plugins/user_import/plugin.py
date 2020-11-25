@@ -52,6 +52,10 @@ from wazo_confd.plugins.voicemail.service import (
     build_service as build_voicemail_service,
 )
 
+from wazo_confd.plugins.tenant.service import (
+    build_service as build_tenant_service,
+)
+
 from .associators import (
     CallPermissionAssociator,
     ExtensionAssociator,
@@ -110,14 +114,15 @@ class Plugin:
         incall_service = build_incall_service()
         incall_extension_service = build_incall_extension_service()
         context_service = build_context_service()
+        tenant_service = build_tenant_service()
 
         creators = {
             'user': UserCreator(user_service),
             'wazo_user': WazoUserCreator(wazo_user_service),
             'line': LineCreator(line_service),
             'voicemail': VoicemailCreator(voicemail_service),
-            'sip': SipCreator(sip_service),
-            'webrtc': WebRTCCreator(sip_service),
+            'sip': SipCreator(sip_service, tenant_service),
+            'webrtc': WebRTCCreator(sip_service, tenant_service),
             'sccp': SccpCreator(sccp_service),
             'extension': ExtensionCreator(extension_service),
             'extension_incall': ExtensionCreator(extension_service),

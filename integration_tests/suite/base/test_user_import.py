@@ -21,6 +21,7 @@ from hamcrest import (
 )
 
 from ..helpers import associations as a, config, fixtures, helpers as h
+from ..helpers.config import MAIN_TENANT
 from . import confd, auth
 
 
@@ -376,6 +377,8 @@ def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
         {"firstname": "Chârles", "line_protocol": "webrtc", "context": config.CONTEXT}
     ]
 
+    tenant = confd.tenants(MAIN_TENANT).get().item
+
     response = client.post("/users/import", csv)
     sip_uuid = get_import_field(response, 'sip_uuid')
     line_id = get_import_field(response, 'line_id')
@@ -386,12 +389,9 @@ def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
         has_entries(
             uuid=sip_uuid,
             line=has_entries(id=line_id),
-            endpoint_section_options=contains_inanyorder(
-                contains('callerid', '"Chârles"'),
-                contains('allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'),
-                contains('dtls_auto_generate_cert', 'yes'),
-                contains('webrtc', 'yes'),
-                contains('transport', 'transport-wss'),
+            templates=contains(
+                has_entries(uuid=tenant['global_sip_template_uuid']),
+                has_entries(uuid=tenant['webrtc_sip_template_uuid']),
             ),
         ),
     )
