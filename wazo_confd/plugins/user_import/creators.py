@@ -155,16 +155,23 @@ class SipCreator(Creator):
 
     schema = EndpointSIPSchema
 
+    def __init__(self, sip_service, tenant_service, *args, **kwargs):
+        super().__init__(sip_service, *args, **kwargs)
+        self.tenant_service = tenant_service
+
     def find(self, fields, tenant_uuid):
         username = fields.get('username')
         if username:
             return self.service.find_by(username=username)
 
-    def create(self, fields, tenant_uuid):
-        form = self._extract_form(fields)
-        return self.service.create(EndpointSIP(tenant_uuid=tenant_uuid, **form))
+    def create(self, fields, tenant_uuid, **ignored):
+        tenant = self.tenant_service.get(tenant_uuid)
+        form = self._extract_form(fields, tenant)
+        result = self.service.create(EndpointSIP(tenant_uuid=tenant.uuid, **form))
+        self.add_templates(result, tenant)
+        return result
 
-    def _extract_form(self, fields):
+    def _extract_form(self, fields, tenant):
         if not fields.get('username'):
             fields['username'] = self._random_string(8)
         if not fields.get('password'):
@@ -173,24 +180,28 @@ class SipCreator(Creator):
             'name': fields['username'],
             'auth_section_options': [[key, value] for key, value in fields.items()],
         }
+        if not tenant.global_sip_template:
+            raise errors.not_found('global_sip_template')
+
         return self.schema(handle_error=False).load(form)
+
+    def add_templates(self, endpoint, tenant):
+        endpoint.templates = [tenant.global_sip_template]
+        self.service.edit(endpoint)
 
     def _random_string(self, length):
         return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
 
 
 class WebRTCCreator(SipCreator):
-    def _extract_form(self, fields):
-        webrtc_form = {
-            'endpoint_section_options': [
-                ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
-                ['dtls_auto_generate_cert', 'yes'],
-                ['webrtc', 'yes'],
-                ['transport', 'transport-wss'],
-            ],
-        }
-        sip_form = super()._extract_form(fields)
-        return {**sip_form, **webrtc_form}
+    def _extract_form(self, fields, tenant):
+        if not tenant.webrtc_sip_template:
+            raise errors.not_found('webrtc_sip_template')
+        return super()._extract_form(fields, tenant)
+
+    def add_templates(self, endpoint, tenant):
+        endpoint.templates = [tenant.global_sip_template, tenant.webrtc_sip_template]
+        self.service.edit(endpoint)
 
 
 class SccpCreator(Creator):
