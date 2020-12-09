@@ -18,6 +18,7 @@ from xivo_dao.alchemy.features import Features
 from xivo_dao.resources.features.search import (
     PARKING_OPTIONS,
     FUNC_KEY_FEATUREMAP_FOREIGN_KEY,
+    FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY,
 )
 
 from wazo_confd.auth import required_acl
@@ -86,6 +87,20 @@ class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
                 )
 
 
+class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
+    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+
+    @validates_schema
+    def _validate_required_options(self, data):
+        keys = [option.get('var_name') for option in data.get('options', {})]
+
+        for required in FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY:
+            if required not in keys:
+                raise ValidationError(
+                    'The following option are required: {}'.format(required), 'options'
+                )
+
+
 class FeaturesConfigurationList(ConfdResource):
     model = Features
     schema = FeaturesConfigurationSchema
@@ -108,6 +123,7 @@ class FeaturesConfigurationList(ConfdResource):
 
 class FeaturesApplicationmapList(FeaturesConfigurationList):
     section_name = 'applicationmap'
+    schema = FeaturesApplicationmapSchema
 
     @required_acl('confd.asterisk.features.applicationmap.get')
     def get(self):
