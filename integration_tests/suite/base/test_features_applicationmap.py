@@ -20,8 +20,14 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'options', None
     yield s.check_bogus_field_returns_error, url, 'options', 'string'
     yield s.check_bogus_field_returns_error, url, 'options', [['ordered', 'option']]
-    yield s.check_bogus_field_returns_error, url, 'options', {'wrong_value': 23, **REQUIRED_OPTIONS}
-    yield s.check_bogus_field_returns_error, url, 'options', {'none_value': None, **REQUIRED_OPTIONS}
+    yield s.check_bogus_field_returns_error, url, 'options', {
+        'wrong_value': 23,
+        **REQUIRED_OPTIONS,
+    }
+    yield s.check_bogus_field_returns_error, url, 'options', {
+        'none_value': None,
+        **REQUIRED_OPTIONS,
+    }
 
 
 def test_get():
