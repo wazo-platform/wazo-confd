@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -7,7 +7,7 @@ from ..helpers import scenarios as s
 from . import confd
 
 
-REQUIRED_OPTIONS = {'atxfer': '*0', 'blindxfer': '9', 'automixmon': '#7'}
+REQUIRED_OPTIONS = {'atxfer': '*0', 'blindxfer': '9'}
 
 
 def test_put_errors():
@@ -37,11 +37,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error_matching_regex, url, 'options', {
         'atxfer': '1',
         'automixmon': '1',
-    }, regex
-    regex = r'automixmon'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'options', {
-        'blindxfer': '1',
-        'atxfer': '1',
     }, regex
 
 
