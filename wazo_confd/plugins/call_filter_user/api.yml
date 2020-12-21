@@ -18,7 +18,7 @@ paths:
         description: Users to associated
         required: true
         schema:
-          $ref: '#/definitions/UsersUuid'
+          $ref: '#/definitions/CallFilterRecipientUsersUuid'
       responses:
         '204':
           description: Call Filter and Users associated
@@ -53,3 +53,17 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+
+definitions:
+  CallFilterRecipientUserUuid:
+    allOf:
+    - properties:
+        timeout:
+          type: integer
+    - $ref: '#/definitions/UserUuid'
+  CallFilterRecipientUsersUuid:
+    properties:
+      users:
+        items:
+          $ref: '#/definitions/CallFilterRecipientUserUuid'
+        type: array
