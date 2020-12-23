@@ -65,6 +65,7 @@ class DbHelper:
             )
         )
         connection.close()
+        self._engine = self.create_engine()
 
     def execute(self, query, **kwargs):
         with self.connect() as connection:
