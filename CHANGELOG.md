@@ -1,5 +1,18 @@
 # Changelog
 
+# 21.01
+
+* New parameters have been added to the users resource:
+
+  * `call_record_outgoing_external_enabled`
+  * `call_record_outgoing_internal_enabled`
+  * `call_record_incoming_external_enabled`
+  * `call_record_incoming_internal_enabled`
+
+* The following user parameter has been deprecated:
+
+  * `call_record_enabled`
+
 ## 20.16
 
 * The following resources have been added:
