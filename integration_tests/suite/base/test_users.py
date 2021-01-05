@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -39,7 +39,10 @@ FULL_USER = {
     "supervision_enabled": False,
     "call_transfer_enabled": False,
     "dtmf_hangup_enabled": True,
-    "call_record_enabled": True,
+    "call_record_outgoing_external_enabled": True,
+    "call_record_outgoing_internal_enabled": True,
+    "call_record_incoming_external_enabled": True,
+    "call_record_incoming_internal_enabled": True,
     "online_call_record_enabled": True,
     "call_permission_password": '1234',
     "enabled": False,
@@ -65,7 +68,10 @@ NULL_USER = {
     "supervision_enabled": True,
     "call_transfer_enabled": True,
     "dtmf_hangup_enabled": False,
-    "call_record_enabled": False,
+    "call_record_outgoing_external_enabled": False,
+    "call_record_outgoing_internal_enabled": False,
+    "call_record_incoming_external_enabled": False,
+    "call_record_incoming_internal_enabled": False,
     "online_call_record_enabled": False,
     "call_permission_password": None,
     "enabled": True,
@@ -187,6 +193,22 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', 123
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', {}
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', []
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_external_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_external_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_external_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_external_enabled', []
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_internal_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_internal_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_internal_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_internal_enabled', []
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_internal_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_internal_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_internal_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_internal_enabled', []
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_external_enabled', 'yeah'
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_external_enabled', 123
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_external_enabled', {}
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_external_enabled', []
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 'yeah'
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', 123
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', {}
@@ -222,12 +244,19 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
     yield s.check_bogus_field_returns_error, url, 'enabled', []
 
+    conflict = {'call_record_incoming_external_enabled': True}
+    yield s.check_bogus_field_returns_error, url, 'call_record_enabled', False, conflict
+
 
 def put_error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'caller_id', None
     yield s.check_bogus_field_returns_error, url, 'call_transfer_enabled', None
     yield s.check_bogus_field_returns_error, url, 'dtmf_hangup_enabled', None
     yield s.check_bogus_field_returns_error, url, 'call_record_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_external_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'call_record_incoming_internal_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_internal_enabled', None
+    yield s.check_bogus_field_returns_error, url, 'call_record_outgoing_external_enabled', None
     yield s.check_bogus_field_returns_error, url, 'online_call_record_enabled', None
     yield s.check_bogus_field_returns_error, url, 'supervision_enabled', None
     yield s.check_bogus_field_returns_error, url, 'ring_seconds', None
@@ -266,6 +295,48 @@ def unique_error_checks(url, existing_resource, required_body=None):
     yield s.check_bogus_field_returns_error, url, 'email', existing_resource[
         'email'
     ], required_body
+
+
+@fixtures.user()
+def test_deprecated_call_record_enabled(user):
+    confd.users(user['uuid']).put({'call_record_enabled': True})
+    response = confd.users(user['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            call_record_enabled=True,
+            call_record_outgoing_external_enabled=True,
+            call_record_outgoing_internal_enabled=True,
+            call_record_incoming_external_enabled=True,
+            call_record_incoming_internal_enabled=True,
+        )
+    )
+
+    confd.users(user['uuid']).put({'call_record_enabled': False})
+    response = confd.users(user['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            call_record_enabled=False,
+            call_record_outgoing_external_enabled=False,
+            call_record_outgoing_internal_enabled=False,
+            call_record_incoming_external_enabled=False,
+            call_record_incoming_internal_enabled=False,
+        )
+    )
+
+    confd.users(user['uuid']).put({'call_record_outgoing_external_enabled': True})
+    response = confd.users(user['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            call_record_enabled=False,
+            call_record_outgoing_external_enabled=True,
+            call_record_outgoing_internal_enabled=False,
+            call_record_incoming_external_enabled=False,
+            call_record_incoming_internal_enabled=False,
+        )
+    )
 
 
 @fixtures.user()
@@ -629,7 +700,10 @@ def test_create_with_null_parameters_fills_default_values():
             caller_id='"Charlie"',
             call_transfer_enabled=False,
             dtmf_hangup_enabled=False,
-            call_record_enabled=False,
+            call_record_outgoing_external_enabled=False,
+            call_record_outgoing_internal_enabled=False,
+            call_record_incoming_external_enabled=False,
+            call_record_incoming_internal_enabled=False,
             online_call_record_enabled=False,
             supervision_enabled=True,
             ring_seconds=30,
