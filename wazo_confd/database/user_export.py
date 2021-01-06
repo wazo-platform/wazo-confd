@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -62,10 +62,11 @@ COLUMNS = (
 def export_query(tenant_uuid, separator=";"):
     ordered_incalls = aliased(
         Session.query(
-            Incall.exten.label('exten'),
-            Incall.context.label('context'),
+            Extension.exten.label('exten'),
+            Extension.context.label('context'),
             User.id.label('user_id'),
         )
+        .select_from(Incall)
         .join(
             Dialaction,
             and_(
@@ -75,7 +76,14 @@ def export_query(tenant_uuid, separator=";"):
             ),
         )
         .join(User, cast(Dialaction.actionarg1, Integer) == User.id)
-        .order_by(Incall.exten, Incall.context)
+        .join(
+            Extension,
+            and_(
+                Extension.type == 'incall',
+                cast(Extension.typeval, Integer) == Incall.id,
+            ),
+        )
+        .order_by(Extension.exten, Extension.context)
         .subquery()
     )
 
