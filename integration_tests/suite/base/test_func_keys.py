@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -198,7 +198,9 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
             queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
-            conference_id = queries.insert_conference(number=conf_exten)
+            conference_id = queries.insert_conference(
+                number=conf_exten, tenant_uuid=MAIN_TENANT
+            )
             agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
             paging_id = queries.insert_paging(
                 number=paging_number, tenant_uuid=MAIN_TENANT
@@ -1032,8 +1034,7 @@ def test_func_key_destinations_multi_tenant(
         '1': {'type': 'user', 'user_id': user['id']},
         '2': {'type': 'group', 'group_id': group['id']},
         '3': {'type': 'queue', 'queue_id': queue['id']},
-        # FIXME: conference is meetme and not multi-tenant
-        # '4': {'type': 'conference', 'conference_id': conference['id']},
+        '4': {'type': 'conference', 'conference_id': conference['id']},
         '6': {'type': 'agent', 'action': 'login', 'agent_id': agent['id']},
         '7': {'type': 'agent', 'action': 'logout', 'agent_id': agent['id']},
         '8': {'type': 'agent', 'action': 'toggle', 'agent_id': agent['id']},
@@ -1104,7 +1105,9 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         park_pos = 701
 
         with self.db.queries() as queries:
-            conference_id = queries.insert_conference(number=conf_exten)
+            conference_id = queries.insert_conference(
+                number=conf_exten, tenant_uuid=MAIN_TENANT
+            )
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
             filter_member_id = queries.insert_filter_member(

@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -93,7 +93,6 @@ def test_edit_multi_tenant(main, sub):
 
 
 @fixtures.call_filter()
-@fixtures.meetme()
 @fixtures.ivr()
 @fixtures.group()
 @fixtures.outcall()
@@ -124,14 +123,11 @@ def _update_call_filter_fallbacks_with_destination(call_filter_id, destination):
 
 @fixtures.call_filter()
 def test_nonexistent_destinations(call_filter):
-    meetme = (
-        ivr
-    ) = group = outcall = queue = user = voicemail = conference = skill_rule = {
+    ivr = group = outcall = queue = user = voicemail = conference = skill_rule = {
         'id': 99999999
     }
     switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
     for destination in valid_destinations(
-        meetme,
         ivr,
         group,
         outcall,
@@ -144,7 +140,6 @@ def test_nonexistent_destinations(call_filter):
         application,
     ):
         if destination['type'] in (
-            'meetme',
             'ivr',
             'group',
             'outcall',

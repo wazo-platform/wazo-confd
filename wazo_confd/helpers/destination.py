@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -19,7 +19,6 @@ from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.application import dao as application_dao
-from xivo_dao.resources.conference import dao as meetme_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
@@ -31,7 +30,7 @@ from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from wazo_confd.helpers.mallow import StrictBoolean
-from wazo_confd.helpers.validator import GetResource, ResourceExists, Validator
+from wazo_confd.helpers.validator import GetResource, Validator
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
 CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,39}$'
@@ -53,7 +52,6 @@ class BaseDestinationSchema(Schema):
                 'group',
                 'hangup',
                 'ivr',
-                'meetme',
                 'none',
                 'outcall',
                 'queue',
@@ -162,10 +160,6 @@ class VoicemailMainDestinationSchema(ApplicationDestinationSchema):
     context = fields.String(
         validate=Regexp(CONTEXT_REGEX), attribute='actionarg1', required=True
     )
-
-
-class MeetmeDestinationSchema(BaseDestinationSchema):
-    conference_id = fields.Integer(attribute='actionarg1', required=True)
 
 
 class ConferenceDestinationSchema(BaseDestinationSchema):
@@ -485,7 +479,6 @@ class DestinationField(fields.Nested):
         'hangup': HangupDestinationSchema,
         'endcall': HangupDestinationSchema,
         'ivr': IVRDestinationSchema,
-        'meetme': MeetmeDestinationSchema,
         'none': NoneDestinationSchema,
         'outcall': OutcallDestinationSchema,
         'queue': QueueDestinationSchema,
@@ -573,7 +566,6 @@ class DestinationValidator:
         'endcall:congestion': [],
         'endcall:hangup': [],
         'ivr': [GetResource('actionarg1', ivr_dao.get, 'IVR')],
-        'meetme': [ResourceExists('actionarg1', meetme_dao.exists, 'Conference')],
         'none': [],
         'outcall': [GetResource('actionarg1', outcall_dao.get, 'Outcall')],
         'queue': [

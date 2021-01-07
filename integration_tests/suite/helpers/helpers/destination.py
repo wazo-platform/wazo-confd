@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .. import scenarios as s
@@ -125,10 +125,6 @@ def invalid_destinations():
             'application': 'voicemail',
             'context': s.random_string(40),
         },
-        {'type': 'meetme'},
-        {'type': 'meetme', 'missing_required_field': 123},
-        {'type': 'meetme', 'conference_id': 'string'},
-        {'type': 'meetme', 'conference_id': None},
         {'type': 'conference'},
         {'type': 'conference', 'missing_required_field': 123},
         {'type': 'conference', 'conference_id': 'string'},
@@ -237,7 +233,6 @@ def invalid_destinations():
 
 
 def valid_destinations(
-    meetme,
     ivr,
     group,
     outcall,
@@ -283,7 +278,6 @@ def valid_destinations(
             'email': 'toto@example.com',
         },
         {'type': 'application', 'application': 'voicemail', 'context': 'name'},
-        {'type': 'meetme', 'conference_id': meetme['id']},
         {'type': 'conference', 'conference_id': conference['id']},
         {'type': 'custom', 'command': 'Playback(toto)'},
         {'type': 'extension', 'exten': '1001', 'context': 'name'},
