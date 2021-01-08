@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries, has_item
@@ -25,7 +25,10 @@ UNKNOWN_TENANT = '00000000-0000-0000-0000-000000000000'
     supervision_enabled=True,
     call_transfer_enabled=False,
     dtmf_hangup_enabled=False,
-    call_record_enabled=False,
+    call_record_outgoing_external_enabled=False,
+    call_record_outgoing_internal_enabled=False,
+    call_record_incoming_external_enabled=False,
+    call_record_incoming_internal_enabled=False,
     online_call_record_enabled=False,
     call_permission_password="1234",
     enabled=True,
@@ -54,7 +57,10 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
                 supervision_enabled="1",
                 call_transfer_enabled="0",
                 dtmf_hangup_enabled="0",
-                call_record_enabled="0",
+                call_record_outgoing_external_enabled="0",
+                call_record_outgoing_internal_enabled="0",
+                call_record_incoming_external_enabled="0",
+                call_record_incoming_internal_enabled="0",
                 online_call_record_enabled="0",
                 call_permission_password="1234",
                 enabled="1",

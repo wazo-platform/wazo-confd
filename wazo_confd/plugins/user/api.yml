@@ -328,7 +328,23 @@ definitions:
         call_record_enabled:
           type: boolean
           default: false
-          description: Record all calls made by this user
+          description: Record all calls made by this user (deprecated). If set, all `call_record_*_enabled` will be affected
+        call_record_outgoing_external_enabled:
+          type: boolean
+          default: false
+          description: Record all external calls made by this user
+        call_record_incoming_external_enabled:
+          type: boolean
+          default: false
+          description: "Record all external calls received by this user. Limitation: transfers are not supported"
+        call_record_outgoing_internal_enabled:
+          type: boolean
+          default: false
+          description: Record all internal calls received by this user
+        call_record_incoming_internal_enabled:
+          type: boolean
+          default: false
+          description: "Record all internal calls received by this user. Limitation: transfers are not supported"
         online_call_record_enabled:
           type: boolean
           default: false

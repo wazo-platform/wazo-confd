@@ -1,7 +1,8 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_dump, pre_dump
+from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
+from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
@@ -36,6 +37,10 @@ class UserSchema(BaseSchema):
     call_transfer_enabled = StrictBoolean()
     dtmf_hangup_enabled = StrictBoolean()
     call_record_enabled = StrictBoolean()
+    call_record_outgoing_external_enabled = StrictBoolean()
+    call_record_outgoing_internal_enabled = StrictBoolean()
+    call_record_incoming_internal_enabled = StrictBoolean()
+    call_record_incoming_external_enabled = StrictBoolean()
     online_call_record_enabled = StrictBoolean()
     supervision_enabled = StrictBoolean()
     ring_seconds = fields.Integer(validate=Range(min=0, max=10800))
@@ -126,6 +131,59 @@ class UserSchema(BaseSchema):
                 yield from cls._flatten(itercheck)
             except TypeError:
                 yield item
+
+    # DEPRECATED 20.01
+    @validates_schema
+    def validate_schema(self, data, **kwargs):
+        call_record_any_enabled = any(
+            (
+                data.get('call_record_outgoing_external_enabled') is not None,
+                data.get('call_record_outgoing_internal_enabled') is not None,
+                data.get('call_record_incoming_external_enabled') is not None,
+                data.get('call_record_incoming_internal_enabled') is not None,
+            )
+        )
+        deprecated_call_record_enabled = data.get('call_record_enabled') is not None
+        if deprecated_call_record_enabled and call_record_any_enabled:
+            raise ValidationError(
+                "'call_record_enabled' is deprecated and incompatible with 'call_record_*_enabled' options"
+            )
+
+    # DEPRECATED 20.01
+    @post_dump
+    def dump_call_record_enable_deprecated(self, data):
+        if self.only and 'call_record_enabled' not in self.only:
+            return data
+
+        call_record_all_enabled = all(
+            (
+                data.get('call_record_outgoing_external_enabled'),
+                data.get('call_record_outgoing_internal_enabled'),
+                data.get('call_record_incoming_external_enabled'),
+                data.get('call_record_incoming_internal_enabled'),
+            )
+        )
+        data['call_record_enabled'] = call_record_all_enabled
+        return data
+
+    # DEPRECATED 20.01
+    @post_load
+    def load_call_record_enable_deprecated(self, data):
+        call_record_enabled = data.get('call_record_enabled')
+        if call_record_enabled is None:
+            return data
+
+        if call_record_enabled:
+            data['call_record_outgoing_external_enabled'] = True
+            data['call_record_outgoing_internal_enabled'] = True
+            data['call_record_incoming_external_enabled'] = True
+            data['call_record_incoming_internal_enabled'] = True
+        else:
+            data['call_record_outgoing_external_enabled'] = False
+            data['call_record_outgoing_internal_enabled'] = False
+            data['call_record_incoming_external_enabled'] = False
+            data['call_record_incoming_internal_enabled'] = False
+        return data
 
 
 class UserDirectorySchema(BaseSchema):
