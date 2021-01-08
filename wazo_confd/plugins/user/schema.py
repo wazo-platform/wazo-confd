@@ -135,13 +135,14 @@ class UserSchema(BaseSchema):
     # DEPRECATED 20.01
     @validates_schema
     def validate_schema(self, data, **kwargs):
-        call_record_any_enabled = any((
-            data.get('call_record_outgoing_external_enabled') is not None,
-            data.get('call_record_outgoing_internal_enabled') is not None,
-            data.get('call_record_incoming_external_enabled') is not None,
-            data.get('call_record_incoming_internal_enabled') is not None,
-
-        ))
+        call_record_any_enabled = any(
+            (
+                data.get('call_record_outgoing_external_enabled') is not None,
+                data.get('call_record_outgoing_internal_enabled') is not None,
+                data.get('call_record_incoming_external_enabled') is not None,
+                data.get('call_record_incoming_internal_enabled') is not None,
+            )
+        )
         deprecated_call_record_enabled = data.get('call_record_enabled') is not None
         if deprecated_call_record_enabled and call_record_any_enabled:
             raise ValidationError(
@@ -154,12 +155,14 @@ class UserSchema(BaseSchema):
         if self.only and 'call_record_enabled' not in self.only:
             return data
 
-        call_record_all_enabled = all((
-            data.get('call_record_outgoing_external_enabled'),
-            data.get('call_record_outgoing_internal_enabled'),
-            data.get('call_record_incoming_external_enabled'),
-            data.get('call_record_incoming_internal_enabled'),
-        ))
+        call_record_all_enabled = all(
+            (
+                data.get('call_record_outgoing_external_enabled'),
+                data.get('call_record_outgoing_internal_enabled'),
+                data.get('call_record_incoming_external_enabled'),
+                data.get('call_record_incoming_internal_enabled'),
+            )
+        )
         data['call_record_enabled'] = call_record_all_enabled
         return data
 

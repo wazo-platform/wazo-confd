@@ -91,10 +91,22 @@ class CsvRow:
         BooleanRule('supervision_enabled', 'supervision_enabled'),
         BooleanRule('call_transfer_enabled', 'call_transfer_enabled'),
         BooleanRule('dtmf_hangup_enabled', 'dtmf_hangup_enabled'),
-        BooleanRule('call_record_outgoing_external_enabled', 'call_record_outgoing_external_enabled'),
-        BooleanRule('call_record_outgoing_internal_enabled', 'call_record_outgoing_internal_enabled'),
-        BooleanRule('call_record_incoming_external_enabled', 'call_record_incoming_external_enabled'),
-        BooleanRule('call_record_incoming_internal_enabled', 'call_record_incoming_internal_enabled'),
+        BooleanRule(
+            'call_record_outgoing_external_enabled',
+            'call_record_outgoing_external_enabled',
+        ),
+        BooleanRule(
+            'call_record_outgoing_internal_enabled',
+            'call_record_outgoing_internal_enabled',
+        ),
+        BooleanRule(
+            'call_record_incoming_external_enabled',
+            'call_record_incoming_external_enabled',
+        ),
+        BooleanRule(
+            'call_record_incoming_internal_enabled',
+            'call_record_incoming_internal_enabled',
+        ),
         BooleanRule('online_call_record_enabled', 'online_call_record_enabled'),
         IntRule('ring_seconds', 'ring_seconds'),
         IntRule('simultaneous_calls', 'simultaneous_calls'),

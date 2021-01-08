@@ -309,7 +309,7 @@ def test_deprecated_call_record_enabled(user):
             call_record_outgoing_internal_enabled=True,
             call_record_incoming_external_enabled=True,
             call_record_incoming_internal_enabled=True,
-        )
+        ),
     )
 
     confd.users(user['uuid']).put({'call_record_enabled': False})
@@ -322,7 +322,7 @@ def test_deprecated_call_record_enabled(user):
             call_record_outgoing_internal_enabled=False,
             call_record_incoming_external_enabled=False,
             call_record_incoming_internal_enabled=False,
-        )
+        ),
     )
 
     confd.users(user['uuid']).put({'call_record_outgoing_external_enabled': True})
@@ -335,7 +335,7 @@ def test_deprecated_call_record_enabled(user):
             call_record_outgoing_internal_enabled=False,
             call_record_incoming_external_enabled=False,
             call_record_incoming_internal_enabled=False,
-        )
+        ),
     )
 
 
