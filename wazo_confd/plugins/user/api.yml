@@ -299,7 +299,7 @@ definitions:
           readOnly: true
         email:
           type: string
-          description: User's email
+          description: User's email. Used for directories (i.e. by wazo-dird)
         timezone:
           type: string
           description: User timezone
