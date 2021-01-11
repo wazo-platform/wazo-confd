@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -30,6 +30,7 @@ ENDPOINT_SIP_FIELDS = [
     'tenant_uuid',
     'name',
     'auth_section_options.username',
+    'registration_section_options.client_uri',
 ]
 
 ENDPOINT_IAX_FIELDS = [
