@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -34,6 +34,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
         self.sip = Mock(
             uuid=str(uuid.uuid4()),
             auth_section_options=[['username', 'username']],
+            registration_section_options=[['client_uri', 'client-uri']],
             tenant_uuid=tenant_uuid,
         )
         self.sip.name = 'limitation of mock instantiation with name ...'
@@ -54,6 +55,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
                 'auth_section_options': self.sip.auth_section_options,
+                'registration_section_options': self.sip.registration_section_options,
             },
         )
 
@@ -114,6 +116,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
                 'auth_section_options': self.sip.auth_section_options,
+                'registration_section_options': self.sip.registration_section_options,
             },
         )
 

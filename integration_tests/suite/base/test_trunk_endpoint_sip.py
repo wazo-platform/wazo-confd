@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, contains
@@ -149,6 +149,7 @@ def test_dissociate_multi_tenant(main_trunk, sub_trunk, main_sip, sub_sip):
     label='label',
     name='label',
     auth_section_options=[['username', 'my-username'], ['password', 'my-password']],
+    registration_section_options=[['client_uri', 'client-uri']],
 )
 def test_get_endpoint_sip_relation(trunk, sip):
     with a.trunk_endpoint_sip(trunk, sip):
@@ -162,6 +163,9 @@ def test_get_endpoint_sip_relation(trunk, sip):
                     name='label',
                     auth_section_options=contains(
                         contains('username', 'my-username'),
+                    ),
+                    registration_section_options=contains(
+                        contains('client_uri', 'client-uri'),
                     ),
                 )
             ),
