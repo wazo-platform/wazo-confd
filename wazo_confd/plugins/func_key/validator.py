@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -144,9 +144,7 @@ def build_validator():
                 'filter_member_id', call_filter_dao.member_exists, 'FilterMember'
             )
         ],
-        'conference': [
-            ResourceExists('conference_id', conference_dao.exists, 'Conference')
-        ],
+        'conference': [GetResource('conference_id', conference_dao.get, 'Conference')],
         'custom': [CustomValidator()],
         'forward': [ForwardValidator()],
         'group': [GetResource('group_id', group_dao.get, 'Group')],

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -190,64 +190,18 @@ class DatabaseQueries:
             destination_query, func_key_id=func_key_id, destination_id=destination_id
         )
 
-    def insert_conference_only(self, name='myconf', number='2000', context='default'):
-        conf_query = text(
+    def insert_conference(self, number='2000', context='default', tenant_uuid=None):
+        query = text(
             """
-        INSERT INTO meetmefeatures
-
-        (meetmeid,
-        name,
-        confno,
-        context,
-        admin_identification,
-        admin_mode,
-        admin_announcejoinleave,
-        user_mode,
-        user_announcejoinleave,
-        emailbody,
-        description)
-
-        VALUES
-
-        (:meetmeid,
-        :name,
-        :confno,
-        :context,
-        :admin_identification,
-        :admin_mode,
-        :admin_announcejoinleave,
-        :user_mode,
-        :user_announcejoinleave,
-        :emailbody,
-        :description)
-
+        INSERT INTO conference (tenant_uuid)
+        VALUES (:tenant_uuid)
         RETURNING id
         """
         )
 
-        conference_id = self.connection.execute(
-            conf_query,
-            meetmeid=1234,
-            name=name,
-            confno=number,
-            context=context,
-            admin_identification='pin',
-            admin_mode='all',
-            admin_announcejoinleave='no',
-            user_mode='all',
-            user_announcejoinleave='no',
-            emailbody='email',
-            description='',
-        ).scalar()
+        conference_id = self.connection.execute(query, tenant_uuid=tenant_uuid).scalar()
 
-        return conference_id
-
-    def insert_conference(self, name='myconf', number='2000', context='default'):
-        conference_id = self.insert_conference_only(
-            name=name, number=number, context=context
-        )
-
-        self.insert_extension(number, context, 'meetme', conference_id)
+        self.insert_extension(number, context, 'conference', conference_id)
 
         func_key_id = self.insert_func_key('speeddial', 'conference')
         self.insert_destination(
@@ -255,14 +209,6 @@ class DatabaseQueries:
         )
 
         return conference_id
-
-    def delete_conference(self, meetme_id):
-        query = text("DELETE FROM meetmefeatures WHERE id = :meetme_id")
-        self.connection.execute(query, meetme_id=meetme_id)
-
-    def get_conferences(self):
-        query = text("SELECT * FROM meetmefeatures")
-        return self.connection.execute(query)
 
     def insert_extension(self, exten, context, type_, typeval):
         exten_query = text(

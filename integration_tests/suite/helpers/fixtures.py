@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .wrappers import IsolatedAction
@@ -162,14 +162,6 @@ class trunk(IsolatedAction):
 class incall(IsolatedAction):
 
     actions = {'generate': h.incall.generate_incall, 'delete': h.incall.delete_incall}
-
-
-class meetme(IsolatedAction):
-
-    actions = {
-        'generate': h.meetme.generate_conference,
-        'delete': h.meetme.delete_conference,
-    }
 
 
 class group(IsolatedAction):

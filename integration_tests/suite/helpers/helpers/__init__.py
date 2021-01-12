@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..client import ConfdClient
@@ -129,7 +129,6 @@ from . import line_endpoint_sip  # noqa
 from . import line_extension  # noqa
 from . import line_fellowship  # noqa
 from . import line_sip  # noqa
-from . import meetme  # noqa
 from . import moh  # noqa
 from . import paging  # noqa
 from . import paging_caller_user  # noqa
@@ -223,7 +222,6 @@ __all__ = [
     'line_extension',
     'line_fellowship',
     'line_sip',
-    'meetme',
     'moh',
     'paging',
     'paging_caller_user',

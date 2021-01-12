@@ -182,8 +182,6 @@ definitions:
         $ref: '#/definitions/DestinationHangupCause'
       ivr:
         $ref: '#/definitions/DestinationIVR'
-      meetme:
-        $ref: '#/definitions/DestinationMeetme'
       none:
         $ref: '#/definitions/DestinationNone'
       outcall:
@@ -311,18 +309,6 @@ definitions:
       required:
       - application
       - context
-  DestinationMeetme:
-    title: DestinationMeetme
-    properties:
-      type:
-        type: string
-        description: MUST be 'meetme'
-      conference_id:
-        type: integer
-        description: The id of the conference
-    required:
-    - type
-    - conference_id
   DestinationConference:
     title: DestinationConference
     properties:

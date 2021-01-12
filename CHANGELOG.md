@@ -17,6 +17,9 @@
 
   * `call_record_enabled`
 
+* Removed `meetme` destination type for fallbacks, schedules, queues, incalls and ivr.
+* Undeprecate `conference` function key
+
 ## 20.16
 
 * The following resources have been added:
