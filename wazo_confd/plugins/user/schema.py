@@ -169,7 +169,7 @@ class UserSchema(BaseSchema):
     # DEPRECATED 20.01
     @post_load
     def load_call_record_enable_deprecated(self, data):
-        call_record_enabled = data.get('call_record_enabled')
+        call_record_enabled = data.pop('call_record_enabled', None)
         if call_record_enabled is None:
             return data
 
