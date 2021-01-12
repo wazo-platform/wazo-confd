@@ -297,8 +297,12 @@ def unique_error_checks(url, existing_resource, required_body=None):
     ], required_body
 
 
-@fixtures.user()
-def test_deprecated_call_record_enabled(user):
+def test_deprecated_call_record_enabled():
+    user_args = {'firstname': 'potato', 'call_record_enabled': True}
+    response = confd.users.post(user_args)
+    response.assert_created('users')
+    user = response.item
+
     confd.users(user['uuid']).put({'call_record_enabled': True})
     response = confd.users(user['uuid']).get()
     assert_that(
@@ -337,6 +341,9 @@ def test_deprecated_call_record_enabled(user):
             call_record_incoming_internal_enabled=False,
         ),
     )
+
+    response = confd.users(user['uuid']).delete()
+    response.assert_deleted()
 
 
 @fixtures.user()
