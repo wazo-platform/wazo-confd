@@ -15,9 +15,14 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import INCALL_CONTEXT, MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -73,34 +78,40 @@ def error_checks(url):
         yield s.check_bogus_field_returns_error, url, 'destination', destination
 
 
+@fixtures.extension(context=INCALL_CONTEXT)
 @fixtures.incall(description='search')
 @fixtures.incall(description='hidden')
-def test_search(incall, hidden):
+def test_search(extension, incall, hidden):
     url = confd.incalls
     searches = {'description': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, incall, hidden, field, term
 
+    searches = {'exten': extension['exten']}
+    with a.incall_extension(incall, extension):
+        for field, term in searches.items():
+            yield check_relation_search, url, incall, hidden, field, term
+
 
 def check_search(url, incall, hidden, field, term):
     response = url.get(search=term)
-    assert_that(
-        response.items,
-        all_of(
-            has_item(has_entry(field, incall[field])),
-            is_not(has_item(has_entry(field, hidden[field]))),
-        ),
-    )
+    assert_that(response.items, has_item(has_entry(field, incall[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: incall[field]})
-    assert_that(
-        response.items,
-        all_of(
-            has_item(has_entry('id', incall['id'])),
-            is_not(has_item(has_entry('id', hidden['id']))),
-        ),
-    )
+    assert_that(response.items, has_item(has_entry('id', incall['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+
+def check_relation_search(url, incall, hidden, field, term):
+    response = url.get(search=term)
+    assert_that(response.items, has_item(has_entry('id', incall['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+    response = url.get(**{field: term})
+    assert_that(response.items, has_item(has_entry('id', incall['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
 @fixtures.incall(wazo_tenant=MAIN_TENANT)

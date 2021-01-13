@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -14,8 +14,17 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+    gen_conference_exten,
+)
 
 
 def test_get_errors():
@@ -87,14 +96,20 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'admin_pin', {}
 
 
+@fixtures.extension(exten=gen_conference_exten())
 @fixtures.conference(name='search', preprocess_subroutine='search')
 @fixtures.conference(name='hidden', preprocess_subroutine='hidden')
-def test_search(conference, hidden):
+def test_search(extension, conference, hidden):
     url = confd.conferences
     searches = {'name': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, conference, hidden, field, term
+
+    searches = {'exten': extension['exten']}
+    with a.conference_extension(conference, extension):
+        for field, term in searches.items():
+            yield check_relation_search, url, conference, hidden, field, term
 
 
 def check_search(url, conference, hidden, field, term):
@@ -103,6 +118,16 @@ def check_search(url, conference, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: conference[field]})
+    assert_that(response.items, has_item(has_entry('id', conference['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+
+def check_relation_search(url, conference, hidden, field, term):
+    response = url.get(search=term)
+    assert_that(response.items, has_item(has_entry('id', conference['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+    response = url.get(**{field: term})
     assert_that(response.items, has_item(has_entry('id', conference['id'])))
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 

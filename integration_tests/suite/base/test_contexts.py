@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -173,11 +173,26 @@ def unique_error_checks(url, context):
     yield s.check_bogus_field_returns_error, url, 'name', context['name']
 
 
-@fixtures.context(name='search', type='internal', description='desc_search')
-@fixtures.context(name='hidden', type='incall', description='hidden')
+@fixtures.context(
+    name='name_search',
+    label='label_search',
+    type='internal',
+    description='desc_search',
+)
+@fixtures.context(
+    name='hidden',
+    label='hidden',
+    type='incall',
+    description='hidden',
+)
 def test_search(context, hidden):
     url = confd.contexts
-    searches = {'name': 'search', 'type': 'internal', 'description': 'desc_search'}
+    searches = {
+        'name': 'name_search',
+        'label': 'label_search',
+        'type': 'internal',
+        'description': 'desc_search',
+    }
 
     for field, term in searches.items():
         yield check_search, url, context, hidden, field, term

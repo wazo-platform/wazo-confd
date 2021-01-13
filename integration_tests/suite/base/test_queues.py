@@ -15,8 +15,17 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+    gen_queue_exten,
+)
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 ALL_OPTIONS = [
@@ -218,14 +227,20 @@ def unique_error_checks(url, queue, group):
     yield s.check_bogus_field_returns_error, url, 'name', group['name']
 
 
+@fixtures.extension(exten=gen_queue_exten())
 @fixtures.queue(name='hidden', label='hidden', preprocess_subroutine='hidden')
 @fixtures.queue(name='search', label='search', preprocess_subroutine='search')
-def test_search(hidden, queue):
+def test_search(extension, hidden, queue):
     url = confd.queues
     searches = {'name': 'search', 'label': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, queue, hidden, field, term
+
+    searches = {'exten': extension['exten']}
+    with a.queue_extension(queue, extension):
+        for field, term in searches.items():
+            yield check_relation_search, url, queue, hidden, field, term
 
 
 def check_search(url, queue, hidden, field, term):
@@ -234,6 +249,16 @@ def check_search(url, queue, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: queue[field]})
+    assert_that(response.items, has_item(has_entry('id', queue['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+
+def check_relation_search(url, queue, hidden, field, term):
+    response = url.get(search=term)
+    assert_that(response.items, has_item(has_entry('id', queue['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+    response = url.get(**{field: term})
     assert_that(response.items, has_item(has_entry('id', queue['id'])))
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
