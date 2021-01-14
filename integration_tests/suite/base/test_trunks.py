@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -15,7 +15,12 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
@@ -54,14 +59,32 @@ def error_checks(url):
 
 @fixtures.context(name='search')
 @fixtures.context(name='hidden')
+@fixtures.sip(name='name_search', label='label_search')
+@fixtures.iax(name='name_search')
+@fixtures.custom(interface='name_search')
 @fixtures.trunk(context='search')
 @fixtures.trunk(context='hidden')
-def test_search(_, __, trunk, hidden):
+def test_search(_, __, sip, iax, custom, trunk, hidden):
     url = confd.trunks
     searches = {'context': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, trunk, hidden, field, term
+
+    searches = {'name': 'name_search', 'label': 'label_search'}
+    with a.trunk_endpoint_sip(trunk, sip):
+        for field, term in searches.items():
+            yield check_relation_search, url, trunk, hidden, field, term
+
+    searches = {'name': 'name_search'}
+    with a.trunk_endpoint_iax(trunk, iax):
+        for field, term in searches.items():
+            yield check_relation_search, url, trunk, hidden, field, term
+
+    searches = {'name': 'name_search'}
+    with a.trunk_endpoint_custom(trunk, custom):
+        for field, term in searches.items():
+            yield check_relation_search, url, trunk, hidden, field, term
 
 
 def check_search(url, trunk, hidden, field, term):
@@ -70,6 +93,16 @@ def check_search(url, trunk, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: trunk[field]})
+    assert_that(response.items, has_item(has_entry('id', trunk['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+
+def check_relation_search(url, trunk, hidden, field, term):
+    response = url.get(search=term)
+    assert_that(response.items, has_item(has_entry('id', trunk['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+    response = url.get(**{field: term})
     assert_that(response.items, has_item(has_entry('id', trunk['id'])))
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 

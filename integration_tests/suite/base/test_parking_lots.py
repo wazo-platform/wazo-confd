@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -14,7 +14,12 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
@@ -70,6 +75,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
 
 
+@fixtures.extension(exten='700')
 @fixtures.parking_lot(
     name='search',
     slots_start='701',
@@ -84,7 +90,7 @@ def error_checks(url):
     music_on_hold='hidden',
     timeout=None,
 )
-def test_search(parking_lot, hidden):
+def test_search(extension, parking_lot, hidden):
     url = confd.parkinglots
     searches = {
         'name': 'search',
@@ -97,6 +103,11 @@ def test_search(parking_lot, hidden):
     for field, term in searches.items():
         yield check_search, url, parking_lot, hidden, field, term
 
+    searches = {'exten': extension['exten']}
+    with a.parking_lot_extension(parking_lot, extension):
+        for field, term in searches.items():
+            yield check_relation_search, url, parking_lot, hidden, field, term
+
 
 def check_search(url, parking_lot, hidden, field, term):
     response = url.get(search=term)
@@ -104,6 +115,16 @@ def check_search(url, parking_lot, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: parking_lot[field]})
+    assert_that(response.items, has_item(has_entry('id', parking_lot['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+
+def check_relation_search(url, parking_lot, hidden, field, term):
+    response = url.get(search=term)
+    assert_that(response.items, has_item(has_entry('id', parking_lot['id'])))
+    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+
+    response = url.get(**{field: term})
     assert_that(response.items, has_item(has_entry('id', parking_lot['id'])))
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
