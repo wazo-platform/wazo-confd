@@ -101,6 +101,12 @@ definitions:
           readOnly: true
         name:
           type: string
+        timeout:
+          type: integer
+        queue_music_on_hold:
+          type: string
+        waiting_music_on_hold:
+          type: string
     - $ref: '#/definitions/SwitchboardRelationIncalls'
     - $ref: '#/definitions/SwitchboardRelationMembers'
   SwitchboardRelationBase:
