@@ -11,6 +11,7 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
 class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    uuid = fields.String(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(
         validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)),

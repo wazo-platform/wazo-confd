@@ -100,7 +100,8 @@ parameters:
     type: integer
     name: group_id
     in: path
-    description: group's ID
+    description: the group's ID or UUID
+
 definitions:
   Group:
     title: Group
@@ -174,6 +175,10 @@ definitions:
         type: integer
         readOnly: true
         description: The id of the group
+      uuid:
+        type: string
+        description: Group UUID. This ID is globally unique across multiple Wazo instances
+        readOnly: true
       name:
         type: string
         description: The name of the group

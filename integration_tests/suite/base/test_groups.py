@@ -50,6 +50,10 @@ def test_put_errors(group):
     for check in error_checks(url):
         yield check
 
+    url = confd.groups(group['uuid']).put
+    for check in error_checks(url):
+        yield check
+
 
 def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
@@ -144,18 +148,18 @@ def check_search(url, group, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: group[field]})
-    assert_that(response.items, has_item(has_entry('id', group['id'])))
-    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+    assert_that(response.items, has_item(has_entry('uuid', group['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
 def check_relation_search(url, group, hidden, field, term):
     response = url.get(search=term)
-    assert_that(response.items, has_item(has_entry('id', group['id'])))
-    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+    assert_that(response.items, has_item(has_entry('uuid', group['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
     response = url.get(**{field: term})
-    assert_that(response.items, has_item(has_entry('id', group['id'])))
-    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+    assert_that(response.items, has_item(has_entry('uuid', group['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
@@ -189,6 +193,32 @@ def test_get(group):
         response.item,
         has_entries(
             id=group['id'],
+            uuid=group['uuid'],
+            name=group['name'],
+            caller_id_mode=group['caller_id_mode'],
+            caller_id_name=group['caller_id_name'],
+            timeout=group['timeout'],
+            music_on_hold=group['music_on_hold'],
+            preprocess_subroutine=group['preprocess_subroutine'],
+            ring_in_use=group['ring_in_use'],
+            ring_strategy=group['ring_strategy'],
+            user_timeout=group['user_timeout'],
+            retry_delay=group['retry_delay'],
+            mark_answered_elsewhere=group['mark_answered_elsewhere'],
+            enabled=group['enabled'],
+            extensions=empty(),
+            members=has_entries(users=empty(), extensions=empty()),
+            incalls=empty(),
+            fallbacks=has_entries(noanswer_destination=none()),
+        ),
+    )
+
+    response = confd.groups(group['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            id=group['id'],
+            uuid=group['uuid'],
             name=group['name'],
             caller_id_mode=group['caller_id_mode'],
             caller_id_name=group['caller_id_name'],
@@ -212,6 +242,12 @@ def test_get(group):
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
 def test_get_multi_tenant(main, sub):
+    response = confd.groups(main['uuid']).get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['uuid']).get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.item, has_entries(**sub))
+
     response = confd.groups(main['id']).get(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='Group'))
 
@@ -229,6 +265,16 @@ def test_create_minimal_parameters():
     )
 
     confd.groups(response.item['id']).delete().assert_deleted()
+
+    response = confd.groups.post(name='MyGroup')
+    response.assert_created('groups')
+
+    assert_that(
+        response.item,
+        has_entries(uuid=not_(empty()), name='MyGroup', tenant_uuid=MAIN_TENANT),
+    )
+
+    confd.groups(response.item['uuid']).delete().assert_deleted()
 
 
 def test_create_all_parameters():
@@ -252,7 +298,7 @@ def test_create_all_parameters():
 
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
-    confd.groups(response.item['id']).delete().assert_deleted()
+    confd.groups(response.item['uuid']).delete().assert_deleted()
 
 
 def test_create_multi_tenant():
@@ -265,6 +311,9 @@ def test_create_multi_tenant():
 @fixtures.group()
 def test_edit_minimal_parameters(group):
     response = confd.groups(group['id']).put()
+    response.assert_updated()
+
+    response = confd.groups(group['uuid']).put()
     response.assert_updated()
 
 
@@ -291,6 +340,27 @@ def test_edit_all_parameters(group):
     response = confd.groups(group['id']).get()
     assert_that(response.item, has_entries(parameters))
 
+    parameters = {
+        'name': 'MyGroup2',
+        'caller_id_mode': 'prepend',
+        'caller_id_name': 'GROUP2-',
+        'timeout': 43,
+        'music_on_hold': 'default',
+        'preprocess_subroutine': 'subroutien2',
+        'ring_in_use': False,
+        'ring_strategy': 'random',
+        'mark_answered_elsewhere': False,
+        'user_timeout': 24,
+        'retry_delay': 12,
+        'enabled': False,
+    }
+
+    response = confd.groups(group['uuid']).put(**parameters)
+    response.assert_updated()
+
+    response = confd.groups(group['uuid']).get()
+    assert_that(response.item, has_entries(parameters))
+
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
@@ -301,12 +371,24 @@ def test_edit_multi_tenant(main, sub):
     response = confd.groups(sub['id']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
 
+    response = confd.groups(main['uuid']).put(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
 
 @fixtures.group()
-def test_delete(group):
-    response = confd.groups(group['id']).delete()
+@fixtures.group()
+def test_delete(group_1, group_2):
+    response = confd.groups(group_1['id']).delete()
     response.assert_deleted()
-    response = confd.groups(group['id']).get()
+    response = confd.groups(group_1['id']).get()
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(group_2['uuid']).delete()
+    response.assert_deleted()
+    response = confd.groups(group_2['uuid']).get()
     response.assert_match(404, e.not_found(resource='Group'))
 
 
@@ -320,6 +402,16 @@ def test_delete_multi_tenant(main, sub):
     response.assert_deleted()
 
 
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant_by_uuid(main, sub):
+    response = confd.groups(main['uuid']).delete(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found(resource='Group'))
+
+    response = confd.groups(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
+    response.assert_deleted()
+
+
 @fixtures.group()
 def test_bus_events(group):
     yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
@@ -327,3 +419,12 @@ def test_bus_events(group):
     }
     yield s.check_bus_event, 'config.groups.edited', confd.groups(group['id']).put
     yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['id']).delete
+
+
+@fixtures.group()
+def test_bus_events_by_uuid(group):
+    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
+        'name': 'group_bus_event_with_uuid'
+    }
+    yield s.check_bus_event, 'config.groups.edited', confd.groups(group['uuid']).put
+    yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['uuid']).delete

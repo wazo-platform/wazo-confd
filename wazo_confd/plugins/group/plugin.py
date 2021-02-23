@@ -14,6 +14,7 @@ class Plugin:
 
         api.add_resource(
             GroupItem,
+            '/groups/<uuid:id>',
             '/groups/<int:id>',
             endpoint='groups',
             resource_class_args=(service,),
