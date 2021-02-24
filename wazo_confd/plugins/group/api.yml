@@ -40,16 +40,16 @@ paths:
             $ref: '#/definitions/Group'
         '400':
           $ref: '#/responses/CreateError'
-  /groups/{group_id}:
+  /groups/{group_uuid}:
     get:
       operationId: get_group
       summary: Get group
-      description: '**Required ACL:** `confd.groups.{group_id}.read`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.read`'
       tags:
       - groups
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       responses:
         '200':
           description: Group
@@ -60,12 +60,12 @@ paths:
     put:
       operationId: update_group
       summary: Update group
-      description: '**Required ACL:** `confd.groups.{group_id}.update`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.update`'
       tags:
       - groups
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - name: body
         in: body
         required: true
@@ -81,12 +81,12 @@ paths:
     delete:
       operationId: delete_group
       summary: Delete group
-      description: '**Required ACL:** `confd.groups.{group_id}.delete`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.delete`'
       tags:
       - groups
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
@@ -100,7 +100,13 @@ parameters:
     type: integer
     name: group_id
     in: path
-    description: the group's ID or UUID
+    description: the group's ID
+  groupuuid:
+    required: true
+    type: string
+    name: group_id
+    in: path
+    description: the group's UUID
 
 definitions:
   Group:
@@ -171,6 +177,10 @@ definitions:
       - name
   GroupRelationBase:
     properties:
+      name:
+        type: string
+        description: The name of the group
+        readOnly: true
       id:
         type: integer
         readOnly: true
@@ -179,9 +189,6 @@ definitions:
         type: string
         description: Group UUID. This ID is globally unique across multiple Wazo instances
         readOnly: true
-      name:
-        type: string
-        description: The name of the group
   GroupRelationExtensions:
     properties:
       extensions:
