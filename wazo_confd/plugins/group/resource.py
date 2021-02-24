@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -17,7 +17,7 @@ class GroupList(ListResource):
     schema = GroupSchema
 
     def build_headers(self, group):
-        return {'Location': url_for('groups', id=group.id, _external=True)}
+        return {'Location': url_for('groups', uuid=group.uuid, _external=True)}
 
     @required_acl('confd.groups.create')
     def post(self):
@@ -33,14 +33,14 @@ class GroupItem(ItemResource):
     schema = GroupSchema
     has_tenant_uuid = True
 
-    @required_acl('confd.groups.{id}.read')
-    def get(self, id):
-        return super().get(id)
+    @required_acl('confd.groups.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
 
-    @required_acl('confd.groups.{id}.update')
-    def put(self, id):
-        return super().put(id)
+    @required_acl('confd.groups.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
 
-    @required_acl('confd.groups.{id}.delete')
-    def delete(self, id):
-        return super().delete(id)
+    @required_acl('confd.groups.{uuid}.delete')
+    def delete(self, uuid):
+        return super().delete(uuid)

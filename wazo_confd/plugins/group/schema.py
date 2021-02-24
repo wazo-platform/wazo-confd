@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -42,7 +42,7 @@ class GroupSchema(BaseSchema):
     ring_in_use = StrictBoolean()
     mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
-    links = ListLink(Link('groups'))
+    links = ListLink(Link('groups', field='uuid'))
 
     extensions = fields.Nested(
         'ExtensionSchema',

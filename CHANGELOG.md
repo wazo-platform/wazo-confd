@@ -5,10 +5,12 @@
 * The following resources have been added:
 
   * GET,PUT,DELETE `/1.1/groups/<group_uuid>`
+  * PUT,DELETE `/1.1/groups/<group_uuid>/extensions/<extension_id>`
 
 * The following resources have been deprecated:
 
   * GET,PUT,DELETE `/1.1/groups/<group_id>`
+  * PUT,DELETE `/1.1/groups/<group_id>/extensions/<extension_id>`
 
 
 # 21.03

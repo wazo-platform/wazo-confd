@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -157,9 +157,9 @@ def queue_member_user(queue, user, **kwargs):
 
 @contextmanager
 def group_extension(group, extension, check=True):
-    h.group_extension.associate(group['id'], extension['id'], check)
+    h.group_extension.associate(group['uuid'], extension['id'], check)
     yield
-    h.group_extension.dissociate(group['id'], extension['id'], check)
+    h.group_extension.dissociate(group['uuid'], extension['id'], check)
 
 
 @contextmanager

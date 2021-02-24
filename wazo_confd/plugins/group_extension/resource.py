@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -15,21 +15,21 @@ class GroupExtensionItem(ConfdResource):
         self.group_dao = group_dao
         self.extension_dao = extension_dao
 
-    @required_acl('confd.groups.{group_id}.extensions.{extension_id}.delete')
-    def delete(self, group_id, extension_id):
+    @required_acl('confd.groups.{group_uuid}.extensions.{extension_id}.delete')
+    def delete(self, group_uuid, extension_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
 
-        group = self.group_dao.get(group_id, tenant_uuids=tenant_uuids)
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
 
         self.service.dissociate(group, extension)
         return '', 204
 
-    @required_acl('confd.groups.{group_id}.extensions.{extension_id}.update')
-    def put(self, group_id, extension_id):
+    @required_acl('confd.groups.{group_uuid}.extensions.{extension_id}.update')
+    def put(self, group_uuid, extension_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
 
-        group = self.group_dao.get(group_id, tenant_uuids=tenant_uuids)
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
 
         self.service.associate(group, extension)

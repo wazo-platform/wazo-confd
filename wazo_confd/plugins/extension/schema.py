@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -22,7 +22,9 @@ class ExtensionSchema(BaseSchema):
     parking_lot = fields.Nested(
         'ParkingLotSchema', only=['id', 'name', 'links'], dump_only=True
     )
-    group = fields.Nested('GroupSchema', only=['id', 'name', 'links'], dump_only=True)
+    group = fields.Nested(
+        'GroupSchema', only=['uuid', 'id', 'name', 'links'], dump_only=True
+    )
     incall = fields.Nested('IncallSchema', only=['id', 'links'], dump_only=True)
     lines = fields.Nested(
         'LineSchema', only=['id', 'name', 'links'], many=True, dump_only=True
