@@ -1,15 +1,15 @@
 paths:
-  /groups/{group_id}/callpermissions/{callpermission_id}:
+  /groups/{group_uuid}/callpermissions/{callpermission_id}:
     put:
       operationId: associate_group_callpermission
       summary: Associate group and call permission
-      description: '**Required ACL:** `confd.groups.{group_id}.callpermissions.{call_permission_id}.update`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.callpermissions.{call_permission_id}.update`'
       tags:
       - groups
       - callpermissions
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - $ref: '#/parameters/callpermissionid'
       responses:
         '400':
@@ -25,7 +25,7 @@ paths:
       - callpermissions
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - $ref: '#/parameters/callpermissionid'
       responses:
         '204':
