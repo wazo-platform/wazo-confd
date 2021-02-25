@@ -22,6 +22,10 @@ def test_put_errors(group):
     fake_group = confd.groups(FAKE_ID).fallbacks.put
     yield s.check_resource_not_found, fake_group, 'Group'
 
+    url = confd.groups(group['uuid']).fallbacks.put
+    for check in error_checks(url):
+        yield check
+
     url = confd.groups(group['id']).fallbacks.put
     for check in error_checks(url):
         yield check
@@ -37,12 +41,15 @@ def test_get(group):
     response = confd.groups(group['id']).fallbacks.get()
     assert_that(response.item, has_entries(noanswer_destination=None))
 
+    response = confd.groups(group['uuid']).fallbacks.get()
+    assert_that(response.item, has_entries(noanswer_destination=None))
+
 
 @fixtures.group()
 def test_get_all_parameters(group):
     parameters = {'noanswer_destination': {'type': 'none'}}
-    confd.groups(group['id']).fallbacks.put(parameters).assert_updated()
-    response = confd.groups(group['id']).fallbacks.get()
+    confd.groups(group['uuid']).fallbacks.put(parameters).assert_updated()
+    response = confd.groups(group['uuid']).fallbacks.get()
     assert_that(response.item, equal_to(parameters))
 
 
@@ -51,23 +58,26 @@ def test_edit(group):
     response = confd.groups(group['id']).fallbacks.put({})
     response.assert_updated()
 
+    response = confd.groups(group['uuid']).fallbacks.put({})
+    response.assert_updated()
+
 
 @fixtures.group()
 def test_edit_with_all_parameters(group):
     parameters = {'noanswer_destination': {'type': 'none'}}
-    response = confd.groups(group['id']).fallbacks.put(parameters)
+    response = confd.groups(group['uuid']).fallbacks.put(parameters)
     response.assert_updated()
 
 
 @fixtures.group()
 def test_edit_to_none(group):
     parameters = {'noanswer_destination': {'type': 'none'}}
-    confd.groups(group['id']).fallbacks.put(parameters).assert_updated()
+    confd.groups(group['uuid']).fallbacks.put(parameters).assert_updated()
 
-    response = confd.groups(group['id']).fallbacks.put(noanswer_destination=None)
+    response = confd.groups(group['uuid']).fallbacks.put(noanswer_destination=None)
     response.assert_updated
 
-    response = confd.groups(group['id']).fallbacks.get()
+    response = confd.groups(group['uuid']).fallbacks.get()
     assert_that(response.item, has_entries(noanswer_destination=None))
 
 
@@ -84,13 +94,13 @@ def test_edit_to_none(group):
 @fixtures.application()
 def test_valid_destinations(group, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_group_fallbacks_with_destination, group['id'], destination
+        yield _update_group_fallbacks_with_destination, group['uuid'], destination
 
 
-def _update_group_fallbacks_with_destination(group_id, destination):
-    response = confd.groups(group_id).fallbacks.put(noanswer_destination=destination)
+def _update_group_fallbacks_with_destination(group_uuid, destination):
+    response = confd.groups(group_uuid).fallbacks.put(noanswer_destination=destination)
     response.assert_updated()
-    response = confd.groups(group_id).fallbacks.get()
+    response = confd.groups(group_uuid).fallbacks.get()
     assert_that(
         response.item, has_entries(noanswer_destination=has_entries(**destination))
     )
@@ -125,7 +135,7 @@ def test_nonexistent_destinations(group):
             'conference',
         ):
             yield _update_user_fallbacks_with_nonexistent_destination, group[
-                'id'
+                'uuid'
             ], destination
 
         if (
@@ -133,27 +143,27 @@ def test_nonexistent_destinations(group):
             and destination['application'] == 'custom'
         ):
             yield _update_user_fallbacks_with_nonexistent_destination, group[
-                'id'
+                'uuid'
             ], destination
 
 
-def _update_user_fallbacks_with_nonexistent_destination(group_id, destination):
-    response = confd.groups(group_id).fallbacks.put(noanswer_destination=destination)
+def _update_user_fallbacks_with_nonexistent_destination(group_uuid, destination):
+    response = confd.groups(group_uuid).fallbacks.put(noanswer_destination=destination)
     response.assert_status(400)
 
 
 @fixtures.group()
 def test_bus_events(group):
-    url = confd.groups(group['id']).fallbacks.put
+    url = confd.groups(group['uuid']).fallbacks.put
     yield s.check_bus_event, 'config.groups.fallbacks.edited', url
 
 
 @fixtures.group()
 def test_get_fallbacks_relation(group):
-    confd.groups(group['id']).fallbacks.put(
+    confd.groups(group['uuid']).fallbacks.put(
         noanswer_destination={'type': 'none'}
     ).assert_updated
-    response = confd.groups(group['id']).get()
+    response = confd.groups(group['uuid']).get()
     assert_that(
         response.item,
         has_entries(
