@@ -8,6 +8,8 @@
   * PUT,DELETE `/1.1/groups/<group_uuid>/extensions/<extension_id>`
   * PUT,DELETE `/1.1/groups/<group_uuid>/schedules/<schedule_id>`
   * PUT,DELETE `/1.1/groups/<group_uuid>/fallbacks`
+  * PUT `/1.1/groups/{group_uuid}/members/users`
+  * PUT `/1.1/groups/{group_uuid}/members/extensions
 
 * The following resources have been deprecated:
 
@@ -15,6 +17,8 @@
   * PUT,DELETE `/1.1/groups/<group_id>/extensions/<extension_id>`
   * PUT,DELETE `/1.1/groups/<group_id>/schedules/<schedule_id>`
   * PUT,DELETE `/1.1/groups/<group_id>/fallbacks`
+  * PUT `/1.1/groups/{group_id}/members/users`
+  * PUT `/1.1/groups/{group_id}/members/extensions`
 
 
 # 21.03

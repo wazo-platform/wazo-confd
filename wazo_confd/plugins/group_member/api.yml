@@ -1,9 +1,9 @@
 paths:
-  /groups/{group_id}/members/users:
+  /groups/{group_uuid}/members/users:
     put:
       operationId: update_group_member_users
       summary: Update group and users
-      description: '**Required ACL:** `confd.groups.{group_id}.members.users.update`
+      description: '**Required ACL:** `confd.groups.{group_uuid}.members.users.update`
 
 
       **WARNING**
@@ -12,7 +12,7 @@ paths:
       - groups
       - users
       parameters:
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - name: body
         in: body
         description: Users to associated
@@ -26,11 +26,11 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /groups/{group_id}/members/extensions:
+  /groups/{group_uuid}/members/extensions:
     put:
       operationId: update_group_member_extensions
       summary: Update group and extensions
-      description: '**Required ACL:** `confd.groups.{group_id}.members.extensions.update`
+      description: '**Required ACL:** `confd.groups.{group_uuid}.members.extensions.update`
 
 
       **WARNING**
@@ -38,7 +38,7 @@ paths:
       tags:
       - groups
       parameters:
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - name: body
         in: body
         description: Extensions to associated

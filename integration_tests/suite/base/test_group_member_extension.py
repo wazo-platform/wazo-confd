@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import string
@@ -31,6 +31,10 @@ def test_associate_errors(group, extension):
     response.assert_status(404)
 
     url = confd.groups(group['id']).members.extensions.put
+    for check in error_checks(url):
+        yield check
+
+    url = confd.groups(group['uuid']).members.extensions.put
     for check in error_checks(url):
         yield check
 
@@ -94,6 +98,11 @@ def error_checks(url):
 @fixtures.group()
 @extension()
 def test_associate(group, extension):
+    response = confd.groups(group['uuid']).members.extensions.put(
+        extensions=[extension]
+    )
+    response.assert_updated()
+
     response = confd.groups(group['id']).members.extensions.put(extensions=[extension])
     response.assert_updated()
 
@@ -104,12 +113,12 @@ def test_associate(group, extension):
 @extension()
 def test_associate_multiple_with_priority(group, extension1, extension2, extension3):
     extension1['priority'], extension2['priority'], extension3['priority'] = 4, 1, 2
-    response = confd.groups(group['id']).members.extensions.put(
+    response = confd.groups(group['uuid']).members.extensions.put(
         extensions=[extension1, extension2, extension3]
     )
     response.assert_updated()
 
-    response = confd.groups(group['id']).get()
+    response = confd.groups(group['uuid']).get()
     assert_that(
         response.item,
         has_entries(
@@ -139,7 +148,7 @@ def test_associate_multiple_with_priority(group, extension1, extension2, extensi
 @fixtures.group()
 @extension()
 def test_associate_same_extension(group, extension):
-    response = confd.groups(group['id']).members.extensions.put(
+    response = confd.groups(group['uuid']).members.extensions.put(
         extensions=[extension, extension]
     )
     response.assert_status(400)
@@ -150,7 +159,7 @@ def test_associate_same_extension(group, extension):
 @extension()
 def test_get_extensions_associated_to_group(group, extension1, extension2):
     with a.group_member_extension(group, extension2, extension1):
-        response = confd.groups(group['id']).get()
+        response = confd.groups(group['uuid']).get()
         assert_that(
             response.item,
             has_entries(
@@ -173,7 +182,7 @@ def test_get_extensions_associated_to_group(group, extension1, extension2):
 @extension()
 def test_dissociate(group, extension1, extension2):
     with a.group_member_extension(group, extension1, extension2):
-        response = confd.groups(group['id']).members.extensions.put(extensions=[])
+        response = confd.groups(group['uuid']).members.extensions.put(extensions=[])
         response.assert_updated()
 
 
@@ -184,15 +193,15 @@ def test_delete_group_when_group_and_extension_associated(
     group, extension1, extension2
 ):
     with a.group_member_extension(group, extension1, extension2, check=False):
-        confd.groups(group['id']).delete().assert_deleted()
+        confd.groups(group['uuid']).delete().assert_deleted()
 
-        deleted_group = confd.groups(group['id']).get
+        deleted_group = confd.groups(group['uuid']).get
         yield s.check_resource_not_found, deleted_group, 'Group'
 
 
 @fixtures.group()
 @extension()
 def test_bus_events(group, extension):
-    url = confd.groups(group['id']).members.extensions.put
+    url = confd.groups(group['uuid']).members.extensions.put
     body = {'extensions': [extension]}
     yield s.check_bus_event, 'config.groups.members.extensions.updated', url, body
