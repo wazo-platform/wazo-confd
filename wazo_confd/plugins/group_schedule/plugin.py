@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.group import dao as group_dao
@@ -15,7 +15,8 @@ class Plugin:
 
         api.add_resource(
             GroupScheduleItem,
-            '/groups/<int:group_id>/schedules/<int:schedule_id>',
+            '/groups/<int:group_uuid>/schedules/<int:schedule_id>',
+            '/groups/<uuid:group_uuid>/schedules/<int:schedule_id>',
             endpoint='group_schedules',
             resource_class_args=(service, group_dao, schedule_dao),
         )

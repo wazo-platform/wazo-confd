@@ -6,12 +6,14 @@
 
   * GET,PUT,DELETE `/1.1/groups/<group_uuid>`
   * PUT,DELETE `/1.1/groups/<group_uuid>/extensions/<extension_id>`
+  * PUT,DELETE `/1.1/groups/<group_uuid>/schedules/<schedule_id>`
   * PUT,DELETE `/1.1/groups/<group_uuid>/fallbacks`
 
 * The following resources have been deprecated:
 
   * GET,PUT,DELETE `/1.1/groups/<group_id>`
   * PUT,DELETE `/1.1/groups/<group_id>/extensions/<extension_id>`
+  * PUT,DELETE `/1.1/groups/<group_id>/schedules/<schedule_id>`
   * PUT,DELETE `/1.1/groups/<group_id>/fallbacks`
 
 
