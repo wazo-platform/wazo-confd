@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.group.event import EditGroupFallbackEvent
@@ -11,7 +11,7 @@ class GroupFallbackNotifier:
         self.bus = bus
 
     def edited(self, group):
-        event = EditGroupFallbackEvent(group.id)
+        event = EditGroupFallbackEvent(id=group.id, uuid=str(group.uuid))
         self.bus.send_bus_event(event)
 
 

@@ -1,8 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.group_member.event import (
@@ -30,13 +31,15 @@ class TestGroupMemberUserNotifier(unittest.TestCase):
         self.member_user2 = Mock(user=Mock(uuid='efgh-5678'))
         self.member_extension1 = Mock(extension=Mock(exten='1234', context='default'))
         self.member_extension2 = Mock(extension=Mock(exten='5678', context='other'))
-        self.group = Mock(id=3)
+        self.group = Mock(id=3, uuid=uuid4())
 
         self.notifier = GroupMemberNotifier(self.bus, self.sysconfd)
 
     def test_associate_users_then_bus_event(self):
         expected_event = GroupMemberUsersAssociatedEvent(
-            self.group.id, [self.member_user1.user.uuid, self.member_user2.user.uuid]
+            group_id=self.group.id,
+            group_uuid=str(self.group.uuid),
+            user_uuids=[self.member_user1.user.uuid, self.member_user2.user.uuid],
         )
 
         self.notifier.users_associated(
@@ -54,8 +57,9 @@ class TestGroupMemberUserNotifier(unittest.TestCase):
 
     def test_associate_extensions_then_bus_event(self):
         expected_event = GroupMemberExtensionsAssociatedEvent(
-            self.group.id,
-            [
+            group_id=self.group.id,
+            group_uuid=str(self.group.uuid),
+            extensions=[
                 {
                     'exten': self.member_extension1.extension.exten,
                     'context': self.member_extension1.extension.context,
