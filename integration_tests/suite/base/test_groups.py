@@ -307,6 +307,8 @@ def test_create_multi_tenant():
 
     assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
+    confd.groups(response.item['uuid']).delete().assert_deleted()
+
 
 @fixtures.group()
 def test_edit_minimal_parameters(group):
