@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -13,8 +13,9 @@ from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo.token_renewer import TokenRenewer
 
+from . import auth
 from ._bus import BusConsumer, bus_consumer_thread
-from .http_server import api, HTTPServer
+from .http_server import api, app, HTTPServer
 from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)
@@ -32,11 +33,13 @@ class Controller:
             config['bus'],
             partial(self_check, config),
         ]
-
+        self.http_server = HTTPServer(config)
         auth_client = AuthClient(**config['auth'])
         self.token_renewer = TokenRenewer(auth_client)
-
-        self.http_server = HTTPServer(config)
+        if not app.config['auth'].get('master_tenant_uuid'):
+            self.token_renewer.subscribe_to_next_token_details_change(
+                auth.init_master_tenant
+            )
 
         plugin_helpers.load(
             namespace='wazo_confd.plugins',

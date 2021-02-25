@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -34,7 +34,8 @@ class ListSchema(BaseSchema):
 class ConfdResource(ErrorCatchingResource):
 
     method_decorators = [
-        auth_verifier.verify_token
+        auth_verifier.verify_tenant,
+        auth_verifier.verify_token,
     ] + ErrorCatchingResource.method_decorators
 
     def _has_write_tenant_uuid(self):
