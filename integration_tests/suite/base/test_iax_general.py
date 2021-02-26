@@ -1,10 +1,11 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers import scenarios as s
 
 from hamcrest import assert_that, has_entries
 from . import confd
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 def test_put_errors():
@@ -90,6 +91,14 @@ def test_edit_iax_general_with_none_value():
 
     response = confd.asterisk.iax.general.get()
     assert_that(response.item, has_entries(parameters))
+
+
+def test_restrict_only_master_tenant():
+    response = confd.asterisk.iax.general.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.asterisk.iax.general.put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
 
 
 def test_bus_event_when_edited():
