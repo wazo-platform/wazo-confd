@@ -1,10 +1,15 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, empty, has_entries, has_entry, has_item, is_not, not_
 
 from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 def test_get_errors():
@@ -139,6 +144,24 @@ def test_delete(access_feature):
     response.assert_deleted()
     response = confd.access_features(access_feature['id']).get()
     response.assert_match(404, e.not_found(resource='AccessFeatures'))
+
+
+@fixtures.access_feature()
+def test_restrict_only_master_tenant(access):
+    response = confd.access_features.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.access_features.post(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.access_features(access['id']).get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.access_features(access['id']).put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.access_features(access['id']).delete(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
 
 
 @fixtures.access_feature(host='1.2.3.0/24')

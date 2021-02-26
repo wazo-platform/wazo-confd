@@ -127,10 +127,15 @@ class RestUrlClient(UrlFragment):
             params['headers'] = {'X-Auth-Token': token}
         return self.client.get(url, **params)
 
-    def post(self, body=None, wazo_tenant=None, **params):
+    def post(self, body=None, token=None, wazo_tenant=None, **params):
         url = str(self)
         params = self._merge_params(params, body, self.body)
-        headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
+        headers = {}
+        if wazo_tenant:
+            headers['Wazo-Tenant'] = wazo_tenant
+        if token:
+            headers['X-Auth-Token'] = token
+        headers = headers or None
         return self.client.post(url, params, headers=headers)
 
     def put(self, body=None, query_string=None, token=None, wazo_tenant=None, **params):
@@ -144,9 +149,14 @@ class RestUrlClient(UrlFragment):
         headers = headers or None
         return self.client.put(url, params, query_string, headers=headers)
 
-    def delete(self, wazo_tenant=None, **params):
+    def delete(self, token=None, wazo_tenant=None, **params):
         url = str(self)
-        headers = {'Wazo-Tenant': wazo_tenant} if wazo_tenant else None
+        headers = {}
+        if wazo_tenant:
+            headers['Wazo-Tenant'] = wazo_tenant
+        if token:
+            headers['X-Auth-Token'] = token
+        headers = headers or None
         return self.client.delete(url, params, headers=headers)
 
     def _copy(self):
