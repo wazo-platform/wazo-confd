@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -21,7 +21,7 @@ from xivo_dao.resources.features.search import (
     FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY,
 )
 
-from wazo_confd.auth import required_acl
+from wazo_confd.auth import required_acl, required_master_tenant
 from wazo_confd.helpers.mallow import BaseSchema
 from wazo_confd.helpers.restful import ConfdResource
 
@@ -125,10 +125,12 @@ class FeaturesApplicationmapList(FeaturesConfigurationList):
     section_name = 'applicationmap'
     schema = FeaturesApplicationmapSchema
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.features.applicationmap.get')
     def get(self):
         return super().get()
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.features.applicationmap.update')
     def put(self):
         return super().put()
@@ -138,10 +140,12 @@ class FeaturesFeaturemapList(FeaturesConfigurationList):
     section_name = 'featuremap'
     schema = FeaturesFeaturemapSchema
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.features.featuremap.get')
     def get(self):
         return super().get()
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.features.featuremap.update')
     def put(self):
         return super().put()
@@ -151,10 +155,12 @@ class FeaturesGeneralList(FeaturesConfigurationList):
     section_name = 'general'
     schema = FeaturesGeneralSchema
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.features.general.get')
     def get(self):
         return super().get()
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.features.general.update')
     def put(self):
         return super().put()

@@ -1,10 +1,11 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 
 from ..helpers import scenarios as s
 from . import confd
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 REQUIRED_OPTIONS = {'atxfer': '*0', 'blindxfer': '9'}
@@ -54,6 +55,14 @@ def test_edit_features_featuremap():
 
     response = confd.asterisk.features.featuremap.get()
     assert_that(response.item, has_entries(parameters))
+
+
+def test_restrict_only_master_tenant():
+    response = confd.asterisk.features.featuremap.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.asterisk.features.featuremap.put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
 
 
 def test_bus_event_when_edited():
