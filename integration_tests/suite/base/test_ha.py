@@ -1,4 +1,4 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -6,9 +6,6 @@ import re
 from hamcrest import (
     assert_that,
     only_contains,
-    # TODO clean after pjsip migration
-    # greater_than,
-    # has_length,
     has_entry,
     has_entries,
 )
@@ -44,20 +41,6 @@ def test_put():
         method='POST',
         json={'node_type': 'master', 'remote_address': '10.10.10.10'},
     )
-    # TODO clean after pjsip migration
-    # sip_general_options = confd.asterisk.sip.general.get().json
-    # assert_that(
-    #     sip_general_options, has_entry('options', has_length(greater_than(3)))
-    # )  # other options are still present
-    # assert_that(
-    #     sip_general_options,
-    #     has_entry(
-    #         'options',
-    #         has_entries(
-    #             {'minexpiry': '180', 'maxexpiry': '300', 'defaultexpiry': '240'}
-    #         ),
-    #     ),
-    # )
     assert_that(
         confd.registrars.get().json,
         has_entry(
@@ -80,20 +63,6 @@ def test_put():
         method='POST',
         json={'node_type': 'disabled', 'remote_address': ''},
     )
-    # TODO clean after pjsip migration
-    # sip_general_options = confd.asterisk.sip.general.get().json
-    # assert_that(
-    #     sip_general_options, has_entry('options', has_length(greater_than(3)))
-    # )  # other options are still present
-    # assert_that(
-    #     sip_general_options,
-    #     has_entry(
-    #         'options',
-    #         has_entries(
-    #             {'minexpiry': '60', 'maxexpiry': '3600', 'defaultexpiry': '120'}
-    #         ),
-    #     ),
-    # )
     assert_that(
         confd.registrars.get().json,
         has_entry(
