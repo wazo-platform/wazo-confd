@@ -1,9 +1,9 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
 from xivo_dao.alchemy.pjsip_transport import PJSIPTransport
-from wazo_confd.auth import required_acl
+from wazo_confd.auth import required_acl, required_master_tenant
 from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 from wazo_confd.helpers.asterisk import AsteriskConfigurationList
 from .schema import (
@@ -24,10 +24,12 @@ class PJSIPDocList(ConfdResource):
 class PJSIPGlobalList(AsteriskConfigurationList):
     section_name = 'global'
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.pjsip.global.read')
     def get(self):
         return super().get()
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.pjsip.global.update')
     def put(self):
         return super().put()
@@ -36,10 +38,12 @@ class PJSIPGlobalList(AsteriskConfigurationList):
 class PJSIPSystemList(AsteriskConfigurationList):
     section_name = 'system'
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.pjsip.system.read')
     def get(self):
         return super().get()
 
+    @required_master_tenant()
     @required_acl('confd.asterisk.pjsip.system.update')
     def put(self):
         return super().put()
@@ -66,6 +70,7 @@ class PJSIPTransportList(ListResource):
     def get(self):
         return super().get()
 
+    @required_master_tenant()
     @required_acl('confd.sip.transports.create')
     def post(self):
         return super().post()
@@ -82,10 +87,12 @@ class PJSIPTransportItem(ItemResource):
     def get(self, transport_uuid):
         return super().get(transport_uuid)
 
+    @required_master_tenant()
     @required_acl('confd.sip.transports.{transport_uuid}.update')
     def put(self, transport_uuid):
         return super().put(transport_uuid)
 
+    @required_master_tenant()
     @required_acl('confd.sip.transports.{transport_uuid}.delete')
     def delete(self, transport_uuid):
         transport = self.service.get(transport_uuid)
