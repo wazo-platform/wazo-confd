@@ -10,8 +10,8 @@ from hamcrest import (
     has_entries,
 )
 
-from . import confd
-from . import sysconfd
+from . import confd, sysconfd
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 def test_get():
@@ -94,3 +94,11 @@ def test_put_errors():
     body = {'node_type': 'master', 'remote_address': 'not-an-ip-address'}
     result = confd.ha.put(body)
     result.assert_match(400, re.compile(re.escape('remote_address')))
+
+
+def test_restrict_only_master_tenant():
+    response = confd.ha.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.ha.put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
