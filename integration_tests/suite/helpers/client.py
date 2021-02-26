@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -118,11 +118,13 @@ class RestUrlClient(UrlFragment):
         params = self._merge_params(params, self.body)
         return self.client.head(url, **params)
 
-    def get(self, wazo_tenant=None, **params):
+    def get(self, token=None, wazo_tenant=None, **params):
         url = str(self)
         params = self._merge_params(params, self.body)
         if wazo_tenant:
             params['headers'] = {'Wazo-Tenant': wazo_tenant}
+        if token:
+            params['headers'] = {'X-Auth-Token': token}
         return self.client.get(url, **params)
 
     def post(self, body=None, wazo_tenant=None, **params):

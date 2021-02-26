@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
@@ -54,6 +54,9 @@ class SingletonProxy:
         if self.obj is None:
             self.obj = self.func(*self.func_args, **self.func_kwargs)
         return self.obj(*args, **kwargs)
+
+    def _reset(self):
+        self.obj = None
 
 
 confd = SingletonProxy(BaseIntegrationTest.create_confd)
