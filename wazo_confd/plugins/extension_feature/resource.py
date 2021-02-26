@@ -24,10 +24,12 @@ class ExtensionFeatureItem(ItemResource):
 
     schema = ExtensionFeatureSchema
 
+    @required_master_tenant()
     @required_acl('confd.extensions.features.{id}.read')
     def get(self, id):
         return super().get(id)
 
+    @required_master_tenant()
     @required_acl('confd.extensions.features.{id}.update')
     def put(self, id):
         return super().put(id)
