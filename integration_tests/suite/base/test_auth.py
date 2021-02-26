@@ -4,14 +4,19 @@
 from xivo_test_helpers import until
 from requests.exceptions import ConnectionError
 
-from . import BaseIntegrationTest, confd, auth
+from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
+from . import BaseIntegrationTest, confd, confd_csv, auth
 
 
 def test_restrict_on_with_slow_wazo_auth():
     BaseIntegrationTest.stop_service('confd')
     BaseIntegrationTest.stop_service('auth')
     BaseIntegrationTest.start_service('confd')
+    BaseIntegrationTest.setup_helpers()
+    helper_confd._reset()
+    helper_new_client._reset()
     confd._reset()
+    confd_csv._reset()
 
     def _returns_503():
         try:

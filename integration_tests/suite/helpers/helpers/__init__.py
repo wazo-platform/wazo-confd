@@ -28,6 +28,9 @@ class NewClientWrapper:
             host=self.host, port=self.port, headers=self.headers, encoder=self.encoder
         )
 
+    def _reset(self):
+        self._client = None
+
 
 class DatabaseWrapper:
     def __init__(self):
