@@ -1,10 +1,11 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that
 
 from . import confd
 from ..helpers import scenarios as s
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 def test_put_errors():
@@ -38,3 +39,11 @@ def test_live_reload_false():
 
     response = confd.configuration.live_reload.get()
     assert_that(response.item, expected)
+
+
+def test_restrict_only_master_tenant():
+    response = confd.configuration.live_reload.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.configuration.live_reload.put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)

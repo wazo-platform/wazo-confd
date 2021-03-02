@@ -1,9 +1,10 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 
 from . import confd
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 def test_get():
@@ -52,3 +53,11 @@ def test_put_all_parameters():
     result.assert_status(204)
     response = confd.provisioning.networking.get()
     assert_that(response.item, has_entries(body))
+
+
+def test_restrict_only_master_tenant():
+    response = confd.provisioning.networking.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.provisioning.networking.put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)

@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -24,6 +24,7 @@ from .sysconfd import SysconfdMock
 
 from .config import (
     TOKEN,
+    TOKEN_SUB_TENANT,
     MAIN_TENANT,
     SUB_TENANT,
     DELETED_TENANT,
@@ -42,6 +43,12 @@ class IntegrationTest(AssetLaunchingTestCase):
             TOKEN,
             'user_uuid',
             metadata={'uuid': 'user_uuid', 'tenant_uuid': MAIN_TENANT},
+        )
+        cls.mock_auth.set_token(token)
+        token = MockUserToken(
+            TOKEN_SUB_TENANT,
+            'user_uuid',
+            metadata={'uuid': 'user_uuid', 'tenant_uuid': SUB_TENANT},
         )
         cls.mock_auth.set_token(token)
         cls._reset_auth_tenants()

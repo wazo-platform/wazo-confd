@@ -1,10 +1,11 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, has_entry, has_item, is_not
 
 from . import confd
 from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers.config import TOKEN_SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -122,6 +123,18 @@ def test_edit_with_same_extension(extension1, extension2):
         exten=extension1['exten']
     )
     response.assert_match(400, e.resource_exists('Extension'))
+
+
+@fixtures.extension_feature()
+def test_restrict_only_master_tenant(extension):
+    response = confd.extensions.features.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.extensions.features(extension['id']).put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.extensions.features(extension['id']).get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
 
 
 @fixtures.extension_feature()

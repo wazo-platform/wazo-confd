@@ -1,4 +1,4 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -17,6 +17,7 @@ from hamcrest import (
 
 from . import confd, provd
 from ..helpers import associations as a, fixtures, helpers as h, scenarios as s
+from ..helpers.config import TOKEN_SUB_TENANT
 from ..helpers.helpers.line_fellowship import line_fellowship
 
 
@@ -464,6 +465,24 @@ def check_registrar_addresses_without_backup_on_sccp_device():
 def test_delete_registrar(registrar):
     response = confd.registrars(registrar['id']).delete()
     response.assert_deleted()
+
+
+@fixtures.registrar()
+def test_restrict_only_master_tenant(registrar):
+    response = confd.registrars.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.registrars.post(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.registrars(registrar['id']).get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.registrars(registrar['id']).put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.registrars(registrar['id']).delete(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
 
 
 @fixtures.registrar()

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -11,6 +11,7 @@ USER_EXTENSION_RANGE = list(range(1000, 2000))
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 TOKEN = '00000000-0000-4000-9000-000000070435'
+TOKEN_SUB_TENANT = '00000000-0000-4000-9000-000000000222'
 DELETED_TENANT = '66666666-6666-4666-8666-666666666666'
 CREATED_TENANT = '77777777-7777-4777-8777-777777777777'
 

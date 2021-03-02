@@ -1,5 +1,67 @@
 # Changelog
 
+# 21.03
+
+* The following endpoints have been restricted to the master tenant only:
+
+  * GET `/1.1/access_features`
+  * POST `/1.1/access_features`
+  * DELETE `/1.1/access_features/<access_feature_id>`
+  * GET `/1.1/access_features/<access_feature_id>`
+  * PUT `/1.1/access_features/<access_feature_id>`
+  * GET `/1.1/asterisk/confbridge/wazo_default_bridge`
+  * PUT `/1.1/asterisk/confbridge/wazo_default_bridge`
+  * GET `/1.1/asterisk/confbridge/wazo_default_user`
+  * PUT `/1.1/asterisk/confbridge/wazo_default_user`
+  * GET `/1.1/asterisk/features/applicationmap`
+  * PUT `/1.1/asterisk/features/applicationmap`
+  * GET `/1.1/asterisk/features/featuremap`
+  * PUT `/1.1/asterisk/features/featuremap`
+  * GET `/1.1/asterisk/features/general`
+  * PUT `/1.1/asterisk/features/general`
+  * GET `/1.1/asterisk/hep/general`
+  * PUT `/1.1/asterisk/hep/general`
+  * GET `/1.1/asterisk/iax/callnumberlimits`
+  * PUT `/1.1/asterisk/iax/callnumberlimits`
+  * GET `/1.1/asterisk/iax/general`
+  * PUT `/1.1/asterisk/iax/general`
+  * GET `/1.1/asterisk/pjsip/doc`
+  * GET `/1.1/asterisk/pjsip/global`
+  * PUT `/1.1/asterisk/pjsip/global`
+  * GET `/1.1/asterisk/pjsip/system`
+  * PUT `/1.1/asterisk/pjsip/system`
+  * GET `/1.1/asterisk/queues/general`
+  * PUT `/1.1/asterisk/queues/general`
+  * GET `/1.1/asterisk/rtp/general`
+  * PUT `/1.1/asterisk/rtp/general`
+  * GET `/1.1/asterisk/rtp/ice_host_candidates`
+  * PUT `/1.1/asterisk/rtp/ice_host_candidates`
+  * GET `/1.1/asterisk/sccp/general`
+  * PUT `/1.1/asterisk/sccp/general`
+  * GET `/1.1/asterisk/voicemail/general`
+  * PUT `/1.1/asterisk/voicemail/general`
+  * GET `/1.1/asterisk/voicemail/zonemessages`
+  * PUT `/1.1/asterisk/voicemail/zonemessages`
+  * GET `/1.1/configuration/live_reload`
+  * PUT `/1.1/configuration/live_reload`
+  * GET `/1.1/dhcp`
+  * PUT `/1.1/dhcp`
+  * GET `/1.1/extensions/features`
+  * GET `/1.1/extensions/features/<extension_id>`
+  * PUT `/1.1/extensions/features/<extension_id>`
+  * GET `/1.1/ha`
+  * PUT `/1.1/ha`
+  * GET `/1.1/provisioning/networking`
+  * PUT `/1.1/provisioning/networking`
+  * POST `/1.1/sip/transports`
+  * PUT `/1.1/sip/transports/<transport_uuid>`
+  * DELETE `/1.1/sip/transports/<transport_uuid>`
+  * GET `/1.1/registrars`
+  * POST `/1.1/registrars`
+  * GET `/1.1/registrars/<registrar_uuid>`
+  * PUT `/1.1/registrars/<registrar_uuid>`
+  * DELETE `/1.1/registrars/<registrar_uuid>`
+
 # 21.01
 
 * New parameters have been added to the users resource, including import/export:

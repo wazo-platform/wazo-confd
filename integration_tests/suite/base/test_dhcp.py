@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -6,6 +6,7 @@ import re
 from hamcrest import assert_that, has_entries
 
 from . import confd
+from ..helpers.config import TOKEN_SUB_TENANT
 
 
 def test_get():
@@ -70,3 +71,11 @@ def test_put_errors():
     body = {'active': True, 'pool_start': '10.0.0.2', 'pool_end': '10.0.0.1'}
     result = confd.dhcp.put(body)
     result.assert_match(400, re.compile(re.escape('pool_end')))
+
+
+def test_restrict_only_master_tenant():
+    response = confd.dhcp.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.dhcp.put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)

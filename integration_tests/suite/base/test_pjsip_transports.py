@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -17,6 +17,7 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
+from ..helpers.config import TOKEN_SUB_TENANT
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
@@ -188,6 +189,18 @@ def test_sorting_offset_limit(transport1, transport2):
     yield s.check_offset, url, transport1, transport2, 'name', 'sort', 'uuid'
 
     yield s.check_limit, url, transport1, transport2, 'name', 'sort', 'uuid'
+
+
+@fixtures.transport()
+def test_restrict_only_master_tenant(transport):
+    response = confd.sip.transports.post(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.sip.transports(transport['uuid']).put(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
+
+    response = confd.sip.transports(transport['uuid']).delete(token=TOKEN_SUB_TENANT)
+    response.assert_status(401)
 
 
 @fixtures.transport(name='original')
