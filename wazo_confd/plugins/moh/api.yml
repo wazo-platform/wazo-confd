@@ -182,7 +182,7 @@ definitions:
           description: The label of the MOH class
         mode:
           type: string
-          description: The play mode of the MOH class
+          description: 'The play mode of the MOH class. Notice: `mp3` is deprecated and should not be used'
           default: files
           enum:
           - custom
