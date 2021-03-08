@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_sip.event import (
@@ -20,6 +20,7 @@ ENDPOINT_SIP_FIELDS = [
     'name',
     'label',
     'auth_section_options.username',
+    'registration_section_options.client_uri',
     'trunk.id',
     'line.id',
 ]
