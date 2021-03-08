@@ -104,7 +104,7 @@ parameters:
   groupuuid:
     required: true
     type: string
-    name: group_id
+    name: group_uuid
     in: path
     description: the group's UUID
 
