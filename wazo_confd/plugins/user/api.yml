@@ -105,7 +105,7 @@ paths:
 
         A user can not be deleted if he is associated to a line or a voicemail. Any
         line or voicemail attached to the user must be dissociated first. The user
-        will also be removed from all queues, groups or other XiVO entities whom he
+        will also be removed from all queues, groups or other Wazo entities whom he
         is member.'
       tags:
       - users

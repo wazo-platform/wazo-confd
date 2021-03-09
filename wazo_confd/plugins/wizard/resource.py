@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -7,7 +7,7 @@ from marshmallow.validate import Equal, Regexp, Length, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean
 from wazo_confd.helpers.restful import ErrorCatchingResource
-from .access_restriction import xivo_unconfigured
+from .access_restriction import wazo_unconfigured
 
 ADMIN_PASSWORD_REGEX = (
     r'^[a-zA-Z0-9\!\"\#\$\%\&\'\(\)\*\+\,\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\-]{4,64}$'
@@ -76,7 +76,7 @@ class WizardResource(ErrorCatchingResource):
         configured = self.service.get()
         return self.configured_schema().dump(configured)
 
-    @xivo_unconfigured
+    @wazo_unconfigured
     def post(self):
         wizard = self.wizard_schema().load(request.get_json())
         wizard_with_uuid = self.service.create(wizard)
@@ -110,7 +110,7 @@ class WizardDiscoverResource(ErrorCatchingResource):
     def __init__(self, service):
         self.service = service
 
-    @xivo_unconfigured
+    @wazo_unconfigured
     def get(self):
 
         discover = {
