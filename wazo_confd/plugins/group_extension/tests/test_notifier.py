@@ -1,8 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.group_extension.event import (
@@ -22,12 +23,16 @@ class TestGroupExtensionNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.extension = Mock(Extension, id=1)
-        self.group = Mock(Group, id=2)
+        self.group = Mock(Group, id=2, uuid=uuid4())
 
         self.notifier = GroupExtensionNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = GroupExtensionAssociatedEvent(self.group.id, self.extension.id)
+        expected_event = GroupExtensionAssociatedEvent(
+            group_id=self.group.id,
+            group_uuid=str(self.group.uuid),
+            extension_id=self.extension.id,
+        )
 
         self.notifier.associated(self.group, self.extension)
 
@@ -40,7 +45,9 @@ class TestGroupExtensionNotifier(unittest.TestCase):
 
     def test_dissociate_then_bus_event(self):
         expected_event = GroupExtensionDissociatedEvent(
-            self.group.id, self.extension.id
+            group_id=self.group.id,
+            group_uuid=str(self.group.uuid),
+            extension_id=self.extension.id,
         )
 
         self.notifier.dissociated(self.group, self.extension)

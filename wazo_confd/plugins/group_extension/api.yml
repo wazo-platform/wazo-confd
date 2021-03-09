@@ -1,14 +1,14 @@
 paths:
-  /groups/{group_id}/extensions/{extension_id}:
+  /groups/{group_uuid}/extensions/{extension_id}:
     put:
       operationId: associate_group_extension
       summary: Associate group and extension
-      description: '**Required ACL:** `confd.groups.{group_id}.extensions.{extension_id}.update`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.extensions.{extension_id}.update`'
       tags:
       - groups
       - extensions
       parameters:
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - $ref: '#/parameters/extensionid'
       responses:
         '204':
@@ -20,12 +20,12 @@ paths:
     delete:
       operationId: dissociate_group_extension
       summary: Dissociate group and extension
-      description: '**Required ACL:** `confd.groups.{group_id}.extensions.{extension_id}.delete`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.extensions.{extension_id}.delete`'
       tags:
       - groups
       - extensions
       parameters:
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - $ref: '#/parameters/extensionid'
       responses:
         '204':

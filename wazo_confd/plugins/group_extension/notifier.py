@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.group_extension.event import (
@@ -20,12 +20,20 @@ class GroupExtensionNotifier:
 
     def associated(self, group, extension):
         self.send_sysconfd_handlers()
-        event = GroupExtensionAssociatedEvent(group.id, extension.id)
+        event = GroupExtensionAssociatedEvent(
+            group_id=group.id,
+            group_uuid=str(group.uuid),
+            extension_id=extension.id,
+        )
         self.bus.send_bus_event(event)
 
     def dissociated(self, group, extension):
         self.send_sysconfd_handlers()
-        event = GroupExtensionDissociatedEvent(group.id, extension.id)
+        event = GroupExtensionDissociatedEvent(
+            group_id=group.id,
+            group_uuid=str(group.uuid),
+            extension_id=extension.id,
+        )
         self.bus.send_bus_event(event)
 
 

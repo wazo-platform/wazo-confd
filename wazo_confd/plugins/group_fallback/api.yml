@@ -1,13 +1,13 @@
 paths:
-  /groups/{group_id}/fallbacks:
+  /groups/{group_uuid}/fallbacks:
     get:
       operationId: get_group_fallback
       summary: List all fallbacks for group
-      description: '**Required ACL:** `confd.groups.{group_id}.fallbacks.read`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.fallbacks.read`'
       tags:
       - groups
       parameters:
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       responses:
         '200':
           description: Fallbacks for group
@@ -16,14 +16,14 @@ paths:
     put:
       operationId: update_group_fallback
       summary: Update group's fallbacks
-      description: '**Required ACL:** `confd.groups.{group_id}.fallbacks.update`
+      description: '**Required ACL:** `confd.groups.{group_uuid}.fallbacks.update`
 
 
         **WARNING** This endpoint delete all fields that are not defined.'
       tags:
       - groups
       parameters:
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - name: body
         in: body
         description: Fallbacks for group

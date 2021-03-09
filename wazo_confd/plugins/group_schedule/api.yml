@@ -1,15 +1,15 @@
 paths:
-  /groups/{group_id}/schedules/{schedule_id}:
+  /groups/{group_uuid}/schedules/{schedule_id}:
     put:
       operationId: associate_group_schedule
       summary: Associate group and schedule
-      description: '**Required ACL:** `confd.groups.{group_id}.schedules.{schedule_id}.update`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.schedules.{schedule_id}.update`'
       tags:
       - groups
       - schedules
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - $ref: '#/parameters/scheduleid'
       responses:
         '204':
@@ -21,13 +21,13 @@ paths:
     delete:
       operationId: dissociate_group_schedule
       summary: Dissociate group and schedule
-      description: '**Required ACL:** `confd.groups.{group_id}.schedules.{schedule_id}.delete`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.schedules.{schedule_id}.delete`'
       tags:
       - groups
       - schedules
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/groupid'
+      - $ref: '#/parameters/groupuuid'
       - $ref: '#/parameters/scheduleid'
       responses:
         '204':

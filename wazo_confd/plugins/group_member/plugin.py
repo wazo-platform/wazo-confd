@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.group import dao as group_dao
@@ -15,14 +15,16 @@ class Plugin:
 
         api.add_resource(
             GroupMemberUserItem,
-            '/groups/<int:group_id>/members/users',
+            '/groups/<int:group_uuid>/members/users',
+            '/groups/<uuid:group_uuid>/members/users',
             endpoint='group_member_users',
             resource_class_args=(service, group_dao, user_dao),
         )
 
         api.add_resource(
             GroupMemberExtensionItem,
-            '/groups/<int:group_id>/members/extensions',
+            '/groups/<int:group_uuid>/members/extensions',
+            '/groups/<uuid:group_uuid>/members/extensions',
             endpoint='group_member_extensions',
             resource_class_args=(service, group_dao),
         )

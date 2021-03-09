@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -20,6 +20,10 @@ def test_associate_errors(group, user):
     response.assert_status(404)
 
     url = confd.groups(group['id']).members.users.put
+    for check in error_checks(url):
+        yield check
+
+    url = confd.groups(group['uuid']).members.users.put
     for check in error_checks(url):
         yield check
 
@@ -64,6 +68,10 @@ def test_associate(group, user, line):
         response = confd.groups(group['id']).members.users.put(users=[user])
         response.assert_updated()
 
+    with a.user_line(user, line):
+        response = confd.groups(group['uuid']).members.users.put(users=[user])
+        response.assert_updated()
+
 
 @fixtures.group()
 @fixtures.user()
@@ -79,12 +87,12 @@ def test_associate_multiple_with_priority(
         user3, line3
     ):
         user1['priority'], user2['priority'], user3['priority'] = 4, 1, 2
-        response = confd.groups(group['id']).members.users.put(
+        response = confd.groups(group['uuid']).members.users.put(
             users=[user1, user2, user3]
         )
         response.assert_updated()
 
-        response = confd.groups(group['id']).get()
+        response = confd.groups(group['uuid']).get()
         assert_that(
             response.item,
             has_entries(
@@ -102,7 +110,7 @@ def test_associate_multiple_with_priority(
 @fixtures.group()
 @fixtures.user()
 def test_associate_user_with_no_line(group, user):
-    response = confd.groups(group['id']).members.users.put(users=[user])
+    response = confd.groups(group['uuid']).members.users.put(users=[user])
     response.assert_match(400, e.missing_association('User', 'Line'))
 
 
@@ -112,7 +120,7 @@ def test_associate_user_with_no_line(group, user):
 @fixtures.line_sip()
 def test_associate_same_user(group, user, line1, line2):
     with a.user_line(user, line1), a.user_line(user, line2):
-        response = confd.groups(group['id']).members.users.put(users=[user, user])
+        response = confd.groups(group['uuid']).members.users.put(users=[user, user])
         response.assert_status(400)
 
 
@@ -122,7 +130,7 @@ def test_associate_same_user(group, user, line1, line2):
 @fixtures.line_sip()
 def test_associate_multiple_user_with_same_line(group, user1, user2, line):
     with a.user_line(user1, line), a.user_line(user2, line):
-        response = confd.groups(group['id']).members.users.put(users=[user1, user2])
+        response = confd.groups(group['uuid']).members.users.put(users=[user1, user2])
         response.assert_match(
             400, re.compile('Cannot associate different users with the same line')
         )
@@ -137,7 +145,7 @@ def test_get_users_associated_to_group(group, user1, user2, line1, line2):
     with a.user_line(user1, line1), a.user_line(user2, line2), a.group_member_user(
         group, user2, user1
     ):
-        response = confd.groups(group['id']).get()
+        response = confd.groups(group['uuid']).get()
         assert_that(
             response.item,
             has_entries(
@@ -172,8 +180,16 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
             response.item,
             has_entries(
                 groups=contains_inanyorder(
-                    has_entries(id=group2['id'], name=group2['name']),
-                    has_entries(id=group1['id'], name=group1['name']),
+                    has_entries(
+                        id=group2['id'],
+                        uuid=group2['uuid'],
+                        name=group2['name'],
+                    ),
+                    has_entries(
+                        id=group1['id'],
+                        uuid=group1['uuid'],
+                        name=group1['name'],
+                    ),
                 )
             ),
         )
@@ -184,17 +200,17 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_group, sub_group, main_user, sub_user):
-    response = confd.groups(main_group['id']).members.users.put(
+    response = confd.groups(main_group['uuid']).members.users.put(
         users=[{'uuid': main_user['uuid']}], wazo_tenant=SUB_TENANT
     )
     response.assert_match(404, e.not_found('Group'))
 
-    response = confd.groups(sub_group['id']).members.users.put(
+    response = confd.groups(sub_group['uuid']).members.users.put(
         users=[{'uuid': main_user['uuid']}], wazo_tenant=SUB_TENANT
     )
     response.assert_match(400, e.not_found('User'))
 
-    response = confd.groups(main_group['id']).members.users.put(
+    response = confd.groups(main_group['uuid']).members.users.put(
         users=[{'uuid': sub_user['uuid']}], wazo_tenant=MAIN_TENANT
     )
     response.assert_match(400, e.different_tenant())
@@ -206,6 +222,12 @@ def test_associate_multi_tenant(main_group, sub_group, main_user, sub_user):
 @fixtures.line_sip()
 @fixtures.line_sip()
 def test_dissociate(group, user1, user2, line1, line2):
+    with a.user_line(user1, line1), a.user_line(user2, line2), a.group_member_user(
+        group, user1, user2
+    ):
+        response = confd.groups(group['uuid']).members.users.put(users=[])
+        response.assert_updated()
+
     with a.user_line(user1, line1), a.user_line(user2, line2), a.group_member_user(
         group, user1, user2
     ):
@@ -222,9 +244,9 @@ def test_delete_group_when_group_and_user_associated(group, user1, user2, line1,
     with a.user_line(user1, line1), a.user_line(user2, line2), a.group_member_user(
         group, user1, user2, check=False
     ):
-        confd.groups(group['id']).delete().assert_deleted()
+        confd.groups(group['uuid']).delete().assert_deleted()
 
-        deleted_group = confd.groups(group['id']).get
+        deleted_group = confd.groups(group['uuid']).get
         yield s.check_resource_not_found, deleted_group, 'Group'
 
         response = confd.users(user1['uuid']).get()
@@ -248,10 +270,10 @@ def test_delete_user_when_group_and_user_associated(group1, group2, user, line):
         deleted_user = confd.users(user['uuid']).get
         yield s.check_resource_not_found, deleted_user, 'User'
 
-        response = confd.groups(group1['id']).get()
+        response = confd.groups(group1['uuid']).get()
         yield assert_that, response.item['members']['users'], empty()
 
-        response = confd.groups(group2['id']).get()
+        response = confd.groups(group2['uuid']).get()
         yield assert_that, response.item['members']['users'], empty()
 
 
@@ -260,6 +282,6 @@ def test_delete_user_when_group_and_user_associated(group1, group2, user, line):
 @fixtures.line_sip()
 def test_bus_events(group, user, line):
     with a.user_line(user, line):
-        url = confd.groups(group['id']).members.users.put
+        url = confd.groups(group['uuid']).members.users.put
         body = {'users': [user]}
         yield s.check_bus_event, 'config.groups.members.users.updated', url, body

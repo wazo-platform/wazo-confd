@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.group.event import (
@@ -8,6 +8,10 @@ from xivo_bus.resources.group.event import (
 )
 
 from wazo_confd import bus, sysconfd
+
+from .schema import GroupSchema
+
+GROUP_FIELDS = ['id', 'uuid']
 
 
 class GroupNotifier:
@@ -20,18 +24,18 @@ class GroupNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, group):
-        self.send_sysconfd_handlers()
-        event = CreateGroupEvent(group.id)
-        self.bus.send_bus_event(event)
+        return self._dispatch_event(group, CreateGroupEvent)
 
     def edited(self, group):
-        self.send_sysconfd_handlers()
-        event = EditGroupEvent(group.id)
-        self.bus.send_bus_event(event)
+        return self._dispatch_event(group, EditGroupEvent)
 
     def deleted(self, group):
+        return self._dispatch_event(group, DeleteGroupEvent)
+
+    def _dispatch_event(self, group, Event):
         self.send_sysconfd_handlers()
-        event = DeleteGroupEvent(group.id)
+        group_serialized = GroupSchema(only=GROUP_FIELDS).dump(group)
+        event = Event(**group_serialized)
         self.bus.send_bus_event(event)
 
 

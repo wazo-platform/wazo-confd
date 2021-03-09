@@ -67,7 +67,7 @@ class UserSchema(BaseSchema):
 
     fallbacks = fields.Nested('UserFallbackSchema', dump_only=True)
     groups = fields.Nested(
-        'GroupSchema', only=['id', 'name', 'links'], many=True, dump_only=True
+        'GroupSchema', only=['uuid', 'id', 'name', 'links'], many=True, dump_only=True
     )
     incalls = fields.Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True

@@ -1,9 +1,10 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
 from mock import Mock
+from uuid import uuid4
 
 from xivo_bus.resources.group_call_permission.event import (
     GroupCallPermissionAssociatedEvent,
@@ -19,13 +20,15 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.call_permission = Mock(CallPermission, id=4)
-        self.group = Mock(Group, id=5)
+        self.group = Mock(Group, id=5, uuid=uuid4())
 
         self.notifier = GroupCallPermissionNotifier(self.bus)
 
     def test_when_call_permission_associate_to_group_then_event_sent_on_bus(self):
         expected_event = GroupCallPermissionAssociatedEvent(
-            self.group.id, self.call_permission.id
+            group_id=self.group.id,
+            group_uuid=str(self.group.uuid),
+            call_permission_id=self.call_permission.id,
         )
 
         self.notifier.associated(self.group, self.call_permission)
@@ -34,7 +37,9 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
 
     def test_when_call_permission_dissociate_to_group_then_event_sent_on_bus(self):
         expected_event = GroupCallPermissionDissociatedEvent(
-            self.group.id, self.call_permission.id
+            group_id=self.group.id,
+            group_uuid=str(self.group.uuid),
+            call_permission_id=self.call_permission.id,
         )
 
         self.notifier.dissociated(self.group, self.call_permission)

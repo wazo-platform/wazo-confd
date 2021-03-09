@@ -166,6 +166,7 @@ class incall(IsolatedAction):
 
 class group(IsolatedAction):
 
+    id_field = 'uuid'
     actions = {'generate': h.group.generate_group, 'delete': h.group.delete_group}
 
 

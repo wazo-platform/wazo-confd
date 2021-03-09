@@ -1,5 +1,26 @@
 # Changelog
 
+# 21.04
+
+* The following resources have been added:
+
+  * GET,PUT,DELETE `/1.1/groups/<group_uuid>`
+  * PUT,DELETE `/1.1/groups/<group_uuid>/extensions/<extension_id>`
+  * PUT,DELETE `/1.1/groups/<group_uuid>/schedules/<schedule_id>`
+  * PUT,DELETE `/1.1/groups/<group_uuid>/fallbacks`
+  * PUT `/1.1/groups/{group_uuid}/members/users`
+  * PUT `/1.1/groups/{group_uuid}/members/extensions
+
+* The following resources have been deprecated:
+
+  * GET,PUT,DELETE `/1.1/groups/<group_id>`
+  * PUT,DELETE `/1.1/groups/<group_id>/extensions/<extension_id>`
+  * PUT,DELETE `/1.1/groups/<group_id>/schedules/<schedule_id>`
+  * PUT,DELETE `/1.1/groups/<group_id>/fallbacks`
+  * PUT `/1.1/groups/{group_id}/members/users`
+  * PUT `/1.1/groups/{group_id}/members/extensions`
+
+
 # 21.03
 
 * The following endpoints have been restricted to the master tenant only:
@@ -61,6 +82,7 @@
   * GET `/1.1/registrars/<registrar_uuid>`
   * PUT `/1.1/registrars/<registrar_uuid>`
   * DELETE `/1.1/registrars/<registrar_uuid>`
+
 
 # 21.01
 

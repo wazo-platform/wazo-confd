@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -11,6 +11,7 @@ NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
 class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    uuid = fields.String(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(
         validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)),
@@ -41,7 +42,7 @@ class GroupSchema(BaseSchema):
     ring_in_use = StrictBoolean()
     mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
-    links = ListLink(Link('groups'))
+    links = ListLink(Link('groups', field='uuid'))
 
     extensions = fields.Nested(
         'ExtensionSchema',

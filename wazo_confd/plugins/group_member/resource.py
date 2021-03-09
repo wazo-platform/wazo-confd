@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -35,11 +35,11 @@ class GroupMemberUserItem(GroupMemberItem):
         super().__init__(service, group_dao)
         self.user_dao = user_dao
 
-    @required_acl('confd.groups.{group_id}.members.users.update')
-    def put(self, group_id):
+    @required_acl('confd.groups.{group_uuid}.members.users.update')
+    def put(self, group_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
 
-        group = self.group_dao.get(group_id, tenant_uuids=tenant_uuids)
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json())
         members = []
         try:
@@ -67,9 +67,9 @@ class GroupMemberExtensionItem(GroupMemberItem):
 
     schema = GroupExtensionsSchema
 
-    @required_acl('confd.groups.{group_id}.members.extensions.update')
-    def put(self, group_id):
-        group = self.group_dao.get(group_id)
+    @required_acl('confd.groups.{group_uuid}.members.extensions.update')
+    def put(self, group_uuid):
+        group = self.group_dao.get(group_uuid)
         form = self.schema().load(request.get_json())
         members = []
         for member_form in form['extensions']:

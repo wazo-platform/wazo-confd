@@ -422,7 +422,7 @@ definitions:
     properties:
       uuid:
         type: string
-        description: User UUID. This ID is globally unique across multiple XiVO instances
+        description: User UUID. This ID is globally unique across multiple Wazo instances
         readOnly: true
       firstname:
         type: string

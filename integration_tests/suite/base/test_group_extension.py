@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -26,6 +26,10 @@ def test_associate_errors(extension, group):
     yield s.check_resource_not_found, fake_group, 'Group'
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
+    fake_extension = confd.groups(group['uuid']).extensions(FAKE_ID).put
+
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+
 
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
@@ -36,10 +40,21 @@ def test_dissociate_errors(extension, group):
     yield s.check_resource_not_found, fake_group, 'Group'
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
+    fake_extension = confd.groups(group['uuid']).extensions(FAKE_ID).delete
+
+    yield s.check_resource_not_found, fake_extension, 'Extension'
+
 
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 def test_associate(extension, group):
+    response = confd.groups(group['uuid']).extensions(extension['id']).put()
+    response.assert_updated()
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+def test_associate_by_id(extension, group):
     response = confd.groups(group['id']).extensions(extension['id']).put()
     response.assert_updated()
 
@@ -48,7 +63,7 @@ def test_associate(extension, group):
 @fixtures.group()
 def test_associate_already_associated(extension, group):
     with a.group_extension(group, extension):
-        response = confd.groups(group['id']).extensions(extension['id']).put()
+        response = confd.groups(group['uuid']).extensions(extension['id']).put()
         response.assert_updated()
 
 
@@ -57,7 +72,7 @@ def test_associate_already_associated(extension, group):
 @fixtures.group()
 def test_associate_multiple_extensions_to_group(extension1, extension2, group):
     with a.group_extension(group, extension1):
-        response = confd.groups(group['id']).extensions(extension2['id']).put()
+        response = confd.groups(group['uuid']).extensions(extension2['id']).put()
         response.assert_match(400, e.resource_associated('Group', 'Extension'))
 
 
@@ -66,7 +81,7 @@ def test_associate_multiple_extensions_to_group(extension1, extension2, group):
 @fixtures.group()
 def test_associate_multiple_groups_to_extension(extension, group1, group2):
     with a.group_extension(group1, extension):
-        response = confd.groups(group2['id']).extensions(extension['id']).put()
+        response = confd.groups(group2['uuid']).extensions(extension['id']).put()
         response.assert_match(400, e.resource_associated('Group', 'Extension'))
 
 
@@ -76,28 +91,28 @@ def test_associate_multiple_groups_to_extension(extension, group1, group2):
 @fixtures.line_sip()
 def test_associate_when_user_already_associated(extension, group, user, line_sip):
     with a.user_line(user, line_sip), a.line_extension(line_sip, extension):
-        response = confd.groups(group['id']).extensions(extension['id']).put()
+        response = confd.groups(group['uuid']).extensions(extension['id']).put()
         response.assert_match(400, e.resource_associated('user', 'Extension'))
 
 
 @fixtures.extension(exten=gen_group_exten(), context=INCALL_CONTEXT)
 @fixtures.group()
 def test_associate_when_not_internal_context(extension, group):
-    response = confd.groups(group['id']).extensions(extension['id']).put()
+    response = confd.groups(group['uuid']).extensions(extension['id']).put()
     response.assert_status(400)
 
 
 @fixtures.extension(exten=EXTEN_OUTSIDE_RANGE)
 @fixtures.group()
 def test_associate_when_exten_outside_range(extension, group):
-    response = confd.groups(group['id']).extensions(extension['id']).put()
+    response = confd.groups(group['uuid']).extensions(extension['id']).put()
     response.assert_status(400)
 
 
 @fixtures.extension(exten='_5678')
 @fixtures.group()
 def test_associate_when_exten_pattern(extension, group):
-    response = confd.groups(group['id']).extensions(extension['id']).put()
+    response = confd.groups(group['uuid']).extensions(extension['id']).put()
     response.assert_updated()
 
 
@@ -111,21 +126,21 @@ def test_associate_multi_tenant(
     main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten
 ):
     response = (
-        confd.groups(sub_group['id'])
+        confd.groups(sub_group['uuid'])
         .extensions(main_exten['id'])
         .put(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('Extension'))
 
     response = (
-        confd.groups(main_group['id'])
+        confd.groups(main_group['uuid'])
         .extensions(sub_exten['id'])
         .put(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('Group'))
 
     response = (
-        confd.groups(main_group['id'])
+        confd.groups(main_group['uuid'])
         .extensions(sub_exten['id'])
         .put(wazo_tenant=MAIN_TENANT)
     )
@@ -136,6 +151,14 @@ def test_associate_multi_tenant(
 @fixtures.group()
 def test_dissociate(extension, group):
     with a.group_extension(group, extension, check=False):
+        response = confd.groups(group['uuid']).extensions(extension['id']).delete()
+        response.assert_deleted()
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+def test_dissociate_by_id(extension, group):
+    with a.group_extension(group, extension, check=False):
         response = confd.groups(group['id']).extensions(extension['id']).delete()
         response.assert_deleted()
 
@@ -143,7 +166,7 @@ def test_dissociate(extension, group):
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 def test_dissociate_not_associated(extension, group):
-    response = confd.groups(group['id']).extensions(extension['id']).delete()
+    response = confd.groups(group['uuid']).extensions(extension['id']).delete()
     response.assert_deleted()
 
 
@@ -157,14 +180,14 @@ def test_dissociate_multi_tenant(
     main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten
 ):
     response = (
-        confd.groups(sub_group['id'])
+        confd.groups(sub_group['uuid'])
         .extensions(main_exten['id'])
         .delete(wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found('Extension'))
 
     response = (
-        confd.groups(main_group['id'])
+        confd.groups(main_group['uuid'])
         .extensions(sub_exten['id'])
         .delete(wazo_tenant=SUB_TENANT)
     )
@@ -175,7 +198,7 @@ def test_dissociate_multi_tenant(
 @fixtures.group()
 def test_get_group_relation(extension, group):
     with a.group_extension(group, extension):
-        response = confd.groups(group['id']).get()
+        response = confd.groups(group['uuid']).get()
         assert_that(
             response.item,
             has_entries(
@@ -197,7 +220,13 @@ def test_get_extension_relation(extension, group):
         response = confd.extensions(extension['id']).get()
         assert_that(
             response.item,
-            has_entries(group=has_entries(id=group['id'], name=group['name'])),
+            has_entries(
+                group=has_entries(
+                    uuid=group['uuid'],
+                    id=group['id'],
+                    name=group['name'],
+                )
+            ),
         )
 
 
@@ -213,7 +242,7 @@ def test_edit_context_to_incall_when_associated(extension, group):
 @fixtures.group()
 def test_delete_group_when_group_and_extension_associated(extension, group):
     with a.group_extension(group, extension, check=False):
-        response = confd.groups(group['id']).delete()
+        response = confd.groups(group['uuid']).delete()
         response.assert_deleted()
 
 
@@ -225,6 +254,6 @@ def test_delete_extension_when_group_and_extension_associated():
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 def test_bus_events(extension, group):
-    url = confd.groups(group['id']).extensions(extension['id'])
+    url = confd.groups(group['uuid']).extensions(extension['id'])
     yield s.check_bus_event, 'config.groups.extensions.updated', url.put
     yield s.check_bus_event, 'config.groups.extensions.deleted', url.delete

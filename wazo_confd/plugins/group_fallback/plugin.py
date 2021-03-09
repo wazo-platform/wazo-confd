@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.group import dao as group_dao
@@ -14,6 +14,7 @@ class Plugin:
 
         api.add_resource(
             GroupFallbackList,
-            '/groups/<int:group_id>/fallbacks',
+            '/groups/<int:group_uuid>/fallbacks',
+            '/groups/<uuid:group_uuid>/fallbacks',
             resource_class_args=(service, group_dao),
         )
