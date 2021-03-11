@@ -278,6 +278,22 @@ def test_create_minimal_parameters():
     confd.groups(response.item['uuid']).delete().assert_deleted()
 
 
+def test_create_deprecated_name():
+    response = confd.groups.post(name='MyGroup')
+    response.assert_created('groups')
+
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=not_(empty()),
+            name=not_(empty()),
+            label='MyGroup',
+        ),
+    )
+
+    confd.groups(response.item['uuid']).delete().assert_deleted()
+
+
 def test_create_all_parameters():
     parameters = {
         'label': 'MyGroup',
