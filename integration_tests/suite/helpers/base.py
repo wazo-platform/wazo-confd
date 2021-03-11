@@ -60,23 +60,58 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def _create_auth_tenant(cls):
         cls.mock_auth.set_tenants(
-            {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
-            {'uuid': CREATED_TENANT, 'name': 'name4', 'parent_uuid': MAIN_TENANT},
+            {
+                'uuid': MAIN_TENANT,
+                'name': 'name1',
+                'slug': 'slug1',
+                'parent_uuid': MAIN_TENANT,
+            },
+            {
+                'uuid': CREATED_TENANT,
+                'name': 'name4',
+                'slug': 'slug2',
+                'parent_uuid': MAIN_TENANT,
+            },
         )
 
     @classmethod
     def _delete_auth_tenant(cls):
         cls.mock_auth.set_tenants(
-            {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
+            {
+                'uuid': MAIN_TENANT,
+                'name': 'name1',
+                'slug': 'slug1',
+                'parent_uuid': MAIN_TENANT,
+            },
         )
 
     @classmethod
     def _reset_auth_tenants(cls):
         cls.mock_auth.set_tenants(
-            {'uuid': MAIN_TENANT, 'name': 'name1', 'parent_uuid': MAIN_TENANT},
-            {'uuid': SUB_TENANT, 'name': 'name2', 'parent_uuid': MAIN_TENANT},
-            {'uuid': DELETED_TENANT, 'name': 'name3', 'parent_uuid': MAIN_TENANT},
-            {'uuid': CREATED_TENANT, 'name': 'name4', 'parent_uuid': MAIN_TENANT},
+            {
+                'uuid': MAIN_TENANT,
+                'name': 'name1',
+                'slug': 'slug1',
+                'parent_uuid': MAIN_TENANT,
+            },
+            {
+                'uuid': SUB_TENANT,
+                'name': 'name2',
+                'slug': 'slug2',
+                'parent_uuid': MAIN_TENANT,
+            },
+            {
+                'uuid': DELETED_TENANT,
+                'name': 'name3',
+                'slug': 'slug3',
+                'parent_uuid': MAIN_TENANT,
+            },
+            {
+                'uuid': CREATED_TENANT,
+                'name': 'name4',
+                'slug': 'slug4',
+                'parent_uuid': MAIN_TENANT,
+            },
         )
 
     @classmethod

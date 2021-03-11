@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -6,6 +6,7 @@ from hamcrest import (
     contains_inanyorder,
     has_entries,
     empty,
+    starts_with,
 )
 
 from xivo_test_helpers import until
@@ -20,7 +21,7 @@ def test_create_default_templates_when_not_exist():
     assert_that(response.items, empty())
 
     with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
-        BusClientHeaders.send_tenant_created(CREATED_TENANT)
+        BusClientHeaders.send_tenant_created(CREATED_TENANT, 'myslug')
 
     def templates_created():
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
@@ -35,4 +36,10 @@ def test_create_default_templates_when_not_exist():
             ),
         )
 
+    def slug_created():
+        # There's no API to check the tenant slug. It is part of any new group name
+        group = confd.groups.create({'label': 'ignore'}, wazo_tenant=CREATED_TENANT)
+        assert_that(group, has_entries(name=starts_with('grp-myslug-')))
+
     until.assert_(templates_created, tries=5)
+    until.assert_(slug_created, tries=5)

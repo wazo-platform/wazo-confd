@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .service import DefaultSIPTemplateService
@@ -19,9 +19,11 @@ class TenantEventHandler:
 
     def _auth_tenant_added(self, event):
         tenant_uuid = event['uuid']
+        slug = event['slug']
         with session_scope():
             tenant = self.tenant_dao.find_or_create_tenant(tenant_uuid)
             self.service.generate_sip_templates(tenant)
+            self.service.copy_slug(tenant, slug)
 
 
 class Plugin:

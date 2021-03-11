@@ -1,4 +1,4 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -39,3 +39,6 @@ class CRUDService:
         self.validator.validate_delete(resource)
         self.dao.delete(resource)
         self.notifier.deleted(resource)
+
+    def update_form(self, form):
+        return form
