@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -12,6 +12,9 @@ class DefaultSIPTemplateService:
     def __init__(self, sip_dao, transport_dao):
         self.sip_dao = sip_dao
         self.transport_dao = transport_dao
+
+    def copy_slug(self, tenant, slug):
+        tenant.slug = slug
 
     def create_or_merge_sip_template(self, template_config, existing_template_uuid):
         if not existing_template_uuid:
