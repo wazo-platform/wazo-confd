@@ -10,6 +10,7 @@
   * PUT, DELETE `/1.1/groups/<group_uuid>/fallbacks`
   * PUT `/1.1/groups/{group_uuid}/members/users`
   * PUT `/1.1/groups/{group_uuid}/members/extensions`
+  * GET, PUT `/1.1/emails`
 
 * The following resources have been deprecated:
 
