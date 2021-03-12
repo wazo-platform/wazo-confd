@@ -1,27 +1,26 @@
 # Changelog
 
-# 21.04
+## 21.04
 
 * The following resources have been added:
 
-  * GET,PUT,DELETE `/1.1/groups/<group_uuid>`
-  * PUT,DELETE `/1.1/groups/<group_uuid>/extensions/<extension_id>`
-  * PUT,DELETE `/1.1/groups/<group_uuid>/schedules/<schedule_id>`
-  * PUT,DELETE `/1.1/groups/<group_uuid>/fallbacks`
+  * GET, PUT, DELETE `/1.1/groups/<group_uuid>`
+  * PUT, DELETE `/1.1/groups/<group_uuid>/extensions/<extension_id>`
+  * PUT, DELETE `/1.1/groups/<group_uuid>/schedules/<schedule_id>`
+  * PUT, DELETE `/1.1/groups/<group_uuid>/fallbacks`
   * PUT `/1.1/groups/{group_uuid}/members/users`
-  * PUT `/1.1/groups/{group_uuid}/members/extensions
+  * PUT `/1.1/groups/{group_uuid}/members/extensions`
 
 * The following resources have been deprecated:
 
-  * GET,PUT,DELETE `/1.1/groups/<group_id>`
-  * PUT,DELETE `/1.1/groups/<group_id>/extensions/<extension_id>`
-  * PUT,DELETE `/1.1/groups/<group_id>/schedules/<schedule_id>`
-  * PUT,DELETE `/1.1/groups/<group_id>/fallbacks`
+  * GET, PUT, DELETE `/1.1/groups/<group_id>`
+  * PUT, DELETE `/1.1/groups/<group_id>/extensions/<extension_id>`
+  * PUT, DELETE `/1.1/groups/<group_id>/schedules/<schedule_id>`
+  * PUT, DELETE `/1.1/groups/<group_id>/fallbacks`
   * PUT `/1.1/groups/{group_id}/members/users`
   * PUT `/1.1/groups/{group_id}/members/extensions`
 
-
-# 21.03
+## 21.03
 
 * The following endpoints have been restricted to the master tenant only:
 
@@ -83,8 +82,7 @@
   * PUT `/1.1/registrars/<registrar_uuid>`
   * DELETE `/1.1/registrars/<registrar_uuid>`
 
-
-# 21.01
+## 21.01
 
 * New parameters have been added to the users resource, including import/export:
 
@@ -152,6 +150,7 @@
   * DELETE `/1.1/endpoints/sip/templates/<template_uuid>`
 
 ## 20.11
+
 * The following endpoints are now multi-tenant.
 
   This means that created resources will be in the same tenant as the creator or in the tenant
@@ -443,8 +442,8 @@
 
   * For destinations of type `bsfilter`:
 
-      * `filter_member_firstname`
-      * `filter_member_lastname`
+    * `filter_member_firstname`
+    * `filter_member_lastname`
 
 * New readonly parameters have been added to the call filter surrogate resource:
 
@@ -563,7 +562,7 @@
 
   * For destinations of type `application`:
 
-      * `custom`
+    * `custom`
 
 * New parameter have been added to the wizard resource:
 
@@ -742,7 +741,6 @@
   * PUT `/1.1/callpickups/<call_pickup_id>/targets/groups`
   * PUT `/1.1/callpickups/<call_pickup_id>/targets/users`
 
-
 * The `/contexts` routes are now multi-tenant. This means that created tenant will be in the same
   tenant as the creator or in the tenant specified by the Wazo-Tenant HTTP header. Listing contexts
   will also only list contexts in the user's tenant unless a sub-tenant is specified using the
@@ -765,8 +763,8 @@
 * The `password` field has been removed from GET `/1.1/users/export`
 * The `Wazo-Tenant` header can now be used when creating users in a given tenant.
 
-    * POST `/1.1/users`
-    * POST `/1.1/users/import`
+  * POST `/1.1/users`
+  * POST `/1.1/users/import`
 
 * The users GET, PUT and DELETE are now filtered by tenant. xivo-confd will behave as if users from other tenants do not exist.
 
@@ -1089,12 +1087,12 @@
 
   * For destinations of type `user`:
 
-      * `user_firstname`
-      * `user_lastname`
+    * `user_firstname`
+    * `user_lastname`
 
   * For destinations of type `group`:
 
-      * `group_name`
+    * `group_name`
 
 * New readonly parameters have been added to the infos resource:
 
@@ -1169,16 +1167,16 @@
 
   * For destinations of type `ivr`:
 
-      * `ivr_name`
+    * `ivr_name`
 
   * For destinations of type `user`:
 
-      * `user_firstname`
-      * `user_lastname`
+    * `user_firstname`
+    * `user_lastname`
 
   * For destinations of type `voicemail`:
 
-      * `voicemail_name`
+    * `voicemail_name`
 
 * New readonly parameters have been added to the voicemail resource:
 
@@ -1491,9 +1489,7 @@
 * Certain fields in the `/lines` API have been modified. List
   of fields are further down
 
-
-Fields modified in the `/lines` API
------------------------------------
+### Fields modified in the `/lines` API
 
 | Name                   | Replaced by       | Editable ? | Required ? |
 |------------------------|-------------------|------------|------------|
@@ -1509,85 +1505,83 @@ Fields modified in the `/lines` API
 | caller_id_name         |                   | yes        |            |
 | caller_id_num          |                   | yes        |            |
 
-
 .. _sip-endpoint-parameters:
 
-Supported parameters on SIP endpoints
--------------------------------------
+### Supported parameters on SIP endpoints
 
- * md5secret
- * language
- * accountcode
- * amaflags
- * allowtransfer
- * fromuser
- * fromdomain
- * subscribemwi
- * buggymwi
- * call-limit
- * callerid
- * fullname
- * cid-number
- * maxcallbitrate
- * insecure
- * nat
- * promiscredir
- * usereqphone
- * videosupport
- * trustrpid
- * sendrpid
- * allowsubscribe
- * allowoverlap
- * dtmfmode
- * rfc2833compensate
- * qualify
- * g726nonstandard
- * disallow
- * allow
- * autoframing
- * mohinterpret
- * useclientcode
- * progressinband
- * t38pt-udptl
- * t38pt-usertpsource
- * rtptimeout
- * rtpholdtimeout
- * rtpkeepalive
- * deny
- * permit
- * defaultip
- * setvar
- * port
- * regexten
- * subscribecontext
- * vmexten
- * callingpres
- * parkinglot
- * protocol
- * outboundproxy
- * transport
- * remotesecret
- * directmedia
- * callcounter
- * busylevel
- * ignoresdpversion
- * session-timers
- * session-expires
- * session-minse
- * session-refresher
- * callbackextension
- * timert1
- * timerb
- * qualifyfreq
- * contactpermit
- * contactdeny
- * unsolicited_mailbox
- * use-q850-reason
- * encryption
- * snom-aoc-enabled
- * maxforwards
- * disallowed-methods
- * textsupport
+* md5secret
+* language
+* accountcode
+* amaflags
+* allowtransfer
+* fromuser
+* fromdomain
+* subscribemwi
+* buggymwi
+* call-limit
+* callerid
+* fullname
+* cid-number
+* maxcallbitrate
+* insecure
+* nat
+* promiscredir
+* usereqphone
+* videosupport
+* trustrpid
+* sendrpid
+* allowsubscribe
+* allowoverlap
+* dtmfmode
+* rfc2833compensate
+* qualify
+* g726nonstandard
+* disallow
+* allow
+* autoframing
+* mohinterpret
+* useclientcode
+* progressinband
+* t38pt-udptl
+* t38pt-usertpsource
+* rtptimeout
+* rtpholdtimeout
+* rtpkeepalive
+* deny
+* permit
+* defaultip
+* setvar
+* port
+* regexten
+* subscribecontext
+* vmexten
+* callingpres
+* parkinglot
+* protocol
+* outboundproxy
+* transport
+* remotesecret
+* directmedia
+* callcounter
+* busylevel
+* ignoresdpversion
+* session-timers
+* session-expires
+* session-minse
+* session-refresher
+* callbackextension
+* timert1
+* timerb
+* qualifyfreq
+* contactpermit
+* contactdeny
+* unsolicited_mailbox
+* use-q850-reason
+* encryption
+* snom-aoc-enabled
+* maxforwards
+* disallowed-methods
+* textsupport
 
 ## 15.16
 
@@ -1606,16 +1600,16 @@ Supported parameters on SIP endpoints
 
 ## 15.15
 
- * The field `enabled` has been added to the voicemail model
- * A line is no longer required when associating a voicemail with a user
- * Voicemails can now be edited even when they are associated to a user
+* The field `enabled` has been added to the voicemail model
+* A line is no longer required when associating a voicemail with a user
+* Voicemails can now be edited even when they are associated to a user
 
 ## 15.14
 
- * All optional fields on a user are now always null (sometimes they were empty strings)
- * The caller id is no longer automatically updated when the firstname or lastname is modified. You must update the
-   caller id yourself if you modify the user's name.
- * Caller id will be generated if and only if it does not exist when creating a user.
+* All optional fields on a user are now always null (sometimes they were empty strings)
+* The caller id is no longer automatically updated when the firstname or lastname is modified. You must update the
+ caller id yourself if you modify the user's name.
+* Caller id will be generated if and only if it does not exist when creating a user.
 
 ## 14.16
 
