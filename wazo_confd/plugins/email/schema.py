@@ -18,3 +18,36 @@ class EmailConfigSchema(BaseSchema):
     address_rewriting_rules = fields.List(fields.Nested(_RewriteRule))
     smtp_host = fields.String(validate=Length(max=255))
     fallback_smtp_host = fields.String(validate=Length(max=255))
+
+    def _rewriting_rules_from_db(self, canonical):
+        rules = []
+        for line in canonical.splitlines():
+            match, replacement = line.split(maxsplit=1)
+            rules.append({'match': match, 'replacement': replacement})
+        return rules
+
+    def _rewriting_rules_to_db(self, rules):
+        lines = [f"{rule['match']} {rule['replacement']}" for rule in rules]
+        return '\n'.join(lines)
+
+    @pre_dump
+    def from_db_model(self, data, **kwargs):
+        result = {
+            'domain_name': data.mydomain,
+            'from_': data.origin,
+            'address_rewriting_rules': self._rewriting_rules_from_db(data.canonical),
+            'smtp_host': data.relayhost,
+            'fallback_smtp_host': data.fallback_relayhost,
+        }
+        return result
+
+    @post_load
+    def to_db_model(self, data, **kwargs):
+        result = {
+            'mydomain': data['domain_name'],
+            'origin': data['from_'],
+            'canonical': self._rewriting_rules_to_db(data['address_rewriting_rules']),
+            'relayhost': data['smtp_host'],
+            'fallback_relayhost': data['fallback_smtp_host'],
+        }
+        return result
