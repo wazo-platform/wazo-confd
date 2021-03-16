@@ -67,7 +67,7 @@ class TestEmailConfigSchema(unittest.TestCase):
             origin='a.test.com',
             relayhost='smtp.test.com',
             fallback_relayhost='smtp2.test.com',
-            canonical='test1 test1@test.com\ntest2 test2@test.com',
+            canonical='test1 test1@test.com\\ntest2 test2@test.com',
         )
 
         result = self.schema.dump(mail_config)
@@ -91,7 +91,7 @@ class TestEmailConfigSchema(unittest.TestCase):
             origin='a.test.com',
             relayhost='smtp.test.com',
             fallback_relayhost='smtp2.test.com',
-            canonical='test1   test1@test.com\ntest2  test2@test.com\n',
+            canonical='test1   test1@test.com\\ntest2  test2@test.com\\n',
         )
 
         result = self.schema.dump(mail_config)
@@ -129,6 +129,6 @@ class TestEmailConfigSchema(unittest.TestCase):
                 origin='a.test.com',
                 relayhost='smtp.test.com',
                 fallback_relayhost='smtp2.test.com',
-                canonical='test1 test1@test.com\ntest2 test2@test.com',
+                canonical='test1 test1@test.com\\ntest2 test2@test.com',
             ),
         )

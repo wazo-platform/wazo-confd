@@ -21,14 +21,15 @@ class EmailConfigSchema(BaseSchema):
 
     def _rewriting_rules_from_db(self, canonical):
         rules = []
-        for line in canonical.splitlines():
+        lines = [line for line in canonical.split('\\n') if line]
+        for line in lines:
             match, replacement = line.split(maxsplit=1)
             rules.append({'match': match, 'replacement': replacement})
         return rules
 
     def _rewriting_rules_to_db(self, rules):
         lines = [f"{rule['match']} {rule['replacement']}" for rule in rules]
-        return '\n'.join(lines)
+        return '\\n'.join(lines)
 
     @pre_dump
     def from_db_model(self, data, **kwargs):
