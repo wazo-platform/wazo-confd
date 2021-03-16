@@ -36,17 +36,17 @@ definitions:
       match:
         type: string
         description: The local address matching rule. Supports regular expressions
-        example: `/^.*@domain.name/` or `user-name` or `user-name@domain.name`
+        example: "`/^.*@domain.name/` or `user-name` or `user-name@domain.name`"
       replacement:
         type: string
         description: The replacement for the matched rule
-        example: `no-reply@domain.name`
+        example: "`no-reply@domain.name`"
   EmailConfig:
     title: E-mail configuration
     properties:
       domain_name:
         type: string
-        description: The domain name of the current mailing server, i.e. `example.com`
+        description: "The domain name of the current mailing server, i.e. `example.com`"
       from:
         type: string
         description: |
