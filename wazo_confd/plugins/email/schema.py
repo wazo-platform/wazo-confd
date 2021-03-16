@@ -13,11 +13,11 @@ class _RewriteRule(BaseSchema):
 
 
 class EmailConfigSchema(BaseSchema):
-    domain_name = fields.String(validate=Length(max=255))
-    from_ = fields.String(data_key='from', validate=Length(max=255))
-    address_rewriting_rules = fields.List(fields.Nested(_RewriteRule))
-    smtp_host = fields.String(validate=Length(max=255))
-    fallback_smtp_host = fields.String(validate=Length(max=255))
+    domain_name = fields.String(validate=Length(max=255), missing='')
+    from_ = fields.String(data_key='from', validate=Length(max=255), missing='')
+    address_rewriting_rules = fields.List(fields.Nested(_RewriteRule), missing=[])
+    smtp_host = fields.String(validate=Length(max=255), missing='')
+    fallback_smtp_host = fields.String(validate=Length(max=255), missing='')
 
     def _rewriting_rules_from_db(self, canonical):
         rules = []
