@@ -5,7 +5,7 @@ paths:
       summary: Get e-mail configuration
       description: '**Required ACL:** `confd.emails.read`'
       tags:
-      - email
+      - emails
       responses:
         '200':
           description: E-mail configuration
@@ -16,7 +16,7 @@ paths:
       summary: Update e-mail configuration
       description: '**Required ACL:** `confd.emails.update`'
       tags:
-      - email
+      - emails
       parameters:
       - name: body
         in: body
