@@ -336,7 +336,7 @@ definitions:
         call_record_incoming_external_enabled:
           type: boolean
           default: false
-          description: "Record all external calls received by this user. Limitation: transfers are not supported"
+          description: "Record all external calls received by this user."
         call_record_outgoing_internal_enabled:
           type: boolean
           default: false
@@ -344,7 +344,7 @@ definitions:
         call_record_incoming_internal_enabled:
           type: boolean
           default: false
-          description: "Record all internal calls received by this user. Limitation: transfers are not supported"
+          description: "Record all internal calls received by this user."
         online_call_record_enabled:
           type: boolean
           default: false
