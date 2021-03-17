@@ -35,14 +35,14 @@ def test_put_minimal_parameters():
 
 def test_put_all_parameters():
     body = {
-        'domain_name': 'test.com',
-        'from': 'a.test.com',
+        'domain_name': 'example.org',
+        'from': 'a.example.org',
         'address_rewriting_rules': [
-            {'match': 'test1', 'replacement': 'test1@test.com'},
-            {'match': 'test2', 'replacement': 'test2@test.com'},
+            {'match': 'test1', 'replacement': 'test1@example.org'},
+            {'match': 'test2', 'replacement': 'test2@example.org'},
         ],
-        'smtp_host': 'smtp.test.com',
-        'fallback_smtp_host': 'smtp2.test.com',
+        'smtp_host': 'smtp.example.org',
+        'fallback_smtp_host': 'smtp2.example.org',
     }
     result = confd.emails.put(body)
     result.assert_status(204)
