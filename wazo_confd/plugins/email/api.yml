@@ -14,7 +14,10 @@ paths:
     put:
       operationId: update_emails_config
       summary: Update e-mail configuration
-      description: '**Required ACL:** `confd.emails.update`'
+      description: '**Required ACL:** `confd.emails.update`
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
       tags:
       - emails
       parameters:
