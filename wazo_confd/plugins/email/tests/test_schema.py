@@ -114,23 +114,6 @@ class TestEmailConfigSchema(unittest.TestCase):
             ),
         )
 
-    def test_address_rewriting_from_db_invalid_values(self):
-        mail_config = Mock(
-            mydomain='test.com',
-            origin='a.test.com',
-            relayhost='smtp.test.com',
-            fallback_relayhost='smtp2.test.com',
-            canonical='test1   test1@test.com\\ntest2  test2@test.com\\ninvalid',
-        )
-
-        assert_that(
-            calling(self.schema.dump).with_args(mail_config),
-            raises(
-                ValidationError,
-                has_property('messages', has_key('address_rewriting_rules')),
-            ),
-        )
-
     def test_address_rewriting_to_db(self):
         mail_config = {
             'domain_name': 'test.com',

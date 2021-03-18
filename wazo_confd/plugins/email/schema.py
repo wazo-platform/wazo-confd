@@ -1,7 +1,7 @@
 # Copyright 2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_load, pre_dump, ValidationError
+from marshmallow import fields, post_load, pre_dump
 from marshmallow.validate import Length
 
 from wazo_confd.helpers.mallow import BaseSchema
@@ -13,10 +13,6 @@ class _RewriteRule(BaseSchema):
 
     @pre_dump
     def from_canonical(self, data, **kwargs):
-        if data and ' ' not in data:
-            raise ValidationError(
-                f'Data value "{data}" should be of format "match replacement"'
-            )
         match, replacement = data.split(maxsplit=1)
         return {'match': match, 'replacement': replacement}
 
