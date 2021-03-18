@@ -33,7 +33,7 @@ class EmailConfigSchema(BaseSchema):
         attribute='origin', data_key='from', validate=Length(max=255), missing=''
     )
     address_rewriting_rules = fields.List(
-        fields.Nested(_RewriteRule, missing=None), attribute='canonical', missing=[]
+        fields.Nested(_RewriteRule, missing=None), attribute='canonical_lines', missing=[]
     )
     smtp_host = fields.String(
         attribute='relayhost', validate=Length(max=255), missing=''
@@ -44,10 +44,10 @@ class EmailConfigSchema(BaseSchema):
 
     @pre_dump
     def split_canonical(self, data, **kwargs):
-        data.canonical = [line for line in data.canonical.split('\\n') if line]
+        data.canonical_lines = [line for line in data.canonical.split('\\n') if line]
         return data
 
     @post_load
     def join_canonical(self, data, **kwargs):
-        data['canonical'] = '\\n'.join(data.get('canonical', []))
+        data['canonical'] = '\\n'.join(data.get('canonical_lines', []))
         return data
