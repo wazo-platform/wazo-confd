@@ -10,7 +10,5 @@ def get():
 
 
 def update(email_config):
-    mail = Session.query(Mail).first()
-    for name, value in email_config.items():
-        setattr(mail, name, value)
+    Session.add(email_config)
     Session.flush()

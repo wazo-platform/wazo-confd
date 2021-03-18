@@ -4,18 +4,23 @@
 import unittest
 from hamcrest import (
     assert_that,
+    calling,
     contains_exactly,
     empty,
     has_entries,
+    has_key,
+    has_property,
 )
+from marshmallow import ValidationError
 from mock import Mock
+from xivo_test_helpers.hamcrest.raises import raises
 
 from ..schema import EmailConfigSchema
 
 
 class TestEmailConfigSchema(unittest.TestCase):
     def setUp(self):
-        self.schema = EmailConfigSchema()
+        self.schema = EmailConfigSchema(handle_error=False)
 
     def test_address_rewriting_from_db_no_value(self):
         mail_config = Mock(
@@ -109,6 +114,23 @@ class TestEmailConfigSchema(unittest.TestCase):
             ),
         )
 
+    def test_address_rewriting_from_db_invalid_values(self):
+        mail_config = Mock(
+            mydomain='test.com',
+            origin='a.test.com',
+            relayhost='smtp.test.com',
+            fallback_relayhost='smtp2.test.com',
+            canonical='test1   test1@test.com\\ntest2  test2@test.com\\ninvalid',
+        )
+
+        assert_that(
+            calling(self.schema.dump).with_args(mail_config),
+            raises(
+                ValidationError,
+                has_property('messages', has_key('address_rewriting_rules')),
+            ),
+        )
+
     def test_address_rewriting_to_db(self):
         mail_config = {
             'domain_name': 'test.com',
@@ -130,5 +152,25 @@ class TestEmailConfigSchema(unittest.TestCase):
                 relayhost='smtp.test.com',
                 fallback_relayhost='smtp2.test.com',
                 canonical='test1 test1@test.com\\ntest2 test2@test.com',
+            ),
+        )
+
+    def test_address_rewriting_to_db_invalid_values(self):
+        mail_config = {
+            'domain_name': 'test.com',
+            'from': 'a.test.com',
+            'address_rewriting_rules': [
+                {'match': 'test1', 'replacement': 'test1@test.com'},
+                {'match': 'test2'},
+            ],
+            'smtp_host': 'smtp.test.com',
+            'fallback_smtp_host': 'smtp2.test.com',
+        }
+
+        assert_that(
+            calling(self.schema.load).with_args(mail_config),
+            raises(
+                ValidationError,
+                has_property('messages', has_key('address_rewriting_rules')),
             ),
         )

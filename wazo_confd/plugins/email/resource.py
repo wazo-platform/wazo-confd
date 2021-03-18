@@ -25,6 +25,9 @@ class EmailConfig(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.emails.update')
     def put(self):
+        model = self.service.get()
         form = self.schema().load(request.get_json())
-        self.service.edit(form)
+        for name, value in form.items():
+            setattr(model, name, value)
+        self.service.edit(model)
         return '', 204
