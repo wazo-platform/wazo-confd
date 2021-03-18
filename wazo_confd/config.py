@@ -1,4 +1,4 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -76,6 +76,7 @@ DEFAULT_CONFIG = {
         'context_context': True,
         'device': True,
         'dhcp': True,
+        'email': True,
         'endpoint_custom': True,
         'endpoint_iax': True,
         'endpoint_sccp': True,

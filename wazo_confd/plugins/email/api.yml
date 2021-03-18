@@ -1,0 +1,71 @@
+paths:
+  /emails:
+    get:
+      operationId: get_emails_config
+      summary: Get e-mail configuration
+      description: '**Required ACL:** `confd.emails.read`'
+      tags:
+      - emails
+      responses:
+        '200':
+          description: E-mail configuration
+          schema:
+            $ref: '#/definitions/EmailConfig'
+    put:
+      operationId: update_emails_config
+      summary: Update e-mail configuration
+      description: '**Required ACL:** `confd.emails.update`
+
+        **WARNING** This endpoint restore to default value or delete all fields that
+        are not defined.'
+      tags:
+      - emails
+      parameters:
+      - name: body
+        in: body
+        description: E-mail configuration
+        required: true
+        schema:
+          $ref: '#/definitions/EmailConfig'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+definitions:
+  RewritingRule:
+    title: Rewriting rule
+    properties:
+      match:
+        type: string
+        description: The local address matching rule. Supports regular expressions
+        example: "`/^.*@example.org/` or `user-name` or `user-name@example.org`"
+      replacement:
+        type: string
+        description: The replacement for the matched rule
+        example: "`no-reply@example.org`"
+  EmailConfig:
+    title: E-mail configuration
+    properties:
+      domain_name:
+        type: string
+        description: "The domain name of the current mailing server, i.e. `example.com`"
+      from:
+        type: string
+        description: |
+          The e-mail address or domain name to use in the `From` header for local services
+      address_rewriting_rules:
+        description: Rules for local address to external address rewriting
+        type: array
+        items:
+          $ref: '#/definitions/RewritingRule'
+      smtp_host:
+        description: |
+          E-mail relay server hostname or address. It is possible to specify the port, for example
+          `domain.com:587`
+        type: string
+      fallback_smtp_host:
+        description: |
+          Fallback relay server hostname or address. It is possible to specify the port, for example
+          `domain.com:587`
+        type: string

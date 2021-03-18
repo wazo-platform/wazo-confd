@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2012-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
@@ -41,6 +41,7 @@ setup(
             'context_context = wazo_confd.plugins.context_context.plugin:Plugin',
             'device = wazo_confd.plugins.device.plugin:Plugin',
             'dhcp = wazo_confd.plugins.dhcp.plugin:Plugin',
+            'email = wazo_confd.plugins.email.plugin:Plugin',
             'endpoint_custom = wazo_confd.plugins.endpoint_custom.plugin:Plugin',
             'endpoint_iax = wazo_confd.plugins.endpoint_iax.plugin:Plugin',
             'endpoint_sccp = wazo_confd.plugins.endpoint_sccp.plugin:Plugin',
