@@ -29,7 +29,9 @@ class EmailConfigSchema(BaseSchema):
         attribute='origin', data_key='from', validate=Length(max=255), missing=''
     )
     address_rewriting_rules = fields.List(
-        fields.Nested(_RewriteRule, missing=None), attribute='canonical_lines', missing=[]
+        fields.Nested(_RewriteRule, missing=None),
+        attribute='canonical_lines',
+        missing=[],
     )
     smtp_host = fields.String(
         attribute='relayhost', validate=Length(max=255), missing=''
