@@ -69,7 +69,7 @@ provd:
     prefix: null
     https: false
 
-#xivo-sysconfd connection information
+# wazo-sysconfd connection information
 sysconfd:
     host: localhost
     port: 8668
