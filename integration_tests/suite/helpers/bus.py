@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_test_helpers import bus
@@ -25,13 +25,16 @@ class BusClientWrapper:
             exchange_type=self.exchange_type,
         )
 
-    def send_tenant_created(self, tenant_uuid):
+    def send_tenant_created(self, tenant_uuid, slug='slug'):
         if self.exchange_type != 'headers':
             raise NotImplementedError()
 
         if self._bus is None:
             self._bus = self._create_client()
-        event = {'name': 'auth_tenant_added', 'data': {'uuid': tenant_uuid}}
+        event = {
+            'name': 'auth_tenant_added',
+            'data': {'uuid': tenant_uuid, 'slug': slug},
+        }
         self._bus.publish(event, headers={'name': event['name']})
 
 

@@ -199,12 +199,15 @@ class GroupDestinationSchema(BaseDestinationSchema):
         validate=Range(min=0), attribute='actionarg2', allow_none=True
     )
 
-    group = fields.Nested('GroupSchema', only=['name'], dump_only=True)
+    group = fields.Nested('GroupSchema', only=['label', 'name'], dump_only=True)
 
     @post_dump
     def make_group_fields_flat(self, data):
         if data.get('group'):
+            # TODO(pc-m): Label was added in 21.04 group_name should be remove when we remove
+            #             the compatibility logic in group schema
             data['group_name'] = data['group']['name']
+            data['group_label'] = data['group']['label']
 
         data.pop('group', None)
         return data

@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -94,13 +94,16 @@ class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
 
     group = fields.Nested(
-        'GroupSchema', attribute='groupfeatures', only=['name'], dump_only=True
+        'GroupSchema', attribute='groupfeatures', only=['label', 'name'], dump_only=True
     )
 
     @post_dump
     def make_group_fields_flat(self, data):
         if data.get('group'):
+            # TODO(pc-m): Label was added in 21.04 group_name should be remove when we remove
+            #             the compatibility logic in group schema
             data['group_name'] = data['group']['name']
+            data['group_label'] = data['group']['label']
 
         data.pop('group', None)
         return data
