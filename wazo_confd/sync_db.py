@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -64,7 +64,6 @@ def main():
     del config['auth']['password']
     tenants = AuthClient(token=token, **config['auth']).tenants.list()['items']
     auth_tenants = set(tenant['uuid'] for tenant in tenants)
-    auth_tenant_slugs = {tenant['uuid']: tenant['slug'] for tenant in tenants}
     logger.debug('wazo-auth tenants: %s', auth_tenants)
 
     init_db_from_config(config)
@@ -74,12 +73,8 @@ def main():
     )
 
     with session_scope() as session:
-        confd_tenants = set()
-        confd_tenant_without_slugs = set()
-        for tenant in session.query(Tenant).all():
-            confd_tenants.add(tenant.uuid)
-            if not tenant.slug:
-                confd_tenant_without_slugs.add(tenant.uuid)
+        tenants = session.query(Tenant).all()
+        confd_tenants = set(tenant.uuid for tenant in tenants)
         logger.debug('wazo-confd tenants: %s', confd_tenants)
 
         removed_tenants = confd_tenants - auth_tenants
@@ -91,14 +86,6 @@ def main():
         for tenant_uuid in auth_tenants:
             tenant = tenant_dao.find_or_create_tenant(tenant_uuid)
             default_sip_template_service.generate_sip_templates(tenant)
-
-        for tenant_uuid in confd_tenant_without_slugs:
-            slug = auth_tenant_slugs.get(tenant_uuid)
-            if not slug:
-                continue
-            tenant = tenant_dao.find_or_create_tenant(tenant_uuid)
-            tenant.slug = slug
-            session.flush()
 
 
 def remove_tenant(tenant_uuid):

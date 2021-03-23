@@ -298,11 +298,7 @@ def test_get_group_destination_relation(group):
     assert_that(
         response.item,
         has_entries(
-            destination=has_entries(
-                group_id=group['id'],
-                group_name=group['name'],
-                group_label=group['label'],
-            ),
+            destination=has_entries(group_id=group['id'], group_name=group['name'])
         ),
     )
 

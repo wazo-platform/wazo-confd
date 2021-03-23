@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -8,7 +8,7 @@ from . import confd
 
 
 def generate_group(**parameters):
-    parameters.setdefault('label', generate_name())
+    parameters.setdefault('name', generate_name())
     return add_group(**parameters)
 
 

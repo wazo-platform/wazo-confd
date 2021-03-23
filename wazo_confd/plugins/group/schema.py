@@ -1,27 +1,21 @@
 # Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
-
-from marshmallow import fields, post_load, post_dump, pre_load
-from marshmallow.validate import Length, OneOf, Range, Regexp
+from marshmallow import fields, post_load, post_dump
+from marshmallow.validate import Length, NoneOf, OneOf, Range, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
 
-# The label is going to end in queues.conf and used in agi.verbose calls.
-# Try not to be too permissive with it
-LABEL_REGEX = r'^[-_.a-zA-Z0-9 ]+$'
-
-logger = logging.getLogger(__name__)
+NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
 
 class GroupSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     uuid = fields.String(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(dump_only=True)
-    label = fields.String(
-        validate=[Length(max=128), Regexp(LABEL_REGEX)], required=True
+    name = fields.String(
+        validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)),
+        required=True,
     )
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
     ring_strategy = fields.String(
@@ -72,18 +66,6 @@ class GroupSchema(BaseSchema):
     call_permissions = fields.Nested(
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-
-    # DEPRECATED 21.04
-    @pre_load
-    def copy_name_to_label(self, data):
-        if 'label' in data:
-            return data
-        if 'name' in data:
-            logger.warning(
-                'the "name" field of groups is deprecated. use "label" instead'
-            )
-            data['label'] = data['name']
-        return data
 
     @post_dump
     def convert_ring_strategy_to_user(self, data):
