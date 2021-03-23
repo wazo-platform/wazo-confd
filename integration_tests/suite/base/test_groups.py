@@ -56,14 +56,13 @@ def test_put_errors(group):
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
-    yield s.check_bogus_field_returns_error, url, 'name', 'general'
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    yield s.check_bogus_field_returns_error, url, 'label', 123
+    yield s.check_bogus_field_returns_error, url, 'label', True
+    yield s.check_bogus_field_returns_error, url, 'label', None
+    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'label', 'legitimate name\nconfig injection'
+    yield s.check_bogus_field_returns_error, url, 'label', []
+    yield s.check_bogus_field_returns_error, url, 'label', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
         40
@@ -115,23 +114,13 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
     yield s.check_bogus_field_returns_error, url, 'enabled', []
 
-    for check in unique_error_checks(url):
-        yield check
-
-
-@fixtures.group(name='unique')
-@fixtures.queue(name='queue_name')
-def unique_error_checks(url, group, queue):
-    yield s.check_bogus_field_returns_error, url, 'name', group['name']
-    yield s.check_bogus_field_returns_error, url, 'name', queue['name']
-
 
 @fixtures.extension(exten=gen_group_exten())
-@fixtures.group(name='hidden', preprocess_subroutine='hidden')
-@fixtures.group(name='search', preprocess_subroutine='search')
+@fixtures.group(label='hidden', preprocess_subroutine='hidden')
+@fixtures.group(label='search', preprocess_subroutine='search')
 def test_search(extension, hidden, group):
     url = confd.groups
-    searches = {'name': 'search', 'preprocess_subroutine': 'search'}
+    searches = {'label': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, group, hidden, field, term
@@ -175,15 +164,15 @@ def test_list_multi_tenant(main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
-@fixtures.group(name='sort1', preprocess_subroutine='sort1')
-@fixtures.group(name='sort2', preprocess_subroutine='sort2')
+@fixtures.group(label='sort1', preprocess_subroutine='sort1')
+@fixtures.group(label='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(group1, group2):
     url = confd.groups.get
-    yield s.check_sorting, url, group1, group2, 'name', 'sort'
+    yield s.check_sorting, url, group1, group2, 'label', 'sort'
     yield s.check_sorting, url, group1, group2, 'preprocess_subroutine', 'sort'
 
-    yield s.check_offset, url, group1, group2, 'name', 'sort'
-    yield s.check_limit, url, group1, group2, 'name', 'sort'
+    yield s.check_offset, url, group1, group2, 'label', 'sort'
+    yield s.check_limit, url, group1, group2, 'label', 'sort'
 
 
 @fixtures.group()
@@ -195,6 +184,7 @@ def test_get(group):
             id=group['id'],
             uuid=group['uuid'],
             name=group['name'],
+            label=group['label'],
             caller_id_mode=group['caller_id_mode'],
             caller_id_name=group['caller_id_name'],
             timeout=group['timeout'],
@@ -220,6 +210,7 @@ def test_get(group):
             id=group['id'],
             uuid=group['uuid'],
             name=group['name'],
+            label=group['label'],
             caller_id_mode=group['caller_id_mode'],
             caller_id_name=group['caller_id_name'],
             timeout=group['timeout'],
@@ -256,22 +247,48 @@ def test_get_multi_tenant(main, sub):
 
 
 def test_create_minimal_parameters():
-    response = confd.groups.post(name='MyGroup')
+    response = confd.groups.post(label='MyGroup')
     response.assert_created('groups')
 
     assert_that(
         response.item,
-        has_entries(id=not_(empty()), name='MyGroup', tenant_uuid=MAIN_TENANT),
+        has_entries(
+            id=not_(empty()),
+            name=not_(empty()),
+            label='MyGroup',
+            tenant_uuid=MAIN_TENANT,
+        ),
     )
 
     confd.groups(response.item['id']).delete().assert_deleted()
 
+    response = confd.groups.post(label='MyGroup')
+    response.assert_created('groups')
+
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=not_(empty()),
+            name=not_(empty()),
+            label='MyGroup',
+            tenant_uuid=MAIN_TENANT,
+        ),
+    )
+
+    confd.groups(response.item['uuid']).delete().assert_deleted()
+
+
+def test_create_deprecated_name():
     response = confd.groups.post(name='MyGroup')
     response.assert_created('groups')
 
     assert_that(
         response.item,
-        has_entries(uuid=not_(empty()), name='MyGroup', tenant_uuid=MAIN_TENANT),
+        has_entries(
+            uuid=not_(empty()),
+            name=not_(empty()),
+            label='MyGroup',
+        ),
     )
 
     confd.groups(response.item['uuid']).delete().assert_deleted()
@@ -279,7 +296,7 @@ def test_create_minimal_parameters():
 
 def test_create_all_parameters():
     parameters = {
-        'name': 'MyGroup',
+        'label': 'MyGroup',
         'caller_id_mode': 'prepend',
         'caller_id_name': 'GROUP-',
         'timeout': 42,
@@ -302,7 +319,7 @@ def test_create_all_parameters():
 
 
 def test_create_multi_tenant():
-    response = confd.groups.post(name='MyGroup', wazo_tenant=SUB_TENANT)
+    response = confd.groups.post(label='MyGroup', wazo_tenant=SUB_TENANT)
     response.assert_created('groups')
 
     assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
@@ -322,7 +339,8 @@ def test_edit_minimal_parameters(group):
 @fixtures.group()
 def test_edit_all_parameters(group):
     parameters = {
-        'name': 'MyGroup',
+        'name': 'ignored',
+        'label': 'MyGroup',
         'caller_id_mode': 'prepend',
         'caller_id_name': 'GROUP-',
         'timeout': 42,
@@ -340,10 +358,13 @@ def test_edit_all_parameters(group):
     response.assert_updated()
 
     response = confd.groups(group['id']).get()
-    assert_that(response.item, has_entries(parameters))
+    expected = dict(parameters)
+    expected['name'] = group['name']
+    assert_that(response.item, has_entries(expected))
 
     parameters = {
-        'name': 'MyGroup2',
+        'name': 'ignored2',
+        'label': 'MyGroup2',
         'caller_id_mode': 'prepend',
         'caller_id_name': 'GROUP2-',
         'timeout': 43,
@@ -360,8 +381,10 @@ def test_edit_all_parameters(group):
     response = confd.groups(group['uuid']).put(**parameters)
     response.assert_updated()
 
+    expected = dict(parameters)
+    expected['name'] = group['name']
     response = confd.groups(group['uuid']).get()
-    assert_that(response.item, has_entries(parameters))
+    assert_that(response.item, has_entries(expected))
 
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
@@ -417,7 +440,7 @@ def test_delete_multi_tenant_by_uuid(main, sub):
 @fixtures.group()
 def test_bus_events(group):
     yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
-        'name': 'group_bus_event'
+        'label': 'group_bus_event'
     }
     yield s.check_bus_event, 'config.groups.edited', confd.groups(group['id']).put
     yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['id']).delete
@@ -426,7 +449,7 @@ def test_bus_events(group):
 @fixtures.group()
 def test_bus_events_by_uuid(group):
     yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
-        'name': 'group_bus_event_with_uuid'
+        'label': 'group_bus_event_with_uuid'
     }
     yield s.check_bus_event, 'config.groups.edited', confd.groups(group['uuid']).put
     yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['uuid']).delete
