@@ -95,9 +95,6 @@ class SoundService:
     def fetch_relations(self, form):
         return form
 
-    def update_form(self, form):
-        return form
-
 
 def build_service(ari_client):
     return SoundService(
