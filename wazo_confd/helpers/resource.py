@@ -39,6 +39,3 @@ class CRUDService:
         self.validator.validate_delete(resource)
         self.dao.delete(resource)
         self.notifier.deleted(resource)
-
-    def update_form(self, form):
-        return form
