@@ -57,7 +57,6 @@ class VoicemailZoneMessagesList(ConfdResource):
         super().__init__()
         self.service = service
 
-    @required_master_tenant()
     @required_acl('confd.asterisk.voicemail.zonemessages.get')
     def get(self):
         options = self.service.list()
