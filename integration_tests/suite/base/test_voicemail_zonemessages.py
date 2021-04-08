@@ -115,11 +115,13 @@ def test_edit_voicemail_zonemessages_with_none_message():
 
 
 def test_restrict_only_master_tenant():
-    response = confd.asterisk.voicemail.zonemessages.get(token=TOKEN_SUB_TENANT)
-    response.assert_status(401)
-
     response = confd.asterisk.voicemail.zonemessages.put(token=TOKEN_SUB_TENANT)
     response.assert_status(401)
+
+
+def test_that_list_is_not_restricted_to_the_master_tenant():
+    response = confd.asterisk.voicemail.zonemessages.get(token=TOKEN_SUB_TENANT)
+    response.assert_status(200)
 
 
 def test_bus_event_when_edited():
