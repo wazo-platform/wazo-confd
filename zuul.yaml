@@ -6,11 +6,11 @@
     check:
       jobs:
         - confd-tox-integration:
-            nodeset: debian10-vm
+            nodeset: vm-debian-10-m1s
     gate:
       jobs:
         - confd-tox-integration:
-            nodeset: debian10-vm
+            nodeset: vm-debian-10-m1s
 
 - job:
     name: confd-tox-integration
