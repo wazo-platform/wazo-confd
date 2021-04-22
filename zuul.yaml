@@ -5,12 +5,10 @@
       - debian-packaging-template
     check:
       jobs:
-        - confd-tox-integration:
-            nodeset: debian10-vm
+        - confd-tox-integration
     gate:
       jobs:
-        - confd-tox-integration:
-            nodeset: debian10-vm
+        - confd-tox-integration
 
 - job:
     name: confd-tox-integration
