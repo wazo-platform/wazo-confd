@@ -549,7 +549,7 @@ class DatabaseQueries:
 def create_helper(
     user='asterisk',
     password='proformatique',
-    host='localhost',
+    host='127.0.0.1',
     port=5432,
     db='asterisk',
 ):

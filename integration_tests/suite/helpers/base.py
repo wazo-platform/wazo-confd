@@ -38,7 +38,7 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def setup_token(cls):
-        cls.mock_auth = MockAuthClient('localhost', cls.service_port(9497, 'auth'))
+        cls.mock_auth = MockAuthClient('127.0.0.1', cls.service_port(9497, 'auth'))
         token = MockUserToken(
             TOKEN,
             'user_uuid',
@@ -164,20 +164,20 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def create_sysconfd(cls):
-        url = 'http://localhost:{port}'.format(port=cls.service_port(8668, 'sysconfd'))
+        url = 'http://127.0.0.1:{port}'.format(port=cls.service_port(8668, 'sysconfd'))
         return SysconfdMock(url)
 
     @classmethod
     def setup_helpers(cls):
-        setup_confd_helpers(host='localhost', port=cls.service_port('9486', 'confd'))
+        setup_confd_helpers(host='127.0.0.1', port=cls.service_port('9486', 'confd'))
         setup_new_client_helpers(
-            host='localhost', port=cls.service_port('9486', 'confd')
+            host='127.0.0.1', port=cls.service_port('9486', 'confd')
         )
         setup_database_helpers(
-            host='localhost', port=cls.service_port(5432, 'postgres')
+            host='127.0.0.1', port=cls.service_port(5432, 'postgres')
         )
-        setup_provd_helpers(host='localhost', port=cls.service_port(8666, 'provd'))
-        setup_bus_helpers(host='localhost', port=cls.service_port(5672, 'rabbitmq'))
+        setup_provd_helpers(host='127.0.0.1', port=cls.service_port(8666, 'provd'))
+        setup_bus_helpers(host='127.0.0.1', port=cls.service_port(5672, 'rabbitmq'))
 
     @classmethod
     def create_confd(cls, headers=None, encoder=None):
@@ -187,7 +187,7 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def new_client(cls, headers=None, encoder=None):
         client = ConfdClient.from_options(
-            host='localhost',
+            host='127.0.0.1',
             port=cls.service_port('9486', 'confd'),
             headers=headers,
             encoder=encoder,
@@ -197,13 +197,13 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def create_bus(cls):
         port = cls.service_port(5672, 'rabbitmq')
-        client = BusClient.from_connection_fields(host='localhost', port=port)
+        client = BusClient.from_connection_fields(host='127.0.0.1', port=port)
         return client
 
     @classmethod
     def create_auth(cls):
         return AuthClient(
-            host='localhost',
+            host='127.0.0.1',
             port=cls.service_port(9497, 'auth'),
             prefix=None,
             https=False,
@@ -211,7 +211,7 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def create_ari(cls):
-        return ARIClient(host='localhost', port=cls.service_port(5039, 'ari'))
+        return ARIClient(host='127.0.0.1', port=cls.service_port(5039, 'ari'))
 
     @classmethod
     def create_filesystem(cls, base_path):
