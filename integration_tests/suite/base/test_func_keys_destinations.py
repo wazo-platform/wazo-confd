@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -96,7 +96,7 @@ def test_get_destinations():
                     'parameters': [
                         {
                             'name': 'user_id',
-                            'collection': 'http://localhost:{}/1.1/users'.format(
+                            'collection': 'http://127.0.0.1:{}/1.1/users'.format(
                                 BaseIntegrationTest.service_port(9486, 'confd')
                             ),
                         }
