@@ -5,7 +5,7 @@ https://github.com/wazo-platform/xivo-bus/archive/master.zip
 https://github.com/wazo-platform/xivo-dao/archive/master.zip
 https://github.com/wazo-platform/xivo-lib-python/archive/master.zip
 cheroot==6.5.4
-flask-cors==3.0.7
+flask-cors==3.0.9
 flask-restful==0.3.7
 flask==1.0.2
 kombu==4.6.11
