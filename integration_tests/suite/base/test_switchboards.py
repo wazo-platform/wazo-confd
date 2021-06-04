@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -31,20 +31,28 @@ def test_delete_errors():
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
 
-def test_post_errors():
-    url = confd.switchboards.post
-    for check in error_checks(url):
+@fixtures.moh(name='othertenant', wazo_tenant=SUB_TENANT)
+def test_post_errors(_):
+    switchboard_post = confd.switchboards(name='TheSwitchboard').post
+    for check in error_checks(switchboard_post):
         yield check
+
+    yield s.check_bogus_field_returns_error, switchboard_post, 'queue_music_on_hold', 'othertenant'
+    yield s.check_bogus_field_returns_error, switchboard_post, 'waiting_room_music_on_hold', 'othertenant'
 
 
 @fixtures.switchboard()
-def test_put_errors(switchboard):
+@fixtures.moh(name='othertenant', wazo_tenant=SUB_TENANT)
+def test_put_errors(switchboard, _):
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
     url = confd.switchboards(switchboard['uuid']).put
     for check in error_checks(url):
         yield check
+
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 'othertenant'
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 'othertenant'
 
 
 def error_checks(url):
@@ -54,6 +62,20 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 'unknown'
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 123
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', True
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', False
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', []
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', {}
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 'unknown'
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 123
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', True
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', False
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', []
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', {}
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
@@ -139,10 +161,38 @@ def test_create_minimal_parameters():
 
     assert_that(
         response.item,
-        has_entries(uuid=not_(empty()), tenant_uuid=MAIN_TENANT, name='MySwitchboard'),
+        has_entries(
+            uuid=not_(empty()),
+            queue_music_on_hold=None,
+            waiting_room_music_on_hold=None,
+            tenant_uuid=MAIN_TENANT,
+            name='MySwitchboard',
+        ),
     )
 
     confd.switchboards(response.item['uuid']).delete().assert_deleted()
+
+
+@fixtures.moh(name='queuemoh')
+@fixtures.moh(name='holdmoh')
+def test_create_all_parameters(*_):
+    response = confd.switchboards.post(
+        name='TheSwitchboard',
+        queue_music_on_hold='queuemoh',
+        waiting_room_music_on_hold='holdmoh',
+    )
+    response.assert_created('switchboards')
+
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=not_(empty()),
+            queue_music_on_hold='queuemoh',
+            waiting_room_music_on_hold='holdmoh',
+            tenant_uuid=MAIN_TENANT,
+            name='TheSwitchboard',
+        )
+    )
 
 
 @fixtures.switchboard(name='before_edit')
@@ -152,6 +202,26 @@ def test_edit_minimal_parameters(switchboard):
 
     response = confd.switchboards(switchboard['uuid']).get()
     assert_that(response.item, has_entries(name='after_edit'))
+
+
+@fixtures.moh(name='foo')
+@fixtures.switchboard(name='before_edit', queue_music_on_hold='foo', waiting_room_music_on_hold='foo')
+def test_update_fields_with_null_value(_, switchboard):
+    response = confd.switchboards(switchboard['uuid']).put(
+        queue_music_on_hold=None,
+        waiting_room_music_on_hold=None,
+    )
+    response.assert_updated()
+
+    response = confd.switchboards(switchboard['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            queue_music_on_hold=None,
+            waiting_room_music_on_hold=None,
+        )
+    )
+
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)

@@ -1,8 +1,10 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+from flask import url_for, request
+from xivo_dao.helpers import errors
 
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.alchemy.switchboard import Switchboard
 
 from wazo_confd.auth import required_acl
@@ -11,7 +13,27 @@ from wazo_confd.helpers.restful import ListResource, ItemResource
 from .schema import SwitchboardSchema
 
 
-class SwitchboardList(ListResource):
+class _BaseSwitchboardResource:
+    def __init__(self, service, moh_dao):
+        super().__init__(service)
+        self._moh_dao = moh_dao
+
+    def _update_moh_fields(self, form, tenant_uuids):
+        form['queue_moh_uuid'] = self._find_moh_uuid(form, 'queue_music_on_hold', tenant_uuids)
+        form['hold_moh_uuid'] = self._find_moh_uuid(form, 'waiting_room_music_on_hold', tenant_uuids)
+        return form
+
+    def _find_moh_uuid(self, form, field, tenant_uuids):
+        name = form.pop(field, None)
+        if name:
+            try:
+                moh = self._moh_dao.get_by(name=name, tenant_uuids=tenant_uuids)
+            except NotFoundError:
+                raise errors.param_not_found(field, 'moh')
+            return moh.uuid
+
+
+class SwitchboardList(_BaseSwitchboardResource, ListResource):
 
     model = Switchboard
     schema = SwitchboardSchema
@@ -23,14 +45,19 @@ class SwitchboardList(ListResource):
 
     @required_acl('confd.switchboards.create')
     def post(self):
-        return super().post()
+        form = self.schema().load(request.get_json())
+        form = self.add_tenant_to_form(form)
+        form = self._update_moh_fields(form, tenant_uuids=[form['tenant_uuid']])
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.switchboards.read')
     def get(self):
         return super().get()
 
 
-class SwitchboardItem(ItemResource):
+class SwitchboardItem(_BaseSwitchboardResource, ItemResource):
 
     schema = SwitchboardSchema
     has_tenant_uuid = True
@@ -42,6 +69,14 @@ class SwitchboardItem(ItemResource):
     @required_acl('confd.switchboards.{uuid}.update')
     def put(self, uuid):
         return super().put(uuid)
+
+    def parse_and_update(self, model, **kwargs):
+        form = self.schema().load(request.get_json(), partial=True)
+        form = self._update_moh_fields(form, tenant_uuids=[model.tenant_uuid])
+        updated_fields = self.find_updated_fields(model, form)
+        for name, value in form.items():
+            setattr(model, name, value)
+        self.service.edit(model, updated_fields=updated_fields, **kwargs)
 
     @required_acl('confd.switchboards.{uuid}.delete')
     def delete(self, uuid):

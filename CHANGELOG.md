@@ -1,5 +1,12 @@
 # Changelog
 
+## 21.08
+
+* The `switchboards` resource now implements the following fields:
+
+  * `waiting_room_music_on_hold`
+  * `queue_music_on_hold`
+
 ## 21.04
 
 * The following resources have been added:
