@@ -143,7 +143,6 @@ definitions:
         type: string
         description: type of the default node
         enum:
-        - mixing
         - holding
   ApplicationRelationLines:
     properties:
