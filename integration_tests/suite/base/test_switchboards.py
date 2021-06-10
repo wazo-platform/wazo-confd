@@ -66,14 +66,18 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 123
     yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', True
     yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', False
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', s.random_string(
+        129
+    )
     yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', []
     yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', {}
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 'unknown'
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 123
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', True
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', False
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', s.random_string(
+        129
+    )
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', []
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', {}
 
@@ -191,7 +195,7 @@ def test_create_all_parameters(*_):
             waiting_room_music_on_hold='holdmoh',
             tenant_uuid=MAIN_TENANT,
             name='TheSwitchboard',
-        )
+        ),
     )
 
 
@@ -205,7 +209,9 @@ def test_edit_minimal_parameters(switchboard):
 
 
 @fixtures.moh(name='foo')
-@fixtures.switchboard(name='before_edit', queue_music_on_hold='foo', waiting_room_music_on_hold='foo')
+@fixtures.switchboard(
+    name='before_edit', queue_music_on_hold='foo', waiting_room_music_on_hold='foo'
+)
 def test_update_fields_with_null_value(_, switchboard):
     response = confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold=None,
@@ -219,9 +225,8 @@ def test_update_fields_with_null_value(_, switchboard):
         has_entries(
             queue_music_on_hold=None,
             waiting_room_music_on_hold=None,
-        )
+        ),
     )
-
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
