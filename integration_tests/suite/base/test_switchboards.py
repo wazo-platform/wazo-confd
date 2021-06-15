@@ -209,9 +209,7 @@ def test_edit_minimal_parameters(switchboard):
 
 
 @fixtures.moh(name='foo')
-@fixtures.switchboard(
-    name='before_edit', queue_music_on_hold='foo', waiting_room_music_on_hold='foo'
-)
+@fixtures.switchboard(queue_music_on_hold='foo', waiting_room_music_on_hold='foo')
 def test_update_fields_with_null_value(_, switchboard):
     response = confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold=None,
