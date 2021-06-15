@@ -251,6 +251,7 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(incall, *destinations):
     for destination in valid_destinations(*destinations):
         yield create_incall_with_destination, destination

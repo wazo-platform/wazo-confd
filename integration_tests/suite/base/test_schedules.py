@@ -477,6 +477,7 @@ def test_edit_all_parameters(schedule):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(schedule, *destinations):
     for destination in valid_destinations(*destinations):
         yield create_schedule_with_destination, destination

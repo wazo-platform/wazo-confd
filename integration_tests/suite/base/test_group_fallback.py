@@ -92,6 +92,7 @@ def test_edit_to_none(group):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(group, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_group_fallbacks_with_destination, group['uuid'], destination

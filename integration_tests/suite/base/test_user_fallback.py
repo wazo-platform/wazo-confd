@@ -127,6 +127,7 @@ def test_edit_to_none(user):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(user, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_user_fallbacks_with_destination, user['uuid'], destination

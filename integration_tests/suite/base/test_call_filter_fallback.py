@@ -103,6 +103,7 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(call_filter, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_call_filter_fallbacks_with_destination, call_filter[

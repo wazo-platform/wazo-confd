@@ -108,6 +108,7 @@ def test_edit_to_none(queue):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(queue, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_queue_fallbacks_with_destination, queue['id'], destination

@@ -515,6 +515,9 @@ definitions:
       ring_time:
         type: number
         format: float
+      moh_uuid:
+        type: string
+        description: The UUID of the music on hold to use instead of a ringback tone.
     required:
     - type
     - user_id

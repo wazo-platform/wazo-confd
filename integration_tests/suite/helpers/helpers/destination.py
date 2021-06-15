@@ -243,6 +243,7 @@ def valid_destinations(
     conference,
     skill_rule,
     application,
+    moh,
 ):
     return [
         {'type': 'application', 'application': 'callback_disa', 'context': 'name'},
@@ -338,6 +339,8 @@ def valid_destinations(
         {'type': 'user', 'user_id': user['id']},
         {'type': 'user', 'user_id': user['id'], 'ring_time': 2},
         {'type': 'user', 'user_id': user['id'], 'ring_time': None},
+        {'type': 'user', 'user_id': user['id'], 'moh_uuid': moh['uuid']},
+        {'type': 'user', 'user_id': user['id'], 'moh_uuid': None},
         {'type': 'voicemail', 'voicemail_id': voicemail['id']},
         {
             'type': 'voicemail',

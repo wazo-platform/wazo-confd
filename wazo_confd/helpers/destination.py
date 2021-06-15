@@ -402,9 +402,8 @@ class SwitchboardDestinationSchema(BaseDestinationSchema):
 
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(attribute='actionarg1', required=True)
-    ring_time = fields.Float(
-        validate=Range(min=0), attribute='actionarg2', allow_none=True
-    )
+    ring_time = fields.Float(validate=Range(min=0), allow_none=True)
+    moh_uuid = fields.UUID(allow_none=True)
 
     user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
@@ -415,6 +414,34 @@ class UserDestinationSchema(BaseDestinationSchema):
             data['user_lastname'] = data['user']['lastname']
 
         data.pop('user', None)
+        return data
+
+    @pre_dump
+    def separate_action(self, data):
+        options = data.actionarg2.split(';') if data.actionarg2 else []
+        data.ring_time = None
+        data.moh_uuid = None
+
+        if len(options) > 0:
+            data.ring_time = options[0] or None
+
+        if len(options) > 1:  # id is always bound with variables
+            data.moh_uuid = options[1]
+
+        return data
+
+    @post_load
+    def merge_action(self, data):
+        ring_time = data.pop('ring_time', None)
+        moh_uuid = data.get('moh_uuid')
+
+        actionarg2 = ''
+        if ring_time:
+            actionarg2 += str(ring_time)
+        if moh_uuid:
+            actionarg2 += ';{}'.format(moh_uuid)
+
+        data['actionarg2'] = actionarg2
         return data
 
 

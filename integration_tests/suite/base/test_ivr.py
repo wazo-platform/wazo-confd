@@ -268,6 +268,7 @@ def test_edit_all_parameters(ivr):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(ivr, *destinations):
     for destination in valid_destinations(*destinations):
         yield create_ivr_with_destination, destination
