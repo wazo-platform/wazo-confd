@@ -30,20 +30,22 @@ def test_delete_errors():
     yield s.check_resource_not_found, fake_schedule, 'Schedule'
 
 
-def test_post_errors():
+@fixtures.user()
+def test_post_errors(user):
     url = confd.schedules.post
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
 @fixtures.schedule()
-def test_put_errors(schedule):
+@fixtures.user()
+def test_put_errors(schedule, user):
     url = confd.schedules(schedule['id']).put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     yield s.check_bogus_field_returns_error, url, 'name', True
     yield s.check_bogus_field_returns_error, url, 'name', 1234
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
@@ -180,6 +182,8 @@ def error_checks(url):
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'closed_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'closed_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
+
     for destination in invalid_destinations():
         regex = r'exceptional_periods.*0.*destination'
         body = [{'destination': destination}]

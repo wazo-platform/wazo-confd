@@ -22,6 +22,7 @@ from xivo_dao.resources.application import dao as application_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
+from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.skill_rule import dao as skill_rule_dao
@@ -433,7 +434,7 @@ class UserDestinationSchema(BaseDestinationSchema):
     @post_load
     def merge_action(self, data):
         ring_time = data.pop('ring_time', None)
-        moh_uuid = data.get('moh_uuid')
+        moh_uuid = data.pop('moh_uuid', None)
 
         actionarg2 = ''
         if ring_time:
@@ -577,6 +578,23 @@ class OptionalGetSkillRuleFromActionArg2Resource(Validator):
             raise errors.param_not_found('skill_rule_id', 'SkillRule', **metadata)
 
 
+class GetMohFromActionArg2Resource(Validator):
+    def __init__(self, dao_get):
+        self._dao_get = dao_get
+
+    def validate(self, model):
+        destination = UserDestinationSchema().dump(model)
+        moh_uuid = destination.get('moh_uuid', None)
+        if not moh_uuid:
+            return
+
+        try:
+            self._dao_get(moh_uuid)
+        except NotFoundError:
+            metadata = {'moh_uuid': moh_uuid}
+            raise errors.param_not_found('moh_uuid', 'MOH', **metadata)
+
+
 class DestinationValidator:
 
     _VALIDATORS = {
@@ -604,7 +622,7 @@ class DestinationValidator:
         ],
         'sound': [],
         'switchboard': [GetResource('actionarg1', switchboard_dao.get, 'Switchboard')],
-        'user': [GetResource('actionarg1', user_dao.get, 'User')],
+        'user': [GetResource('actionarg1', user_dao.get, 'User'), GetMohFromActionArg2Resource(moh_dao.get)],
         'voicemail': [GetResource('actionarg1', voicemail_dao.get, 'Voicemail')],
     }
 

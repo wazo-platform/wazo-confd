@@ -16,18 +16,20 @@ def test_get_errors():
 
 
 @fixtures.queue()
-def test_put_errors(queue):
+@fixtures.user()
+def test_put_errors(queue, user):
     fake_queue = confd.queues(FAKE_ID).fallbacks.put
     yield s.check_resource_not_found, fake_queue, 'Queue'
 
     url = confd.queues(queue['id']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'noanswer_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
 
 
 @fixtures.queue()

@@ -18,22 +18,24 @@ def test_get_errors():
 
 
 @fixtures.group()
-def test_put_errors(group):
+@fixtures.user()
+def test_put_errors(group, user):
     fake_group = confd.groups(FAKE_ID).fallbacks.put
     yield s.check_resource_not_found, fake_group, 'Group'
 
     url = confd.groups(group['uuid']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
     url = confd.groups(group['id']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
 
 
 @fixtures.group()

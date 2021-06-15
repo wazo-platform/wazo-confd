@@ -17,18 +17,20 @@ def test_get_errors():
 
 
 @fixtures.call_filter()
-def test_put_errors(call_filter):
+@fixtures.user()
+def test_put_errors(call_filter, user):
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.put
     yield s.check_resource_not_found, fake_call_filter, 'CallFilter'
 
     url = confd.callfilters(call_filter['id']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
 
 
 @fixtures.call_filter()
