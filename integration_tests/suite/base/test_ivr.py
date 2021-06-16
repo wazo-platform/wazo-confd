@@ -98,15 +98,15 @@ def error_checks(url, user):
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'invalid_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'invalid_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
+    yield s.check_bogus_field_returns_error, url, 'invalid_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {'name': 'name', 'menu_sound': 'menu'}, 'MOH was not found'
     
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'timeout_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'timeout_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
+    yield s.check_bogus_field_returns_error, url, 'timeout_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {'name': 'name', 'menu_sound': 'menu'}, 'MOH was not found'
     
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'abort_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'abort_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
+    yield s.check_bogus_field_returns_error, url, 'abort_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {'name': 'name', 'menu_sound': 'menu'}, 'MOH was not found'
     
 
 

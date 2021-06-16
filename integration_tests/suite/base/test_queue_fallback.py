@@ -126,7 +126,8 @@ def _update_queue_fallbacks_with_destination(queue_id, destination):
 
 
 @fixtures.queue()
-def test_nonexistent_destinations(queue):
+@fixtures.moh()
+def test_nonexistent_destinations(queue, moh):
     ivr = group = outcall = dest_queue = user = voicemail = conference = skill_rule = {
         'id': 99999999
     }
@@ -142,6 +143,7 @@ def test_nonexistent_destinations(queue):
         conference,
         skill_rule,
         application,
+        moh,
     ):
         if destination['type'] in (
             'ivr',
