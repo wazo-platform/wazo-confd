@@ -227,7 +227,7 @@ def test_update_fields_with_null_value(_, switchboard):
 
     confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold='foo',
-        waiting_room_music_on_hold='foo'
+        waiting_room_music_on_hold='foo',
     )
 
     response = confd.switchboards(switchboard['uuid']).put(

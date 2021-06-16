@@ -20,10 +20,14 @@ class _BaseSwitchboardResource:
 
     def _update_moh_fields(self, form, tenant_uuids):
         if 'queue_music_on_hold' in form:
-            form['queue_moh_uuid'] = self._find_moh_uuid(form, 'queue_music_on_hold', tenant_uuids)
+            form['queue_moh_uuid'] = self._find_moh_uuid(
+                form, 'queue_music_on_hold', tenant_uuids
+            )
 
         if 'waiting_room_music_on_hold' in form:
-            form['hold_moh_uuid'] = self._find_moh_uuid(form, 'waiting_room_music_on_hold', tenant_uuids)
+            form['hold_moh_uuid'] = self._find_moh_uuid(
+                form, 'waiting_room_music_on_hold', tenant_uuids
+            )
 
         return form
 
