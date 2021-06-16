@@ -213,7 +213,6 @@ def test_edit_minimal_parameters(switchboard):
 def test_update_fields_with_null_value(_, switchboard):
     response = confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold=None,
-        waiting_room_music_on_hold=None,
     )
     response.assert_updated()
 
@@ -222,6 +221,25 @@ def test_update_fields_with_null_value(_, switchboard):
         response.item,
         has_entries(
             queue_music_on_hold=None,
+            waiting_room_music_on_hold='foo',
+        ),
+    )
+
+    confd.switchboards(switchboard['uuid']).put(
+        queue_music_on_hold='foo',
+        waiting_room_music_on_hold='foo',
+    )
+
+    response = confd.switchboards(switchboard['uuid']).put(
+        waiting_room_music_on_hold=None,
+    )
+    response.assert_updated()
+
+    response = confd.switchboards(switchboard['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            queue_music_on_hold='foo',
             waiting_room_music_on_hold=None,
         ),
     )
