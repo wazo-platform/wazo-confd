@@ -22,7 +22,7 @@ def test_put_errors(user):
     yield s.check_resource_not_found, fake_user, 'User'
 
     url = confd.users(user['uuid']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
@@ -165,7 +165,7 @@ def test_nonexistent_destinations(user):
     ivr = group = outcall = queue = dest_user = voicemail = conference = skill_rule = {
         'id': 99999999
     }
-    switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
+    moh = switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
     for destination in valid_destinations(
         ivr,
         group,
@@ -177,6 +177,7 @@ def test_nonexistent_destinations(user):
         conference,
         skill_rule,
         application,
+        moh,
     ):
         if destination['type'] in (
             'ivr',

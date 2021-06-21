@@ -218,12 +218,12 @@ def error_checks(url, user):
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'wait_time_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'wait_time_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
-    
+    yield s.check_bogus_field_returns_error, url, 'wait_time_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {'name': 'foo'}, 'MOH was not found'
+
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {}, 'MOH was not found'
-    
+    yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', {'type': 'user', 'user_id': user['id'], 'moh_uuid': '00000000-0000-0000-0000-000000000000'}, {'name': 'foo'}, 'MOH was not found'
+
 
 
 @fixtures.queue(name='unique')
@@ -423,6 +423,7 @@ def test_create_multi_tenant():
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(queue, *destinations):
     for destination in valid_destinations(*destinations):
         yield create_queue_with_destination, destination
