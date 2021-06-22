@@ -32,7 +32,9 @@ class UserDestinationSchema(BaseDestinationSchema):
 
     @pre_dump
     def separate_action(self, data):
-        options = data.fallback_actionargs.split(';') if data.fallback_actionargs else []
+        options = (
+            data.fallback_actionargs.split(';') if data.fallback_actionargs else []
+        )
         data.ring_time = None
         data.moh_uuid = None
 

@@ -622,7 +622,10 @@ class DestinationValidator:
         ],
         'sound': [],
         'switchboard': [GetResource('actionarg1', switchboard_dao.get, 'Switchboard')],
-        'user': [GetResource('actionarg1', user_dao.get, 'User'), GetMohFromActionArg2Resource(moh_dao.get)],
+        'user': [
+            GetResource('actionarg1', user_dao.get, 'User'),
+            GetMohFromActionArg2Resource(moh_dao.get),
+        ],
         'voicemail': [GetResource('actionarg1', voicemail_dao.get, 'Voicemail')],
     }
 
