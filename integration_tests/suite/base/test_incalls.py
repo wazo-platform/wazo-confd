@@ -35,20 +35,22 @@ def test_delete_errors():
     yield s.check_resource_not_found, fake_incall, 'Incall'
 
 
-def test_post_errors():
+@fixtures.user()
+def test_post_errors(user):
     url = confd.incalls.post
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
 @fixtures.incall()
-def test_put_errors(incall):
+@fixtures.user()
+def test_put_errors(incall, user):
     url = confd.incalls(incall['id']).put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
         40
@@ -76,6 +78,12 @@ def error_checks(url):
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'destination', destination
+
+    yield s.check_bogus_field_returns_error, url, 'destination', {
+        'type': 'user',
+        'user_id': user['id'],
+        'moh_uuid': '00000000-0000-0000-0000-000000000000',
+    }, {}, 'MOH was not found'
 
 
 @fixtures.extension(context=INCALL_CONTEXT)
@@ -251,6 +259,7 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(incall, *destinations):
     for destination in valid_destinations(*destinations):
         yield create_incall_with_destination, destination

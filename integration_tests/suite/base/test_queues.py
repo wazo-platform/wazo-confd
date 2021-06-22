@@ -84,9 +84,10 @@ def test_delete_errors():
     yield s.check_resource_not_found, fake_queue, 'Queue'
 
 
-def test_post_errors():
+@fixtures.user()
+def test_post_errors(user):
     url = confd.queues.post
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
     yield s.check_bogus_field_returns_error, url, 'name', 123
@@ -103,13 +104,14 @@ def test_post_errors():
 
 
 @fixtures.queue()
-def test_put_errors(queue):
+@fixtures.user()
+def test_put_errors(queue, user):
     url = confd.queues(queue['id']).put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     yield s.check_bogus_field_returns_error, url, 'label', 123
     yield s.check_bogus_field_returns_error, url, 'label', True
     yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
@@ -216,8 +218,19 @@ def error_checks(url):
 
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'wait_time_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'wait_time_destination', {
+        'type': 'user',
+        'user_id': user['id'],
+        'moh_uuid': '00000000-0000-0000-0000-000000000000',
+    }, {'name': 'foo'}, 'MOH was not found'
+
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'wait_ratio_destination', {
+        'type': 'user',
+        'user_id': user['id'],
+        'moh_uuid': '00000000-0000-0000-0000-000000000000',
+    }, {'name': 'foo'}, 'MOH was not found'
 
 
 @fixtures.queue(name='unique')
@@ -417,6 +430,7 @@ def test_create_multi_tenant():
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(queue, *destinations):
     for destination in valid_destinations(*destinations):
         yield create_queue_with_destination, destination

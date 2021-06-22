@@ -17,18 +17,24 @@ def test_get_errors():
 
 
 @fixtures.call_filter()
-def test_put_errors(call_filter):
+@fixtures.user()
+def test_put_errors(call_filter, user):
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.put
     yield s.check_resource_not_found, fake_call_filter, 'CallFilter'
 
     url = confd.callfilters(call_filter['id']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'noanswer_destination', {
+        'type': 'user',
+        'user_id': user['id'],
+        'moh_uuid': '00000000-0000-0000-0000-000000000000',
+    }, {}, 'MOH was not found'
 
 
 @fixtures.call_filter()
@@ -103,6 +109,7 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(call_filter, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_call_filter_fallbacks_with_destination, call_filter[
@@ -122,7 +129,8 @@ def _update_call_filter_fallbacks_with_destination(call_filter_id, destination):
 
 
 @fixtures.call_filter()
-def test_nonexistent_destinations(call_filter):
+@fixtures.moh()
+def test_nonexistent_destinations(call_filter, moh):
     ivr = group = outcall = queue = user = voicemail = conference = skill_rule = {
         'id': 99999999
     }
@@ -138,6 +146,7 @@ def test_nonexistent_destinations(call_filter):
         conference,
         skill_rule,
         application,
+        moh,
     ):
         if destination['type'] in (
             'ivr',

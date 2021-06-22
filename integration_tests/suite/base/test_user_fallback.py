@@ -22,16 +22,27 @@ def test_put_errors(user):
     yield s.check_resource_not_found, fake_user, 'User'
 
     url = confd.users(user['uuid']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
-    for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
-        yield s.check_bogus_field_returns_error, url, 'busy_destination', destination
-        yield s.check_bogus_field_returns_error, url, 'congestion_destination', destination
-        yield s.check_bogus_field_returns_error, url, 'fail_destination', destination
+def error_checks(url, user):
+    destination_types = [
+        'noanswer_destination',
+        'busy_destination',
+        'congestion_destination',
+        'fail_destination',
+    ]
+
+    for destination_type in destination_types:
+        for destination in invalid_destinations():
+            yield s.check_bogus_field_returns_error, url, destination_type, destination
+
+        yield s.check_bogus_field_returns_error, url, destination_type, {
+            'type': 'user',
+            'user_id': user['id'],
+            'moh_uuid': '00000000-0000-0000-0000-000000000000',
+        }, {}, 'MOH was not found'
 
 
 @fixtures.user()
@@ -127,6 +138,7 @@ def test_edit_to_none(user):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(user, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_user_fallbacks_with_destination, user['uuid'], destination
@@ -157,7 +169,7 @@ def test_nonexistent_destinations(user):
     ivr = group = outcall = queue = dest_user = voicemail = conference = skill_rule = {
         'id': 99999999
     }
-    switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
+    moh = switchboard = application = {'uuid': '00000000-0000-0000-0000-000000000000'}
     for destination in valid_destinations(
         ivr,
         group,
@@ -169,6 +181,7 @@ def test_nonexistent_destinations(user):
         conference,
         skill_rule,
         application,
+        moh,
     ):
         if destination['type'] in (
             'ivr',

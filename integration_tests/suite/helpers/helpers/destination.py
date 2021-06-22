@@ -221,6 +221,9 @@ def invalid_destinations():
         {'type': 'user', 'user_id': 'string'},
         {'type': 'user', 'user_id': None},
         {'type': 'user', 'user_id': 1, 'ring_time': -10},
+        {'type': 'user', 'user_id': 1, 'moh_uuid': True},
+        {'type': 'user', 'user_id': 1, 'moh_uuid': 42},
+        {'type': 'user', 'user_id': 1, 'moh_uuid': 'string'},
         {'type': 'voicemail'},
         {'type': 'voicemail', 'missing_required_field': 123},
         {'type': 'voicemail', 'voicemail_id': 'string'},
@@ -243,6 +246,7 @@ def valid_destinations(
     conference,
     skill_rule,
     application,
+    moh,
 ):
     return [
         {'type': 'application', 'application': 'callback_disa', 'context': 'name'},
@@ -338,6 +342,8 @@ def valid_destinations(
         {'type': 'user', 'user_id': user['id']},
         {'type': 'user', 'user_id': user['id'], 'ring_time': 2},
         {'type': 'user', 'user_id': user['id'], 'ring_time': None},
+        {'type': 'user', 'user_id': user['id'], 'moh_uuid': moh['uuid']},
+        {'type': 'user', 'user_id': user['id'], 'moh_uuid': None},
         {'type': 'voicemail', 'voicemail_id': voicemail['id']},
         {
             'type': 'voicemail',

@@ -22,6 +22,7 @@ from xivo_dao.resources.application import dao as application_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.ivr import dao as ivr_dao
+from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.skill_rule import dao as skill_rule_dao
@@ -402,9 +403,8 @@ class SwitchboardDestinationSchema(BaseDestinationSchema):
 
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(attribute='actionarg1', required=True)
-    ring_time = fields.Float(
-        validate=Range(min=0), attribute='actionarg2', allow_none=True
-    )
+    ring_time = fields.Float(validate=Range(min=0), allow_none=True)
+    moh_uuid = fields.UUID(allow_none=True)
 
     user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
@@ -415,6 +415,34 @@ class UserDestinationSchema(BaseDestinationSchema):
             data['user_lastname'] = data['user']['lastname']
 
         data.pop('user', None)
+        return data
+
+    @pre_dump
+    def separate_action(self, data):
+        options = data.actionarg2.split(';') if data.actionarg2 else []
+        data.ring_time = None
+        data.moh_uuid = None
+
+        if len(options) > 0:
+            data.ring_time = options[0] or None
+
+        if len(options) > 1:  # id is always bound with variables
+            data.moh_uuid = options[1]
+
+        return data
+
+    @post_load
+    def merge_action(self, data):
+        ring_time = data.pop('ring_time', None)
+        moh_uuid = data.pop('moh_uuid', None)
+
+        actionarg2 = ''
+        if ring_time is not None:
+            actionarg2 += str(ring_time)
+        if moh_uuid is not None:
+            actionarg2 += ';{}'.format(moh_uuid)
+
+        data['actionarg2'] = actionarg2
         return data
 
 
@@ -550,6 +578,23 @@ class OptionalGetSkillRuleFromActionArg2Resource(Validator):
             raise errors.param_not_found('skill_rule_id', 'SkillRule', **metadata)
 
 
+class GetMohFromActionArg2Resource(Validator):
+    def __init__(self, dao_get):
+        self._dao_get = dao_get
+
+    def validate(self, model):
+        destination = UserDestinationSchema().dump(model)
+        moh_uuid = destination.get('moh_uuid', None)
+        if not moh_uuid:
+            return
+
+        try:
+            self._dao_get(moh_uuid)
+        except NotFoundError:
+            metadata = {'moh_uuid': moh_uuid}
+            raise errors.param_not_found('moh_uuid', 'MOH', **metadata)
+
+
 class DestinationValidator:
 
     _VALIDATORS = {
@@ -577,7 +622,10 @@ class DestinationValidator:
         ],
         'sound': [],
         'switchboard': [GetResource('actionarg1', switchboard_dao.get, 'Switchboard')],
-        'user': [GetResource('actionarg1', user_dao.get, 'User')],
+        'user': [
+            GetResource('actionarg1', user_dao.get, 'User'),
+            GetMohFromActionArg2Resource(moh_dao.get),
+        ],
         'voicemail': [GetResource('actionarg1', voicemail_dao.get, 'Voicemail')],
     }
 

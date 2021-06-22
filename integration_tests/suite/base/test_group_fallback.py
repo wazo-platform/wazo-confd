@@ -18,22 +18,28 @@ def test_get_errors():
 
 
 @fixtures.group()
-def test_put_errors(group):
+@fixtures.user()
+def test_put_errors(group, user):
     fake_group = confd.groups(FAKE_ID).fallbacks.put
     yield s.check_resource_not_found, fake_group, 'Group'
 
     url = confd.groups(group['uuid']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
     url = confd.groups(group['id']).fallbacks.put
-    for check in error_checks(url):
+    for check in error_checks(url, user):
         yield check
 
 
-def error_checks(url):
+def error_checks(url, user):
     for destination in invalid_destinations():
         yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
+    yield s.check_bogus_field_returns_error, url, 'noanswer_destination', {
+        'type': 'user',
+        'user_id': user['id'],
+        'moh_uuid': '00000000-0000-0000-0000-000000000000',
+    }, {}, 'MOH was not found'
 
 
 @fixtures.group()
@@ -92,6 +98,7 @@ def test_edit_to_none(group):
 @fixtures.conference()
 @fixtures.skill_rule()
 @fixtures.application()
+@fixtures.moh()
 def test_valid_destinations(group, *destinations):
     for destination in valid_destinations(*destinations):
         yield _update_group_fallbacks_with_destination, group['uuid'], destination
@@ -107,7 +114,8 @@ def _update_group_fallbacks_with_destination(group_uuid, destination):
 
 
 @fixtures.group()
-def test_nonexistent_destinations(group):
+@fixtures.moh()
+def test_nonexistent_destinations(group, moh):
     ivr = dest_group = outcall = queue = user = voicemail = conference = skill_rule = {
         'id': 99999999
     }
@@ -123,6 +131,7 @@ def test_nonexistent_destinations(group):
         conference,
         skill_rule,
         application,
+        moh,
     ):
         if destination['type'] in (
             'ivr',
