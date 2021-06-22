@@ -437,9 +437,9 @@ class UserDestinationSchema(BaseDestinationSchema):
         moh_uuid = data.pop('moh_uuid', None)
 
         actionarg2 = ''
-        if ring_time:
+        if ring_time is not None:
             actionarg2 += str(ring_time)
-        if moh_uuid:
+        if moh_uuid is not None:
             actionarg2 += ';{}'.format(moh_uuid)
 
         data['actionarg2'] = actionarg2

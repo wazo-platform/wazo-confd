@@ -52,9 +52,9 @@ class UserDestinationSchema(BaseDestinationSchema):
         moh_uuid = data.pop('moh_uuid', None)
 
         fallback_actionargs = ''
-        if ring_time:
+        if ring_time is not None:
             fallback_actionargs += str(ring_time)
-        if moh_uuid:
+        if moh_uuid is not None:
             fallback_actionargs += ';{}'.format(moh_uuid)
 
         data['fallback_actionargs'] = fallback_actionargs
