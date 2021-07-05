@@ -134,6 +134,7 @@ DEFAULT_CONFIG = {
         'sound': True,
         'sound_language': True,
         'switchboard': True,
+        'switchboard_fallback': True,
         'switchboard_member': True,
         'timezone': True,
         'tenant': True,
