@@ -1,0 +1,68 @@
+paths:
+  /switchboards/{switchboard_uuid}/fallbacks:
+    get:
+      operationId: get_switchboard_fallback
+      summary: List all fallbacks for switchboard
+      description: '**Required ACL:** `confd.switchboards.{switchboard_uuid}.fallbacks.read`'
+      tags:
+      - switchboards
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/switchboard_uuid'
+      responses:
+        '200':
+          description: Fallbacks for switchboard
+          schema:
+            $ref: '#/definitions/SwitchboardFallbacks'
+    put:
+      operationId: update_switchboard_fallback
+      summary: Update switchboard's fallbacks
+      description: '**Required ACL:** `confd.switchboards.{switchboard_uuid}.fallbacks.update`
+
+
+        **WARNING** This endpoint delete all fields that are not defined.'
+      tags:
+      - switchboards
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/switchboard_uuid'
+      - name: body
+        in: body
+        description: Fallbacks for switchboard
+        schema:
+          $ref: '#/definitions/SwitchboardFallbacks'
+      responses:
+        '204':
+          description: Switchboard's fallbacks updated
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+definitions:
+  SwitchboardFallbacks:
+    properties:
+      noanswer_destination:
+        description: The destination to redirect the caller to when there are no answer
+        $ref: '#/definitions/DestinationType'
+      busy_destination:
+        description: The destination to redirect the caller to when there are busy
+        $ref: '#/definitions/DestinationType'
+      congestion_destination:
+        description: The destination to redirect the caller to when there are congestion
+        $ref: '#/definitions/DestinationType'
+      fail_destination:
+        description: The destination to redirect the caller to when the call fail
+        $ref: '#/definitions/DestinationType'
+    example:
+      noanswer_destination:
+        type: user
+        user_id: 1
+      busy_destination:
+        type: group
+        group_id: 2
+      congestion_destination:
+        type: ivr
+        ivr_id: 3
+      fail_destination:
+        type: voicemail
+        voicemail_id: 4
