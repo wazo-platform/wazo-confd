@@ -22,13 +22,17 @@ class SwitchboardFallbackList(ConfdResource):
     @required_acl('confd.switchboards.{switchboard_uuid}.fallbacks.read')
     def get(self, switchboard_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        switchboard = self.switchboard_dao.get(switchboard_uuid, tenant_uuids=tenant_uuids)
+        switchboard = self.switchboard_dao.get(
+            switchboard_uuid, tenant_uuids=tenant_uuids
+        )
         return self.schema().dump(switchboard.fallbacks)
 
     @required_acl('confd.switchboards.{switchboard_uuid}.fallbacks.update')
     def put(self, switchboard_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        switchboard = self.switchboard_dao.get(switchboard_uuid, tenant_uuids=tenant_uuids)
+        switchboard = self.switchboard_dao.get(
+            switchboard_uuid, tenant_uuids=tenant_uuids
+        )
         fallbacks = self.schema().load(request.get_json())
         self.service.edit(switchboard, fallbacks)
         return '', 204

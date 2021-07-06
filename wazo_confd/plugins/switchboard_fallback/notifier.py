@@ -16,11 +16,9 @@ class SwitchboardFallbackNotifier:
         event = ArbitraryEvent(
             name='switchboard_fallback_edited',
             body=SwitchboardFallbackSchema().dump(switchboard),
-            required_acl='switchboards.{uuid}.fallbacks.edited'.format(uuid=switchboard.uuid),
+            required_acl='switchboards.fallbacks.edited',
         )
-        event.routing_key = 'config.switchboards.{uuid}.fallbacks.edited'.format(
-            uuid=switchboard.uuid
-        )
+        event.routing_key = 'config.switchboards.fallbacks.edited'
         self.bus.send_bus_event(event)
 
 

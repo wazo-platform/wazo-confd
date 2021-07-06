@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -33,6 +33,7 @@ class SwitchboardSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    fallbacks = fields.Nested('SwitchboardFallbackSchema', dump_only=True)
 
     @post_dump
     def wrap_users(self, data):
