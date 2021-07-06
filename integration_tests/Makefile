@@ -20,7 +20,7 @@ update-db-pull:
 	docker tag wazoplatform/wazo-confd-db-test:latest wazoplatform/wazo-confd-db-test:local
 
 update-db-build:
-	docker build --no-cache -t wazoplatform/wazo-confd-db-test:local -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
+	docker build --pull --no-cache -t wazoplatform/wazo-confd-db-test:local -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
 
 build-provd:
 	docker build -t wazoplatform/wazo-provd $(PROVD_DIR)
