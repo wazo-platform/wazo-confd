@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -42,7 +42,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid_régèx!'
+    yield s.check_bogus_field_returns_error, url, 'name', 'a' * 129
+    yield s.check_bogus_field_returns_error, url, 'name', ''
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'password', 123
@@ -201,7 +202,7 @@ def test_create_without_name():
 @fixtures.call_permission()
 def test_create_2_call_permissions_with_same_name(call_permission):
     response = confd.callpermissions.post(name=call_permission['name'])
-    response.assert_match(400, e.resource_exists('CallPermission'))
+    response.assert_created('callpermissions')
 
 
 @fixtures.call_permission()
@@ -250,7 +251,7 @@ def test_edit_with_same_name(first_call_permission, second_call_permission):
     response = confd.callpermissions(first_call_permission['id']).put(
         name=second_call_permission['name']
     )
-    response.assert_match(400, e.resource_exists('CallPermission'))
+    response.assert_updated()
 
 
 @fixtures.call_permission(wazo_tenant=MAIN_TENANT)
