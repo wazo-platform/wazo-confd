@@ -202,7 +202,7 @@ def test_create_without_name():
 @fixtures.call_permission()
 def test_create_2_call_permissions_with_same_name(call_permission):
     response = confd.callpermissions.post(name=call_permission['name'])
-    response.assert_created('callpermissions')
+    response.assert_match(400, e.resource_exists('CallPermission'))
 
 
 @fixtures.call_permission()
@@ -251,7 +251,7 @@ def test_edit_with_same_name(first_call_permission, second_call_permission):
     response = confd.callpermissions(first_call_permission['id']).put(
         name=second_call_permission['name']
     )
-    response.assert_updated()
+    response.assert_match(400, e.resource_exists('CallPermission'))
 
 
 @fixtures.call_permission(wazo_tenant=MAIN_TENANT)
