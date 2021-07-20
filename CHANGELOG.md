@@ -2,7 +2,7 @@
 
 ## 21.10
 
-* The name of call_filters does not have to be unique anymore
+* The name of call_permissions is now unique to a given tenant only
 
 
 ## 21.09
