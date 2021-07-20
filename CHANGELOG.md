@@ -1,5 +1,10 @@
 # Changelog
 
+## 21.10
+
+* The name of call_permissions is now unique to a given tenant only
+
+
 ## 21.09
 
 * The "user" destination type can now include a "moh_uuid" which will be used instead of the ringback tone. This includes the following resources

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -172,6 +172,9 @@ class CallPermissionAssociator(Associator):
         names = entry.extract_field('call_permissions', 'names')
         if names is not None:
             entry.call_permissions = [
-                self.call_permission_service.get_by(name=name) for name in names
+                self.call_permission_service.get_by(
+                    tenant_uuids=[user.tenant_uuid], name=name
+                )
+                for name in names
             ]
             self.associate_permissions(user, entry.call_permissions)

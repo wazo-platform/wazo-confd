@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -42,7 +42,8 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', None
     yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid_régèx!'
+    yield s.check_bogus_field_returns_error, url, 'name', 'a' * 129
+    yield s.check_bogus_field_returns_error, url, 'name', ''
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'password', 123
