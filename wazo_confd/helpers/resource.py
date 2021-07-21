@@ -5,11 +5,10 @@ from xivo_dao.helpers.db_manager import Session
 
 
 class CRUDService:
-    def __init__(self, dao, validator, notifier, extra_parameters=None):
+    def __init__(self, dao, validator, notifier):
         self.dao = dao
         self.validator = validator
         self.notifier = notifier
-        self.extra_parameters = extra_parameters or []
 
     def search(self, parameters, tenant_uuids=None):
         return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
