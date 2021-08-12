@@ -11,7 +11,7 @@ class SwitchboardSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
-    timeout = fields.Integer(validate=Range(min=0), allow_none=True)
+    timeout = fields.Integer(validate=Range(min=1), allow_none=True)
     queue_music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
     waiting_room_music_on_hold = fields.String(
         validate=Length(max=128), allow_none=True

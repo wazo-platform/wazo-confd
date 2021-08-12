@@ -80,6 +80,11 @@ def error_checks(url):
     )
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', []
     yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', {}
+    yield s.check_bogus_field_returns_error, url, 'timeout', 'unknown'
+    yield s.check_bogus_field_returns_error, url, 'timeout', True
+    yield s.check_bogus_field_returns_error, url, 'timeout', False
+    yield s.check_bogus_field_returns_error, url, 'timeout', -1
+    yield s.check_bogus_field_returns_error, url, 'timeout', 0
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
@@ -184,6 +189,7 @@ def test_create_all_parameters(*_):
         name='TheSwitchboard',
         queue_music_on_hold='queuemoh',
         waiting_room_music_on_hold='holdmoh',
+        timeout=42,
     )
     response.assert_created('switchboards')
 
@@ -209,7 +215,9 @@ def test_edit_minimal_parameters(switchboard):
 
 
 @fixtures.moh(name='foo')
-@fixtures.switchboard(queue_music_on_hold='foo', waiting_room_music_on_hold='foo')
+@fixtures.switchboard(
+    queue_music_on_hold='foo', waiting_room_music_on_hold='foo', timeout=42
+)
 def test_update_fields_with_null_value(_, switchboard):
     response = confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold=None,
@@ -222,12 +230,14 @@ def test_update_fields_with_null_value(_, switchboard):
         has_entries(
             queue_music_on_hold=None,
             waiting_room_music_on_hold='foo',
+            timeout=42,
         ),
     )
 
     confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold='foo',
         waiting_room_music_on_hold='foo',
+        timeout=42,
     )
 
     response = confd.switchboards(switchboard['uuid']).put(
@@ -241,6 +251,28 @@ def test_update_fields_with_null_value(_, switchboard):
         has_entries(
             queue_music_on_hold='foo',
             waiting_room_music_on_hold=None,
+            timeout=42,
+        ),
+    )
+
+    confd.switchboards(switchboard['uuid']).put(
+        queue_music_on_hold='foo',
+        waiting_room_music_on_hold='foo',
+        timeout=42,
+    )
+
+    response = confd.switchboards(switchboard['uuid']).put(
+        timeout=None,
+    )
+    response.assert_updated()
+
+    response = confd.switchboards(switchboard['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            queue_music_on_hold='foo',
+            waiting_room_music_on_hold='foo',
+            timeout=None,
         ),
     )
 
