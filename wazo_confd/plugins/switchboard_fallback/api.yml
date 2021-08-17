@@ -44,25 +44,7 @@ definitions:
       noanswer_destination:
         description: The destination to redirect the caller to when there are no answer
         $ref: '#/definitions/DestinationType'
-      busy_destination:
-        description: The destination to redirect the caller to when there are busy
-        $ref: '#/definitions/DestinationType'
-      congestion_destination:
-        description: The destination to redirect the caller to when there are congestion
-        $ref: '#/definitions/DestinationType'
-      fail_destination:
-        description: The destination to redirect the caller to when the call fail
-        $ref: '#/definitions/DestinationType'
     example:
       noanswer_destination:
         type: user
         user_id: 1
-      busy_destination:
-        type: group
-        group_id: 2
-      congestion_destination:
-        type: ivr
-        ivr_id: 3
-      fail_destination:
-        type: voicemail
-        voicemail_id: 4
