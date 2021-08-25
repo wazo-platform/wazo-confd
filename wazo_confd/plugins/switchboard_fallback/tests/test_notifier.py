@@ -4,7 +4,7 @@
 import unittest
 from mock import Mock
 
-from xivo_bus.resources.common.event import ArbitraryEvent
+from xivo_bus.resources.switchboard.event import EditSwitchboardFallbackEvent
 from xivo_dao.alchemy.switchboard import Switchboard
 
 from ..notifier import SwitchboardFallbackNotifier
@@ -19,13 +19,8 @@ class TestSwitchboardFallbackNotifier(unittest.TestCase):
         self.notifier = SwitchboardFallbackNotifier(self.bus)
 
     def test_edited_then_bus_event(self):
-        expected_event = ArbitraryEvent(
-            name='switchboard_fallback_edited',
-            body=SwitchboardFallbackSchema().dump(self.switchboard),
-            required_acl='switchboards.{uuid}.fallbacks.edited'.format(
-                uuid=self.switchboard.uuid
-            ),
-        )
+        event_body = SwitchboardFallbackSchema().dump(self.switchboard)
+        expected_event = EditSwitchboardFallbackEvent(event_body)
 
         self.notifier.edited(self.switchboard)
 
