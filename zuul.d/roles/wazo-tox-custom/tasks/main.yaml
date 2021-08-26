@@ -1,0 +1,113 @@
+- name: Require tox_envlist variable
+  fail:
+    msg: tox_envlist is required for this role
+  when: tox_envlist is not defined
+
+- name: Run tox without tests
+  command: "{{ tox_executable }} --notest -e{{ tox_envlist }}"
+  args:
+    chdir: "{{ zuul_work_dir }}"
+  environment: "{{ tox_environment|combine(tox_constraints_env|default({})) }}"
+
+- name: Extract tox config
+  shell: "{{ tox_executable }} --showconfig -e{{ tox_envlist }} > .tox.config"
+  args:
+    chdir: "{{ zuul_work_dir }}"
+  environment: "{{ tox_environment|combine(tox_constraints_env|default({})) }}"
+
+- name: Check if setup.py exists
+  stat:
+    path: "{{ zuul_work_dir }}/setup.py"
+  register: check_setup_py_file
+
+- name: Extract tox package name
+  command: "python3 setup.py --name"
+  args:
+    chdir: "{{ zuul_work_dir }}"
+  when: check_setup_py_file.stat.exists
+  register: python_package_name
+
+- name: Install any sibling python packages
+  tox_install_sibling_packages:
+    tox_show_config: "{{ zuul_work_dir }}/.tox.config"
+    tox_package_name: "{{ python_package_name.stdout | default(omit) }}"
+    tox_constraints_file: "{{ tox_constraints_file | default(omit) }}"
+    project_dir: "{{ zuul_work_dir }}"
+    projects: "{{ zuul.projects.values() | list | json_query(projects_filter) }}"
+  vars:
+    projects_filter: "[?name!='{{ zuul.project.name }}']"
+
+- name: Install any sibling python packages into docker compose configuration
+  docker_sibling_packages:
+    tox_envlist: "{{ tox_envlist }}"
+    project_dir: "{{ zuul_work_dir }}"
+    projects: "{{ zuul.projects.values() | list | json_query(projects_filter) }}"
+    services: "{{ docker_compose_services_override | list }}"
+  vars:
+    projects_filter: "[?name!='{{ zuul.project.name }}']"
+  register: docker_sibling_results
+  when: docker_install_siblings
+
+- name: Set docker-compose override location env
+  set_fact:
+    docker_compose_override_env:
+      WAZO_TEST_DOCKER_OVERRIDE_EXTRA: "{{ docker_sibling_results.file }}"
+  when: docker_install_siblings
+
+- name: debug the integration environment variables
+  debug:
+    msg:
+      - "zuul.projects.values(): {{ zuul.projects.values() }}"
+      - "zuul.projects.values() list : {{ zuul.projects.values() | list }}"
+      - "zuul.projects.values() list query : {{ zuul.projects.values() | list | json_query(manage_db_query) }}"
+      - "zuul.projects.values() list query first : {{ zuul.projects.values() | list | json_query(manage_db_query) | first }}"
+      - "zuul.projects.values() list query first default: {{ zuul.projects.values() | list | json_query(manage_db_query) | first | default('') }}"
+  vars:
+    manage_db_query: "[?short_name=='xivo-manage-db'].src_dir"
+
+- name: Set the integration environment variables
+  set_fact:
+    integration_env:
+      INTEGRATION_TEST_TIMEOUT: "{{ integration_test_timeout | default(omit) }}"
+      MANAGE_DB_DIR: "{{ ansible_env.PWD }}/{{ zuul.projects.values() | list | json_query(manage_db_query) | first | default('') }}"
+      TEST_LOGS: "verbose"
+      WAZO_TEST_DOCKER_LOGS_ENABLED: 1
+      WAZO_TEST_NO_DOCKER_COMPOSE_PULL: 1
+      WAZO_TEST_DOCKER_LOGS_DIR: "/tmp/docker-logs"
+      TOX_TESTENV_PASSENV: >-
+        INTEGRATION_TEST_TIMEOUT
+        MANAGE_DB_DIR
+        TEST_LOGS
+        WAZO_TEST_DOCKER_LOGS_DIR
+        WAZO_TEST_DOCKER_LOGS_ENABLED
+        WAZO_TEST_DOCKER_OVERRIDE_EXTRA
+        WAZO_TEST_NO_DOCKER_COMPOSE_PULL
+  vars:
+    manage_db_query: "[?short_name=='xivo-manage-db'].src_dir"
+
+- name: Emit docker compose override file
+  debug:
+    msg: "Docker compose override file contents: {{ docker_sibling_results.contents }}"
+  when: docker_install_siblings
+
+- name: Set tox environment variables
+  set_fact:
+    tox_environment: "{{ tox_environment | combine(item) }}"
+  loop:
+    - "{{ docker_compose_override_env | default({}) }}"
+    - "{{ tox_constraints_env | default({}) }}"
+    - "{{ integration_env | default({}) }}"
+
+- name: Emit tox environment
+  debug:
+    var: tox_environment
+
+- name: Emit tox command
+  debug:
+    msg: "Running tox: {{ tox_executable }} -e{{ tox_envlist }} {{ tox_extra_args }}"
+
+- name: Run tox
+  args:
+    chdir: "{{ zuul_work_dir }}"
+  environment: "{{ tox_environment }}"
+  command: "{{ tox_executable }} -e{{ tox_envlist }} {{ tox_extra_args }}"

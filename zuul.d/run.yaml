@@ -1,0 +1,4 @@
+---
+- hosts: all
+  roles:
+    - wazo-tox-custom
