@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -8,7 +8,7 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
 from .model import SoundCategory, SoundFile, SoundFormat
-from .schema import SoundSchema, SoundQueryParametersSchema
+from .schema import SoundFileSchema, SoundSchema, SoundQueryParametersSchema
 
 
 class SoundList(ListResource):
@@ -26,7 +26,15 @@ class SoundList(ListResource):
 
     @required_acl('confd.sounds.read')
     def get(self):
-        return super().get()
+        params = self.search_params()
+        tenant_uuids = self._build_tenant_list(params)
+
+        kwargs = {}
+        if tenant_uuids is not None:
+            kwargs['tenant_uuids'] = tenant_uuids
+
+        total, items = self.service.search_categories(params, **kwargs)
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
 
 
 class SoundItem(ItemResource):
@@ -49,6 +57,21 @@ class SoundItem(ItemResource):
 
     def put(self, category):
         return '', 405
+
+
+class SoundFileList(ListResource):
+
+    model = SoundItem
+    schema = SoundFileSchema
+    has_tenant_uuid = True
+
+    @required_acl('confd.sounds.{category}.read')
+    def get(self, category):
+        tenant = Tenant.autodetect()
+        parameters = self.search_params()
+
+        total, items = self.service.search_files(tenant.uuid, category, parameters)
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
 
 
 class SoundFileItem(ConfdResource):
