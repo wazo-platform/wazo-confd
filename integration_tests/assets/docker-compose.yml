@@ -21,7 +21,7 @@ services:
       - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
 
   postgres:
-    image: wazoplatform/wazo-confd-db-test
+    image: wazoplatform/wazo-confd-db-test:local
     ports:
       - "5432"
 
