@@ -72,6 +72,7 @@ setup(
             'line_endpoint = wazo_confd.plugins.line_endpoint.plugin:Plugin',
             'line_extension = wazo_confd.plugins.line_extension.plugin:Plugin',
             'line_sip = wazo_confd.plugins.line_sip.plugin:Plugin',
+            'meeting = wazo_confd.plugins.meeting.plugin:Plugin',
             'moh = wazo_confd.plugins.moh.plugin:Plugin',
             'outcall = wazo_confd.plugins.outcall.plugin:Plugin',
             'outcall_call_permission = wazo_confd.plugins.outcall_call_permission.plugin:Plugin',

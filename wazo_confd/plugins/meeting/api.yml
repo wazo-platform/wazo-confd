@@ -1,0 +1,261 @@
+paths:
+  /meetings:
+    get:
+      operationId: list_meetings
+      summary: List meetings
+      description: '**Required ACL:** `confd.meetings.read`'
+      tags:
+      - meetings
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Meetings list
+          schema:
+            $ref: '#/definitions/MeetingItems'
+    post:
+      operationId: create_meeting
+      summary: Create meeting
+      description: '**Required ACL:** `confd.meetings.create`'
+      tags:
+      - meetings
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - name: body
+        in: body
+        description: Meeting to create
+        required: true
+        schema:
+          $ref: '#/definitions/MeetingRequest'
+      responses:
+        '201':
+          description: Meeting created
+          schema:
+            $ref: '#/definitions/Meeting'
+        '400':
+          $ref: '#/responses/CreateError'
+  /meetings/{meeting_uuid}:
+    get:
+      operationId: get_meeting
+      summary: Get meeting
+      description: '**Required ACL:** `confd.meetings.{meeting_uuid}.read`'
+      tags:
+      - meetings
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '200':
+          description: Meeting
+          schema:
+            $ref: '#/definitions/Meeting'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_meeting
+      summary: Update meeting
+      description: '**Required ACL:** `confd.meetings.{meeting_uuid}.update`'
+      tags:
+      - meetings
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/MeetingRequest'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_meeting
+      summary: Delete meeting
+      description: '**Required ACL:** `confd.meetings.{meeting_uuid}.delete`'
+      tags:
+      - meetings
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /users/me/meetings:
+    get:
+      operationId: list_user_meetings
+      summary: List user meetings
+      description: '**Required ACL:** `confd.users.me.meetings.read`'
+      tags:
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: Meetings list
+          schema:
+            $ref: '#/definitions/MeetingItems'
+    post:
+      operationId: create_user_meeting
+      summary: Create user meeting
+      description: '**Required ACL:** `confd.users.me.meetings.create`'
+      tags:
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - name: body
+        in: body
+        description: Meeting to create
+        required: true
+        schema:
+          $ref: '#/definitions/MeetingUserRequest'
+      responses:
+        '201':
+          description: Meeting created
+          schema:
+            $ref: '#/definitions/Meeting'
+        '400':
+          $ref: '#/responses/CreateError'
+  /users/me/meetings/{meeting_uuid}:
+    get:
+      operationId: get_user_meeting
+      summary: Get one of the meetings of the current user
+      description: '**Required ACL:** `confd.users.me.meetings.{meeting_uuid}.read`'
+      tags:
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '200':
+          description: Meeting
+          schema:
+            $ref: '#/definitions/Meeting'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_user_meeting
+      summary: Update one of the meetings of the current user
+      description: '**Required ACL:** `confd.users.me.meetings.{meeting_uuid}.update`'
+      tags:
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/MeetingRequest'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_user_meeting
+      summary: Delete one of the meetings of the current user
+      description: '**Required ACL:** `confd.users.me.meetings.{meeting_uuid}.delete`'
+      tags:
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+  /guests/me/meetings/{meeting_uuid}:
+    get:
+      operationId: get_guest_meeting
+      summary: Get one guest meeting
+      description: '**Required ACL:** none'
+      tags:
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '200':
+          description: Meetings list
+          schema:
+            $ref: '#/definitions/Meeting'
+definitions:
+  MeetingItems:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/Meeting'
+  Meeting:
+    type: object
+    properties:
+      uuid:
+        type: string
+      owner_uuids:
+        type: array
+        items:
+          type: string
+      name:
+        type: string
+      hostname:
+        type: string
+        readOnly: true
+      guest_sip_authorization:
+        type: string
+        readOnly: true
+        description: "Format: base64(username:password), same as HTTP Basic Auth."
+  MeetingUserRequest:
+    type: object
+    properties:
+      name:
+        type: string
+  MeetingRequest:
+    type: object
+    allOf:
+    - $ref: '#/definitions/MeetingUserRequest'
+    - properties:
+        owner_uuids:
+          type: array
+          items:
+            type: string
+
+parameters:
+  meeting_uuid:
+    required: true
+    name: meeting_uuid
+    in: path
+    type: string
+    description: Meeting UUID
