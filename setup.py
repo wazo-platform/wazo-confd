@@ -100,6 +100,7 @@ setup(
             'sound = wazo_confd.plugins.sound.plugin:Plugin',
             'sound_language = wazo_confd.plugins.sound_language.plugin:Plugin',
             'switchboard = wazo_confd.plugins.switchboard.plugin:Plugin',
+            'switchboard_fallback = wazo_confd.plugins.switchboard_fallback.plugin:Plugin',
             'switchboard_member = wazo_confd.plugins.switchboard_member.plugin:Plugin',
             'timezone = wazo_confd.plugins.timezone.plugin:Plugin',
             'tenant = wazo_confd.plugins.tenant.plugin:Plugin',
