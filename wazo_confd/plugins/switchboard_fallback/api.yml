@@ -42,7 +42,7 @@ definitions:
   SwitchboardFallbacks:
     properties:
       noanswer_destination:
-        description: The destination to redirect the caller to when there are no answer
+        description: If a call has not been answered before the switchboard `timeout`, the call will be redirected to this destination.
         $ref: '#/definitions/DestinationType'
     example:
       noanswer_destination:
