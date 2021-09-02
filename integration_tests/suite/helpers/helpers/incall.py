@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -14,7 +14,7 @@ def add_incall(wazo_tenant=None, **params):
     return response.item
 
 
-def delete_incall(incall_id, check=False):
+def delete_incall(incall_id, check=False, **params):
     response = confd.incalls(incall_id).delete()
     if check:
         response.assert_ok()

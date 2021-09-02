@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -32,7 +32,7 @@ def add_user(wazo_tenant=None, **params):
     return response.item
 
 
-def delete_user(user_id, check=False):
+def delete_user(user_id, check=False, **params):
     response = confd.users(user_id).delete()
     if check:
         response.assert_ok()

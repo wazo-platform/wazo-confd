@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -14,7 +14,7 @@ def add_schedule(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_schedule(schedule_id, check=False):
+def delete_schedule(schedule_id, check=False, **parameters):
     response = confd.schedules(schedule_id).delete()
     if check:
         response.assert_ok()

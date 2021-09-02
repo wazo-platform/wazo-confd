@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -17,7 +17,7 @@ def add_queue(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_queue(queue_id, check=False):
+def delete_queue(queue_id, check=False, **parameters):
     response = confd.queues(queue_id).delete()
     if check:
         response.assert_ok()

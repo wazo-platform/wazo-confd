@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -19,7 +19,7 @@ def add_outcall(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_outcall(outcall_id, check=False):
+def delete_outcall(outcall_id, check=False, **params):
     response = confd.outcalls(outcall_id).delete()
     if check:
         response.assert_ok()

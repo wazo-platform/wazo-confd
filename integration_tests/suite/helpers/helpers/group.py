@@ -17,7 +17,7 @@ def add_group(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_group(group_id, check=False):
+def delete_group(group_id, check=False, **parameters):
     response = confd.groups(group_id).delete()
     if check:
         response.assert_ok()

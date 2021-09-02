@@ -1,4 +1,4 @@
-# Copyright 2016-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -15,7 +15,7 @@ def add_parking_lot(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_parking_lot(parking_lot_id, check=False):
+def delete_parking_lot(parking_lot_id, check=False, **parameters):
     response = confd.parkinglots(parking_lot_id).delete()
     if check:
         response.assert_ok()

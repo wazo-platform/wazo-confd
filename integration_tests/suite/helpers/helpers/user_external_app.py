@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -30,7 +30,7 @@ def add_user_external_app(user_uuid=None, wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_user_external_app(user_uuid, name, check=False):
+def delete_user_external_app(user_uuid, name, check=False, **parameters):
     response = confd.users(user_uuid).external.apps(name).delete()
     if check:
         response.assert_ok()
