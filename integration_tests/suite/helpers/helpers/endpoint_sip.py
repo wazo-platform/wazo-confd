@@ -20,7 +20,7 @@ def delete_sip(sip_uuid, check=False, **params):
         response.assert_ok()
 
 
-def delete_sip_template(sip_template_uuid, check=False):
+def delete_sip_template(sip_template_uuid, check=False, **params):
     response = confd.endpoints.sip.templates(sip_template_uuid).delete()
     if check:
         response.assert_ok()

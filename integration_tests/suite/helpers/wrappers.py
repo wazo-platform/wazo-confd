@@ -102,4 +102,7 @@ class IsolatedAction:
                 fields = [self.id_field]
 
             args = [self.resource[key] for key in fields]
-            callback(*args, check=False, **self.kwargs)
+            kwargs = {
+                key: value for key, value in self.kwargs.items() if key not in fields
+            }
+            callback(*args, check=False, **kwargs)

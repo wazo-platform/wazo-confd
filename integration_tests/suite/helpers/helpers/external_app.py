@@ -17,7 +17,7 @@ def add_external_app(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_external_app(name, check=False, **params):
+def delete_external_app(name, check=False, **parameters):
     response = confd.external.apps(name).delete()
     if check:
         response.assert_ok()
