@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -22,6 +22,13 @@ from . import confd, ari, wazo_sound, asterisk_sound
 
 DEFAULT_INTERNAL_DIRECTORY = ('monitor', 'recordings-meetme')
 DEFAULT_CATEGORY = ('acd', 'features', 'playback', 'recordings')
+
+
+def _get_file_by_name(sound, name):
+    for file in sound.get('files', []):
+        if file.get('name') == name:
+            return file
+    return None
 
 
 def setup_module():
@@ -50,6 +57,17 @@ def test_post_errors():
 
     for check in unique_error_checks(url):
         yield check
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT)
+def test_search_errors(sound):
+    searchable_endpoints = [
+        confd.sounds.get,
+        confd.sounds(sound.get('name')).files.get,
+    ]
+    for url in searchable_endpoints:
+        for check in s.search_error_checks(url):
+            yield check
 
 
 def error_checks(url):
@@ -145,6 +163,89 @@ def test_get_with_files(sound):
             ),
         ),
     )
+
+
+@fixtures.sound(name='test_category_1')
+@fixtures.sound(name='test_category_2')
+def test_search_sound(sound1, sound2):
+    yield s.check_sorting, confd.sounds.get, sound1, sound2, 'name', 'test_category', 'name'
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT, name='test_category_1')
+@fixtures.sound(wazo_tenant=SUB_TENANT, name='test_category_2')
+def test_search_sound_multi_tenant(sound1, sound2):
+    response = confd.sounds.get(wazo_tenant=MAIN_TENANT, search='test_category')
+    assert_that(
+        response.items,
+        contains(
+            has_entries(name="test_category_1"),
+        ),
+    )
+
+    response = confd.sounds.get(
+        wazo_tenant=MAIN_TENANT, search='test_category', recurse=True
+    )
+    assert_that(
+        response.items,
+        contains_inanyorder(
+            has_entries(name='test_category_1'),
+            has_entries(name='test_category_2'),
+        ),
+    )
+
+
+@fixtures.sound(name='test_offset_1')
+@fixtures.sound(name='test_offset_2')
+def test_search_sound_offset(sound1, sound2):
+    url = confd.sounds.get
+    yield s.check_offset, url, sound1, sound2, 'name', 'test_offset', 'name'
+
+
+@fixtures.sound(name='test_limit_1')
+@fixtures.sound(name='test_limit_2')
+def test_search_sound_limit(sound1, sound2):
+    url = confd.sounds.get
+    yield s.check_limit, url, sound1, sound2, 'name', 'test_limit', 'name'
+
+
+@fixtures.sound(
+    files=[
+        {'name': 'skip_me', 'language': 'en_US', 'format': 'slin'},
+        {'name': 'file1', 'language': 'en_US', 'format': 'slin'},
+        {'name': 'file2', 'language': 'fr_FR', 'format': 'wav'},
+    ]
+)
+def test_search_files(sound):
+    url = confd.sounds(sound.get('name')).files.get
+    file1 = _get_file_by_name(sound, 'file1')
+    file2 = _get_file_by_name(sound, 'file2')
+    yield s.check_sorting, url, file1, file2, 'name', 'file', 'name'
+
+
+@fixtures.sound(
+    files=[
+        {'name': 'file1'},
+        {'name': 'file2'},
+    ]
+)
+def test_search_files_offset(sound):
+    url = confd.sounds(sound['name']).files.get
+    file1 = _get_file_by_name(sound, 'file1')
+    file2 = _get_file_by_name(sound, 'file2')
+    yield s.check_offset, url, file1, file2, 'name', None, 'name'
+
+
+@fixtures.sound(
+    files=[
+        {'name': 'file1'},
+        {'name': 'file2'},
+    ]
+)
+def test_search_files_limit(sound):
+    url = confd.sounds(sound['name']).files.get
+    file1 = _get_file_by_name(sound, 'file1')
+    file2 = _get_file_by_name(sound, 'file2')
+    yield s.check_limit, url, file1, file2, 'name', None, 'name'
 
 
 def test_get_system_sound():
