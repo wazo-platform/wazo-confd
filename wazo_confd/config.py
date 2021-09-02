@@ -106,6 +106,7 @@ DEFAULT_CONFIG = {
         'line_device': True,
         'line_endpoint': True,
         'line_extension': True,
+        'meeting': True,
         'moh': True,
         'outcall': True,
         'outcall_call_permission': True,
