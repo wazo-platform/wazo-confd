@@ -178,3 +178,16 @@ def test_delete_multi_tenant(main, sub):
 
     response = confd.meetings(sub['uuid']).delete(wazo_tenant=MAIN_TENANT)
     response.assert_deleted()
+
+
+@fixtures.meeting()
+def test_bus_events(meeting):
+    yield s.check_bus_event, 'config.meetings.created', confd.meetings.post, {
+        'name': 'meeting'
+    }
+    yield s.check_bus_event, 'config.meetings.updated', confd.meetings(
+        meeting['uuid']
+    ).put
+    yield s.check_bus_event, 'config.meetings.deleted', confd.meetings(
+        meeting['uuid']
+    ).delete

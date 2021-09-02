@@ -1,21 +1,43 @@
 # Copyright 2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_bus.resources.meeting.event import (
+    CreateMeetingEvent,
+    DeleteMeetingEvent,
+    EditMeetingEvent,
+)
+
 from wazo_confd import bus
+
+from .schema import MeetingSchema
+
+
+MEETING_FIELDS = [
+    'uuid',
+    'name',
+    'owner_uuids',
+    # TODO(pc-m): uncomment once the fields get added to the schema
+    # 'hostname',
+    # 'guest_sip_authorization',
+]
 
 
 class Notifier:
     def __init__(self, bus):
         self.bus = bus
+        self._schema = MeetingSchema(only=MEETING_FIELDS)
 
     def created(self, meeting):
-        pass
+        event = CreateMeetingEvent(self._schema.dump(meeting))
+        self.bus.send_bus_event(event)
 
     def edited(self, meeting):
-        pass
+        event = EditMeetingEvent(self._schema.dump(meeting))
+        self.bus.send_bus_event(event)
 
     def deleted(self, meeting):
-        pass
+        event = DeleteMeetingEvent(self._schema.dump(meeting))
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():
