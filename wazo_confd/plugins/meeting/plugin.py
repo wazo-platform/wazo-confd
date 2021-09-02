@@ -8,17 +8,21 @@ from .service import build_service
 class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
+        config = dependencies['config']
 
-        service = build_service()
+        hostname = config['beta_meeting_public_hostname']
+        port = config['beta_meeting_public_port']
+
+        service = build_service(hostname, port)
 
         api.add_resource(
             MeetingList,
             '/meetings',
-            resource_class_args=(service,),
+            resource_class_args=(service, hostname, port),
         )
         api.add_resource(
             MeetingItem,
             '/meetings/<uuid:uuid>',
             endpoint='meetings',
-            resource_class_args=(service,),
+            resource_class_args=(service, hostname, port),
         )

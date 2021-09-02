@@ -233,6 +233,11 @@ definitions:
       hostname:
         type: string
         readOnly: true
+        description: The public hostname to reach this stack
+      port:
+        type: int
+        readOnly: true
+        description: The port to use with the public hostname to reach this stack
       guest_sip_authorization:
         type: string
         readOnly: true

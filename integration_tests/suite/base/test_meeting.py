@@ -117,7 +117,16 @@ def test_create_minimal_parameters():
     response = confd.meetings.post(name='minimal')
     response.assert_created('meetings')
 
-    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, uuid=not_(empty())))
+    assert_that(
+        response.item,
+        has_entries(
+            tenant_uuid=MAIN_TENANT,
+            uuid=not_(empty()),
+            name='minimal',
+            hostname='wazo.example.com',
+            port=443,
+        ),
+    )
 
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
@@ -127,7 +136,12 @@ def test_create_all_parameters():
 
     response = confd.meetings.post(**parameters)
     response.assert_created('meetings')
-    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
+    assert_that(
+        response.item,
+        has_entries(
+            tenant_uuid=MAIN_TENANT, hostname='wazo.example.com', port=443, **parameters
+        ),
+    )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
 

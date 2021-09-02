@@ -16,6 +16,11 @@ class MeetingList(ListResource):
     model = Meeting
     schema = MeetingSchema
 
+    def __init__(self, service, hostname, port):
+        super().__init__(service)
+        self._schema = MeetingSchema()
+        self._schema.context = {'hostname': hostname, 'port': port}
+
     def build_headers(self, meeting):
         return {'Location': url_for('meetings', uuid=meeting.uuid, _external=True)}
 
@@ -27,10 +32,17 @@ class MeetingList(ListResource):
     def get(self):
         return super().get()
 
+    def schema(self):
+        return self._schema
+
 
 class MeetingItem(ItemResource):
-    schema = MeetingSchema
     has_tenant_uuid = True
+
+    def __init__(self, service, hostname, port):
+        super().__init__(service)
+        self._schema = MeetingSchema()
+        self._schema.context = {'hostname': hostname, 'port': port}
 
     @required_acl('confd.meetings.{uuid}.read')
     def get(self, uuid):
@@ -43,3 +55,6 @@ class MeetingItem(ItemResource):
     @required_acl('confd.meetings.{uuid}.delete')
     def delete(self, uuid):
         return super().delete(uuid)
+
+    def schema(self):
+        return self._schema

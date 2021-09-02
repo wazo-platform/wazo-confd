@@ -9,5 +9,9 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-def build_service():
-    return CRUDService(dao, build_validator(), build_notifier())
+def build_service(hostname, port):
+    return CRUDService(
+        dao,
+        build_validator(),
+        build_notifier(hostname, port),
+    )

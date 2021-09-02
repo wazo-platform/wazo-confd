@@ -16,16 +16,18 @@ MEETING_FIELDS = [
     'uuid',
     'name',
     'owner_uuids',
+    'hostname',
+    'port',
     # TODO(pc-m): uncomment once the fields get added to the schema
-    # 'hostname',
     # 'guest_sip_authorization',
 ]
 
 
 class Notifier:
-    def __init__(self, bus):
+    def __init__(self, bus, hostname, port):
         self.bus = bus
         self._schema = MeetingSchema(only=MEETING_FIELDS)
+        self._schema.context = {'hostname': hostname, 'port': port}
 
     def created(self, meeting):
         event = CreateMeetingEvent(self._schema.dump(meeting))
@@ -40,5 +42,5 @@ class Notifier:
         self.bus.send_bus_event(event)
 
 
-def build_notifier():
-    return Notifier(bus)
+def build_notifier(hostname, port):
+    return Notifier(bus, hostname, port)
