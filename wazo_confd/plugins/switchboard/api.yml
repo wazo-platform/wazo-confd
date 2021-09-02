@@ -108,12 +108,14 @@ definitions:
           type: string
         timeout:
           type: integer
+          description: Maximum time allowed for a call to be queued. When the timeout expires, the call is redirected to the no-answer fallback.
         queue_music_on_hold:
           type: string
         waiting_room_music_on_hold:
           type: string
     - $ref: '#/definitions/SwitchboardRelationIncalls'
     - $ref: '#/definitions/SwitchboardRelationMembers'
+    - $ref: '#/definitions/SwitchboardRelationFallbacks'
   SwitchboardRelationBase:
     properties:
         uuid:
@@ -123,6 +125,11 @@ definitions:
         name:
           type: string
           description: Switchboard name
+  SwitchboardRelationFallbacks:
+    properties:
+      fallbacks:
+        readOnly: true
+        $ref: '#/definitions/SwitchboardFallbacks'
   SwitchboardRelationIncalls:
     properties:
       incalls:
