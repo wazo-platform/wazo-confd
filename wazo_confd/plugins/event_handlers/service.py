@@ -136,6 +136,19 @@ class DefaultSIPTemplateService:
             tenant.webrtc_video_sip_template_uuid,
         )
 
+        meeting_guest_config = {
+            'label': 'meeting_guest',
+            'template': True,
+            'tenant_uuid': tenant.uuid,
+            'transport': None,
+            'asterisk_id': None,
+            'templates': [webrtc_video_template],
+        }
+        meeting_guest_template = self.create_or_merge_sip_template(
+            meeting_guest_config,
+            tenant.meeting_guest_sip_template_uuid,
+        )
+
         registration_trunk_config = {
             'label': 'registration_trunk',
             'template': True,
@@ -218,6 +231,7 @@ class DefaultSIPTemplateService:
         tenant.global_sip_template_uuid = global_template.uuid
         tenant.webrtc_sip_template_uuid = webrtc_template.uuid
         tenant.webrtc_video_sip_template_uuid = webrtc_video_template.uuid
+        tenant.meeting_guest_sip_template_uuid = meeting_guest_template.uuid
         tenant.registration_trunk_sip_template_uuid = registration_trunk_template.uuid
         tenant.twilio_trunk_sip_template_uuid = twilio_trunk_template.uuid
         tenant.sip_templates_generated = True
