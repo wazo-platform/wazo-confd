@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries, is_not, none
@@ -187,3 +187,23 @@ def test_bus_events(call_filter, user):
     url = confd.callfilters(call_filter['id']).surrogates.users.put
     body = {'users': [user]}
     yield s.check_bus_event, 'config.callfilters.surrogates.users.updated', url, body
+
+
+@fixtures.call_filter()
+@fixtures.user()
+def test_get_surrogates_callfilter_exten(call_filter, user):
+    response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user])
+    response.assert_updated()
+
+    response = confd.callfilters(call_filter['id']).get()
+    member_id = response.item['surrogates']['users'][0]['member_id']
+    assert_that(
+        response.item,
+        has_entries(
+            surrogates=has_entries(
+                users=contains(
+                    has_entries(exten=("*37" + str(member_id)), uuid=user['uuid']),
+                )
+            )
+        ),
+    )
