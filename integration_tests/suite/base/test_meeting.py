@@ -102,6 +102,14 @@ def test_get(meeting):
         ),
     )
 
+    response = confd.guests.me.meetings(meeting['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            name=meeting['name'],
+        ),
+    )
+
 
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
 @fixtures.meeting(wazo_tenant=SUB_TENANT)

@@ -58,3 +58,17 @@ class MeetingItem(ItemResource):
 
     def schema(self):
         return self._schema
+
+
+class GuestMeetingItem(ItemResource):
+    def __init__(self, service, hostname, port):
+        super().__init__(service)
+        self._schema = MeetingSchema()
+        # TODO(pc-m): The hostname and port are going to becore multi-tenant
+        self._schema.context = {'hostname': hostname, 'port': port}
+
+    def get(self, uuid):
+        return super().get(uuid)
+
+    def schema(self):
+        return self._schema
