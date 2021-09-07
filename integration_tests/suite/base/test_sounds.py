@@ -24,13 +24,6 @@ DEFAULT_INTERNAL_DIRECTORY = ('monitor', 'recordings-meetme')
 DEFAULT_CATEGORY = ('acd', 'features', 'playback', 'recordings')
 
 
-def _get_file_by_name(sound, name):
-    for file in sound.get('files', []):
-        if file.get('name') == name:
-            return file
-    return None
-
-
 def setup_module():
     wazo_sound.create_directory(MAIN_TENANT, name='')
     wazo_sound.create_directory(SUB_TENANT, name='')
@@ -63,7 +56,6 @@ def test_post_errors():
 def test_search_errors(sound):
     searchable_endpoints = [
         confd.sounds.get,
-        confd.sounds(sound.get('name')).files.get,
     ]
     for url in searchable_endpoints:
         for check in s.search_error_checks(url):
@@ -206,46 +198,6 @@ def test_search_sound_offset(sound1, sound2):
 def test_search_sound_limit(sound1, sound2):
     url = confd.sounds.get
     yield s.check_limit, url, sound1, sound2, 'name', 'test_limit', 'name'
-
-
-@fixtures.sound(
-    files=[
-        {'name': 'skip_me', 'language': 'en_US', 'format': 'slin'},
-        {'name': 'file1', 'language': 'en_US', 'format': 'slin'},
-        {'name': 'file2', 'language': 'fr_FR', 'format': 'wav'},
-    ]
-)
-def test_search_files(sound):
-    url = confd.sounds(sound.get('name')).files.get
-    file1 = _get_file_by_name(sound, 'file1')
-    file2 = _get_file_by_name(sound, 'file2')
-    yield s.check_sorting, url, file1, file2, 'name', 'file', 'name'
-
-
-@fixtures.sound(
-    files=[
-        {'name': 'file1'},
-        {'name': 'file2'},
-    ]
-)
-def test_search_files_offset(sound):
-    url = confd.sounds(sound['name']).files.get
-    file1 = _get_file_by_name(sound, 'file1')
-    file2 = _get_file_by_name(sound, 'file2')
-    yield s.check_offset, url, file1, file2, 'name', None, 'name'
-
-
-@fixtures.sound(
-    files=[
-        {'name': 'file1'},
-        {'name': 'file2'},
-    ]
-)
-def test_search_files_limit(sound):
-    url = confd.sounds(sound['name']).files.get
-    file1 = _get_file_by_name(sound, 'file1')
-    file2 = _get_file_by_name(sound, 'file2')
-    yield s.check_limit, url, file1, file2, 'name', None, 'name'
 
 
 def test_get_system_sound():

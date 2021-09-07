@@ -3,7 +3,7 @@
 
 from wazo_confd.helpers.ari import Client as ARIClient
 
-from .resource import SoundFileList, SoundItem, SoundList, SoundFileItem
+from .resource import SoundItem, SoundList, SoundFileItem
 from .service import build_service
 
 
@@ -20,13 +20,6 @@ class Plugin:
             SoundItem,
             '/sounds/<filename:category>',
             endpoint='sounds',
-            resource_class_args=(service,),
-        )
-
-        api.add_resource(
-            SoundFileList,
-            '/sounds/<filename:category>/files',
-            endpoint='soundsfilelist',
             resource_class_args=(service,),
         )
 

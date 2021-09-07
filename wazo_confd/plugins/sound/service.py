@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 
 class SoundService:
     CATEGORY_SORTABLE_FIELDS = ('name',)
-    FILE_SORTABLE_FIELDS = ('name',)
 
     def __init__(
         self, ari_client, storage, asterisk_storage, validator, validator_file, notifier
@@ -31,7 +30,7 @@ class SoundService:
         self.validator_file = validator_file
         self.notifier = notifier
 
-    def search_categories(self, parameters, tenant_uuids):
+    def search(self, parameters, tenant_uuids):
         sound_system = self._get_asterisk_sound(parameters)
         sounds = self._storage.list_directories(parameters, tenant_uuids)
         sounds.append(sound_system)
@@ -39,12 +38,6 @@ class SoundService:
         sounds = self._filter_and_sort_categories(sounds, parameters)
         total = len(sounds)
         return total, sounds
-
-    def search_files(self, tenant_uuid, category, parameters=None):
-        sounds = self.get(tenant_uuid, category, parameters, with_files=True)
-        files = self._filter_and_sort_files(sounds, parameters)
-        total = len(files)
-        return total, files
 
     def _validate_parameters(self, parameters):
         if parameters.get('direction') not in ['asc', 'desc', None]:
@@ -74,21 +67,6 @@ class SoundService:
                 results,
                 key=lambda category: getattr(category, order),
                 reverse=direction,
-            )
-        return results[offset:limit]
-
-    def _filter_and_sort_files(self, category, parameters):
-        pattern, order, offset, limit, direction = self._validate_parameters(parameters)
-        results = (
-            list(filter(lambda file: pattern in getattr(file, 'name'), category.files))
-            if pattern
-            else category.files
-        )
-        if order:
-            if order not in self.FILE_SORTABLE_FIELDS:
-                raise errors.invalid_ordering(order)
-            results = sorted(
-                results, key=lambda file: getattr(file, order), reverse=direction
             )
         return results[offset:limit]
 

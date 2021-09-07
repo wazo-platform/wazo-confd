@@ -76,28 +76,6 @@ paths:
           $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
-  /sounds/{sound_category}/files:
-    get:
-      operationId: list_sound_files
-      summary: List category's sound files
-      description: '**Required ACL: ** `confd.sounds.{sound_category}.read`'
-      tags:
-      - sounds
-      parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/sound_category'
-      - $ref: '#/parameters/order'
-      - $ref: '#/parameters/direction'
-      - $ref: '#/parameters/limit'
-      - $ref: '#/parameters/offset'
-      - $ref: '#/parameters/search'
-      responses:
-        '200':
-          description: Audio files list
-          schema:
-            $ref: '#/definitions/SoundFileItems'
-        '404':
-          $ref: '#/responses/NotFoundError'
   /sounds/{sound_category}/files/{sound_filename}:
     get:
       operationId: get_sounds_files
@@ -234,16 +212,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Sound'
-      total:
-        type: integer
-    required:
-    - total
-  SoundFileItems:
-    properties:
-      items:
-        type: array
-        items:
-          $ref: '#/definitions/SoundFile'
       total:
         type: integer
     required:
