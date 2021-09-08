@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class SoundService:
-    CATEGORY_SORTABLE_FIELDS = ('name',)
+    DEFAULT_ORDER = 'name'
+    CATEGORY_SORTABLE_FIELDS = (DEFAULT_ORDER,)
 
     def __init__(
         self, ari_client, storage, asterisk_storage, validator, validator_file, notifier
@@ -47,7 +48,7 @@ class SoundService:
         offset = parameters.get('offset', 0)
         limit = offset + parameters['limit'] if 'limit' in parameters else None
         search = parameters.get('search', None)
-        order = parameters.get('order', None)
+        order = parameters.get('order', self.DEFAULT_ORDER)
         reverse = direction == 'desc'
         return search, order, offset, limit, reverse
 
@@ -57,15 +58,14 @@ class SoundService:
         if pattern:
             results = list(filter(lambda category: pattern in category.name, results))
 
-        if order:
-            if order not in self.CATEGORY_SORTABLE_FIELDS:
-                raise errors.invalid_ordering(order)
+        if order not in self.CATEGORY_SORTABLE_FIELDS:
+            raise errors.invalid_ordering(order)
 
-            results = sorted(
-                results,
-                key=lambda category: getattr(category, order),
-                reverse=reverse,
-            )
+        results = sorted(
+            results,
+            key=lambda category: getattr(category, order),
+            reverse=reverse,
+        )
 
         return results[offset:limit]
 
