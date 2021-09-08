@@ -1,4 +1,4 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -14,7 +14,7 @@ def add_access_feature(**params):
     return response.item
 
 
-def delete_access_feature(access_feature_id, check=False):
+def delete_access_feature(access_feature_id, check=False, **kwargs):
     response = confd.access_features(access_feature_id).delete()
     if check:
         response.assert_ok()

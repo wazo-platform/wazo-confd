@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -16,7 +16,7 @@ def add_agent(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_agent(agent_id, check=False):
+def delete_agent(agent_id, check=False, **kwargs):
     response = confd.agents(agent_id).delete()
     if check:
         response.assert_ok()

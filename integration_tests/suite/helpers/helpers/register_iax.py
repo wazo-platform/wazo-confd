@@ -1,4 +1,4 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -14,7 +14,7 @@ def add_register_iax(**params):
     return response.item
 
 
-def delete_register_iax(register_iax_id, check=False):
+def delete_register_iax(register_iax_id, check=False, **params):
     response = confd.registers.iax(register_iax_id).delete()
     if check:
         response.assert_ok()

@@ -18,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 
 class SoundService:
+    DEFAULT_ORDER = 'name'
+    CATEGORY_SORTABLE_FIELDS = (DEFAULT_ORDER,)
+
     def __init__(
         self, ari_client, storage, asterisk_storage, validator, validator_file, notifier
     ):
@@ -32,8 +35,39 @@ class SoundService:
         sound_system = self._get_asterisk_sound(parameters)
         sounds = self._storage.list_directories(parameters, tenant_uuids)
         sounds.append(sound_system)
+
+        sounds = self._filter_and_sort_categories(sounds, parameters)
         total = len(sounds)
         return total, sounds
+
+    def _validate_parameters(self, parameters):
+        direction = parameters.get('direction')
+        if direction not in ['asc', 'desc', None]:
+            raise errors.invalid_direction()
+
+        offset = parameters.get('offset', 0)
+        limit = offset + parameters['limit'] if 'limit' in parameters else None
+        search = parameters.get('search', None)
+        order = parameters.get('order', self.DEFAULT_ORDER)
+        reverse = direction == 'desc'
+        return search, order, offset, limit, reverse
+
+    def _filter_and_sort_categories(self, sounds, parameters):
+        pattern, order, offset, limit, reverse = self._validate_parameters(parameters)
+        results = sounds
+        if pattern:
+            results = list(filter(lambda category: pattern in category.name, results))
+
+        if order not in self.CATEGORY_SORTABLE_FIELDS:
+            raise errors.invalid_ordering(order)
+
+        results = sorted(
+            results,
+            key=lambda category: getattr(category, order),
+            reverse=reverse,
+        )
+
+        return results[offset:limit]
 
     def get(self, tenant_uuid, category, parameters=None, with_files=True):
         parameters = parameters if parameters is not None else {}

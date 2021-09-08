@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import string
@@ -21,7 +21,7 @@ def add_device(wazo_tenant=None, **params):
     return response.item
 
 
-def delete_device(device_id, check=False):
+def delete_device(device_id, check=False, **params):
     response = confd.devices(device_id).delete()
     if check:
         response.assert_ok()

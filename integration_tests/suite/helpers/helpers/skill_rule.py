@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -17,7 +17,7 @@ def add_skill_rule(wazo_tenant=None, **parameters):
     return response.item
 
 
-def delete_skill_rule(skill_rule_id, check=False):
+def delete_skill_rule(skill_rule_id, check=False, **parameters):
     response = confd.queues.skillrules(skill_rule_id).delete()
     if check:
         response.assert_ok()

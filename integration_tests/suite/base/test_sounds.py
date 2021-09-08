@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -50,6 +50,16 @@ def test_post_errors():
 
     for check in unique_error_checks(url):
         yield check
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT)
+def test_search_errors(sound):
+    searchable_endpoints = [
+        confd.sounds.get,
+    ]
+    for url in searchable_endpoints:
+        for check in s.search_error_checks(url):
+            yield check
 
 
 def error_checks(url):
@@ -145,6 +155,49 @@ def test_get_with_files(sound):
             ),
         ),
     )
+
+
+@fixtures.sound(name='test_category_1')
+@fixtures.sound(name='test_category_2')
+def test_search_sound(sound1, sound2):
+    yield s.check_sorting, confd.sounds.get, sound1, sound2, 'name', 'test_category', 'name'
+
+
+@fixtures.sound(wazo_tenant=MAIN_TENANT, name='test_category_1')
+@fixtures.sound(wazo_tenant=SUB_TENANT, name='test_category_2')
+def test_search_sound_multi_tenant(sound1, sound2):
+    response = confd.sounds.get(wazo_tenant=MAIN_TENANT, search='test_category')
+    assert_that(
+        response.items,
+        contains(
+            has_entries(name="test_category_1"),
+        ),
+    )
+
+    response = confd.sounds.get(
+        wazo_tenant=MAIN_TENANT, search='test_category', recurse=True
+    )
+    assert_that(
+        response.items,
+        contains_inanyorder(
+            has_entries(name='test_category_1'),
+            has_entries(name='test_category_2'),
+        ),
+    )
+
+
+@fixtures.sound(name='test_offset_1')
+@fixtures.sound(name='test_offset_2')
+def test_search_sound_offset(sound1, sound2):
+    url = confd.sounds.get
+    yield s.check_offset, url, sound1, sound2, 'name', 'test_offset', 'name'
+
+
+@fixtures.sound(name='test_limit_1')
+@fixtures.sound(name='test_limit_2')
+def test_search_sound_limit(sound1, sound2):
+    url = confd.sounds.get
+    yield s.check_limit, url, sound1, sound2, 'name', 'test_limit', 'name'
 
 
 def test_get_system_sound():

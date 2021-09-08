@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -18,7 +18,7 @@ def add_transport(**parameters):
     return response.item
 
 
-def delete_transport(transport_uuid, check=False):
+def delete_transport(transport_uuid, check=False, **parameters):
     response = confd.sip.transports(transport_uuid).delete()
     if check:
         response.assert_ok()

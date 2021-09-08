@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import inspect
@@ -102,4 +102,7 @@ class IsolatedAction:
                 fields = [self.id_field]
 
             args = [self.resource[key] for key in fields]
-            callback(*args, check=False)
+            kwargs = {
+                key: value for key, value in self.kwargs.items() if key not in fields
+            }
+            callback(*args, check=False, **kwargs)
