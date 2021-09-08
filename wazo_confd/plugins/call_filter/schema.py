@@ -1,8 +1,9 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
 from marshmallow.validate import OneOf, Length, Range
+from xivo.xivo_helpers import clean_extension
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
@@ -26,6 +27,13 @@ class CallFilterSurrogatesSchema(BaseSchema):
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
     )
     member_id = fields.Integer(attribute='id', dump_only=True)
+    exten = fields.Method('_get_callfilter_exten', dump_only=True)
+
+    def _get_callfilter_exten(self, obj):
+        exten = obj.callfilter_exten
+        if exten:
+            return '{prefix}{id}'.format(prefix=clean_extension(exten), id=obj.id)
+        return None
 
     @post_dump
     def merge_user(self, data):

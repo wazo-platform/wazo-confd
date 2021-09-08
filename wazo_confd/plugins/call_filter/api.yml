@@ -211,4 +211,6 @@ definitions:
     - properties:
         member_id:
           type: integer
+        exten:
+          type: string
     - $ref: '#/definitions/UserRelationBase'
