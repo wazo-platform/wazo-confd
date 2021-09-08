@@ -40,34 +40,33 @@ class SoundService:
         return total, sounds
 
     def _validate_parameters(self, parameters):
-        if parameters.get('direction') not in ['asc', 'desc', None]:
+        direction = parameters.get('direction')
+        if direction not in ['asc', 'desc', None]:
             raise errors.invalid_direction()
-        offset = parameters.get('offset', 0)
-        limit = offset + parameters.get('limit') if 'limit' in parameters else None
 
-        return (
-            parameters.get('search', None),
-            parameters.get('order', None),
-            offset,
-            limit,
-            parameters.get('direction') == 'desc',
-        )
+        offset = parameters.get('offset', 0)
+        limit = offset + parameters['limit'] if 'limit' in parameters else None
+        search = parameters.get('search', None)
+        order = parameters.get('order', None)
+        reverse = direction == 'desc'
+        return search, order, offset, limit, reverse
 
     def _filter_and_sort_categories(self, sounds, parameters):
-        pattern, order, offset, limit, direction = self._validate_parameters(parameters)
-        results = (
-            list(filter(lambda category: pattern in getattr(category, 'name'), sounds))
-            if pattern
-            else sounds
-        )
+        pattern, order, offset, limit, reverse = self._validate_parameters(parameters)
+        results = sounds
+        if pattern:
+            results = list(filter(lambda category: pattern in category.name, results))
+
         if order:
             if order not in self.CATEGORY_SORTABLE_FIELDS:
                 raise errors.invalid_ordering(order)
+
             results = sorted(
                 results,
                 key=lambda category: getattr(category, order),
-                reverse=direction,
+                reverse=reverse,
             )
+
         return results[offset:limit]
 
     def get(self, tenant_uuid, category, parameters=None, with_files=True):
