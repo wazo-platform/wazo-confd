@@ -2,6 +2,7 @@
 
 ## 21.12
 
+* The surrogates user list of `callfilters` resource now implements the `exten` field
 * The following query string parameters have been added to GET `/1.1/sounds`:
 
   * `search`
