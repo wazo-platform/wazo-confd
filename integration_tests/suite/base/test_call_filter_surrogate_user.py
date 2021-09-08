@@ -192,18 +192,41 @@ def test_bus_events(call_filter, user):
 @fixtures.call_filter()
 @fixtures.user()
 def test_get_surrogates_callfilter_exten(call_filter, user):
-    response = confd.callfilters(call_filter['id']).surrogates.users.put(users=[user])
-    response.assert_updated()
+    with a.call_filter_surrogate_user(call_filter, user):
+        response = confd.callfilters(call_filter['id']).get()
+        member_id = response.item['surrogates']['users'][0]['member_id']
 
-    response = confd.callfilters(call_filter['id']).get()
-    member_id = response.item['surrogates']['users'][0]['member_id']
-    assert_that(
-        response.item,
-        has_entries(
-            surrogates=has_entries(
-                users=contains(
-                    has_entries(exten=("*37" + str(member_id)), uuid=user['uuid']),
+        assert_that(
+            response.item,
+            has_entries(
+                surrogates=has_entries(
+                    users=contains(
+                        has_entries(exten='*37{}'.format(member_id), uuid=user['uuid']),
+                    )
                 )
-            )
-        ),
-    )
+            ),
+        )
+
+
+@fixtures.call_filter()
+@fixtures.user()
+def test_get_surrogates_callfilter_exten_when_disabled(call_filter, user):
+    response = confd.extensions.features.get(search="bsfilter")
+    feature = response.items[0]
+    confd.extensions.features(feature['id']).put({'enabled': False}).assert_updated()
+
+    with a.call_filter_surrogate_user(call_filter, user):
+        response = confd.callfilters(call_filter['id']).get()
+
+        assert_that(
+            response.item,
+            has_entries(
+                surrogates=has_entries(
+                    users=contains(has_entries(exten=None, uuid=user['uuid']))
+                )
+            ),
+        )
+
+    confd.extensions.features(feature['id']).put(
+        {'enabled': feature['enabled']}
+    ).assert_updated()

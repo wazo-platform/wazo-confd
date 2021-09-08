@@ -31,7 +31,9 @@ class CallFilterSurrogatesSchema(BaseSchema):
 
     def _get_callfilter_exten(self, obj):
         exten = obj.callfilter_exten
-        return (clean_extension(exten) + str(obj.id)) if exten else None
+        if exten:
+            return '{prefix}{id}'.format(prefix=clean_extension(exten), id=obj.id)
+        return None
 
     @post_dump
     def merge_user(self, data):
