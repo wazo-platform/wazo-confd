@@ -1,5 +1,16 @@
 # Changelog
 
+## 21.12
+
+* The following query string parameters have been added to GET `/1.1/sounds`:
+
+  * `search`
+  * `order`
+  * `limit`
+  * `offset`
+  * `direction`
+
+
 ## 21.10
 
 * The name of call_permissions is now unique to a given tenant only
