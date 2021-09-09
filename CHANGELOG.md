@@ -11,6 +11,10 @@
   * `offset`
   * `direction`
 
+* The following resources have been added:
+
+  * GET, PUT `/1.1/switchboards/<switchboard_uui>/fallbacks`
+
 ## 21.10
 
 * The name of `call_permissions` is now unique to a given tenant only
