@@ -7,7 +7,7 @@ from xivo_bus.resources.meeting.event import (
     EditMeetingEvent,
 )
 
-from wazo_confd import bus
+from wazo_confd import bus, sysconfd
 
 from .schema import MeetingSchema
 
@@ -23,23 +23,31 @@ MEETING_FIELDS = [
 
 
 class Notifier:
-    def __init__(self, bus, hostname, port):
+    def __init__(self, bus, hostname, port, sysconfd):
         self.bus = bus
         self._schema = MeetingSchema(only=MEETING_FIELDS)
         self._schema.context = {'hostname': hostname, 'port': port}
+        self.sysconfd = sysconfd
+
+    def send_sysconfd_handlers(self):
+        handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
+        self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, meeting):
+        self.send_sysconfd_handlers()
         event = CreateMeetingEvent(self._schema.dump(meeting))
         self.bus.send_bus_event(event)
 
     def edited(self, meeting):
+        self.send_sysconfd_handlers()
         event = EditMeetingEvent(self._schema.dump(meeting))
         self.bus.send_bus_event(event)
 
     def deleted(self, meeting):
+        self.send_sysconfd_handlers()
         event = DeleteMeetingEvent(self._schema.dump(meeting))
         self.bus.send_bus_event(event)
 
 
 def build_notifier(hostname, port):
-    return Notifier(bus, hostname, port)
+    return Notifier(bus, hostname, port, sysconfd)
