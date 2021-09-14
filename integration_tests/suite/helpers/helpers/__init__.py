@@ -171,6 +171,7 @@ from . import user_call_permission  # noqa
 from . import user_funckey_template  # noqa
 from . import user_import  # noqa
 from . import user_line  # noqa
+from . import user_me_meeting  # noqa
 from . import user_schedule  # noqa
 from . import user_voicemail  # noqa
 from . import voicemail  # noqa
@@ -265,6 +266,7 @@ __all__ = [
     'user_funckey_template',
     'user_import',
     'user_line',
+    'user_me_meeting',
     'user_schedule',
     'user_voicemail',
     'voicemail',

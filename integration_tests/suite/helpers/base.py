@@ -29,6 +29,7 @@ from .config import (
     SUB_TENANT,
     DELETED_TENANT,
     CREATED_TENANT,
+    USER_UUID,
 )
 
 
@@ -42,7 +43,7 @@ class IntegrationTest(AssetLaunchingTestCase):
         token = MockUserToken(
             TOKEN,
             'user_uuid',
-            metadata={'uuid': 'user_uuid', 'tenant_uuid': MAIN_TENANT},
+            metadata={'uuid': USER_UUID, 'tenant_uuid': MAIN_TENANT},
         )
         cls.mock_auth.set_token(token)
         token = MockUserToken(

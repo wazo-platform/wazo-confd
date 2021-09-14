@@ -49,6 +49,7 @@ class Controller:
                 'config': config,
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
                 'bus_consumer': self._bus_consumer,
+                'auth_client': auth_client,
             },
         )
 

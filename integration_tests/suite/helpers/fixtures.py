@@ -326,3 +326,12 @@ class meeting(IsolatedAction):
         'generate': h.meeting.generate,
         'delete': h.meeting.delete,
     }
+
+
+class user_me_meeting(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {
+        'generate': h.user_me_meeting.generate,
+        'delete': h.user_me_meeting.delete,
+    }

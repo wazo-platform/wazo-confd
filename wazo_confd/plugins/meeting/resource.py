@@ -1,23 +1,29 @@
 # Copyright 2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+import logging
+
+from flask import url_for, request
+from requests import HTTPError
 
 from xivo_dao.alchemy.meeting import Meeting
+from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ItemResource, ListResource
+from wazo_confd.helpers.restful import ItemResource, ListResource, ListSchema
 
 from .schema import MeetingSchema
+
+logger = logging.getLogger(__name__)
 
 
 class MeetingList(ListResource):
 
     model = Meeting
-    schema = MeetingSchema
 
-    def __init__(self, service, hostname, port):
+    def __init__(self, service, user_service, hostname, port):
         super().__init__(service)
+        self._user_service = user_service
         self._schema = MeetingSchema()
         self._schema.context = {'hostname': hostname, 'port': port}
 
@@ -26,7 +32,15 @@ class MeetingList(ListResource):
 
     @required_acl('confd.meetings.create')
     def post(self):
-        return super().post()
+        return self._post(request.get_json())
+
+    def _post(self, body):
+        form = self.schema().load(body)
+        form = self.add_tenant_to_form(form)
+        form = self.find_owners(form)
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.meetings.read')
     def get(self):
@@ -35,12 +49,36 @@ class MeetingList(ListResource):
     def schema(self):
         return self._schema
 
+    def find_owners(self, form):
+        owner_uuids = form.pop('owner_uuids', None) or []
+        owners = []
+        tenant_uuid = form['tenant_uuid']
+        for uuid in owner_uuids:
+            owners.append(self._user_service.get(uuid, tenant_uuids=[tenant_uuid]))
+        form['owners'] = owners
+        return form
+
+    def _find_user_uuid(self):
+        token = request.headers.get('X-Auth-Token') or request.args.get('token')
+        try:
+            token_infos = self._auth_client.token.get(token)
+        except HTTPError as e:
+            logger.warning('HTTP error from wazo-auth while getting token: %s', e)
+            raise errors.param_not_found('user_uuid', 'meetings')
+
+        user_uuid = token_infos['metadata']['pbx_user_uuid']
+        if not user_uuid:
+            raise errors.param_not_found('user_uuid', 'meetings')
+
+        return user_uuid
+
 
 class MeetingItem(ItemResource):
     has_tenant_uuid = True
 
-    def __init__(self, service, hostname, port):
+    def __init__(self, service, user_service, hostname, port):
         super().__init__(service)
+        self._user_service = user_service
         self._schema = MeetingSchema()
         self._schema.context = {'hostname': hostname, 'port': port}
 
@@ -61,10 +99,9 @@ class MeetingItem(ItemResource):
 
 
 class GuestMeetingItem(ItemResource):
-    def __init__(self, service, hostname, port):
+    def __init__(self, service, user_service, hostname, port):
         super().__init__(service)
         self._schema = MeetingSchema()
-        # TODO(pc-m): The hostname and port are going to becore multi-tenant
         self._schema.context = {'hostname': hostname, 'port': port}
 
     def get(self, uuid):
@@ -72,3 +109,77 @@ class GuestMeetingItem(ItemResource):
 
     def schema(self):
         return self._schema
+
+
+class UserMeetingItem(MeetingItem):
+    def __init__(self, service, user_service, hostname, port, auth_client):
+        super().__init__(service, user_service, hostname, port)
+        self._auth_client = auth_client
+
+    def get_model(self, uuid, user_uuid, **kwargs):
+        return self.service.get_by(uuid=uuid, owner=user_uuid, **kwargs)
+
+    @required_acl('confd.users.me.meetings.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
+
+    @required_acl('confd.users.me.meetings.{uuid}.update')
+    def put(self, uuid):
+        kwargs = self._add_tenant_uuid()
+        kwargs['user_uuid'] = self._find_user_uuid()
+        model = self.get_model(uuid, **kwargs)
+        self.parse_and_update(model)
+        return '', 204
+
+    @required_acl('confd.users.me.meetings.{uuid}.delete')
+    def delete(self, uuid):
+        kwargs = self._add_tenant_uuid()
+        kwargs['user_uuid'] = self._find_user_uuid()
+        model = self.get_model(uuid, **kwargs)
+        self.service.delete(model)
+        return '', 204
+
+    def _find_user_uuid(self):
+        token = request.headers.get('X-Auth-Token') or request.args.get('token')
+        try:
+            token_infos = self._auth_client.token.get(token)
+        except HTTPError as e:
+            logger.warning('HTTP error from wazo-auth while getting token: %s', e)
+            raise errors.param_not_found('user_uuid', 'meetings')
+
+        user_uuid = token_infos['metadata']['pbx_user_uuid']
+        if not user_uuid:
+            raise errors.param_not_found('user_uuid', 'meetings')
+
+        return user_uuid
+
+
+class UserMeetingList(MeetingList):
+
+    model = Meeting
+
+    def __init__(self, service, user_service, hostname, port, auth_client):
+        super().__init__(service, user_service, hostname, port)
+        self._auth_client = auth_client
+
+    def build_headers(self, meeting):
+        return {'Location': url_for('meetings', uuid=meeting.uuid, _external=True)}
+
+    @required_acl('confd.users.me.meetings.create')
+    def post(self):
+        body = self.add_user_to_owner_uuids(request.get_json())
+        return self._post(body)
+
+    @required_acl('confd.users.me.meetings.read')
+    def get(self):
+        return super().get()
+
+    def add_user_to_owner_uuids(self, body):
+        user_uuid = self._find_user_uuid()
+        body['owner_uuids'] = list(set(body.get('owner_uuids', []) + [user_uuid]))
+        return body
+
+    def search_params(self):
+        params = ListSchema().load(request.args)
+        params['owner'] = self._find_user_uuid()
+        return params
