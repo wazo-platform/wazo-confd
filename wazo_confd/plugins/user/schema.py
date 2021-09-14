@@ -17,7 +17,7 @@ CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
 
 class UserSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    uuid = fields.String(dump_only=True)
+    uuid = fields.String()
     firstname = fields.String(validate=Length(max=128), required=True)
     lastname = fields.String(validate=Length(max=128), allow_none=True)
     email = fields.Email(validate=Length(max=254), allow_none=True)
