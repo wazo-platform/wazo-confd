@@ -11,15 +11,18 @@
   * `offset`
   * `direction`
 
+* The following resources have been added:
+
+  * GET, PUT `/1.1/switchboards/<switchboard_uui>/fallbacks`
 
 ## 21.10
 
-* The name of call_permissions is now unique to a given tenant only
-
+* The name of `call_permissions` is now unique to a given tenant only
 
 ## 21.09
 
-* The "user" destination type can now include a "moh_uuid" which will be used instead of the ringback tone. This includes the following resources
+* The `user` destination type can now include a `moh_uuid` which will be used instead of the
+  ringback tone. This includes the following resources
 
   * call_filter fallbacks
   * group fallbacks
@@ -29,14 +32,12 @@
   * schedule closed destinations
   * user fallbacks
 
-
 ## 21.08
 
 * The `switchboards` resource now implements the following fields:
 
   * `waiting_room_music_on_hold`
   * `queue_music_on_hold`
-
 
 ## 21.04
 
