@@ -1,9 +1,7 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-
-from wazo_confd.helpers.asterisk import PJSIPDoc
 
 from .service import build_service, build_pjsip_transport_service
 from .resource import (
@@ -21,9 +19,8 @@ logger = logging.getLogger(__name__)
 class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
-        config = dependencies['config']
+        pjsip_doc = dependencies['pjsip_doc']
 
-        pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
         service = build_service(pjsip_doc)
         transport_service = build_pjsip_transport_service(
             pjsip_doc, schema.PJSIPTransportSchema()

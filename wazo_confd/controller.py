@@ -13,6 +13,8 @@ from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
 from xivo.token_renewer import TokenRenewer
 
+from wazo_confd.helpers.asterisk import PJSIPDoc
+
 from . import auth
 from ._bus import BusConsumer, bus_consumer_thread
 from .http_server import api, app, HTTPServer
@@ -40,6 +42,7 @@ class Controller:
             self.token_renewer.subscribe_to_next_token_details_change(
                 auth.init_master_tenant
             )
+        pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
 
         plugin_helpers.load(
             namespace='wazo_confd.plugins',
@@ -50,6 +53,7 @@ class Controller:
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
                 'bus_consumer': self._bus_consumer,
                 'auth_client': auth_client,
+                'pjsip_doc': pjsip_doc,
             },
         )
 
