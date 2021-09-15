@@ -5,6 +5,8 @@ import logging
 import random
 import string
 
+from uuid import uuid4
+
 from flask import url_for, request
 from requests import HTTPError
 
@@ -41,11 +43,12 @@ class MeetingList(ListResource):
 
     def _post(self, body):
         form = self.schema().load(body)
+        form['uuid'] = uuid4()
         form = self.add_tenant_to_form(form)
         form = self.find_owners(form)
+        form = self.add_endpoint_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
-        model = self.add_endpoint_to_model(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.meetings.read')
@@ -55,19 +58,18 @@ class MeetingList(ListResource):
     def schema(self):
         return self._schema
 
-    def add_endpoint_to_model(self, model):
-         tenant = self._tenant_service.get(model.tenant_uuid)
+    def add_endpoint_to_form(self, form):
+         tenant = self._tenant_service.get(form['tenant_uuid'])
          template_uuid = tenant.meeting_guest_sip_template_uuid
-         endpoint_name = endpoint_username = context = 'wazo-meeting-{}-guest'.format(model.uuid)
-         password = random_string(16)
+         endpoint_name = endpoint_username = context = 'wazo-meeting-{}-guest'.format(form['uuid'])
          endpoint_body = {
             'name': endpoint_name,
-            'tenant_uuid': model.tenant_uuid,
+            'tenant_uuid': form['tenant_uuid'],
             'templates': [{'uuid': template_uuid}] if template_uuid else [],
-            'label': 'External meeting guest {}'.format(model.name),
+            'label': 'External meeting guest {}'.format(form['name']),
             'auth_section_options': [
                 ['username', endpoint_username],
-                ['password', password],
+                ['password', random_string(16)],
             ],
             'aor_section_options': [],
             'endpoint_section_options': [
@@ -80,8 +82,8 @@ class MeetingList(ListResource):
          }
          endpoint_model = EndpointSIP(**endpoint_body)
          endpoint = self._endpoint_sip_service.create(endpoint_model)
-         model.guest_endpoint_sip = endpoint
-         return model
+         form['guest_endpoint_sip_uuid'] = endpoint.uuid
+         return form
 
     def find_owners(self, form):
         owner_uuids = form.pop('owner_uuids', None) or []
