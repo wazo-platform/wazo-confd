@@ -2,11 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+import random
+import string
 
 from flask import url_for, request
 from requests import HTTPError
 
 from xivo_dao.alchemy.meeting import Meeting
+from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
@@ -21,9 +24,11 @@ class MeetingList(ListResource):
 
     model = Meeting
 
-    def __init__(self, service, user_service, hostname, port):
+    def __init__(self, service, user_service, tenant_service, endpoint_sip_service, hostname, port):
         super().__init__(service)
         self._user_service = user_service
+        self._tenant_service = tenant_service
+        self._endpoint_sip_service = endpoint_sip_service
         self._schema = MeetingSchema()
         self._schema.context = {'hostname': hostname, 'port': port}
 
@@ -40,6 +45,7 @@ class MeetingList(ListResource):
         form = self.find_owners(form)
         model = self.model(**form)
         model = self.service.create(model)
+        model = self.add_endpoint_to_model(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.meetings.read')
@@ -48,6 +54,34 @@ class MeetingList(ListResource):
 
     def schema(self):
         return self._schema
+
+    def add_endpoint_to_model(self, model):
+         tenant = self._tenant_service.get(model.tenant_uuid)
+         template_uuid = tenant.meeting_guest_sip_template_uuid
+         endpoint_name = endpoint_username = context = 'wazo-meeting-{}-guest'.format(model.uuid)
+         password = random_string(16)
+         endpoint_body = {
+            'name': endpoint_name,
+            'tenant_uuid': model.tenant_uuid,
+            'templates': [{'uuid': template_uuid}] if template_uuid else [],
+            'label': 'External meeting guest {}'.format(model.name),
+            'auth_section_options': [
+                ['username', endpoint_username],
+                ['password', password],
+            ],
+            'aor_section_options': [],
+            'endpoint_section_options': [
+                ['context', context],
+            ],
+            'identify_section_options': [],
+            'registration_section_options': [],
+            'registration_outbound_auth_section_options': [],
+            'outbound_auth_section_options': [],
+         }
+         endpoint_model = EndpointSIP(**endpoint_body)
+         endpoint = self._endpoint_sip_service.create(endpoint_model)
+         model.guest_endpoint_sip = endpoint
+         return model
 
     def find_owners(self, form):
         owner_uuids = form.pop('owner_uuids', None) or []
@@ -158,8 +192,8 @@ class UserMeetingList(MeetingList):
 
     model = Meeting
 
-    def __init__(self, service, user_service, hostname, port, auth_client):
-        super().__init__(service, user_service, hostname, port)
+    def __init__(self, service, user_service, tenant_service, endpoint_sip_service, hostname, port, auth_client):
+        super().__init__(service, user_service, tenant_service, endpoint_sip_service, hostname, port)
         self._auth_client = auth_client
 
     def build_headers(self, meeting):
@@ -183,3 +217,7 @@ class UserMeetingList(MeetingList):
         params = ListSchema().load(request.args)
         params['owner'] = self._find_user_uuid()
         return params
+
+
+def random_string(length):
+    return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))

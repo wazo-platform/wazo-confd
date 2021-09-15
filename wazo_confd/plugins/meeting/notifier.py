@@ -18,8 +18,7 @@ MEETING_FIELDS = [
     'owner_uuids',
     'hostname',
     'port',
-    # TODO(pc-m): uncomment once the fields get added to the schema
-    # 'guest_sip_authorization',
+    'guest_sip_authorization',
 ]
 
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
+from base64 import b64encode
 from hamcrest import (
     all_of,
     assert_that,
@@ -15,6 +16,7 @@ from hamcrest import (
     has_properties,
     is_not,
     not_,
+    not_none,
 )
 
 from . import confd
@@ -223,6 +225,51 @@ def test_create_all_parameters(me, owner):
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
+
+
+@fixtures.meeting()
+def test_guest_endpoint_sip_creation(meeting):
+    endpoint_sip_name = 'wazo-meeting-{uuid}-guest'.format(**meeting)
+    response = confd.endpoints.sip.get(name=endpoint_sip_name)
+    assert_that(response.total, equal_to(1))
+
+    endpoint_sip = response.items[0]
+    endpoint_username = None
+    endpoint_password = None
+    endpoint_context = None
+
+    for option, value in endpoint_sip['auth_section_options']:
+        if option == 'username':
+            endpoint_username = value
+        elif option == 'password':
+            endpoint_password = value
+
+    for option, value in endpoint_sip['endpoint_section_options']:
+        if option == 'context':
+            endpoint_context = value
+
+    assert_that(endpoint_username, not_none())
+    assert_that(endpoint_password, not_none())
+    assert_that(
+        endpoint_context,
+        equal_to('wazo-meeting-{uuid}-guest'.format(**meeting))
+    )
+
+    guest_sip_authorization = b64encode(
+        '{}:{}'.format(endpoint_username, endpoint_password).encode()
+    ).decode()
+    assert_that(
+        meeting,
+        has_entries(
+            guest_sip_authorization=guest_sip_authorization,
+        )
+    )
+
+    response = confd.meetings(meeting['uuid']).delete()
+    response.assert_deleted()
+
+    response = confd.endpoints.sip(endpoint_sip['uuid']).get()
+    response.assert_status(404)
 
 
 def test_create_without_name():
