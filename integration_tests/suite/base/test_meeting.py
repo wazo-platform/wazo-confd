@@ -19,7 +19,7 @@ from hamcrest import (
     not_none,
 )
 
-from . import confd
+from . import confd, db
 from ..helpers import errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT, USER_UUID
 
@@ -94,7 +94,7 @@ def test_list_user_me(_, mine_1, mine_2, *__):
         has_properties(
             total=equal_to(2),
             items=contains_inanyorder(mine_1, mine_2),
-        )
+        ),
     )
 
 
@@ -227,8 +227,16 @@ def test_create_all_parameters(me, owner):
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
 
-@fixtures.meeting()
-def test_guest_endpoint_sip_creation(meeting):
+@fixtures.sip_template()
+def test_guest_endpoint_sip_creation(template):
+    with db.queries() as queries:
+        queries.set_tenant_templates(
+            MAIN_TENANT, meeting_guest_sip_template_uuid=template['uuid']
+        )
+
+    response = confd.meetings.post({'name': 'testing'})
+    meeting = response.item
+
     endpoint_sip_name = 'wazo-meeting-{uuid}-guest'.format(**meeting)
     response = confd.endpoints.sip.get(name=endpoint_sip_name)
     assert_that(response.total, equal_to(1))
@@ -251,8 +259,7 @@ def test_guest_endpoint_sip_creation(meeting):
     assert_that(endpoint_username, not_none())
     assert_that(endpoint_password, not_none())
     assert_that(
-        endpoint_context,
-        equal_to('wazo-meeting-{uuid}-guest'.format(**meeting))
+        endpoint_context, equal_to('wazo-meeting-{uuid}-guest'.format(**meeting))
     )
 
     guest_sip_authorization = b64encode(
@@ -262,7 +269,7 @@ def test_guest_endpoint_sip_creation(meeting):
         meeting,
         has_entries(
             guest_sip_authorization=guest_sip_authorization,
-        )
+        ),
     )
 
     response = confd.meetings(meeting['uuid']).delete()

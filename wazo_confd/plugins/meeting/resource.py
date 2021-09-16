@@ -26,11 +26,21 @@ class MeetingList(ListResource):
 
     model = Meeting
 
-    def __init__(self, service, user_service, tenant_service, endpoint_sip_service, hostname, port):
+    def __init__(
+        self,
+        service,
+        user_service,
+        tenant_service,
+        endpoint_sip_service,
+        endpoint_sip_template_service,
+        hostname,
+        port,
+    ):
         super().__init__(service)
         self._user_service = user_service
         self._tenant_service = tenant_service
         self._endpoint_sip_service = endpoint_sip_service
+        self._endpoint_sip_template_service = endpoint_sip_template_service
         self._schema = MeetingSchema()
         self._schema.context = {'hostname': hostname, 'port': port}
 
@@ -59,14 +69,19 @@ class MeetingList(ListResource):
         return self._schema
 
     def add_endpoint_to_form(self, form):
-         tenant = self._tenant_service.get(form['tenant_uuid'])
-         template_uuid = tenant.meeting_guest_sip_template_uuid
-         endpoint_name = endpoint_username = context = 'wazo-meeting-{}-guest'.format(form['uuid'])
-         endpoint_body = {
+        tenant = self._tenant_service.get(form['tenant_uuid'])
+        template_uuid = tenant.meeting_guest_sip_template_uuid
+        if not template_uuid:
+            logger.warning('Cannot create guest endpoint, missing template')
+            return form
+
+        template = self._endpoint_sip_template_service.get(template_uuid)
+        endpoint_name = endpoint_username = context = 'wazo-meeting-{}-guest'.format(form['uuid'])
+        endpoint_body = {
             'name': endpoint_name,
             'tenant_uuid': form['tenant_uuid'],
-            'templates': [{'uuid': template_uuid}] if template_uuid else [],
             'label': 'External meeting guest {}'.format(form['name']),
+            'templates': [template],
             'auth_section_options': [
                 ['username', endpoint_username],
                 ['password', random_string(16)],
@@ -79,11 +94,11 @@ class MeetingList(ListResource):
             'registration_section_options': [],
             'registration_outbound_auth_section_options': [],
             'outbound_auth_section_options': [],
-         }
-         endpoint_model = EndpointSIP(**endpoint_body)
-         endpoint = self._endpoint_sip_service.create(endpoint_model)
-         form['guest_endpoint_sip_uuid'] = endpoint.uuid
-         return form
+        }
+        endpoint_model = EndpointSIP(**endpoint_body)
+        endpoint = self._endpoint_sip_service.create(endpoint_model)
+        form['guest_endpoint_sip_uuid'] = endpoint.uuid
+        return form
 
     def find_owners(self, form):
         owner_uuids = form.pop('owner_uuids', None) or []
@@ -194,8 +209,26 @@ class UserMeetingList(MeetingList):
 
     model = Meeting
 
-    def __init__(self, service, user_service, tenant_service, endpoint_sip_service, hostname, port, auth_client):
-        super().__init__(service, user_service, tenant_service, endpoint_sip_service, hostname, port)
+    def __init__(
+        self,
+        service,
+        user_service,
+        tenant_service,
+        endpoint_sip_service,
+        endpoint_sip_template_service,
+        hostname,
+        port,
+        auth_client,
+    ):
+        super().__init__(
+            service,
+            user_service,
+            tenant_service,
+            endpoint_sip_service,
+            endpoint_sip_template_service,
+            hostname,
+            port,
+        )
         self._auth_client = auth_client
 
     def build_headers(self, meeting):

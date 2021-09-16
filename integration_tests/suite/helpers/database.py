@@ -130,6 +130,19 @@ class DatabaseQueries:
             tenant_uuid=tenant_uuid,
         )
 
+    def set_tenant_templates(self, tenant_uuid, **template_uuids):
+        for field, template_uuid in template_uuids.items():
+            query = text(
+                "UPDATE tenant SET {} = :template_uuid WHERE uuid = :tenant_uuid".format(
+                    field
+                )
+            )
+            self.connection.execute(
+                query,
+                template_uuid=template_uuid,
+                tenant_uuid=tenant_uuid,
+            )
+
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
         query = text(
             """

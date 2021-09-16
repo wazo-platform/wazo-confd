@@ -8,7 +8,12 @@ from .resource import (
     UserMeetingItem,
     UserMeetingList,
 )
-from wazo_confd.plugins.endpoint_sip.service import build_endpoint_service as build_endpoint_sip_service
+from wazo_confd.plugins.endpoint_sip.service import (
+    build_endpoint_service as build_endpoint_sip_service,
+)
+from wazo_confd.plugins.endpoint_sip.service import (
+    build_template_service as build_endpoint_sip_template_service,
+)
 from wazo_confd.plugins.tenant.service import build_service as build_tenant_service
 from wazo_confd.plugins.user.service import build_service as build_user_service
 
@@ -27,6 +32,9 @@ class Plugin:
 
         service = build_service(hostname, port)
         endpoint_sip_service = build_endpoint_sip_service(None, pjsip_doc)
+        endpoint_sip_template_service = build_endpoint_sip_template_service(
+            None, pjsip_doc
+        )
         user_service = build_user_service(provd_client=None)
         tenant_service = build_tenant_service()
         args = [service, user_service, hostname, port]
@@ -39,6 +47,7 @@ class Plugin:
                 user_service,
                 tenant_service,
                 endpoint_sip_service,
+                endpoint_sip_template_service,
                 hostname,
                 port,
             ],
@@ -69,6 +78,7 @@ class Plugin:
                 user_service,
                 tenant_service,
                 endpoint_sip_service,
+                endpoint_sip_template_service,
                 hostname,
                 port,
                 auth_client,
