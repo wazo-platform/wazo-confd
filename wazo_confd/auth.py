@@ -1,7 +1,7 @@
 # Copyright 2014-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo.auth_verifier import required_acl, required_tenant
+from xivo.auth_verifier import required_acl, required_tenant, no_auth
 from xivo.rest_api_helpers import APIException
 
 from werkzeug.local import LocalProxy as Proxy
@@ -35,4 +35,4 @@ def get_master_tenant_uuid():
 
 
 master_tenant_uuid = Proxy(get_master_tenant_uuid)
-__all__ = ['required_acl']
+__all__ = ['required_acl', 'no_auth']

@@ -14,7 +14,7 @@ from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.helpers import errors
 
-from wazo_confd.auth import required_acl
+from wazo_confd.auth import required_acl, no_auth
 from wazo_confd.helpers.restful import ItemResource, ListResource, ListSchema
 
 from .schema import MeetingSchema
@@ -157,6 +157,7 @@ class GuestMeetingItem(ItemResource, _SchemaMixin):
         super().__init__(service)
         self._init_schema(hostname, port)
 
+    @no_auth
     def get(self, uuid):
         return super().get(uuid)
 
