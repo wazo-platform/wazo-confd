@@ -22,7 +22,16 @@ from .schema import MeetingSchema
 logger = logging.getLogger(__name__)
 
 
-class MeetingList(ListResource):
+class _SchemaMixin:
+    def _init_schema(self, hostname, port):
+        self._schema = MeetingSchema()
+        self._schema.context = {'hostname': hostname, 'port': port}
+
+    def schema(self):
+        return self._schema
+
+
+class MeetingList(ListResource, _SchemaMixin):
 
     model = Meeting
 
@@ -41,8 +50,7 @@ class MeetingList(ListResource):
         self._tenant_service = tenant_service
         self._endpoint_sip_service = endpoint_sip_service
         self._endpoint_sip_template_service = endpoint_sip_template_service
-        self._schema = MeetingSchema()
-        self._schema.context = {'hostname': hostname, 'port': port}
+        self._init_schema(hostname, port)
 
     def build_headers(self, meeting):
         return {'Location': url_for('meetings', uuid=meeting.uuid, _external=True)}
@@ -64,9 +72,6 @@ class MeetingList(ListResource):
     @required_acl('confd.meetings.read')
     def get(self):
         return super().get()
-
-    def schema(self):
-        return self._schema
 
     def add_endpoint_to_form(self, form):
         tenant = self._tenant_service.get(form['tenant_uuid'])
@@ -126,14 +131,13 @@ class MeetingList(ListResource):
         return user_uuid
 
 
-class MeetingItem(ItemResource):
+class MeetingItem(ItemResource, _SchemaMixin):
     has_tenant_uuid = True
 
     def __init__(self, service, user_service, hostname, port):
         super().__init__(service)
         self._user_service = user_service
-        self._schema = MeetingSchema()
-        self._schema.context = {'hostname': hostname, 'port': port}
+        self._init_schema(hostname, port)
 
     @required_acl('confd.meetings.{uuid}.read')
     def get(self, uuid):
@@ -147,21 +151,14 @@ class MeetingItem(ItemResource):
     def delete(self, uuid):
         return super().delete(uuid)
 
-    def schema(self):
-        return self._schema
 
-
-class GuestMeetingItem(ItemResource):
+class GuestMeetingItem(ItemResource, _SchemaMixin):
     def __init__(self, service, user_service, hostname, port):
         super().__init__(service)
-        self._schema = MeetingSchema()
-        self._schema.context = {'hostname': hostname, 'port': port}
+        self._init_schema(hostname, port)
 
     def get(self, uuid):
         return super().get(uuid)
-
-    def schema(self):
-        return self._schema
 
 
 class UserMeetingItem(MeetingItem):
