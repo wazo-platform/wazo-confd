@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from base64 import b64encode
-from marshmallow import fields, pre_dump
+from marshmallow import fields
 from marshmallow.validate import Length
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
@@ -12,9 +12,9 @@ class MeetingSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     owner_uuids = fields.List(fields.UUID())
     name = fields.String(validate=Length(max=512), required=True)
-    hostname = fields.Method('_hostname')
-    port = fields.Method('_port')
-    guest_sip_authorization = fields.String(dump_only=True)
+    hostname = fields.Method('_hostname', dump_only=True)
+    port = fields.Method('_port', dump_only=True)
+    guest_sip_authorization = fields.Method('_guest_sip_authorization', dump_only=True)
     links = ListLink(Link('meetings', field='uuid'))
     tenant_uuid = fields.String(dump_only=True)
 
@@ -24,11 +24,10 @@ class MeetingSchema(BaseSchema):
     def _port(self, *args):
         return self.context['port']
 
-    @pre_dump
-    def add_guest_sip_authorization(self, data):
-        endpoint_sip = data.guest_endpoint_sip
+    def _guest_sip_authorization(self, model):
+        endpoint_sip = model.guest_endpoint_sip
         if not endpoint_sip:
-            return data
+            return None
 
         username = None
         password = None
@@ -38,7 +37,4 @@ class MeetingSchema(BaseSchema):
             elif option == 'password':
                 password = value
 
-        data.guest_sip_authorization = b64encode(
-            '{}:{}'.format(username, password).encode()
-        )
-        return data
+        return b64encode('{}:{}'.format(username, password).encode()).decode()
