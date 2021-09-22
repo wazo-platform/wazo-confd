@@ -139,7 +139,6 @@ def test_get(_, mine, other):
     response = confd.guests.me.meetings(other['uuid']).get()
     assert_that(response.item, has_entries(uuid=other['uuid']))
 
-    # Should this be a 404 or a 200???
     response = confd.users.me.meetings(other['uuid']).get()
     assert_that(response.item, has_entries(uuid=other['uuid']))
 
