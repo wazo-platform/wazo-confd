@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import random
+import secrets
 import string
 
 from uuid import uuid4
@@ -255,4 +255,4 @@ class UserMeetingList(MeetingList):
 
 
 def random_string(length):
-    return ''.join(random.choice(string.ascii_lowercase) for _ in range(length))
+    return ''.join(secrets.choice(string.ascii_lowercase) for _ in range(length))
