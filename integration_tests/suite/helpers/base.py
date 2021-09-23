@@ -181,17 +181,26 @@ class IntegrationTest(AssetLaunchingTestCase):
         setup_bus_helpers(host='127.0.0.1', port=cls.service_port(5672, 'rabbitmq'))
 
     @classmethod
-    def create_confd(cls, headers=None, encoder=None):
-        client = cls.new_client(headers, encoder)
+    def create_confd(cls, headers=None, encoder=None, user_uuid=None):
+        token_id = None
+        if user_uuid:
+            token = MockUserToken.some_token(
+                user_uuid=user_uuid,
+                metadata={'uuid': user_uuid, 'tenant_uuid': MAIN_TENANT},
+            )
+            cls.mock_auth.set_token(token)
+            token_id = token.token_id
+        client = cls.new_client(headers, encoder, token=token_id)
         return client.url
 
     @classmethod
-    def new_client(cls, headers=None, encoder=None):
+    def new_client(cls, headers=None, encoder=None, token=None):
         client = ConfdClient.from_options(
             host='127.0.0.1',
             port=cls.service_port('9486', 'confd'),
             headers=headers,
             encoder=encoder,
+            token=token,
         )
         return client
 

@@ -19,28 +19,39 @@ from hamcrest import (
     not_none,
 )
 
-from . import confd, db
-from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT, USER_UUID
+from . import (
+    confd,
+    create_confd,
+    db,
+)
+from ..helpers import (
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
-def test_get_errors(_):
+@fixtures.user()
+def test_get_errors(me):
     fake_get = confd.meetings(FAKE_UUID).get
     yield s.check_resource_not_found, fake_get, 'Meeting'
 
-    fake_get = confd.users.me.meetings(FAKE_UUID).get
+    user_confd = create_confd(user_uuid=me['uuid'])
+    fake_get = user_confd.users.me.meetings(FAKE_UUID).get
     yield s.check_resource_not_found, fake_get, 'Meeting'
 
 
-def test_post_errors():
+@fixtures.user()
+def test_post_errors(me):
     url = confd.meetings.post
     for check in error_checks(url):
         yield check
 
-    url = confd.users.me.meetings.post
+    user_confd = create_confd(user_uuid=me['uuid'])
+    url = user_confd.users.me.meetings.post
     for check in error_checks(url):
         yield check
 
@@ -52,12 +63,13 @@ def test_put_errors(meeting):
         yield check
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
-@fixtures.user_me_meeting()
-def test_put_errors_users_me(me, meeting):
-    url = confd.users.me.meetings(meeting['uuid']).put
-    for check in error_checks(url):
-        yield check
+@fixtures.user()
+def test_put_errors_users_me(me):
+    user_confd = create_confd(user_uuid=me['uuid'])
+    with fixtures.user_me_meeting(user_confd) as meeting:
+        url = user_confd.users.me.meetings(meeting['uuid']).put
+        for check in error_checks(url):
+            yield check
 
 
 def error_checks(url):
@@ -82,20 +94,21 @@ def test_list_multi_tenant(main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
-@fixtures.user_me_meeting()
-@fixtures.user_me_meeting()
-@fixtures.meeting()
-@fixtures.meeting()
-def test_list_user_me(_, mine_1, mine_2, *__):
-    response = confd.users.me.meetings.get()
-    assert_that(
-        response,
-        has_properties(
-            total=equal_to(2),
-            items=contains_inanyorder(mine_1, mine_2),
-        ),
-    )
+@fixtures.user()
+@fixtures.meeting(name='ignored')
+def test_list_user_me(me, _):
+    user_confd = create_confd(user_uuid=me['uuid'])
+    with fixtures.user_me_meeting(user_confd) as mine_1, fixtures.user_me_meeting(
+        user_confd
+    ) as mine_2:
+        response = user_confd.users.me.meetings.get()
+        assert_that(
+            response,
+            has_properties(
+                total=equal_to(2),
+                items=contains_inanyorder(mine_1, mine_2),
+            ),
+        )
 
 
 @fixtures.meeting(name="search")
@@ -129,21 +142,22 @@ def test_sorting_offset_limit(meeting1, meeting2):
     yield s.check_limit, url, meeting1, meeting2, 'name', 'sort', 'uuid'
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
-@fixtures.user_me_meeting()
+@fixtures.user()
 @fixtures.meeting()
-def test_get(_, mine, other):
-    response = confd.meetings(other['uuid']).get()
-    assert_that(response.item, has_entries(uuid=other['uuid']))
+def test_get(me, other_meeting):
+    user_confd = create_confd(user_uuid=me['uuid'])
+    with fixtures.user_me_meeting(user_confd) as mine:
+        response = confd.meetings(other_meeting['uuid']).get()
+        assert_that(response.item, has_entries(uuid=other_meeting['uuid']))
 
-    response = confd.guests.me.meetings(other['uuid']).get()
-    assert_that(response.item, has_entries(uuid=other['uuid']))
+        response = confd.guests.me.meetings(other_meeting['uuid']).get()
+        assert_that(response.item, has_entries(uuid=other_meeting['uuid']))
 
-    response = confd.users.me.meetings(other['uuid']).get()
-    assert_that(response.item, has_entries(uuid=other['uuid']))
+        response = user_confd.users.me.meetings(other_meeting['uuid']).get()
+        assert_that(response.item, has_entries(uuid=other_meeting['uuid']))
 
-    response = confd.users.me.meetings(mine['uuid']).get()
-    assert_that(response.item, has_entries(name=mine['name']))
+        response = user_confd.users.me.meetings(mine['uuid']).get()
+        assert_that(response.item, has_entries(name=mine['name']))
 
 
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
@@ -156,7 +170,7 @@ def test_get_multi_tenant(main, sub):
     assert_that(response.item, has_entries(**sub))
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
+@fixtures.user()
 def test_create_minimal_parameters(me):
     response = confd.meetings.post(name='minimal')
     response.assert_created('meetings')
@@ -174,7 +188,8 @@ def test_create_minimal_parameters(me):
 
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
-    response = confd.users.me.meetings.post(name='minimal')
+    user_confd = create_confd(user_uuid=me['uuid'])
+    response = user_confd.users.me.meetings.post(name='minimal')
     response.assert_created('meetings')
 
     assert_that(
@@ -192,7 +207,7 @@ def test_create_minimal_parameters(me):
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
+@fixtures.user()
 @fixtures.user()
 def test_create_all_parameters(me, owner):
     parameters = {'name': 'allparameter', 'owner_uuids': [owner['uuid']]}
@@ -211,7 +226,8 @@ def test_create_all_parameters(me, owner):
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
-    response = confd.users.me.meetings.post(**parameters)
+    user_confd = create_confd(user_uuid=me['uuid'])
+    response = user_confd.users.me.meetings.post(**parameters)
     response.assert_created('meetings')
     assert_that(
         response.item,
@@ -289,28 +305,28 @@ def test_edit_minimal_parameters(meeting):
     response.assert_updated()
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
-@fixtures.user_me_meeting()
+@fixtures.user()
 @fixtures.meeting()
-def test_edit_all_parameters(_, mine, other):
+def test_edit_all_parameters(me, other_meeting):
     parameters = {'name': 'editallparameter'}
+    user_confd = create_confd(user_uuid=me['uuid'])
+    with fixtures.user_me_meeting(user_confd) as mine:
+        response = confd.meetings(mine['uuid']).put(**parameters)
+        response.assert_updated()
 
-    response = confd.meetings(mine['uuid']).put(**parameters)
-    response.assert_updated()
+        response = confd.meetings(mine['uuid']).get()
+        assert_that(response.item, has_entries(parameters))
 
-    response = confd.meetings(mine['uuid']).get()
-    assert_that(response.item, has_entries(parameters))
+        parameters = {'name': 'editallparameteragain'}
 
-    parameters = {'name': 'editallparameteragain'}
+        response = user_confd.users.me.meetings(mine['uuid']).put(**parameters)
+        response.assert_updated()
 
-    response = confd.users.me.meetings(mine['uuid']).put(**parameters)
-    response.assert_updated()
+        response = user_confd.users.me.meetings(mine['uuid']).get()
+        assert_that(response.item, has_entries(parameters))
 
-    response = confd.users.me.meetings(mine['uuid']).get()
-    assert_that(response.item, has_entries(parameters))
-
-    response = confd.users.me.meetings(other['uuid']).put(**parameters)
-    response.assert_match(404, e.not_found(resource='Meeting'))
+        response = user_confd.users.me.meetings(other_meeting['uuid']).put(**parameters)
+        response.assert_match(404, e.not_found(resource='Meeting'))
 
 
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
@@ -330,16 +346,17 @@ def test_delete(meeting):
     confd.meetings(meeting['uuid']).get().assert_status(404)
 
 
-@fixtures.user(uuid=USER_UUID)  # users.me user
-@fixtures.user_me_meeting()
+@fixtures.user()
 @fixtures.meeting()
-def test_delete_users_me(_, mine, other):
-    response = confd.users.me.meetings(mine['uuid']).delete()
-    response.assert_deleted()
-    confd.meetings(mine['uuid']).get().assert_status(404)
+def test_delete_users_me(me, other_meeting):
+    user_confd = create_confd(user_uuid=me['uuid'])
+    with fixtures.user_me_meeting(user_confd) as mine:
+        response = user_confd.users.me.meetings(mine['uuid']).delete()
+        response.assert_deleted()
+        confd.meetings(mine['uuid']).get().assert_status(404)
 
-    response = confd.users.me.meetings(other['uuid']).delete()
-    response.assert_match(404, e.not_found(resource='Meeting'))
+        response = user_confd.users.me.meetings(other_meeting['uuid']).delete()
+        response.assert_match(404, e.not_found(resource='Meeting'))
 
 
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)

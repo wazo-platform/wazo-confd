@@ -45,16 +45,19 @@ class ConfdClient:
         https=False,
         headers=None,
         encoder=None,
+        token=None,
     ):
         url = '{}://{}:{}/1.1'.format('https' if https else 'http', host, port)
         logger.info('CONFD URL: %s', url)
-        return cls(url, headers, encoder)
+        return cls(url, headers, encoder, token)
 
-    def __init__(self, base_url, headers=None, encoder=None):
+    def __init__(self, base_url, headers=None, encoder=None, token=None):
         self.base_url = base_url
         self.encode = encoder or self._encode_dict
         self.session = requests.Session()
         self.session.headers.update(headers or self.DEFAULT_HEADERS)
+        if token:
+            self.session.headers.update({'X-Auth-Token': token})
 
     def request(self, method, url, parameters=None, data=None, headers=None):
         full_url = self._build_url(url)
