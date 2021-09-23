@@ -8,7 +8,6 @@ import string
 from uuid import uuid4
 
 from flask import url_for, request
-from requests import HTTPError
 
 from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
@@ -31,7 +30,16 @@ class _SchemaMixin:
         return self._schema
 
 
-class MeetingList(ListResource, _SchemaMixin):
+class _MeResourceMixin:
+    def _find_user_uuid(self):
+        user_uuid = request.user_uuid
+        if not user_uuid:
+            raise errors.param_not_found('user_uuid', 'meetings')
+
+        return user_uuid
+
+
+class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
 
     model = Meeting
 
@@ -116,20 +124,6 @@ class MeetingList(ListResource, _SchemaMixin):
         form['owners'] = owners
         return form
 
-    def _find_user_uuid(self):
-        token = request.headers.get('X-Auth-Token') or request.args.get('token')
-        try:
-            token_infos = self._auth_client.token.get(token)
-        except HTTPError as e:
-            logger.warning('HTTP error from wazo-auth while getting token: %s', e)
-            raise errors.param_not_found('user_uuid', 'meetings')
-
-        user_uuid = token_infos['metadata']['pbx_user_uuid']
-        if not user_uuid:
-            raise errors.param_not_found('user_uuid', 'meetings')
-
-        return user_uuid
-
 
 class MeetingItem(ItemResource, _SchemaMixin):
     has_tenant_uuid = True
@@ -162,7 +156,7 @@ class GuestMeetingItem(ItemResource, _SchemaMixin):
         return super().get(uuid)
 
 
-class UserMeetingItem(MeetingItem):
+class UserMeetingItem(MeetingItem, _MeResourceMixin):
     def __init__(self, service, user_service, hostname, port, auth_client):
         super().__init__(service, user_service, hostname, port)
         self._auth_client = auth_client
@@ -189,20 +183,6 @@ class UserMeetingItem(MeetingItem):
         model = self.get_model(uuid, **kwargs)
         self.service.delete(model)
         return '', 204
-
-    def _find_user_uuid(self):
-        token = request.headers.get('X-Auth-Token') or request.args.get('token')
-        try:
-            token_infos = self._auth_client.token.get(token)
-        except HTTPError as e:
-            logger.warning('HTTP error from wazo-auth while getting token: %s', e)
-            raise errors.param_not_found('user_uuid', 'meetings')
-
-        user_uuid = token_infos['metadata']['pbx_user_uuid']
-        if not user_uuid:
-            raise errors.param_not_found('user_uuid', 'meetings')
-
-        return user_uuid
 
 
 class UserMeetingList(MeetingList):
