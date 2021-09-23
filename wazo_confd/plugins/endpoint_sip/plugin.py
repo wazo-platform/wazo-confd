@@ -1,12 +1,10 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
 
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
-
-from wazo_confd.helpers.asterisk import PJSIPDoc
 
 from .resource import SipItem, SipList, SipTemplateItem, SipTemplateList
 from .service import build_endpoint_service, build_template_service
@@ -20,7 +18,7 @@ class Plugin:
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
-        pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
+        pjsip_doc = dependencies['pjsip_doc']
 
         endpoint_service = build_endpoint_service(provd_client, pjsip_doc)
         template_service = build_template_service(provd_client, pjsip_doc)

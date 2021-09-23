@@ -317,3 +317,21 @@ class user_external_app(IsolatedAction):
         'generate': h.user_external_app.generate_user_external_app,
         'delete': h.user_external_app.delete_user_external_app,
     }
+
+
+class meeting(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {
+        'generate': h.meeting.generate,
+        'delete': h.meeting.delete,
+    }
+
+
+class user_me_meeting(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {
+        'generate': h.user_me_meeting.generate,
+        'delete': h.user_me_meeting.delete,
+    }

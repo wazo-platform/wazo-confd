@@ -106,6 +106,7 @@ DEFAULT_CONFIG = {
         'line_device': True,
         'line_endpoint': True,
         'line_extension': True,
+        'meeting': True,
         'moh': True,
         'outcall': True,
         'outcall_call_permission': True,
@@ -171,6 +172,9 @@ DEFAULT_CONFIG = {
     'wizard': {'service_id': None, 'service_key': None},
     'pjsip_config_doc_filename': '/usr/share/doc/asterisk-doc/json/pjsip.json.gz',
     'sync_db': {'quiet': False},
+    # This configuration is temporary and will be replaced by an API to configure the public host and port
+    'beta_meeting_public_hostname': 'wazo.example.com',
+    'beta_meeting_public_port': 443,
 }
 
 

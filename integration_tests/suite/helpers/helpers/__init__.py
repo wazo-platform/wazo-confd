@@ -132,6 +132,7 @@ from . import line_endpoint_sip  # noqa
 from . import line_extension  # noqa
 from . import line_fellowship  # noqa
 from . import line_sip  # noqa
+from . import meeting  # noqa
 from . import moh  # noqa
 from . import paging  # noqa
 from . import paging_caller_user  # noqa
@@ -170,6 +171,7 @@ from . import user_call_permission  # noqa
 from . import user_funckey_template  # noqa
 from . import user_import  # noqa
 from . import user_line  # noqa
+from . import user_me_meeting  # noqa
 from . import user_schedule  # noqa
 from . import user_voicemail  # noqa
 from . import voicemail  # noqa
@@ -225,6 +227,7 @@ __all__ = [
     'line_extension',
     'line_fellowship',
     'line_sip',
+    'meeting',
     'moh',
     'paging',
     'paging_caller_user',
@@ -263,6 +266,7 @@ __all__ = [
     'user_funckey_template',
     'user_import',
     'user_line',
+    'user_me_meeting',
     'user_schedule',
     'user_voicemail',
     'voicemail',

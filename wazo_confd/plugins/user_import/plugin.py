@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import OrderedDict
@@ -18,7 +18,6 @@ from xivo_dao.resources.voicemail import dao as voicemail_dao
 from wazo_provd_client import Client as ProvdClient
 
 from wazo_confd.database import user_export as user_export_dao
-from wazo_confd.helpers.asterisk import PJSIPDoc
 from wazo_confd.plugins.call_permission.service import (
     build_service as build_call_permission_service,
 )
@@ -90,12 +89,12 @@ class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
         config = dependencies['config']
+        pjsip_doc = dependencies['pjsip_doc']
         token_changed_subscribe = dependencies['token_changed_subscribe']
         set_auth_client_config(config['auth'])
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
-        pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
 
         user_service = build_user_service(provd_client)
         wazo_user_service = build_wazo_user_service()
