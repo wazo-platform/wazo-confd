@@ -81,7 +81,7 @@ paths:
     delete:
       operationId: delete_meeting
       summary: Delete meeting
-      description: '**Required ACL:** `confd.meetings.{meeting_uuid}.delete`'
+      description: '**Required ACL:** `confd.meetings.{meeting_uuid}.delete`, Deleting a meeting will hangup all current participants.'
       tags:
       - meetings
       parameters:
