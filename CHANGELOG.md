@@ -1,5 +1,15 @@
 # Changelog
 
+## 21.13
+
+* The following resources have been added:
+
+  * `GET, POST /meetings`
+  * `GET, PUT, DELETE /meetings/<meeting_uuid>`
+  * `GET, POST /users/me/meetings`
+  * `GET, PUT, DELETE /users/me/meetings/<meeting_uuid>`
+  * `GET /guests/me/meetings`
+
 ## 21.12
 
 * The surrogates user list of `callfilters` resource now implements the `exten` field
