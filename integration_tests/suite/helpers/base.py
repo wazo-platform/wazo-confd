@@ -59,6 +59,10 @@ class IntegrationTest(AssetLaunchingTestCase):
         cls.docker_exec(['wazo-confd-sync-db', '--debug'])
 
     @classmethod
+    def purge_meetings(cls):
+        cls.docker_exec(['wazo-confd-purge-meetings', '--debug'])
+
+    @classmethod
     def _create_auth_tenant(cls):
         cls.mock_auth.set_tenants(
             {

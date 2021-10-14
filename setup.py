@@ -20,6 +20,7 @@ setup(
         'console_scripts': [
             'wazo-confd=wazo_confd.main:main',
             'wazo-confd-sync-db=wazo_confd.sync_db:main',
+            'wazo-confd-purge-meetings=wazo_confd.purge_meetings:main',
         ],
         'wazo_confd.plugins': [
             'access_feature = wazo_confd.plugins.access_feature.plugin:Plugin',

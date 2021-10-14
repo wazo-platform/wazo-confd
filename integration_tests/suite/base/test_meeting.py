@@ -18,8 +18,10 @@ from hamcrest import (
     not_,
     not_none,
 )
+from datetime import datetime, timedelta
 
 from . import (
+    BaseIntegrationTest,
     confd,
     create_confd,
     db,
@@ -380,3 +382,18 @@ def test_bus_events(meeting):
     yield s.check_bus_event, 'config.meetings.deleted', confd.meetings(
         meeting['uuid']
     ).delete
+
+
+@fixtures.meeting()
+@fixtures.meeting()
+def test_purge_old_meetings(meeting_too_old, meeting_too_young):
+    too_old = datetime.now() - timedelta(hours=72)
+    with db.queries() as queries:
+        queries.set_meeting_creation_date(meeting_too_old['uuid'], too_old)
+
+    BaseIntegrationTest.purge_meetings()
+
+    response = confd.meetings(meeting_too_old['uuid']).get()
+    response.assert_status(404)
+    response = confd.meetings(meeting_too_young['uuid']).get()
+    response.assert_status(200)
