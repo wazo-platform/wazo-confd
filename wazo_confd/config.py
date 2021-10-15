@@ -100,6 +100,7 @@ DEFAULT_CONFIG = {
         'incall_extension': True,
         'incall_schedule': True,
         'info': True,
+        'ingress_http': True,
         'ivr': True,
         'line': True,
         'line_application': True,

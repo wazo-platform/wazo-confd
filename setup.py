@@ -66,6 +66,7 @@ setup(
             'incall_extension = wazo_confd.plugins.incall_extension.plugin:Plugin',
             'incall_schedule = wazo_confd.plugins.incall_schedule.plugin:Plugin',
             'info = wazo_confd.plugins.info.plugin:Plugin',
+            'ingress_http = wazo_confd.plugins.ingress_http.plugin:Plugin',
             'ivr = wazo_confd.plugins.ivr.plugin:Plugin',
             'line = wazo_confd.plugins.line.plugin:Plugin',
             'line_application = wazo_confd.plugins.line_application.plugin:Plugin',
