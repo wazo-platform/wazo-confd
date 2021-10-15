@@ -1,7 +1,10 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+import secrets
+import string
+
+from marshmallow import fields, post_load
 from marshmallow.validate import Length, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, AsteriskSection
@@ -30,6 +33,15 @@ class MohSchema(BaseSchema):
     files = fields.Nested(MohFileSchema, many=True, dump_only=True)
 
     links = ListLink(Link('moh', field='uuid'))
+
+    def _generate_random_characters(self, length=16):
+        return ''.join(secrets.choice(string.ascii_letters) for _ in range(length))
+
+    @post_load
+    def suffix_name_with_random_characters(self, data):
+        if 'name' in data:
+            data['name'] = data['name'] + '-' + self._generate_random_characters()
+        return data
 
 
 class MohSchemaPUT(MohSchema):

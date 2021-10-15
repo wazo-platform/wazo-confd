@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -13,6 +13,7 @@ from hamcrest import (
     has_items,
     is_not,
     not_,
+    starts_with,
 )
 
 from . import BaseIntegrationTest, confd
@@ -180,7 +181,7 @@ def test_create_all_parameters():
         response.item,
         has_entries(
             tenant_uuid=MAIN_TENANT,
-            name='moh1',
+            name=starts_with('moh1'),
             label='MOH 1',
             mode='custom',
             application='/usr/bin/mpg123 xxx',
