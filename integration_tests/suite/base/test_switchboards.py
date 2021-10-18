@@ -184,11 +184,11 @@ def test_create_minimal_parameters():
 
 @fixtures.moh(name='queuemoh')
 @fixtures.moh(name='holdmoh')
-def test_create_all_parameters(*_):
+def test_create_all_parameters(moh1, moh2):
     response = confd.switchboards.post(
         name='TheSwitchboard',
-        queue_music_on_hold='queuemoh',
-        waiting_room_music_on_hold='holdmoh',
+        queue_music_on_hold=moh1['name'],
+        waiting_room_music_on_hold=moh2['name'],
         timeout=42,
     )
     response.assert_created('switchboards')
@@ -197,8 +197,8 @@ def test_create_all_parameters(*_):
         response.item,
         has_entries(
             uuid=not_(empty()),
-            queue_music_on_hold='queuemoh',
-            waiting_room_music_on_hold='holdmoh',
+            queue_music_on_hold=moh1['name'],
+            waiting_room_music_on_hold=moh2['name'],
             tenant_uuid=MAIN_TENANT,
             name='TheSwitchboard',
         ),
@@ -215,10 +215,16 @@ def test_edit_minimal_parameters(switchboard):
 
 
 @fixtures.moh(name='foo')
-@fixtures.switchboard(
-    queue_music_on_hold='foo', waiting_room_music_on_hold='foo', timeout=42
-)
-def test_update_fields_with_null_value(_, switchboard):
+def test_update_fields_with_null_value(moh):
+    response = confd.switchboards.post(
+        name='TheSwitchboard',
+        queue_music_on_hold=moh['name'],
+        waiting_room_music_on_hold=moh['name'],
+        timeout=42,
+    )
+    response.assert_created('switchboards')
+    switchboard = response.item
+
     response = confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold=None,
     )
@@ -229,14 +235,14 @@ def test_update_fields_with_null_value(_, switchboard):
         response.item,
         has_entries(
             queue_music_on_hold=None,
-            waiting_room_music_on_hold='foo',
+            waiting_room_music_on_hold=moh['name'],
             timeout=42,
         ),
     )
 
     confd.switchboards(switchboard['uuid']).put(
-        queue_music_on_hold='foo',
-        waiting_room_music_on_hold='foo',
+        queue_music_on_hold=moh['name'],
+        waiting_room_music_on_hold=moh['name'],
         timeout=42,
     )
 
@@ -249,15 +255,15 @@ def test_update_fields_with_null_value(_, switchboard):
     assert_that(
         response.item,
         has_entries(
-            queue_music_on_hold='foo',
+            queue_music_on_hold=moh['name'],
             waiting_room_music_on_hold=None,
             timeout=42,
         ),
     )
 
     confd.switchboards(switchboard['uuid']).put(
-        queue_music_on_hold='foo',
-        waiting_room_music_on_hold='foo',
+        queue_music_on_hold=moh['name'],
+        waiting_room_music_on_hold=moh['name'],
         timeout=42,
     )
 
@@ -270,8 +276,8 @@ def test_update_fields_with_null_value(_, switchboard):
     assert_that(
         response.item,
         has_entries(
-            queue_music_on_hold='foo',
-            waiting_room_music_on_hold='foo',
+            queue_music_on_hold=moh['name'],
+            waiting_room_music_on_hold=moh['name'],
             timeout=None,
         ),
     )
