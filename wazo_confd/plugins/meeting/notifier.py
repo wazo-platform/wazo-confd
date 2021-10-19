@@ -16,8 +16,7 @@ MEETING_FIELDS = [
     'uuid',
     'name',
     'owner_uuids',
-    'hostname',
-    'port',
+    'ingress_http_uri',
     'guest_sip_authorization',
 ]
 

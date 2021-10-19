@@ -12,17 +12,20 @@ class MeetingSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     owner_uuids = fields.List(fields.UUID())
     name = fields.String(validate=Length(max=512), required=True)
-    hostname = fields.Method('_hostname', dump_only=True)
-    port = fields.Method('_port', dump_only=True)
+    ingress_http_uri = fields.Method('_uri', dump_only=True)
     guest_sip_authorization = fields.Method('_guest_sip_authorization', dump_only=True)
     links = ListLink(Link('meetings', field='uuid'))
     tenant_uuid = fields.String(dump_only=True)
 
-    def _hostname(self, *args):
-        return self.context['hostname']
+    def _uri(self, meeting):
+        if meeting.ingress_http:
+            return meeting.ingress_http.uri
 
-    def _port(self, *args):
-        return self.context['port']
+        default_uri = 'https://{hostname}'.format(**self.context)
+        port = self.context.get('port')
+        if port:
+            default_uri += ':{}'.format(port)
+        return default_uri
 
     def _guest_sip_authorization(self, model):
         endpoint_sip = model.guest_endpoint_sip

@@ -183,8 +183,7 @@ def test_create_minimal_parameters(me):
             tenant_uuid=MAIN_TENANT,
             uuid=not_(empty()),
             name='minimal',
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri='https://wazo.example.com:443',
         ),
     )
 
@@ -201,17 +200,17 @@ def test_create_minimal_parameters(me):
             uuid=not_(empty()),
             owner_uuids=contains_inanyorder(me['uuid']),
             name='minimal',
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri='https://wazo.example.com:443',
         ),
     )
 
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
 
+@fixtures.ingress_http(uri='https://wazo.example.com:10443')
 @fixtures.user()
 @fixtures.user()
-def test_create_all_parameters(me, owner):
+def test_create_all_parameters(ingress_http, me, owner):
     parameters = {'name': 'allparameter', 'owner_uuids': [owner['uuid']]}
 
     response = confd.meetings.post(**parameters)
@@ -222,8 +221,7 @@ def test_create_all_parameters(me, owner):
             name=parameters['name'],
             tenant_uuid=MAIN_TENANT,
             owner_uuids=contains_inanyorder(owner['uuid']),
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri=ingress_http['uri'],
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -236,8 +234,7 @@ def test_create_all_parameters(me, owner):
         has_entries(
             name=parameters['name'],
             tenant_uuid=MAIN_TENANT,
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri=ingress_http['uri'],
             owner_uuids=contains_inanyorder(me['uuid'], owner['uuid']),
         ),
     )
@@ -341,8 +338,9 @@ def test_edit_multi_tenant(main, sub):
     response.assert_updated()
 
 
+@fixtures.ingress_http()
 @fixtures.meeting()
-def test_delete(meeting):
+def test_delete(_, meeting):
     response = confd.meetings(meeting['uuid']).delete()
     response.assert_deleted()
     confd.meetings(meeting['uuid']).get().assert_status(404)
