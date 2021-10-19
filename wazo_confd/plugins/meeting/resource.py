@@ -13,7 +13,7 @@ from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.helpers import errors
 
-from wazo_confd.auth import required_acl, no_auth
+from wazo_confd.auth import required_acl, no_auth, master_tenant_uuid
 from wazo_confd.helpers.restful import ItemResource, ListResource, ListSchema
 
 from .schema import MeetingSchema
@@ -22,11 +22,14 @@ logger = logging.getLogger(__name__)
 
 
 class _SchemaMixin:
-    def _init_schema(self, hostname, port):
+    def _init_schema(self):
         self._schema = MeetingSchema()
-        self._schema.context = {'hostname': hostname, 'port': port}
 
     def schema(self):
+        ingress_http = self._ingress_http_service.find_by(
+            tenant_uuid=str(master_tenant_uuid)
+        )
+        self._schema.context = {'default_ingress_http_uri': ingress_http}
         return self._schema
 
 
@@ -50,15 +53,15 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
         tenant_service,
         endpoint_sip_service,
         endpoint_sip_template_service,
-        hostname,
-        port,
+        ingress_http_service,
     ):
         super().__init__(service)
         self._user_service = user_service
         self._tenant_service = tenant_service
         self._endpoint_sip_service = endpoint_sip_service
         self._endpoint_sip_template_service = endpoint_sip_template_service
-        self._init_schema(hostname, port)
+        self._ingress_http_service = ingress_http_service
+        self._init_schema()
 
     def build_headers(self, meeting):
         return {'Location': url_for('meetings', uuid=meeting.uuid, _external=True)}
@@ -128,10 +131,11 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
 class MeetingItem(ItemResource, _SchemaMixin):
     has_tenant_uuid = True
 
-    def __init__(self, service, user_service, hostname, port):
+    def __init__(self, service, user_service, ingress_http_service):
         super().__init__(service)
         self._user_service = user_service
-        self._init_schema(hostname, port)
+        self._ingress_http_service = ingress_http_service
+        self._init_schema()
 
     @required_acl('confd.meetings.{uuid}.read')
     def get(self, uuid):
@@ -147,9 +151,10 @@ class MeetingItem(ItemResource, _SchemaMixin):
 
 
 class GuestMeetingItem(ItemResource, _SchemaMixin):
-    def __init__(self, service, user_service, hostname, port):
+    def __init__(self, service, user_service, ingress_http_service):
         super().__init__(service)
-        self._init_schema(hostname, port)
+        self._ingress_http_service = ingress_http_service
+        self._init_schema()
 
     @no_auth
     def get(self, uuid):
@@ -157,8 +162,8 @@ class GuestMeetingItem(ItemResource, _SchemaMixin):
 
 
 class UserMeetingItem(MeetingItem, _MeResourceMixin):
-    def __init__(self, service, user_service, hostname, port, auth_client):
-        super().__init__(service, user_service, hostname, port)
+    def __init__(self, service, user_service, ingress_http_service, auth_client):
+        super().__init__(service, user_service, ingress_http_service)
         self._auth_client = auth_client
 
     def get_model(self, uuid, user_uuid, **kwargs):
@@ -196,8 +201,7 @@ class UserMeetingList(MeetingList):
         tenant_service,
         endpoint_sip_service,
         endpoint_sip_template_service,
-        hostname,
-        port,
+        ingress_http_service,
         auth_client,
     ):
         super().__init__(
@@ -206,8 +210,7 @@ class UserMeetingList(MeetingList):
             tenant_service,
             endpoint_sip_service,
             endpoint_sip_template_service,
-            hostname,
-            port,
+            ingress_http_service,
         )
         self._auth_client = auth_client
 

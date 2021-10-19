@@ -5,7 +5,18 @@ from base64 import b64encode
 from marshmallow import fields
 from marshmallow.validate import Length
 
+from xivo.rest_api_helpers import APIException
+
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+
+
+class NoIngressHTTPException(APIException):
+    def __init__(self):
+        self.msg = 'no Ingress HTTP configured'
+        super().__init__(503, self.msg, 'not-configured')
+
+    def __str__(self):
+        return self.msg
 
 
 class MeetingSchema(BaseSchema):
@@ -21,11 +32,11 @@ class MeetingSchema(BaseSchema):
         if meeting.ingress_http:
             return meeting.ingress_http.uri
 
-        default_uri = 'https://{hostname}'.format(**self.context)
-        port = self.context.get('port')
-        if port:
-            default_uri += ':{}'.format(port)
-        return default_uri
+        default_ingress_http = self.context['default_ingress_http']
+        if default_ingress_http:
+            return default_ingress_http.uri
+
+        raise NoIngressHTTPException()
 
     def _guest_sip_authorization(self, model):
         endpoint_sip = model.guest_endpoint_sip
