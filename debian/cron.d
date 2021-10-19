@@ -3,3 +3,4 @@
 #
 
 42 3 * * * root /usr/bin/wazo-confd-sync-db --quiet
+24 3 * * * root /usr/bin/wazo-confd-purge-meetings --quiet

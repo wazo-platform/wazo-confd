@@ -558,6 +558,10 @@ class DatabaseQueries:
 
         return count > 0
 
+    def set_meeting_creation_date(self, meeting_uuid, date):
+        query = text("UPDATE meeting SET created_at = :date WHERE uuid = :meeting_uuid")
+        self.connection.execute(query, date=date, meeting_uuid=meeting_uuid)
+
 
 def create_helper(
     user='asterisk',
