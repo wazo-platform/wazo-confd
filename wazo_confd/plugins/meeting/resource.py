@@ -29,7 +29,7 @@ class _SchemaMixin:
         ingress_http = self._ingress_http_service.find_by(
             tenant_uuid=str(master_tenant_uuid)
         )
-        self._schema.context = {'default_ingress_http_uri': ingress_http}
+        self._schema.context = {'default_ingress_http': ingress_http}
         return self._schema
 
 
