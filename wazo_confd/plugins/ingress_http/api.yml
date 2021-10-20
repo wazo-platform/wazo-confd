@@ -1,0 +1,129 @@
+paths:
+  /ingresses/http:
+    get:
+      operationId: list_http_ingresses
+      summary: List HTTP ingresses
+      description: '**Required ACL:** `confd.ingresses.http.read`'
+      tags:
+      - ingresses
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      responses:
+        '200':
+          description: HTTP ingress list
+          schema:
+            $ref: '#/definitions/HTTPIngressItems'
+    post:
+      operationId: create_http_ingress
+      summary: Create HTTP Ingress
+      description: '**Required ACL:** `confd.ingresses.http.create`'
+      tags:
+      - ingresses
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - name: body
+        in: body
+        description: HTTP Ingress to create
+        required: true
+        schema:
+          $ref: '#/definitions/HTTPIngressRequest'
+      responses:
+        '201':
+          description: HTTP ingress ceated
+          schema:
+            $ref: '#/definitions/HTTPIngress'
+        '400':
+          $ref: '#/responses/CreateError'
+
+  /ingresses/http/{http_ingress_uuid}:
+    get:
+      operationId: get_http_ingress
+      summary: Get HTTP ingress
+      description: '**Required ACL:** `confd.ingresses.http.{http_ingress_uuid}.read`'
+      tags:
+      - ingresses
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/http_ingress_uuid'
+      responses:
+        '200':
+          description: HTTP ingress
+          schema:
+            $ref: '#/definitions/HTTPIngress'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_http_ingress
+      summary: Update HTTP ingress
+      description: '**Required ACL:** `confd.ingresses.http.{http_ingress_uuid}.update`'
+      tags:
+      - ingresses
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/http_ingress_uuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/HTTPIngressRequest'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_http_ingress
+      summary: Delete HTTP ingress
+      description: '**Required ACL:** `confd.ingresses.http.{http_ingress_uuid}.delete`'
+      tags:
+      - ingresses
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/http_ingress_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  http_ingress_uuid:
+    required: true
+    type: string
+    name: http_ingress_uuid
+    in: path
+
+definitions:
+  HTTPIngressItems:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/HTTPIngress'
+  HTTPIngress:
+    type: object
+    allOf:
+    - $ref: '#/definitions/HTTPIngressRequest'
+    - properties:
+        uuid:
+          type: string
+          readOnly: true
+  HTTPIngressRequest:
+    type: object
+    properties:
+      uri:
+        type: string
+        description: The public URI to contact this stack HTTP API
+    required:
+      - uri

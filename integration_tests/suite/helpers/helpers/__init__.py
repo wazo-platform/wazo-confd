@@ -122,6 +122,7 @@ from . import incall  # noqa
 from . import incall_extension  # noqa
 from . import incall_schedule  # noqa
 from . import incall_user  # noqa
+from . import ingress_http  # noqa
 from . import ivr  # noqa
 from . import line  # noqa
 from . import line_application  # noqa
@@ -217,6 +218,7 @@ __all__ = [
     'incall_extension',
     'incall_schedule',
     'incall_user',
+    'ingress_http',
     'ivr',
     'line',
     'line_application',

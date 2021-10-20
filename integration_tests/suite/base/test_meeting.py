@@ -6,6 +6,7 @@ from base64 import b64encode
 from hamcrest import (
     all_of,
     assert_that,
+    contains,
     contains_inanyorder,
     empty,
     equal_to,
@@ -58,15 +59,17 @@ def test_post_errors(me):
         yield check
 
 
+@fixtures.ingress_http()
 @fixtures.meeting()
-def test_put_errors(meeting):
+def test_put_errors(_, meeting):
     url = confd.meetings(meeting['uuid']).put
     for check in error_checks(url):
         yield check
 
 
+@fixtures.ingress_http()
 @fixtures.user()
-def test_put_errors_users_me(me):
+def test_put_errors_users_me(_, me):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as meeting:
         url = user_confd.users.me.meetings(meeting['uuid']).put
@@ -83,9 +86,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 'a' * 513
 
 
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
+@fixtures.ingress_http(wazo_tenant=SUB_TENANT)
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
 @fixtures.meeting(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(main, sub):
+def test_list_multi_tenant(_, __, main, sub):
     response = confd.meetings.get(wazo_tenant=MAIN_TENANT)
     assert_that(response.items, all_of(has_item(main)), not_(has_item(sub)))
 
@@ -96,9 +101,10 @@ def test_list_multi_tenant(main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
+@fixtures.ingress_http()
 @fixtures.user()
 @fixtures.meeting(name='ignored')
-def test_list_user_me(me, _):
+def test_list_user_me(_, me, __):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as mine_1, fixtures.user_me_meeting(
         user_confd
@@ -113,9 +119,10 @@ def test_list_user_me(me, _):
         )
 
 
+@fixtures.ingress_http()
 @fixtures.meeting(name="search")
 @fixtures.meeting(name="hidden")
-def test_search(meeting, hidden):
+def test_search(_, meeting, hidden):
     url = confd.meetings
     searches = {'name': 'search'}
 
@@ -134,9 +141,10 @@ def check_search(url, meeting, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
+@fixtures.ingress_http()
 @fixtures.meeting(name="sort1")
 @fixtures.meeting(name="sort2")
-def test_sorting_offset_limit(meeting1, meeting2):
+def test_sorting_offset_limit(_, meeting1, meeting2):
     url = confd.meetings.get
     yield s.check_sorting, url, meeting1, meeting2, 'name', 'sort', 'uuid'
 
@@ -144,9 +152,10 @@ def test_sorting_offset_limit(meeting1, meeting2):
     yield s.check_limit, url, meeting1, meeting2, 'name', 'sort', 'uuid'
 
 
+@fixtures.ingress_http()
 @fixtures.user()
 @fixtures.meeting()
-def test_get(me, other_meeting):
+def test_get(_, me, other_meeting):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as mine:
         response = confd.meetings(other_meeting['uuid']).get()
@@ -162,9 +171,11 @@ def test_get(me, other_meeting):
         assert_that(response.item, has_entries(name=mine['name']))
 
 
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
+@fixtures.ingress_http(wazo_tenant=SUB_TENANT)
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
 @fixtures.meeting(wazo_tenant=SUB_TENANT)
-def test_get_multi_tenant(main, sub):
+def test_get_multi_tenant(_, __, main, sub):
     response = confd.meetings(main['uuid']).get(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='Meeting'))
 
@@ -172,8 +183,20 @@ def test_get_multi_tenant(main, sub):
     assert_that(response.item, has_entries(**sub))
 
 
+def test_create_no_ingress_http_configured():
+    response = confd.meetings.post(name='error')
+    assert_that(
+        response,
+        has_properties(
+            status=503,
+            json=contains('no Ingress HTTP configured'),
+        ),
+    )
+
+
+@fixtures.ingress_http()
 @fixtures.user()
-def test_create_minimal_parameters(me):
+def test_create_minimal_parameters(ingress_http, me):
     response = confd.meetings.post(name='minimal')
     response.assert_created('meetings')
 
@@ -183,8 +206,7 @@ def test_create_minimal_parameters(me):
             tenant_uuid=MAIN_TENANT,
             uuid=not_(empty()),
             name='minimal',
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri=ingress_http['uri'],
         ),
     )
 
@@ -201,17 +223,17 @@ def test_create_minimal_parameters(me):
             uuid=not_(empty()),
             owner_uuids=contains_inanyorder(me['uuid']),
             name='minimal',
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri=ingress_http['uri'],
         ),
     )
 
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
 
+@fixtures.ingress_http(uri='https://wazo.example.com:10443')
 @fixtures.user()
 @fixtures.user()
-def test_create_all_parameters(me, owner):
+def test_create_all_parameters(ingress_http, me, owner):
     parameters = {'name': 'allparameter', 'owner_uuids': [owner['uuid']]}
 
     response = confd.meetings.post(**parameters)
@@ -222,8 +244,7 @@ def test_create_all_parameters(me, owner):
             name=parameters['name'],
             tenant_uuid=MAIN_TENANT,
             owner_uuids=contains_inanyorder(owner['uuid']),
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri=ingress_http['uri'],
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -236,16 +257,16 @@ def test_create_all_parameters(me, owner):
         has_entries(
             name=parameters['name'],
             tenant_uuid=MAIN_TENANT,
-            hostname='wazo.example.com',
-            port=443,
+            ingress_http_uri=ingress_http['uri'],
             owner_uuids=contains_inanyorder(me['uuid'], owner['uuid']),
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
 
 
+@fixtures.ingress_http()
 @fixtures.sip_template()
-def test_guest_endpoint_sip_creation(template):
+def test_guest_endpoint_sip_creation(_, template):
     with db.queries() as queries:
         queries.set_tenant_templates(
             MAIN_TENANT, meeting_guest_sip_template_uuid=template['uuid']
@@ -296,20 +317,23 @@ def test_guest_endpoint_sip_creation(template):
     response.assert_status(404)
 
 
-def test_create_without_name():
+@fixtures.ingress_http()
+def test_create_without_name(_):
     response = confd.meetings.post()
     response.assert_status(400)
 
 
+@fixtures.ingress_http()
 @fixtures.meeting()
-def test_edit_minimal_parameters(meeting):
+def test_edit_minimal_parameters(_, meeting):
     response = confd.meetings(meeting['uuid']).put()
     response.assert_updated()
 
 
+@fixtures.ingress_http()
 @fixtures.user()
 @fixtures.meeting()
-def test_edit_all_parameters(me, other_meeting):
+def test_edit_all_parameters(_, me, other_meeting):
     parameters = {'name': 'editallparameter'}
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as mine:
@@ -331,9 +355,11 @@ def test_edit_all_parameters(me, other_meeting):
         response.assert_match(404, e.not_found(resource='Meeting'))
 
 
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
+@fixtures.ingress_http(wazo_tenant=SUB_TENANT)
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
 @fixtures.meeting(wazo_tenant=SUB_TENANT)
-def test_edit_multi_tenant(main, sub):
+def test_edit_multi_tenant(_, __, main, sub):
     response = confd.meetings(main['uuid']).put(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='Meeting'))
 
@@ -341,16 +367,18 @@ def test_edit_multi_tenant(main, sub):
     response.assert_updated()
 
 
+@fixtures.ingress_http()
 @fixtures.meeting()
-def test_delete(meeting):
+def test_delete(_, meeting):
     response = confd.meetings(meeting['uuid']).delete()
     response.assert_deleted()
     confd.meetings(meeting['uuid']).get().assert_status(404)
 
 
+@fixtures.ingress_http()
 @fixtures.user()
 @fixtures.meeting()
-def test_delete_users_me(me, other_meeting):
+def test_delete_users_me(_, me, other_meeting):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as mine:
         response = user_confd.users.me.meetings(mine['uuid']).delete()
@@ -361,9 +389,11 @@ def test_delete_users_me(me, other_meeting):
         response.assert_match(404, e.not_found(resource='Meeting'))
 
 
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
+@fixtures.ingress_http(wazo_tenant=SUB_TENANT)
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
 @fixtures.meeting(wazo_tenant=SUB_TENANT)
-def test_delete_multi_tenant(main, sub):
+def test_delete_multi_tenant(_, __, main, sub):
     response = confd.meetings(main['uuid']).delete(wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='Meeting'))
 
@@ -371,8 +401,9 @@ def test_delete_multi_tenant(main, sub):
     response.assert_deleted()
 
 
+@fixtures.ingress_http()
 @fixtures.meeting()
-def test_bus_events(meeting):
+def test_bus_events(_, meeting):
     yield s.check_bus_event, 'config.meetings.created', confd.meetings.post, {
         'name': 'meeting'
     }
@@ -384,9 +415,10 @@ def test_bus_events(meeting):
     ).delete
 
 
+@fixtures.ingress_http()
 @fixtures.meeting()
 @fixtures.meeting()
-def test_purge_old_meetings(meeting_too_old, meeting_too_young):
+def test_purge_old_meetings(_, meeting_too_old, meeting_too_young):
     too_old = datetime.now() - timedelta(hours=72)
     with db.queries() as queries:
         queries.set_meeting_creation_date(meeting_too_old['uuid'], too_old)

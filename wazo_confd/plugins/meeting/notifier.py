@@ -7,7 +7,7 @@ from xivo_bus.resources.meeting.event import (
     EditMeetingEvent,
 )
 
-from wazo_confd import bus, sysconfd
+from wazo_confd import auth, bus, sysconfd
 
 from .schema import MeetingSchema
 
@@ -16,18 +16,18 @@ MEETING_FIELDS = [
     'uuid',
     'name',
     'owner_uuids',
-    'hostname',
-    'port',
+    'ingress_http_uri',
     'guest_sip_authorization',
 ]
 
 
 class Notifier:
-    def __init__(self, bus, hostname, port, sysconfd):
+    def __init__(self, bus, sysconfd, ingress_http_service, preset_tenant_uuid=None):
         self.bus = bus
-        self._schema = MeetingSchema(only=MEETING_FIELDS)
-        self._schema.context = {'hostname': hostname, 'port': port}
+        self._schema_instance = MeetingSchema(only=MEETING_FIELDS)
         self.sysconfd = sysconfd
+        self._ingress_http_service = ingress_http_service
+        self._preset_tenant_uuid = preset_tenant_uuid
 
     def send_sysconfd_handlers(self):
         handlers = {
@@ -41,19 +41,29 @@ class Notifier:
 
     def created(self, meeting):
         self.send_sysconfd_handlers()
-        event = CreateMeetingEvent(self._schema.dump(meeting))
+        event = CreateMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
     def edited(self, meeting):
         self.send_sysconfd_handlers()
-        event = EditMeetingEvent(self._schema.dump(meeting))
+        event = EditMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
     def deleted(self, meeting):
         self.send_sysconfd_handlers()
-        event = DeleteMeetingEvent(self._schema.dump(meeting))
+        event = DeleteMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
+    def _schema(self):
+        if self._preset_tenant_uuid:
+            tenant_uuid = self._preset_tenant_uuid
+        else:
+            tenant_uuid = str(auth.master_tenant_uuid)
 
-def build_notifier(hostname, port):
-    return Notifier(bus, hostname, port, sysconfd)
+        ingress_http = self._ingress_http_service.find_by(tenant_uuid=tenant_uuid)
+        self._schema_instance.context = {'default_ingress_http': ingress_http}
+        return self._schema_instance
+
+
+def build_notifier(ingress_http_service):
+    return Notifier(bus, sysconfd, ingress_http_service)

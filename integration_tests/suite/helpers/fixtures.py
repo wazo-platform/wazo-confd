@@ -199,6 +199,15 @@ class conference(IsolatedAction):
     }
 
 
+class ingress_http(IsolatedAction):
+
+    id_field = 'uuid'
+    actions = {
+        'generate': h.ingress_http.generate_ingress_http,
+        'delete': h.ingress_http.delete_ingress_http,
+    }
+
+
 class parking_lot(IsolatedAction):
 
     actions = {
