@@ -1,5 +1,12 @@
 # Changelog
 
+## 21.14
+
+* The following resources have been added:
+
+  * `GET, POST /ingresses/http`
+  * `GET, PUT, DELETE /ingresses/http/<ingress_http_uuid>`
+
 ## 21.13
 
 * The following resources have been added:
