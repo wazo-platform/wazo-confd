@@ -332,9 +332,13 @@ def test_edit_minimal_parameters(_, meeting):
 
 @fixtures.ingress_http()
 @fixtures.user()
+@fixtures.user()
 @fixtures.meeting()
-def test_edit_all_parameters(_, me, other_meeting):
-    parameters = {'name': 'editallparameter'}
+def test_edit_all_parameters(_, me, other_user, other_meeting):
+    parameters = {
+        'name': 'editallparameter',
+        'owner_uuids': [me['uuid'], other_user['uuid']],
+    }
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as mine:
         response = confd.meetings(mine['uuid']).put(**parameters)
@@ -343,7 +347,10 @@ def test_edit_all_parameters(_, me, other_meeting):
         response = confd.meetings(mine['uuid']).get()
         assert_that(response.item, has_entries(parameters))
 
-        parameters = {'name': 'editallparameteragain'}
+        parameters = {
+            'name': 'editallparameteragain',
+            'owner_uuids': [me['uuid'], other_user['uuid']],
+        }
 
         response = user_confd.users.me.meetings(mine['uuid']).put(**parameters)
         response.assert_updated()

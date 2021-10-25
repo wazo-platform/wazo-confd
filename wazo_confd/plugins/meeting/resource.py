@@ -42,6 +42,15 @@ class _MeResourceMixin:
         return user_uuid
 
 
+def find_owners(form, tenant_uuid, user_service):
+    owner_uuids = form.pop('owner_uuids', None) or []
+    owners = [
+        user_service.get(uuid, tenant_uuids=[tenant_uuid]) for uuid in owner_uuids
+    ]
+    form['owners'] = owners
+    return form
+
+
 class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
 
     model = Meeting
@@ -74,7 +83,7 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
         form = self.schema().load(body)
         form['uuid'] = uuid4()
         form = self.add_tenant_to_form(form)
-        form = self.find_owners(form)
+        form = find_owners(form, form['tenant_uuid'], self._user_service)
         form = self.add_endpoint_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
@@ -118,15 +127,6 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
         form['guest_endpoint_sip_uuid'] = endpoint.uuid
         return form
 
-    def find_owners(self, form):
-        owner_uuids = form.pop('owner_uuids', None) or []
-        owners = []
-        tenant_uuid = form['tenant_uuid']
-        for uuid in owner_uuids:
-            owners.append(self._user_service.get(uuid, tenant_uuids=[tenant_uuid]))
-        form['owners'] = owners
-        return form
-
 
 class MeetingItem(ItemResource, _SchemaMixin):
     has_tenant_uuid = True
@@ -144,6 +144,14 @@ class MeetingItem(ItemResource, _SchemaMixin):
     @required_acl('confd.meetings.{uuid}.update')
     def put(self, uuid):
         return super().put(uuid)
+
+    def parse_and_update(self, model, **kwargs):
+        form = self.schema().load(request.get_json(), partial=True)
+        form = find_owners(form, model.tenant_uuid, self._user_service)
+        updated_fields = self.find_updated_fields(model, form)
+        for name, value in form.items():
+            setattr(model, name, value)
+        self.service.edit(model, updated_fields=updated_fields, **kwargs)
 
     @required_acl('confd.meetings.{uuid}.delete')
     def delete(self, uuid):
