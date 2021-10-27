@@ -296,9 +296,7 @@ def test_guest_endpoint_sip_creation(_, template):
 
     assert_that(endpoint_username, not_none())
     assert_that(endpoint_password, not_none())
-    assert_that(
-        endpoint_context, equal_to('wazo-meeting-{uuid}-guest'.format(**meeting))
-    )
+    assert_that(endpoint_context, equal_to('wazo-meeting-guest'))
 
     guest_sip_authorization = b64encode(
         '{}:{}'.format(endpoint_username, endpoint_password).encode()
