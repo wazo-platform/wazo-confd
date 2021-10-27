@@ -186,8 +186,28 @@ class UserMeetingItem(MeetingItem, _MeResourceMixin):
         kwargs = self._add_tenant_uuid()
         kwargs['user_uuid'] = self._find_user_uuid()
         model = self.get_model(uuid, **kwargs)
-        self.parse_and_update(model)
+        self.parse_and_update(model, **kwargs)
         return '', 204
+
+    def parse_and_update(self, model, **kwargs):
+        form = self.schema().load(request.get_json(), partial=True)
+
+        if not self._current_user_in_owners(kwargs['user_uuid'], form):
+            self._add_current_user_owner(kwargs['user_uuid'], form)
+        form = find_owners(form, model.tenant_uuid, self._user_service)
+
+        updated_fields = self.find_updated_fields(model, form)
+        for name, value in form.items():
+            setattr(model, name, value)
+        self.service.edit(model, updated_fields=updated_fields)
+
+    @staticmethod
+    def _current_user_in_owners(user_uuid, form):
+        return user_uuid in form['owner_uuids']
+
+    @staticmethod
+    def _add_current_user_owner(user_uuid, form):
+        return form['owner_uuids'].append(user_uuid)
 
     @required_acl('confd.users.me.meetings.{uuid}.delete')
     def delete(self, uuid):
