@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import kombu
@@ -39,9 +39,16 @@ class BusPublisher:
     def flush(self):
         for event, headers in self.messages:
             self._publisher.publish(event, headers)
+        self.messages.clear()
 
     def rollback(self):
-        self.messages = []
+        self.messages.clear()
+
+
+class InstantBusPublisher(BusPublisher):
+    def send_bus_event(self, *args, **kwargs):
+        super().send_bus_event(*args, **kwargs)
+        super().flush()
 
 
 @contextmanager

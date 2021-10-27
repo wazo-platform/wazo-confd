@@ -28,6 +28,7 @@ from . import (
     db,
 )
 from ..helpers import (
+    bus,
     errors as e,
     fixtures,
     scenarios as s,
@@ -427,6 +428,18 @@ def test_bus_events(_, meeting):
     yield s.check_bus_event, 'config.meetings.deleted', confd.meetings(
         meeting['uuid']
     ).delete
+
+
+@fixtures.ingress_http()
+@fixtures.user()
+@fixtures.meeting()
+def test_bus_events_progress(_, me, meeting):
+    yield s.check_bus_event, 'config.meetings.progress', bus.BusClientHeaders.send_meeting_reload_complete_event, meeting
+
+    my_uuid = me['uuid']
+    user_confd = create_confd(user_uuid=my_uuid)
+    with fixtures.user_me_meeting(user_confd) as mine:
+        yield s.check_bus_event, f'config.users.{my_uuid}.meetings.progress', bus.BusClientHeaders.send_meeting_reload_complete_event, mine
 
 
 @fixtures.ingress_http()

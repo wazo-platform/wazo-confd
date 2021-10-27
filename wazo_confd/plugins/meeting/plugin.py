@@ -8,6 +8,8 @@ from .resource import (
     UserMeetingItem,
     UserMeetingList,
 )
+from wazo_confd import bus, sysconfd
+from wazo_confd._bus import InstantBusPublisher
 from wazo_confd.plugins.endpoint_sip.service import (
     build_endpoint_service as build_endpoint_sip_service,
 )
@@ -20,6 +22,8 @@ from wazo_confd.plugins.ingress_http.service import (
 from wazo_confd.plugins.tenant.service import build_service as build_tenant_service
 from wazo_confd.plugins.user.service import build_service as build_user_service
 
+from .bus_consume import MeetingBusEventHandler
+from .notifier import Notifier
 from .service import build_service
 
 
@@ -27,14 +31,26 @@ class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
         auth_client = dependencies['auth_client']
+        bus_consumer = dependencies['bus_consumer']
+        config = dependencies['config']
         pjsip_doc = dependencies['pjsip_doc']
 
-        service = build_service()
+        ingress_http_service = build_ingress_http_service()
+        api_notifier = Notifier(bus, sysconfd, ingress_http_service)
+        service = build_service(api_notifier)
+
+        instant_bus_publisher = InstantBusPublisher.from_config(
+            config['bus'],
+            config['uuid'],
+        )
+        bus_notifier = Notifier(instant_bus_publisher, sysconfd, ingress_http_service)
+        bus_event_handler = MeetingBusEventHandler(service, bus_notifier)
+        bus_event_handler.subscribe(bus_consumer)
+
         endpoint_sip_service = build_endpoint_sip_service(None, pjsip_doc)
         endpoint_sip_template_service = build_endpoint_sip_template_service(
             None, pjsip_doc
         )
-        ingress_http_service = build_ingress_http_service()
         user_service = build_user_service(provd_client=None)
         tenant_service = build_tenant_service()
         args = [service, user_service, ingress_http_service]

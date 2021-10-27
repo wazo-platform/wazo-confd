@@ -5,9 +5,11 @@ from xivo_bus.resources.meeting.event import (
     CreateMeetingEvent,
     DeleteMeetingEvent,
     EditMeetingEvent,
+    MeetingProgressEvent,
+    UserMeetingProgressEvent,
 )
 
-from wazo_confd import auth, bus, sysconfd
+from wazo_confd import auth
 
 from .schema import MeetingSchema
 
@@ -60,6 +62,18 @@ class Notifier:
         event = DeleteMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
+    def ready(self, meeting):
+        meeting_body = self._schema().dump(meeting)
+        event = MeetingProgressEvent(meeting_body, 'ready')
+        self.bus.send_bus_event(event)
+        for owner_uuid in meeting_body['owner_uuids']:
+            event = UserMeetingProgressEvent(meeting_body, owner_uuid, 'ready')
+            headers = {
+                'name': UserMeetingProgressEvent.name,
+                f'user:{owner_uuid}': True,
+            }
+            self.bus.send_bus_event(event, headers)
+
     def _schema(self):
         if self._preset_tenant_uuid:
             tenant_uuid = self._preset_tenant_uuid
@@ -69,7 +83,3 @@ class Notifier:
         ingress_http = self._ingress_http_service.find_by(tenant_uuid=tenant_uuid)
         self._schema_instance.context = {'default_ingress_http': ingress_http}
         return self._schema_instance
-
-
-def build_notifier(ingress_http_service):
-    return Notifier(bus, sysconfd, ingress_http_service)

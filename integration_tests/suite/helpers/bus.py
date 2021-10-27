@@ -29,13 +29,28 @@ class BusClientWrapper:
         if self.exchange_type != 'headers':
             raise NotImplementedError()
 
-        if self._bus is None:
-            self._bus = self._create_client()
         event = {
             'name': 'auth_tenant_added',
             'data': {'uuid': tenant_uuid, 'slug': slug},
         }
-        self._bus.publish(event, headers={'name': event['name']})
+        self.publish(event, headers={'name': event['name']})
+
+    def send_meeting_reload_complete_event(self, meeting):
+        event = {
+            'name': 'request_handlers_progress',
+            'data': {
+                'uuid': '371b64b9-1f45-4c56-9a8e-0672fde9d452',
+                'status': 'completed',
+                'context': [
+                    {
+                        'resource_type': 'meeting',
+                        'resource_action': 'created',
+                        'resource_body': {'uuid': meeting['uuid']},
+                    }
+                ],
+            },
+        }
+        self.publish(event, headers={'name': event['name']})
 
 
 BusClient = BusClientWrapper()
