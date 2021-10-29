@@ -331,25 +331,41 @@ def test_edit_minimal_parameters(_, meeting):
 
 
 @fixtures.ingress_http()
+@fixtures.meeting()
+@fixtures.user()
+def test_edit_all_parameters(_, meeting, some_user):
+    parameters = {
+        'name': 'editallparameter',
+        'owner_uuids': [some_user['uuid']],
+    }
+    response = confd.meetings(meeting['uuid']).put(**parameters)
+    response.assert_updated()
+
+    response = confd.meetings(meeting['uuid']).get()
+    assert_that(response.item, has_entries(parameters))
+
+
+@fixtures.ingress_http()
+@fixtures.user()
 @fixtures.user()
 @fixtures.meeting()
-def test_edit_all_parameters(_, me, other_meeting):
-    parameters = {'name': 'editallparameter'}
+def test_edit_all_parameters_users_me(_, me, other_user, other_meeting):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as mine:
-        response = confd.meetings(mine['uuid']).put(**parameters)
-        response.assert_updated()
-
-        response = confd.meetings(mine['uuid']).get()
-        assert_that(response.item, has_entries(parameters))
-
-        parameters = {'name': 'editallparameteragain'}
+        parameters = {
+            'name': 'editallparameter',
+            'owner_uuids': [other_user['uuid']],
+        }
+        expected_parameters = {
+            'name': 'editallparameter',
+            'owner_uuids': [me['uuid'], other_user['uuid']],
+        }
 
         response = user_confd.users.me.meetings(mine['uuid']).put(**parameters)
         response.assert_updated()
 
         response = user_confd.users.me.meetings(mine['uuid']).get()
-        assert_that(response.item, has_entries(parameters))
+        assert_that(response.item, has_entries(expected_parameters))
 
         response = user_confd.users.me.meetings(other_meeting['uuid']).put(**parameters)
         response.assert_match(404, e.not_found(resource='Meeting'))
