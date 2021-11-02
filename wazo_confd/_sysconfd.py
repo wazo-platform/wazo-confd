@@ -1,4 +1,4 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
@@ -33,6 +33,7 @@ class SysconfdPublisher:
             self.add_handlers(args)
 
     def add_handlers(self, args):
+        self.handlers_contexts.extend(args.pop('context', []))
         for service, new_commands in args.items():
             commands = self.handlers.setdefault(service, set())
             commands.update(set(new_commands))
@@ -127,6 +128,8 @@ class SysconfdPublisher:
         if len(self.handlers) > 0:
             url = "{}/exec_request_handlers".format(self.base_url)
             body = {key: tuple(commands) for key, commands in self.handlers.items()}
+            if self.handlers_contexts:
+                body['context'] = self.handlers_contexts
             response = session.request('POST', url, json=body)
             self.check_for_errors(response)
 
@@ -141,3 +144,4 @@ class SysconfdPublisher:
     def _reset(self):
         self.requests = []
         self.handlers = {}
+        self.handlers_contexts = []

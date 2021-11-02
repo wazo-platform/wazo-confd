@@ -29,25 +29,34 @@ class Notifier:
         self._ingress_http_service = ingress_http_service
         self._preset_tenant_uuid = preset_tenant_uuid
 
-    def send_sysconfd_handlers(self):
+    def send_sysconfd_handlers(self, meeting, action):
         handlers = {
             'ipbx': ['module reload res_pjsip.so'],
             'agentbus': [],
+            'context': [
+                {
+                    'resource_type': 'meeting',
+                    'resource_action': action,
+                    'resource_body': {
+                        'uuid': str(meeting.uuid),
+                    },
+                },
+            ],
         }
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, meeting):
-        self.send_sysconfd_handlers()
+        self.send_sysconfd_handlers(meeting, 'created')
         event = CreateMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
     def edited(self, meeting):
-        self.send_sysconfd_handlers()
+        self.send_sysconfd_handlers(meeting, 'edited')
         event = EditMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
     def deleted(self, meeting):
-        self.send_sysconfd_handlers()
+        self.send_sysconfd_handlers(meeting, 'deleted')
         event = DeleteMeetingEvent(self._schema().dump(meeting))
         self.bus.send_bus_event(event)
 
