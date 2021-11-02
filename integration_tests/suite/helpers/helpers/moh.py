@@ -8,7 +8,7 @@ from . import confd
 
 
 def generate_moh(**parameters):
-    parameters.setdefault('name', generate_name())
+    parameters.setdefault('label', generate_name())
     parameters.setdefault('mode', 'files')
     return add_moh(**parameters)
 
