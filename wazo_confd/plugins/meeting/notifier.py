@@ -31,10 +31,7 @@ class Notifier:
 
     def send_sysconfd_handlers(self):
         handlers = {
-            'ipbx': [
-                'dialplan reload',
-                'module reload res_pjsip.so',
-            ],
+            'ipbx': ['module reload res_pjsip.so'],
             'agentbus': [],
         }
         self.sysconfd.exec_request_handlers(handlers)

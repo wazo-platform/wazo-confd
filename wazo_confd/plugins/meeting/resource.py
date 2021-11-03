@@ -101,9 +101,8 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
             return form
 
         template = self._endpoint_sip_template_service.get(template_uuid)
-        endpoint_name = endpoint_username = context = 'wazo-meeting-{}-guest'.format(
-            form['uuid']
-        )
+        context = 'wazo-meeting-guest'
+        endpoint_name = endpoint_username = 'wazo-meeting-{}-guest'.format(form['uuid'])
         endpoint_body = {
             'name': endpoint_name,
             'tenant_uuid': form['tenant_uuid'],
