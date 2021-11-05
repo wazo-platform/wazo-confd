@@ -204,6 +204,8 @@ def test_create_all_parameters(moh1, moh2):
         ),
     )
 
+    confd.switchboards(response.item['uuid']).delete().assert_deleted()
+
 
 @fixtures.switchboard(name='before_edit')
 def test_edit_minimal_parameters(switchboard):
@@ -281,6 +283,8 @@ def test_update_fields_with_null_value(moh):
             timeout=None,
         ),
     )
+
+    confd.switchboards(response.item['uuid']).delete().assert_deleted()
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
