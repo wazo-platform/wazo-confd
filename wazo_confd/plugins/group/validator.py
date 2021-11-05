@@ -3,8 +3,10 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.queue import dao as queue_dao
+from xivo_dao.resources.moh import dao as moh_dao
 
 from wazo_confd.helpers.validator import (
+    MOHExists,
     Validator,
     ValidationGroup,
 )
@@ -22,4 +24,5 @@ class GroupValidator(Validator):
 
 
 def build_validator():
-    return ValidationGroup(create=[GroupValidator()])
+    moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
+    return ValidationGroup(create=[GroupValidator(), moh_validator], edit=[moh_validator])
