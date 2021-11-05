@@ -1,8 +1,4 @@
 - project:
-    templates:
-      - wazo-tox-linters
-      - wazo-tox-py37
-      - debian-packaging-template
     check:
       jobs:
         - confd-tox-integration
