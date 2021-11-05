@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -188,3 +188,24 @@ class BaseExtensionRangeMixin:
 
     def _is_pattern(self, exten):
         return exten.startswith('_')
+
+
+class MOHExists(Validator):
+    def __init__(self, field, dao_get_by, resource='MOH'):
+        self.dao_get_by = dao_get_by
+        self.field = field
+        self.resource = resource
+
+    def validate(self, model):
+        self.validate_moh_exists_in_tenant(model)
+
+    def validate_moh_exists_in_tenant(self, model):
+        moh_name = getattr(model, self.field)
+        if moh_name:
+            if moh_name == 'default':
+                return
+            try:
+                self.dao_get_by(name=moh_name, tenant_uuids=[model.tenant_uuid])
+            except NotFoundError:
+                metadata = {self.field: moh_name}
+                raise errors.param_not_found(self.field, self.resource, **metadata)
