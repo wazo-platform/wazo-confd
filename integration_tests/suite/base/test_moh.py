@@ -40,13 +40,6 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
         129
     ), None, 'label'
-    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'label', True
-    yield s.check_bogus_field_returns_error, url, 'label', 1234
-    yield s.check_bogus_field_returns_error, url, 'label', '$foo'
-    yield s.check_bogus_field_returns_error, url, 'label', 'foo\nbar'
-    yield s.check_bogus_field_returns_error, url, 'label', []
-    yield s.check_bogus_field_returns_error, url, 'label', {}
 
 
 @fixtures.moh()
