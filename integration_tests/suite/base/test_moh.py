@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -37,17 +37,9 @@ def test_post_errors():
     for check in error_checks(url):
         yield check
 
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(21)
-    yield s.check_bogus_field_returns_error, url, 'name', 'general'
-    yield s.check_bogus_field_returns_error, url, 'name', '.foo'
-    yield s.check_bogus_field_returns_error, url, 'name', 'foo\nbar'
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-
-    for check in unique_error_checks(url):
-        yield check
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
+        129
+    ), None, 'label'
 
 
 @fixtures.moh()
@@ -80,16 +72,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'sort', {}
 
 
-@fixtures.moh(name='unique')
-def unique_error_checks(url, moh):
-    yield s.check_bogus_field_returns_error, url, 'name', moh['name'], {'mode': 'files'}
-
-
-@fixtures.moh(name='visible', label='hello')
-@fixtures.moh(name='hidden', label='hidden')
+@fixtures.moh(label='visible')
+@fixtures.moh(label='hidden')
 def test_search(visible, hidden):
     url = confd.moh
-    searches = {'name': 'visible', 'label': 'hello'}
+    searches = {'label': 'visible'}
 
     for field, term in searches.items():
         yield check_search, url, visible, hidden, field, term
@@ -105,14 +92,14 @@ def check_search(url, visible, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
-@fixtures.moh(name='sort1')
-@fixtures.moh(name='sort2')
+@fixtures.moh(label='sort1')
+@fixtures.moh(label='sort2')
 def test_sorting_offset_limit(moh1, moh2):
     url = confd.moh.get
-    yield s.check_sorting, url, moh1, moh2, 'name', 'sort', 'uuid'
+    yield s.check_sorting, url, moh1, moh2, 'label', 'sort', 'uuid'
 
-    yield s.check_offset, url, moh1, moh2, 'name', 'sort', 'uuid'
-    yield s.check_limit, url, moh1, moh2, 'name', 'sort', 'uuid'
+    yield s.check_offset, url, moh1, moh2, 'label', 'sort', 'uuid'
+    yield s.check_limit, url, moh1, moh2, 'label', 'sort', 'uuid'
 
 
 @fixtures.moh(wazo_tenant=MAIN_TENANT)
@@ -156,7 +143,7 @@ def test_get_multi_tenant(main, sub):
 
 
 def test_create_minimal_parameters():
-    response = confd.moh.post(name='moh1', mode='files')
+    response = confd.moh.post(label='moh1', mode='files')
     response.assert_created('moh')
 
     assert_that(
@@ -168,7 +155,6 @@ def test_create_minimal_parameters():
 
 def test_create_all_parameters():
     response = confd.moh.post(
-        name='moh1',
         label='MOH 1',
         mode='custom',
         application='/usr/bin/mpg123 xxx',
@@ -180,7 +166,7 @@ def test_create_all_parameters():
         response.item,
         has_entries(
             tenant_uuid=MAIN_TENANT,
-            name='moh1',
+            name=not_(empty()),
             label='MOH 1',
             mode='custom',
             application='/usr/bin/mpg123 xxx',
@@ -192,21 +178,37 @@ def test_create_all_parameters():
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
 
+def test_create_deprecated_name():
+    response = confd.moh.post(name='MyMOH', mode='files')
+    response.assert_created('moh')
+
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=not_(empty()),
+            name=not_(empty()),
+            label='MyMOH',
+        ),
+    )
+
+    confd.moh(response.item['uuid']).delete().assert_deleted()
+
+
 def test_create_custom_mode_with_application():
-    response = confd.moh.post(name='moh', mode='custom', application='/bin/false')
+    response = confd.moh.post(label='moh', mode='custom', application='/bin/false')
     response.assert_created('moh')
     confd.moh(response.item['uuid']).delete().assert_deleted()
 
 
 def test_create_custom_mode_without_application():
-    response = confd.moh.post(name='moh', mode='custom')
+    response = confd.moh.post(label='moh', mode='custom')
     response.assert_status(400)
 
 
 def test_create_valid_sort():
     valid_sorts = ['alphabetical', 'random', 'random_start']
     for sort in valid_sorts:
-        response = confd.moh.post(name='moh', mode='files', sort=sort)
+        response = confd.moh.post(label='moh', mode='files', sort=sort)
         response.assert_created('moh')
         confd.moh(response.item['uuid']).delete().assert_deleted()
 
@@ -226,15 +228,6 @@ def test_edit_all_parameters(moh):
 
     response = confd.moh(moh['uuid']).get()
     assert_that(response.item, has_entries(parameters))
-
-
-@fixtures.moh(name='OriginalName')
-def test_edit_name_unavailable(moh):
-    response = confd.moh(moh['uuid']).put(name='ModifiedName')
-    response.assert_updated()
-
-    response = confd.moh(moh['uuid']).get()
-    assert_that(response.item, has_entries(name=moh['name']))
 
 
 @fixtures.moh(mode='files', application=None)

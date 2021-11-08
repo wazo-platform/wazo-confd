@@ -31,7 +31,7 @@ def test_delete_errors():
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
 
 
-@fixtures.moh(name='othertenant', wazo_tenant=SUB_TENANT)
+@fixtures.moh(label='othertenant', wazo_tenant=SUB_TENANT)
 def test_post_errors(_):
     switchboard_post = confd.switchboards(name='TheSwitchboard').post
     for check in error_checks(switchboard_post):
@@ -42,7 +42,7 @@ def test_post_errors(_):
 
 
 @fixtures.switchboard()
-@fixtures.moh(name='othertenant', wazo_tenant=SUB_TENANT)
+@fixtures.moh(label='othertenant', wazo_tenant=SUB_TENANT)
 def test_put_errors(switchboard, _):
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
     yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
@@ -182,13 +182,13 @@ def test_create_minimal_parameters():
     confd.switchboards(response.item['uuid']).delete().assert_deleted()
 
 
-@fixtures.moh(name='queuemoh')
-@fixtures.moh(name='holdmoh')
-def test_create_all_parameters(*_):
+@fixtures.moh(label='queuemoh')
+@fixtures.moh(label='holdmoh')
+def test_create_all_parameters(moh1, moh2):
     response = confd.switchboards.post(
         name='TheSwitchboard',
-        queue_music_on_hold='queuemoh',
-        waiting_room_music_on_hold='holdmoh',
+        queue_music_on_hold=moh1['name'],
+        waiting_room_music_on_hold=moh2['name'],
         timeout=42,
     )
     response.assert_created('switchboards')
@@ -197,12 +197,14 @@ def test_create_all_parameters(*_):
         response.item,
         has_entries(
             uuid=not_(empty()),
-            queue_music_on_hold='queuemoh',
-            waiting_room_music_on_hold='holdmoh',
+            queue_music_on_hold=moh1['name'],
+            waiting_room_music_on_hold=moh2['name'],
             tenant_uuid=MAIN_TENANT,
             name='TheSwitchboard',
         ),
     )
+
+    confd.switchboards(response.item['uuid']).delete().assert_deleted()
 
 
 @fixtures.switchboard(name='before_edit')
@@ -214,11 +216,17 @@ def test_edit_minimal_parameters(switchboard):
     assert_that(response.item, has_entries(name='after_edit'))
 
 
-@fixtures.moh(name='foo')
-@fixtures.switchboard(
-    queue_music_on_hold='foo', waiting_room_music_on_hold='foo', timeout=42
-)
-def test_update_fields_with_null_value(_, switchboard):
+@fixtures.moh(label='foo')
+def test_update_fields_with_null_value(moh):
+    response = confd.switchboards.post(
+        name='TheSwitchboard',
+        queue_music_on_hold=moh['name'],
+        waiting_room_music_on_hold=moh['name'],
+        timeout=42,
+    )
+    response.assert_created('switchboards')
+    switchboard = response.item
+
     response = confd.switchboards(switchboard['uuid']).put(
         queue_music_on_hold=None,
     )
@@ -229,14 +237,14 @@ def test_update_fields_with_null_value(_, switchboard):
         response.item,
         has_entries(
             queue_music_on_hold=None,
-            waiting_room_music_on_hold='foo',
+            waiting_room_music_on_hold=moh['name'],
             timeout=42,
         ),
     )
 
     confd.switchboards(switchboard['uuid']).put(
-        queue_music_on_hold='foo',
-        waiting_room_music_on_hold='foo',
+        queue_music_on_hold=moh['name'],
+        waiting_room_music_on_hold=moh['name'],
         timeout=42,
     )
 
@@ -249,15 +257,15 @@ def test_update_fields_with_null_value(_, switchboard):
     assert_that(
         response.item,
         has_entries(
-            queue_music_on_hold='foo',
+            queue_music_on_hold=moh['name'],
             waiting_room_music_on_hold=None,
             timeout=42,
         ),
     )
 
     confd.switchboards(switchboard['uuid']).put(
-        queue_music_on_hold='foo',
-        waiting_room_music_on_hold='foo',
+        queue_music_on_hold=moh['name'],
+        waiting_room_music_on_hold=moh['name'],
         timeout=42,
     )
 
@@ -270,11 +278,13 @@ def test_update_fields_with_null_value(_, switchboard):
     assert_that(
         response.item,
         has_entries(
-            queue_music_on_hold='foo',
-            waiting_room_music_on_hold='foo',
+            queue_music_on_hold=moh['name'],
+            waiting_room_music_on_hold=moh['name'],
             timeout=None,
         ),
     )
+
+    confd.switchboards(response.item['uuid']).delete().assert_deleted()
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)

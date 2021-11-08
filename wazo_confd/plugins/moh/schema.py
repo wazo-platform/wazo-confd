@@ -1,16 +1,14 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+import logging
+
+from marshmallow import fields, pre_load
 from marshmallow.validate import Length, OneOf
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, AsteriskSection
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
-# the regex is more restrictive since the name is used both for the Asterisk
-# section and the directory on the file system
-moh_name_validator = AsteriskSection(
-    max_length=20, regex=r'^[a-zA-Z0-9][-_.a-zA-Z0-9]*$'
-)
+logger = logging.getLogger(__name__)
 
 
 class MohFileSchema(BaseSchema):
@@ -20,8 +18,8 @@ class MohFileSchema(BaseSchema):
 class MohSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=moh_name_validator, required=True)
-    label = fields.String(validate=Length(max=128), allow_none=True)
+    name = fields.String(dump_only=True)
+    label = fields.String(validate=Length(max=128), required=True)
     mode = fields.String(validate=OneOf(['custom', 'files', 'mp3']), required=True)
     application = fields.String(validate=Length(max=256), allow_none=True)
     sort = fields.String(
@@ -30,6 +28,16 @@ class MohSchema(BaseSchema):
     files = fields.Nested(MohFileSchema, many=True, dump_only=True)
 
     links = ListLink(Link('moh', field='uuid'))
+
+    # DEPRECATED 21.15
+    @pre_load
+    def copy_name_to_label(self, data):
+        if 'label' in data:
+            return data
+        if 'name' in data:
+            logger.warning('the "name" field of moh is deprecated. use "label" instead')
+            data['label'] = data['name']
+        return data
 
 
 class MohSchemaPUT(MohSchema):

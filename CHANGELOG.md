@@ -1,5 +1,12 @@
 # Changelog
 
+## 21.15
+
+* A music on hold now has a read-only auto-generated `name` and a required `label` instead
+  of a user-provided `name` and optional `label`. For compatibility purposes, if a music
+  on hold is created using only a `name`, it will be used as the `label` and
+  auto-generated.
+
 ## 21.14
 
 * The following resources have been added:
