@@ -3,9 +3,11 @@
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.group import dao as group_dao
+from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.queue import dao as queue_dao
 
 from wazo_confd.helpers.validator import (
+    MOHExists,
     Optional,
     UniqueField,
     UniqueFieldChanged,
@@ -37,15 +39,18 @@ class WaitDestinationValidator(DestinationValidator):
 
 
 def build_validator():
+    moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     return ValidationGroup(
         create=[
             UniqueField('name', lambda name: queue_dao.find_by(name=name), 'Queue'),
             QueueValidator(),
             WaitDestinationValidator(),
+            moh_validator,
         ],
         edit=[
             Optional('name', UniqueFieldChanged('name', queue_dao.find_by, 'Queue')),
             QueueValidator(),
             WaitDestinationValidator(),
+            moh_validator,
         ],
     )
