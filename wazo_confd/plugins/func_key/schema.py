@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
-from marshmallow import EXCLUDE, Schema, fields, validates, post_dump
+from marshmallow import EXCLUDE, Schema, fields, validates, post_dump, pre_load
 from marshmallow.validate import OneOf, Regexp, Range, Length
 from marshmallow.exceptions import ValidationError
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
 
-EXTEN_REGEX = r'[A-Z0-9+*]+'
+EXTEN_REGEX = r'^[A-Z0-9+*]+$'
 
 
 class BaseDestinationSchema(Schema):
@@ -151,12 +151,26 @@ class ServiceDestinationSchema(BaseDestinationSchema):
 class CustomDestinationSchema(BaseDestinationSchema):
     exten = fields.String(validate=Regexp(EXTEN_REGEX), required=True)
 
+    @pre_load
+    def remove_invalid_white_spaces(self, data):
+        exten = data.get('exten')
+        if exten and isinstance(exten, str):
+            data['exten'] = exten.strip()
+        return data
+
 
 class ForwardDestinationSchema(BaseDestinationSchema):
     forward = fields.String(
         validate=OneOf(['busy', 'noanswer', 'unconditional']), required=True
     )
     exten = fields.String(validate=Regexp(EXTEN_REGEX), allow_none=True)
+
+    @pre_load
+    def remove_invalid_white_spaces(self, data):
+        exten = data.get('exten')
+        if exten and isinstance(exten, str):
+            data['exten'] = exten.strip()
+        return data
 
 
 class TransferDestinationSchema(BaseDestinationSchema):
