@@ -1,11 +1,13 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
+from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 
 from wazo_confd.helpers.validator import (
+    MOHExists,
     Optional,
     UniqueField,
     UniqueFieldChanged,
@@ -45,6 +47,7 @@ class NoEmptyFieldWhenEnabled(Validator):
 
 
 def build_validator():
+    moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     return ValidationGroup(
         delete=[NoVoicemailAssociated(), NoLineAssociated(user_line_dao)],
         create=[
@@ -62,12 +65,14 @@ def build_validator():
                     'User',
                 ),
             ),
+            moh_validator,
         ],
         edit=[
             Optional('email', UniqueFieldChanged('email', user_dao.find_by, 'User')),
             Optional(
                 'username', UniqueFieldChanged('username', user_dao.find_by, 'User')
             ),
+            moh_validator,
         ],
     )
 

@@ -197,7 +197,8 @@ def test_create_minimal_parameters():
     confd.conferences(response.item['id']).delete().assert_deleted()
 
 
-def test_create_all_parameters():
+@fixtures.moh(label='music')
+def test_create_all_parameters(moh):
     parameters = {
         'name': 'MyConference',
         'preprocess_subroutine': 'subroutine',
@@ -209,7 +210,7 @@ def test_create_all_parameters():
         'announce_join_leave': True,
         'announce_user_count': True,
         'announce_only_user': False,
-        'music_on_hold': 'music',
+        'music_on_hold': moh['name'],
     }
 
     response = confd.conferences.post(**parameters)
@@ -221,6 +222,30 @@ def test_create_all_parameters():
     confd.conferences(response.item['id']).delete().assert_deleted()
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_create_multi_tenant_moh(main_moh, sub_moh):
+    parameters = {
+        'name': 'MyConference',
+        'music_on_hold': main_moh['name'],
+    }
+    response = confd.conferences.post(**parameters)
+    response.assert_created('conferences')
+    confd.conferences(response.item['id']).delete().assert_deleted()
+
+    response = confd.conferences.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    parameters['music_on_hold'] = sub_moh['name']
+
+    response = confd.conferences.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_created('conferences')
+    confd.conferences(response.item['id']).delete().assert_deleted()
+
+    response = confd.conferences.post(**parameters)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+
 @fixtures.conference()
 def test_edit_minimal_parameters(conference):
     response = confd.conferences(conference['id']).put()
@@ -228,7 +253,8 @@ def test_edit_minimal_parameters(conference):
 
 
 @fixtures.conference()
-def test_edit_all_parameters(conference):
+@fixtures.moh(label='music')
+def test_edit_all_parameters(conference, moh):
     parameters = {
         'name': 'MyConference',
         'preprocess_subroutine': 'subroutine',
@@ -240,7 +266,7 @@ def test_edit_all_parameters(conference):
         'announce_join_leave': True,
         'announce_user_count': True,
         'announce_only_user': False,
-        'music_on_hold': 'music',
+        'music_on_hold': moh['name'],
     }
 
     response = confd.conferences(conference['id']).put(**parameters)
@@ -257,6 +283,24 @@ def test_edit_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='Conference'))
 
     response = confd.conferences(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
+@fixtures.conference(wazo_tenant=MAIN_TENANT)
+@fixtures.conference(wazo_tenant=SUB_TENANT)
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
+    response = confd.conferences(main['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.conferences(sub['id']).put(music_on_hold=main_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.conferences(main['id']).put(music_on_hold=main_moh['name'])
+    response.assert_updated()
+
+    response = confd.conferences(sub['id']).put(music_on_hold=sub_moh['name'])
     response.assert_updated()
 
 

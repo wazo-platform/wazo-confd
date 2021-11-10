@@ -18,7 +18,12 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import associations as a, fixtures, scenarios as s
+from ..helpers import (
+    associations as a,
+    errors as e,
+    fixtures,
+    scenarios as s,
+)
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FULL_USER = {
@@ -476,20 +481,23 @@ def test_summary_view_on_user_without_line(user):
     email="jenkins@leeroy.com",
     outgoing_caller_id='"Mystery Man" <5551234567>',
     username="leeroyjenkins",
-    music_on_hold="leeroy_music_on_hold",
     mobile_phone_number="5552423232",
     userfield="leeroy jenkins userfield",
     description="Léeroy Jénkin's bio",
     enabled=False,
     preprocess_subroutine="leeroy_preprocess",
 )
-def test_search_on_user_view(user):
+@fixtures.moh(label='leeroy_music_on_hold')
+def test_search_on_user_view(user, moh):
+    response = confd.users(user['id']).put(music_on_hold=moh['name'])
+    response.assert_updated()
+    user = confd.users(user['id']).get().item
     url = confd.users
     searches = {
         'firstname': 'léeroy',
         'lastname': 'jénkins',
         'email': 'jenkins@',
-        'music_on_hold': 'leeroy_music',
+        'music_on_hold': moh['uuid'],
         'outgoing_caller_id': '5551234567',
         'mobile_phone_number': '2423232',
         'userfield': 'jenkins userfield',
@@ -740,13 +748,37 @@ def test_create_generates_appropriate_caller_id():
     assert_that(response.item['caller_id'], equal_to('"Jôhn Doe"'))
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_create_multi_tenant_moh(main_moh, sub_moh):
+    parameters = {
+        'firstname': 'MyUser',
+        'music_on_hold': main_moh['name'],
+    }
+    response = confd.users.post(**parameters)
+    response.assert_created('users')
+    confd.users(response.item['id']).delete().assert_deleted()
+
+    response = confd.users.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    parameters['music_on_hold'] = sub_moh['name']
+
+    response = confd.users.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_created('users')
+    confd.users(response.item['id']).delete().assert_deleted()
+
+    response = confd.users.post(**parameters)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+
 @fixtures.user(
     firstname="Léeroy",
     lastname="Jénkins",
     email="leeroy@jenkins.com",
     outgoing_caller_id='"Mystery Man" <5551234567>',
     username="leeroyjenkins",
-    music_on_hold="leeroy_music_on_hold",
+    music_on_hold="",
     mobile_phone_number="5552423232",
     userfield="leeroy jenkins userfield",
     description="Léeroy Jénkin's bio",
@@ -778,6 +810,24 @@ def test_update_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
+
+
+@fixtures.user(firstname='main', wazo_tenant=MAIN_TENANT)
+@fixtures.user(firstname='sub', wazo_tenant=SUB_TENANT)
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
+    response = confd.users(main['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.users(sub['id']).put(music_on_hold=main_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.users(main['id']).put(music_on_hold=main_moh['name'])
+    response.assert_updated()
+
+    response = confd.users(sub['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_updated()
 
 
 @fixtures.user()

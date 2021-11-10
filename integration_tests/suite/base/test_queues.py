@@ -419,6 +419,30 @@ def test_create_multi_tenant():
     assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_create_multi_tenant_moh(main_moh, sub_moh):
+    parameters = {
+        'name': 'MyQueue',
+        'music_on_hold': main_moh['name'],
+    }
+    response = confd.queues.post(**parameters)
+    response.assert_created('queues')
+    confd.queues(response.item['id']).delete().assert_deleted()
+
+    response = confd.queues.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    parameters['music_on_hold'] = sub_moh['name']
+
+    response = confd.queues.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_created('queues')
+    confd.queues(response.item['id']).delete().assert_deleted()
+
+    response = confd.queues.post(**parameters)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+
 @fixtures.queue()
 @fixtures.ivr()
 @fixtures.group()
@@ -518,6 +542,24 @@ def test_edit_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='Queue'))
 
     response = confd.queues(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
+@fixtures.queue(wazo_tenant=MAIN_TENANT)
+@fixtures.queue(wazo_tenant=SUB_TENANT)
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
+    response = confd.queues(main['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.queues(sub['id']).put(music_on_hold=main_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.queues(main['id']).put(music_on_hold=main_moh['name'])
+    response.assert_updated()
+
+    response = confd.queues(sub['id']).put(music_on_hold=sub_moh['name'])
     response.assert_updated()
 
 

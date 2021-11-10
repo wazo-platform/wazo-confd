@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -181,6 +181,40 @@ def test_create_all_parameters():
     confd.applications(response.item['uuid']).delete().assert_deleted()
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_create_with_moh(main_moh, sub_moh):
+    parameters_main = {
+        'name': 'MainApplication',
+        'destination': 'node',
+        'destination_options': {
+            'type': 'holding',
+            'music_on_hold': sub_moh['name'],
+        },
+    }
+    parameters_sub = {
+        'name': 'SubApplication',
+        'destination': 'node',
+        'destination_options': {
+            'type': 'holding',
+            'music_on_hold': main_moh['name'],
+        },
+    }
+    response = confd.applications.post(**parameters_main, wazo_tenant=SUB_TENANT)
+    response.assert_created('applications')
+    confd.applications(response.item['uuid']).delete().assert_deleted()
+
+    response = confd.applications.post(**parameters_sub)
+    response.assert_created('applications')
+    confd.applications(response.item['uuid']).delete().assert_deleted()
+
+    response = confd.applications.post(**parameters_main)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.applications.post(**parameters_sub, wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+
 @fixtures.application()
 def test_edit_minimal_parameters(application):
     response = confd.applications(application['uuid']).put()
@@ -188,13 +222,14 @@ def test_edit_minimal_parameters(application):
 
 
 @fixtures.application()
-def test_edit_all_parameters(application):
+@fixtures.moh(label='updated_moh')
+def test_edit_all_parameters(application, moh):
     parameters = {
         'name': 'UpdatedApplication',
         'destination': 'node',
         'destination_options': {
             'type': 'holding',
-            'music_on_hold': 'updated_moh',
+            'music_on_hold': moh['name'],
             'answer': True,
         },
     }
@@ -224,6 +259,39 @@ def test_edit_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='Application'))
 
     response = confd.applications(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
+@fixtures.application(
+    destination='node',
+    destination_options={'type': 'holding'},
+    wazo_tenant=MAIN_TENANT,
+)
+@fixtures.application(
+    destination='node',
+    destination_options={'type': 'holding'},
+    wazo_tenant=SUB_TENANT,
+)
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
+    parameters = {
+        'destination': 'node',
+        'destination_options': {'type': 'holding', 'music_on_hold': main_moh['name']},
+    }
+
+    response = confd.applications(sub['uuid']).put(**parameters)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.applications(main['uuid']).put(**parameters)
+    response.assert_updated()
+
+    parameters['destination_options']['music_on_hold'] = sub_moh['name']
+
+    response = confd.applications(main['uuid']).put(**parameters)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.applications(sub['uuid']).put(**parameters)
     response.assert_updated()
 
 

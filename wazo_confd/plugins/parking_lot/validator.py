@@ -1,10 +1,11 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.moh import dao as moh_dao
 
-from wazo_confd.helpers.validator import ValidationGroup, Validator
+from wazo_confd.helpers.validator import MOHExists, ValidationGroup, Validator
 
 
 class SlotsAvailableValidator(Validator):
@@ -28,4 +29,8 @@ class SlotsAvailableValidator(Validator):
 
 
 def build_validator():
-    return ValidationGroup(edit=[SlotsAvailableValidator()])
+    moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
+    return ValidationGroup(
+        create=[moh_validator],
+        edit=[SlotsAvailableValidator(), moh_validator],
+    )

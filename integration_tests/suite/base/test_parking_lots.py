@@ -76,21 +76,34 @@ def error_checks(url):
 
 
 @fixtures.extension(exten='700')
+@fixtures.moh(label='search')
+@fixtures.moh(label='hidden')
 @fixtures.parking_lot(
     name='search',
     slots_start='701',
     slots_end='750',
-    music_on_hold='search',
     timeout=100,
 )
 @fixtures.parking_lot(
     name='hidden',
     slots_start='801',
     slots_end='850',
-    music_on_hold='hidden',
     timeout=None,
 )
-def test_search(extension, parking_lot, hidden):
+def test_search(extension, moh_visible, moh_hidden, parking_lot, hidden):
+    response = confd.parkinglots(parking_lot['id']).put(
+        {'music_on_hold': moh_visible['name']}
+    )
+    response.assert_updated()
+
+    response = confd.parkinglots(hidden['id']).put(
+        {'music_on_hold': moh_hidden['name']}
+    )
+    response.assert_updated()
+
+    parking_lot = confd.parkinglots(parking_lot['id']).get().item
+    hidden = confd.parkinglots(hidden['id']).get().item
+
     url = confd.parkinglots
     searches = {
         'name': 'search',
@@ -188,13 +201,14 @@ def test_create_minimal_parameters():
     confd.parkinglots(response.item['id']).delete().assert_deleted()
 
 
-def test_create_all_parameters():
+@fixtures.moh(label='music')
+def test_create_all_parameters(moh):
     parameters = {
         'name': 'MyParkingLot',
         'slots_start': '701',
         'slots_end': '750',
         'timeout': None,
-        'music_on_hold': 'music',
+        'music_on_hold': moh['name'],
     }
 
     response = confd.parkinglots.post(**parameters)
@@ -205,6 +219,32 @@ def test_create_all_parameters():
     confd.parkinglots(response.item['id']).delete().assert_deleted()
 
 
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_create_multitenant_moh(main_moh, sub_moh):
+    parameters = {
+        'name': 'MyParkingLot',
+        'slots_start': '701',
+        'slots_end': '750',
+        'music_on_hold': main_moh['name'],
+    }
+    response = confd.parkinglots.post(**parameters)
+    response.assert_created('parkinglots')
+    confd.parkinglots(response.item['id']).delete().assert_deleted()
+
+    response = confd.parkinglots.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    parameters['music_on_hold'] = sub_moh['name']
+
+    response = confd.parkinglots.post(**parameters, wazo_tenant=SUB_TENANT)
+    response.assert_created('parkinglots')
+    confd.parkinglots(response.item['id']).delete().assert_deleted()
+
+    response = confd.parkinglots.post(**parameters)
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+
 @fixtures.parking_lot()
 def test_edit_minimal_parameters(parking_lot):
     response = confd.parkinglots(parking_lot['id']).put()
@@ -212,13 +252,14 @@ def test_edit_minimal_parameters(parking_lot):
 
 
 @fixtures.parking_lot()
-def test_edit_all_parameters(parking_lot):
+@fixtures.moh(label='music')
+def test_edit_all_parameters(parking_lot, moh):
     parameters = {
         'name': 'MyParkingLot',
         'slots_start': '801',
         'slots_end': '850',
         'timeout': None,
-        'music_on_hold': 'music',
+        'music_on_hold': moh['name'],
     }
 
     response = confd.parkinglots(parking_lot['id']).put(**parameters)
@@ -243,6 +284,24 @@ def test_edit_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='ParkingLot'))
 
     response = confd.parkinglots(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response.assert_updated()
+
+
+@fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
+@fixtures.parking_lot(wazo_tenant=SUB_TENANT)
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
+    response = confd.parkinglots(main['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.parkinglots(sub['id']).put(music_on_hold=main_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.parkinglots(main['id']).put(music_on_hold=main_moh['name'])
+    response.assert_updated()
+
+    response = confd.parkinglots(sub['id']).put(music_on_hold=sub_moh['name'])
     response.assert_updated()
 
 

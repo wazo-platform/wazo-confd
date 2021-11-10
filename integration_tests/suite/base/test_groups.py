@@ -327,6 +327,24 @@ def test_create_multi_tenant():
     confd.groups(response.item['uuid']).delete().assert_deleted()
 
 
+@fixtures.moh(label='visible')
+@fixtures.moh(label='hidden', wazo_tenant=SUB_TENANT)
+def test_create_multi_tenant_moh(moh_main, moh_sub):
+    response = confd.groups.post(label='MyGroup', music_on_hold=moh_main['name'])
+    response.assert_created('groups')
+    confd.groups(response.item['uuid']).delete().assert_deleted()
+
+    response = confd.groups.post(label='MyGroup', music_on_hold=moh_sub['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.groups.post(
+        label='MyGroup',
+        music_on_hold=moh_main['name'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+
 @fixtures.group()
 def test_edit_minimal_parameters(group):
     response = confd.groups(group['id']).put()
@@ -401,6 +419,24 @@ def test_edit_multi_tenant(main, sub):
 
     response = confd.groups(sub['uuid']).put(wazo_tenant=MAIN_TENANT)
     response.assert_updated()
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.moh(wazo_tenant=MAIN_TENANT)
+@fixtures.moh(wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant_moh(main_group, sub_group, main_moh, sub_moh):
+    response = confd.groups(main_group['id']).put(music_on_hold=main_moh['name'])
+    response.assert_updated()
+
+    response = confd.groups(sub_group['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_updated()
+
+    response = confd.groups(main_group['id']).put(music_on_hold=sub_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
+
+    response = confd.groups(sub_group['id']).put(music_on_hold=main_moh['name'])
+    response.assert_match(400, e.not_found(resource='MOH'))
 
 
 @fixtures.group()
