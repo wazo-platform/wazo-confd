@@ -25,4 +25,6 @@ class GroupValidator(Validator):
 
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
-    return ValidationGroup(create=[GroupValidator(), moh_validator], edit=[moh_validator])
+    return ValidationGroup(
+        create=[GroupValidator(), moh_validator], edit=[moh_validator]
+    )

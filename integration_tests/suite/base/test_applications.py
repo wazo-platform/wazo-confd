@@ -214,6 +214,7 @@ def test_create_with_moh(main_moh, sub_moh):
     response = confd.applications.post(**parameters_sub, wazo_tenant=SUB_TENANT)
     response.assert_match(400, e.not_found(resource='MOH'))
 
+
 @fixtures.application()
 def test_edit_minimal_parameters(application):
     response = confd.applications(application['uuid']).put()
@@ -262,15 +263,22 @@ def test_edit_multi_tenant(main, sub):
 
 
 @fixtures.application(
-    destination='node', destination_options={'type': 'holding'}, wazo_tenant=MAIN_TENANT,
+    destination='node',
+    destination_options={'type': 'holding'},
+    wazo_tenant=MAIN_TENANT,
 )
 @fixtures.application(
-    destination='node', destination_options={'type': 'holding'}, wazo_tenant=SUB_TENANT,
+    destination='node',
+    destination_options={'type': 'holding'},
+    wazo_tenant=SUB_TENANT,
 )
 @fixtures.moh(wazo_tenant=MAIN_TENANT)
 @fixtures.moh(wazo_tenant=SUB_TENANT)
 def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
-    parameters = {'destination': 'node', 'destination_options': {'type': 'holding', 'music_on_hold': main_moh['name']}}
+    parameters = {
+        'destination': 'node',
+        'destination_options': {'type': 'holding', 'music_on_hold': main_moh['name']},
+    }
 
     response = confd.applications(sub['uuid']).put(**parameters)
     response.assert_match(400, e.not_found(resource='MOH'))
@@ -278,7 +286,7 @@ def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
     response = confd.applications(main['uuid']).put(**parameters)
     response.assert_updated()
 
-    parameters['destination_options']['music_on_hold'] =  sub_moh['name']
+    parameters['destination_options']['music_on_hold'] = sub_moh['name']
 
     response = confd.applications(main['uuid']).put(**parameters)
     response.assert_match(400, e.not_found(resource='MOH'))

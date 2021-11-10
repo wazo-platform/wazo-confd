@@ -91,10 +91,14 @@ def error_checks(url):
     timeout=None,
 )
 def test_search(extension, moh_visible, moh_hidden, parking_lot, hidden):
-    response = confd.parkinglots(parking_lot['id']).put({'music_on_hold': moh_visible['name']})
+    response = confd.parkinglots(parking_lot['id']).put(
+        {'music_on_hold': moh_visible['name']}
+    )
     response.assert_updated()
 
-    response = confd.parkinglots(hidden['id']).put({'music_on_hold': moh_hidden['name']})
+    response = confd.parkinglots(hidden['id']).put(
+        {'music_on_hold': moh_hidden['name']}
+    )
     response.assert_updated()
 
     parking_lot = confd.parkinglots(parking_lot['id']).get().item
@@ -239,7 +243,6 @@ def test_create_multitenant_moh(main_moh, sub_moh):
 
     response = confd.parkinglots.post(**parameters)
     response.assert_match(400, e.not_found(resource='MOH'))
-
 
 
 @fixtures.parking_lot()

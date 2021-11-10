@@ -811,6 +811,7 @@ def test_update_by_uuid(user):
     response = confd.users(user['uuid']).get()
     assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
 
+
 @fixtures.user(firstname='main', wazo_tenant=MAIN_TENANT)
 @fixtures.user(firstname='sub', wazo_tenant=SUB_TENANT)
 @fixtures.moh(wazo_tenant=MAIN_TENANT)
@@ -821,7 +822,6 @@ def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
 
     response = confd.users(sub['id']).put(music_on_hold=main_moh['name'])
     response.assert_match(400, e.not_found(resource='MOH'))
-
 
     response = confd.users(main['id']).put(music_on_hold=main_moh['name'])
     response.assert_updated()

@@ -8,7 +8,6 @@ from xivo_dao.resources.moh import dao as moh_dao
 from wazo_confd.helpers.validator import Validator, ValidationGroup
 
 
-
 class MOHExists(Validator):
     def __init__(self, dao_get_by):
         self.dao_get_by = dao_get_by

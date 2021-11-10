@@ -556,7 +556,6 @@ def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
     response = confd.queues(sub['id']).put(music_on_hold=main_moh['name'])
     response.assert_match(400, e.not_found(resource='MOH'))
 
-
     response = confd.queues(main['id']).put(music_on_hold=main_moh['name'])
     response.assert_updated()
 

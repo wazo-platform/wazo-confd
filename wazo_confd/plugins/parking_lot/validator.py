@@ -31,5 +31,6 @@ class SlotsAvailableValidator(Validator):
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     return ValidationGroup(
-        create=[moh_validator], edit=[SlotsAvailableValidator(), moh_validator],
+        create=[moh_validator],
+        edit=[SlotsAvailableValidator(), moh_validator],
     )

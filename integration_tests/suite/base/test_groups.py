@@ -338,7 +338,9 @@ def test_create_multi_tenant_moh(moh_main, moh_sub):
     response.assert_match(400, e.not_found(resource='MOH'))
 
     response = confd.groups.post(
-        label='MyGroup', music_on_hold=moh_main['name'], wazo_tenant=SUB_TENANT,
+        label='MyGroup',
+        music_on_hold=moh_main['name'],
+        wazo_tenant=SUB_TENANT,
     )
     response.assert_match(400, e.not_found(resource='MOH'))
 
