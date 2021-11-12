@@ -27,7 +27,8 @@ class MeetingBusEventHandler:
 
     @staticmethod
     def _extract_meetings_from_reload_complete(event):
-        for request_context in event.get('context', []):
+        context = event.get('context') or []
+        for request_context in context:
             if (
                 request_context.get('resource_type') == 'meeting'
                 and request_context.get('resource_action') != 'deleted'
