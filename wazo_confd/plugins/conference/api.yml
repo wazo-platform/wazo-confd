@@ -49,6 +49,7 @@ paths:
       tags:
       - conferences
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Conference to create
