@@ -466,14 +466,18 @@ def test_bus_events_progress(_, me, meeting):
 @fixtures.ingress_http()
 @fixtures.meeting()
 @fixtures.meeting()
-def test_purge_old_meetings(_, meeting_too_old, meeting_too_young):
+@fixtures.meeting(persistent=True)
+def test_purge_old_meetings(_, meeting_too_old, meeting_too_young, meeting_persistent):
     too_old = datetime.now() - timedelta(hours=72)
     with db.queries() as queries:
         queries.set_meeting_creation_date(meeting_too_old['uuid'], too_old)
+        queries.set_meeting_creation_date(meeting_persistent['uuid'], too_old)
 
     BaseIntegrationTest.purge_meetings()
 
     response = confd.meetings(meeting_too_old['uuid']).get()
     response.assert_status(404)
     response = confd.meetings(meeting_too_young['uuid']).get()
+    response.assert_status(200)
+    response = confd.meetings(meeting_persistent['uuid']).get()
     response.assert_status(200)
