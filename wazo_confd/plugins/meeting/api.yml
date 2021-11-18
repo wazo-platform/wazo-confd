@@ -242,6 +242,9 @@ definitions:
         type: string
         readOnly: true
         description: "Format: base64(username:password), same as HTTP Basic Auth."
+      persistent:
+        type: boolean
+        description: Persistent meetings will not get deleted automatically
   MeetingUserRequest:
     type: object
     properties:

@@ -85,6 +85,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', 'a' * 513
+    yield s.check_bogus_field_returns_error, url, 'persistent', None
+    yield s.check_bogus_field_returns_error, url, 'persistent', 42
+    yield s.check_bogus_field_returns_error, url, 'persistent', 'no'
+    yield s.check_bogus_field_returns_error, url, 'persistent', []
+    yield s.check_bogus_field_returns_error, url, 'persistent', {}
 
 
 @fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
@@ -208,6 +213,7 @@ def test_create_minimal_parameters(ingress_http, me):
             uuid=not_(empty()),
             name='minimal',
             ingress_http_uri=ingress_http['uri'],
+            persistent=False,
         ),
     )
 
@@ -225,6 +231,7 @@ def test_create_minimal_parameters(ingress_http, me):
             owner_uuids=contains_inanyorder(me['uuid']),
             name='minimal',
             ingress_http_uri=ingress_http['uri'],
+            persistent=False,
         ),
     )
 
@@ -235,7 +242,11 @@ def test_create_minimal_parameters(ingress_http, me):
 @fixtures.user()
 @fixtures.user()
 def test_create_all_parameters(ingress_http, me, owner):
-    parameters = {'name': 'allparameter', 'owner_uuids': [owner['uuid']]}
+    parameters = {
+        'name': 'allparameter',
+        'owner_uuids': [owner['uuid']],
+        'persistent': True,
+    }
 
     response = confd.meetings.post(**parameters)
     response.assert_created('meetings')
@@ -246,6 +257,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             tenant_uuid=MAIN_TENANT,
             owner_uuids=contains_inanyorder(owner['uuid']),
             ingress_http_uri=ingress_http['uri'],
+            persistent=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -260,6 +272,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             tenant_uuid=MAIN_TENANT,
             ingress_http_uri=ingress_http['uri'],
             owner_uuids=contains_inanyorder(me['uuid'], owner['uuid']),
+            persistent=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
