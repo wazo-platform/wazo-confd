@@ -126,14 +126,22 @@ def test_list_user_me(_, me, __):
 
 
 @fixtures.ingress_http()
-@fixtures.meeting(name="search")
-@fixtures.meeting(name="hidden")
+@fixtures.meeting(name="search", persistent=True)
+@fixtures.meeting(name="hidden", persistent=False)
 def test_search(_, meeting, hidden):
     url = confd.meetings
     searches = {'name': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, meeting, hidden, field, term
+
+    response = url.get(persistent=True)
+    assert_that(response.items, has_item(meeting))
+    assert_that(response.items, is_not(has_item(hidden)))
+
+    response = url.get(persistent=False)
+    assert_that(response.items, has_item(hidden))
+    assert_that(response.items, is_not(has_item(meeting)))
 
 
 def check_search(url, meeting, hidden, field, term):
