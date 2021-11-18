@@ -58,7 +58,7 @@ class Controller:
         )
 
     def run(self):
-        logger.info('wazo-confd running...')
+        logger.info('wazo-confd starting...')
         xivo_dao.init_db_from_config(self.config)
         signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
 
