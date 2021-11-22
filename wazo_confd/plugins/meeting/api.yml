@@ -245,6 +245,9 @@ definitions:
     properties:
       name:
         type: string
+      persistent:
+        type: boolean
+        description: Persistent meetings will not get deleted automatically
   MeetingRequest:
     type: object
     allOf:
