@@ -25,6 +25,7 @@ class MeetingSchema(BaseSchema):
     name = fields.String(validate=Length(max=512), required=True)
     ingress_http_uri = fields.Method('_uri', dump_only=True)
     guest_sip_authorization = fields.Method('_guest_sip_authorization', dump_only=True)
+    persistent = fields.Boolean(missing=False)
     links = ListLink(Link('meetings', field='uuid'))
     tenant_uuid = fields.String(dump_only=True)
 

@@ -85,6 +85,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', {}
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', 'a' * 513
+    yield s.check_bogus_field_returns_error, url, 'persistent', None
+    yield s.check_bogus_field_returns_error, url, 'persistent', 42
+    yield s.check_bogus_field_returns_error, url, 'persistent', 'no'
+    yield s.check_bogus_field_returns_error, url, 'persistent', []
+    yield s.check_bogus_field_returns_error, url, 'persistent', {}
 
 
 @fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
@@ -121,14 +126,22 @@ def test_list_user_me(_, me, __):
 
 
 @fixtures.ingress_http()
-@fixtures.meeting(name="search")
-@fixtures.meeting(name="hidden")
+@fixtures.meeting(name="search", persistent=True)
+@fixtures.meeting(name="hidden", persistent=False)
 def test_search(_, meeting, hidden):
     url = confd.meetings
     searches = {'name': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, meeting, hidden, field, term
+
+    response = url.get(persistent=True)
+    assert_that(response.items, has_item(meeting))
+    assert_that(response.items, is_not(has_item(hidden)))
+
+    response = url.get(persistent=False)
+    assert_that(response.items, has_item(hidden))
+    assert_that(response.items, is_not(has_item(meeting)))
 
 
 def check_search(url, meeting, hidden, field, term):
@@ -208,6 +221,7 @@ def test_create_minimal_parameters(ingress_http, me):
             uuid=not_(empty()),
             name='minimal',
             ingress_http_uri=ingress_http['uri'],
+            persistent=False,
         ),
     )
 
@@ -225,6 +239,7 @@ def test_create_minimal_parameters(ingress_http, me):
             owner_uuids=contains_inanyorder(me['uuid']),
             name='minimal',
             ingress_http_uri=ingress_http['uri'],
+            persistent=False,
         ),
     )
 
@@ -235,7 +250,11 @@ def test_create_minimal_parameters(ingress_http, me):
 @fixtures.user()
 @fixtures.user()
 def test_create_all_parameters(ingress_http, me, owner):
-    parameters = {'name': 'allparameter', 'owner_uuids': [owner['uuid']]}
+    parameters = {
+        'name': 'allparameter',
+        'owner_uuids': [owner['uuid']],
+        'persistent': True,
+    }
 
     response = confd.meetings.post(**parameters)
     response.assert_created('meetings')
@@ -246,6 +265,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             tenant_uuid=MAIN_TENANT,
             owner_uuids=contains_inanyorder(owner['uuid']),
             ingress_http_uri=ingress_http['uri'],
+            persistent=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -260,6 +280,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             tenant_uuid=MAIN_TENANT,
             ingress_http_uri=ingress_http['uri'],
             owner_uuids=contains_inanyorder(me['uuid'], owner['uuid']),
+            persistent=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -445,14 +466,18 @@ def test_bus_events_progress(_, me, meeting):
 @fixtures.ingress_http()
 @fixtures.meeting()
 @fixtures.meeting()
-def test_purge_old_meetings(_, meeting_too_old, meeting_too_young):
+@fixtures.meeting(persistent=True)
+def test_purge_old_meetings(_, meeting_too_old, meeting_too_young, meeting_persistent):
     too_old = datetime.now() - timedelta(hours=72)
     with db.queries() as queries:
         queries.set_meeting_creation_date(meeting_too_old['uuid'], too_old)
+        queries.set_meeting_creation_date(meeting_persistent['uuid'], too_old)
 
     BaseIntegrationTest.purge_meetings()
 
     response = confd.meetings(meeting_too_old['uuid']).get()
     response.assert_status(404)
     response = confd.meetings(meeting_too_young['uuid']).get()
+    response.assert_status(200)
+    response = confd.meetings(meeting_persistent['uuid']).get()
     response.assert_status(200)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 21.16
+
+* the `meeting` resource now has a `persistent` field.
+
 ## 21.15
 
 * A music on hold now has a read-only auto-generated `name` and a required `label` instead

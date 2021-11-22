@@ -230,23 +230,24 @@ definitions:
           type: string
       name:
         type: string
-      hostname:
+      ingress_http_uri:
         type: string
-        readOnly: true
-        description: The public hostname to reach this stack
-      port:
-        type: integer
-        readOnly: true
-        description: The port to use with the public hostname to reach this stack
+        description: URI to reach this stack (configured by the Ingress HTTP resource)
       guest_sip_authorization:
         type: string
         readOnly: true
         description: "Format: base64(username:password), same as HTTP Basic Auth."
+      persistent:
+        type: boolean
+        description: Persistent meetings will not get deleted automatically
   MeetingUserRequest:
     type: object
     properties:
       name:
         type: string
+      persistent:
+        type: boolean
+        description: Persistent meetings will not get deleted automatically
   MeetingRequest:
     type: object
     allOf:

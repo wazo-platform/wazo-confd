@@ -64,7 +64,7 @@ def remove_meetings_older_than(date, meeting_service):
     logger.debug('Removing meetings older than %s', date)
 
     with session_scope() as session:
-        meetings = meeting_dao.find_all_by(created_before=date)
+        meetings = meeting_dao.find_all_by(created_before=date, persistent=False)
         for meeting in meetings:
             logger.info('Removing meeting %s: %s', meeting.uuid, meeting.name)
             meeting_service.delete(meeting)
