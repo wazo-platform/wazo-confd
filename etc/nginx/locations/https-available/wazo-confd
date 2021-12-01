@@ -1,11 +1,11 @@
 location ^~ /api/confd/1.1/guests {
     include /etc/nginx/wazo-confd-shared.conf;
-    include /etc/nginx/wazo-no-auth-shared.conf;
+    include /etc/nginx/wazo-no-auth-shared[.]conf;
 }
 
 location ^~ /api/confd/1.1/wizard {
     include /etc/nginx/wazo-confd-shared.conf;
-    include /etc/nginx/wazo-no-auth-shared.conf;
+    include /etc/nginx/wazo-no-auth-shared[.]conf;
 }
 
 location ^~ /api/confd/ {
