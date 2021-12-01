@@ -28,6 +28,7 @@ Depends:
   python3-tz,
   rename,
   wazo-auth-client-python3,
+  wazo-nginx,
   wazo-provd-client-python3,
   xivo-bus-python3,
   xivo-lib-python-python3,
