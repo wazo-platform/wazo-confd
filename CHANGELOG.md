@@ -1,5 +1,9 @@
 # Changelog
 
+## 22.01
+
+* the `meeting` resource now has a `creation_time` read only field.
+
 ## 21.16
 
 * the `meeting` resource now has a `persistent` field.
