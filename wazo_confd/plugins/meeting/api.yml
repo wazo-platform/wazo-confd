@@ -240,6 +240,10 @@ definitions:
       persistent:
         type: boolean
         description: Persistent meetings will not get deleted automatically
+      creation_time:
+        type: string
+        format: date-time
+        readOnly: true
   MeetingUserRequest:
     type: object
     properties:

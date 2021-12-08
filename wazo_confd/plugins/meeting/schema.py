@@ -28,6 +28,7 @@ class MeetingSchema(BaseSchema):
     persistent = fields.Boolean(missing=False)
     links = ListLink(Link('meetings', field='uuid'))
     tenant_uuid = fields.String(dump_only=True)
+    creation_time = fields.DateTime(attribute='created_at', dump_only=True)
 
     def _uri(self, meeting):
         if meeting.ingress_http:

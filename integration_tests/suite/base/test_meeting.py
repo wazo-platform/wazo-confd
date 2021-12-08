@@ -266,6 +266,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             owner_uuids=contains_inanyorder(owner['uuid']),
             ingress_http_uri=ingress_http['uri'],
             persistent=True,
+            creation_time=not_none(),
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -281,6 +282,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             ingress_http_uri=ingress_http['uri'],
             owner_uuids=contains_inanyorder(me['uuid'], owner['uuid']),
             persistent=True,
+            creation_time=not_none(),
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -358,11 +360,15 @@ def test_edit_all_parameters(_, meeting, some_user):
         'name': 'editallparameter',
         'owner_uuids': [some_user['uuid']],
     }
-    response = confd.meetings(meeting['uuid']).put(**parameters)
+    response = confd.meetings(meeting['uuid']).put(
+        creation_time='2021-12-06T18:55:58.961760+00:00', **parameters
+    )
     response.assert_updated()
 
     response = confd.meetings(meeting['uuid']).get()
-    assert_that(response.item, has_entries(parameters))
+    assert_that(
+        response.item, has_entries(creation_time=meeting['creation_time'], **parameters)
+    )
 
 
 @fixtures.ingress_http()
@@ -379,9 +385,12 @@ def test_edit_all_parameters_users_me(_, me, other_user, other_meeting):
         expected_parameters = {
             'name': 'editallparameter',
             'owner_uuids': [me['uuid'], other_user['uuid']],
+            'creation_time': mine['creation_time'],
         }
 
-        response = user_confd.users.me.meetings(mine['uuid']).put(**parameters)
+        response = user_confd.users.me.meetings(mine['uuid']).put(
+            creation_time='2021-12-06T18:55:58.961760+00:00', **parameters
+        )
         response.assert_updated()
 
         response = user_confd.users.me.meetings(mine['uuid']).get()
