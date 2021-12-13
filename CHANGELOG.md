@@ -3,6 +3,7 @@
 ## 22.01
 
 * the `meeting` resource now has a `creation_time` read only field.
+* the `meeting` resource now has a read only `number` field.
 
 ## 21.16
 

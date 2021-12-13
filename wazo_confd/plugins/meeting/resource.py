@@ -9,6 +9,8 @@ from uuid import uuid4
 
 from flask import url_for, request
 
+from xivo.xivo_helpers import clean_extension
+
 from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.helpers import errors
@@ -29,7 +31,20 @@ class _SchemaMixin:
         ingress_http = self._ingress_http_service.find_by(
             tenant_uuid=str(master_tenant_uuid)
         )
-        self._schema.context = {'default_ingress_http': ingress_http}
+        exten_pattern = None
+        exten_prefix = None
+        extens = self._extension_features_service.search({'feature': 'meetingjoin'}).items
+        for exten in extens:
+            if exten.feature == 'meetingjoin' and exten.commented == 0:
+                exten_pattern = exten.exten
+                break
+        if exten_pattern:
+            exten_prefix = clean_extension(exten_pattern)
+
+        self._schema.context = {
+            'default_ingress_http': ingress_http,
+            'exten_prefix': exten_prefix,
+        }
         return self._schema
 
 
@@ -63,6 +78,7 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
         endpoint_sip_service,
         endpoint_sip_template_service,
         ingress_http_service,
+        extension_features_service,
     ):
         super().__init__(service)
         self._user_service = user_service
@@ -70,6 +86,7 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
         self._endpoint_sip_service = endpoint_sip_service
         self._endpoint_sip_template_service = endpoint_sip_template_service
         self._ingress_http_service = ingress_http_service
+        self._extension_features_service = extension_features_service
         self._init_schema()
 
     def build_headers(self, meeting):
@@ -130,10 +147,11 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
 class MeetingItem(ItemResource, _SchemaMixin):
     has_tenant_uuid = True
 
-    def __init__(self, service, user_service, ingress_http_service):
+    def __init__(self, service, user_service, ingress_http_service, extension_features_service):
         super().__init__(service)
         self._user_service = user_service
         self._ingress_http_service = ingress_http_service
+        self._extension_features_service = extension_features_service
         self._init_schema()
 
     @required_acl('confd.meetings.{uuid}.read')
@@ -158,9 +176,10 @@ class MeetingItem(ItemResource, _SchemaMixin):
 
 
 class GuestMeetingItem(ItemResource, _SchemaMixin):
-    def __init__(self, service, user_service, ingress_http_service):
+    def __init__(self, service, user_service, ingress_http_service, extension_features_service):
         super().__init__(service)
         self._ingress_http_service = ingress_http_service
+        self._extension_features_service = extension_features_service
         self._init_schema()
 
     @no_auth
@@ -169,8 +188,8 @@ class GuestMeetingItem(ItemResource, _SchemaMixin):
 
 
 class UserMeetingItem(MeetingItem, _MeResourceMixin):
-    def __init__(self, service, user_service, ingress_http_service, auth_client):
-        super().__init__(service, user_service, ingress_http_service)
+    def __init__(self, service, user_service, ingress_http_service, extension_features_service, auth_client):
+        super().__init__(service, user_service, ingress_http_service, extension_features_service)
         self._auth_client = auth_client
 
     def get_model(self, uuid, user_uuid, **kwargs):
@@ -229,6 +248,7 @@ class UserMeetingList(MeetingList):
         endpoint_sip_service,
         endpoint_sip_template_service,
         ingress_http_service,
+        extension_features_service,
         auth_client,
     ):
         super().__init__(
@@ -238,6 +258,7 @@ class UserMeetingList(MeetingList):
             endpoint_sip_service,
             endpoint_sip_template_service,
             ingress_http_service,
+            extension_features_service,
         )
         self._auth_client = auth_client
 

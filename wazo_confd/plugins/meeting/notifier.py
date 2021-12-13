@@ -1,6 +1,7 @@
 # Copyright 2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo.xivo_helpers import clean_extension
 from xivo_bus.resources.meeting.event import (
     CreateMeetingEvent,
     DeleteMeetingEvent,
@@ -24,11 +25,12 @@ MEETING_FIELDS = [
 
 
 class Notifier:
-    def __init__(self, bus, sysconfd, ingress_http_service, preset_tenant_uuid=None):
+    def __init__(self, bus, sysconfd, ingress_http_service, extension_features_service, preset_tenant_uuid=None):
         self.bus = bus
         self._schema_instance = MeetingSchema(only=MEETING_FIELDS)
         self.sysconfd = sysconfd
         self._ingress_http_service = ingress_http_service
+        self._extension_features_service = extension_features_service
         self._preset_tenant_uuid = preset_tenant_uuid
 
     def send_sysconfd_handlers(self, meeting, action):
@@ -81,5 +83,17 @@ class Notifier:
             tenant_uuid = str(auth.master_tenant_uuid)
 
         ingress_http = self._ingress_http_service.find_by(tenant_uuid=tenant_uuid)
-        self._schema_instance.context = {'default_ingress_http': ingress_http}
+        exten_pattern = None
+        exten_prefix = None
+        extens = self._extension_features_service.search({'feature': 'meetingjoin'}).items
+        for exten in extens:
+            if exten.typeval == 'meetingjoin' and exten.commented == 0:
+                exten_pattern = exten.exten
+                break
+        if exten_pattern:
+            exten_prefix = clean_extension(exten_pattern)
+        self._schema_instance.context = {
+            'default_ingress_http': ingress_http,
+            'exten_prefix': exten_prefix,
+        }
         return self._schema_instance

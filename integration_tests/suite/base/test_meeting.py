@@ -209,6 +209,19 @@ def test_create_no_ingress_http_configured():
 
 
 @fixtures.ingress_http()
+def test_create_no_meetingjoin_extension_feature(_):
+    extension = confd.extensions.features.get(feature='meetingjoin').items[0]
+    extension['enabled'] = False
+    response = confd.extensions.features(extension['id']).put(**extension)
+
+    response = confd.meetings.post(name='no exten')
+    try:
+        assert_that(response.item, has_entries(exten=None))
+    finally:
+        confd.meetings.delete(response.item['uuid'])
+
+
+@fixtures.ingress_http()
 @fixtures.user()
 def test_create_minimal_parameters(ingress_http, me):
     response = confd.meetings.post(name='minimal')
@@ -222,6 +235,7 @@ def test_create_minimal_parameters(ingress_http, me):
             name='minimal',
             ingress_http_uri=ingress_http['uri'],
             persistent=False,
+            exten=not_none(),
         ),
     )
 
@@ -240,6 +254,7 @@ def test_create_minimal_parameters(ingress_http, me):
             name='minimal',
             ingress_http_uri=ingress_http['uri'],
             persistent=False,
+            exten=not_none(),
         ),
     )
 
@@ -267,6 +282,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             ingress_http_uri=ingress_http['uri'],
             persistent=True,
             creation_time=not_none(),
+            exten=not_none(),
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -283,6 +299,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             owner_uuids=contains_inanyorder(me['uuid'], owner['uuid']),
             persistent=True,
             creation_time=not_none(),
+            exten=not_none(),
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
