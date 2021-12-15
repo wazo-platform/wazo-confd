@@ -8,7 +8,10 @@ from xivo_dao.alchemy.meeting_authorization import MeetingAuthorization
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
-from .schema import MeetingAuthorizationSchema
+from .schema import (
+    MeetingAuthorizationSchema,
+    MeetingAuthorizationIDSchema,
+)
 
 
 class GuestMeetingAuthorizationList(ListResource):
@@ -50,10 +53,33 @@ class GuestMeetingAuthorizationList(ListResource):
 
 
 class GuestMeetingAuthorizationItem(ItemResource):
-    def __init__(self, service):
-        super().__init__(service)
+    model = MeetingAuthorization
+    schema = MeetingAuthorizationIDSchema
+
+    def __init__(self, service, meeting_dao):
         self._service = service
+        self._meeting_dao = meeting_dao
 
     @no_auth
     def get(self, guest_uuid, meeting_uuid, authorization_uuid):
-        return '', 200
+        ids = {
+            'guest_uuid': guest_uuid,
+            'meeting_uuid': meeting_uuid,
+            'uuid': authorization_uuid,
+        }
+        ids = self.schema().load(ids)
+        try:
+            self._meeting_dao.get(ids['meeting_uuid'])
+        except NotFoundError as e:
+            raise errors.not_found('meetings', 'Meeting', **e.metadata)
+
+        try:
+            model = self._service.get(
+                ids['guest_uuid'], ids['meeting_uuid'], ids['uuid']
+            )
+        except NotFoundError as e:
+            raise errors.not_found(
+                'meeting_authorizations', 'MeetingAuthorization', **e.metadata
+            )
+
+        return self.schema().dump(model)

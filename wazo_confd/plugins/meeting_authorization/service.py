@@ -8,5 +8,10 @@ from wazo_confd.helpers.resource import CRUDService
 from .validator import build_validator
 
 
+class MeetingAuthorizationService(CRUDService):
+    def get(self, guest_uuid, meeting_uuid, authorization_uuid, **kwargs):
+        return self.dao.get(meeting_uuid, authorization_uuid, guest_uuid, **kwargs)
+
+
 def build_service(notifier):
-    return CRUDService(dao, build_validator(), notifier)
+    return MeetingAuthorizationService(dao, build_validator(), notifier)

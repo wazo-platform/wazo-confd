@@ -26,6 +26,27 @@ paths:
           $ref: '#/responses/CreateError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /guests/{guest_uuid}/meetings/{meeting_uuid}/authorizations/{authorization_uuid}:
+      operationId: get_guest_meeting_authorization
+      summary: Read the guest authorization to enter a meeting
+      description: '**Required ACL:** none'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/guest_uuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '200':
+          description: Authorization details
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
 
 definitions:
   MeetingAuthorizationRequest:
@@ -66,3 +87,9 @@ parameters:
     in: path
     type: string
     description: Meeting UUID
+  authorization_uuid:
+    required: true
+    name: authorization_uuid
+    in: path
+    type: string
+    description: Authorization UUID

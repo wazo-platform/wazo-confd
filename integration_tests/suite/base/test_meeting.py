@@ -560,3 +560,76 @@ def test_create_meeting_authorization(_, meeting):
 
     response.assert_status(201)
     assert_that(response.json, has_entries(status='pending'))
+
+
+@fixtures.ingress_http()
+@fixtures.meeting()
+def test_get_meeting_authorization(_, meeting):
+    unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
+    invalid_uuid = 'invalid'
+    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+
+    with fixtures.meeting_authorization(guest_uuid, meeting) as authorization:
+        # Test invalid guest_uuid
+        response = (
+            confd.guests(invalid_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+        response.assert_status(400)
+
+        # Test unknown guest_uuid
+        response = (
+            confd.guests(unknown_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+        response.assert_status(404)
+
+        # Test invalid meeting_uuid
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(invalid_uuid)
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+        response.assert_status(404)
+
+        # Test unknown meeting_uuid
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(unknown_uuid)
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+        response.assert_status(404)
+
+        # Test invalid authorization_uuid
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(invalid_uuid)
+            .get()
+        )
+        response.assert_status(404)
+
+        # Test unknown authorization_uuid
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(unknown_uuid)
+            .get()
+        )
+        response.assert_status(404)
+
+        # Test get OK
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+
+        response.assert_status(200)

@@ -344,3 +344,12 @@ class user_me_meeting(IsolatedAction):
         'generate': h.user_me_meeting.generate,
         'delete': h.user_me_meeting.delete,
     }
+
+
+class meeting_authorization(IsolatedAction):
+
+    id_field = ['guest_uuid', 'meeting_uuid', 'uuid']
+    actions = {
+        'generate': h.meeting_authorization.generate,
+        'delete': h.meeting_authorization.delete,
+    }
