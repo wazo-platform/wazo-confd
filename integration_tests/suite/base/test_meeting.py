@@ -507,3 +507,56 @@ def test_purge_old_meetings(_, meeting_too_old, meeting_too_young, meeting_persi
     response.assert_status(200)
     response = confd.meetings(meeting_persistent['uuid']).get()
     response.assert_status(200)
+
+
+@fixtures.ingress_http()
+@fixtures.meeting()
+def test_create_meeting_authorization(_, meeting):
+    unknown_meeting_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
+    invalid_guest_uuid = 'invalid'
+    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+    invalid_body = {}
+    body = {
+        'guest_name': 'jane doe',
+    }
+
+    # API can be used without authentication
+    response = (
+        create_confd()
+        .guests(guest_uuid)
+        .meetings(meeting['uuid'])
+        .authorizations.post(invalid_body)
+    )
+    response.assert_status(400)
+
+    # Test invalid guest UUID
+    response = (
+        confd.guests(invalid_guest_uuid)
+        .meetings(meeting['uuid'])
+        .authorizations.post(body)
+    )
+    response.assert_status(400)
+
+    # Test invalid meeting UUID
+    response = (
+        confd.guests(guest_uuid)
+        .meetings(unknown_meeting_uuid)
+        .authorizations.post(body)
+    )
+    response.assert_status(404)
+
+    # Test invalid body
+    response = (
+        confd.guests(guest_uuid)
+        .meetings(meeting['uuid'])
+        .authorizations.post(invalid_body)
+    )
+    response.assert_status(400)
+
+    # Test creation
+    response = (
+        confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.post(body)
+    )
+
+    response.assert_status(201)
+    assert_that(response.json, has_entries(status='pending'))
