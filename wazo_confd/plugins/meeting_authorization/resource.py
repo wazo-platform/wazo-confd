@@ -51,6 +51,10 @@ class GuestMeetingAuthorizationList(ListResource):
         self._service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 
+    @no_auth
+    def get(self, guest_uuid, meeting_uuid):
+        return '', 404
+
 
 class GuestMeetingAuthorizationItem(ItemResource):
     model = MeetingAuthorization

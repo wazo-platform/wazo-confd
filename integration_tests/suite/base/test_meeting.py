@@ -564,7 +564,7 @@ def test_create_meeting_authorization(_, meeting):
 
 @fixtures.ingress_http()
 @fixtures.meeting()
-def test_get_meeting_authorization(_, meeting):
+def test_get_meeting_authorization_by_guest(_, meeting):
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
     invalid_uuid = 'invalid'
     guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
@@ -633,3 +633,18 @@ def test_get_meeting_authorization(_, meeting):
         )
 
         response.assert_status(200)
+
+
+@fixtures.ingress_http()
+@fixtures.meeting()
+def test_list_meeting_authorizations_by_guest(_, meeting):
+    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+    with fixtures.meeting_authorization(guest_uuid, meeting):
+        # Guests do not have permission to list authorizations
+        response = (
+            confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.get()
+        )
+        response.assert_status(404)
+
+
+# TODO: test maximum auth per meeting
