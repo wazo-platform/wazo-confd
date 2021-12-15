@@ -561,6 +561,17 @@ def test_create_meeting_authorization(_, meeting):
     response.assert_status(201)
     assert_that(response.json, has_entries(status='pending'))
 
+    # Test max creation
+    with db.queries() as queries:
+        with queries.insert_max_meeting_authorizations(guest_uuid, meeting['uuid']):
+            response = (
+                confd.guests(guest_uuid)
+                .meetings(meeting['uuid'])
+                .authorizations.post(body)
+            )
+
+            response.assert_status(400)
+
 
 @fixtures.ingress_http()
 @fixtures.meeting()
@@ -645,6 +656,3 @@ def test_list_meeting_authorizations_by_guest(_, meeting):
             confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.get()
         )
         response.assert_status(404)
-
-
-# TODO: test maximum auth per meeting

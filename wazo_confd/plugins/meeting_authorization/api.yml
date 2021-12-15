@@ -3,7 +3,7 @@ paths:
     post:
       operationId: create_guest_meeting_authorization
       summary: Request guest authorization to enter a meeting
-      description: '**Required ACL:** none'
+      description: '**Required ACL:** none. A single meeting only accepts a maximum amount of 128 authorizations.'
       tags:
       - meeting_authorizations
       - meetings
