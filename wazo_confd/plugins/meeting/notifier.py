@@ -25,7 +25,14 @@ MEETING_FIELDS = [
 
 
 class Notifier:
-    def __init__(self, bus, sysconfd, ingress_http_service, extension_features_service, preset_tenant_uuid=None):
+    def __init__(
+        self,
+        bus,
+        sysconfd,
+        ingress_http_service,
+        extension_features_service,
+        preset_tenant_uuid=None,
+    ):
         self.bus = bus
         self._schema_instance = MeetingSchema(only=MEETING_FIELDS)
         self.sysconfd = sysconfd
@@ -85,7 +92,9 @@ class Notifier:
         ingress_http = self._ingress_http_service.find_by(tenant_uuid=tenant_uuid)
         exten_pattern = None
         exten_prefix = None
-        extens = self._extension_features_service.search({'feature': 'meetingjoin'}).items
+        extens = self._extension_features_service.search(
+            {'feature': 'meetingjoin'}
+        ).items
         for exten in extens:
             if exten.typeval == 'meetingjoin' and exten.commented == 0:
                 exten_pattern = exten.exten

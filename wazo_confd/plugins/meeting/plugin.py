@@ -40,14 +40,21 @@ class Plugin:
 
         ingress_http_service = build_ingress_http_service()
         extension_features_service = build_extension_features_service()
-        api_notifier = Notifier(bus, sysconfd, ingress_http_service, extension_features_service)
+        api_notifier = Notifier(
+            bus, sysconfd, ingress_http_service, extension_features_service
+        )
         service = build_service(api_notifier)
 
         instant_bus_publisher = InstantBusPublisher.from_config(
             config['bus'],
             config['uuid'],
         )
-        bus_notifier = Notifier(instant_bus_publisher, sysconfd, ingress_http_service, extension_features_service)
+        bus_notifier = Notifier(
+            instant_bus_publisher,
+            sysconfd,
+            ingress_http_service,
+            extension_features_service,
+        )
         bus_event_handler = MeetingBusEventHandler(service, bus_notifier)
         bus_event_handler.subscribe(bus_consumer)
 

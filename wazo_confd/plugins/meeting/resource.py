@@ -33,7 +33,9 @@ class _SchemaMixin:
         )
         exten_pattern = None
         exten_prefix = None
-        extens = self._extension_features_service.search({'feature': 'meetingjoin'}).items
+        extens = self._extension_features_service.search(
+            {'feature': 'meetingjoin'}
+        ).items
         for exten in extens:
             if exten.feature == 'meetingjoin' and exten.commented == 0:
                 exten_pattern = exten.exten
@@ -147,7 +149,9 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
 class MeetingItem(ItemResource, _SchemaMixin):
     has_tenant_uuid = True
 
-    def __init__(self, service, user_service, ingress_http_service, extension_features_service):
+    def __init__(
+        self, service, user_service, ingress_http_service, extension_features_service
+    ):
         super().__init__(service)
         self._user_service = user_service
         self._ingress_http_service = ingress_http_service
@@ -176,7 +180,9 @@ class MeetingItem(ItemResource, _SchemaMixin):
 
 
 class GuestMeetingItem(ItemResource, _SchemaMixin):
-    def __init__(self, service, user_service, ingress_http_service, extension_features_service):
+    def __init__(
+        self, service, user_service, ingress_http_service, extension_features_service
+    ):
         super().__init__(service)
         self._ingress_http_service = ingress_http_service
         self._extension_features_service = extension_features_service
@@ -188,8 +194,17 @@ class GuestMeetingItem(ItemResource, _SchemaMixin):
 
 
 class UserMeetingItem(MeetingItem, _MeResourceMixin):
-    def __init__(self, service, user_service, ingress_http_service, extension_features_service, auth_client):
-        super().__init__(service, user_service, ingress_http_service, extension_features_service)
+    def __init__(
+        self,
+        service,
+        user_service,
+        ingress_http_service,
+        extension_features_service,
+        auth_client,
+    ):
+        super().__init__(
+            service, user_service, ingress_http_service, extension_features_service
+        )
         self._auth_client = auth_client
 
     def get_model(self, uuid, user_uuid, **kwargs):

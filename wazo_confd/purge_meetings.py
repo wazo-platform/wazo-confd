@@ -100,7 +100,9 @@ def main():
     meeting_service = CRUDService(
         meeting_dao,
         build_meeting_validator(),
-        MeetingNotifier(bus, sysconfd, ingress_http_service, extension_features_service, tenant_uuid),
+        MeetingNotifier(
+            bus, sysconfd, ingress_http_service, extension_features_service, tenant_uuid
+        ),
     )
 
     meeting_date_limit = datetime.utcnow() - timedelta(hours=48)
