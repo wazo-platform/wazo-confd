@@ -49,7 +49,7 @@ class MeetingSchema(BaseSchema):
         prefix = self.context['exten_prefix']
         if not prefix:
             logger.debug(
-                'cannot add the meeting exten, no joinmeeting extension_features configured'
+                'cannot add the meeting exten, no "meetingjoin" extension_features configured'
             )
             return
         return '{}{}'.format(prefix, meeting.number)
