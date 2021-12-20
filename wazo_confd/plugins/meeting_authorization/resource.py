@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
-from wazo_confd.auth import no_auth
+from wazo_confd.auth import no_auth, required_acl
 from wazo_confd.helpers.restful import ItemResource, ListResource
 from xivo_dao.alchemy.meeting_authorization import MeetingAuthorization
 from xivo_dao.helpers import errors
@@ -58,7 +58,7 @@ class GuestMeetingAuthorizationList(ListResource):
 
 class GuestMeetingAuthorizationItem(ItemResource):
     model = MeetingAuthorization
-    schema = MeetingAuthorizationIDSchema
+    schema = MeetingAuthorizationSchema
 
     def __init__(self, service, meeting_dao):
         self._service = service
@@ -69,9 +69,9 @@ class GuestMeetingAuthorizationItem(ItemResource):
         ids = {
             'guest_uuid': guest_uuid,
             'meeting_uuid': meeting_uuid,
-            'uuid': authorization_uuid,
+            'authorization_uuid': authorization_uuid,
         }
-        ids = self.schema().load(ids)
+        ids = MeetingAuthorizationIDSchema().load(ids)
         try:
             self._meeting_dao.get(ids['meeting_uuid'])
         except NotFoundError as e:
@@ -79,11 +79,43 @@ class GuestMeetingAuthorizationItem(ItemResource):
 
         try:
             model = self._service.get(
-                ids['guest_uuid'], ids['meeting_uuid'], ids['uuid']
+                ids['guest_uuid'], ids['meeting_uuid'], ids['authorization_uuid']
             )
         except NotFoundError as e:
             raise errors.not_found(
                 'meeting_authorizations', 'MeetingAuthorization', **e.metadata
             )
 
+        return self.schema().dump(model)
+
+
+class UserMeetingAuthorizationAccept(ItemResource):
+
+    model = MeetingAuthorization
+    schema = MeetingAuthorizationSchema
+
+    def __init__(self, service, meeting_authorization_dao):
+        self.service = service
+        self.meeting_authorization_dao = meeting_authorization_dao
+
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.accept.update'
+    )
+    def put(self, meeting_uuid, authorization_uuid):
+        ids = {
+            'meeting_uuid': meeting_uuid,
+            'authorization_uuid': authorization_uuid,
+        }
+        ids = MeetingAuthorizationIDSchema().load(ids)
+
+        try:
+            model = self.meeting_authorization_dao.get(
+                ids['meeting_uuid'], ids['authorization_uuid']
+            )
+        except NotFoundError as e:
+            raise errors.not_found(
+                'meeting_authorization', 'MeetingAuthorization', **e.metadata
+            )
+
+        self.service.accept(model)
         return self.schema().dump(model)

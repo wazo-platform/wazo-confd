@@ -656,3 +656,61 @@ def test_list_meeting_authorizations_by_guest(_, meeting):
             confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.get()
         )
         response.assert_status(404)
+
+
+@fixtures.ingress_http()
+@fixtures.user()
+@fixtures.meeting()
+def test_accept_meeting_authorization(_, me, another_meeting):
+    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+    my_uuid = me['uuid']
+    unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
+    user_confd = create_confd(user_uuid=my_uuid)
+
+    with fixtures.user_me_meeting(
+        user_confd
+    ) as meeting, fixtures.meeting_authorization(guest_uuid, meeting) as authorization:
+
+        # Test unknown meeting
+        response = (
+            user_confd.users.me.meetings(unknown_uuid)
+            .authorizations(authorization['uuid'])
+            .accept.put()
+        )
+        response.assert_status(404)
+
+        # Test unknown authorization
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(unknown_uuid)
+            .accept.put()
+        )
+        response.assert_status(404)
+
+        # Test another meeting
+        response = (
+            user_confd.users.me.meetings(another_meeting['uuid'])
+            .authorizations(unknown_uuid)
+            .accept.put()
+        )
+        response.assert_status(404)
+
+        # Test accept authorization
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .accept.put()
+        )
+        response.assert_status(200)
+        assert_that(response.json, has_entries(status='accepted'))
+
+        # Guest can see the accepted authorization
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+
+        response.assert_status(200)
+        assert_that(response.json, has_entries(status='accepted'))

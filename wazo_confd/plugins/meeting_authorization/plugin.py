@@ -3,10 +3,12 @@
 
 from wazo_confd import bus
 from xivo_dao.resources.meeting import dao as meeting_dao
+from xivo_dao.resources.meeting_authorization import dao as meeting_authorization_dao
 
 from .resource import (
     GuestMeetingAuthorizationList,
     GuestMeetingAuthorizationItem,
+    UserMeetingAuthorizationAccept,
 )
 from .notifier import Notifier
 from .service import build_service
@@ -30,4 +32,11 @@ class Plugin:
             '/guests/<guest_uuid>/meetings/<uuid:meeting_uuid>/authorizations/<uuid:authorization_uuid>',
             endpoint='guest_meeting_authorization',
             resource_class_args=[service, meeting_dao],
+        )
+
+        api.add_resource(
+            UserMeetingAuthorizationAccept,
+            '/users/me/meetings/<uuid:meeting_uuid>/authorizations/<uuid:authorization_uuid>/accept',
+            endpoint='user_meeting_authorization_accept',
+            resource_class_args=[service, meeting_authorization_dao],
         )

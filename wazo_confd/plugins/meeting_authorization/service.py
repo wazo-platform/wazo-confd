@@ -12,6 +12,10 @@ class MeetingAuthorizationService(CRUDService):
     def get(self, guest_uuid, meeting_uuid, authorization_uuid, **kwargs):
         return self.dao.get(meeting_uuid, authorization_uuid, guest_uuid, **kwargs)
 
+    def accept(self, meeting_authorization):
+        meeting_authorization.status = 'accepted'
+        return self.dao.edit(meeting_authorization)
+
 
 def build_service(notifier):
     return MeetingAuthorizationService(dao, build_validator(), notifier)
