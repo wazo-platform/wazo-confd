@@ -26,6 +26,9 @@ from wazo_confd.plugins.meeting.validator import (
 from wazo_confd.plugins.ingress_http.service import (
     build_service as build_ingress_http_service,
 )
+from wazo_confd.plugins.extension_feature.service import (
+    build_service as build_extension_features_service,
+)
 from wazo_confd.plugins.meeting.notifier import Notifier as MeetingNotifier
 
 logger = logging.getLogger('wazo-confd-purge-meetings')
@@ -93,10 +96,13 @@ def main():
     )
     sysconfd = SysconfdPublisher.from_config(config)
     ingress_http_service = build_ingress_http_service()
+    extension_features_service = build_extension_features_service()
     meeting_service = CRUDService(
         meeting_dao,
         build_meeting_validator(),
-        MeetingNotifier(bus, sysconfd, ingress_http_service, tenant_uuid),
+        MeetingNotifier(
+            bus, sysconfd, ingress_http_service, extension_features_service, tenant_uuid
+        ),
     )
 
     meeting_date_limit = datetime.utcnow() - timedelta(hours=48)
