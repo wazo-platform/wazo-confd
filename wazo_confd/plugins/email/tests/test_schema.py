@@ -13,7 +13,7 @@ from hamcrest import (
 )
 from marshmallow import ValidationError
 from mock import Mock
-from xivo_test_helpers.hamcrest.raises import raises
+from wazo_test_helpers.hamcrest.raises import raises
 
 from ..schema import EmailConfigSchema
 

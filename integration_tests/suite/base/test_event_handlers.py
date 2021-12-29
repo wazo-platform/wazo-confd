@@ -9,7 +9,7 @@ from hamcrest import (
     starts_with,
 )
 
-from xivo_test_helpers import until
+from wazo_test_helpers import until
 
 from . import BaseIntegrationTest, confd
 from ..helpers.config import CREATED_TENANT

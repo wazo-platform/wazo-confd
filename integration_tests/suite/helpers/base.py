@@ -5,9 +5,9 @@ import os
 
 from contextlib import contextmanager
 
-from xivo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
-from xivo_test_helpers.bus import BusClient
-from xivo_test_helpers.auth import MockUserToken, AuthClient as MockAuthClient
+from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from wazo_test_helpers.bus import BusClient
+from wazo_test_helpers.auth import MockUserToken, AuthClient as MockAuthClient
 
 from .ari import ARIClient
 from .auth import AuthClient

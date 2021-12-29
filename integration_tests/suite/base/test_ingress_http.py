@@ -14,7 +14,7 @@ from hamcrest import (
     not_,
 )
 
-from xivo_test_helpers import until
+from wazo_test_helpers import until
 
 from . import confd
 from ..helpers import bus, errors as e, fixtures, scenarios as s

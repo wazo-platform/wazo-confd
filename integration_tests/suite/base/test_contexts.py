@@ -12,7 +12,7 @@ from hamcrest import (
     is_not,
     not_,
 )
-from xivo_test_helpers.hamcrest.uuid_ import uuid_
+from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
 from . import confd
 from ..helpers import errors as e, fixtures, scenarios as s
