@@ -1,7 +1,7 @@
 # Copyright 2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_test_helpers import until
+from wazo_test_helpers import until
 from requests.exceptions import ConnectionError
 
 from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
