@@ -3,7 +3,6 @@ https://github.com/wazo-platform/wazo-auth-client/archive/master.zip
 https://github.com/wazo-platform/wazo-provd-client/archive/master.zip
 https://github.com/wazo-platform/wazo-test-helpers/archive/master.zip
 docker
-docker-compose
 kombu
 nose
 openapi-spec-validator
