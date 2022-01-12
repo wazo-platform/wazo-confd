@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_test_helpers import until
@@ -28,8 +28,9 @@ def test_restrict_on_with_slow_wazo_auth():
     until.assert_(_returns_503, tries=10)
 
     BaseIntegrationTest.start_service('auth')
-    BaseIntegrationTest.setup_token()
     auth._reset()
+    until.true(auth.is_up, tries=5)
+    BaseIntegrationTest.setup_token()
 
     def _not_return_503():
         response = confd.extensions.features.get()

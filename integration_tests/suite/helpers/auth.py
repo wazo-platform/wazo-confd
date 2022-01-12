@@ -1,6 +1,7 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import requests
 import re
 
 from wazo_auth_client import Client as AuthClient
@@ -18,6 +19,15 @@ from hamcrest import (
 
 
 class AuthClient(AuthClient):
+    def is_up(self):
+        try:
+            self.status.check()
+        except requests.ConnectionError:
+            return False
+        except requests.HTTPError:
+            pass
+        return True
+
     def clear(self):
         self.clear_requests()
 
