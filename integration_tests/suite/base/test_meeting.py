@@ -704,13 +704,15 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         response.assert_status(200)
         assert_that(response.json, has_entries(status='accepted'))
 
-        # Guest can see the accepted authorization
+        # Guest can see the accepted authorization and sip credentials
         response = (
             confd.guests(guest_uuid)
             .meetings(meeting['uuid'])
             .authorizations(authorization['uuid'])
             .get()
         )
-
         response.assert_status(200)
-        assert_that(response.json, has_entries(status='accepted'))
+        assert_that(
+            response.json,
+            has_entries(status='accepted', guest_sip_authorization=not_none()),
+        )
