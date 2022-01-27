@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -187,7 +187,7 @@ class CustomDestinationSchema(BaseDestinationSchema):
 
 class ExtensionDestinationSchema(BaseDestinationSchema):
     exten = fields.String(
-        validate=Regexp(CONTEXT_REGEX), attribute='actionarg1', required=True
+        validate=Regexp(EXTEN_REGEX), attribute='actionarg1', required=True
     )
     context = fields.String(
         validate=Regexp(CONTEXT_REGEX), attribute='actionarg2', required=True
