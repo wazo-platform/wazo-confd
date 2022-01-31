@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.extension_feature.event import EditExtensionFeatureEvent
@@ -17,9 +17,13 @@ class ExtensionFeatureNotifier:
 
     def edited(self, extension, updated_fields):
         event = EditExtensionFeatureEvent(extension.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(extension)
+        self.bus.send_bus_event(event, headers=headers)
         if updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
+
+    def _build_headers(self, extension):
+        return {'tenant_uuid': str(extension.tenant_uuid)}
 
 
 def build_notifier():

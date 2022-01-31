@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.group_member.event import (
@@ -33,7 +33,8 @@ class GroupMemberNotifier:
             group_uuid=str(group.uuid),
             user_uuids=user_uuids,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(group)
+        self.bus.send_bus_event(event, headers=headers)
 
     def extensions_associated(self, group, members):
         self.send_sysconfd_handlers()
@@ -46,7 +47,11 @@ class GroupMemberNotifier:
             group_uuid=str(group.uuid),
             extensions=extensions,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(group)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, group):
+        return {'tenant_uuid': str(group.tenant_uuid)}
 
 
 def build_notifier():

@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.agent.event import (
@@ -23,19 +23,25 @@ class AgentNotifier:
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
         event = CreateAgentEvent(agent.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(agent)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
         event = EditAgentEvent(agent.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(agent)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
         event = DeleteAgentEvent(agent.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(agent)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, agent):
+        return {'tenant_uuid': str(agent.tenant_uuid)}
 
 
 def build_notifier():

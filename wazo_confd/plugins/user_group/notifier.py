@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_group.event import UserGroupsAssociatedEvent
@@ -26,7 +26,11 @@ class UserGroupNotifier:
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
         event = UserGroupsAssociatedEvent(user.uuid, group_ids)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, user):
+        return {'tenant_uuid': str(user.tenant_uuid)}
 
 
 def build_notifier():

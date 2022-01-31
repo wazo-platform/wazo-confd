@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.trunk.event import (
@@ -25,7 +25,8 @@ class TrunkNotifier:
 
     def created(self, trunk):
         event = CreateTrunkEvent(trunk.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, trunk):
         if trunk.endpoint_sip_uuid:
@@ -33,7 +34,8 @@ class TrunkNotifier:
         if trunk.endpoint_iax_id:
             self.send_sysconfd_handlers(self._IAX_IPBX_COMMANDS)
         event = EditTrunkEvent(trunk.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, trunk):
         if trunk.endpoint_sip_uuid:
@@ -41,7 +43,11 @@ class TrunkNotifier:
         if trunk.endpoint_iax_id:
             self.send_sysconfd_handlers(self._IAX_IPBX_COMMANDS)
         event = DeleteTrunkEvent(trunk.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, trunk):
+        return {'tenant_uuid': str(trunk.tenant_uuid)}
 
 
 def build_notifier():

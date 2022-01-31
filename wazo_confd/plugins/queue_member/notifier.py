@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.queue_member.event import (
@@ -24,7 +24,8 @@ class QueueMemberNotifier:
         event = QueueMemberAgentAssociatedEvent(
             queue.id, member.agent.id, member.penalty
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(queue)
+        self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(
             # Only used if the agent is logged
             # EditAgentEvent can be sent without passing by sysconfd
@@ -33,7 +34,8 @@ class QueueMemberNotifier:
 
     def agent_dissociated(self, queue, member):
         event = QueueMemberAgentDissociatedEvent(queue.id, member.agent.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(queue)
+        self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(
             # Only used if the agent is logged
             # EditAgentEvent can be sent without passing by sysconfd
@@ -42,7 +44,8 @@ class QueueMemberNotifier:
 
     def user_associated(self, queue, member):
         event = QueueMemberUserAssociatedEvent(queue.id, member.user.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(queue)
+        self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(
             ipbx_command=[
                 'module reload res_pjsip.so',
@@ -53,7 +56,8 @@ class QueueMemberNotifier:
 
     def user_dissociated(self, queue, member):
         event = QueueMemberUserDissociatedEvent(queue.id, member.user.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(queue)
+        self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(
             ipbx_command=[
                 'module reload res_pjsip.so',
@@ -61,6 +65,9 @@ class QueueMemberNotifier:
                 'module reload chan_sccp.so',
             ]
         )
+
+    def _build_headers(self, queue):
+        return {'tenant_uuid': str(queue.tenant_uuid)}
 
 
 def build_notifier():

@@ -1,4 +1,4 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd import bus, sysconfd
@@ -39,7 +39,8 @@ class LineApplicationNotifier:
         event = LineApplicationAssociatedEvent(
             line=line_serialized, application=application_serialized
         )
-        self._bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self._bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, line, application):
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
@@ -51,7 +52,11 @@ class LineApplicationNotifier:
         event = LineApplicationDissociatedEvent(
             line=line_serialized, application=application_serialized
         )
-        self._bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self._bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, line):
+        return {'tenant_uuid': str(line.tenant_uuid)}
 
 
 def build_notifier():

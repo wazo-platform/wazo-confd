@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.call_pickup_member.event import (
@@ -27,25 +27,32 @@ class CallPickupMemberNotifier:
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
         event = CallPickupInterceptorGroupsAssociatedEvent(call_pickup.id, group_ids)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(call_pickup)
+        self.bus.send_bus_event(event, headers=headers)
 
     def target_groups_associated(self, call_pickup, groups):
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
         event = CallPickupTargetGroupsAssociatedEvent(call_pickup.id, group_ids)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(call_pickup)
+        self.bus.send_bus_event(event, headers=headers)
 
     def interceptor_users_associated(self, call_pickup, users):
         self.send_sysconfd_handlers()
         user_uuids = [user.uuid for user in users]
         event = CallPickupInterceptorUsersAssociatedEvent(call_pickup.id, user_uuids)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(call_pickup)
+        self.bus.send_bus_event(event, headers=headers)
 
     def target_users_associated(self, call_pickup, users):
         self.send_sysconfd_handlers()
         user_uuids = [user.uuid for user in users]
         event = CallPickupTargetUsersAssociatedEvent(call_pickup.id, user_uuids)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(call_pickup)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, call_pickup):
+        return {'tenant_uuid': str(call_pickup.tenant_uuid)}
 
 
 def build_notifier():

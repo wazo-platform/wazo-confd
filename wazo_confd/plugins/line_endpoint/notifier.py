@@ -1,4 +1,4 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.line_endpoint.event import (
@@ -50,7 +50,8 @@ class LineEndpointSIPNotifier:
             line=line_serialized,
             sip=sip_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -59,7 +60,11 @@ class LineEndpointSIPNotifier:
             line=line_serialized,
             sip=sip_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, line):
+        return {'tenant_uuid': str(line.tenant_uuid)}
 
 
 class LineEndpointSCCPNotifier:
@@ -74,7 +79,8 @@ class LineEndpointSCCPNotifier:
             line=line_serialized,
             sccp=sccp_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -83,7 +89,11 @@ class LineEndpointSCCPNotifier:
             line=line_serialized,
             sccp=sccp_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, line):
+        return {'tenant_uuid': str(line.tenant_uuid)}
 
 
 class LineEndpointCustomNotifier:
@@ -98,7 +108,8 @@ class LineEndpointCustomNotifier:
             line=line_serialized,
             custom=custom_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -107,7 +118,11 @@ class LineEndpointCustomNotifier:
             line=line_serialized,
             custom=custom_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, line):
+        return {'tenant_uuid': str(line.tenant_uuid)}
 
 
 def build_notifier_sip():

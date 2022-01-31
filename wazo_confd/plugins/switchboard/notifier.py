@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.common.event import ArbitraryEvent
@@ -21,7 +21,8 @@ class SwitchboardNotifier:
         event.routing_key = 'config.switchboards.{uuid}.created'.format(
             uuid=switchboard.uuid
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(switchboard)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, switchboard):
         event = ArbitraryEvent(
@@ -32,7 +33,8 @@ class SwitchboardNotifier:
         event.routing_key = 'config.switchboards.{uuid}.edited'.format(
             uuid=switchboard.uuid
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(switchboard)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, switchboard):
         event = ArbitraryEvent(
@@ -43,7 +45,11 @@ class SwitchboardNotifier:
         event.routing_key = 'config.switchboards.{uuid}.deleted'.format(
             uuid=switchboard.uuid
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(switchboard)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, switchboard):
+        return {'tenant_uuid': str(switchboard.tenant_uuid)}
 
 
 def build_notifier():

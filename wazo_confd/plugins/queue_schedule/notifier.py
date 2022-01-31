@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.queue_schedule.event import (
@@ -15,11 +15,16 @@ class QueueScheduleNotifier:
 
     def associated(self, queue, schedule):
         event = QueueScheduleAssociatedEvent(queue.id, schedule.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(queue)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, queue, schedule):
         event = QueueScheduleDissociatedEvent(queue.id, schedule.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(queue)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, queue):
+        return {'tenant_uuid': str(queue.tenant_uuid)}
 
 
 def build_notifier():

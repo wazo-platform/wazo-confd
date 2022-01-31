@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.xivo_helpers import clean_extension
@@ -48,10 +48,8 @@ class Notifier:
                 {
                     'resource_type': 'meeting',
                     'resource_action': action,
-                    'resource_body': {
-                        'uuid': str(meeting.uuid),
-                    },
-                },
+                    'resource_body': {'uuid': str(meeting.uuid)},
+                }
             ],
         }
         self.sysconfd.exec_request_handlers(handlers)
@@ -59,27 +57,33 @@ class Notifier:
     def created(self, meeting):
         self.send_sysconfd_handlers(meeting, 'created')
         event = CreateMeetingEvent(self._schema().dump(meeting))
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(meeting)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, meeting):
         self.send_sysconfd_handlers(meeting, 'edited')
         event = EditMeetingEvent(self._schema().dump(meeting))
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(meeting)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, meeting):
         self.send_sysconfd_handlers(meeting, 'deleted')
         event = DeleteMeetingEvent(self._schema().dump(meeting))
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(meeting)
+        self.bus.send_bus_event(event, headers=headers)
 
     def ready(self, meeting):
         meeting_body = self._schema().dump(meeting)
         event = MeetingProgressEvent(meeting_body, 'ready')
-        self.bus.send_bus_event(event)
+        tenant_uuid = meeting.tenant_uuid
+        headers = self._build_headers(meeting)
+        self.bus.send_bus_event(event, headers=headers)
         for owner_uuid in meeting_body['owner_uuids']:
             event = UserMeetingProgressEvent(meeting_body, owner_uuid, 'ready')
             headers = {
                 'name': UserMeetingProgressEvent.name,
                 f'user:{owner_uuid}': True,
+                'tenant_uuid': tenant_uuid,
             }
             self.bus.send_bus_event(event, headers)
 
@@ -106,3 +110,6 @@ class Notifier:
             'exten_prefix': exten_prefix,
         }
         return self._schema_instance
+
+    def _build_headers(self, meeting):
+        return {'tenant_uuid': str(meeting.tenant_uuid)}

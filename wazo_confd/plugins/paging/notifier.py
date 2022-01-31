@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.paging.event import (
@@ -16,15 +16,21 @@ class PagingNotifier:
 
     def created(self, paging):
         event = CreatePagingEvent(paging.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(paging)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, paging):
         event = EditPagingEvent(paging.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(paging)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, paging):
         event = DeletePagingEvent(paging.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(paging)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, paging):
+        return {'tenant_uuid': str(paging.tenant_uuid)}
 
 
 def build_notifier():

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.voicemail.event import (
@@ -23,7 +23,8 @@ class VoicemailNotifier:
     def created(self, voicemail):
         self._send_sysconfd_handlers(['voicemail reload'])
         event = CreateVoicemailEvent(voicemail.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(voicemail)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, voicemail):
         self._send_sysconfd_handlers(
@@ -34,15 +35,20 @@ class VoicemailNotifier:
             ]
         )
         event = EditVoicemailEvent(voicemail.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(voicemail)
+        self.bus.send_bus_event(event, headers=headers)
         for user in voicemail.users:
             event = EditUserVoicemailEvent(user.uuid, voicemail.id)
-            self.bus.send_bus_event(event)
+            self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, voicemail):
         self._send_sysconfd_handlers(['voicemail reload'])
         event = DeleteVoicemailEvent(voicemail.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(voicemail)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, voicemail):
+        return {'tenant_uuid': str(voicemail.tenant_uuid)}
 
 
 def build_notifier():

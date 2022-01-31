@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.skill_rule.event import (
@@ -22,17 +22,23 @@ class SkillRuleNotifier:
     def created(self, skill_rule):
         self.send_sysconfd_handlers()
         event = CreateSkillRuleEvent(skill_rule.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(skill_rule)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, skill_rule):
         self.send_sysconfd_handlers()
         event = EditSkillRuleEvent(skill_rule.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(skill_rule)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, skill_rule):
         self.send_sysconfd_handlers()
         event = DeleteSkillRuleEvent(skill_rule.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(skill_rule)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, skill_rule):
+        return {'tenant_uuid': str(skill_rule.tenant_uuid)}
 
 
 def build_notifier():
