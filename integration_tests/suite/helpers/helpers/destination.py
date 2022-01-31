@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .. import scenarios as s
@@ -148,6 +148,7 @@ def invalid_destinations():
         {'type': 'extension', 'context': 'default', 'exten': True},
         {'type': 'extension', 'context': 'default', 'exten': None},
         {'type': 'extension', 'context': 'default', 'exten': '*1234#??'},
+        {'type': 'extension', 'context': 'default', 'exten': 'invalid'},
         {'type': 'group'},
         {'type': 'group', 'missing_required_field': 123},
         {'type': 'group', 'group_id': 'string'},
