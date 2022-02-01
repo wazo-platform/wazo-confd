@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -31,6 +31,7 @@ class TestApplicationNotifier(unittest.TestCase):
             'destination': self.application.destination,
             'destination_options': self.application.destination_options,
         }
+        self.expected_headers = {'tenant_uuid': self.application.tenant_uuid}
 
         self.notifier = ApplicationNotifier(self.bus)
 
@@ -39,18 +40,24 @@ class TestApplicationNotifier(unittest.TestCase):
 
         self.notifier.created(self.application)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_application_edited_then_event_sent_on_bus(self):
         expected_event = EditApplicationEvent(self.expected_body)
 
         self.notifier.edited(self.application)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_application_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteApplicationEvent(self.expected_body)
 
         self.notifier.deleted(self.application)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

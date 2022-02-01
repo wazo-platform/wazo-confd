@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -22,8 +22,9 @@ class TestGroupNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         group_id = 1234
         group_uuid = uuid4()
-        self.group = Mock(id=group_id, uuid=group_uuid)
+        self.group = Mock(id=group_id, uuid=group_uuid, tenant_uuid=uuid4())
         self.group_serialized = {'id': group_id, 'uuid': str(group_uuid)}
+        self.expected_headers = {'tenant_uuid': str(self.group.tenant_uuid)}
 
         self.notifier = GroupNotifier(self.bus, self.sysconfd)
 
@@ -37,7 +38,9 @@ class TestGroupNotifier(unittest.TestCase):
 
         self.notifier.created(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_group_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.group)
@@ -49,7 +52,9 @@ class TestGroupNotifier(unittest.TestCase):
 
         self.notifier.edited(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_group_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.group)
@@ -61,4 +66,6 @@ class TestGroupNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

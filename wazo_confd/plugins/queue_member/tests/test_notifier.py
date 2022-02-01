@@ -1,8 +1,9 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.queue_member.event import (
@@ -19,8 +20,10 @@ class TestQueueMemberNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.queue = Mock(id=1)
+        self.queue = Mock(id=1, tenant_uuid=uuid4())
         self.member = Mock(agent=Mock(id=1), penalty=5)
+        self.expected_headers = {'tenant_uuid': str(self.queue.tenant_uuid)}
+
         self.notifier = QueueMemberNotifier(self.bus, self.sysconfd)
 
     def test_agent_associate_then_bus_event(self):
@@ -30,7 +33,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.agent_associated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_agent_associate_then_sysconfd_event(self):
         expected_handlers = {
@@ -49,7 +54,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.agent_dissociated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_agent_dissociate_then_sysconfd_event(self):
         expected_handlers = {
@@ -68,7 +75,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.user_associated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_user_associate_then_sysconfd_event(self):
         expected_handlers = {
@@ -91,7 +100,9 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
         self.notifier.user_dissociated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_user_dissociate_then_sysconfd_event(self):
         expected_handlers = {

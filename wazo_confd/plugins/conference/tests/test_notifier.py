@@ -1,7 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.conference.event import (
@@ -19,7 +21,8 @@ class TestConferenceNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.conference = Mock(id=1234)
+        self.conference = Mock(id=1234, tenant_uuid=str(uuid4()))
+        self.expected_headers = {'tenant_uuid': self.conference.tenant_uuid}
 
         self.notifier = ConferenceNotifier(self.bus, self.sysconfd)
 
@@ -33,7 +36,9 @@ class TestConferenceNotifier(unittest.TestCase):
 
         self.notifier.created(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_conference_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.conference)
@@ -45,7 +50,9 @@ class TestConferenceNotifier(unittest.TestCase):
 
         self.notifier.edited(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_conference_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.conference)
@@ -57,4 +64,6 @@ class TestConferenceNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

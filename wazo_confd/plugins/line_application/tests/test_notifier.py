@@ -1,4 +1,4 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -28,10 +28,12 @@ class TestLineApplicationNotifier(unittest.TestCase):
             endpoint_sip={'uuid': str(uuid.uuid4())},
             endpoint_sccp=None,
             endpoint_custom=None,
+            tenant_uuid=uuid.uuid4(),
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.application = Mock(Application, uuid='custom-uuid')
         self.bus = Mock()
+        self.expected_headers = {'tenant_uuid': str(self.line.tenant_uuid)}
         self.notifier = LineApplicationNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_pjsip_reloaded(self):
@@ -62,7 +64,9 @@ class TestLineApplicationNotifier(unittest.TestCase):
 
         self.notifier.associated(self.line, self.application)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_dissociate_then_bus_event(self):
         expected_event = LineApplicationDissociatedEvent(
@@ -78,4 +82,6 @@ class TestLineApplicationNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.line, self.application)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

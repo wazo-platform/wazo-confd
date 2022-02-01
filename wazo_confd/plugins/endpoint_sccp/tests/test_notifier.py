@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -31,6 +31,7 @@ class TestSccpEndpointNotifier(unittest.TestCase):
             'tenant_uuid': self.sccp.tenant_uuid,
             'line': self.sccp.line,
         }
+        self.expected_headers = {'tenant_uuid': self.sccp.tenant_uuid}
 
         self.notifier = SccpEndpointNotifier(self.sysconfd, self.bus)
 
@@ -39,7 +40,9 @@ class TestSccpEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.sccp)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_sccp_endpoint_edited_then_sccp_reloaded(self):
         self.notifier.edited(self.sccp)
@@ -51,7 +54,9 @@ class TestSccpEndpointNotifier(unittest.TestCase):
 
         self.notifier.edited(self.sccp)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_sccp_endpoint_deleted_then_sccp_reloaded(self):
         self.notifier.deleted(self.sccp)
@@ -63,4 +68,6 @@ class TestSccpEndpointNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.sccp)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

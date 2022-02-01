@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -47,6 +47,7 @@ class TestSipEndpointNotifier(unittest.TestCase):
             'trunk': self.sip.trunk,
             'line': self.sip.line,
         }
+        self.expected_headers = {'tenant_uuid': self.sip.tenant_uuid}
 
         self.notifier = SipEndpointNotifier(self.sysconfd, self.bus)
 
@@ -55,7 +56,9 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_sip_endpoint_edited_then_sip_reloaded(self):
         self.notifier.edited(self.sip)
@@ -67,7 +70,9 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
         self.notifier.edited(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_sip_endpoint_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.sip)
@@ -79,7 +84,9 @@ class TestSipEndpointNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
 
 class TestSipTemplateNotifier(unittest.TestCase):

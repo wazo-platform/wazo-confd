@@ -1,7 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock, call
 
 from xivo_bus.resources.func_key.event import (
@@ -22,7 +24,8 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.device_db = Mock()
-        self.func_key_template = Mock(FuncKeyTemplate, id=10)
+        self.func_key_template = Mock(FuncKeyTemplate, id=10, tenant_uuid=str(uuid4()))
+        self.expected_headers = {'tenant_uuid': self.func_key_template.tenant_uuid}
         self.notifier = FuncKeyTemplateNotifier(self.bus, self.sysconfd, self.device_db)
 
     def test_when_func_key_template_created_then_event_sent_on_bus(self):
@@ -30,14 +33,18 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.notifier.created(self.func_key_template)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_func_key_template_edited_then_event_sent_on_bus(self):
         expected_event = EditFuncKeyTemplateEvent(self.func_key_template.id)
 
         self.notifier.edited(self.func_key_template, None)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(
         self,
@@ -90,7 +97,9 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.func_key_template)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(
         self,

@@ -1,7 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.extension.event import (
@@ -18,7 +20,14 @@ class TestExtensionNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.extension = Mock(Extension, id=1234, exten='1000', context='default')
+        self.extension = Mock(
+            Extension,
+            id=1234,
+            exten='1000',
+            context='default',
+            tenant_uuid=str(uuid4()),
+        )
+        self.expected_headers = {'tenant_uuid': self.extension.tenant_uuid}
 
         self.notifier = ExtensionNotifier(self.sysconfd, self.bus)
 
@@ -29,7 +38,9 @@ class TestExtensionNotifier(unittest.TestCase):
 
         self.notifier.created(self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_extension_created_then_dialplan_reloaded(self):
         expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
@@ -79,7 +90,9 @@ class TestExtensionNotifier(unittest.TestCase):
 
         self.notifier.edited(self.extension, None)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_extension_deleted_then_dialplan_reloaded(self):
         expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
@@ -94,4 +107,6 @@ class TestExtensionNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

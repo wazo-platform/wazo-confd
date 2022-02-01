@@ -1,8 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.user.event import EditUserFallbackEvent
@@ -14,7 +15,8 @@ from ..notifier import UserFallbackNotifier
 class TestUserFallbackNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
-        self.user = Mock(User, id=1, uuid='abcd-1234')
+        self.user = Mock(User, id=1, uuid='abcd-1234', tenant_uuid=str(uuid4()))
+        self.expected_headers = {'tenant_uuid': self.user.tenant_uuid}
 
         self.notifier = UserFallbackNotifier(self.bus)
 
@@ -23,4 +25,6 @@ class TestUserFallbackNotifier(unittest.TestCase):
 
         self.notifier.edited(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

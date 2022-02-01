@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -58,10 +58,13 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'registration_section_options': self.sip.registration_section_options,
             },
         )
+        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_sip.associated(self.trunk, self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=expected_headers
+        )
 
     def test_associate_custom_then_bus_event(self):
         expected_event = TrunkEndpointCustomAssociatedEvent(
@@ -72,10 +75,13 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'interface': self.custom.interface,
             },
         )
+        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_custom.associated(self.trunk, self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=expected_headers
+        )
 
     def test_associate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXAssociatedEvent(
@@ -86,10 +92,13 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'name': self.iax.name,
             },
         )
+        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_iax.associated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=expected_headers
+        )
 
     def test_associate_sip_then_sysconfd_event(self):
         self.notifier_sip.associated(self.trunk, self.sip)
@@ -119,10 +128,13 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'registration_section_options': self.sip.registration_section_options,
             },
         )
+        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_sip.dissociated(self.trunk, self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=expected_headers
+        )
 
     def test_dissociate_custom_then_bus_event(self):
         expected_event = TrunkEndpointCustomDissociatedEvent(
@@ -133,10 +145,13 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'interface': self.custom.interface,
             },
         )
+        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_custom.dissociated(self.trunk, self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=expected_headers
+        )
 
     def test_dissociate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXDissociatedEvent(
@@ -147,7 +162,10 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
                 'name': self.iax.name,
             },
         )
+        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_iax.dissociated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=expected_headers
+        )

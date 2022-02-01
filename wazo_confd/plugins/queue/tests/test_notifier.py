@@ -1,7 +1,9 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.queue.event import (
@@ -19,7 +21,8 @@ class TestQueueNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.queue = Mock(id=1234)
+        self.queue = Mock(id=1234, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.queue.tenant_uuid)}
 
         self.notifier = QueueNotifier(self.bus, self.sysconfd)
 
@@ -33,7 +36,9 @@ class TestQueueNotifier(unittest.TestCase):
 
         self.notifier.created(self.queue)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_queue_edited_then_app_queue_reloaded(self):
         self.notifier.edited(self.queue)
@@ -45,7 +50,9 @@ class TestQueueNotifier(unittest.TestCase):
 
         self.notifier.edited(self.queue)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_queue_deleted_then_app_queue_reloaded(self):
         self.notifier.deleted(self.queue)
@@ -57,4 +64,6 @@ class TestQueueNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.queue)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

@@ -1,10 +1,10 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
-
 from xivo_bus.resources.trunk_register.event import (
     TrunkRegisterIAXAssociatedEvent,
     TrunkRegisterIAXDissociatedEvent,
@@ -18,7 +18,8 @@ class TestTrunkRegisterIAXNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.iax = Mock(id=2)
-        self.trunk = Mock(Trunk, id=3)
+        self.trunk = Mock(Trunk, id=3, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.trunk.tenant_uuid)}
 
         self.notifier_iax = TrunkRegisterIAXNotifier(self.bus)
 
@@ -27,11 +28,15 @@ class TestTrunkRegisterIAXNotifier(unittest.TestCase):
 
         self.notifier_iax.associated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_dissociate_iax_then_bus_event(self):
         expected_event = TrunkRegisterIAXDissociatedEvent(self.trunk.id, self.iax.id)
 
         self.notifier_iax.dissociated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

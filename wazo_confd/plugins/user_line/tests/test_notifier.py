@@ -1,4 +1,4 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -47,6 +47,7 @@ class TestUserLineNotifier(unittest.TestCase):
         self.user_line = Mock(
             user=self.user, line=self.line, main_user=True, main_line=True
         )
+        self.expected_headers = {'tenant_uuid': TENANT_UUID}
         self.notifier = UserLineNotifier(self.bus, self.sysconfd)
 
     @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
@@ -67,7 +68,9 @@ class TestUserLineNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user_line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
     def test_associated_then_sip_reload(self, user_dump):
@@ -96,7 +99,9 @@ class TestUserLineNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.user_line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     @patch('wazo_confd.plugins.user_line.notifier.UserSchema.dump')
     def test_dissociated_then_sip_reload(self, user_dump):

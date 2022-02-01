@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -31,6 +31,7 @@ class TestIAXEndpointNotifier(unittest.TestCase):
             'name': self.iax.name,
             'trunk': self.iax.trunk_rel,
         }
+        self.expected_headers = {'tenant_uuid': self.iax.tenant_uuid}
 
         self.notifier = IAXEndpointNotifier(self.sysconfd, self.bus)
 
@@ -39,7 +40,9 @@ class TestIAXEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_iax_endpoint_edited_then_iax_reloaded(self):
         self.notifier.edited(self.iax)
@@ -51,7 +54,9 @@ class TestIAXEndpointNotifier(unittest.TestCase):
 
         self.notifier.edited(self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_iax_endpoint_deleted_then_iax_reloaded(self):
         self.notifier.deleted(self.iax)
@@ -63,4 +68,6 @@ class TestIAXEndpointNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

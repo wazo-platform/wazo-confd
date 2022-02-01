@@ -1,7 +1,8 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
 from mock import Mock
 
 from xivo_bus.resources.context.event import (
@@ -28,6 +29,7 @@ class TestContextNotifier(unittest.TestCase):
         }
         self.context = Mock(**self.expected_body)
         self.context.name = self.expected_body['name']
+        self.expected_headers = {'tenant_uuid': self.context.tenant_uuid}
 
         self.notifier = ContextNotifier(self.bus, self.sysconfd)
 
@@ -41,7 +43,9 @@ class TestContextNotifier(unittest.TestCase):
 
         self.notifier.created(self.context)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_context_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.context)
@@ -53,7 +57,9 @@ class TestContextNotifier(unittest.TestCase):
 
         self.notifier.edited(self.context)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_context_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.context)
@@ -65,4 +71,6 @@ class TestContextNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.context)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

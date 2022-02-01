@@ -1,8 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.parking_lot_extension.event import (
@@ -22,7 +23,8 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.extension = Mock(Extension, id=1)
-        self.parking_lot = Mock(ParkingLot, id=2)
+        self.parking_lot = Mock(ParkingLot, id=2, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.parking_lot.tenant_uuid)}
 
         self.notifier = ParkingLotExtensionNotifier(self.bus, self.sysconfd)
 
@@ -33,7 +35,9 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.parking_lot, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.parking_lot, self.extension)
@@ -47,7 +51,9 @@ class TestParkingLotExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.parking_lot, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.parking_lot, self.extension)

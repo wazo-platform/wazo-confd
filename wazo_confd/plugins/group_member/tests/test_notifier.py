@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -31,7 +31,8 @@ class TestGroupMemberUserNotifier(unittest.TestCase):
         self.member_user2 = Mock(user=Mock(uuid='efgh-5678'))
         self.member_extension1 = Mock(extension=Mock(exten='1234', context='default'))
         self.member_extension2 = Mock(extension=Mock(exten='5678', context='other'))
-        self.group = Mock(id=3, uuid=uuid4())
+        self.group = Mock(id=3, uuid=uuid4(), tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.group.tenant_uuid)}
 
         self.notifier = GroupMemberNotifier(self.bus, self.sysconfd)
 
@@ -46,7 +47,9 @@ class TestGroupMemberUserNotifier(unittest.TestCase):
             self.group, [self.member_user1, self.member_user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_associate_users_then_sysconfd_event(self):
         self.notifier.users_associated(
@@ -75,7 +78,9 @@ class TestGroupMemberUserNotifier(unittest.TestCase):
             self.group, [self.member_extension1, self.member_extension2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_associate_extensions_then_sysconfd_event(self):
         self.notifier.extensions_associated(
