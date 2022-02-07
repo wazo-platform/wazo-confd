@@ -510,67 +510,108 @@ def test_purge_old_meetings(_, meeting_too_old, meeting_too_young, meeting_persi
 
 
 @fixtures.ingress_http()
-@fixtures.meeting()
-def test_create_meeting_authorization(_, meeting):
-    unknown_meeting_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
-    invalid_guest_uuid = 'invalid'
-    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
-    invalid_body = {}
-    body = {
-        'guest_name': 'jane doe',
-    }
+@fixtures.user()
+def test_create_meeting_authorization(_, owner):
+    owner_uuid = owner['uuid']
+    owner_confd = create_confd(user_uuid=owner_uuid)
+    with fixtures.user_me_meeting(owner_confd) as meeting:
+        unknown_meeting_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
+        invalid_guest_uuid = 'invalid'
+        guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+        invalid_body = {}
+        body = {
+            'guest_name': 'jane doe',
+        }
 
-    # API can be used without authentication
-    response = (
-        create_confd()
-        .guests(guest_uuid)
-        .meetings(meeting['uuid'])
-        .authorizations.post(invalid_body)
-    )
-    response.assert_status(400)
+        # API can be used without authentication
+        response = (
+            create_confd()
+            .guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations.post(invalid_body)
+        )
+        response.assert_status(400)
 
-    # Test invalid guest UUID
-    response = (
-        confd.guests(invalid_guest_uuid)
-        .meetings(meeting['uuid'])
-        .authorizations.post(body)
-    )
-    response.assert_status(400)
+        # Test invalid guest UUID
+        response = (
+            confd.guests(invalid_guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations.post(body)
+        )
+        response.assert_status(400)
 
-    # Test invalid meeting UUID
-    response = (
-        confd.guests(guest_uuid)
-        .meetings(unknown_meeting_uuid)
-        .authorizations.post(body)
-    )
-    response.assert_status(404)
+        # Test invalid meeting UUID
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(unknown_meeting_uuid)
+            .authorizations.post(body)
+        )
+        response.assert_status(404)
 
-    # Test invalid body
-    response = (
-        confd.guests(guest_uuid)
-        .meetings(meeting['uuid'])
-        .authorizations.post(invalid_body)
-    )
-    response.assert_status(400)
+        # Test invalid body
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations.post(invalid_body)
+        )
+        response.assert_status(400)
 
-    # Test creation
-    response = (
-        confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.post(body)
-    )
+        # Test creation & bus events
+        bus_events = bus.BusClient.accumulator(
+            'config.meeting_guest_authorizations.created'
+        )
+        bus_events_user = bus.BusClient.accumulator(
+            f'config.users.{owner_uuid}.meeting_guest_authorizations.created'
+        )
 
-    response.assert_status(201)
-    assert_that(response.json, has_entries(status='pending'))
+        response = (
+            confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.post(body)
+        )
+        response.assert_status(201)
 
-    # Test max creation
-    with db.queries() as queries:
-        with queries.insert_max_meeting_authorizations(guest_uuid, meeting['uuid']):
-            response = (
-                confd.guests(guest_uuid)
-                .meetings(meeting['uuid'])
-                .authorizations.post(body)
-            )
+        bus_events.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_guest_authorization_created',
+                        'data': has_entries(
+                            {
+                                'uuid': response.json['uuid'],
+                                'guest_name': body['guest_name'],
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
+        bus_events_user.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_user_guest_authorization_created',
+                        'data': has_entries(
+                            {
+                                'uuid': response.json['uuid'],
+                                'guest_name': body['guest_name'],
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
 
-            response.assert_status(400)
+        # Test max creation
+        with db.queries() as queries:
+            with queries.insert_max_meeting_authorizations(guest_uuid, meeting['uuid']):
+                response = (
+                    confd.guests(guest_uuid)
+                    .meetings(meeting['uuid'])
+                    .authorizations.post(body)
+                )
+
+                response.assert_status(400)
 
 
 @fixtures.ingress_http()
