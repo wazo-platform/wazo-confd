@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.meeting_authorization import dao
@@ -14,6 +14,10 @@ class MeetingAuthorizationService(CRUDService):
 
     def accept(self, meeting_authorization):
         meeting_authorization.status = 'accepted'
+        return self.dao.edit(meeting_authorization)
+
+    def reject(self, meeting_authorization):
+        meeting_authorization.status = 'rejected'
         return self.dao.edit(meeting_authorization)
 
 

@@ -16,6 +16,7 @@ from hamcrest import (
     has_items,
     has_properties,
     is_not,
+    none,
     not_,
     not_none,
 )
@@ -756,4 +757,64 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         assert_that(
             response.json,
             has_entries(status='accepted', guest_sip_authorization=not_none()),
+        )
+
+
+@fixtures.ingress_http()
+@fixtures.user()
+@fixtures.meeting()
+def test_reject_meeting_authorization(_, me, another_meeting):
+    guest_uuid = '18388400-8f8f-4e76-a487-db3c79cf8d35'
+    my_uuid = me['uuid']
+    unknown_uuid = 'ff65a89a-ef00-4c9b-883b-d96ee4186492'
+    user_confd = create_confd(user_uuid=my_uuid)
+
+    with fixtures.user_me_meeting(
+        user_confd
+    ) as meeting, fixtures.meeting_authorization(guest_uuid, meeting) as authorization:
+
+        # Test unknown meeting
+        response = (
+            user_confd.users.me.meetings(unknown_uuid)
+            .authorizations(authorization['uuid'])
+            .reject.put()
+        )
+        response.assert_status(404)
+
+        # Test unknown authorization
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(unknown_uuid)
+            .reject.put()
+        )
+        response.assert_status(404)
+
+        # Test another meeting
+        response = (
+            user_confd.users.me.meetings(another_meeting['uuid'])
+            .authorizations(unknown_uuid)
+            .reject.put()
+        )
+        response.assert_status(404)
+
+        # Test reject authorization
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .reject.put()
+        )
+        response.assert_status(200)
+        assert_that(response.json, has_entries(status='rejected'))
+
+        # Guest can see the authorization is rejected and no sip credentials
+        response = (
+            confd.guests(guest_uuid)
+            .meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .get()
+        )
+        response.assert_status(200)
+        assert_that(
+            response.json,
+            has_entries(status='rejected', guest_sip_authorization=none()),
         )

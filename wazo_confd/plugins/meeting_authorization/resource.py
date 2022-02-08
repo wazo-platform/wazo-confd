@@ -119,3 +119,35 @@ class UserMeetingAuthorizationAccept(ItemResource):
 
         self.service.accept(model)
         return self.schema().dump(model)
+
+
+class UserMeetingAuthorizationReject(ItemResource):
+
+    model = MeetingAuthorization
+    schema = MeetingAuthorizationSchema
+
+    def __init__(self, service, meeting_authorization_dao):
+        self.service = service
+        self.meeting_authorization_dao = meeting_authorization_dao
+
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.reject.update'
+    )
+    def put(self, meeting_uuid, authorization_uuid):
+        ids = {
+            'meeting_uuid': meeting_uuid,
+            'authorization_uuid': authorization_uuid,
+        }
+        ids = MeetingAuthorizationIDSchema().load(ids)
+
+        try:
+            model = self.meeting_authorization_dao.get(
+                ids['meeting_uuid'], ids['authorization_uuid']
+            )
+        except NotFoundError as e:
+            raise errors.not_found(
+                'meeting_authorization', 'MeetingAuthorization', **e.metadata
+            )
+
+        self.service.reject(model)
+        return self.schema().dump(model)

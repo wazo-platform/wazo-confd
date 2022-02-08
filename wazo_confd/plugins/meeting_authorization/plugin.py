@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd import bus
@@ -9,6 +9,7 @@ from .resource import (
     GuestMeetingAuthorizationList,
     GuestMeetingAuthorizationItem,
     UserMeetingAuthorizationAccept,
+    UserMeetingAuthorizationReject,
 )
 from .notifier import Notifier
 from .service import build_service
@@ -38,5 +39,12 @@ class Plugin:
             UserMeetingAuthorizationAccept,
             '/users/me/meetings/<uuid:meeting_uuid>/authorizations/<uuid:authorization_uuid>/accept',
             endpoint='user_meeting_authorization_accept',
+            resource_class_args=[service, meeting_authorization_dao],
+        )
+
+        api.add_resource(
+            UserMeetingAuthorizationReject,
+            '/users/me/meetings/<uuid:meeting_uuid>/authorizations/<uuid:authorization_uuid>/reject',
+            endpoint='user_meeting_authorization_reject',
             resource_class_args=[service, meeting_authorization_dao],
         )

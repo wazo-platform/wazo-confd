@@ -67,6 +67,26 @@ paths:
           $ref: '#/responses/CreateError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/reject:
+      operationId: put_user_meeting_authorization_reject
+      summary: Reject a guest authorization request
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.reject.update'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '200':
+          description: Authorization details
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
 
 definitions:
   MeetingAuthorizationRequest:
