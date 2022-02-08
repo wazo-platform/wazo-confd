@@ -102,7 +102,7 @@ definitions:
         format: uuid
       guest_name:
         type: string
-      created_at:
+      creation_time:
         type: string
         format: date-time
       status:

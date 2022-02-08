@@ -22,6 +22,7 @@ class MeetingAuthorizationSchema(BaseSchema):
         allow_none=True,
         dump_only=True,
     )
+    creation_time = fields.DateTime(attribute='created_at', dump_only=True)
 
     def _guest_sip_authorization(self, model):
         if model.status != 'accepted':
