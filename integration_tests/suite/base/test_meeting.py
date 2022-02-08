@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -306,12 +306,12 @@ def test_create_all_parameters(ingress_http, me, owner):
 
 
 @fixtures.ingress_http()
-@fixtures.sip_template()
-def test_guest_endpoint_sip_creation(_, template):
+def test_guest_endpoint_sip_creation(_):
+    # Create without guest SIP template should fail
     with db.queries() as queries:
-        queries.set_tenant_templates(
-            MAIN_TENANT, meeting_guest_sip_template_uuid=template['uuid']
-        )
+        with queries.tenant_guest_sip_template_temporarily_disabled(MAIN_TENANT):
+            response = confd.meetings.post({'name': 'testing'})
+            response.assert_status(503)
 
     response = confd.meetings.post({'name': 'testing'})
     meeting = response.item

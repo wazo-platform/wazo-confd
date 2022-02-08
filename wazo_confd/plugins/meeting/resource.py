@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -18,6 +18,7 @@ from xivo_dao.helpers import errors
 from wazo_confd.auth import required_acl, no_auth, master_tenant_uuid
 from wazo_confd.helpers.restful import ItemResource, ListResource, ListSchema
 
+from .exceptions import MeetingGuestSIPTemplateNotFound
 from .schema import MeetingSchema
 
 logger = logging.getLogger(__name__)
@@ -116,8 +117,7 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
         tenant = self._tenant_service.get(form['tenant_uuid'])
         template_uuid = tenant.meeting_guest_sip_template_uuid
         if not template_uuid:
-            logger.warning('Cannot create guest endpoint, missing template')
-            return form
+            raise MeetingGuestSIPTemplateNotFound(form['tenant_uuid'])
 
         template = self._endpoint_sip_template_service.get(template_uuid)
         context = 'wazo-meeting-guest'
