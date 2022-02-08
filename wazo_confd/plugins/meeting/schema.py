@@ -55,10 +55,13 @@ class MeetingSchema(BaseSchema):
         return '{}{}'.format(prefix, meeting.number)
 
     def _guest_sip_authorization(self, model):
-        endpoint_sip = model.guest_endpoint_sip
-        if not endpoint_sip:
+        if not model.guest_endpoint_sip:
             return None
 
+        return self.format_sip_authorization(model.guest_endpoint_sip)
+
+    @staticmethod
+    def format_sip_authorization(endpoint_sip):
         username = None
         password = None
         for option, value in endpoint_sip.auth_section_options:
@@ -66,5 +69,8 @@ class MeetingSchema(BaseSchema):
                 username = value
             elif option == 'password':
                 password = value
+
+        if username is None or password is None:
+            return None
 
         return b64encode('{}:{}'.format(username, password).encode()).decode()

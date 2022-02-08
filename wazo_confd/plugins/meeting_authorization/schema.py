@@ -1,11 +1,11 @@
 # Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from base64 import b64encode
 from marshmallow import fields
 from marshmallow.validate import Length, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.plugins.meeting.schema import MeetingSchema
 
 
 class MeetingAuthorizationSchema(BaseSchema):
@@ -28,22 +28,10 @@ class MeetingAuthorizationSchema(BaseSchema):
         if model.status != 'accepted':
             return None
 
-        endpoint_sip = model.guest_endpoint_sip
-        if not endpoint_sip:
+        if not model.guest_endpoint_sip:
             return None
 
-        username = None
-        password = None
-        for option, value in endpoint_sip.auth_section_options:
-            if option == 'username':
-                username = value
-            elif option == 'password':
-                password = value
-
-        if username is None or password is None:
-            return None
-
-        return b64encode('{}:{}'.format(username, password).encode()).decode()
+        return MeetingSchema.format_sip_authorization(model.guest_endpoint_sip)
 
 
 class MeetingAuthorizationIDSchema(BaseSchema):
