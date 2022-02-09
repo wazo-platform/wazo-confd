@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -140,6 +140,35 @@ class DatabaseQueries:
             self.connection.execute(
                 query,
                 template_uuid=template_uuid,
+                tenant_uuid=tenant_uuid,
+            )
+
+    @contextmanager
+    def tenant_guest_sip_template_temporarily_disabled(self, tenant_uuid):
+        query = text(
+            "SELECT meeting_guest_sip_template_uuid FROM tenant WHERE uuid = :tenant_uuid"
+        )
+        guest_sip_template_uuid = self.connection.execute(
+            query, tenant_uuid=tenant_uuid
+        ).scalar()
+        query = text(
+            'UPDATE tenant SET meeting_guest_sip_template_uuid = :template_uuid WHERE uuid = :tenant_uuid'
+        )
+        self.connection.execute(
+            query,
+            template_uuid=None,
+            tenant_uuid=tenant_uuid,
+        )
+
+        try:
+            yield
+        finally:
+            query = text(
+                'UPDATE tenant SET meeting_guest_sip_template_uuid = :template_uuid WHERE uuid = :tenant_uuid'
+            )
+            self.connection.execute(
+                query,
+                template_uuid=guest_sip_template_uuid,
                 tenant_uuid=tenant_uuid,
             )
 
