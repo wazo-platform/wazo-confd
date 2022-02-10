@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -506,17 +506,17 @@ def test_delete_template(template, sip):
 @fixtures.sip_template()
 def test_bus_events(sip):
     yield (
-        s.check_bus_event,
+        s.check_bus_event_ignore_headers,
         'config.sip_endpoint_template.created',
         confd.endpoints.sip.templates.post,
     )
     yield (
-        s.check_bus_event,
+        s.check_bus_event_ignore_headers,
         'config.sip_endpoint_template.updated',
         confd.endpoints.sip.templates(sip['uuid']).put,
     )
     yield (
-        s.check_bus_event,
+        s.check_bus_event_ignore_headers,
         'config.sip_endpoint_template.deleted',
         confd.endpoints.sip.templates(sip['uuid']).delete,
     )

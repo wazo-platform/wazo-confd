@@ -1,4 +1,4 @@
-# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -488,10 +488,10 @@ def test_restrict_only_master_tenant(registrar):
 @fixtures.registrar()
 def test_bus_events(registrar):
     body = {'name': 'a', 'main_host': '1.2.3.4', 'proxy_main_host': '1.2.3.4'}
-    yield s.check_bus_event, 'config.registrar.created', confd.registrars.post, body
-    yield s.check_bus_event, 'config.registrar.edited', confd.registrars(
+    yield s.check_bus_event_ignore_headers, 'config.registrar.created', confd.registrars.post, body
+    yield s.check_bus_event_ignore_headers, 'config.registrar.edited', confd.registrars(
         registrar['id']
     ).put
-    yield s.check_bus_event, 'config.registrar.deleted', confd.registrars(
+    yield s.check_bus_event_ignore_headers, 'config.registrar.deleted', confd.registrars(
         registrar['id']
     ).delete

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -61,4 +61,6 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.pjsip.system
-    yield s.check_bus_event, 'config.pjsip_system.updated', url.put, {'options': {}}
+    yield s.check_bus_event_ignore_headers, 'config.pjsip_system.updated', url.put, {
+        'options': {}
+    }

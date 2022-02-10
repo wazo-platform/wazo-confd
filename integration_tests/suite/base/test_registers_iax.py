@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, empty, has_entries, none, not_
@@ -150,12 +150,12 @@ def test_delete(register_iax):
 
 @fixtures.register_iax()
 def test_bus_events(register_iax):
-    yield s.check_bus_event, 'config.register.iax.created', confd.registers.iax.post, {
+    yield s.check_bus_event_ignore_headers, 'config.register.iax.created', confd.registers.iax.post, {
         'remote_host': 'bus-event'
     }
-    yield s.check_bus_event, 'config.register.iax.edited', confd.registers.iax(
+    yield s.check_bus_event_ignore_headers, 'config.register.iax.edited', confd.registers.iax(
         register_iax['id']
     ).put
-    yield s.check_bus_event, 'config.register.iax.deleted', confd.registers.iax(
+    yield s.check_bus_event_ignore_headers, 'config.register.iax.deleted', confd.registers.iax(
         register_iax['id']
     ).delete
