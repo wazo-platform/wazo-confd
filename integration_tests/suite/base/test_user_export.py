@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries, has_item
@@ -67,6 +67,16 @@ def test_given_user_with_no_associations_when_exporting_then_csv_has_all_user_fi
                 username="ursule",
             )
         ),
+    )
+
+
+@database.reset(db)
+@fixtures.user()
+def test_given_user_with_no_authentication_when_exporting_then_no_username(user):
+    response = confd_csv.users.export.get()
+    assert_that(
+        response.csv(),
+        has_item(has_entries(uuid=user['uuid'], username="")),
     )
 
 

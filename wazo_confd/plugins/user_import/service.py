@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -67,8 +67,14 @@ class ExportService:
         wazo_users = self._auth_client.users.list(tenant_uuid=tenant_uuid)['items']
         wazo_users = {user['uuid']: user for user in wazo_users}
         for user in users:
-            wazo_user = wazo_users[user['uuid']]
-            user['username'] = wazo_user['username']
+            if user['uuid'] in wazo_users:
+                wazo_user = wazo_users[user['uuid']]
+                user['username'] = wazo_user['username']
+            else:
+                logger.warning(
+                    "User '%s' has no wazo-auth user associated. Please create one with same uuid",
+                    user['uuid'],
+                )
 
         csv_header = csv_header + ('username',)
 
