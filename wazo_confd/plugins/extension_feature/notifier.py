@@ -17,13 +17,9 @@ class ExtensionFeatureNotifier:
 
     def edited(self, extension, updated_fields):
         event = EditExtensionFeatureEvent(extension.id)
-        headers = self._build_headers(extension)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
         if updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
-
-    def _build_headers(self, extension):
-        return {'tenant_uuid': str(extension.tenant_uuid)}
 
 
 def build_notifier():
