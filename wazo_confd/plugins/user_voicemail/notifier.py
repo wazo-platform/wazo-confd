@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_voicemail.event import (
@@ -23,12 +23,17 @@ class UserVoicemailNotifier:
     def associated(self, user, voicemail):
         self._send_sysconfd_handlers()
         event = UserVoicemailAssociatedEvent(user.uuid, voicemail.id)
-        self._bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self._bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, user, voicemail):
         self._send_sysconfd_handlers()
         event = UserVoicemailDissociatedEvent(user.uuid, voicemail.id)
-        self._bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self._bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, user):
+        return {'tenant_uuid': str(user.tenant_uuid)}
 
 
 def build_notifier():

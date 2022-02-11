@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -34,6 +34,7 @@ class TestCustomEndpointNotifier(unittest.TestCase):
             'trunk': self.custom.trunk,
             'line': self.custom.line,
         }
+        self.expected_headers = {'tenant_uuid': self.custom.tenant_uuid}
         self.notifier = CustomEndpointNotifier(self.bus)
 
     def test_when_custom_endpoint_created_then_event_sent_on_bus(self):
@@ -41,18 +42,24 @@ class TestCustomEndpointNotifier(unittest.TestCase):
 
         self.notifier.created(self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_custom_endpoint_edited_then_event_sent_on_bus(self):
         expected_event = EditCustomEndpointEvent(self.custom_serialized)
 
         self.notifier.edited(self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_custom_endpoint_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteCustomEndpointEvent(self.custom_serialized)
 
         self.notifier.deleted(self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

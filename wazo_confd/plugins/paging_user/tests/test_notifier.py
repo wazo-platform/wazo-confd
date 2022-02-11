@@ -1,8 +1,9 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.paging_user.event import (
@@ -20,7 +21,8 @@ class TestPagingUserNotifier(unittest.TestCase):
         self.bus = Mock()
         self.user1 = Mock(User, uuid='abcd-1234')
         self.user2 = Mock(User, uuid='efgh-5678')
-        self.paging = Mock(Paging, id=3)
+        self.paging = Mock(Paging, id=3, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.paging.tenant_uuid)}
 
         self.notifier = PagingUserNotifier(self.bus)
 
@@ -31,7 +33,9 @@ class TestPagingUserNotifier(unittest.TestCase):
 
         self.notifier.callers_associated(self.paging, [self.user1, self.user2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_associate_member_then_bus_event(self):
         expected_event = PagingMemberUsersAssociatedEvent(
@@ -40,4 +44,6 @@ class TestPagingUserNotifier(unittest.TestCase):
 
         self.notifier.members_associated(self.paging, [self.user1, self.user2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

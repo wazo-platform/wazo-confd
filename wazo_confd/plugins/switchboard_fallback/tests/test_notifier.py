@@ -1,7 +1,9 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.switchboard.event import EditSwitchboardFallbackEvent
@@ -14,7 +16,8 @@ from ..schema import SwitchboardFallbackSchema
 class TestSwitchboardFallbackNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
-        self.switchboard = Mock(Switchboard, uuid=1)
+        self.switchboard = Mock(Switchboard, uuid=1, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.switchboard.tenant_uuid)}
 
         self.notifier = SwitchboardFallbackNotifier(self.bus)
 
@@ -24,4 +27,6 @@ class TestSwitchboardFallbackNotifier(unittest.TestCase):
 
         self.notifier.edited(self.switchboard)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

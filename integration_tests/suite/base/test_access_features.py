@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, empty, has_entries, has_entry, has_item, is_not, not_
@@ -166,13 +166,13 @@ def test_restrict_only_master_tenant(access):
 
 @fixtures.access_feature(host='1.2.3.0/24')
 def test_bus_events(access_feature):
-    yield s.check_bus_event, 'config.access_feature.created', confd.access_features.post, {
+    yield s.check_bus_event_ignore_headers, 'config.access_feature.created', confd.access_features.post, {
         'host': '9.2.4.0/24',
         'feature': 'phonebook',
     }
-    yield s.check_bus_event, 'config.access_feature.edited', confd.access_features(
+    yield s.check_bus_event_ignore_headers, 'config.access_feature.edited', confd.access_features(
         access_feature['id']
     ).put
-    yield s.check_bus_event, 'config.access_feature.deleted', confd.access_features(
+    yield s.check_bus_event_ignore_headers, 'config.access_feature.deleted', confd.access_features(
         access_feature['id']
     ).delete

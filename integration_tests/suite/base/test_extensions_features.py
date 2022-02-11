@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, has_entry, has_item, is_not
@@ -139,6 +139,6 @@ def test_restrict_only_master_tenant(extension):
 
 @fixtures.extension_feature()
 def test_bus_events(extension):
-    yield s.check_bus_event, 'config.extension_feature.edited', confd.extensions.features(
+    yield s.check_bus_event_ignore_headers, 'config.extension_feature.edited', confd.extensions.features(
         extension['id']
     ).put

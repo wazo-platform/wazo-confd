@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -48,6 +48,7 @@ class TestUserNotifier(unittest.TestCase):
             created_at=datetime.datetime.utcnow(),
             tenant_uuid=uuid.uuid4(),
         )
+        self.expected_headers = {'tenant_uuid': str(self.user.tenant_uuid)}
 
         self.notifier = UserNotifier(self.sysconfd, self.bus)
 
@@ -67,7 +68,9 @@ class TestUserNotifier(unittest.TestCase):
 
         self.notifier.created(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_user_edited_then_sip_reloaded(self):
         self.notifier.edited(self.user)
@@ -85,7 +88,9 @@ class TestUserNotifier(unittest.TestCase):
 
         self.notifier.edited(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_user_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.user)
@@ -103,7 +108,9 @@ class TestUserNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
 
 class TestUserServiceNotifier(unittest.TestCase):
@@ -128,12 +135,15 @@ class TestUserServiceNotifier(unittest.TestCase):
             schema.types[0],
             self.user.dnd_enabled,
         )
+        expected_headers = {
+            f'user_uuid:{self.user.uuid}': True,
+            'tenant_uuid': self.user.tenant_uuid,
+        }
 
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(
-            expected_event,
-            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+            expected_event, headers=expected_headers
         )
 
     def test_when_user_service_incallfilter_edited_then_event_sent_on_bus(self):
@@ -145,12 +155,15 @@ class TestUserServiceNotifier(unittest.TestCase):
             schema.types[0],
             self.user.incallfilter_enabled,
         )
+        expected_headers = {
+            f'user_uuid:{self.user.uuid}': True,
+            'tenant_uuid': self.user.tenant_uuid,
+        }
 
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(
-            expected_event,
-            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+            expected_event, headers=expected_headers
         )
 
 
@@ -182,12 +195,15 @@ class TestUserForwardNotifier(unittest.TestCase):
             self.user.busy_enabled,
             self.user.busy_destination,
         )
+        expected_headers = {
+            f'user_uuid:{self.user.uuid}': True,
+            'tenant_uuid': self.user.tenant_uuid,
+        }
 
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(
-            expected_event,
-            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+            expected_event, headers=expected_headers
         )
 
     def test_when_user_forward_noanswer_edited_then_event_sent_on_bus(self):
@@ -200,12 +216,15 @@ class TestUserForwardNotifier(unittest.TestCase):
             self.user.noanswer_enabled,
             self.user.noanswer_destination,
         )
+        expected_headers = {
+            f'user_uuid:{self.user.uuid}': True,
+            'tenant_uuid': self.user.tenant_uuid,
+        }
 
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(
-            expected_event,
-            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+            expected_event, headers=expected_headers
         )
 
     def test_when_user_forward_unconditional_edited_then_event_sent_on_bus(self):
@@ -218,12 +237,14 @@ class TestUserForwardNotifier(unittest.TestCase):
             self.user.unconditional_enabled,
             self.user.unconditional_destination,
         )
-
+        expected_headers = {
+            f'user_uuid:{self.user.uuid}': True,
+            'tenant_uuid': self.user.tenant_uuid,
+        }
         self.notifier.edited(self.user, schema)
 
         self.bus.send_bus_event.assert_called_once_with(
-            expected_event,
-            headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
+            expected_event, headers=expected_headers
         )
 
     def test_when_user_forwards_edited_then_event_sent_on_bus(self):
@@ -254,18 +275,14 @@ class TestUserForwardNotifier(unittest.TestCase):
             self.user.unconditional_enabled,
             self.user.unconditional_destination,
         )
+        expected_headers = {
+            f'user_uuid:{self.user.uuid}': True,
+            'tenant_uuid': self.user.tenant_uuid,
+        }
+
         expected_calls = [
-            call(
-                expected_busy_event,
-                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
-            ),
-            call(
-                expected_noanswer_event,
-                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
-            ),
-            call(
-                expected_unconditional_event,
-                headers={'user_uuid:{uuid}'.format(uuid=self.user.uuid): True},
-            ),
+            call(expected_busy_event, headers=expected_headers),
+            call(expected_noanswer_event, headers=expected_headers),
+            call(expected_unconditional_event, headers=expected_headers),
         ]
         self.bus.send_bus_event.assert_has_calls(expected_calls)

@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_sip.event import (
@@ -41,19 +41,25 @@ class SipEndpointNotifier:
     def created(self, sip):
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = CreateSipEndpointEvent(sip_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = EditSipEndpointEvent(sip_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = DeleteSipEndpointEvent(sip_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, sip):
+        return {'tenant_uuid': str(sip.tenant_uuid)}
 
 
 class SipTemplateNotifier:
@@ -70,17 +76,23 @@ class SipTemplateNotifier:
 
     def created(self, sip):
         event = CreateSipEndpointTemplateEvent({})
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
         event = EditSipEndpointTemplateEvent({})
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
         event = DeleteSipEndpointTemplateEvent({})
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, sip):
+        return {'tenant_uuid': sip.tenant_uuid}
 
 
 def build_endpoint_notifier():

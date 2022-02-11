@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_sccp.event import (
@@ -33,19 +33,25 @@ class SccpEndpointNotifier:
     def created(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         event = CreateSccpEndpointEvent(sccp_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sccp)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         self.send_sysconfd_handlers()
         event = EditSccpEndpointEvent(sccp_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sccp)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         self.send_sysconfd_handlers()
         event = DeleteSccpEndpointEvent(sccp_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sccp)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, sccp):
+        return {'tenant_uuid': str(sccp.tenant_uuid)}
 
 
 def build_notifier():

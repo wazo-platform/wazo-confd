@@ -1,7 +1,9 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.queue.event import EditQueueFallbackEvent
@@ -13,7 +15,8 @@ from ..notifier import QueueFallbackNotifier
 class TestQueueFallbackNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
-        self.queue = Mock(Queue, id=1)
+        self.queue = Mock(Queue, id=1, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.queue.tenant_uuid)}
 
         self.notifier = QueueFallbackNotifier(self.bus)
 
@@ -22,4 +25,6 @@ class TestQueueFallbackNotifier(unittest.TestCase):
 
         self.notifier.edited(self.queue)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -80,7 +80,7 @@ class UserExternalAppItem(ItemResource):
         form['user_uuid'] = user.uuid
         form.update(form_part)
         model = self.model(**form)
-        model = self.service.create(model)
+        model = self.service.create(model, user.tenant_uuid)
         return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.users.{user_uuid}.external.apps.{name}.read')
@@ -96,7 +96,7 @@ class UserExternalAppItem(ItemResource):
         kwargs = self._add_tenant_uuid()
         user = self.user_dao.get_by_id_uuid(user_uuid, **kwargs)
         model = self.service.get(user.uuid, user.tenant_uuid, name)
-        self.parse_and_update(model)
+        self.parse_and_update(model, tenant_uuid=user.tenant_uuid)
         return '', 204
 
     @required_acl('confd.users.{user_uuid}.external.apps.{name}.delete')
@@ -104,5 +104,5 @@ class UserExternalAppItem(ItemResource):
         kwargs = self._add_tenant_uuid()
         user = self.user_dao.get_by_id_uuid(user_uuid, **kwargs)
         model = self.service.get(user.uuid, user.tenant_uuid, name)
-        self.service.delete(model)
+        self.service.delete(model, user.tenant_uuid)
         return '', 204

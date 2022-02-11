@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_call_permission.event import (
@@ -15,11 +15,16 @@ class UserCallPermissionNotifier:
 
     def associated(self, user, call_permission):
         event = UserCallPermissionAssociatedEvent(user.uuid, call_permission.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, user, call_permission):
         event = UserCallPermissionDissociatedEvent(user.uuid, call_permission.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, user):
+        return {'tenant_uuid': str(user.tenant_uuid)}
 
 
 def build_notifier():

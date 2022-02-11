@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -12,6 +12,9 @@ from hamcrest import (
     equal_to,
     has_entries,
     has_length,
+    all_of,
+    has_entry,
+    has_key,
 )
 from wazo_test_helpers import until
 
@@ -55,12 +58,32 @@ def random_digits(length):
     return ''.join(random.choice(string.digits) for _ in range(length))
 
 
-def check_bus_event(routing_key, url, body=None):
+def check_bus_event_ignore_headers(routing_key, url, body=None):
     bus_events = BusClient.accumulator(routing_key)
     url(body) if body else url()
 
     def assert_function():
         assert_that(bus_events.accumulate(), has_length(1))
+
+    until.assert_(assert_function, tries=5)
+
+
+def check_bus_event(routing_key, url, body=None):
+    bus_events = BusClient.accumulator(routing_key)
+    url(body) if body else url()
+
+    assertions = all_of(
+        has_length(1),
+        contains(
+            has_entry(
+                'headers',
+                has_key('tenant_uuid'),
+            )
+        ),
+    )
+
+    def assert_function():
+        assert_that(bus_events.accumulate(with_headers=True), assertions)
 
     until.assert_(assert_function, tries=5)
 

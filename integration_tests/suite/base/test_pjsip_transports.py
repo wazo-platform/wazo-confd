@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -205,12 +205,14 @@ def test_restrict_only_master_tenant(transport):
 
 @fixtures.transport(name='original')
 def test_bus_events(transport):
-    yield s.check_bus_event, 'config.sip.transports.created', confd.sip.transports.post, {
+    yield s.check_bus_event_ignore_headers, 'config.sip.transports.created', confd.sip.transports.post, {
         'name': 'a-leaked-transport',
     }
-    yield s.check_bus_event, 'config.sip.transports.edited', confd.sip.transports(
+    yield s.check_bus_event_ignore_headers, 'config.sip.transports.edited', confd.sip.transports(
         transport['uuid']
-    ).put, {'name': 'new'}
-    yield s.check_bus_event, 'config.sip.transports.deleted', confd.sip.transports(
+    ).put, {
+        'name': 'new'
+    }
+    yield s.check_bus_event_ignore_headers, 'config.sip.transports.deleted', confd.sip.transports(
         transport['uuid']
     ).delete

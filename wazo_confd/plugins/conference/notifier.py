@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.conference.event import (
@@ -22,17 +22,23 @@ class ConferenceNotifier:
     def created(self, conference):
         self.send_sysconfd_handlers()
         event = CreateConferenceEvent(conference.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(conference)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, conference):
         self.send_sysconfd_handlers()
         event = EditConferenceEvent(conference.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(conference)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, conference):
         self.send_sysconfd_handlers()
         event = DeleteConferenceEvent(conference.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(conference)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, conference):
+        return {'tenant_uuid': str(conference.tenant_uuid)}
 
 
 def build_notifier():

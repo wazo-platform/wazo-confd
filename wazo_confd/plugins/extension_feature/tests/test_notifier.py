@@ -1,7 +1,9 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.extension_feature.event import EditExtensionFeatureEvent
@@ -14,8 +16,7 @@ class TestExtensionFeatureNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.extension = Mock(Extension, id=1)
-
+        self.extension = Mock(Extension, id=1, tenant_uuid=str(uuid4()))
         self.notifier = ExtensionFeatureNotifier(self.sysconfd, self.bus)
 
     def test_when_extension_edited_then_handlers_sent(self):

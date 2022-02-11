@@ -1,8 +1,9 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.call_pickup_member.event import (
@@ -31,7 +32,8 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
         self.user2 = Mock(User, uuid='efgh-5678')
         self.group1 = Mock(Group, uuid='abcd-1234')
         self.group2 = Mock(Group, uuid='efgh-5678')
-        self.call_pickup = Mock(CallPickup, id=3)
+        self.call_pickup = Mock(CallPickup, id=3, tenant_uuid=str(uuid4()))
+        self.expected_headers = {'tenant_uuid': self.call_pickup.tenant_uuid}
 
         self.notifier = CallPickupMemberNotifier(self.bus, self.sysconfd)
 
@@ -44,7 +46,9 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
             self.call_pickup, [self.user1, self.user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_interceptor_users_associate_then_sysconfd_event(self):
         self.notifier.interceptor_users_associated(
@@ -62,7 +66,9 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
             self.call_pickup, [self.user1, self.user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_target_users_associate_then_sysconfd_event(self):
         self.notifier.target_users_associated(
@@ -80,7 +86,9 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
             self.call_pickup, [self.group1, self.group2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_interceptor_groups_associate_then_sysconfd_event(self):
         self.notifier.interceptor_groups_associated(
@@ -98,7 +106,9 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
             self.call_pickup, [self.group1, self.group2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_target_groups_associate_then_sysconfd_event(self):
         self.notifier.target_groups_associated(

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.func_key.event import (
@@ -23,24 +23,30 @@ class FuncKeyTemplateNotifier:
 
     def created(self, template):
         event = CreateFuncKeyTemplateEvent(template.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(template)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, template, updated_fields):
         event = EditFuncKeyTemplateEvent(template.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(template)
+        self.bus.send_bus_event(event, headers=headers)
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
             self._reload_sccp(template)
 
     def deleted(self, template):
         event = DeleteFuncKeyTemplateEvent(template.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(template)
+        self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(['dialplan reload'])
         self._reload_sccp(template)
 
     def _reload_sccp(self, template):
         if self.device_db.template_has_sccp_device(template.id):
             self.send_sysconfd_handlers(['module reload chan_sccp.so'])
+
+    def _build_headers(self, template):
+        return {'tenant_uuid': str(template.tenant_uuid)}
 
 
 def build_notifier():

@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -20,7 +20,8 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.call_permission = Mock(CallPermission, id=4)
-        self.group = Mock(Group, id=5, uuid=uuid4())
+        self.group = Mock(Group, id=5, uuid=uuid4(), tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.group.tenant_uuid)}
 
         self.notifier = GroupCallPermissionNotifier(self.bus)
 
@@ -33,7 +34,9 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.group, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_call_permission_dissociate_to_group_then_event_sent_on_bus(self):
         expected_event = GroupCallPermissionDissociatedEvent(
@@ -44,4 +47,6 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.group, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

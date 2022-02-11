@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user.event import (
@@ -38,7 +38,8 @@ class UserNotifier:
             created_at=user.created_at,
             tenant_uuid=user.tenant_uuid,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, user):
         self.send_sysconfd_handlers()
@@ -49,7 +50,8 @@ class UserNotifier:
             created_at=user.created_at,
             tenant_uuid=user.tenant_uuid,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, user):
         self.send_sysconfd_handlers()
@@ -60,7 +62,11 @@ class UserNotifier:
             created_at=user.created_at,
             tenant_uuid=user.tenant_uuid,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(user)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, user):
+        return {'tenant_uuid': str(user.tenant_uuid)}
 
 
 def build_notifier():
@@ -79,7 +85,11 @@ class UserServiceNotifier:
                 user.id, user.uuid, user.tenant_uuid, type_, service['enabled']
             )
             self.bus.send_bus_event(
-                event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
+                event,
+                headers={
+                    'user_uuid:{uuid}'.format(uuid=user.uuid): True,
+                    'tenant_uuid': str(user.tenant_uuid),
+                },
             )
 
 
@@ -98,13 +108,17 @@ class UserForwardNotifier:
             event = EditUserForwardEvent(
                 user.id,
                 user.uuid,
-                user.tenant_uuid,
+                str(user.tenant_uuid),
                 type_,
                 forward['enabled'],
                 forward['destination'],
             )
             self.bus.send_bus_event(
-                event, headers={'user_uuid:{uuid}'.format(uuid=user.uuid): True}
+                event,
+                headers={
+                    'user_uuid:{uuid}'.format(uuid=user.uuid): True,
+                    'tenant_uuid': str(user.tenant_uuid),
+                },
             )
 
 

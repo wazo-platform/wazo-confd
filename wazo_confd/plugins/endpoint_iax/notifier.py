@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_iax.event import (
@@ -31,19 +31,25 @@ class IAXEndpointNotifier:
     def created(self, iax):
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(iax)
         event = CreateIAXEndpointEvent(iax_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(iax)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, iax):
         self.send_sysconfd_handlers()
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(iax)
         event = EditIAXEndpointEvent(iax_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(iax)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, iax):
         self.send_sysconfd_handlers()
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(iax)
         event = DeleteIAXEndpointEvent(iax_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(iax)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, iax):
+        return {'tenant_uuid': str(iax.tenant_uuid)}
 
 
 def build_notifier():

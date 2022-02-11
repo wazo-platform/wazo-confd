@@ -1,8 +1,9 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.user_group.event import UserGroupsAssociatedEvent
@@ -27,7 +28,8 @@ class TestUserGroupNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.group1 = Mock(Group, id=1)
         self.group2 = Mock(Group, id=2)
-        self.user = Mock(User, uuid='abcd-1234')
+        self.user = Mock(User, uuid='abcd-1234', tenant_uuid=str(uuid4()))
+        self.expected_headers = {'tenant_uuid': self.user.tenant_uuid}
 
         self.notifier = UserGroupNotifier(self.bus, self.sysconfd)
 
@@ -38,7 +40,9 @@ class TestUserGroupNotifier(unittest.TestCase):
 
         self.notifier.associated(self.user, [self.group1, self.group2])
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.user, [self.group1, self.group2])

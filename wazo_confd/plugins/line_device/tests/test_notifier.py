@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -34,10 +34,12 @@ class TestLineDeviceNotifier(unittest.TestCase):
             endpoint_sip_uuid=None,
             endpoint_sccp_id=None,
             endpoint_custom_id=None,
+            tenant_uuid=uuid.uuid4(),
         )
         self.line.name = 'limitation of mock instantiation with name ...'
         self.device = Mock(Device, id='custom-id')
         self.bus = Mock()
+        self.expected_headers = {'tenant_uuid': str(self.line.tenant_uuid)}
         self.notifier = LineDeviceNotifier(self.bus, self.sysconfd)
 
     def test_given_line_is_not_sccp_when_associated_then_sccp_not_reloaded(self):
@@ -82,7 +84,9 @@ class TestLineDeviceNotifier(unittest.TestCase):
 
         self.notifier.associated(self.line, self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_dissociate_then_bus_event(self):
         expected_event = LineDeviceDissociatedEvent(
@@ -98,4 +102,6 @@ class TestLineDeviceNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.line, self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

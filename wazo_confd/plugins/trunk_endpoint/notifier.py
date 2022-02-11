@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -51,6 +51,9 @@ class TrunkEndpointNotifier:
         handlers = {'ipbx': ipbx, 'agentbus': []}
         self.sysconfd.exec_request_handlers(handlers)
 
+    def _build_headers(self, trunk):
+        return {'tenant_uuid': str(trunk.tenant_uuid)}
+
 
 class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
     def associated(self, trunk, endpoint):
@@ -62,7 +65,8 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
             trunk=trunk_serialized,
             sip=sip_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, trunk, endpoint):
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
@@ -73,7 +77,8 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
             trunk=trunk_serialized,
             sip=sip_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
 
 class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
@@ -86,7 +91,8 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
             trunk=trunk_serialized,
             iax=iax_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, trunk, endpoint):
         self.send_sysconfd_handlers(['iax2 reload'])
@@ -97,7 +103,8 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
             trunk=trunk_serialized,
             iax=iax_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
 
 class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
@@ -108,7 +115,8 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
             trunk=trunk_serialized,
             custom=custom_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, trunk, endpoint):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
@@ -117,7 +125,8 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
             trunk=trunk_serialized,
             custom=custom_serialized,
         )
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(trunk)
+        self.bus.send_bus_event(event, headers=headers)
 
 
 def build_notifier_sip():

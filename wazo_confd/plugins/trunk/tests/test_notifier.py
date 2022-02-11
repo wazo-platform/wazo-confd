@@ -1,7 +1,9 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.trunk.event import (
@@ -24,7 +26,9 @@ class TestTrunkNotifier(unittest.TestCase):
             endpoint_sip_uuid=None,
             endpoint_iax_id=None,
             endpoint_custom_id=None,
+            tenant_uuid=uuid4(),
         )
+        self.expected_headers = {'tenant_uuid': str(self.trunk.tenant_uuid)}
 
         self.notifier = TrunkNotifier(self.bus, self.sysconfd)
 
@@ -33,21 +37,27 @@ class TestTrunkNotifier(unittest.TestCase):
 
         self.notifier.created(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_trunk_edited_then_event_sent_on_bus(self):
         expected_event = EditTrunkEvent(self.trunk.id)
 
         self.notifier.edited(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_trunk_deleted_then_event_sent_on_bus(self):
         expected_event = DeleteTrunkEvent(self.trunk.id)
 
         self.notifier.deleted(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_trunk_sip_edited_then_sip_reloaded(self):
         self.trunk.endpoint_sip_uuid = 123

@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.line_extension.event import (
@@ -27,12 +27,17 @@ class LineExtensionNotifier:
     def associated(self, line, extension):
         self.send_sysconfd_handlers()
         event = LineExtensionAssociatedEvent(line.id, extension.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, line, extension):
         self.send_sysconfd_handlers()
         event = LineExtensionDissociatedEvent(line.id, extension.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, line):
+        return {'tenant_uuid': str(line.tenant_uuid)}
 
 
 def build_notifier():

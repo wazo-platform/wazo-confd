@@ -1,4 +1,4 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_line.event import (
@@ -43,7 +43,8 @@ class UserLineNotifier:
             main_user=user_line.main_user,
             main_line=user_line.main_line,
         )
-        self._bus.send_bus_event(event)
+        headers = self._build_headers(user_line)
+        self._bus.send_bus_event(event, headers=headers)
 
     def dissociated(self, user_line):
         self._send_sysconfd_handlers()
@@ -55,7 +56,11 @@ class UserLineNotifier:
             main_user=user_line.main_user,
             main_line=user_line.main_line,
         )
-        self._bus.send_bus_event(event)
+        headers = self._build_headers(user_line)
+        self._bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, user_line):
+        return {'tenant_uuid': str(user_line.user.tenant_uuid)}
 
 
 def build_notifier():

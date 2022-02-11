@@ -1,7 +1,9 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.line.event import (
@@ -27,14 +29,15 @@ class TestLineNotifier(unittest.TestCase):
     def setUp(self):
         self.sysconfd = Mock()
         self.bus = Mock()
-        self.line = Mock(Line, id=1234, protocol='sip', tenant_uuid='uuid')
+        self.line = Mock(Line, id=1234, protocol='sip', tenant_uuid=uuid4())
         self.line.name = 'limitation of mock instantiation with name ...'
         self.line_serialized = {
             'id': self.line.id,
             'name': self.line.name,
-            'tenant_uuid': self.line.tenant_uuid,
+            'tenant_uuid': str(self.line.tenant_uuid),
             'protocol': self.line.protocol,
         }
+        self.expected_headers = {'tenant_uuid': str(self.line.tenant_uuid)}
 
         self.notifier = LineNotifier(self.sysconfd, self.bus)
 
@@ -48,7 +51,9 @@ class TestLineNotifier(unittest.TestCase):
 
         self.notifier.created(self.line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_line_edited_then_sip_reloaded(self):
         updated_fields = ['name']
@@ -72,7 +77,9 @@ class TestLineNotifier(unittest.TestCase):
 
         self.notifier.edited(self.line, None)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_line_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.line)
@@ -84,4 +91,6 @@ class TestLineNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.line)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

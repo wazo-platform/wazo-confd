@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.parking_lot.event import (
@@ -22,17 +22,23 @@ class ParkingLotNotifier:
     def created(self, parking_lot):
         self.send_sysconfd_handlers()
         event = CreateParkingLotEvent(parking_lot.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(parking_lot)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, parking_lot):
         self.send_sysconfd_handlers()
         event = EditParkingLotEvent(parking_lot.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(parking_lot)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, parking_lot):
         self.send_sysconfd_handlers()
         event = DeleteParkingLotEvent(parking_lot.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(parking_lot)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, parking_lot):
+        return {'tenant_uuid': str(parking_lot.tenant_uuid)}
 
 
 def build_notifier():

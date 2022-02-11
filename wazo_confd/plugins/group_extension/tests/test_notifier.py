@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -23,7 +23,8 @@ class TestGroupExtensionNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.extension = Mock(Extension, id=1)
-        self.group = Mock(Group, id=2, uuid=uuid4())
+        self.group = Mock(Group, id=2, uuid=uuid4(), tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.group.tenant_uuid)}
 
         self.notifier = GroupExtensionNotifier(self.bus, self.sysconfd)
 
@@ -36,7 +37,9 @@ class TestGroupExtensionNotifier(unittest.TestCase):
 
         self.notifier.associated(self.group, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.group, self.extension)
@@ -52,7 +55,9 @@ class TestGroupExtensionNotifier(unittest.TestCase):
 
         self.notifier.dissociated(self.group, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.group, self.extension)

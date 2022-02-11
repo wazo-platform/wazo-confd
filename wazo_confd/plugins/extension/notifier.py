@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.extension.event import (
@@ -22,7 +22,8 @@ class ExtensionNotifier:
     def created(self, extension):
         self.send_sysconfd_handlers(['dialplan reload'])
         event = CreateExtensionEvent(extension.id, extension.exten, extension.context)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(extension)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, extension, updated_fields):
         if updated_fields is None or updated_fields:
@@ -35,12 +36,17 @@ class ExtensionNotifier:
                 ]
             )
         event = EditExtensionEvent(extension.id, extension.exten, extension.context)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(extension)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, extension):
         self.send_sysconfd_handlers(['dialplan reload'])
         event = DeleteExtensionEvent(extension.id, extension.exten, extension.context)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(extension)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, extension):
+        return {'tenant_uuid': str(extension.tenant_uuid)}
 
 
 def build_notifier():

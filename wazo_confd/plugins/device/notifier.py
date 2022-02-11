@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.device.event import (
@@ -16,15 +16,21 @@ class DeviceNotifier:
 
     def created(self, device):
         event = CreateDeviceEvent(device.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(device)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, device):
         event = EditDeviceEvent(device.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(device)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, device):
         event = DeleteDeviceEvent(device.id)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(device)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, device):
+        return {'tenant_uuid': str(device.tenant_uuid)}
 
 
 def build_notifier():

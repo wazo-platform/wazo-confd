@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.context_context.event import ContextContextsAssociatedEvent
@@ -19,7 +19,11 @@ class ContextContextNotifier:
         self.send_sysconfd_handlers()
         context_ids = [context.id for context in contexts]
         event = ContextContextsAssociatedEvent(context.id, context_ids)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(context)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, context):
+        return {'tenant_uuid': str(context.tenant_uuid)}
 
 
 def build_notifier():

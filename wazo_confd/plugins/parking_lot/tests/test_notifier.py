@@ -1,7 +1,9 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.parking_lot.event import (
@@ -19,7 +21,8 @@ class TestParkingLotNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.parking_lot = Mock(id=1234)
+        self.parking_lot = Mock(id=1234, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.parking_lot.tenant_uuid)}
 
         self.notifier = ParkingLotNotifier(self.bus, self.sysconfd)
 
@@ -33,7 +36,9 @@ class TestParkingLotNotifier(unittest.TestCase):
 
         self.notifier.created(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_parking_lot_edited_then_res_parking_reloaded(self):
         self.notifier.edited(self.parking_lot)
@@ -45,7 +50,9 @@ class TestParkingLotNotifier(unittest.TestCase):
 
         self.notifier.edited(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_parking_lot_deleted_then_res_parking_reloaded(self):
         self.notifier.deleted(self.parking_lot)
@@ -57,4 +64,6 @@ class TestParkingLotNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -14,7 +14,8 @@ from ..notifier import GroupFallbackNotifier
 class TestGroupFallbackNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
-        self.group = Mock(Group, id=1, uuid=uuid4())
+        self.group = Mock(Group, id=1, uuid=uuid4(), tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.group.tenant_uuid)}
 
         self.notifier = GroupFallbackNotifier(self.bus)
 
@@ -25,4 +26,6 @@ class TestGroupFallbackNotifier(unittest.TestCase):
 
         self.notifier.edited(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

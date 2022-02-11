@@ -1,7 +1,9 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
+from uuid import uuid4
 from mock import Mock
 
 from xivo_bus.resources.skill_rule.event import (
@@ -19,7 +21,8 @@ class TestSkillRuleNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.skill_rule = Mock(id=1234)
+        self.skill_rule = Mock(id=1234, tenant_uuid=uuid4())
+        self.expected_headers = {'tenant_uuid': str(self.skill_rule.tenant_uuid)}
 
         self.notifier = SkillRuleNotifier(self.bus, self.sysconfd)
 
@@ -33,7 +36,9 @@ class TestSkillRuleNotifier(unittest.TestCase):
 
         self.notifier.created(self.skill_rule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_skill_rule_edited_then_call_expected_handlers(self):
         self.notifier.edited(self.skill_rule)
@@ -45,7 +50,9 @@ class TestSkillRuleNotifier(unittest.TestCase):
 
         self.notifier.edited(self.skill_rule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )
 
     def test_when_skill_rule_deleted_then_call_expected_handlers(self):
         self.notifier.deleted(self.skill_rule)
@@ -57,4 +64,6 @@ class TestSkillRuleNotifier(unittest.TestCase):
 
         self.notifier.deleted(self.skill_rule)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.send_bus_event.assert_called_once_with(
+            expected_event, headers=self.expected_headers
+        )

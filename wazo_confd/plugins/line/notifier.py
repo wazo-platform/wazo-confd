@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.line.event import (
@@ -38,20 +38,26 @@ class LineNotifier:
         self.send_sysconfd_handlers()
         serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
         event = CreateLineEvent(serialized_line)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, line, updated_fields):
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers()
         serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
         event = EditLineEvent(serialized_line)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, line):
         self.send_sysconfd_handlers()
         serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
         event = DeleteLineEvent(serialized_line)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(line)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, line):
+        return {'tenant_uuid': str(line.tenant_uuid)}
 
 
 def build_notifier():
