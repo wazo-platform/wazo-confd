@@ -506,17 +506,17 @@ def test_delete_template(template, sip):
 @fixtures.sip_template()
 def test_bus_events(sip):
     yield (
-        s.check_bus_event_ignore_headers,
+        s.check_bus_event,
         'config.sip_endpoint_template.created',
         confd.endpoints.sip.templates.post,
     )
     yield (
-        s.check_bus_event_ignore_headers,
+        s.check_bus_event,
         'config.sip_endpoint_template.updated',
         confd.endpoints.sip.templates(sip['uuid']).put,
     )
     yield (
-        s.check_bus_event_ignore_headers,
+        s.check_bus_event,
         'config.sip_endpoint_template.deleted',
         confd.endpoints.sip.templates(sip['uuid']).delete,
     )

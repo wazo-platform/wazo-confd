@@ -76,17 +76,20 @@ class SipTemplateNotifier:
 
     def created(self, sip):
         event = CreateSipEndpointTemplateEvent({})
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
         event = EditSipEndpointTemplateEvent({})
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
         event = DeleteSipEndpointTemplateEvent({})
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(sip)
+        self.bus.send_bus_event(event, headers=headers)
 
     def _build_headers(self, sip):
         return {'tenant_uuid': sip.tenant_uuid}
