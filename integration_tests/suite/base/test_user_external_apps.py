@@ -308,6 +308,6 @@ def test_delete_multi_tenant(main, sub):
 @fixtures.user()
 def test_bus_events(user):
     url = confd.users(user['uuid']).external.apps('myapp')
-    yield s.check_bus_event_ignore_headers, 'config.user_external_apps.created', url.post
-    yield s.check_bus_event_ignore_headers, 'config.user_external_apps.edited', url.put
-    yield s.check_bus_event_ignore_headers, 'config.user_external_apps.deleted', url.delete
+    yield s.check_bus_event, 'config.user_external_apps.created', url.post
+    yield s.check_bus_event, 'config.user_external_apps.edited', url.put
+    yield s.check_bus_event, 'config.user_external_apps.deleted', url.delete

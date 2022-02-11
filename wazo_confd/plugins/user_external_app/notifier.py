@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_external_app.event import (
@@ -18,20 +18,26 @@ class UserExternalAppNotifier:
     def __init__(self, bus):
         self.bus = bus
 
-    def created(self, app):
+    def created(self, app, tenant_uuid):
         app_serialized = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = CreateUserExternalAppEvent(app_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(tenant_uuid)
+        self.bus.send_bus_event(event, headers=headers)
 
-    def edited(self, app):
+    def edited(self, app, tenant_uuid):
         app_serialized = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = EditUserExternalAppEvent(app_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(tenant_uuid)
+        self.bus.send_bus_event(event, headers=headers)
 
-    def deleted(self, app):
+    def deleted(self, app, tenant_uuid):
         app_serialized = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = DeleteUserExternalAppEvent(app_serialized)
-        self.bus.send_bus_event(event)
+        headers = self._build_headers(tenant_uuid)
+        self.bus.send_bus_event(event, headers=headers)
+
+    def _build_headers(self, tenant_uuid):
+        return {'tenant_uuid': str(tenant_uuid)}
 
 
 def build_notifier():
