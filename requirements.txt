@@ -8,6 +8,7 @@ cheroot==6.5.4
 flask-cors==3.0.7
 flask-restful==0.3.7
 flask==1.0.2
+itsdangerous==0.24  # from flask
 kombu==4.6.11
 marshmallow==3.0.0b14
 netifaces==0.10.4
