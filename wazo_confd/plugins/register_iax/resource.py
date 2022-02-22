@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -118,7 +118,7 @@ class RegisterIAXList(ListResource):
     def build_headers(self, register):
         return {'Location': url_for('register_iax', id=register.id, _external=True)}
 
-    @required_acl('confd.registers.create')
+    @required_acl('confd.registers.iax.create')
     def post(self):
         form = self.schema().load(request.get_json())
         model = self.model(
@@ -131,7 +131,7 @@ class RegisterIAXList(ListResource):
         model = self.service.create(model)
         return self.schema().dump(model), 201, self.build_headers(model)
 
-    @required_acl('confd.registers.read')
+    @required_acl('confd.registers.iax.read')
     def get(self):
         return super().get()
 
@@ -140,11 +140,11 @@ class RegisterIAXItem(ItemResource):
 
     schema = RegisterIAXSchema
 
-    @required_acl('confd.registers.{id}.read')
+    @required_acl('confd.registers.iax.{id}.read')
     def get(self, id):
         return super().get(id)
 
-    @required_acl('confd.registers.{id}.update')
+    @required_acl('confd.registers.iax.{id}.update')
     def put(self, id):
         model = self.service.get(id)
         form = self.schema().load(request.get_json(), partial=True)
@@ -159,6 +159,6 @@ class RegisterIAXItem(ItemResource):
         self.service.edit(model)
         return '', 204
 
-    @required_acl('confd.registers.{id}.delete')
+    @required_acl('confd.registers.iax.{id}.delete')
     def delete(self, id):
         return super().delete(id)
