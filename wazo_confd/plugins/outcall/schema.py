@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -53,7 +53,7 @@ class DialPatternSchema(BaseSchema):
     @post_dump(pass_many=True)
     def merge_extension_dialpattern(self, data, many):
         if not many:
-            return self.merge_extension(data)
+            return self._merge_extension(data)
 
         for row in data:
             row = self._merge_extension(row)

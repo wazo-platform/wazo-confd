@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -33,7 +33,7 @@ class SkillAgentsSchema(BaseSchema):
     @post_dump(pass_many=True)
     def merge_agent_queue_skills(self, data, many):
         if not many:
-            return self.merge_agent(data)
+            return self._merge_agent(data)
 
         return [self._merge_agent(row) for row in data if row.get('agent')]
 

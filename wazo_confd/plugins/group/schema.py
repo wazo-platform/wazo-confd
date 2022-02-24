@@ -133,7 +133,7 @@ class GroupUsersMemberSchema(BaseSchema):
     @post_dump(pass_many=True)
     def merge_user_group_member(self, data, many):
         if not many:
-            return self.merge_user(data)
+            return self._merge_user(data)
 
         return [self._merge_user(row) for row in data if row.get('user')]
 

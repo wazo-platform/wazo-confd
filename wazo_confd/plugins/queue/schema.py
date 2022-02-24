@@ -89,7 +89,7 @@ class QueueAgentQueueMembersSchema(BaseSchema):
     @post_dump(pass_many=True)
     def merge_agent_queue_member(self, data, many):
         if not many:
-            return self.merge_agent(data)
+            return self._merge_agent(data)
 
         return [self._merge_agent(row) for row in data if row.get('agent')]
 
@@ -110,7 +110,7 @@ class QueueUserQueueMembersSchema(BaseSchema):
     @post_dump(pass_many=True)
     def merge_user_queue_member(self, data, many):
         if not many:
-            return self.merge_user(data)
+            return self._merge_user(data)
 
         return [self._merge_user(row) for row in data if row.get('user')]
 
