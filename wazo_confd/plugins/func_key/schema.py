@@ -40,7 +40,10 @@ class BaseDestinationSchema(Schema):
     @validates('type')
     def exclude_destination(self, data):
         if data in self.context.get('exclude_destination', []):
-            raise ValidationError('The "{}" funckey are excluded'.format(data), 'type')
+            raise ValidationError(
+                'The "{}" funckey are excluded'.format(data),
+                field_name='type',
+            )
 
     def get_parameters(self):
         parameters = []

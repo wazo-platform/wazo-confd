@@ -346,7 +346,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
         if not data.get('skill_rule_id'):
             raise ValidationError(
                 'Missing data for required field. When `skill_rule_variables` is defined',
-                ['skill_rule_id'],
+                field_name='skill_rule_id',
             )
 
     @validates('skill_rule_variables')

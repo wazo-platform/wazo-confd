@@ -53,7 +53,7 @@ class RegisterIAXSchema(BaseSchema):
         if data.get('auth_username') and not data.get('auth_password'):
             raise ValidationError(
                 'Cannot set field "auth_username" if the field "auth_password" is not set',
-                'auth_username',
+                field_name='auth_username',
             )
 
     @validates_schema
@@ -61,7 +61,7 @@ class RegisterIAXSchema(BaseSchema):
         if data.get('callback_context') and not data.get('callback_extension'):
             raise ValidationError(
                 'Cannot set field "callback_context" if the field "callback_extension" is not set',
-                'callback_context',
+                field_name='callback_context',
             )
 
     @validates_schema

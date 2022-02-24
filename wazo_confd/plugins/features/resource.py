@@ -83,7 +83,8 @@ class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
         for required in FUNC_KEY_FEATUREMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required), 'options'
+                    'The following option are required: {}'.format(required),
+                    field_name='options',
                 )
 
 
@@ -97,7 +98,8 @@ class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
         for required in FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required), 'options'
+                    'The following option are required: {}'.format(required),
+                    field_name='options',
                 )
 
 
