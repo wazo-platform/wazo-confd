@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -63,14 +63,14 @@ class QueueSchema(BaseSchema):
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key in ('wait_time_destination', 'wait_ratio_destination'):
             if data.get(key):
                 data[key] = Dialaction(**data[key])
         return data
 
     @post_dump
-    def wrap_members(self, data):
+    def wrap_members(self, data, **kwargs):
         if not self.only or 'members' in self.only:
             data['members'] = {
                 'agents': data.pop('agent_queue_members', []),

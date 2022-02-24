@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load
@@ -39,7 +39,7 @@ class IvrSchema(BaseSchema):
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key in ['invalid_destination', 'timeout_destination', 'abort_destination']:
             if data.get(key):
                 data[key] = Dialaction(**data[key])

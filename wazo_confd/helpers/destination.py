@@ -66,13 +66,13 @@ class BaseDestinationSchema(Schema):
     )
 
     @post_dump
-    def convert_type_to_user(self, data):
+    def convert_type_to_user(self, data, **kwargs):
         if data['type'] == 'endcall':
             data['type'] = 'hangup'
         return data
 
     @post_load
-    def convert_type_to_database(self, data):
+    def convert_type_to_database(self, data, **kwargs):
         if data['type'] == 'hangup':
             data['type'] = 'endcall'
         return data
@@ -88,7 +88,7 @@ class ApplicationDestinationSchema(BaseDestinationSchema):
     )
 
     @post_dump
-    def convert_application_to_user(self, data):
+    def convert_application_to_user(self, data, **kwargs):
         if data['application'] == 'callbackdisa':
             data['application'] = 'callback_disa'
         elif data['application'] == 'faxtomail':
@@ -98,7 +98,7 @@ class ApplicationDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_load
-    def convert_application_to_database(self, data):
+    def convert_application_to_database(self, data, **kwargs):
         if data['subtype'] == 'callback_disa':
             data['subtype'] = 'callbackdisa'
         elif data['subtype'] == 'fax_to_mail':
@@ -128,7 +128,7 @@ class CustomApplicationDestinationSchema(ApplicationDestinationSchema):
     )
 
     @post_dump
-    def make_application_fields_flat(self, data):
+    def make_application_fields_flat(self, data, **kwargs):
         if data.get('_application'):
             data['application_name'] = data['_application']['name']
 
@@ -169,7 +169,7 @@ class ConferenceDestinationSchema(BaseDestinationSchema):
     conference = fields.Nested('ConferenceSchema', only=['name'], dump_only=True)
 
     @post_dump
-    def make_conference_fields_flat(self, data):
+    def make_conference_fields_flat(self, data, **kwargs):
         if data.get('conference'):
             data['conference_name'] = data['conference']['name']
 
@@ -203,7 +203,7 @@ class GroupDestinationSchema(BaseDestinationSchema):
     group = fields.Nested('GroupSchema', only=['label', 'name'], dump_only=True)
 
     @post_dump
-    def make_group_fields_flat(self, data):
+    def make_group_fields_flat(self, data, **kwargs):
         if data.get('group'):
             # TODO(pc-m): Label was added in 21.04 group_name should be remove when we remove
             #             the compatibility logic in group schema
@@ -223,13 +223,13 @@ class HangupDestinationSchema(BaseDestinationSchema):
     )
 
     @post_dump
-    def convert_cause_to_user(self, data):
+    def convert_cause_to_user(self, data, **kwargs):
         if data['cause'] == 'hangup':
             data['cause'] = 'normal'
         return data
 
     @post_load
-    def convert_cause_to_database(self, data):
+    def convert_cause_to_database(self, data, **kwargs):
         if data['subtype'] == 'normal':
             data['subtype'] = 'hangup'
         return data
@@ -253,7 +253,7 @@ class IVRDestinationSchema(BaseDestinationSchema):
     ivr = fields.Nested('IvrSchema', only=['name'], dump_only=True)
 
     @post_dump
-    def make_ivr_fields_flat(self, data):
+    def make_ivr_fields_flat(self, data, **kwargs):
         if data.get('ivr'):
             data['ivr_name'] = data['ivr']['name']
 
@@ -287,7 +287,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
     queue = fields.Nested('QueueSchema', only=['label'], dump_only=True)
 
     @pre_dump
-    def separate_action(self, data):
+    def separate_action(self, data, **kwargs):
         options = data.actionarg2.split(';') if data.actionarg2 else []
         data.ring_time = None
         data.skill_rule_id = None
@@ -311,7 +311,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_load
-    def merge_action(self, data):
+    def merge_action(self, data, **kwargs):
         ring_time = data.pop('ring_time', None)
         skill_rule_id = data.pop('skill_rule_id', None)
         skill_rule_variables = data.pop('skill_rule_variables', None)
@@ -332,7 +332,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_dump
-    def make_queue_fields_flat(self, data):
+    def make_queue_fields_flat(self, data, **kwargs):
         if data.get('queue'):
             data['queue_label'] = data['queue']['label']
 
@@ -340,7 +340,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
         return data
 
     @validates_schema
-    def _validate_skill_rule_variables(self, data):
+    def _validate_skill_rule_variables(self, data, **kwargs):
         if not data.get('skill_rule_variables'):
             return
         if not data.get('skill_rule_id'):
@@ -369,14 +369,14 @@ class SoundDestinationSchema(BaseDestinationSchema):
     no_answer = StrictBoolean()
 
     @pre_dump
-    def separate_action(self, data):
+    def separate_action(self, data, **kwargs):
         options = data.actionarg2 if data.actionarg2 else ''
         data.skip = True if 'skip' in options else False
         data.no_answer = True if 'noanswer' in options else False
         return data
 
     @post_load
-    def merge_action(self, data):
+    def merge_action(self, data, **kwargs):
         data['actionarg2'] = '{skip}{noanswer}'.format(
             skip='skip' if data.pop('skip', False) else '',
             noanswer='noanswer' if data.pop('no_answer', False) else '',
@@ -393,7 +393,7 @@ class SwitchboardDestinationSchema(BaseDestinationSchema):
     switchboard = fields.Nested('SwitchboardSchema', only=['name'], dump_only=True)
 
     @post_dump
-    def make_switchboard_fields_flat(self, data):
+    def make_switchboard_fields_flat(self, data, **kwargs):
         if data.get('switchboard'):
             data['switchboard_name'] = data['switchboard']['name']
 
@@ -409,7 +409,7 @@ class UserDestinationSchema(BaseDestinationSchema):
     user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
     @post_dump
-    def make_user_fields_flat(self, data):
+    def make_user_fields_flat(self, data, **kwargs):
         if data.get('user'):
             data['user_firstname'] = data['user']['firstname']
             data['user_lastname'] = data['user']['lastname']
@@ -418,7 +418,7 @@ class UserDestinationSchema(BaseDestinationSchema):
         return data
 
     @pre_dump
-    def separate_action(self, data):
+    def separate_action(self, data, **kwargs):
         options = data.actionarg2.split(';') if data.actionarg2 else []
         data.ring_time = None
         data.moh_uuid = None
@@ -432,7 +432,7 @@ class UserDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_load
-    def merge_action(self, data):
+    def merge_action(self, data, **kwargs):
         ring_time = data.pop('ring_time', None)
         moh_uuid = data.pop('moh_uuid', None)
 
@@ -454,7 +454,7 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
     voicemail = fields.Nested('VoicemailSchema', only=['name'], dump_only=True)
 
     @pre_dump
-    def separate_action(self, data):
+    def separate_action(self, data, **kwargs):
         options = data.actionarg2 if data.actionarg2 else ''
         data.skip_instructions = True if 's' in options else False
         data.greeting = (
@@ -463,7 +463,7 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_load
-    def merge_action(self, data):
+    def merge_action(self, data, **kwargs):
         greeting = data.pop('greeting', None)
         data['actionarg2'] = '{}{}'.format(
             'b' if greeting == 'busy' else 'u' if greeting == 'unavailable' else '',
@@ -472,7 +472,7 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_dump
-    def make_voicemail_fields_flat(self, data):
+    def make_voicemail_fields_flat(self, data, **kwargs):
         if data.get('voicemail'):
             data['voicemail_name'] = data['voicemail']['name']
 
@@ -526,20 +526,26 @@ class DestinationField(fields.Nested):
         self.kwargs["unknown"] = EXCLUDE
         super().__init__(BaseDestinationSchema, **self.kwargs)
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         self.schema.context = self.context
-        base = super()._deserialize(value, attr, data)
+        base = super()._deserialize(value, attr, data, **kwargs)
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
-            base = fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
+            base = fields.Nested(schema, **self.kwargs)._deserialize(
+                value, attr, data, **kwargs
+            )
             schema = self.application_schemas[base['subtype']]
 
         if base['type'] == 'endcall':
-            base = fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
+            base = fields.Nested(schema, **self.kwargs)._deserialize(
+                value, attr, data, **kwargs
+            )
             schema = self.hangup_schemas[base['subtype']]
 
-        return fields.Nested(schema, **self.kwargs)._deserialize(value, attr, data)
+        return fields.Nested(schema, **self.kwargs)._deserialize(
+            value, attr, data, **kwargs
+        )
 
     def _serialize(self, nested_obj, attr, obj):
         base = super()._serialize(nested_obj, attr, obj)

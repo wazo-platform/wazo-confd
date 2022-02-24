@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -26,13 +26,13 @@ class IAXGeneralOption(BaseSchema):
 
 class IAXGeneralOrderedOption(IAXGeneralOption):
     @pre_load
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         if isinstance(data, list) and len(data) == 2:
             return {'key': data[0], 'value': data[1]}
         return data
 
     @post_dump
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return [data['key'], data['value']]
 
 
@@ -42,7 +42,7 @@ class IAXGeneralSchema(BaseSchema):
     ordered_options = fields.List(fields.Nested(IAXGeneralOrderedOption), required=True)
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -51,7 +51,7 @@ class IAXGeneralSchema(BaseSchema):
         return data
 
     @post_load
-    def merge_options_and_ordered_options(self, data):
+    def merge_options_and_ordered_options(self, data, **kwargs):
         self._add_metric(data)
         result = []
         result.extend(data['options'])
@@ -65,14 +65,14 @@ class IAXGeneralSchema(BaseSchema):
             option['metric'] = None
 
     @pre_dump
-    def separate_options_and_ordered_options(self, data):
+    def separate_options_and_ordered_options(self, data, **kwargs):
         return {
             'options': [option for option in data if option.metric is None],
             'ordered_options': [option for option in data if option.metric is not None],
         }
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 

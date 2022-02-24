@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -15,7 +15,7 @@ class CallFilterRecipientsSchema(BaseSchema):
     timeout = fields.Integer(dump_only=True)
 
     @post_dump
-    def merge_user(self, data):
+    def merge_user(self, data, **kwargs):
         user = data.pop('user', {})
         if user:
             data.update(user)
@@ -36,7 +36,7 @@ class CallFilterSurrogatesSchema(BaseSchema):
         return None
 
     @post_dump
-    def merge_user(self, data):
+    def merge_user(self, data, **kwargs):
         user = data.pop('user', {})
         if user:
             data.update(user)
@@ -78,7 +78,7 @@ class CallFilterSchema(BaseSchema):
     fallbacks = fields.Nested('CallFilterFallbackSchema', dump_only=True)
 
     @post_dump
-    def wrap_users(self, data):
+    def wrap_users(self, data, **kwargs):
         recipient_users = data.pop('recipients', [])
         surrogate_users = data.pop('surrogates', [])
 

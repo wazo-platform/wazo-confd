@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -26,7 +26,7 @@ class SCCPGeneralSchema(BaseSchema):
     options = fields.Nested(SCCPGeneralOptionSchema, many=True, required=True)
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -35,7 +35,7 @@ class SCCPGeneralSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 

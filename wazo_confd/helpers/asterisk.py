@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -32,7 +32,7 @@ class AsteriskConfigurationSchema(BaseSchema):
     )
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -41,16 +41,16 @@ class AsteriskConfigurationSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'options': data}
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['options']
 
 

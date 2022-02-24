@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import socket
@@ -17,7 +17,7 @@ class DHCPSchema(BaseSchema):
     network_interfaces = fields.List(fields.String(), missing=list)
 
     @validates_schema
-    def check_pool_if_active(self, data):
+    def check_pool_if_active(self, data, **kwargs):
         if not data['active']:
             return
 
@@ -43,7 +43,7 @@ class DHCPSchema(BaseSchema):
             raise ValidationError('pool_start must be less than pool_end')
 
     @pre_dump
-    def from_db_model(self, data):
+    def from_db_model(self, data, **kwargs):
         result = {
             'active': bool(data.active),
             'pool_start': data.pool_start,
@@ -55,7 +55,7 @@ class DHCPSchema(BaseSchema):
         return result
 
     @post_load
-    def to_db_model(self, data):
+    def to_db_model(self, data, **kwargs):
         data['active'] = int(data['active'])
         data['network_interfaces'] = ','.join(data['network_interfaces'])
         return data

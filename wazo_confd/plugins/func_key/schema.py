@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -75,13 +75,13 @@ class UserDestinationSchema(BaseDestinationSchema):
     endpoint_list = 'users_list'
 
     @post_dump
-    def generate_href(self, output):
+    def generate_href(self, output, **kwargs):
         user_id = output['user_id']
         output['href'] = url_for('users', id=user_id, _external=True)
         return output
 
     @post_dump
-    def make_user_fields_flat(self, data):
+    def make_user_fields_flat(self, data, **kwargs):
         if data.get('user'):
             data['user_firstname'] = data['user']['firstname']
             data['user_lastname'] = data['user']['lastname']
@@ -98,7 +98,7 @@ class GroupDestinationSchema(BaseDestinationSchema):
     )
 
     @post_dump
-    def make_group_fields_flat(self, data):
+    def make_group_fields_flat(self, data, **kwargs):
         if data.get('group'):
             # TODO(pc-m): Label was added in 21.04 group_name should be remove when we remove
             #             the compatibility logic in group schema
@@ -152,7 +152,7 @@ class CustomDestinationSchema(BaseDestinationSchema):
     exten = fields.String(validate=Regexp(EXTEN_REGEX), required=True)
 
     @pre_load
-    def remove_invalid_white_spaces(self, data):
+    def remove_invalid_white_spaces(self, data, **kwargs):
         exten = data.get('exten')
         if exten and isinstance(exten, str):
             data['exten'] = exten.strip()
@@ -166,7 +166,7 @@ class ForwardDestinationSchema(BaseDestinationSchema):
     exten = fields.String(validate=Regexp(EXTEN_REGEX), allow_none=True)
 
     @pre_load
-    def remove_invalid_white_spaces(self, data):
+    def remove_invalid_white_spaces(self, data, **kwargs):
         exten = data.get('exten')
         if exten and isinstance(exten, str):
             data['exten'] = exten.strip()
@@ -196,7 +196,7 @@ class BSFilterDestinationSchema(BaseDestinationSchema):
     )
 
     @post_dump
-    def make_member_fields_flat(self, data):
+    def make_member_fields_flat(self, data, **kwargs):
         if data['filter_member'].get('user'):
             data['filter_member_firstname'] = data['filter_member']['user']['firstname']
             data['filter_member_lastname'] = data['filter_member']['user']['lastname']
@@ -242,12 +242,12 @@ class FuncKeyDestinationField(fields.Nested):
         kwargs['unknown'] = EXCLUDE
         super().__init__(*args, **kwargs)
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         self.schema.context = self.context
-        base = super()._deserialize(value, attr, data)
+        base = super()._deserialize(value, attr, data, **kwargs)
         return fields.Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
-        )._deserialize(value, attr, data)
+        )._deserialize(value, attr, data, **kwargs)
 
     def _serialize(self, nested_obj, attr, obj):
         base = super()._serialize(nested_obj, attr, obj)
@@ -269,18 +269,20 @@ class FuncKeyPositionField(fields.Field):
         super().__init__(*args, **kwargs)
         self.key_field = key_field
         self.nested_field = nested_field
-        self.nested_field.schema.handle_error = lambda _, __: None
+        self.nested_field.schema.handle_error = lambda *args, **kwargs: None
 
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if not isinstance(value, dict):
             raise ValidationError('FuncKey must be a dictionary')
 
         template = {}
         for raw_position, raw_funckey in value.items():
-            position = self.key_field.deserialize(raw_position, attr, data)
+            position = self.key_field.deserialize(raw_position, attr, data, **kwargs)
             self.nested_field.schema.context = self.context
             try:
-                funckey = self.nested_field.deserialize(raw_funckey, attr, data)
+                funckey = self.nested_field.deserialize(
+                    raw_funckey, attr, data, **kwargs
+                )
             except ValidationError as e:
                 nested_errors = {str(position): e.messages}
                 raise ValidationError(nested_errors, data=data)

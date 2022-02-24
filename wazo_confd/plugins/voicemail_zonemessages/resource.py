@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -19,7 +19,7 @@ class VoicemailZoneMessagesOption(BaseSchema):
     message = fields.String(allow_none=True, missing=None)
 
     @post_load
-    def convert_to_sqlalchemy(self, data):
+    def convert_to_sqlalchemy(self, data, **kwargs):
         message = data['message'] if data['message'] else ''
         return {
             'var_name': data['name'],
@@ -27,7 +27,7 @@ class VoicemailZoneMessagesOption(BaseSchema):
         }
 
     @pre_dump
-    def convert_to_api(self, data):
+    def convert_to_api(self, data, **kwargs):
         timezone, message = data.var_val.split('|', 1)
         return {
             'name': data.var_name,
@@ -40,11 +40,11 @@ class VoicemailZoneMessagesSchema(BaseSchema):
     items = fields.Nested(VoicemailZoneMessagesOption, many=True, required=True)
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['items']
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'items': [option for option in data]}
 
 

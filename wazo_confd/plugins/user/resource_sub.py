@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -49,11 +49,11 @@ class ServicesSchema(BaseSchema):
     types = ['dnd', 'incallfilter']
 
     @pre_dump()
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {type_: data for type_ in self.types}
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         result = {}
         for service in data.values():
             for key, value in service.items():
@@ -135,11 +135,11 @@ class ForwardsSchema(BaseSchema):
     types = ['busy', 'noanswer', 'unconditional']
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {type_: data for type_ in self.types}
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         result = {}
         for forward in data.values():
             for key, value in forward.items():

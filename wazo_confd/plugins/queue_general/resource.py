@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -22,7 +22,7 @@ class QueueGeneralSchema(BaseSchema):
     options = fields.Nested(QueueGeneralOption, many=True, required=True)
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -31,7 +31,7 @@ class QueueGeneralSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 

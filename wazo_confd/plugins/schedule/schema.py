@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import EXCLUDE, fields, post_load, validates, validates_schema
@@ -62,7 +62,7 @@ class ScheduleOpenPeriod(BaseSchema):
     )
 
     @validates_schema
-    def validate_hours(self, data):
+    def validate_hours(self, data, **kwargs):
         if not data.get('hours_start') or not data.get('hours_end'):
             return
 
@@ -87,7 +87,7 @@ class ScheduleOpenPeriod(BaseSchema):
             raise ValidationError('months cannot be empty')
 
     @post_load
-    def create_object(self, data):
+    def create_object(self, data, **kwargs):
         return ScheduleTime(**data)
 
 
@@ -95,7 +95,7 @@ class ScheduleExceptionalPeriod(ScheduleOpenPeriod):
     destination = DestinationField(required=True)
 
     @post_load
-    def create_object(self, data):
+    def create_object(self, data, **kwargs):
         if 'destination' in data:
             data['type'] = data['destination'].get('type')
             data['subtype'] = data['destination'].get('subtype')
@@ -139,7 +139,7 @@ class ScheduleSchema(BaseSchema):
     )
 
     @post_load
-    def unwrap_closed_destination(self, data):
+    def unwrap_closed_destination(self, data, **kwargs):
         if 'closed_destination' in data:
             data['type'] = data['closed_destination'].get('type')
             data['subtype'] = data['closed_destination'].get('subtype')

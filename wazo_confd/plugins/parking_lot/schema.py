@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, validates_schema
@@ -32,7 +32,7 @@ class ParkingLotSchema(BaseSchema):
     )
 
     @validates_schema
-    def validate_slots_range(self, data):
+    def validate_slots_range(self, data, **kwargs):
         # validates_schema is executed before fields validator, so the required
         # fields is not yet checked
         if not data.get('slots_start') or not data.get('slots_end'):

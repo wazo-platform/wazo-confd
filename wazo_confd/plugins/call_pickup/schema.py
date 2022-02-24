@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -29,7 +29,7 @@ class CallPickupSchema(BaseSchema):
     )
 
     @post_dump
-    def wrap_users(self, data):
+    def wrap_users(self, data, **kwargs):
         interceptor_groups = data.pop('group_interceptors', [])
         interceptor_users = data.pop('user_interceptors', [])
         target_groups = data.pop('group_targets', [])

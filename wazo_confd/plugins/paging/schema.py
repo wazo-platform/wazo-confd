@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -37,7 +37,7 @@ class PagingSchema(BaseSchema):
     )
 
     @post_dump
-    def wrap_users(self, data):
+    def wrap_users(self, data, **kwargs):
         users_member = data.pop('users_member', [])
         users_caller = data.pop('users_caller', [])
 

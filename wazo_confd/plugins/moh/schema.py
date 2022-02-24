@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -31,7 +31,7 @@ class MohSchema(BaseSchema):
 
     # DEPRECATED 21.15
     @pre_load
-    def copy_name_to_label(self, data):
+    def copy_name_to_label(self, data, **kwargs):
         if 'label' in data:
             return data
         if 'name' in data:

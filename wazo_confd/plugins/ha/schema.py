@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import validates_schema
@@ -17,7 +17,7 @@ class HASchema(BaseSchema):
     remote_address = fields.IP()
 
     @validates_schema
-    def check_remote_if_enabled(self, data):
+    def check_remote_if_enabled(self, data, **kwargs):
         if 'node_type' not in data:
             return
         if data['node_type'] == 'disabled':

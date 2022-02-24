@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -50,7 +50,7 @@ class BaseSchema(Schema):
         return True
 
     @pre_load
-    def ensure_dict(self, data):
+    def ensure_dict(self, data, **kwargs):
         return data or {}
 
     class Meta:
@@ -67,7 +67,7 @@ class UsersUUIDSchema(BaseSchema):
 
 
 class StrictBoolean(fields.Boolean):
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if not isinstance(value, bool):
             self.fail('invalid')
         return value

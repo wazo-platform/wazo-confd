@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -39,7 +39,7 @@ class FeaturesConfigurationSchema(BaseSchema):
     options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -48,16 +48,16 @@ class FeaturesConfigurationSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'options': data}
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['options']
 
 
@@ -77,7 +77,7 @@ class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
     options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
 
     @validates_schema
-    def _validate_required_options(self, data):
+    def _validate_required_options(self, data, **kwargs):
         keys = [option.get('var_name') for option in data.get('options', {})]
 
         for required in FUNC_KEY_FEATUREMAP_FOREIGN_KEY:
@@ -91,7 +91,7 @@ class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
     options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
 
     @validates_schema
-    def _validate_required_options(self, data):
+    def _validate_required_options(self, data, **kwargs):
         keys = [option.get('var_name') for option in data.get('options', {})]
 
         for required in FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY:

@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
@@ -117,7 +117,7 @@ class UserSchema(BaseSchema):
         return data
 
     @post_dump
-    def format_call_pickup_targets(self, data):
+    def format_call_pickup_targets(self, data, **kwargs):
         if not self.only or 'call_pickup_target_users' in self.only:
             call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
             data['call_pickup_target_users'] = call_pickup_user_targets
@@ -151,7 +151,7 @@ class UserSchema(BaseSchema):
 
     # DEPRECATED 20.01
     @post_dump
-    def dump_call_record_enable_deprecated(self, data):
+    def dump_call_record_enable_deprecated(self, data, **kwargs):
         if self.only and 'call_record_enabled' not in self.only:
             return data
 
@@ -168,7 +168,7 @@ class UserSchema(BaseSchema):
 
     # DEPRECATED 20.01
     @post_load
-    def load_call_record_enable_deprecated(self, data):
+    def load_call_record_enable_deprecated(self, data, **kwargs):
         call_record_enabled = data.pop('call_record_enabled', None)
         if call_record_enabled is None:
             return data

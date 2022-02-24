@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -75,7 +75,7 @@ class GroupSchema(BaseSchema):
 
     # DEPRECATED 21.04
     @pre_load
-    def copy_name_to_label(self, data):
+    def copy_name_to_label(self, data, **kwargs):
         if 'label' in data:
             return data
         if 'name' in data:
@@ -86,7 +86,7 @@ class GroupSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_ring_strategy_to_user(self, data):
+    def convert_ring_strategy_to_user(self, data, **kwargs):
         ring_strategy = data.get('ring_strategy', None)
         if ring_strategy == 'ringall':
             data['ring_strategy'] = 'all'
@@ -101,7 +101,7 @@ class GroupSchema(BaseSchema):
         return data
 
     @post_dump
-    def wrap_users_member(self, data):
+    def wrap_users_member(self, data, **kwargs):
         users_member = data.pop('user_queue_members', [])
         extensions_member = data.pop('extension_queue_members', [])
         if not self.only or 'members' in self.only:
@@ -109,7 +109,7 @@ class GroupSchema(BaseSchema):
         return data
 
     @post_load
-    def convert_ring_strategy_to_database(self, data):
+    def convert_ring_strategy_to_database(self, data, **kwargs):
         ring_strategy = data.get('ring_strategy', None)
         if ring_strategy == 'all':
             data['ring_strategy'] = 'ringall'

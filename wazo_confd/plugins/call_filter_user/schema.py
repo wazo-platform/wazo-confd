@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import EXCLUDE, fields, post_load
@@ -12,7 +12,7 @@ class CallFilterRecipientUserSchema(BaseSchema):
     timeout = fields.Integer(validate=Range(min=0), allow_none=True, missing=None)
 
     @post_load
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         data['user'] = {'uuid': data.pop('uuid')}
         return data
 
@@ -27,7 +27,7 @@ class CallFilterSurrogateUserSchema(BaseSchema):
     uuid = fields.String(required=True)
 
     @post_load
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         data['user'] = {'uuid': data.pop('uuid')}
         return data
 

@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, pre_dump
@@ -19,9 +19,9 @@ class SkillRuleRuleSchema(BaseSchema):
     definition = fields.String(required=True)
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['definition']
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'definition': data}

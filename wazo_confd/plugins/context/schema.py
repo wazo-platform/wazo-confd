@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import EXCLUDE, fields, post_load, validates_schema
@@ -80,7 +80,7 @@ class ContextSchema(BaseSchema):
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key in [
             'user_ranges',
             'group_ranges',
