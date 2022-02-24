@@ -304,7 +304,7 @@ class FuncKeyTemplateSchema(BaseSchema):
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
-        fields.Nested(FuncKeySchema, required=True, unknown=EXCLUDE),
+        fields.Nested(FuncKeySchema, required=True),
     )
     links = ListLink(Link('func_keys_templates'))
 
@@ -314,7 +314,7 @@ class FuncKeyUnifiedTemplateSchema(BaseSchema):
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
-        fields.Nested(FuncKeySchema, required=True, unknown=EXCLUDE),
+        fields.Nested(FuncKeySchema, required=True),
     )
 
 

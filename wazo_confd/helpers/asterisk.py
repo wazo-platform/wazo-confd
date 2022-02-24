@@ -7,7 +7,7 @@ import json
 
 from flask import request
 
-from marshmallow import EXCLUDE, fields, pre_dump, post_load, pre_load, post_dump
+from marshmallow import fields, pre_dump, post_load, pre_load, post_dump
 from marshmallow.validate import Length
 
 from xivo.rest_api_helpers import APIException
@@ -27,9 +27,7 @@ class AsteriskOptionSchema(BaseSchema):
 
 
 class AsteriskConfigurationSchema(BaseSchema):
-    options = fields.Nested(
-        AsteriskOptionSchema, many=True, required=True, unknown=EXCLUDE
-    )
+    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data, **kwargs):

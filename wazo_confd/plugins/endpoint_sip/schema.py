@@ -3,7 +3,7 @@
 
 import logging
 
-from marshmallow import fields, EXCLUDE, post_dump
+from marshmallow import fields, post_dump
 from marshmallow.validate import Length, OneOf
 from marshmallow.utils import get_value
 
@@ -65,12 +65,8 @@ class _BaseSIPSchema(BaseSchema):
     registration_outbound_auth_section_options = OptionsField()
     outbound_auth_section_options = OptionsField()
 
-    templates = fields.List(
-        fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
-    )
-    transport = fields.Nested(
-        'TransportRelationSchema', unknown=EXCLUDE, allow_none=True
-    )
+    templates = fields.List(fields.Nested('EndpointSIPRelationSchema'), missing=[])
+    transport = fields.Nested('TransportRelationSchema', allow_none=True)
     asterisk_id = fields.String(validate=Length(max=1024), allow_none=True)
 
 

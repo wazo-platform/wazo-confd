@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import EXCLUDE, fields, pre_dump, post_load
+from marshmallow import fields, pre_dump, post_load
 from marshmallow.validate import Length
 
 from wazo_confd.auth import required_acl
@@ -43,8 +43,8 @@ class ServiceIncallFilterSchema(BaseSchema):
 
 
 class ServicesSchema(BaseSchema):
-    dnd = fields.Nested(ServiceDNDSchema, unknown=EXCLUDE)
-    incallfilter = fields.Nested(ServiceIncallFilterSchema, unknown=EXCLUDE)
+    dnd = fields.Nested(ServiceDNDSchema)
+    incallfilter = fields.Nested(ServiceIncallFilterSchema)
 
     types = ['dnd', 'incallfilter']
 
@@ -128,9 +128,9 @@ class ForwardUnconditionalSchema(BaseSchema):
 
 
 class ForwardsSchema(BaseSchema):
-    busy = fields.Nested(ForwardBusySchema, unknown=EXCLUDE)
-    noanswer = fields.Nested(ForwardNoAnswerSchema, unknown=EXCLUDE)
-    unconditional = fields.Nested(ForwardUnconditionalSchema, unknown=EXCLUDE)
+    busy = fields.Nested(ForwardBusySchema)
+    noanswer = fields.Nested(ForwardNoAnswerSchema)
+    unconditional = fields.Nested(ForwardUnconditionalSchema)
 
     types = ['busy', 'noanswer', 'unconditional']
 

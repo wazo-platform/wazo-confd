@@ -63,7 +63,7 @@ class UserSchemaUUIDLoad(BaseSchema):
 
 
 class UsersUUIDSchema(BaseSchema):
-    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True, unknown=EXCLUDE)
+    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
 
 
 class StrictBoolean(fields.Boolean):

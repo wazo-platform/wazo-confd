@@ -1,7 +1,7 @@
 # Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import EXCLUDE, fields, post_load, validates, validates_schema
+from marshmallow import fields, post_load, validates, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Regexp, Range
 
@@ -111,10 +111,8 @@ class ScheduleSchema(BaseSchema):
     name = fields.String(validate=Length(max=128), allow_none=True)
     timezone = fields.String(validate=Length(max=128), allow_none=True)
     closed_destination = DestinationField(required=True)
-    open_periods = fields.Nested('ScheduleOpenPeriod', many=True, unknown=EXCLUDE)
-    exceptional_periods = fields.Nested(
-        'ScheduleExceptionalPeriod', many=True, unknown=EXCLUDE
-    )
+    open_periods = fields.Nested('ScheduleOpenPeriod', many=True)
+    exceptional_periods = fields.Nested('ScheduleExceptionalPeriod', many=True)
 
     enabled = fields.Boolean()
     links = ListLink(Link('schedules'))
