@@ -48,6 +48,14 @@ class BaseSchema(Schema):
         unknown = EXCLUDE
 
 
+class Nested(fields.Nested):
+
+    def _deserialize(self, value, attr, data, partial=None, **kwargs):
+        # wazo-confd only support partial on first layer, not through nested fields
+        fake_partial = False
+        return super()._deserialize(value, attr, data, partial=fake_partial, **kwargs)
+
+
 class UserSchemaUUIDLoad(BaseSchema):
     uuid = fields.String(required=True)
 
