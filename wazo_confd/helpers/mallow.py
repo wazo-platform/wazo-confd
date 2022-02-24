@@ -6,7 +6,7 @@ import re
 from flask import url_for
 from flask_restful import abort
 from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
-from marshmallow.exceptions import RegistryError, ValidationError
+from marshmallow.exceptions import ValidationError
 
 
 class BaseSchema(Schema):
@@ -38,13 +38,6 @@ class BaseSchema(Schema):
             field_obj.schema.handle_error = super().handle_error
         if isinstance(field_obj, fields.List):
             self._inherit_handle_error(field_obj.inner)
-
-    def _nested_field_is_loaded(self, nested_field_obj):
-        try:
-            nested_field_obj.schema
-        except RegistryError:
-            return False
-        return True
 
     @pre_load
     def ensure_dict(self, data, **kwargs):
