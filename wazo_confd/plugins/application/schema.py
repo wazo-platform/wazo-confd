@@ -11,9 +11,7 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class NodeApplicationDestinationOptionsSchema(BaseSchema):
 
-    type = fields.String(
-        attribute='type_', validate=OneOf(['holding']), required=True, missing='holding'
-    )
+    type = fields.String(attribute='type_', validate=OneOf(['holding']), required=True)
     music_on_hold = fields.String(
         validate=Length(max=128), allow_none=True, missing=None
     )

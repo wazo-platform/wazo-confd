@@ -218,7 +218,6 @@ class HangupDestinationSchema(BaseDestinationSchema):
     cause = fields.String(
         validate=OneOf(['busy', 'congestion', 'normal']),
         attribute='subtype',
-        missing='normal',
         required=True,
     )
 
