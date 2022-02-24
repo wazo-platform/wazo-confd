@@ -66,7 +66,7 @@ class UsersUUIDSchema(BaseSchema):
 class StrictBoolean(fields.Boolean):
     def _deserialize(self, value, attr, data, **kwargs):
         if not isinstance(value, bool):
-            self.fail('invalid')
+            raise self.make_error('invalid')
         return value
 
 
