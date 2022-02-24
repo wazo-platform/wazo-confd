@@ -11,6 +11,7 @@ from wazo_confd.helpers.mallow import (
     BaseSchema,
     Link,
     ListLink,
+    Nested,
     PJSIPSection,
     PJSIPSectionOption,
 )
@@ -65,8 +66,8 @@ class _BaseSIPSchema(BaseSchema):
     registration_outbound_auth_section_options = OptionsField()
     outbound_auth_section_options = OptionsField()
 
-    templates = fields.List(fields.Nested('EndpointSIPRelationSchema'), missing=[])
-    transport = fields.Nested('TransportRelationSchema', allow_none=True)
+    templates = fields.List(Nested('EndpointSIPRelationSchema'), missing=[])
+    transport = Nested('TransportRelationSchema', allow_none=True)
     asterisk_id = fields.String(validate=Length(max=1024), allow_none=True)
 
 
@@ -74,8 +75,8 @@ class EndpointSIPSchema(_BaseSIPSchema):
 
     links = ListLink(Link('endpoint_sip', field='uuid'))
 
-    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
-    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+    trunk = Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    line = Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
 
 class MergedEndpointSIPSchema(EndpointSIPSchema):

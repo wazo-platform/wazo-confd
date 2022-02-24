@@ -4,7 +4,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
@@ -17,14 +17,14 @@ class SkillSchema(BaseSchema):
     description = fields.String(allow_none=True)
     links = ListLink(Link('skills'))
 
-    agents = fields.Nested(
+    agents = Nested(
         'SkillAgentsSchema', attribute='agent_queue_skills', many=True, dump_only=True
     )
 
 
 class SkillAgentsSchema(BaseSchema):
     skill_weight = fields.Integer(attribute='weight')
-    agent = fields.Nested(
+    agent = Nested(
         'AgentSchema',
         only=['id', 'number', 'firstname', 'lastname', 'links'],
         dump_only=True,

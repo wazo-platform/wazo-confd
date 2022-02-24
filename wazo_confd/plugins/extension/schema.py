@@ -1,10 +1,10 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class ExtensionSchema(BaseSchema):
@@ -16,22 +16,16 @@ class ExtensionSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('extensions'))
 
-    conference = fields.Nested(
+    conference = Nested(
         'ConferenceSchema', only=['id', 'name', 'links'], dump_only=True
     )
-    parking_lot = fields.Nested(
+    parking_lot = Nested(
         'ParkingLotSchema', only=['id', 'name', 'links'], dump_only=True
     )
-    group = fields.Nested(
-        'GroupSchema', only=['uuid', 'id', 'name', 'links'], dump_only=True
-    )
-    incall = fields.Nested('IncallSchema', only=['id', 'links'], dump_only=True)
-    lines = fields.Nested(
+    group = Nested('GroupSchema', only=['uuid', 'id', 'name', 'links'], dump_only=True)
+    incall = Nested('IncallSchema', only=['id', 'links'], dump_only=True)
+    lines = Nested(
         'LineSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    outcall = fields.Nested(
-        'OutcallSchema', only=['id', 'name', 'links'], dump_only=True
-    )
-    queue = fields.Nested(
-        'QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True
-    )
+    outcall = Nested('OutcallSchema', only=['id', 'name', 'links'], dump_only=True)
+    queue = Nested('QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True)

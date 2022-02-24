@@ -6,7 +6,7 @@ from marshmallow.validate import Length, NoneOf, OneOf, Range, Regexp
 
 from xivo_dao.alchemy.dialaction import Dialaction
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
@@ -46,19 +46,19 @@ class QueueSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('queues'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
         dump_only=True,
     )
-    schedules = fields.Nested(
+    schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    agent_queue_members = fields.Nested(
+    agent_queue_members = Nested(
         'QueueAgentQueueMembersSchema', many=True, dump_only=True
     )
-    user_queue_members = fields.Nested(
+    user_queue_members = Nested(
         'QueueUserQueueMembersSchema', many=True, dump_only=True
     )
 
@@ -82,7 +82,7 @@ class QueueSchema(BaseSchema):
 class QueueAgentQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
     penalty = fields.Integer()
-    agent = fields.Nested(
+    agent = Nested(
         'AgentSchema', only=['id', 'number', 'firstname', 'lastname', 'links']
     )
 
@@ -102,7 +102,7 @@ class QueueAgentQueueMembersSchema(BaseSchema):
 
 class QueueUserQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
-    user = fields.Nested('UserSchema', only=['uuid', 'firstname', 'lastname', 'links'])
+    user = Nested('UserSchema', only=['uuid', 'firstname', 'lastname', 'links'])
 
     @post_dump
     def merge_user_queue_member(self, data, **kwargs):

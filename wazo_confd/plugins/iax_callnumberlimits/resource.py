@@ -9,7 +9,7 @@ from marshmallow.validate import Length
 from xivo_dao.alchemy.iaxcallnumberlimits import IAXCallNumberLimits
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -22,7 +22,7 @@ class IAXCallNumberLimitsSchema(BaseSchema):
 
 
 class IAXCallNumberLimitsCollectionSchema(BaseSchema):
-    items = fields.Nested(IAXCallNumberLimitsSchema, many=True, required=True)
+    items = Nested(IAXCallNumberLimitsSchema, many=True, required=True)
 
     @post_load
     def remove_envelope(self, data, **kwargs):

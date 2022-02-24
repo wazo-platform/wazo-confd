@@ -1,10 +1,10 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, NoneOf, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 from .storage import RESERVED_DIRECTORIES
 
@@ -33,7 +33,7 @@ class SoundFormatSchema(BaseSchema):
 class SoundFileSchema(BaseSchema):
     tenant_uuid = fields.String()
     name = fields.String()
-    formats = fields.Nested(SoundFormatSchema, many=True)
+    formats = Nested(SoundFormatSchema, many=True)
 
 
 class SoundSchema(BaseSchema):
@@ -47,6 +47,6 @@ class SoundSchema(BaseSchema):
         ],
         required=True,
     )
-    files = fields.Nested(SoundFileSchema, many=True, dump_only=True)
+    files = Nested(SoundFileSchema, many=True, dump_only=True)
 
     links = ListLink(Link('sounds', field='name', target='category'))

@@ -6,7 +6,7 @@ from marshmallow.validate import Length, OneOf
 
 from xivo_dao.alchemy.application_dest_node import ApplicationDestNode
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class NodeApplicationDestinationOptionsSchema(BaseSchema):
@@ -20,7 +20,7 @@ class NodeApplicationDestinationOptionsSchema(BaseSchema):
 
 class ApplicationDestinationOptionsField(fields.Field):
 
-    _options = {'node': fields.Nested(NodeApplicationDestinationOptionsSchema)}
+    _options = {'node': Nested(NodeApplicationDestinationOptionsSchema)}
 
     def _deserialize(self, value, attr, data, **kwargs):
         destination = data.get('destination')
@@ -51,7 +51,7 @@ class ApplicationSchema(BaseSchema):
     destination_options = ApplicationDestinationOptionsField(default={})
     links = ListLink(Link('applications', field='uuid', target='application_uuid'))
 
-    lines = fields.Nested(
+    lines = Nested(
         'LineSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
 

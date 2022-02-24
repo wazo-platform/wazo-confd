@@ -8,7 +8,7 @@ from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -17,7 +17,7 @@ class ContextSchemaIDLoad(BaseSchema):
 
 
 class ContextsSchema(BaseSchema):
-    contexts = fields.Nested(ContextSchemaIDLoad, many=True, required=True)
+    contexts = Nested(ContextSchemaIDLoad, many=True, required=True)
 
 
 class ContextContextList(ConfdResource):

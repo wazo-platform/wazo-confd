@@ -5,7 +5,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Range
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
 
 
 class OutcallSchema(BaseSchema):
@@ -18,22 +18,22 @@ class OutcallSchema(BaseSchema):
     description = fields.String(allow_none=True)
     enabled = StrictBoolean()
     links = ListLink(Link('outcalls'))
-    trunks = fields.Nested(
+    trunks = Nested(
         'TrunkSchema',
         only=['tenant_uuid', 'id', 'endpoint_sip', 'endpoint_custom', 'links'],
         many=True,
         dump_only=True,
     )
-    extensions = fields.Nested(
+    extensions = Nested(
         'DialPatternSchema', attribute='dialpatterns', many=True, dump_only=True
     )
-    schedules = fields.Nested(
+    schedules = Nested(
         'ScheduleSchema',
         only=['tenant_uuid', 'id', 'name', 'links'],
         many=True,
         dump_only=True,
     )
-    call_permissions = fields.Nested(
+    call_permissions = Nested(
         'CallPermissionSchema',
         only=['tenant_uuid', 'id', 'name', 'links'],
         many=True,
@@ -46,9 +46,7 @@ class DialPatternSchema(BaseSchema):
     prefix = fields.String()
     strip_digits = fields.Integer()
     caller_id = fields.String()
-    extension = fields.Nested(
-        'ExtensionSchema', only=['id', 'exten', 'context', 'links']
-    )
+    extension = Nested('ExtensionSchema', only=['id', 'exten', 'context', 'links'])
 
     @post_dump
     def merge_extension_dialpattern(self, data, **kwargs):

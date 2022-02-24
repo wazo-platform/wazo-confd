@@ -18,6 +18,8 @@ from wazo_confd.helpers.mallow import BaseSchema
 from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.helpers.validator import Validator
 
+from .mallow import Nested
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +29,7 @@ class AsteriskOptionSchema(BaseSchema):
 
 
 class AsteriskConfigurationSchema(BaseSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data, **kwargs):

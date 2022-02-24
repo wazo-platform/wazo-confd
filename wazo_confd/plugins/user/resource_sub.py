@@ -6,7 +6,7 @@ from marshmallow import fields, pre_dump, post_load
 from marshmallow.validate import Length
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -43,8 +43,8 @@ class ServiceIncallFilterSchema(BaseSchema):
 
 
 class ServicesSchema(BaseSchema):
-    dnd = fields.Nested(ServiceDNDSchema)
-    incallfilter = fields.Nested(ServiceIncallFilterSchema)
+    dnd = Nested(ServiceDNDSchema)
+    incallfilter = Nested(ServiceIncallFilterSchema)
 
     types = ['dnd', 'incallfilter']
 
@@ -128,9 +128,9 @@ class ForwardUnconditionalSchema(BaseSchema):
 
 
 class ForwardsSchema(BaseSchema):
-    busy = fields.Nested(ForwardBusySchema)
-    noanswer = fields.Nested(ForwardNoAnswerSchema)
-    unconditional = fields.Nested(ForwardUnconditionalSchema)
+    busy = Nested(ForwardBusySchema)
+    noanswer = Nested(ForwardNoAnswerSchema)
+    unconditional = Nested(ForwardUnconditionalSchema)
 
     types = ['busy', 'noanswer', 'unconditional']
 

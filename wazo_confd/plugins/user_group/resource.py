@@ -8,7 +8,7 @@ from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -17,7 +17,7 @@ class GroupSchemaIDLoad(BaseSchema):
 
 
 class GroupsIDSchema(BaseSchema):
-    groups = fields.Nested(GroupSchemaIDLoad, many=True, required=True)
+    groups = Nested(GroupSchemaIDLoad, many=True, required=True)
 
 
 class UserGroupItem(ConfdResource):

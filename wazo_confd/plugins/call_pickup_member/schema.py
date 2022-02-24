@@ -3,7 +3,7 @@
 
 from marshmallow import fields
 
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 
 
 class CallPickupInterceptorGroupSchema(BaseSchema):
@@ -11,7 +11,7 @@ class CallPickupInterceptorGroupSchema(BaseSchema):
 
 
 class CallPickupInterceptorGroupsSchema(BaseSchema):
-    groups = fields.Nested(CallPickupInterceptorGroupSchema, many=True, required=True)
+    groups = Nested(CallPickupInterceptorGroupSchema, many=True, required=True)
 
 
 class CallPickupTargetGroupSchema(BaseSchema):
@@ -19,7 +19,7 @@ class CallPickupTargetGroupSchema(BaseSchema):
 
 
 class CallPickupTargetGroupsSchema(BaseSchema):
-    groups = fields.Nested(CallPickupTargetGroupSchema, many=True, required=True)
+    groups = Nested(CallPickupTargetGroupSchema, many=True, required=True)
 
 
 class CallPickupInterceptorUserSchema(BaseSchema):
@@ -27,7 +27,7 @@ class CallPickupInterceptorUserSchema(BaseSchema):
 
 
 class CallPickupInterceptorUsersSchema(BaseSchema):
-    users = fields.Nested(CallPickupInterceptorUserSchema, many=True, required=True)
+    users = Nested(CallPickupInterceptorUserSchema, many=True, required=True)
 
 
 class CallPickupTargetUserSchema(BaseSchema):
@@ -35,4 +35,4 @@ class CallPickupTargetUserSchema(BaseSchema):
 
 
 class CallPickupTargetUsersSchema(BaseSchema):
-    users = fields.Nested(CallPickupTargetUserSchema, many=True, required=True)
+    users = Nested(CallPickupTargetUserSchema, many=True, required=True)

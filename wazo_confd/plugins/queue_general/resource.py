@@ -9,7 +9,7 @@ from marshmallow.validate import Length
 from xivo_dao.alchemy.staticqueue import StaticQueue
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -19,7 +19,7 @@ class QueueGeneralOption(BaseSchema):
 
 
 class QueueGeneralSchema(BaseSchema):
-    options = fields.Nested(QueueGeneralOption, many=True, required=True)
+    options = Nested(QueueGeneralOption, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data, **kwargs):

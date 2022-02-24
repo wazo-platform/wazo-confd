@@ -22,7 +22,7 @@ from xivo_dao.resources.features.search import (
 )
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 PARKING_ERROR = "The parking options can only be defined with the parkinglots API"
@@ -36,7 +36,7 @@ class AsteriskOptionSchema(BaseSchema):
 
 
 class FeaturesConfigurationSchema(BaseSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data, **kwargs):
@@ -70,11 +70,11 @@ class FeaturesGeneralOptionSchema(AsteriskOptionSchema):
 
 
 class FeaturesGeneralSchema(FeaturesConfigurationSchema):
-    options = fields.Nested(FeaturesGeneralOptionSchema, many=True, required=True)
+    options = Nested(FeaturesGeneralOptionSchema, many=True, required=True)
 
 
 class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @validates_schema
     def _validate_required_options(self, data, **kwargs):
@@ -89,7 +89,7 @@ class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
 
 
 class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @validates_schema
     def _validate_required_options(self, data, **kwargs):

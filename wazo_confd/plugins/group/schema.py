@@ -6,7 +6,7 @@ import logging
 from marshmallow import fields, post_load, post_dump, pre_load
 from marshmallow.validate import Length, OneOf, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 # The label is going to end in queues.conf and used in agi.verbose calls.
 # Try not to be too permissive with it
@@ -50,26 +50,24 @@ class GroupSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('groups', field='uuid'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
         dump_only=True,
     )
-    fallbacks = fields.Nested('GroupFallbackSchema', dump_only=True)
-    incalls = fields.Nested(
+    fallbacks = Nested('GroupFallbackSchema', dump_only=True)
+    incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
-    user_queue_members = fields.Nested(
-        'GroupUsersMemberSchema', many=True, dump_only=True
-    )
-    extension_queue_members = fields.Nested(
+    user_queue_members = Nested('GroupUsersMemberSchema', many=True, dump_only=True)
+    extension_queue_members = Nested(
         'GroupExtensionsMemberSchema', many=True, dump_only=True
     )
-    schedules = fields.Nested(
+    schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    call_permissions = fields.Nested(
+    call_permissions = Nested(
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
 
@@ -126,7 +124,7 @@ class GroupSchema(BaseSchema):
 
 class GroupUsersMemberSchema(BaseSchema):
     priority = fields.Integer()
-    user = fields.Nested(
+    user = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
     )
 

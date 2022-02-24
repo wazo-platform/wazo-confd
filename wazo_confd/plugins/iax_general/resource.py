@@ -9,7 +9,7 @@ from marshmallow.validate import Length, NoneOf
 from xivo_dao.alchemy.staticiax import StaticIAX
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 REGISTER_ERROR = "The 'register' key can only be defined in trunk options"
@@ -37,9 +37,9 @@ class IAXGeneralOrderedOption(IAXGeneralOption):
 
 
 class IAXGeneralSchema(BaseSchema):
-    options = fields.Nested(IAXGeneralOption, many=True, required=True)
+    options = Nested(IAXGeneralOption, many=True, required=True)
 
-    ordered_options = fields.List(fields.Nested(IAXGeneralOrderedOption), required=True)
+    ordered_options = fields.List(Nested(IAXGeneralOrderedOption), required=True)
 
     @pre_load
     def convert_options_to_collection(self, data, **kwargs):

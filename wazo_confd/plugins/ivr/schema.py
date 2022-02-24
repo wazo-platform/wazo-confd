@@ -8,7 +8,7 @@ from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.ivr_choice import IVRChoice
 
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 from wazo_confd.helpers.validator import EXTEN_REGEX
 
 
@@ -31,10 +31,10 @@ class IvrSchema(BaseSchema):
     invalid_destination = DestinationField(allow_none=True)
     timeout_destination = DestinationField(allow_none=True)
     abort_destination = DestinationField(allow_none=True)
-    choices = fields.Nested(IvrChoiceSchema, many=True)
+    choices = Nested(IvrChoiceSchema, many=True)
     links = ListLink(Link('ivr'))
 
-    incalls = fields.Nested(
+    incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
 

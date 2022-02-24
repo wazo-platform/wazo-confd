@@ -7,7 +7,7 @@ from marshmallow.validate import Length, NoneOf, OneOf, Predicate, Range, Regexp
 
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 CONTEXT_REGEX = r"^[a-zA-Z0-9-_]*$"
 
@@ -62,17 +62,17 @@ class ContextSchema(BaseSchema):
     type = fields.String(
         validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others'])
     )
-    user_ranges = fields.Nested(RangeSchema, many=True)
-    group_ranges = fields.Nested(RangeSchema, many=True)
-    queue_ranges = fields.Nested(RangeSchema, many=True)
-    conference_room_ranges = fields.Nested(RangeSchema, many=True)
-    incall_ranges = fields.Nested(IncallRangeSchema, many=True)
+    user_ranges = Nested(RangeSchema, many=True)
+    group_ranges = Nested(RangeSchema, many=True)
+    queue_ranges = Nested(RangeSchema, many=True)
+    conference_room_ranges = Nested(RangeSchema, many=True)
+    incall_ranges = Nested(IncallRangeSchema, many=True)
     description = fields.String(allow_none=True)
     tenant_uuid = fields.String(dump_only=True)
     enabled = StrictBoolean()
     links = ListLink(Link('contexts'))
 
-    contexts = fields.Nested(
+    contexts = Nested(
         'ContextSchema',
         only=['id', 'name', 'label', 'links'],
         many=True,

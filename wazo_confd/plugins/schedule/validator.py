@@ -11,6 +11,7 @@ from xivo_dao.resources.moh import dao as moh_dao
 
 from wazo_confd.helpers.validator import GetResource, Validator, ValidationGroup
 from wazo_confd.helpers.destination import BaseDestinationSchema
+from wazo_confd.helpers.mallow import Nested
 
 
 # This is a copy of the destination helper, only difference being the name of the columns
@@ -19,7 +20,7 @@ class UserDestinationSchema(BaseDestinationSchema):
     ring_time = fields.Float(validate=Range(min=0), allow_none=True)
     moh_uuid = fields.UUID(allow_none=True)
 
-    user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
+    user = Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
     @post_dump
     def make_user_fields_flat(self, data, **kwargs):

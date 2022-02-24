@@ -5,11 +5,11 @@ from marshmallow import fields, post_dump
 from marshmallow.validate import OneOf, Length, Range
 from xivo.xivo_helpers import clean_extension
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
 
 
 class CallFilterRecipientsSchema(BaseSchema):
-    user = fields.Nested(
+    user = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
     )
     timeout = fields.Integer(dump_only=True)
@@ -23,7 +23,7 @@ class CallFilterRecipientsSchema(BaseSchema):
 
 
 class CallFilterSurrogatesSchema(BaseSchema):
-    user = fields.Nested(
+    user = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
     )
     member_id = fields.Integer(attribute='id', dump_only=True)
@@ -73,9 +73,9 @@ class CallFilterSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('callfilters'))
 
-    recipients = fields.Nested('CallFilterRecipientsSchema', many=True, dump_only=True)
-    surrogates = fields.Nested('CallFilterSurrogatesSchema', many=True, dump_only=True)
-    fallbacks = fields.Nested('CallFilterFallbackSchema', dump_only=True)
+    recipients = Nested('CallFilterRecipientsSchema', many=True, dump_only=True)
+    surrogates = Nested('CallFilterSurrogatesSchema', many=True, dump_only=True)
+    fallbacks = Nested('CallFilterFallbackSchema', dump_only=True)
 
     @post_dump
     def wrap_users(self, data, **kwargs):

@@ -4,7 +4,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
 
 
 class CallPickupSchema(BaseSchema):
@@ -15,16 +15,16 @@ class CallPickupSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('callpickups'))
 
-    group_interceptors = fields.Nested(
+    group_interceptors = Nested(
         'GroupSchema', only=['id', 'name'], many=True, dump_only=True
     )
-    group_targets = fields.Nested(
+    group_targets = Nested(
         'GroupSchema', only=['id', 'name'], many=True, dump_only=True
     )
-    user_interceptors = fields.Nested(
+    user_interceptors = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname'], many=True, dump_only=True
     )
-    user_targets = fields.Nested(
+    user_targets = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname'], many=True, dump_only=True
     )
 

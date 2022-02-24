@@ -1,10 +1,10 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 
 IP_REGEX = r'(1?\d{1,2}|2([0-4][0-9]|5[0-5]))(\.(1?\d{1,2}|2([0-4][0-9]|5[0-5]))){3}$'
@@ -29,5 +29,5 @@ class DeviceSchema(BaseSchema):
     version = fields.String(allow_none=True)
     description = fields.String(allow_none=True)
     template_id = fields.String(allow_none=True)
-    options = fields.Nested(DeviceOptionsSchema, allow_none=True)
+    options = Nested(DeviceOptionsSchema, allow_none=True)
     links = ListLink(Link('devices'))

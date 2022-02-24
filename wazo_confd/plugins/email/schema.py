@@ -1,10 +1,10 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, pre_dump
 from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 
 
 class _RewriteRule(BaseSchema):
@@ -29,7 +29,7 @@ class EmailConfigSchema(BaseSchema):
         attribute='origin', data_key='from', validate=Length(max=255), missing=''
     )
     address_rewriting_rules = fields.List(
-        fields.Nested(_RewriteRule, missing=None),
+        Nested(_RewriteRule, missing=None),
         attribute='canonical_lines',
         missing=[],
     )

@@ -6,7 +6,7 @@ import logging
 from marshmallow import fields, pre_load
 from marshmallow.validate import Length, OneOf
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class MohSchema(BaseSchema):
     sort = fields.String(
         validate=OneOf(['alphabetical', 'random', 'random_start']), allow_none=True
     )
-    files = fields.Nested(MohFileSchema, many=True, dump_only=True)
+    files = Nested(MohFileSchema, many=True, dump_only=True)
 
     links = ListLink(Link('moh', field='uuid'))
 

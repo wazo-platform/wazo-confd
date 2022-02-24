@@ -8,7 +8,7 @@ from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -17,7 +17,7 @@ class LineSchemaIDLoad(BaseSchema):
 
 
 class LinesIDSchema(BaseSchema):
-    lines = fields.Nested(LineSchemaIDLoad, many=True, required=True)
+    lines = Nested(LineSchemaIDLoad, many=True, required=True)
 
 
 class UserLineResource(ConfdResource):

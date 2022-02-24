@@ -9,7 +9,7 @@ from marshmallow.validate import Length
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -23,7 +23,7 @@ class SCCPGeneralOptionSchema(BaseSchema):
 
 
 class SCCPGeneralSchema(BaseSchema):
-    options = fields.Nested(SCCPGeneralOptionSchema, many=True, required=True)
+    options = Nested(SCCPGeneralOptionSchema, many=True, required=True)
 
     @pre_load
     def convert_options_to_collection(self, data, **kwargs):

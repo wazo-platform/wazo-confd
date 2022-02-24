@@ -49,7 +49,6 @@ class BaseSchema(Schema):
 
 
 class Nested(fields.Nested):
-
     def _deserialize(self, value, attr, data, partial=None, **kwargs):
         # wazo-confd only support partial on first layer, not through nested fields
         fake_partial = False

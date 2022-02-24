@@ -1,10 +1,10 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 NUMBER_REGEX = r"^[0-9]{1,40}$"
@@ -30,7 +30,7 @@ class VoicemailSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('voicemails'))
 
-    users = fields.Nested(
+    users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,

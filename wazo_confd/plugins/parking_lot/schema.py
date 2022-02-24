@@ -5,7 +5,7 @@ from marshmallow import fields, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Predicate, Range
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class ParkingLotSchema(BaseSchema):
@@ -24,7 +24,7 @@ class ParkingLotSchema(BaseSchema):
     )
     links = ListLink(Link('parkinglots'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,

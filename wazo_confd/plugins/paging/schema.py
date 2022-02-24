@@ -4,7 +4,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Predicate
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class PagingSchema(BaseSchema):
@@ -23,13 +23,13 @@ class PagingSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('pagings'))
 
-    users_caller = fields.Nested(
+    users_caller = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,
         dump_only=True,
     )
-    users_member = fields.Nested(
+    users_member = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,

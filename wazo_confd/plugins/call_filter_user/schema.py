@@ -4,7 +4,7 @@
 from marshmallow import fields, post_load
 from marshmallow.validate import Range
 
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 
 
 class CallFilterRecipientUserSchema(BaseSchema):
@@ -18,7 +18,7 @@ class CallFilterRecipientUserSchema(BaseSchema):
 
 
 class CallFilterRecipientUsersSchema(BaseSchema):
-    users = fields.Nested(CallFilterRecipientUserSchema, many=True, required=True)
+    users = Nested(CallFilterRecipientUserSchema, many=True, required=True)
 
 
 class CallFilterSurrogateUserSchema(BaseSchema):
@@ -31,4 +31,4 @@ class CallFilterSurrogateUserSchema(BaseSchema):
 
 
 class CallFilterSurrogateUsersSchema(BaseSchema):
-    users = fields.Nested(CallFilterSurrogateUserSchema, many=True, required=True)
+    users = Nested(CallFilterSurrogateUserSchema, many=True, required=True)

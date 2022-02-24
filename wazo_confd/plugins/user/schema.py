@@ -5,7 +5,7 @@ from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
@@ -54,25 +54,25 @@ class UserSchema(BaseSchema):
     tenant_uuid = fields.String(dump_only=True)
     links = ListLink(Link('users'))
 
-    agent = fields.Nested('AgentSchema', only=['id', 'number', 'links'], dump_only=True)
-    call_permissions = fields.Nested(
+    agent = Nested('AgentSchema', only=['id', 'number', 'links'], dump_only=True)
+    call_permissions = Nested(
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    call_pickup_user_targets_flat = fields.Nested(
+    call_pickup_user_targets_flat = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,
         dump_only=True,
     )
 
-    fallbacks = fields.Nested('UserFallbackSchema', dump_only=True)
-    groups = fields.Nested(
+    fallbacks = Nested('UserFallbackSchema', dump_only=True)
+    groups = Nested(
         'GroupSchema', only=['uuid', 'id', 'name', 'links'], many=True, dump_only=True
     )
-    incalls = fields.Nested(
+    incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
-    lines = fields.Nested(
+    lines = Nested(
         'LineSchema',
         only=[
             'id',
@@ -86,18 +86,16 @@ class UserSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
-    forwards = fields.Nested('ForwardsSchema', dump_only=True)
-    schedules = fields.Nested(
+    forwards = Nested('ForwardsSchema', dump_only=True)
+    schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    services = fields.Nested('ServicesSchema', dump_only=True)
-    switchboards = fields.Nested(
+    services = Nested('ServicesSchema', dump_only=True)
+    switchboards = Nested(
         'SwitchboardSchema', only=['uuid', 'name', 'links'], many=True, dump_only=True
     )
-    voicemail = fields.Nested(
-        'VoicemailSchema', only=['id', 'name', 'links'], dump_only=True
-    )
-    queues = fields.Nested(
+    voicemail = Nested('VoicemailSchema', only=['id', 'name', 'links'], dump_only=True)
+    queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
 

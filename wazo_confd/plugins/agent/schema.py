@@ -4,7 +4,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 NUMBER_REGEX = r"^[0-9\*#]{1,40}$"
 
@@ -23,16 +23,16 @@ class AgentSchema(BaseSchema):
     description = fields.String(allow_none=True)
     links = ListLink(Link('agents'))
 
-    queues = fields.Nested(
+    queues = Nested(
         'AgentQueuesMemberSchema',
         attribute='queue_queue_members',
         many=True,
         dump_only=True,
     )
-    skills = fields.Nested(
+    skills = Nested(
         'AgentSkillsSchema', attribute='agent_queue_skills', many=True, dump_only=True
     )
-    users = fields.Nested(
+    users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,
@@ -42,9 +42,7 @@ class AgentSchema(BaseSchema):
 
 class AgentQueuesMemberSchema(BaseSchema):
     penalty = fields.Integer()
-    queue = fields.Nested(
-        'QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True
-    )
+    queue = Nested('QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True)
 
     @post_dump
     def merge_queue_queue_member(self, data, **kwargs):
@@ -61,7 +59,7 @@ class AgentQueuesMemberSchema(BaseSchema):
 
 class AgentSkillsSchema(BaseSchema):
     skill_weight = fields.Integer(attribute='weight')
-    skill = fields.Nested('SkillSchema', only=['id', 'name', 'links'], dump_only=True)
+    skill = Nested('SkillSchema', only=['id', 'name', 'links'], dump_only=True)
 
     @post_dump
     def merge_agent_queue_skills(self, data, **kwargs):

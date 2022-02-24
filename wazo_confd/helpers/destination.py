@@ -30,7 +30,7 @@ from xivo_dao.resources.switchboard import dao as switchboard_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
-from wazo_confd.helpers.mallow import StrictBoolean
+from wazo_confd.helpers.mallow import StrictBoolean, Nested
 from wazo_confd.helpers.validator import GetResource, Validator
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
@@ -123,7 +123,7 @@ class CallBackDISADestinationSchema(ApplicationDestinationSchema):
 class CustomApplicationDestinationSchema(ApplicationDestinationSchema):
     application_uuid = fields.UUID(attribute='actionarg1', required=True)
 
-    _application = fields.Nested(
+    _application = Nested(
         'ApplicationSchema', only=['name'], attribute='application', dump_only=True
     )
 
@@ -166,7 +166,7 @@ class VoicemailMainDestinationSchema(ApplicationDestinationSchema):
 class ConferenceDestinationSchema(BaseDestinationSchema):
     conference_id = fields.Integer(attribute='actionarg1', required=True)
 
-    conference = fields.Nested('ConferenceSchema', only=['name'], dump_only=True)
+    conference = Nested('ConferenceSchema', only=['name'], dump_only=True)
 
     @post_dump
     def make_conference_fields_flat(self, data, **kwargs):
@@ -200,7 +200,7 @@ class GroupDestinationSchema(BaseDestinationSchema):
         validate=Range(min=0), attribute='actionarg2', allow_none=True
     )
 
-    group = fields.Nested('GroupSchema', only=['label', 'name'], dump_only=True)
+    group = Nested('GroupSchema', only=['label', 'name'], dump_only=True)
 
     @post_dump
     def make_group_fields_flat(self, data, **kwargs):
@@ -249,7 +249,7 @@ class CongestionDestinationSchema(HangupDestinationSchema):
 class IVRDestinationSchema(BaseDestinationSchema):
     ivr_id = fields.Integer(attribute='actionarg1', required=True)
 
-    ivr = fields.Nested('IvrSchema', only=['name'], dump_only=True)
+    ivr = Nested('IvrSchema', only=['name'], dump_only=True)
 
     @post_dump
     def make_ivr_fields_flat(self, data, **kwargs):
@@ -283,7 +283,7 @@ class QueueDestinationSchema(BaseDestinationSchema):
     skill_rule_id = fields.Integer(allow_none=True)
     skill_rule_variables = fields.Dict(allow_none=True)
 
-    queue = fields.Nested('QueueSchema', only=['label'], dump_only=True)
+    queue = Nested('QueueSchema', only=['label'], dump_only=True)
 
     @pre_dump
     def separate_action(self, data, **kwargs):
@@ -389,7 +389,7 @@ class SwitchboardDestinationSchema(BaseDestinationSchema):
         validate=Range(min=0), attribute='actionarg2', allow_none=True
     )
 
-    switchboard = fields.Nested('SwitchboardSchema', only=['name'], dump_only=True)
+    switchboard = Nested('SwitchboardSchema', only=['name'], dump_only=True)
 
     @post_dump
     def make_switchboard_fields_flat(self, data, **kwargs):
@@ -405,7 +405,7 @@ class UserDestinationSchema(BaseDestinationSchema):
     ring_time = fields.Float(validate=Range(min=0), allow_none=True)
     moh_uuid = fields.UUID(allow_none=True)
 
-    user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
+    user = Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
     @post_dump
     def make_user_fields_flat(self, data, **kwargs):
@@ -450,7 +450,7 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
     skip_instructions = StrictBoolean()
     greeting = fields.String(validate=OneOf(['busy', 'unavailable']), allow_none=True)
 
-    voicemail = fields.Nested('VoicemailSchema', only=['name'], dump_only=True)
+    voicemail = Nested('VoicemailSchema', only=['name'], dump_only=True)
 
     @pre_dump
     def separate_action(self, data, **kwargs):
@@ -479,7 +479,7 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
         return data
 
 
-class DestinationField(fields.Nested):
+class DestinationField(Nested):
 
     application_schemas = {
         'callback_disa': CallBackDISADestinationSchema,
@@ -531,20 +531,18 @@ class DestinationField(fields.Nested):
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
-            base = fields.Nested(schema, **self.kwargs)._deserialize(
+            base = Nested(schema, **self.kwargs)._deserialize(
                 value, attr, data, **kwargs
             )
             schema = self.application_schemas[base['subtype']]
 
         if base['type'] == 'endcall':
-            base = fields.Nested(schema, **self.kwargs)._deserialize(
+            base = Nested(schema, **self.kwargs)._deserialize(
                 value, attr, data, **kwargs
             )
             schema = self.hangup_schemas[base['subtype']]
 
-        return fields.Nested(schema, **self.kwargs)._deserialize(
-            value, attr, data, **kwargs
-        )
+        return Nested(schema, **self.kwargs)._deserialize(value, attr, data, **kwargs)
 
     def _serialize(self, nested_obj, attr, obj):
         base = super()._serialize(nested_obj, attr, obj)
@@ -553,18 +551,14 @@ class DestinationField(fields.Nested):
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
-            base = fields.Nested(schema, **self.kwargs)._serialize(
-                nested_obj, attr, obj
-            )
+            base = Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
             schema = self.application_schemas[base['application']]
 
         if base['type'] == 'hangup':
-            base = fields.Nested(schema, **self.kwargs)._serialize(
-                nested_obj, attr, obj
-            )
+            base = Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
             schema = self.hangup_schemas[base['cause']]
 
-        return fields.Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
+        return Nested(schema, **self.kwargs)._serialize(nested_obj, attr, obj)
 
 
 class OptionalGetSkillRuleFromActionArg2Resource(Validator):

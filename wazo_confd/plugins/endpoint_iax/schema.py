@@ -1,10 +1,10 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, Regexp, OneOf
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 NAME_REGEX = r"^[a-zA-Z0-9_-]{1,40}$"
 
@@ -18,6 +18,6 @@ class IAXSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('endpoint_iax'))
 
-    trunk = fields.Nested(
+    trunk = Nested(
         'TrunkSchema', only=['id', 'links'], dump_only=True, attribute='trunk_rel'
     )

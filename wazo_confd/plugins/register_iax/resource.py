@@ -11,7 +11,7 @@ from marshmallow.validate import Range, Regexp
 from xivo_dao.alchemy.staticiax import StaticIAX
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
 REGISTER_REGEX = re.compile(
@@ -46,7 +46,7 @@ class RegisterIAXSchema(BaseSchema):
     enabled = StrictBoolean(missing=True)
     links = ListLink(Link('register_iax'))
 
-    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    trunk = Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
 
     @validates_schema
     def validate_auth_username(self, data, **kwargs):

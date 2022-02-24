@@ -6,7 +6,7 @@ from marshmallow import EXCLUDE, Schema, fields, validates, post_dump, pre_load
 from marshmallow.validate import OneOf, Regexp, Range, Length
 from marshmallow.exceptions import ValidationError
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
 
 EXTEN_REGEX = r'^[A-Z0-9+*]+$'
 
@@ -68,7 +68,7 @@ class BaseDestinationSchema(Schema):
 class UserDestinationSchema(BaseDestinationSchema):
     user_id = fields.Integer(required=True)
 
-    user = fields.Nested(
+    user = Nested(
         'UserSchema',
         attribute='userfeatures',
         only=['firstname', 'lastname'],
@@ -96,7 +96,7 @@ class UserDestinationSchema(BaseDestinationSchema):
 class GroupDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
 
-    group = fields.Nested(
+    group = Nested(
         'GroupSchema', attribute='groupfeatures', only=['label', 'name'], dump_only=True
     )
 
@@ -191,7 +191,7 @@ class ParkingDestinationSchema(BaseDestinationSchema):
 class BSFilterDestinationSchema(BaseDestinationSchema):
     filter_member_id = fields.Integer(required=True)
 
-    filter_member = fields.Nested(
+    filter_member = Nested(
         '_BSFilterMemberDestinationSchema',
         attribute='filtermember',
         dump_only=True,
@@ -209,7 +209,7 @@ class BSFilterDestinationSchema(BaseDestinationSchema):
 
 
 class _BSFilterMemberDestinationSchema(Schema):
-    user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
+    user = Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
 
 class AgentDestinationSchema(BaseDestinationSchema):
@@ -221,7 +221,7 @@ class OnlineRecordingDestinationSchema(BaseDestinationSchema):
     pass
 
 
-class FuncKeyDestinationField(fields.Nested):
+class FuncKeyDestinationField(Nested):
 
     destination_schemas = {
         'agent': AgentDestinationSchema,
@@ -248,13 +248,13 @@ class FuncKeyDestinationField(fields.Nested):
     def _deserialize(self, value, attr, data, **kwargs):
         self.schema.context = self.context
         base = super()._deserialize(value, attr, data, **kwargs)
-        return fields.Nested(
+        return Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
         )._deserialize(value, attr, data, **kwargs)
 
     def _serialize(self, nested_obj, attr, obj):
         base = super()._serialize(nested_obj, attr, obj)
-        return fields.Nested(
+        return Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
         )._serialize(nested_obj, attr, obj)
 
@@ -307,7 +307,7 @@ class FuncKeyTemplateSchema(BaseSchema):
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
-        fields.Nested(FuncKeySchema, required=True),
+        Nested(FuncKeySchema, required=True),
     )
     links = ListLink(Link('func_keys_templates'))
 
@@ -317,7 +317,7 @@ class FuncKeyUnifiedTemplateSchema(BaseSchema):
     name = fields.String(validate=Length(max=128))
     keys = FuncKeyPositionField(
         fields.Integer(validate=Range(min=1)),
-        fields.Nested(FuncKeySchema, required=True),
+        Nested(FuncKeySchema, required=True),
     )
 
 
