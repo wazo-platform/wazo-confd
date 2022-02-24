@@ -50,19 +50,14 @@ class DialPatternSchema(BaseSchema):
         'ExtensionSchema', only=['id', 'exten', 'context', 'links']
     )
 
-    @post_dump(pass_many=True)
-    def merge_extension_dialpattern(self, data, many):
-        if not many:
-            return self._merge_extension(data)
+    @post_dump
+    def merge_extension_dialpattern(self, data, **kwargs):
+        extension = data.pop('extension', None)
+        if not extension:
+            return data
 
-        for row in data:
-            row = self._merge_extension(row)
+        data['id'] = extension.get('id', None)
+        data['exten'] = extension.get('exten', None)
+        data['context'] = extension.get('context', None)
+        data['links'] = extension.get('links', [])
         return data
-
-    def _merge_extension(self, row):
-        extension = row.pop('extension', None)
-        row['id'] = extension.get('id', None)
-        row['exten'] = extension.get('exten', None)
-        row['context'] = extension.get('context', None)
-        row['links'] = extension.get('links', [])
-        return row

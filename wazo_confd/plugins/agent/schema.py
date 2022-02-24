@@ -46,39 +46,33 @@ class AgentQueuesMemberSchema(BaseSchema):
         'QueueSchema', only=['id', 'name', 'label', 'links'], dump_only=True
     )
 
-    @post_dump(pass_many=True)
-    def merge_queue_queue_member(self, data, many):
-        if not many:
-            return self._merge_queue(data)
+    @post_dump
+    def merge_queue_queue_member(self, data, **kwargs):
+        queue = data.pop('queue', None)
+        if not queue:
+            return data
 
-        return [self._merge_queue(row) for row in data if row.get('queue')]
-
-    def _merge_queue(self, row):
-        queue = row.pop('queue')
-        row['id'] = queue.get('id', None)
-        row['name'] = queue.get('name', None)
-        row['label'] = queue.get('label', None)
-        row['links'] = queue.get('links', [])
-        return row
+        data['id'] = queue.get('id', None)
+        data['name'] = queue.get('name', None)
+        data['label'] = queue.get('label', None)
+        data['links'] = queue.get('links', [])
+        return data
 
 
 class AgentSkillsSchema(BaseSchema):
     skill_weight = fields.Integer(attribute='weight')
     skill = fields.Nested('SkillSchema', only=['id', 'name', 'links'], dump_only=True)
 
-    @post_dump(pass_many=True)
-    def merge_agent_queue_skills(self, data, many):
-        if not many:
-            return self._merge_skill(data)
+    @post_dump
+    def merge_agent_queue_skills(self, data, **kwargs):
+        skill = data.pop('skill', None)
+        if not skill:
+            return data
 
-        return [self._merge_skill(row) for row in data if row.get('skill')]
-
-    def _merge_skill(self, row):
-        skill = row.pop('skill')
-        row['id'] = skill.get('id', None)
-        row['name'] = skill.get('name', None)
-        row['links'] = skill.get('links', [])
-        return row
+        data['id'] = skill.get('id', None)
+        data['name'] = skill.get('name', None)
+        data['links'] = skill.get('links', [])
+        return data
 
 
 class AgentSchemaPUT(AgentSchema):

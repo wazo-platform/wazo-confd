@@ -86,41 +86,35 @@ class QueueAgentQueueMembersSchema(BaseSchema):
         'AgentSchema', only=['id', 'number', 'firstname', 'lastname', 'links']
     )
 
-    @post_dump(pass_many=True)
-    def merge_agent_queue_member(self, data, many):
-        if not many:
-            return self._merge_agent(data)
+    @post_dump
+    def merge_agent_queue_member(self, data, **kwargs):
+        agent = data.pop('agent', None)
+        if not agent:
+            return data
 
-        return [self._merge_agent(row) for row in data if row.get('agent')]
-
-    def _merge_agent(self, row):
-        agent = row.pop('agent')
-        row['id'] = agent.get('id', None)
-        row['number'] = agent.get('number', None)
-        row['firstname'] = agent.get('firstname', None)
-        row['lastname'] = agent.get('lastname', None)
-        row['links'] = agent.get('links', [])
-        return row
+        data['id'] = agent.get('id', None)
+        data['number'] = agent.get('number', None)
+        data['firstname'] = agent.get('firstname', None)
+        data['lastname'] = agent.get('lastname', None)
+        data['links'] = agent.get('links', [])
+        return data
 
 
 class QueueUserQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
     user = fields.Nested('UserSchema', only=['uuid', 'firstname', 'lastname', 'links'])
 
-    @post_dump(pass_many=True)
-    def merge_user_queue_member(self, data, many):
-        if not many:
-            return self._merge_user(data)
+    @post_dump
+    def merge_user_queue_member(self, data, **kwargs):
+        user = data.pop('user', None)
+        if not user:
+            return data
 
-        return [self._merge_user(row) for row in data if row.get('user')]
-
-    def _merge_user(self, row):
-        user = row.pop('user')
-        row['uuid'] = user.get('uuid', None)
-        row['firstname'] = user.get('firstname', None)
-        row['lastname'] = user.get('lastname', None)
-        row['links'] = user.get('links', [])
-        return row
+        data['uuid'] = user.get('uuid', None)
+        data['firstname'] = user.get('firstname', None)
+        data['lastname'] = user.get('lastname', None)
+        data['links'] = user.get('links', [])
+        return data
 
 
 class QueueSchemaPUT(QueueSchema):

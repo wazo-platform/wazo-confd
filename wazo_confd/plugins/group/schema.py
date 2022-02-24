@@ -130,20 +130,17 @@ class GroupUsersMemberSchema(BaseSchema):
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
     )
 
-    @post_dump(pass_many=True)
-    def merge_user_group_member(self, data, many):
-        if not many:
-            return self._merge_user(data)
+    @post_dump
+    def merge_user_group_member(self, data, **kwargs):
+        user = data.pop('user', None)
+        if not user:
+            return data
 
-        return [self._merge_user(row) for row in data if row.get('user')]
-
-    def _merge_user(self, row):
-        user = row.pop('user')
-        row['uuid'] = user.get('uuid', None)
-        row['firstname'] = user.get('firstname', None)
-        row['lastname'] = user.get('lastname', None)
-        row['links'] = user.get('links', [])
-        return row
+        data['uuid'] = user.get('uuid', None)
+        data['firstname'] = user.get('firstname', None)
+        data['lastname'] = user.get('lastname', None)
+        data['links'] = user.get('links', [])
+        return data
 
 
 class GroupExtensionsMemberSchema(BaseSchema):

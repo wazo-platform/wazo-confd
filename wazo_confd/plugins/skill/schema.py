@@ -30,18 +30,15 @@ class SkillAgentsSchema(BaseSchema):
         dump_only=True,
     )
 
-    @post_dump(pass_many=True)
-    def merge_agent_queue_skills(self, data, many):
-        if not many:
-            return self._merge_agent(data)
+    @post_dump
+    def merge_agent_queue_skills(self, data, **kwargs):
+        agent = data.pop('agent', None)
+        if not agent:
+            return data
 
-        return [self._merge_agent(row) for row in data if row.get('agent')]
-
-    def _merge_agent(self, row):
-        agent = row.pop('agent')
-        row['id'] = agent.get('id', None)
-        row['number'] = agent.get('number', None)
-        row['firstname'] = agent.get('firstname', None)
-        row['lastname'] = agent.get('lastname', None)
-        row['links'] = agent.get('links', [])
-        return row
+        data['id'] = agent.get('id', None)
+        data['number'] = agent.get('number', None)
+        data['firstname'] = agent.get('firstname', None)
+        data['lastname'] = agent.get('lastname', None)
+        data['links'] = agent.get('links', [])
+        return data
