@@ -87,7 +87,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 'a' * 513
     yield s.check_bogus_field_returns_error, url, 'persistent', None
     yield s.check_bogus_field_returns_error, url, 'persistent', 42
-    yield s.check_bogus_field_returns_error, url, 'persistent', 'no'
+    yield s.check_bogus_field_returns_error, url, 'persistent', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'persistent', []
     yield s.check_bogus_field_returns_error, url, 'persistent', {}
 
