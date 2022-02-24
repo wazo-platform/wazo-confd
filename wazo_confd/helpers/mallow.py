@@ -15,7 +15,7 @@ class BaseSchema(Schema):
 
         if handle_error:
 
-            def handle_error_fn(error, data):
+            def handle_error_fn(error, data, **kwargs):
                 # Ugly hack to keep the same error message from python2 to python3
                 # The message can be a dictionary and we do not want to cast it to string,
                 # because there are some logic with the `type` in common.py
@@ -37,7 +37,7 @@ class BaseSchema(Schema):
         if isinstance(field_obj, fields.Nested):
             field_obj.schema.handle_error = super().handle_error
         if isinstance(field_obj, fields.List):
-            self._inherit_handle_error(field_obj.container)
+            self._inherit_handle_error(field_obj.inner)
 
     def _nested_field_is_loaded(self, nested_field_obj):
         try:
