@@ -1,15 +1,12 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
-import logging
 
 from flask import url_for
 from flask_restful import abort
 from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
-from marshmallow.exceptions import RegistryError, ValidationError
-
-logger = logging.getLogger(__name__)
+from marshmallow.exceptions import ValidationError
 
 
 class BaseSchema(Schema):
@@ -18,7 +15,7 @@ class BaseSchema(Schema):
 
         if handle_error:
 
-            def handle_error_fn(error, data):
+            def handle_error_fn(error, data, **kwargs):
                 # Ugly hack to keep the same error message from python2 to python3
                 # The message can be a dictionary and we do not want to cast it to string,
                 # because there are some logic with the `type` in common.py
@@ -40,17 +37,10 @@ class BaseSchema(Schema):
         if isinstance(field_obj, fields.Nested):
             field_obj.schema.handle_error = super().handle_error
         if isinstance(field_obj, fields.List):
-            self._inherit_handle_error(field_obj.container)
-
-    def _nested_field_is_loaded(self, nested_field_obj):
-        try:
-            nested_field_obj.schema
-        except RegistryError:
-            return False
-        return True
+            self._inherit_handle_error(field_obj.inner)
 
     @pre_load
-    def ensure_dict(self, data):
+    def ensure_dict(self, data, **kwargs):
         return data or {}
 
     class Meta:
@@ -58,18 +48,25 @@ class BaseSchema(Schema):
         unknown = EXCLUDE
 
 
+class Nested(fields.Nested):
+    def _deserialize(self, value, attr, data, partial=None, **kwargs):
+        # wazo-confd only support partial on first layer, not through nested fields
+        fake_partial = False
+        return super()._deserialize(value, attr, data, partial=fake_partial, **kwargs)
+
+
 class UserSchemaUUIDLoad(BaseSchema):
     uuid = fields.String(required=True)
 
 
 class UsersUUIDSchema(BaseSchema):
-    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True, unknown=EXCLUDE)
+    users = fields.Nested(UserSchemaUUIDLoad, many=True, required=True)
 
 
 class StrictBoolean(fields.Boolean):
-    def _deserialize(self, value, attr, data):
+    def _deserialize(self, value, attr, data, **kwargs):
         if not isinstance(value, bool):
-            self.fail('invalid')
+            raise self.make_error('invalid')
         return value
 
 

@@ -1,11 +1,11 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import OneOf, Length
 
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class IncallSchema(BaseSchema):
@@ -21,12 +21,12 @@ class IncallSchema(BaseSchema):
     destination = DestinationField(required=True)
     links = ListLink(Link('incalls'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
         dump_only=True,
     )
-    schedules = fields.Nested(
+    schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )

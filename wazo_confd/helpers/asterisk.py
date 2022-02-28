@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -7,7 +7,7 @@ import json
 
 from flask import request
 
-from marshmallow import EXCLUDE, fields, pre_dump, post_load, pre_load, post_dump
+from marshmallow import fields, pre_dump, post_load, pre_load, post_dump
 from marshmallow.validate import Length
 
 from xivo.rest_api_helpers import APIException
@@ -18,6 +18,8 @@ from wazo_confd.helpers.mallow import BaseSchema
 from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.helpers.validator import Validator
 
+from .mallow import Nested
+
 logger = logging.getLogger(__name__)
 
 
@@ -27,12 +29,10 @@ class AsteriskOptionSchema(BaseSchema):
 
 
 class AsteriskConfigurationSchema(BaseSchema):
-    options = fields.Nested(
-        AsteriskOptionSchema, many=True, required=True, unknown=EXCLUDE
-    )
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -41,16 +41,16 @@ class AsteriskConfigurationSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'options': data}
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['options']
 
 

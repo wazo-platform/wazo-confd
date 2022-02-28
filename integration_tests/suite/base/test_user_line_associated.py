@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -33,7 +33,7 @@ def test_get_merged_view_validation(user, line, sip):
             .lines(line['id'])
             .associated.endpoints.sip.get(view='unknown')
         )
-        response.assert_match(400, re.compile(re.escape('Not a valid choice')))
+        response.assert_match(400, re.compile(re.escape('Must be one of: merged.')))
 
 
 @fixtures.user()

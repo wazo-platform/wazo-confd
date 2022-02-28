@@ -1,11 +1,11 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Predicate, Range
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class ParkingLotSchema(BaseSchema):
@@ -24,7 +24,7 @@ class ParkingLotSchema(BaseSchema):
     )
     links = ListLink(Link('parkinglots'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
@@ -32,7 +32,7 @@ class ParkingLotSchema(BaseSchema):
     )
 
     @validates_schema
-    def validate_slots_range(self, data):
+    def validate_slots_range(self, data, **kwargs):
         # validates_schema is executed before fields validator, so the required
         # fields is not yet checked
         if not data.get('slots_start') or not data.get('slots_end'):

@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -6,7 +6,7 @@ import logging
 from marshmallow import fields, pre_load
 from marshmallow.validate import Length, OneOf
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +25,13 @@ class MohSchema(BaseSchema):
     sort = fields.String(
         validate=OneOf(['alphabetical', 'random', 'random_start']), allow_none=True
     )
-    files = fields.Nested(MohFileSchema, many=True, dump_only=True)
+    files = Nested(MohFileSchema, many=True, dump_only=True)
 
     links = ListLink(Link('moh', field='uuid'))
 
     # DEPRECATED 21.15
     @pre_load
-    def copy_name_to_label(self, data):
+    def copy_name_to_label(self, data, **kwargs):
         if 'label' in data:
             return data
         if 'name' in data:

@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -6,7 +6,7 @@ import logging
 from marshmallow import fields, post_load, post_dump, pre_load
 from marshmallow.validate import Length, OneOf, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 # The label is going to end in queues.conf and used in agi.verbose calls.
 # Try not to be too permissive with it
@@ -50,32 +50,30 @@ class GroupSchema(BaseSchema):
     enabled = StrictBoolean()
     links = ListLink(Link('groups', field='uuid'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
         dump_only=True,
     )
-    fallbacks = fields.Nested('GroupFallbackSchema', dump_only=True)
-    incalls = fields.Nested(
+    fallbacks = Nested('GroupFallbackSchema', dump_only=True)
+    incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
-    user_queue_members = fields.Nested(
-        'GroupUsersMemberSchema', many=True, dump_only=True
-    )
-    extension_queue_members = fields.Nested(
+    user_queue_members = Nested('GroupUsersMemberSchema', many=True, dump_only=True)
+    extension_queue_members = Nested(
         'GroupExtensionsMemberSchema', many=True, dump_only=True
     )
-    schedules = fields.Nested(
+    schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    call_permissions = fields.Nested(
+    call_permissions = Nested(
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
 
     # DEPRECATED 21.04
     @pre_load
-    def copy_name_to_label(self, data):
+    def copy_name_to_label(self, data, **kwargs):
         if 'label' in data:
             return data
         if 'name' in data:
@@ -86,7 +84,7 @@ class GroupSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_ring_strategy_to_user(self, data):
+    def convert_ring_strategy_to_user(self, data, **kwargs):
         ring_strategy = data.get('ring_strategy', None)
         if ring_strategy == 'ringall':
             data['ring_strategy'] = 'all'
@@ -101,7 +99,7 @@ class GroupSchema(BaseSchema):
         return data
 
     @post_dump
-    def wrap_users_member(self, data):
+    def wrap_users_member(self, data, **kwargs):
         users_member = data.pop('user_queue_members', [])
         extensions_member = data.pop('extension_queue_members', [])
         if not self.only or 'members' in self.only:
@@ -109,7 +107,7 @@ class GroupSchema(BaseSchema):
         return data
 
     @post_load
-    def convert_ring_strategy_to_database(self, data):
+    def convert_ring_strategy_to_database(self, data, **kwargs):
         ring_strategy = data.get('ring_strategy', None)
         if ring_strategy == 'all':
             data['ring_strategy'] = 'ringall'
@@ -126,24 +124,21 @@ class GroupSchema(BaseSchema):
 
 class GroupUsersMemberSchema(BaseSchema):
     priority = fields.Integer()
-    user = fields.Nested(
+    user = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname', 'links'], dump_only=True
     )
 
-    @post_dump(pass_many=True)
-    def merge_user_group_member(self, data, many):
-        if not many:
-            return self.merge_user(data)
+    @post_dump
+    def merge_user_group_member(self, data, **kwargs):
+        user = data.pop('user', None)
+        if not user:
+            return data
 
-        return [self._merge_user(row) for row in data if row.get('user')]
-
-    def _merge_user(self, row):
-        user = row.pop('user')
-        row['uuid'] = user.get('uuid', None)
-        row['firstname'] = user.get('firstname', None)
-        row['lastname'] = user.get('lastname', None)
-        row['links'] = user.get('links', [])
-        return row
+        data['uuid'] = user.get('uuid', None)
+        data['firstname'] = user.get('firstname', None)
+        data['lastname'] = user.get('lastname', None)
+        data['links'] = user.get('links', [])
+        return data
 
 
 class GroupExtensionsMemberSchema(BaseSchema):

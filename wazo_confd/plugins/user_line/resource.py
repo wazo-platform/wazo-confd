@@ -1,14 +1,14 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import EXCLUDE, fields
+from marshmallow import fields
 
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -17,7 +17,7 @@ class LineSchemaIDLoad(BaseSchema):
 
 
 class LinesIDSchema(BaseSchema):
-    lines = fields.Nested(LineSchemaIDLoad, many=True, required=True, unknown=EXCLUDE)
+    lines = Nested(LineSchemaIDLoad, many=True, required=True)
 
 
 class UserLineResource(ConfdResource):

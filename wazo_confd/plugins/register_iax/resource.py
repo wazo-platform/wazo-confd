@@ -11,7 +11,7 @@ from marshmallow.validate import Range, Regexp
 from xivo_dao.alchemy.staticiax import StaticIAX
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
 REGISTER_REGEX = re.compile(
@@ -46,33 +46,33 @@ class RegisterIAXSchema(BaseSchema):
     enabled = StrictBoolean(missing=True)
     links = ListLink(Link('register_iax'))
 
-    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    trunk = Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
 
     @validates_schema
-    def validate_auth_username(self, data):
+    def validate_auth_username(self, data, **kwargs):
         if data.get('auth_username') and not data.get('auth_password'):
             raise ValidationError(
                 'Cannot set field "auth_username" if the field "auth_password" is not set',
-                'auth_username',
+                field_name='auth_username',
             )
 
     @validates_schema
-    def validate_callback_context(self, data):
+    def validate_callback_context(self, data, **kwargs):
         if data.get('callback_context') and not data.get('callback_extension'):
             raise ValidationError(
                 'Cannot set field "callback_context" if the field "callback_extension" is not set',
-                'callback_context',
+                field_name='callback_context',
             )
 
     @validates_schema
-    def validate_total_length(self, data):
+    def validate_total_length(self, data, **kwargs):
         if len(self.convert_to_chaniax(data)['var_val']) > 255:
             raise ValidationError(
                 'The sum of all fields is longer than maximum length 255'
             )
 
     @post_load
-    def convert_to_chaniax(self, data):
+    def convert_to_chaniax(self, data, **kwargs):
         chaniax_fmt = (
             '{auth_username}{auth_password}{separator}'
             '{remote_host}{remote_port}{callback_extension}{callback_context}'
@@ -101,7 +101,7 @@ class RegisterIAXSchema(BaseSchema):
         return data
 
     @pre_dump
-    def convert_from_chaniax(self, data):
+    def convert_from_chaniax(self, data, **kwargs):
         register = REGISTER_REGEX.match(data.var_val)
         result = register.groupdict()
         result['id'] = data.id

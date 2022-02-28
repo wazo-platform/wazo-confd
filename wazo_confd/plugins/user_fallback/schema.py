@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import post_load
@@ -21,7 +21,7 @@ class UserFallbackSchema(BaseSchema):
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key, form in data.items():
             if form:
                 data[key] = Dialaction(**form)

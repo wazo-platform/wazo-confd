@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -6,7 +6,7 @@ from marshmallow.validate import Length, NoneOf, OneOf, Range, Regexp
 
 from xivo_dao.alchemy.dialaction import Dialaction
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 
@@ -46,31 +46,31 @@ class QueueSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('queues'))
 
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
         dump_only=True,
     )
-    schedules = fields.Nested(
+    schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
-    agent_queue_members = fields.Nested(
+    agent_queue_members = Nested(
         'QueueAgentQueueMembersSchema', many=True, dump_only=True
     )
-    user_queue_members = fields.Nested(
+    user_queue_members = Nested(
         'QueueUserQueueMembersSchema', many=True, dump_only=True
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key in ('wait_time_destination', 'wait_ratio_destination'):
             if data.get(key):
                 data[key] = Dialaction(**data[key])
         return data
 
     @post_dump
-    def wrap_members(self, data):
+    def wrap_members(self, data, **kwargs):
         if not self.only or 'members' in self.only:
             data['members'] = {
                 'agents': data.pop('agent_queue_members', []),
@@ -82,45 +82,39 @@ class QueueSchema(BaseSchema):
 class QueueAgentQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
     penalty = fields.Integer()
-    agent = fields.Nested(
+    agent = Nested(
         'AgentSchema', only=['id', 'number', 'firstname', 'lastname', 'links']
     )
 
-    @post_dump(pass_many=True)
-    def merge_agent_queue_member(self, data, many):
-        if not many:
-            return self.merge_agent(data)
+    @post_dump
+    def merge_agent_queue_member(self, data, **kwargs):
+        agent = data.pop('agent', None)
+        if not agent:
+            return data
 
-        return [self._merge_agent(row) for row in data if row.get('agent')]
-
-    def _merge_agent(self, row):
-        agent = row.pop('agent')
-        row['id'] = agent.get('id', None)
-        row['number'] = agent.get('number', None)
-        row['firstname'] = agent.get('firstname', None)
-        row['lastname'] = agent.get('lastname', None)
-        row['links'] = agent.get('links', [])
-        return row
+        data['id'] = agent.get('id', None)
+        data['number'] = agent.get('number', None)
+        data['firstname'] = agent.get('firstname', None)
+        data['lastname'] = agent.get('lastname', None)
+        data['links'] = agent.get('links', [])
+        return data
 
 
 class QueueUserQueueMembersSchema(BaseSchema):
     priority = fields.Integer()
-    user = fields.Nested('UserSchema', only=['uuid', 'firstname', 'lastname', 'links'])
+    user = Nested('UserSchema', only=['uuid', 'firstname', 'lastname', 'links'])
 
-    @post_dump(pass_many=True)
-    def merge_user_queue_member(self, data, many):
-        if not many:
-            return self.merge_user(data)
+    @post_dump
+    def merge_user_queue_member(self, data, **kwargs):
+        user = data.pop('user', None)
+        if not user:
+            return data
 
-        return [self._merge_user(row) for row in data if row.get('user')]
-
-    def _merge_user(self, row):
-        user = row.pop('user')
-        row['uuid'] = user.get('uuid', None)
-        row['firstname'] = user.get('firstname', None)
-        row['lastname'] = user.get('lastname', None)
-        row['links'] = user.get('links', [])
-        return row
+        data['uuid'] = user.get('uuid', None)
+        data['firstname'] = user.get('firstname', None)
+        data['lastname'] = user.get('lastname', None)
+        data['links'] = user.get('links', [])
+        return data
 
 
 class QueueSchemaPUT(QueueSchema):

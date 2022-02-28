@@ -1,10 +1,10 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length, Predicate, Range
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class LineSchema(BaseSchema):
@@ -26,10 +26,10 @@ class LineSchema(BaseSchema):
     registrar = fields.String(validate=Length(max=128))
     links = ListLink(Link('lines'))
 
-    application = fields.Nested(
+    application = Nested(
         'ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True
     )
-    endpoint_sip = fields.Nested(
+    endpoint_sip = Nested(
         'EndpointSIPSchema',
         # TODO(pc-m): Is it really useful to have the username/password on the relation?
         only=[
@@ -41,17 +41,17 @@ class LineSchema(BaseSchema):
         ],
         dump_only=True,
     )
-    endpoint_sccp = fields.Nested('SccpSchema', only=['id', 'links'], dump_only=True)
-    endpoint_custom = fields.Nested(
+    endpoint_sccp = Nested('SccpSchema', only=['id', 'links'], dump_only=True)
+    endpoint_custom = Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
     )
-    extensions = fields.Nested(
+    extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
         dump_only=True,
     )
-    users = fields.Nested(
+    users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,

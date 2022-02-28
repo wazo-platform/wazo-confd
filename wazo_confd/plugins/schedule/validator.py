@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump, pre_dump, post_load
@@ -11,6 +11,7 @@ from xivo_dao.resources.moh import dao as moh_dao
 
 from wazo_confd.helpers.validator import GetResource, Validator, ValidationGroup
 from wazo_confd.helpers.destination import BaseDestinationSchema
+from wazo_confd.helpers.mallow import Nested
 
 
 # This is a copy of the destination helper, only difference being the name of the columns
@@ -19,10 +20,10 @@ class UserDestinationSchema(BaseDestinationSchema):
     ring_time = fields.Float(validate=Range(min=0), allow_none=True)
     moh_uuid = fields.UUID(allow_none=True)
 
-    user = fields.Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
+    user = Nested('UserSchema', only=['firstname', 'lastname'], dump_only=True)
 
     @post_dump
-    def make_user_fields_flat(self, data):
+    def make_user_fields_flat(self, data, **kwargs):
         if data.get('user'):
             data['user_firstname'] = data['user']['firstname']
             data['user_lastname'] = data['user']['lastname']
@@ -31,7 +32,7 @@ class UserDestinationSchema(BaseDestinationSchema):
         return data
 
     @pre_dump
-    def separate_action(self, data):
+    def separate_action(self, data, **kwargs):
         options = (
             data.fallback_actionargs.split(';') if data.fallback_actionargs else []
         )
@@ -47,7 +48,7 @@ class UserDestinationSchema(BaseDestinationSchema):
         return data
 
     @post_load
-    def merge_action(self, data):
+    def merge_action(self, data, **kwargs):
         ring_time = data.pop('ring_time', None)
         moh_uuid = data.pop('moh_uuid', None)
 

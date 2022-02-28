@@ -1,9 +1,9 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 
-from marshmallow import fields, EXCLUDE, post_dump
+from marshmallow import fields, post_dump
 from marshmallow.validate import Length, OneOf
 from marshmallow.utils import get_value
 
@@ -11,6 +11,7 @@ from wazo_confd.helpers.mallow import (
     BaseSchema,
     Link,
     ListLink,
+    Nested,
     PJSIPSection,
     PJSIPSectionOption,
 )
@@ -65,12 +66,8 @@ class _BaseSIPSchema(BaseSchema):
     registration_outbound_auth_section_options = OptionsField()
     outbound_auth_section_options = OptionsField()
 
-    templates = fields.List(
-        fields.Nested('EndpointSIPRelationSchema', unknown=EXCLUDE), missing=[]
-    )
-    transport = fields.Nested(
-        'TransportRelationSchema', unknown=EXCLUDE, allow_none=True
-    )
+    templates = fields.List(Nested('EndpointSIPRelationSchema'), missing=[])
+    transport = Nested('TransportRelationSchema', allow_none=True)
     asterisk_id = fields.String(validate=Length(max=1024), allow_none=True)
 
 
@@ -78,8 +75,8 @@ class EndpointSIPSchema(_BaseSIPSchema):
 
     links = ListLink(Link('endpoint_sip', field='uuid'))
 
-    trunk = fields.Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
-    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+    trunk = Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
+    line = Nested('LineSchema', only=['id', 'links'], dump_only=True)
 
 
 class MergedEndpointSIPSchema(EndpointSIPSchema):
@@ -102,7 +99,7 @@ class MergedEndpointSIPSchema(EndpointSIPSchema):
     )
 
     @post_dump
-    def merge_options(self, data):
+    def merge_options(self, data, **kwargs):
         sections = [
             'aor',
             'auth',

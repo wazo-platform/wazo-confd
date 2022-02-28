@@ -1,11 +1,11 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
 from marshmallow import fields
 from marshmallow.validate import Equal, Regexp, Length, OneOf
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Nested
 from wazo_confd.helpers.restful import ErrorCatchingResource
 from .access_restriction import wazo_unconfigured
 
@@ -54,8 +54,8 @@ class WizardSchema(BaseSchema):
     license = StrictBoolean(validate=Equal(True), required=True)
     language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
     timezone = fields.String(validate=Length(max=128), required=True)
-    network = fields.Nested(WizardNetworkSchema, required=True)
-    steps = fields.Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}))
+    network = Nested(WizardNetworkSchema, required=True)
+    steps = Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}))
 
 
 class ConfiguredSchema(BaseSchema):
@@ -99,8 +99,8 @@ class WizardDiscoverSchema(BaseSchema):
     nameservers = fields.List(fields.String())
     domain = fields.String()
     timezone = fields.String()
-    interfaces = fields.List(fields.Nested(WizardDiscoverInterfaceSchema))
-    gateways = fields.List(fields.Nested(WizardDiscoverGatewaySchema))
+    interfaces = fields.List(Nested(WizardDiscoverInterfaceSchema))
+    gateways = fields.List(Nested(WizardDiscoverGatewaySchema))
 
 
 class WizardDiscoverResource(ErrorCatchingResource):

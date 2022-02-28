@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load
@@ -8,7 +8,7 @@ from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.ivr_choice import IVRChoice
 
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 from wazo_confd.helpers.validator import EXTEN_REGEX
 
 
@@ -31,15 +31,15 @@ class IvrSchema(BaseSchema):
     invalid_destination = DestinationField(allow_none=True)
     timeout_destination = DestinationField(allow_none=True)
     abort_destination = DestinationField(allow_none=True)
-    choices = fields.Nested(IvrChoiceSchema, many=True)
+    choices = Nested(IvrChoiceSchema, many=True)
     links = ListLink(Link('ivr'))
 
-    incalls = fields.Nested(
+    incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key in ['invalid_destination', 'timeout_destination', 'abort_destination']:
             if data.get(key):
                 data[key] = Dialaction(**data[key])

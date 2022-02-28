@@ -1,13 +1,13 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import EXCLUDE, fields, post_load, validates, validates_schema
+from marshmallow import fields, post_load, validates, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Regexp, Range
 
 from xivo_dao.alchemy.schedule_time import ScheduleTime
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 HOUR_REGEX = r"^([0,1][0-9]|2[0-3]):[0-5][0-9]$"
@@ -62,7 +62,7 @@ class ScheduleOpenPeriod(BaseSchema):
     )
 
     @validates_schema
-    def validate_hours(self, data):
+    def validate_hours(self, data, **kwargs):
         if not data.get('hours_start') or not data.get('hours_end'):
             return
 
@@ -87,7 +87,7 @@ class ScheduleOpenPeriod(BaseSchema):
             raise ValidationError('months cannot be empty')
 
     @post_load
-    def create_object(self, data):
+    def create_object(self, data, **kwargs):
         return ScheduleTime(**data)
 
 
@@ -95,7 +95,7 @@ class ScheduleExceptionalPeriod(ScheduleOpenPeriod):
     destination = DestinationField(required=True)
 
     @post_load
-    def create_object(self, data):
+    def create_object(self, data, **kwargs):
         if 'destination' in data:
             data['type'] = data['destination'].get('type')
             data['subtype'] = data['destination'].get('subtype')
@@ -111,35 +111,31 @@ class ScheduleSchema(BaseSchema):
     name = fields.String(validate=Length(max=128), allow_none=True)
     timezone = fields.String(validate=Length(max=128), allow_none=True)
     closed_destination = DestinationField(required=True)
-    open_periods = fields.Nested('ScheduleOpenPeriod', many=True, unknown=EXCLUDE)
-    exceptional_periods = fields.Nested(
-        'ScheduleExceptionalPeriod', many=True, unknown=EXCLUDE
-    )
+    open_periods = Nested('ScheduleOpenPeriod', many=True)
+    exceptional_periods = Nested('ScheduleExceptionalPeriod', many=True)
 
     enabled = fields.Boolean()
     links = ListLink(Link('schedules'))
 
-    incalls = fields.Nested(
-        'IncallSchema', only=['id', 'links'], many=True, dump_only=True
-    )
-    users = fields.Nested(
+    incalls = Nested('IncallSchema', only=['id', 'links'], many=True, dump_only=True)
+    users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,
         dump_only=True,
     )
-    groups = fields.Nested(
+    groups = Nested(
         'GroupSchema', only=['id', 'uuid', 'name', 'links'], many=True, dump_only=True
     )
-    queues = fields.Nested(
+    queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
-    outcalls = fields.Nested(
+    outcalls = Nested(
         'OutcallSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
 
     @post_load
-    def unwrap_closed_destination(self, data):
+    def unwrap_closed_destination(self, data, **kwargs):
         if 'closed_destination' in data:
             data['type'] = data['closed_destination'].get('type')
             data['subtype'] = data['closed_destination'].get('subtype')

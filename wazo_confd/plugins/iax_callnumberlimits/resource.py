@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -9,7 +9,7 @@ from marshmallow.validate import Length
 from xivo_dao.alchemy.iaxcallnumberlimits import IAXCallNumberLimits
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 
@@ -22,14 +22,14 @@ class IAXCallNumberLimitsSchema(BaseSchema):
 
 
 class IAXCallNumberLimitsCollectionSchema(BaseSchema):
-    items = fields.Nested(IAXCallNumberLimitsSchema, many=True, required=True)
+    items = Nested(IAXCallNumberLimitsSchema, many=True, required=True)
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['items']
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'items': [option for option in data]}
 
 

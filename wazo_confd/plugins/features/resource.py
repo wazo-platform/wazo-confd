@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -22,7 +22,7 @@ from xivo_dao.resources.features.search import (
 )
 
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.mallow import BaseSchema, Nested
 from wazo_confd.helpers.restful import ConfdResource
 
 PARKING_ERROR = "The parking options can only be defined with the parkinglots API"
@@ -36,10 +36,10 @@ class AsteriskOptionSchema(BaseSchema):
 
 
 class FeaturesConfigurationSchema(BaseSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @pre_load
-    def convert_options_to_collection(self, data):
+    def convert_options_to_collection(self, data, **kwargs):
         options = data.get('options')
         if isinstance(options, dict):
             data['options'] = [
@@ -48,16 +48,16 @@ class FeaturesConfigurationSchema(BaseSchema):
         return data
 
     @post_dump
-    def convert_options_to_dict(self, data):
+    def convert_options_to_dict(self, data, **kwargs):
         data['options'] = {option['key']: option['value'] for option in data['options']}
         return data
 
     @pre_dump
-    def add_envelope(self, data):
+    def add_envelope(self, data, **kwargs):
         return {'options': data}
 
     @post_load
-    def remove_envelope(self, data):
+    def remove_envelope(self, data, **kwargs):
         return data['options']
 
 
@@ -70,34 +70,36 @@ class FeaturesGeneralOptionSchema(AsteriskOptionSchema):
 
 
 class FeaturesGeneralSchema(FeaturesConfigurationSchema):
-    options = fields.Nested(FeaturesGeneralOptionSchema, many=True, required=True)
+    options = Nested(FeaturesGeneralOptionSchema, many=True, required=True)
 
 
 class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @validates_schema
-    def _validate_required_options(self, data):
+    def _validate_required_options(self, data, **kwargs):
         keys = [option.get('var_name') for option in data.get('options', {})]
 
         for required in FUNC_KEY_FEATUREMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required), 'options'
+                    'The following option are required: {}'.format(required),
+                    field_name='options',
                 )
 
 
 class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
-    options = fields.Nested(AsteriskOptionSchema, many=True, required=True)
+    options = Nested(AsteriskOptionSchema, many=True, required=True)
 
     @validates_schema
-    def _validate_required_options(self, data):
+    def _validate_required_options(self, data, **kwargs):
         keys = [option.get('var_name') for option in data.get('options', {})]
 
         for required in FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required), 'options'
+                    'The following option are required: {}'.format(required),
+                    field_name='options',
                 )
 
 

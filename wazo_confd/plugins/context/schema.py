@@ -1,13 +1,13 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import EXCLUDE, fields, post_load, validates_schema
+from marshmallow import fields, post_load, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, NoneOf, OneOf, Predicate, Range, Regexp
 
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 CONTEXT_REGEX = r"^[a-zA-Z0-9-_]*$"
 
@@ -62,17 +62,17 @@ class ContextSchema(BaseSchema):
     type = fields.String(
         validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others'])
     )
-    user_ranges = fields.Nested(RangeSchema, many=True, unknown=EXCLUDE)
-    group_ranges = fields.Nested(RangeSchema, many=True, unknown=EXCLUDE)
-    queue_ranges = fields.Nested(RangeSchema, many=True, unknown=EXCLUDE)
-    conference_room_ranges = fields.Nested(RangeSchema, many=True, unknown=EXCLUDE)
-    incall_ranges = fields.Nested(IncallRangeSchema, many=True, unknown=EXCLUDE)
+    user_ranges = Nested(RangeSchema, many=True)
+    group_ranges = Nested(RangeSchema, many=True)
+    queue_ranges = Nested(RangeSchema, many=True)
+    conference_room_ranges = Nested(RangeSchema, many=True)
+    incall_ranges = Nested(IncallRangeSchema, many=True)
     description = fields.String(allow_none=True)
     tenant_uuid = fields.String(dump_only=True)
     enabled = StrictBoolean()
     links = ListLink(Link('contexts'))
 
-    contexts = fields.Nested(
+    contexts = Nested(
         'ContextSchema',
         only=['id', 'name', 'label', 'links'],
         many=True,
@@ -80,7 +80,7 @@ class ContextSchema(BaseSchema):
     )
 
     @post_load
-    def create_objects(self, data):
+    def create_objects(self, data, **kwargs):
         for key in [
             'user_ranges',
             'group_ranges',

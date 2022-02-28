@@ -1,10 +1,10 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class SccpSchema(BaseSchema):
@@ -13,4 +13,4 @@ class SccpSchema(BaseSchema):
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('endpoint_sccp'))
 
-    line = fields.Nested('LineSchema', only=['id', 'links'], dump_only=True)
+    line = Nested('LineSchema', only=['id', 'links'], dump_only=True)
