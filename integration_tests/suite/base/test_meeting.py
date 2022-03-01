@@ -494,7 +494,7 @@ def test_bus_events_progress(_, me, meeting):
 @fixtures.meeting()
 @fixtures.meeting(persistent=True)
 def test_purge_old_meetings(_, meeting_too_old, meeting_too_young, meeting_persistent):
-    too_old = datetime.now() - timedelta(hours=72)
+    too_old = datetime.now() - timedelta(hours=25)
     with db.queries() as queries:
         queries.set_meeting_creation_date(meeting_too_old['uuid'], too_old)
         queries.set_meeting_creation_date(meeting_persistent['uuid'], too_old)
