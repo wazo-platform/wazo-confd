@@ -248,6 +248,9 @@ definitions:
         type: string
         description: the external extension to dial to reach this meeting
         readOnly: true
+      require_authorization:
+        type: boolean
+        description: when `true`, the `guest_sip_authorization` is always `null`. Instead, clients must request an authorization to access the meeting.
   MeetingUserRequest:
     type: object
     properties:

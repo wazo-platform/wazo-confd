@@ -237,6 +237,7 @@ def test_create_minimal_parameters(ingress_http, me):
             ingress_http_uri=ingress_http['uri'],
             persistent=False,
             exten=not_none(),
+            require_authorization=False,
         ),
     )
 
@@ -256,6 +257,7 @@ def test_create_minimal_parameters(ingress_http, me):
             ingress_http_uri=ingress_http['uri'],
             persistent=False,
             exten=not_none(),
+            require_authorization=False,
         ),
     )
 
@@ -270,6 +272,7 @@ def test_create_all_parameters(ingress_http, me, owner):
         'name': 'allparameter',
         'owner_uuids': [owner['uuid']],
         'persistent': True,
+        'require_authorization': True,
     }
 
     response = confd.meetings.post(**parameters)
@@ -284,6 +287,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             persistent=True,
             creation_time=not_none(),
             exten=not_none(),
+            require_authorization=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -301,6 +305,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             persistent=True,
             creation_time=not_none(),
             exten=not_none(),
+            require_authorization=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -377,6 +382,7 @@ def test_edit_all_parameters(_, meeting, some_user):
     parameters = {
         'name': 'editallparameter',
         'owner_uuids': [some_user['uuid']],
+        'require_authorization': True,
     }
     response = confd.meetings(meeting['uuid']).put(
         creation_time='2021-12-06T18:55:58.961760+00:00', **parameters
@@ -399,6 +405,7 @@ def test_edit_all_parameters_users_me(_, me, other_user, other_meeting):
         parameters = {
             'name': 'editallparameter',
             'owner_uuids': [other_user['uuid']],
+            'require_authorization': True,
         }
         expected_parameters = {
             'name': 'editallparameter',
