@@ -127,8 +127,8 @@ def test_list_user_me(_, me, __):
 
 
 @fixtures.ingress_http()
-@fixtures.meeting(name="search", persistent=True)
-@fixtures.meeting(name="hidden", persistent=False)
+@fixtures.meeting(name="search", persistent=True, require_authorization=True)
+@fixtures.meeting(name="hidden", persistent=False, require_authorization=False)
 def test_search(_, meeting, hidden):
     url = confd.meetings
     searches = {'name': 'search'}
@@ -141,6 +141,10 @@ def test_search(_, meeting, hidden):
     assert_that(response.items, is_not(has_item(hidden)))
 
     response = url.get(persistent=False)
+    assert_that(response.items, has_item(hidden))
+    assert_that(response.items, is_not(has_item(meeting)))
+
+    response = url.get(require_authorization=False)
     assert_that(response.items, has_item(hidden))
     assert_that(response.items, is_not(has_item(meeting)))
 
