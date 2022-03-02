@@ -7,7 +7,6 @@ from marshmallow.validate import Length, Range, Regexp
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
-NUMBER_REGEX = r"^[0-9]{1,40}$"
 PASSWORD_REGEX = r"^[0-9]{1,80}$"
 
 
@@ -15,7 +14,7 @@ class VoicemailSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=80), required=True)
-    number = fields.String(validate=Regexp(NUMBER_REGEX), required=True)
+    number = fields.Integer(validate=Range(min=0), validate=Length(max=40), required=True)
     context = fields.String(required=True)
     password = fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
     email = fields.String(validate=Length(max=80), allow_none=True)
