@@ -114,7 +114,7 @@ definitions:
     - $ref: '#/definitions/VoicemailRelationBase'
     - properties:
         number:
-          type: string
+          type: integer
           description: Mailbox number
         context:
           type: string
