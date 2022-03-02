@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -105,7 +105,7 @@ def main():
         ),
     )
 
-    meeting_date_limit = datetime.utcnow() - timedelta(hours=48)
+    meeting_date_limit = datetime.utcnow() - timedelta(hours=24)
     remove_meetings_older_than(meeting_date_limit, meeting_service)
 
     sysconfd.flush()
