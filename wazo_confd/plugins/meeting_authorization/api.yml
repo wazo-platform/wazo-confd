@@ -27,6 +27,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
   /guests/{guest_uuid}/meetings/{meeting_uuid}/authorizations/{authorization_uuid}:
+    get:
       operationId: get_guest_meeting_authorization
       summary: Read the guest authorization to enter a meeting
       description: '**Required ACL:** none'
@@ -48,6 +49,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
   /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/accept:
+    put:
       operationId: put_user_meeting_authorization_accept
       summary: Accept a guest authorization request
       description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.accept.update'
@@ -68,6 +70,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
   /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/reject:
+    put:
       operationId: put_user_meeting_authorization_reject
       summary: Reject a guest authorization request
       description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.reject.update'
