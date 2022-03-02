@@ -115,7 +115,7 @@ definitions:
     - properties:
         number:
           type: string
-          description: Mailbox number
+          description: Mailbox number, for example `0001`
         context:
           type: string
           description: Voicemail context
