@@ -59,6 +59,9 @@ class MeetingSchema(BaseSchema):
         if not model.guest_endpoint_sip:
             return None
 
+        if model.require_authorization:
+            return None
+
         return self.format_sip_authorization(model.guest_endpoint_sip)
 
     @staticmethod

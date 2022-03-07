@@ -373,6 +373,34 @@ def test_create_without_name(_):
 
 
 @fixtures.ingress_http()
+@fixtures.user()
+def test_create_require_authorization(ingress_http, me):
+    response = confd.meetings.post(
+        name='require_authorization_false', require_authorization=False
+    )
+
+    assert_that(
+        response.item,
+        has_entries(
+            guest_sip_authorization=not_(none()),
+        ),
+    )
+    confd.meetings(response.item['uuid']).delete().assert_deleted()
+
+    response = confd.meetings.post(
+        name='require_authorization_true', require_authorization=True
+    )
+
+    assert_that(
+        response.item,
+        has_entries(
+            guest_sip_authorization=none(),
+        ),
+    )
+    confd.meetings(response.item['uuid']).delete().assert_deleted()
+
+
+@fixtures.ingress_http()
 @fixtures.meeting()
 def test_edit_minimal_parameters(_, meeting):
     response = confd.meetings(meeting['uuid']).put()
