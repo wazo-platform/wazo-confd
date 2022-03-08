@@ -4,7 +4,7 @@
 import unittest
 
 from uuid import uuid4
-from mock import Mock
+from mock import Mock, call
 
 from xivo_bus.resources.queue_member.event import (
     QueueMemberAgentAssociatedEvent,
@@ -12,61 +12,50 @@ from xivo_bus.resources.queue_member.event import (
     QueueMemberUserAssociatedEvent,
     QueueMemberUserDissociatedEvent,
 )
-
+from xivo_bus.resources.agent.event import EditAgentEvent
 from ..notifier import QueueMemberNotifier
 
 
 class TestQueueMemberNotifier(unittest.TestCase):
     def setUp(self):
+        tenant_uuid = uuid4()
         self.bus = Mock()
         self.sysconfd = Mock()
-        self.queue = Mock(id=1, tenant_uuid=uuid4())
-        self.member = Mock(agent=Mock(id=1), penalty=5)
-        self.expected_headers = {'tenant_uuid': str(self.queue.tenant_uuid)}
+        self.queue = Mock(id=1, tenant_uuid=tenant_uuid)
+        self.member = Mock(agent=Mock(id=1, tenant_uuid=tenant_uuid), penalty=5)
+        self.expected_headers = {'tenant_uuid': str(tenant_uuid)}
 
         self.notifier = QueueMemberNotifier(self.bus, self.sysconfd)
 
     def test_agent_associate_then_bus_event(self):
-        expected_event = QueueMemberAgentAssociatedEvent(
-            self.queue.id, self.member.agent.id, self.member.penalty
-        )
+        expected_events = [
+            QueueMemberAgentAssociatedEvent(
+                self.queue.id, self.member.agent.id, self.member.penalty
+            ),
+            EditAgentEvent(self.member.agent.id),
+        ]
 
         self.notifier.agent_associated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
-
-    def test_agent_associate_then_sysconfd_event(self):
-        expected_handlers = {
-            'ipbx': [],
-            'agentbus': ['agent.edit.{}'.format(self.member.agent.id)],
-        }
-
-        self.notifier.agent_associated(self.queue, self.member)
-
-        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
+        calls = [
+            call(expected_events[0], headers=self.expected_headers),
+            call(expected_events[1], headers=self.expected_headers),
+        ]
+        self.bus.send_bus_event.assert_has_calls(calls)
 
     def test_agent_dissociate_then_bus_event(self):
-        expected_event = QueueMemberAgentDissociatedEvent(
-            self.queue.id, self.member.agent.id
-        )
+        expected_events = [
+            QueueMemberAgentDissociatedEvent(self.queue.id, self.member.agent.id),
+            EditAgentEvent(self.member.agent.id),
+        ]
 
         self.notifier.agent_dissociated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
-
-    def test_agent_dissociate_then_sysconfd_event(self):
-        expected_handlers = {
-            'ipbx': [],
-            'agentbus': ['agent.edit.{}'.format(self.member.agent.id)],
-        }
-
-        self.notifier.agent_dissociated(self.queue, self.member)
-
-        self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
+        calls = [
+            call(expected_events[0], headers=self.expected_headers),
+            call(expected_events[1], headers=self.expected_headers),
+        ]
+        self.bus.send_bus_event.assert_has_calls(calls)
 
     def test_user_associate_then_bus_event(self):
         expected_event = QueueMemberUserAssociatedEvent(
@@ -81,7 +70,6 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
     def test_user_associate_then_sysconfd_event(self):
         expected_handlers = {
-            'agentbus': [],
             'ipbx': [
                 'module reload res_pjsip.so',
                 'module reload app_queue.so',
@@ -106,7 +94,6 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
     def test_user_dissociate_then_sysconfd_event(self):
         expected_handlers = {
-            'agentbus': [],
             'ipbx': [
                 'module reload res_pjsip.so',
                 'module reload app_queue.so',

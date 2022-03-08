@@ -7,7 +7,7 @@ from xivo_bus.resources.queue_member.event import (
     QueueMemberUserAssociatedEvent,
     QueueMemberUserDissociatedEvent,
 )
-
+from xivo_bus.resources.agent.event import EditAgentEvent
 from wazo_confd import bus, sysconfd
 
 
@@ -16,35 +16,40 @@ class QueueMemberNotifier:
         self.bus = bus
         self.sysconfd = sysconfd
 
-    def send_sysconfd_handlers(self, ipbx_command=[], agent_command=[]):
-        handlers = {'ipbx': ipbx_command, 'agentbus': agent_command}
+    @staticmethod
+    def _build_headers(**kwargs):
+        headers = {}
+        for key, value in kwargs.items():
+            if value:
+                headers[key] = value
+        return headers
+
+    def _send_agent_edited(self, agent):
+        event = EditAgentEvent(agent.id)
+        headers = self._build_headers(tenant_uuid=str(agent.tenant_uuid))
+        self.bus.send_bus_event(event, headers=headers)
+
+    def send_sysconfd_handlers(self, ipbx_command=[]):
+        handlers = {'ipbx': ipbx_command}
         self.sysconfd.exec_request_handlers(handlers)
 
     def agent_associated(self, queue, member):
         event = QueueMemberAgentAssociatedEvent(
             queue.id, member.agent.id, member.penalty
         )
-        headers = self._build_headers(queue)
+        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
         self.bus.send_bus_event(event, headers=headers)
-        self.send_sysconfd_handlers(
-            # Only used if the agent is logged
-            # EditAgentEvent can be sent without passing by sysconfd
-            agent_command=['agent.edit.{}'.format(member.agent.id)]
-        )
+        self._send_agent_edited(member.agent)
 
     def agent_dissociated(self, queue, member):
         event = QueueMemberAgentDissociatedEvent(queue.id, member.agent.id)
-        headers = self._build_headers(queue)
+        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
         self.bus.send_bus_event(event, headers=headers)
-        self.send_sysconfd_handlers(
-            # Only used if the agent is logged
-            # EditAgentEvent can be sent without passing by sysconfd
-            agent_command=['agent.edit.{}'.format(member.agent.id)]
-        )
+        self._send_agent_edited(member.agent)
 
     def user_associated(self, queue, member):
         event = QueueMemberUserAssociatedEvent(queue.id, member.user.id)
-        headers = self._build_headers(queue)
+        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
         self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(
             ipbx_command=[
@@ -56,7 +61,7 @@ class QueueMemberNotifier:
 
     def user_dissociated(self, queue, member):
         event = QueueMemberUserDissociatedEvent(queue.id, member.user.id)
-        headers = self._build_headers(queue)
+        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
         self.bus.send_bus_event(event, headers=headers)
         self.send_sysconfd_handlers(
             ipbx_command=[
@@ -65,9 +70,6 @@ class QueueMemberNotifier:
                 'module reload chan_sccp.so',
             ]
         )
-
-    def _build_headers(self, queue):
-        return {'tenant_uuid': str(queue.tenant_uuid)}
 
 
 def build_notifier():
