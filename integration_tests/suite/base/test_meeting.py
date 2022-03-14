@@ -655,6 +655,69 @@ def test_create_meeting_authorization(_, owner):
 
 
 @fixtures.ingress_http()
+@fixtures.user()
+@fixtures.meeting(name="search", persistent=True, require_authorization=True)
+def test_list_search_authorizations_by_user(_, me, another_meeting):
+    searches = {'guest_name': 'found'}
+    found_guest_uuid = 'a6c156c9-b401-40dc-9939-c1f2492d8572'
+    hidden_guest_uuid = 'a6c156c9-b401-40dc-9939-c1f2492d8572'
+    my_uuid = me['uuid']
+    unknown_uuid = '02b3d964-30ba-4b30-8f9c-e89cbe87b8bc'
+    user_confd = create_confd(user_uuid=my_uuid)
+
+    with fixtures.user_me_meeting(
+        user_confd
+    ) as meeting, fixtures.meeting_authorization(
+        found_guest_uuid, meeting, guest_name='found'
+    ) as authorization_found, fixtures.meeting_authorization(
+        hidden_guest_uuid, meeting, guest_name='hidden'
+    ) as authorization_hidden:
+
+        # Test unknown meeting
+        response = user_confd.users.me.meetings(unknown_uuid).authorizations.get()
+        response.assert_status(404)
+
+        # Test search
+        url = confd.users('me').meetings(meeting['uuid']).authorizations
+        for field, term in searches.items():
+            yield check_authorization_search, url, authorization_found, authorization_hidden, field, term
+
+
+def check_authorization_search(url, meeting, hidden, field, term):
+    response = url.get(search=term)
+
+    assert_that(response.items, has_item(has_entry(field, meeting[field])))
+    assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
+
+    response = url.get(**{field: meeting[field]})
+
+    assert_that(response.items, has_item(has_entry('uuid', meeting['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
+
+
+@fixtures.ingress_http()
+@fixtures.user()
+def test_sorting_offset_limit_authorizations_by_user(_, me):
+    sort1_uuid = 'd8fe7608-687c-4399-ba55-332fb29cb868'
+    sort2_uuid = 'a28d1ca7-02a7-4bce-8b84-2b22e900cc01'
+    my_uuid = me['uuid']
+    user_confd = create_confd(user_uuid=my_uuid)
+    with fixtures.user_me_meeting(
+        user_confd
+    ) as meeting, fixtures.meeting_authorization(
+        sort1_uuid, meeting, guest_name='sort1'
+    ) as authorization1, fixtures.meeting_authorization(
+        sort2_uuid, meeting, guest_name='sort2'
+    ) as authorization2:
+        url = confd.users('me').meetings(meeting['uuid']).authorizations.get
+
+        yield s.check_sorting, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+
+        yield s.check_offset, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+        yield s.check_limit, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+
+
+@fixtures.ingress_http()
 @fixtures.meeting()
 def test_get_meeting_authorization_by_guest(_, meeting):
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'

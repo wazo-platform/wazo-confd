@@ -9,6 +9,9 @@ from .validator import build_validator
 
 
 class MeetingAuthorizationService(CRUDService):
+    def search(self, parameters, meeting_uuid):
+        return self.dao.search(meeting_uuid, **parameters)
+
     def get(self, guest_uuid, meeting_uuid, authorization_uuid, **kwargs):
         return self.dao.get(meeting_uuid, authorization_uuid, guest_uuid, **kwargs)
 

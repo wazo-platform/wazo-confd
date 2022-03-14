@@ -48,6 +48,24 @@ paths:
           $ref: '#/responses/CreateError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /user/me/meetings/{meeting_uuid}/authorizations:
+    get:
+      operationId: list_user_meeting_authorizations
+      summary: List all guest authorization requests of a meeting
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.read'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '200':
+          description: Authorizations list
+          schema:
+            $ref: '#/definitions/MeetingAuthorizationItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
   /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/accept:
     put:
       operationId: put_user_meeting_authorization_accept
@@ -97,6 +115,15 @@ definitions:
     properties:
       guest_name:
         type: string
+  MeetingAuthorizationItems:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/MeetingAuthorization'
+      total:
+        type: integer
   MeetingAuthorization:
     type: object
     properties:

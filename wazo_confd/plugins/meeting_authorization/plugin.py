@@ -8,6 +8,7 @@ from xivo_dao.resources.meeting_authorization import dao as meeting_authorizatio
 from .resource import (
     GuestMeetingAuthorizationList,
     GuestMeetingAuthorizationItem,
+    UserMeetingAuthorizationList,
     UserMeetingAuthorizationAccept,
     UserMeetingAuthorizationReject,
 )
@@ -32,6 +33,13 @@ class Plugin:
             GuestMeetingAuthorizationItem,
             '/guests/<guest_uuid>/meetings/<uuid:meeting_uuid>/authorizations/<uuid:authorization_uuid>',
             endpoint='guest_meeting_authorization',
+            resource_class_args=[service, meeting_dao],
+        )
+
+        api.add_resource(
+            UserMeetingAuthorizationList,
+            '/users/me/meetings/<uuid:meeting_uuid>/authorizations',
+            endpoint='user_meeting_authorization_list',
             resource_class_args=[service, meeting_dao],
         )
 

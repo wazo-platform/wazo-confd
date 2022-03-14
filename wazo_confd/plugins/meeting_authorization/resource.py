@@ -89,6 +89,45 @@ class GuestMeetingAuthorizationItem(ItemResource):
         return self.schema().dump(model)
 
 
+class UserMeetingAuthorizationList(ListResource):
+
+    model = MeetingAuthorization
+    schema = MeetingAuthorizationSchema
+
+    def __init__(self, service, meeting_dao):
+        self.service = service
+        self.meeting_dao = meeting_dao
+
+    def build_headers(self, meeting_authorization):
+        return {
+            'Location': url_for(
+                'user_meeting_authorization_list',
+                meeting_uuid=meeting_authorization.meeting_uuid,
+                authorization_uuid=meeting_authorization.uuid,
+                _external=True,
+            )
+        }
+
+    @required_acl('confd.users.me.meetings.{meeting_uuid}.authorizations.read')
+    def get(self, meeting_uuid):
+        ids = {
+            'meeting_uuid': meeting_uuid,
+        }
+        ids = MeetingAuthorizationIDSchema().load(ids)
+
+        try:
+            self.meeting_dao.get(ids['meeting_uuid'])
+        except NotFoundError as e:
+            raise errors.not_found(
+                'meeting_authorization', 'MeetingAuthorization', **e.metadata
+            )
+
+        params = self.search_params()
+
+        total, items = self.service.search(params, ids['meeting_uuid'])
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
+
+
 class UserMeetingAuthorizationAccept(ItemResource):
 
     model = MeetingAuthorization

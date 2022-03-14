@@ -11,7 +11,7 @@ def add(guest_uuid, meeting_uuid, **params):
     return response.item
 
 
-def delete(guest_uuid, meeting_uuid, uuid, check=False):
+def delete(guest_uuid, meeting_uuid, uuid, check=False, **params):
     response = (
         confd.guests(guest_uuid).meetings(meeting_uuid).authorizations(uuid).delete()
     )
