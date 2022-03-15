@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -12,7 +12,8 @@ from hamcrest import (
 from wazo_test_helpers import until
 
 from . import BaseIntegrationTest, confd
-from ..helpers.config import CREATED_TENANT
+from ..helpers import errors, fixtures
+from ..helpers.config import CREATED_TENANT, DELETED_TENANT
 from ..helpers.bus import BusClientHeaders
 
 
@@ -44,3 +45,18 @@ def test_create_default_templates_when_not_exist():
 
     until.assert_(templates_created, tries=5)
     until.assert_(slug_created, tries=5)
+
+
+@fixtures.device(wazo_tenant=DELETED_TENANT)
+def test_delete_device_when_deleting_tenant(device):
+    response = confd.devices(device['id']).get()
+    assert_that(response.item, has_entries(**device))
+
+    with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+        BusClientHeaders.send_tenant_deleted(DELETED_TENANT, 'slug3')
+
+    def device_deleted():
+        response = confd.devices(device['id']).get()
+        response.assert_match(404, errors.not_found('Device'))
+
+    until.assert_(device_deleted, tries=5)
