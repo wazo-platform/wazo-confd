@@ -677,8 +677,14 @@ def test_list_search_authorizations_by_user(_, me, another_meeting):
         response = user_confd.users.me.meetings(unknown_uuid).authorizations.get()
         response.assert_status(404)
 
+        # Test another meeting
+        response = user_confd.users.me.meetings(
+            another_meeting['uuid']
+        ).authorizations.get()
+        response.assert_status(404)
+
         # Test search
-        url = confd.users('me').meetings(meeting['uuid']).authorizations
+        url = user_confd.users.me.meetings(meeting['uuid']).authorizations
         for field, term in searches.items():
             yield check_authorization_search, url, authorization_found, authorization_hidden, field, term
 
@@ -709,7 +715,7 @@ def test_sorting_offset_limit_authorizations_by_user(_, me):
     ) as authorization1, fixtures.meeting_authorization(
         sort2_uuid, meeting, guest_name='sort2'
     ) as authorization2:
-        url = confd.users('me').meetings(meeting['uuid']).authorizations.get
+        url = user_confd.users.me.meetings(meeting['uuid']).authorizations.get
 
         yield s.check_sorting, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
 
@@ -807,13 +813,18 @@ def test_list_meeting_authorizations_by_guest(_, meeting):
 @fixtures.meeting()
 def test_accept_meeting_authorization(_, me, another_meeting):
     guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+    another_guest_uuid = 'd810dacf-ce08-4cea-b7fc-2b08323451bc'
     my_uuid = me['uuid']
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
     user_confd = create_confd(user_uuid=my_uuid)
 
     with fixtures.user_me_meeting(
         user_confd
-    ) as meeting, fixtures.meeting_authorization(guest_uuid, meeting) as authorization:
+    ) as meeting, fixtures.meeting_authorization(
+        guest_uuid, meeting
+    ) as authorization, fixtures.meeting_authorization(
+        another_guest_uuid, another_meeting
+    ) as another_authorization:
 
         # Test unknown meeting
         response = (
@@ -834,7 +845,7 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         # Test another meeting
         response = (
             user_confd.users.me.meetings(another_meeting['uuid'])
-            .authorizations(unknown_uuid)
+            .authorizations(another_authorization['uuid'])
             .accept.put()
         )
         response.assert_status(404)
@@ -867,13 +878,18 @@ def test_accept_meeting_authorization(_, me, another_meeting):
 @fixtures.meeting()
 def test_reject_meeting_authorization(_, me, another_meeting):
     guest_uuid = '18388400-8f8f-4e76-a487-db3c79cf8d35'
+    another_guest_uuid = 'd810dacf-ce08-4cea-b7fc-2b08323451bc'
     my_uuid = me['uuid']
     unknown_uuid = 'ff65a89a-ef00-4c9b-883b-d96ee4186492'
     user_confd = create_confd(user_uuid=my_uuid)
 
     with fixtures.user_me_meeting(
         user_confd
-    ) as meeting, fixtures.meeting_authorization(guest_uuid, meeting) as authorization:
+    ) as meeting, fixtures.meeting_authorization(
+        guest_uuid, meeting
+    ) as authorization, fixtures.meeting_authorization(
+        another_guest_uuid, another_meeting
+    ) as another_authorization:
 
         # Test unknown meeting
         response = (
@@ -894,7 +910,7 @@ def test_reject_meeting_authorization(_, me, another_meeting):
         # Test another meeting
         response = (
             user_confd.users.me.meetings(another_meeting['uuid'])
-            .authorizations(unknown_uuid)
+            .authorizations(another_authorization['uuid'])
             .reject.put()
         )
         response.assert_status(404)

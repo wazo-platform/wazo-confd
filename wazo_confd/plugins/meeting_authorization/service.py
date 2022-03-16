@@ -12,8 +12,8 @@ class MeetingAuthorizationService(CRUDService):
     def search(self, parameters, meeting_uuid):
         return self.dao.search(meeting_uuid, **parameters)
 
-    def get(self, guest_uuid, meeting_uuid, authorization_uuid, **kwargs):
-        return self.dao.get(meeting_uuid, authorization_uuid, guest_uuid, **kwargs)
+    def get(self, meeting_uuid, authorization_uuid, **kwargs):
+        return self.dao.get(meeting_uuid, authorization_uuid, **kwargs)
 
     def accept(self, meeting_authorization):
         meeting_authorization.status = 'accepted'

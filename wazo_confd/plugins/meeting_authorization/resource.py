@@ -79,7 +79,9 @@ class GuestMeetingAuthorizationItem(ItemResource):
 
         try:
             model = self._service.get(
-                ids['guest_uuid'], ids['meeting_uuid'], ids['authorization_uuid']
+                ids['meeting_uuid'],
+                ids['authorization_uuid'],
+                guest_uuid=ids['guest_uuid'],
             )
         except NotFoundError as e:
             raise errors.not_found(
@@ -89,7 +91,16 @@ class GuestMeetingAuthorizationItem(ItemResource):
         return self.schema().dump(model)
 
 
-class UserMeetingAuthorizationList(ListResource):
+class _MeResourceMixin:
+    def _find_user_uuid(self):
+        user_uuid = request.user_uuid
+        if not user_uuid:
+            raise errors.param_not_found('user_uuid', 'meeting_authorizations')
+
+        return user_uuid
+
+
+class UserMeetingAuthorizationList(ListResource, _MeResourceMixin):
 
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
@@ -114,13 +125,12 @@ class UserMeetingAuthorizationList(ListResource):
             'meeting_uuid': meeting_uuid,
         }
         ids = MeetingAuthorizationIDSchema().load(ids)
+        user_uuid = self._find_user_uuid()
 
         try:
-            self.meeting_dao.get(ids['meeting_uuid'])
+            self.meeting_dao.get_by(uuid=ids['meeting_uuid'], owner=user_uuid)
         except NotFoundError as e:
-            raise errors.not_found(
-                'meeting_authorization', 'MeetingAuthorization', **e.metadata
-            )
+            raise errors.not_found('meetings', 'Meeting', **e.metadata)
 
         params = self.search_params()
 
@@ -128,7 +138,7 @@ class UserMeetingAuthorizationList(ListResource):
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
 
-class UserMeetingAuthorizationAccept(ItemResource):
+class UserMeetingAuthorizationAccept(ItemResource, _MeResourceMixin):
 
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
@@ -146,10 +156,13 @@ class UserMeetingAuthorizationAccept(ItemResource):
             'authorization_uuid': authorization_uuid,
         }
         ids = MeetingAuthorizationIDSchema().load(ids)
+        user_uuid = self._find_user_uuid()
 
         try:
             model = self.meeting_authorization_dao.get(
-                ids['meeting_uuid'], ids['authorization_uuid']
+                ids['meeting_uuid'],
+                ids['authorization_uuid'],
+                owner=user_uuid,
             )
         except NotFoundError as e:
             raise errors.not_found(
@@ -160,7 +173,7 @@ class UserMeetingAuthorizationAccept(ItemResource):
         return self.schema().dump(model)
 
 
-class UserMeetingAuthorizationReject(ItemResource):
+class UserMeetingAuthorizationReject(ItemResource, _MeResourceMixin):
 
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
@@ -178,10 +191,13 @@ class UserMeetingAuthorizationReject(ItemResource):
             'authorization_uuid': authorization_uuid,
         }
         ids = MeetingAuthorizationIDSchema().load(ids)
+        user_uuid = self._find_user_uuid()
 
         try:
             model = self.meeting_authorization_dao.get(
-                ids['meeting_uuid'], ids['authorization_uuid']
+                ids['meeting_uuid'],
+                ids['authorization_uuid'],
+                owner=user_uuid,
             )
         except NotFoundError as e:
             raise errors.not_found(
