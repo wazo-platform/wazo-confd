@@ -88,6 +88,25 @@ paths:
           $ref: '#/responses/CreateError'
         '404':
           $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_user_meeting_authorization
+      summary: Delete the guest authorization to enter a meeting
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.read'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/guest_uuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
   /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/accept:
     put:
       operationId: put_user_meeting_authorization_accept

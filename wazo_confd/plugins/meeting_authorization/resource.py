@@ -171,6 +171,31 @@ class UserMeetingAuthorizationItem(ItemResource, _MeResourceMixin):
 
         return self.schema().dump(model)
 
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.delete'
+    )
+    def delete(self, meeting_uuid, authorization_uuid):
+        ids = {
+            'meeting_uuid': meeting_uuid,
+            'authorization_uuid': authorization_uuid,
+        }
+        ids = MeetingAuthorizationIDSchema().load(ids)
+        user_uuid = self._find_user_uuid()
+
+        try:
+            model = self.meeting_authorization_dao.get(
+                ids['meeting_uuid'],
+                ids['authorization_uuid'],
+                owner=user_uuid,
+            )
+        except NotFoundError as e:
+            raise errors.not_found(
+                'meeting_authorization', 'MeetingAuthorization', **e.metadata
+            )
+
+        self.service.delete(model)
+        return '', 204
+
 
 class UserMeetingAuthorizationAccept(ItemResource, _MeResourceMixin):
 

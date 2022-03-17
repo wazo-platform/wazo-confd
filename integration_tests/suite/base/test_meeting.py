@@ -1004,3 +1004,85 @@ def test_reject_meeting_authorization(_, me, another_meeting):
             response.json,
             has_entries(status='rejected', guest_sip_authorization=none()),
         )
+
+
+@fixtures.ingress_http()
+@fixtures.meeting()
+@fixtures.user()
+def test_delete_meeting_authorization_by_user(_, another_meeting, me):
+    unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
+    invalid_uuid = 'invalid'
+    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+    another_guest_uuid = 'd810dacf-ce08-4cea-b7fc-2b08323451bc'
+    my_uuid = me['uuid']
+    user_confd = create_confd(user_uuid=my_uuid)
+
+    with fixtures.user_me_meeting(
+        user_confd
+    ) as meeting, fixtures.meeting_authorization(
+        guest_uuid, meeting
+    ) as authorization, fixtures.meeting_authorization(
+        another_guest_uuid, another_meeting
+    ) as another_authorization:
+        # Test invalid meeting_uuid
+        response = (
+            user_confd.users.me.meetings(invalid_uuid)
+            .authorizations(authorization['uuid'])
+            .delete()
+        )
+        response.assert_status(404)
+
+        # Test unknown meeting_uuid
+        response = (
+            user_confd.users.me.meetings(unknown_uuid)
+            .authorizations(authorization['uuid'])
+            .delete()
+        )
+        response.assert_status(404)
+
+        # Test another meeting_uuid
+        response = (
+            user_confd.users.me.meetings(another_meeting['uuid'])
+            .authorizations(another_authorization['uuid'])
+            .delete()
+        )
+        response.assert_status(404)
+
+        # Test invalid authorization_uuid
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(invalid_uuid)
+            .delete()
+        )
+        response.assert_status(404)
+
+        # Test unknown authorization_uuid
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(unknown_uuid)
+            .delete()
+        )
+        response.assert_status(404)
+
+        # Test delete OK
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .delete()
+        )
+
+        response.assert_status(204)
+
+        # Test delete again
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(authorization['uuid'])
+            .delete()
+        )
+
+        response.assert_status(404)
+
+        # Meeting is still present
+        response = user_confd.users.me.meetings(meeting['uuid']).get()
+
+        response.assert_status(200)
