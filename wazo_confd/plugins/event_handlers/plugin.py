@@ -4,10 +4,15 @@
 import logging
 
 from wazo_provd_client import Client as ProvdClient
+from wazo_provd_client.exceptions import ProvdError
 from xivo_dao import tenant_dao
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
+
+from wazo_confd._bus import InstantBusPublisher
+from wazo_confd.plugins.device.model import Device
+from wazo_confd.plugins.device.notifier import DeviceNotifier
 
 from .service import DefaultSIPTemplateService
 
@@ -15,10 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 class TenantEventHandler:
-    def __init__(self, tenant_dao, service, provd_client):
+    def __init__(self, tenant_dao, service, provd_client, bus_publisher):
         self.tenant_dao = tenant_dao
         self.service = service
         self.provd = provd_client
+        self.bus_publisher = bus_publisher
+        self.device_notifier = DeviceNotifier(bus_publisher)
 
     def subscribe(self, bus_consumer):
         bus_consumer.on_event('auth_tenant_added', self._auth_tenant_added)
@@ -39,7 +46,19 @@ class TenantEventHandler:
             'devices'
         ]
         for device in devices:
-            self.provd.devices.delete(device['id'])
+            self._delete_device(device)
+
+    def _delete_device(self, device):
+        device_model = Device(device)
+        self.provd.devices.delete(device_model.id)
+        try:
+            self.provd.configs.delete(device_model.config)
+        except ProvdError as e:
+            if e.status_code != 404:
+                raise
+        except Exception:
+            pass  # device has no config
+        self.device_notifier.deleted(device_model)
 
 
 class Plugin:
@@ -51,6 +70,16 @@ class Plugin:
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
+        instant_bus_publisher = InstantBusPublisher.from_config(
+            config['bus'],
+            config['uuid'],
+        )
+
         service = DefaultSIPTemplateService(sip_dao, transport_dao)
-        tenant_event_handler = TenantEventHandler(tenant_dao, service, provd_client)
+        tenant_event_handler = TenantEventHandler(
+            tenant_dao,
+            service,
+            provd_client,
+            instant_bus_publisher,
+        )
         tenant_event_handler.subscribe(bus_consumer)
