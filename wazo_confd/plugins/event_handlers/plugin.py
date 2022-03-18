@@ -46,18 +46,21 @@ class TenantEventHandler:
         ]
         for device in devices:
             self._delete_device(device)
+            self._delete_config(device['config'])
 
     def _delete_device(self, device):
         device_model = Device(device)
         self.provd.devices.delete(device_model.id)
+        self.device_notifier.deleted(device_model)
+
+    def _delete_config(self, config):
         try:
-            self.provd.configs.delete(device_model.config)
+            self.provd.configs.delete(config)
         except ProvdError as e:
             if e.status_code != 404:
                 raise
         except Exception:
             pass  # device has no config
-        self.device_notifier.deleted(device_model)
 
 
 class Plugin:
