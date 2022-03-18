@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -24,8 +24,8 @@ def find_available_exten(context, exclude=None):
     return str(available.pop())
 
 
-def add_extension(**params):
-    response = confd.extensions.post(params)
+def add_extension(wazo_tenant=None, **params):
+    response = confd.extensions.post(params, wazo_tenant=wazo_tenant)
     return response.item
 
 
