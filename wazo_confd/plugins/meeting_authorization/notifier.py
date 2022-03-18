@@ -6,6 +6,7 @@ from xivo_bus.resources.meeting.event import (
     DeleteMeetingAuthorizationEvent,
     EditMeetingAuthorizationEvent,
     UserCreateMeetingAuthorizationEvent,
+    UserDeleteMeetingAuthorizationEvent,
     UserEditMeetingAuthorizationEvent,
 )
 
@@ -48,10 +49,18 @@ class Notifier:
             self.bus.send_bus_event(event, headers)
 
     def deleted(self, meeting_authorization):
-        event = DeleteMeetingAuthorizationEvent(
-            self._schema().dump(meeting_authorization)
-        )
+        meeting_authorization_body = self._schema().dump(meeting_authorization)
+        event = DeleteMeetingAuthorizationEvent(meeting_authorization_body)
         self.bus.send_bus_event(event)
+        for owner_uuid in meeting_authorization.meeting.owner_uuids:
+            event = UserDeleteMeetingAuthorizationEvent(
+                meeting_authorization_body, owner_uuid
+            )
+            headers = {
+                'name': UserDeleteMeetingAuthorizationEvent.name,
+                f'user:{owner_uuid}': True,
+            }
+            self.bus.send_bus_event(event, headers)
 
     def _schema(self):
         return self._schema_instance

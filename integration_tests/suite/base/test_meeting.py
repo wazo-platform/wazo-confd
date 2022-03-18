@@ -1154,6 +1154,14 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         )
         response.assert_status(404)
 
+        # Setup bus events
+        bus_events = bus.BusClient.accumulator(
+            'config.meeting_guest_authorizations.deleted'
+        )
+        bus_events_user = bus.BusClient.accumulator(
+            f'config.users.{my_uuid}.meeting_guest_authorizations.deleted'
+        )
+
         # Test delete OK
         response = (
             user_confd.users.me.meetings(meeting['uuid'])
@@ -1162,6 +1170,40 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         )
 
         response.assert_status(204)
+
+        # Test bus events
+        bus_events.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_guest_authorization_deleted',
+                        'data': has_entries(
+                            {
+                                'uuid': authorization['uuid'],
+                                'guest_name': authorization['guest_name'],
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
+        bus_events_user.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_user_guest_authorization_deleted',
+                        'data': has_entries(
+                            {
+                                'uuid': authorization['uuid'],
+                                'guest_name': authorization['guest_name'],
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
 
         # Test delete again
         response = (
