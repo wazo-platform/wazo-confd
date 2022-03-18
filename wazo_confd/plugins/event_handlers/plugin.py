@@ -20,12 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 class TenantEventHandler:
-    def __init__(self, tenant_dao, service, provd_client, bus_publisher):
+    def __init__(self, tenant_dao, service, provd_client, device_notifier):
         self.tenant_dao = tenant_dao
         self.service = service
         self.provd = provd_client
-        self.bus_publisher = bus_publisher
-        self.device_notifier = DeviceNotifier(bus_publisher)
+        self.device_notifier = device_notifier
 
     def subscribe(self, bus_consumer):
         bus_consumer.on_event('auth_tenant_added', self._auth_tenant_added)
@@ -74,12 +73,13 @@ class Plugin:
             config['bus'],
             config['uuid'],
         )
+        device_notifier = DeviceNotifier(instant_bus_publisher)
 
         service = DefaultSIPTemplateService(sip_dao, transport_dao)
         tenant_event_handler = TenantEventHandler(
             tenant_dao,
             service,
             provd_client,
-            instant_bus_publisher,
+            device_notifier,
         )
         tenant_event_handler.subscribe(bus_consumer)
