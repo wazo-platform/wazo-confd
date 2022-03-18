@@ -596,7 +596,7 @@ def test_create_meeting_authorization(_, owner):
         )
         response.assert_status(400)
 
-        # Test creation & bus events
+        # Setup bus events
         bus_events = bus.BusClient.accumulator(
             'config.meeting_guest_authorizations.created'
         )
@@ -604,11 +604,13 @@ def test_create_meeting_authorization(_, owner):
             f'config.users.{owner_uuid}.meeting_guest_authorizations.created'
         )
 
+        # Test creation
         response = (
             confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.post(body)
         )
         response.assert_status(201)
 
+        # Test bus events
         bus_events.until_assert_that_accumulate(
             has_item(
                 has_entries(
@@ -918,6 +920,14 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         )
         response.assert_status(404)
 
+        # Setup bus events
+        bus_events = bus.BusClient.accumulator(
+            'config.meeting_guest_authorizations.updated'
+        )
+        bus_events_user = bus.BusClient.accumulator(
+            f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
+        )
+
         # Test accept authorization
         response = (
             user_confd.users.me.meetings(meeting['uuid'])
@@ -926,6 +936,42 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         )
         response.assert_status(200)
         assert_that(response.json, has_entries(status='accepted'))
+
+        # Test bus events
+        bus_events.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_guest_authorization_updated',
+                        'data': has_entries(
+                            {
+                                'uuid': authorization['uuid'],
+                                'guest_name': authorization['guest_name'],
+                                'status': 'accepted',
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
+        bus_events_user.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_user_guest_authorization_updated',
+                        'data': has_entries(
+                            {
+                                'uuid': authorization['uuid'],
+                                'guest_name': authorization['guest_name'],
+                                'status': 'accepted',
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
 
         # Guest can see the accepted authorization and sip credentials
         response = (
