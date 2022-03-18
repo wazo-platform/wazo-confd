@@ -1029,7 +1029,15 @@ def test_reject_meeting_authorization(_, me, another_meeting):
         )
         response.assert_status(404)
 
-        # Test reject authorization
+        # Setup bus events
+        bus_events = bus.BusClient.accumulator(
+            'config.meeting_guest_authorizations.updated'
+        )
+        bus_events_user = bus.BusClient.accumulator(
+            f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
+        )
+
+        # Test reject authorization and bus events
         response = (
             user_confd.users.me.meetings(meeting['uuid'])
             .authorizations(authorization['uuid'])
@@ -1037,6 +1045,42 @@ def test_reject_meeting_authorization(_, me, another_meeting):
         )
         response.assert_status(200)
         assert_that(response.json, has_entries(status='rejected'))
+
+        # Test bus events
+        bus_events.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_guest_authorization_updated',
+                        'data': has_entries(
+                            {
+                                'uuid': authorization['uuid'],
+                                'guest_name': authorization['guest_name'],
+                                'status': 'rejected',
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
+        bus_events_user.until_assert_that_accumulate(
+            has_item(
+                has_entries(
+                    {
+                        'name': 'meeting_user_guest_authorization_updated',
+                        'data': has_entries(
+                            {
+                                'uuid': authorization['uuid'],
+                                'guest_name': authorization['guest_name'],
+                                'status': 'rejected',
+                            }
+                        ),
+                    }
+                ),
+            ),
+            timeout=5,
+        )
 
         # Guest can see the authorization is rejected and no sip credentials
         response = (

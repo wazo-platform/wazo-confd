@@ -23,7 +23,9 @@ class MeetingAuthorizationService(CRUDService):
 
     def reject(self, meeting_authorization):
         meeting_authorization.status = 'rejected'
-        return self.dao.edit(meeting_authorization)
+        model = self.dao.edit(meeting_authorization)
+        self.notifier.edited(meeting_authorization)
+        return model
 
 
 def build_service(notifier):
