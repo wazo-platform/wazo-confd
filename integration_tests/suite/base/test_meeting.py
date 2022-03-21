@@ -727,75 +727,47 @@ def test_sorting_offset_limit_authorizations_by_user(_, me):
 
 @fixtures.ingress_http()
 @fixtures.meeting()
-def test_get_meeting_authorization_by_guest(_, meeting):
+@fixtures.meeting()
+def test_get_meeting_authorization_by_guest(_, meeting, another_meeting):
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
     invalid_uuid = 'invalid'
     guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
+    another_guest_uuid = '35d77566-357f-46b9-856e-758452148c11'
 
-    with fixtures.meeting_authorization(guest_uuid, meeting) as authorization:
-        # Test invalid guest_uuid
-        response = (
-            confd.guests(invalid_uuid)
-            .meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
+    def url(guest_uuid, meeting_uuid, authorization_uuid):
+        return (
+            confd.guests(guest_uuid)
+            .meetings(meeting_uuid)
+            .authorizations(authorization_uuid)
             .get()
         )
-        response.assert_status(400)
+
+    with fixtures.meeting_authorization(
+        guest_uuid, meeting
+    ) as authorization, fixtures.meeting_authorization(
+        another_guest_uuid, another_meeting
+    ) as another_authorization:
+
+        # Test invalid guest_uuid
+        url(invalid_uuid, meeting['uuid'], authorization['uuid']).assert_status(400)
 
         # Test unknown guest_uuid
-        response = (
-            confd.guests(unknown_uuid)
-            .meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-        response.assert_status(404)
+        url(unknown_uuid, meeting['uuid'], authorization['uuid']).assert_status(404)
 
         # Test invalid meeting_uuid
-        response = (
-            confd.guests(guest_uuid)
-            .meetings(invalid_uuid)
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-        response.assert_status(404)
+        url(guest_uuid, invalid_uuid, authorization['uuid']).assert_status(404)
 
         # Test unknown meeting_uuid
-        response = (
-            confd.guests(guest_uuid)
-            .meetings(unknown_uuid)
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-        response.assert_status(404)
+        url(guest_uuid, unknown_uuid, authorization['uuid']).assert_status(404)
 
         # Test invalid authorization_uuid
-        response = (
-            confd.guests(guest_uuid)
-            .meetings(meeting['uuid'])
-            .authorizations(invalid_uuid)
-            .get()
-        )
-        response.assert_status(404)
+        url(guest_uuid, meeting['uuid'], invalid_uuid).assert_status(404)
 
         # Test unknown authorization_uuid
-        response = (
-            confd.guests(guest_uuid)
-            .meetings(meeting['uuid'])
-            .authorizations(unknown_uuid)
-            .get()
-        )
-        response.assert_status(404)
+        url(guest_uuid, meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Test get OK
-        response = (
-            confd.guests(guest_uuid)
-            .meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-
-        response.assert_status(200)
+        url(guest_uuid, meeting['uuid'], authorization['uuid']).assert_status(200)
 
 
 @fixtures.ingress_http()
@@ -821,6 +793,13 @@ def test_get_meeting_authorization_by_user(_, another_meeting, me):
     my_uuid = me['uuid']
     user_confd = create_confd(user_uuid=my_uuid)
 
+    def url(meeting_uuid, authorization_uuid):
+        return (
+            user_confd.users.me.meetings(meeting_uuid)
+            .authorizations(authorization_uuid)
+            .get()
+        )
+
     with fixtures.user_me_meeting(
         user_confd
     ) as meeting, fixtures.meeting_authorization(
@@ -829,53 +808,22 @@ def test_get_meeting_authorization_by_user(_, another_meeting, me):
         another_guest_uuid, another_meeting
     ) as another_authorization:
         # Test invalid meeting_uuid
-        response = (
-            user_confd.users.me.meetings(invalid_uuid)
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-        response.assert_status(404)
+        url(invalid_uuid, authorization['uuid']).assert_status(404)
 
         # Test unknown meeting_uuid
-        response = (
-            user_confd.users.me.meetings(unknown_uuid)
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-        response.assert_status(404)
+        url(unknown_uuid, authorization['uuid']).assert_status(404)
 
         # Test another meeting_uuid
-        response = (
-            user_confd.users.me.meetings(another_meeting['uuid'])
-            .authorizations(another_authorization['uuid'])
-            .get()
-        )
-        response.assert_status(404)
+        url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Test invalid authorization_uuid
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(invalid_uuid)
-            .get()
-        )
-        response.assert_status(404)
+        url(meeting['uuid'], invalid_uuid).assert_status(404)
 
         # Test unknown authorization_uuid
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(unknown_uuid)
-            .get()
-        )
-        response.assert_status(404)
+        url(meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Test get OK
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .get()
-        )
-
-        response.assert_status(200)
+        url(meeting['uuid'], authorization['uuid']).assert_status(200)
 
 
 @fixtures.ingress_http()
@@ -888,6 +836,13 @@ def test_accept_meeting_authorization(_, me, another_meeting):
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
     user_confd = create_confd(user_uuid=my_uuid)
 
+    def url(meeting_uuid, authorization_uuid):
+        return (
+            user_confd.users.me.meetings(meeting_uuid)
+            .authorizations(authorization_uuid)
+            .accept.put()
+        )
+
     with fixtures.user_me_meeting(
         user_confd
     ) as meeting, fixtures.meeting_authorization(
@@ -897,28 +852,13 @@ def test_accept_meeting_authorization(_, me, another_meeting):
     ) as another_authorization:
 
         # Test unknown meeting
-        response = (
-            user_confd.users.me.meetings(unknown_uuid)
-            .authorizations(authorization['uuid'])
-            .accept.put()
-        )
-        response.assert_status(404)
+        url(unknown_uuid, authorization['uuid']).assert_status(404)
 
         # Test unknown authorization
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(unknown_uuid)
-            .accept.put()
-        )
-        response.assert_status(404)
+        url(meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Test another meeting
-        response = (
-            user_confd.users.me.meetings(another_meeting['uuid'])
-            .authorizations(another_authorization['uuid'])
-            .accept.put()
-        )
-        response.assert_status(404)
+        url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Setup bus events
         bus_events = bus.BusClient.accumulator(
@@ -929,11 +869,7 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         )
 
         # Test accept authorization
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .accept.put()
-        )
+        response = url(meeting['uuid'], authorization['uuid'])
         response.assert_status(200)
         assert_that(response.json, has_entries(status='accepted'))
 
@@ -997,6 +933,13 @@ def test_reject_meeting_authorization(_, me, another_meeting):
     unknown_uuid = 'ff65a89a-ef00-4c9b-883b-d96ee4186492'
     user_confd = create_confd(user_uuid=my_uuid)
 
+    def url(meeting_uuid, authorization_uuid):
+        return (
+            user_confd.users.me.meetings(meeting_uuid)
+            .authorizations(authorization_uuid)
+            .reject.put()
+        )
+
     with fixtures.user_me_meeting(
         user_confd
     ) as meeting, fixtures.meeting_authorization(
@@ -1006,28 +949,13 @@ def test_reject_meeting_authorization(_, me, another_meeting):
     ) as another_authorization:
 
         # Test unknown meeting
-        response = (
-            user_confd.users.me.meetings(unknown_uuid)
-            .authorizations(authorization['uuid'])
-            .reject.put()
-        )
-        response.assert_status(404)
+        url(unknown_uuid, authorization['uuid']).assert_status(404)
 
         # Test unknown authorization
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(unknown_uuid)
-            .reject.put()
-        )
-        response.assert_status(404)
+        url(meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Test another meeting
-        response = (
-            user_confd.users.me.meetings(another_meeting['uuid'])
-            .authorizations(another_authorization['uuid'])
-            .reject.put()
-        )
-        response.assert_status(404)
+        url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Setup bus events
         bus_events = bus.BusClient.accumulator(
@@ -1038,11 +966,7 @@ def test_reject_meeting_authorization(_, me, another_meeting):
         )
 
         # Test reject authorization and bus events
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .reject.put()
-        )
+        response = url(meeting['uuid'], authorization['uuid'])
         response.assert_status(200)
         assert_that(response.json, has_entries(status='rejected'))
 
@@ -1107,6 +1031,13 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
     my_uuid = me['uuid']
     user_confd = create_confd(user_uuid=my_uuid)
 
+    def url(meeting_uuid, authorization_uuid):
+        return (
+            user_confd.users.me.meetings(meeting_uuid)
+            .authorizations(authorization_uuid)
+            .delete()
+        )
+
     with fixtures.user_me_meeting(
         user_confd
     ) as meeting, fixtures.meeting_authorization(
@@ -1115,44 +1046,19 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         another_guest_uuid, another_meeting
     ) as another_authorization:
         # Test invalid meeting_uuid
-        response = (
-            user_confd.users.me.meetings(invalid_uuid)
-            .authorizations(authorization['uuid'])
-            .delete()
-        )
-        response.assert_status(404)
+        url(invalid_uuid, authorization['uuid']).assert_status(404)
 
         # Test unknown meeting_uuid
-        response = (
-            user_confd.users.me.meetings(unknown_uuid)
-            .authorizations(authorization['uuid'])
-            .delete()
-        )
-        response.assert_status(404)
+        url(unknown_uuid, authorization['uuid']).assert_status(404)
 
         # Test another meeting_uuid
-        response = (
-            user_confd.users.me.meetings(another_meeting['uuid'])
-            .authorizations(another_authorization['uuid'])
-            .delete()
-        )
-        response.assert_status(404)
+        url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Test invalid authorization_uuid
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(invalid_uuid)
-            .delete()
-        )
-        response.assert_status(404)
+        url(meeting['uuid'], invalid_uuid).assert_status(404)
 
         # Test unknown authorization_uuid
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(unknown_uuid)
-            .delete()
-        )
-        response.assert_status(404)
+        url(meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Setup bus events
         bus_events = bus.BusClient.accumulator(
@@ -1163,13 +1069,7 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         )
 
         # Test delete OK
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .delete()
-        )
-
-        response.assert_status(204)
+        url(meeting['uuid'], authorization['uuid']).assert_status(204)
 
         # Test bus events
         bus_events.until_assert_that_accumulate(
@@ -1206,13 +1106,7 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         )
 
         # Test delete again
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization['uuid'])
-            .delete()
-        )
-
-        response.assert_status(404)
+        url(meeting['uuid'], authorization['uuid']).assert_status(404)
 
         # Meeting is still present
         response = user_confd.users.me.meetings(meeting['uuid']).get()
