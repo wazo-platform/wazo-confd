@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_test_helpers import bus
@@ -31,6 +31,16 @@ class BusClientWrapper:
 
         event = {
             'name': 'auth_tenant_added',
+            'data': {'uuid': tenant_uuid, 'slug': slug},
+        }
+        self.publish(event, headers={'name': event['name']})
+
+    def send_tenant_deleted(self, tenant_uuid, slug='slug'):
+        if self.exchange_type != 'headers':
+            raise NotImplementedError()
+
+        event = {
+            'name': 'auth_tenant_deleted',
             'data': {'uuid': tenant_uuid, 'slug': slug},
         }
         self.publish(event, headers={'name': event['name']})
