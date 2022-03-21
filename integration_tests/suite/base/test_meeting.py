@@ -766,6 +766,26 @@ def test_get_meeting_authorization_by_guest(_, meeting, another_meeting):
         # Test unknown authorization_uuid
         url(guest_uuid, meeting['uuid'], unknown_uuid).assert_status(404)
 
+        # Test stolen guest_uuid
+        url(
+            guest_uuid, another_meeting['uuid'], another_authorization['uuid']
+        ).assert_status(404)
+
+        # Test stolen meeting_uuid
+        url(
+            another_guest_uuid, meeting['uuid'], another_authorization['uuid']
+        ).assert_status(404)
+
+        # Test stolen authorization_uuid
+        url(
+            another_guest_uuid, another_meeting['uuid'], authorization['uuid']
+        ).assert_status(404)
+
+        # Test stolen meeting_uuid & authorization_uuid
+        url(another_guest_uuid, meeting['uuid'], authorization['uuid']).assert_status(
+            404
+        )
+
         # Test get OK
         url(guest_uuid, meeting['uuid'], authorization['uuid']).assert_status(200)
 
