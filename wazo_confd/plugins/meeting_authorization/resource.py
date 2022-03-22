@@ -53,7 +53,7 @@ class GuestMeetingAuthorizationList(ListResource):
 
     @no_auth
     def get(self, guest_uuid, meeting_uuid):
-        return '', 404
+        return '', 405
 
 
 class GuestMeetingAuthorizationItem(ItemResource):
@@ -89,6 +89,14 @@ class GuestMeetingAuthorizationItem(ItemResource):
             )
 
         return self.schema().dump(model)
+
+    @no_auth
+    def put(self, guest_uuid, meeting_uuid, authorization_uuid):
+        return '', 405
+
+    @no_auth
+    def delete(self, guest_uuid, meeting_uuid, authorization_uuid):
+        return '', 405
 
 
 class _MeResourceMixin:
@@ -137,6 +145,10 @@ class UserMeetingAuthorizationList(ListResource, _MeResourceMixin):
         total, items = self.service.search(params, ids['meeting_uuid'])
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
+    @required_acl('confd.users.me.meetings.{meeting_uuid}.authorizations.create')
+    def post(self, meeting_uuid):
+        return '', 405
+
 
 class UserMeetingAuthorizationItem(ItemResource, _MeResourceMixin):
 
@@ -170,6 +182,12 @@ class UserMeetingAuthorizationItem(ItemResource, _MeResourceMixin):
             )
 
         return self.schema().dump(model)
+
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.update'
+    )
+    def put(self, meeting_uuid, authorization_uuid):
+        return '', 405
 
     @required_acl(
         'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.delete'
@@ -207,6 +225,12 @@ class UserMeetingAuthorizationAccept(ItemResource, _MeResourceMixin):
         self.meeting_authorization_dao = meeting_authorization_dao
 
     @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.accept.read'
+    )
+    def get(self, meeting_uuid, authorization_uuid):
+        return '', 405
+
+    @required_acl(
         'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.accept.update'
     )
     def put(self, meeting_uuid, authorization_uuid):
@@ -231,6 +255,12 @@ class UserMeetingAuthorizationAccept(ItemResource, _MeResourceMixin):
         self.service.accept(model)
         return self.schema().dump(model)
 
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.accept.delete'
+    )
+    def delete(self, meeting_uuid, authorization_uuid):
+        return '', 405
+
 
 class UserMeetingAuthorizationReject(ItemResource, _MeResourceMixin):
 
@@ -240,6 +270,12 @@ class UserMeetingAuthorizationReject(ItemResource, _MeResourceMixin):
     def __init__(self, service, meeting_authorization_dao):
         self.service = service
         self.meeting_authorization_dao = meeting_authorization_dao
+
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.reject.read'
+    )
+    def get(self, meeting_uuid, authorization_uuid):
+        return '', 405
 
     @required_acl(
         'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.reject.update'
@@ -265,3 +301,9 @@ class UserMeetingAuthorizationReject(ItemResource, _MeResourceMixin):
 
         self.service.reject(model)
         return self.schema().dump(model)
+
+    @required_acl(
+        'confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.delete.read'
+    )
+    def delete(self, meeting_uuid, authorization_uuid):
+        return '', 405

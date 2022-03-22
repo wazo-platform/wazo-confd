@@ -266,18 +266,6 @@ def test_get_meeting_authorization_by_guest(_, meeting, another_meeting):
 
 @fixtures.ingress_http()
 @fixtures.meeting()
-def test_list_meeting_authorizations_by_guest(_, meeting):
-    guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
-    with fixtures.meeting_authorization(guest_uuid, meeting):
-        # Guests do not have permission to list authorizations
-        response = (
-            confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.get()
-        )
-        response.assert_status(404)
-
-
-@fixtures.ingress_http()
-@fixtures.meeting()
 @fixtures.user()
 def test_get_meeting_authorization_by_user(_, another_meeting, me):
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
@@ -606,3 +594,81 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         response = user_confd.users.me.meetings(meeting['uuid']).get()
 
         response.assert_status(200)
+
+
+def test_unimplemented_methods():
+    guest_uuid = '5797d37d-bee4-4b59-861e-a372bbb64c60'
+    meeting_uuid = '83ea3511-d655-4e0f-b7a9-57850f767a59'
+    authorization_uuid = '7da4d46b-fe5a-4ebd-b7ac-ca7d9152cc0f'
+    user_uuid = '48c7d8a1-dbce-4681-b307-061b9f80b204'
+    user_confd = create_confd(user_uuid=user_uuid)
+
+    # Guests list authorizations
+    response = (
+        create_confd().guests(guest_uuid).meetings(meeting_uuid).authorizations.get()
+    )
+    response.assert_status(405)
+
+    # Guests update authorization
+    response = (
+        create_confd()
+        .guests(guest_uuid)
+        .meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .update({})
+    )
+    response.assert_status(405)
+
+    # Guests update authorization
+    response = (
+        create_confd()
+        .guests(guest_uuid)
+        .meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .delete()
+    )
+    response.assert_status(405)
+
+    # Users create authorizations
+    response = user_confd.users.me.meetings(meeting_uuid).authorizations.create({})
+    response.assert_status(405)
+
+    # Users update authorization
+    response = (
+        user_confd.users.me.meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .update({})
+    )
+    response.assert_status(405)
+
+    # Users get authorization accept
+    response = (
+        user_confd.users.me.meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .accept.get()
+    )
+    response.assert_status(405)
+
+    # Users delete authorization accept
+    response = (
+        user_confd.users.me.meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .accept.delete()
+    )
+    response.assert_status(405)
+
+    # Users get authorization reject
+    response = (
+        user_confd.users.me.meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .reject.get()
+    )
+    response.assert_status(405)
+
+    # Users delete authorization reject
+    response = (
+        user_confd.users.me.meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .reject.delete()
+    )
+    response.assert_status(405)
