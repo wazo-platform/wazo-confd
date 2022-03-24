@@ -16,6 +16,7 @@ from hamcrest import (
     has_items,
     has_properties,
     is_not,
+    none,
     not_,
     not_none,
 )
@@ -126,8 +127,8 @@ def test_list_user_me(_, me, __):
 
 
 @fixtures.ingress_http()
-@fixtures.meeting(name="search", persistent=True)
-@fixtures.meeting(name="hidden", persistent=False)
+@fixtures.meeting(name="search", persistent=True, require_authorization=True)
+@fixtures.meeting(name="hidden", persistent=False, require_authorization=False)
 def test_search(_, meeting, hidden):
     url = confd.meetings
     searches = {'name': 'search'}
@@ -140,6 +141,10 @@ def test_search(_, meeting, hidden):
     assert_that(response.items, is_not(has_item(hidden)))
 
     response = url.get(persistent=False)
+    assert_that(response.items, has_item(hidden))
+    assert_that(response.items, is_not(has_item(meeting)))
+
+    response = url.get(require_authorization=False)
     assert_that(response.items, has_item(hidden))
     assert_that(response.items, is_not(has_item(meeting)))
 
@@ -236,6 +241,7 @@ def test_create_minimal_parameters(ingress_http, me):
             ingress_http_uri=ingress_http['uri'],
             persistent=False,
             exten=not_none(),
+            require_authorization=False,
         ),
     )
 
@@ -255,6 +261,7 @@ def test_create_minimal_parameters(ingress_http, me):
             ingress_http_uri=ingress_http['uri'],
             persistent=False,
             exten=not_none(),
+            require_authorization=False,
         ),
     )
 
@@ -269,6 +276,7 @@ def test_create_all_parameters(ingress_http, me, owner):
         'name': 'allparameter',
         'owner_uuids': [owner['uuid']],
         'persistent': True,
+        'require_authorization': True,
     }
 
     response = confd.meetings.post(**parameters)
@@ -283,6 +291,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             persistent=True,
             creation_time=not_none(),
             exten=not_none(),
+            require_authorization=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -300,6 +309,7 @@ def test_create_all_parameters(ingress_http, me, owner):
             persistent=True,
             creation_time=not_none(),
             exten=not_none(),
+            require_authorization=True,
         ),
     )
     confd.meetings(response.item['uuid']).delete().assert_deleted()
@@ -363,6 +373,34 @@ def test_create_without_name(_):
 
 
 @fixtures.ingress_http()
+@fixtures.user()
+def test_create_require_authorization(ingress_http, me):
+    response = confd.meetings.post(
+        name='require_authorization_false', require_authorization=False
+    )
+
+    assert_that(
+        response.item,
+        has_entries(
+            guest_sip_authorization=not_(none()),
+        ),
+    )
+    confd.meetings(response.item['uuid']).delete().assert_deleted()
+
+    response = confd.meetings.post(
+        name='require_authorization_true', require_authorization=True
+    )
+
+    assert_that(
+        response.item,
+        has_entries(
+            guest_sip_authorization=none(),
+        ),
+    )
+    confd.meetings(response.item['uuid']).delete().assert_deleted()
+
+
+@fixtures.ingress_http()
 @fixtures.meeting()
 def test_edit_minimal_parameters(_, meeting):
     response = confd.meetings(meeting['uuid']).put()
@@ -376,6 +414,7 @@ def test_edit_all_parameters(_, meeting, some_user):
     parameters = {
         'name': 'editallparameter',
         'owner_uuids': [some_user['uuid']],
+        'require_authorization': True,
     }
     response = confd.meetings(meeting['uuid']).put(
         creation_time='2021-12-06T18:55:58.961760+00:00', **parameters
@@ -398,6 +437,7 @@ def test_edit_all_parameters_users_me(_, me, other_user, other_meeting):
         parameters = {
             'name': 'editallparameter',
             'owner_uuids': [other_user['uuid']],
+            'require_authorization': True,
         }
         expected_parameters = {
             'name': 'editallparameter',

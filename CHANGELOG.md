@@ -1,5 +1,18 @@
 # Changelog
 
+## 22.05
+
+* The following resources have been added:
+
+  * `GET /users/me/meetings/<meeting_uuid>/authorizations`
+  * `GET, DELETE /users/me/meetings/<meeting_uuid>/authorizations/<authorization_uuid>`
+  * `PUT /users/me/meetings/<meeting_uuid>/authorizations/<authorization_uuid>/accept`
+  * `PUT /users/me/meetings/<meeting_uuid>/authorizations/<authorization_uuid>/reject`
+  * `POST /guests/<guest_uuid>/meetings/<meeting_uuid>/authorizations`
+  * `GET /guests/<guest_uuid>/meetings/<meeting_uuid>/authorizations/<authorization_uuid>`
+  
+* the `meeting` resource now has a `require_authorization` field.
+
 ## 22.01
 
 * the `meeting` resource now has a `creation_time` read only field.

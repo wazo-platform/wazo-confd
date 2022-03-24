@@ -134,6 +134,7 @@ from . import line_extension  # noqa
 from . import line_fellowship  # noqa
 from . import line_sip  # noqa
 from . import meeting  # noqa
+from . import meeting_authorization  # noqa
 from . import moh  # noqa
 from . import paging  # noqa
 from . import paging_caller_user  # noqa
@@ -230,6 +231,7 @@ __all__ = [
     'line_fellowship',
     'line_sip',
     'meeting',
+    'meeting_authorization',
     'moh',
     'paging',
     'paging_caller_user',

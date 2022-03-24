@@ -591,6 +591,34 @@ class DatabaseQueries:
         query = text("UPDATE meeting SET created_at = :date WHERE uuid = :meeting_uuid")
         self.connection.execute(query, date=date, meeting_uuid=meeting_uuid)
 
+    @contextmanager
+    def insert_max_meeting_authorizations(self, guest_uuid, meeting_uuid):
+        query = text(
+            """
+        INSERT INTO meeting_authorization (meeting_uuid, guest_uuid, guest_name)
+        VALUES (
+            :meeting_uuid,
+            :guest_uuid,
+            :guest_name
+        )
+        """
+        )
+
+        for _ in range(128):
+            self.connection.execute(
+                query,
+                meeting_uuid=meeting_uuid,
+                guest_uuid=guest_uuid,
+                guest_name='Dummy guest name',
+            )
+
+        yield
+
+        query = text(
+            "DELETE FROM meeting_authorization WHERE meeting_uuid = :meeting_uuid"
+        )
+        self.connection.execute(query, meeting_uuid=meeting_uuid)
+
 
 def create_helper(
     user='asterisk',

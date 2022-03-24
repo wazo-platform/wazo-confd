@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -34,6 +34,7 @@ class MeetingSchema(BaseSchema):
     tenant_uuid = fields.String(dump_only=True)
     creation_time = fields.DateTime(attribute='created_at', dump_only=True)
     exten = fields.Method('_exten', dump_only=True)
+    require_authorization = fields.Boolean(missing=False)
 
     def _uri(self, meeting):
         if meeting.ingress_http:
@@ -55,10 +56,16 @@ class MeetingSchema(BaseSchema):
         return '{}{}'.format(prefix, meeting.number)
 
     def _guest_sip_authorization(self, model):
-        endpoint_sip = model.guest_endpoint_sip
-        if not endpoint_sip:
+        if not model.guest_endpoint_sip:
             return None
 
+        if model.require_authorization:
+            return None
+
+        return self.format_sip_authorization(model.guest_endpoint_sip)
+
+    @staticmethod
+    def format_sip_authorization(endpoint_sip):
         username = None
         password = None
         for option, value in endpoint_sip.auth_section_options:
@@ -66,5 +73,8 @@ class MeetingSchema(BaseSchema):
                 username = value
             elif option == 'password':
                 password = value
+
+        if username is None or password is None:
+            return None
 
         return b64encode('{}:{}'.format(username, password).encode()).decode()

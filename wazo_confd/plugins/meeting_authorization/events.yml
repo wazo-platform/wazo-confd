@@ -1,0 +1,119 @@
+asyncapi: 2.3.0
+id: urn:wazo:wazo-confd
+info:
+  title: wazo-confd events
+  version: 1.0.0
+channels:
+  config.meeting_guest_authorizations.created:
+    publish:
+      message:
+        $ref: '#/components/messages/meeting_guest_authorization_created'
+  config.meeting_guest_authorizations.updated:
+    publish:
+      message:
+        $ref: '#/components/messages/meeting_guest_authorization_updated'
+  config.meeting_guest_authorizations.deleted:
+    publish:
+      message:
+        $ref: '#/components/messages/meeting_guest_authorization_deleted'
+  config.users.{user_uuid}.meeting_guest_authorizations.created:
+    parameters:
+      user_uuid:
+        $ref: '#/components/parameters/user_uuid'
+    publish:
+      message:
+        $ref: '#/components/messages/meeting_user_guest_authorization_created'
+  config.users.{user_uuid}.meeting_guest_authorizations.updated:
+    parameters:
+      user_uuid:
+        $ref: '#/components/parameters/user_uuid'
+    publish:
+      message:
+        $ref: '#/components/messages/meeting_user_guest_authorization_updated'
+  config.users.{user_uuid}.meeting_guest_authorizations.deleted:
+    parameters:
+      user_uuid:
+        $ref: '#/components/parameters/user_uuid'
+    publish:
+      message:
+        $ref: '#/components/messages/meeting_user_guest_authorization_deleted'
+components:
+  messages:
+    meeting_guest_authorization_created:
+      description: |-
+        **Required ACL**: events.config.meeting_guest_authorizations.created
+
+        A new meeting authorization was requested
+      payload:
+        $ref: '#/components/schemas/meeting_guest_authorization'
+    meeting_guest_authorization_updated:
+      description: |-
+        **Required ACL**: events.config.meeting_guest_authorizations.created
+
+        A meeting authorization was updated
+      payload:
+        $ref: '#/components/schemas/meeting_guest_authorization'
+    meeting_guest_authorization_deleted:
+      description: |-
+        **Required ACL**: events.config.meeting_guest_authorizations.created
+
+        A meeting authorization was deleted
+      payload:
+        $ref: '#/components/schemas/meeting_guest_authorization'
+    meeting_user_guest_authorization_created:
+      description: >-
+        **Required ACL**:
+        events.config.users.{user_uuid}.meeting_guest_authorizations.created
+
+
+        A new meeting authorization was requested
+      payload:
+        $ref: '#/components/schemas/meeting_guest_authorization'
+    meeting_user_guest_authorization_updated:
+      description: >-
+        **Required ACL**:
+        events.config.users.{user_uuid}.meeting_guest_authorizations.updated
+
+
+        A new meeting authorization was requested
+      payload:
+        $ref: '#/components/schemas/meeting_guest_authorization'
+    meeting_user_guest_authorization_deleted:
+      description: >-
+        **Required ACL**:
+        events.config.users.{user_uuid}.meeting_guest_authorizations.deleted
+
+
+        A new meeting authorization was requested
+      payload:
+        $ref: '#/components/schemas/meeting_guest_authorization'
+  schemas:
+    meeting_guest_authorization:
+      type: object
+      properties:
+        meeting_uuid:
+          type: string
+          description: The meeting UUID
+        uuid:
+          type: string
+          description: The authorization UUID
+        guest_name:
+          type: string
+          description: The guest's name who requested the autorization
+        guest_uuid:
+          type: string
+          description: The guest's UUID who requested the autorization
+        creation_time:
+          type: string
+          format: date-time
+          description: When the authorization was requested
+        status:
+          type: string
+          description: >-
+            If the authorization was accepted. Possible values: pending,
+            accepted, rejected
+  parameters:
+    user_uuid:
+      schema:
+        type: string
+      description: the UUID of the user

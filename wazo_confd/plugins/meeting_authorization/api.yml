@@ -1,0 +1,206 @@
+paths:
+  /guests/{guest_uuid}/meetings/{meeting_uuid}/authorizations:
+    post:
+      operationId: create_guest_meeting_authorization
+      summary: Request guest authorization to enter a meeting
+      description: '**Required ACL:** none. A single meeting only accepts a maximum amount of 128 authorizations.'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/guest_uuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - name: body
+        in: body
+        description: Details to request authorization
+        required: true
+        schema:
+          $ref: '#/definitions/MeetingAuthorizationRequest'
+      responses:
+        '201':
+          description: Authorization created
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /guests/{guest_uuid}/meetings/{meeting_uuid}/authorizations/{authorization_uuid}:
+    get:
+      operationId: get_guest_meeting_authorization
+      summary: Read the guest authorization to enter a meeting
+      description: '**Required ACL:** none'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/guest_uuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '200':
+          description: Authorization details
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /user/me/meetings/{meeting_uuid}/authorizations:
+    get:
+      operationId: list_user_meeting_authorizations
+      summary: List all guest authorization requests of a meeting
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.read'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/meeting_uuid'
+      responses:
+        '200':
+          description: Authorizations list
+          schema:
+            $ref: '#/definitions/MeetingAuthorizationItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}:
+    get:
+      operationId: get_user_meeting_authorization
+      summary: Read the guest authorization to enter a meeting
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.read'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/guest_uuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '200':
+          description: Authorization details
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_user_meeting_authorization
+      summary: Delete the guest authorization to enter a meeting
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.read'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - guests
+      parameters:
+      - $ref: '#/parameters/guest_uuid'
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '400':
+          $ref: '#/responses/DeleteError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/accept:
+    put:
+      operationId: put_user_meeting_authorization_accept
+      summary: Accept a guest authorization request
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.accept.update'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '200':
+          description: Authorization details
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /user/me/meetings/{meeting_uuid}/authorizations/{authorization_uuid}/reject:
+    put:
+      operationId: put_user_meeting_authorization_reject
+      summary: Reject a guest authorization request
+      description: '**Required ACL:** confd.users.me.meetings.{meeting_uuid}.authorizations.{authorization_uuid}.reject.update'
+      tags:
+      - meeting_authorizations
+      - meetings
+      - users
+      parameters:
+      - $ref: '#/parameters/meeting_uuid'
+      - $ref: '#/parameters/authorization_uuid'
+      responses:
+        '200':
+          description: Authorization details
+          schema:
+            $ref: '#/definitions/MeetingAuthorization'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  MeetingAuthorizationRequest:
+    type: object
+    properties:
+      guest_name:
+        type: string
+  MeetingAuthorizationItems:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/MeetingAuthorization'
+      total:
+        type: integer
+  MeetingAuthorization:
+    type: object
+    properties:
+      uuid:
+        type: string
+        format: uuid
+      guest_name:
+        type: string
+      creation_time:
+        type: string
+        format: date-time
+      status:
+        type: string
+        enum:
+          - pending
+          - accepted
+          - rejected
+      sip_authorization:
+        type: string
+
+parameters:
+  guest_uuid:
+    required: true
+    name: guest_uuid
+    in: path
+    type: string
+    description: Guest UUID. It must be generated by the guest.
+  meeting_uuid:
+    required: true
+    name: meeting_uuid
+    in: path
+    type: string
+    description: Meeting UUID
+  authorization_uuid:
+    required: true
+    name: authorization_uuid
+    in: path
+    type: string
+    description: Authorization UUID
