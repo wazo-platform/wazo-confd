@@ -13,6 +13,7 @@ from xivo_dao import init_db_from_config
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
 from xivo_dao.resources.meeting import dao as meeting_dao
+from xivo_dao.resources.meeting_authorization import dao as meeting_authorization_dao
 
 from wazo_auth_client import Client as AuthClient
 
@@ -30,6 +31,12 @@ from wazo_confd.plugins.extension_feature.service import (
     build_service as build_extension_features_service,
 )
 from wazo_confd.plugins.meeting.notifier import Notifier as MeetingNotifier
+from wazo_confd.plugins.meeting_authorization.notifier import (
+    Notifier as MeetingAuthorizationNotifier,
+)
+from wazo_confd.plugins.meeting_authorization.service import (
+    build_service as build_authorization_service,
+)
 
 logger = logging.getLogger('wazo-confd-purge-meetings')
 
@@ -48,12 +55,18 @@ def parse_cli_args():
         action='store_true',
         help='Only print warnings and errors',
     )
+    parser.add_argument(
+        '--authorizations-only',
+        action='store_true',
+        help='Only remove old meeting authorizations, not meeting themselves.',
+    )
     parsed_args = parser.parse_args()
     result = {'log_level': logging.INFO}
     if parsed_args.quiet:
         result['log_level'] = logging.WARNING
     elif parsed_args.debug:
         result['log_level'] = logging.DEBUG
+    result['authorizations_only'] = parsed_args.authorizations_only
     return result
 
 
@@ -71,6 +84,26 @@ def remove_meetings_older_than(date, meeting_service):
         for meeting in meetings:
             logger.info('Removing meeting %s: %s', meeting.uuid, meeting.name)
             meeting_service.delete(meeting)
+        session.flush()
+
+
+def remove_meeting_authorizations_older_than(date, meeting_authorization_service):
+    logger.info('Removing meeting authorizations older than %s...', date)
+
+    with session_scope() as session:
+        meeting_authorizations = meeting_authorization_dao.find_all_by(
+            meeting_uuid=None,
+            created_before=date,
+        )
+        logger.info('Found %s meeting authorizations.', len(meeting_authorizations))
+        for meeting_authorization in meeting_authorizations:
+            logger.debug(
+                'Removing authorization for meeting %s: uuid "%s", guest_name "%s"',
+                meeting_authorization.meeting_uuid,
+                meeting_authorization.uuid,
+                meeting_authorization.guest_name,
+            )
+            meeting_authorization_service.delete(meeting_authorization)
         session.flush()
 
 
@@ -95,18 +128,32 @@ def main():
         wazo_uuid,
     )
     sysconfd = SysconfdPublisher.from_config(config)
-    ingress_http_service = build_ingress_http_service()
-    extension_features_service = build_extension_features_service()
-    meeting_service = CRUDService(
-        meeting_dao,
-        build_meeting_validator(),
-        MeetingNotifier(
-            bus, sysconfd, ingress_http_service, extension_features_service, tenant_uuid
-        ),
-    )
 
-    meeting_date_limit = datetime.utcnow() - timedelta(hours=24)
-    remove_meetings_older_than(meeting_date_limit, meeting_service)
+    if not cli_args['authorizations_only']:
+        ingress_http_service = build_ingress_http_service()
+        extension_features_service = build_extension_features_service()
+        meeting_service = CRUDService(
+            meeting_dao,
+            build_meeting_validator(),
+            MeetingNotifier(
+                bus,
+                sysconfd,
+                ingress_http_service,
+                extension_features_service,
+                tenant_uuid,
+            ),
+        )
+
+        meeting_date_limit = datetime.utcnow() - timedelta(hours=24)
+        remove_meetings_older_than(meeting_date_limit, meeting_service)
+
+    authorization_notifier = MeetingAuthorizationNotifier(bus)
+    meeting_authorization_service = build_authorization_service(authorization_notifier)
+
+    meeting_authorization_date_limit = datetime.now() - timedelta(hours=24)
+    remove_meeting_authorizations_older_than(
+        meeting_authorization_date_limit, meeting_authorization_service
+    )
 
     sysconfd.flush()
     bus.flush()

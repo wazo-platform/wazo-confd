@@ -10,8 +10,10 @@ from hamcrest import (
     none,
     not_none,
 )
+from datetime import datetime, timedelta, timezone
 
 from . import (
+    BaseIntegrationTest,
     confd,
     create_confd,
     db,
@@ -672,3 +674,38 @@ def test_unimplemented_methods():
         .reject.delete()
     )
     response.assert_status(405)
+
+
+@fixtures.ingress_http()
+@fixtures.user()
+def test_purge_old_meeting_authorizations(_, me):
+    guest_uuid = '5797d37d-bee4-4b59-861e-a372bbb64c60'
+    another_guest_uuid = '2d79b38f-7457-4377-85d7-67951337f121'
+    user_confd = create_confd(user_uuid=me['uuid'])
+    with fixtures.user_me_meeting(
+        user_confd
+    ) as meeting, fixtures.meeting_authorization(
+        guest_uuid, meeting
+    ) as authorization_too_old, fixtures.meeting_authorization(
+        another_guest_uuid, meeting
+    ) as authorization_too_young:
+        too_old = datetime.now(timezone.utc) - timedelta(hours=25)
+        with db.queries() as queries:
+            queries.set_meeting_authorization_creation_date(
+                authorization_too_old['uuid'], too_old
+            )
+
+        BaseIntegrationTest.purge_meeting_authorizations()
+
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(authorization_too_old['uuid'])
+            .get()
+        )
+        response.assert_status(404)
+        response = (
+            user_confd.users.me.meetings(meeting['uuid'])
+            .authorizations(authorization_too_young['uuid'])
+            .get()
+        )
+        response.assert_status(200)
