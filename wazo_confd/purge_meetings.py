@@ -4,7 +4,7 @@
 import argparse
 import logging
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from xivo import xivo_logging
 from xivo.chain_map import ChainMap
@@ -144,13 +144,13 @@ def main():
             ),
         )
 
-        meeting_date_limit = datetime.utcnow() - timedelta(hours=24)
+        meeting_date_limit = datetime.now(timezone.utc) - timedelta(hours=24)
         remove_meetings_older_than(meeting_date_limit, meeting_service)
 
     authorization_notifier = MeetingAuthorizationNotifier(bus)
     meeting_authorization_service = build_authorization_service(authorization_notifier)
 
-    meeting_authorization_date_limit = datetime.now() - timedelta(hours=24)
+    meeting_authorization_date_limit = datetime.now(timezone.utc) - timedelta(hours=24)
     remove_meeting_authorizations_older_than(
         meeting_authorization_date_limit, meeting_authorization_service
     )
