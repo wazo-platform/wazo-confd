@@ -77,12 +77,13 @@ def load_config():
 
 
 def remove_meetings_older_than(date, meeting_service):
-    logger.debug('Removing meetings older than %s', date)
+    logger.info('Removing meetings older than %s...', date)
 
     with session_scope() as session:
         meetings = meeting_dao.find_all_by(created_before=date, persistent=False)
+        logger.info('Found %s meeting.', len(meetings))
         for meeting in meetings:
-            logger.info('Removing meeting %s: %s', meeting.uuid, meeting.name)
+            logger.debug('Removing meeting %s: %s', meeting.uuid, meeting.name)
             meeting_service.delete(meeting)
         session.flush()
 
