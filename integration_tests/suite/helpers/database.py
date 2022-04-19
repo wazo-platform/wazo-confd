@@ -591,6 +591,14 @@ class DatabaseQueries:
         query = text("UPDATE meeting SET created_at = :date WHERE uuid = :meeting_uuid")
         self.connection.execute(query, date=date, meeting_uuid=meeting_uuid)
 
+    def set_meeting_authorization_creation_date(self, meeting_authorization_uuid, date):
+        query = text(
+            "UPDATE meeting_authorization SET created_at = :date WHERE uuid = :meeting_authorization_uuid"
+        )
+        self.connection.execute(
+            query, date=date, meeting_authorization_uuid=meeting_authorization_uuid
+        )
+
     @contextmanager
     def insert_max_meeting_authorizations(self, guest_uuid, meeting_uuid):
         query = text(

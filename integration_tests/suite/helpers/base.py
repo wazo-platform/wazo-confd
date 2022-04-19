@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -61,6 +61,12 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def purge_meetings(cls):
         cls.docker_exec(['wazo-confd-purge-meetings', '--debug'])
+
+    @classmethod
+    def purge_meeting_authorizations(cls):
+        return cls.docker_exec(
+            ['wazo-confd-purge-meetings', '--debug', '--authorizations-only'],
+        )
 
     @classmethod
     def _create_auth_tenant(cls):

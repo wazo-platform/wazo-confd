@@ -1,5 +1,10 @@
 # Changelog
 
+## 22.06
+
+* Meeting authorizations are now only valid for 24 hours. They are automatically
+  deleted after 24 hours.
+
 ## 22.05
 
 * The following resources have been added:
