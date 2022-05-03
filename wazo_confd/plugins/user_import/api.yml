@@ -6,10 +6,10 @@ paths:
       description: '**Required ACL:** `confd.users.export.read`
 
 
-        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html'
+        CSV field list available at https://wazo-platform.org/uc-doc/administration/users/csv_import'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
-        url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
+        url: https://wazo-platform.org/uc-doc/administration/users/csv_import
       tags:
       - users
       produces:
@@ -28,10 +28,10 @@ paths:
       description: '**Required ACL:** `confd.users.import.create`
 
 
-        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html'
+        CSV field list available at https://wazo-platform.org/uc-doc/administration/users/csv_import'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
-        url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
+        url: https://wazo-platform.org/uc-doc/administration/users/csv_import
       consumes:
       - text/csv; charset=utf-8
       tags:
@@ -56,12 +56,12 @@ paths:
       **Required ACL:** `confd.users.import.update`
 
 
-        CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html
+        CSV field list available at https://wazo-platform.org/uc-doc/administration/users/csv_import
 
         This resource has been disabled since it creates invalid configurations'
       externalDocs:
         description: Complete documentation on the CSV data format and fields
-        url: http://documentation.wazo.community/en/stable/administration/users/csv_import.html
+        url: https://wazo-platform.org/uc-doc/administration/users/csv_import
       consumes:
       - text/csv; charset=utf-8
       tags:
@@ -86,7 +86,7 @@ parameters:
     name: body
     in: body
     required: true
-    description: CSV field list available at http://documentation.wazo.community/en/stable/administration/users/csv_import.html
+    description: CSV field list available at https://wazo-platform.org/uc-doc/administration/users/csv_import
     schema:
       type: string
 

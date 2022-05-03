@@ -5,14 +5,14 @@ wazo-confd
 
 Wazo CONFD is a web server that provides a [RESTful](http://en.wikipedia.org/wiki/Representational_state_transfer)
 service for configuring and managing a Wazo server. Further details on how to use the API can be found on
-the [Wazo API web site](http://api.wazo.community)
+the [Wazo API web site](https://wazo-platform.org/documentation)
 
 
 Installing wazo-confd
 ---------------------
 
-The server is already provided as a part of [Wazo](http://documentation.wazo.community).
-Please refer to [the documentation](http://documentation.wazo.community/en/stable/installation/installsystem.html) for
+The server is already provided as a part of [Wazo](https://wazo-platform.org/uc-doc/).
+Please refer to [the documentation](https://wazo-platform.org/uc-doc/installation/install-system) for
 further details on installing one.
 
 

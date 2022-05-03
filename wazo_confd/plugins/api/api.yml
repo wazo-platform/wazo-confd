@@ -20,7 +20,7 @@ info:
     url: http://www.gnu.org/licenses/gpl.txt
   contact:
     name: Dev Team
-    url: http://wazo.community
+    url: https://wazo-platform.org/
     email: dev@wazo.community
 schemes:
 - http
@@ -34,7 +34,7 @@ x-xivo-name: confd
 tags:
 - name: funckeys
   externalDocs:
-    url: http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
+    url: https://wazo-platform.org/uc-doc/api_sdk/rest_api/confd/func_keys
     description: Documentation on function key models
 securityDefinitions:
   wazo_auth_token:

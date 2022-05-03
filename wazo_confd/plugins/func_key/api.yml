@@ -348,7 +348,7 @@ parameters:
 definitions:
   FuncKey:
     title: FuncKey
-    description: Further documentation at http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
+    description: Further documentation at https://wazo-platform.org/uc-doc/api_sdk/rest_api/confd/func_keys
     properties:
       blf:
         type: boolean
@@ -388,7 +388,7 @@ definitions:
     type: array
   FuncKeyTemplate:
     title: FuncKeyTemplate
-    description: Further documentation at http://documentation.wazo.community/en/stable/api_sdk/rest_api/confd/func_keys.html
+    description: Further documentation at https://wazo-platform.org/uc-doc/administration/users/csv_import
     properties:
       id:
         type: integer
