@@ -93,19 +93,69 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'persistent', {}
 
 
-@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
-@fixtures.ingress_http(wazo_tenant=SUB_TENANT)
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT, uri='http://main')
+@fixtures.ingress_http(wazo_tenant=SUB_TENANT, uri='http://sub')
 @fixtures.meeting(wazo_tenant=MAIN_TENANT)
 @fixtures.meeting(wazo_tenant=SUB_TENANT)
-def test_list_multi_tenant(_, __, main, sub):
+def test_list_multi_tenant(main_ingress, sub_ingress, main, sub):
     response = confd.meetings.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
+    assert_that(
+        response.items,
+        all_of(
+            has_item(
+                has_entries(
+                    {
+                        'uuid': main['uuid'],
+                        'ingress_http_uri': main_ingress['uri'],
+                    }
+                )
+            ),
+            not_(
+                has_item(
+                    has_entries(uuid=sub['uuid']),
+                )
+            ),
+        ),
+    )
 
     response = confd.meetings.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
+    assert_that(
+        response.items,
+        all_of(
+            not_(
+                has_item(
+                    has_entries(uuid=main['uuid']),
+                )
+            ),
+            has_item(
+                has_entries(
+                    {
+                        'uuid': sub['uuid'],
+                        'ingress_http_uri': sub_ingress['uri'],
+                    }
+                ),
+            ),
+        ),
+    )
 
     response = confd.meetings.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(main, sub))
+    assert_that(
+        response.items,
+        has_items(
+            has_entries(
+                {
+                    'uuid': main['uuid'],
+                    'ingress_http_uri': main_ingress['uri'],
+                },
+            ),
+            has_entries(
+                {
+                    'uuid': sub['uuid'],
+                    'ingress_http_uri': sub_ingress['uri'],
+                }
+            ),
+        ),
+    )
 
 
 @fixtures.ingress_http()
