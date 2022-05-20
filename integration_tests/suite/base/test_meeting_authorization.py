@@ -202,9 +202,12 @@ def test_sorting_offset_limit_authorizations_by_user(_, me):
 
 
 @fixtures.ingress_http()
+@fixtures.meeting(require_authorization=False)
 @fixtures.meeting()
-@fixtures.meeting()
-def test_get_meeting_authorization_by_guest(_, meeting, another_meeting):
+@fixtures.meeting(require_authorization=True)
+def test_get_meeting_authorization_by_guest(
+    _, meeting, another_meeting, meeting_authorization_required
+):
     unknown_uuid = '97891324-fed9-46d7-ae00-b40b75178011'
     invalid_uuid = 'invalid'
     guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
@@ -222,7 +225,9 @@ def test_get_meeting_authorization_by_guest(_, meeting, another_meeting):
         guest_uuid, meeting
     ) as authorization, fixtures.meeting_authorization(
         another_guest_uuid, another_meeting
-    ) as another_authorization:
+    ) as another_authorization, fixtures.meeting_authorization(
+        guest_uuid, meeting_authorization_required
+    ) as authorization_required:
 
         # Test invalid guest_uuid
         url(invalid_uuid, meeting['uuid'], authorization['uuid']).assert_status(400)
@@ -262,8 +267,19 @@ def test_get_meeting_authorization_by_guest(_, meeting, another_meeting):
             404
         )
 
-        # Test get OK
-        url(guest_uuid, meeting['uuid'], authorization['uuid']).assert_status(200)
+        # Test get OK, accepted if authorizations is not required
+        response = url(guest_uuid, meeting['uuid'], authorization['uuid'])
+        response.assert_status(200)
+        assert_that(response.json, has_entries(status='accepted'))
+
+        # Test get OK, pending if authorizations is required
+        response = url(
+            guest_uuid,
+            meeting_authorization_required['uuid'],
+            authorization_required['uuid'],
+        )
+        response.assert_status(200)
+        assert_that(response.json, has_entries(status='pending'))
 
 
 @fixtures.ingress_http()

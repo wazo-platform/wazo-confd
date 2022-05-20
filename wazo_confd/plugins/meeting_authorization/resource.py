@@ -40,12 +40,6 @@ class GuestMeetingAuthorizationList(ListResource):
         body['guest_uuid'] = guest_uuid
         body['meeting_uuid'] = meeting_uuid
         form = self.schema().load(body)
-        form['status'] = 'pending'
-
-        try:
-            self._meeting_dao.get(meeting_uuid)
-        except NotFoundError as e:
-            raise errors.not_found('meetings', 'Meeting', **e.metadata)
 
         model = self.model(**form)
         self._service.create(model)
