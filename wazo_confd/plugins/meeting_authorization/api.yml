@@ -178,6 +178,7 @@ definitions:
         format: date-time
       status:
         type: string
+        description: The status of the authorization. If the meeting does not require an authorization, the authorization will always be `accepted`.
         enum:
           - pending
           - accepted
