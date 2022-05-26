@@ -3,7 +3,7 @@
 
 import unittest
 import uuid
-from mock import Mock
+from unittest.mock import Mock
 
 from xivo_bus.resources.endpoint_sip.event import (
     CreateSipEndpointEvent,

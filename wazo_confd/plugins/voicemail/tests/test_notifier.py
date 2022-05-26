@@ -5,7 +5,7 @@ import unittest
 
 from hamcrest import assert_that, contains
 from uuid import uuid4
-from mock import call, Mock
+from unittest.mock import call, Mock
 
 from xivo_dao.alchemy.voicemail import Voicemail
 

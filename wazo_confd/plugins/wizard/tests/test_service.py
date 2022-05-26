@@ -1,11 +1,11 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
 from textwrap import dedent
 
-from mock import Mock, patch, mock_open
+from unittest.mock import Mock, patch, mock_open
 from hamcrest import assert_that, equal_to, empty, none
 
 from ..service import WizardService

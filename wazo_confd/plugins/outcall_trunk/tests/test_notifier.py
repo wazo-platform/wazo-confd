@@ -4,7 +4,7 @@
 import unittest
 
 from uuid import uuid4
-from mock import Mock
+from unittest.mock import Mock
 
 from xivo_bus.resources.outcall_trunk.event import OutcallTrunksAssociatedEvent
 from xivo_dao.alchemy.outcall import Outcall

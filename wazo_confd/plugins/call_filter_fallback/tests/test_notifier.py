@@ -3,7 +3,7 @@
 
 import unittest
 from uuid import uuid4
-from mock import Mock
+from unittest.mock import Mock
 
 from xivo_bus.resources.call_filter.event import EditCallFilterFallbackEvent
 from xivo_dao.alchemy.callfilter import Callfilter as CallFilter

@@ -4,7 +4,7 @@
 import unittest
 
 from uuid import uuid4
-from mock import Mock
+from unittest.mock import Mock
 from xivo_bus.resources.ivr.event import CreateIvrEvent, DeleteIvrEvent, EditIvrEvent
 from xivo_dao.alchemy.ivr import IVR
 

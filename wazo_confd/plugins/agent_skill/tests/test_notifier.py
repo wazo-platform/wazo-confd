@@ -3,7 +3,7 @@
 
 import unittest
 
-from mock import Mock
+from unittest.mock import Mock
 import uuid
 
 from xivo_bus.resources.agent_skill.event import (
