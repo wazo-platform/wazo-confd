@@ -4,7 +4,7 @@
 import unittest
 import uuid
 
-from mock import Mock
+from unittest.mock import Mock
 
 from hamcrest import assert_that, equal_to
 

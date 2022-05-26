@@ -3,7 +3,7 @@
 
 import unittest
 
-from mock import Mock
+from unittest.mock import Mock
 from uuid import uuid4
 
 from xivo_bus.resources.group_call_permission.event import (

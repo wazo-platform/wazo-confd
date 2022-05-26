@@ -4,7 +4,7 @@
 import unittest
 
 from uuid import uuid4
-from mock import Mock
+from unittest.mock import Mock
 
 from xivo_bus.resources.user.event import EditUserFallbackEvent
 from xivo_dao.alchemy.userfeatures import UserFeatures as User

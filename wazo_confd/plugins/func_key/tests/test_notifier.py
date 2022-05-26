@@ -4,7 +4,7 @@
 import unittest
 
 from uuid import uuid4
-from mock import Mock, call
+from unittest.mock import Mock, call
 
 from xivo_bus.resources.func_key.event import (
     CreateFuncKeyTemplateEvent,

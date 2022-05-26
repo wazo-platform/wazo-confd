@@ -4,7 +4,7 @@
 import unittest
 
 from uuid import uuid4
-from mock import Mock
+from unittest.mock import Mock
 
 from xivo_bus.resources.switchboard.event import EditSwitchboardFallbackEvent
 from xivo_dao.alchemy.switchboard import Switchboard

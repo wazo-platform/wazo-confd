@@ -4,7 +4,7 @@
 import datetime
 import unittest
 import uuid
-from mock import Mock, call
+from unittest.mock import Mock, call
 
 from xivo_bus.resources.user.event import (
     CreateUserEvent,

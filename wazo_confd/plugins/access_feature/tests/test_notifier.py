@@ -1,8 +1,8 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-from mock import Mock
+from unittest.mock import Mock
 
 from xivo_bus.resources.access_feature.event import (
     CreateAccessFeatureEvent,
