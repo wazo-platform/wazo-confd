@@ -104,17 +104,11 @@ def test_list_multi_tenant(main_ingress, sub_ingress, main, sub):
         all_of(
             has_item(
                 has_entries(
-                    {
-                        'uuid': main['uuid'],
-                        'ingress_http_uri': main_ingress['uri'],
-                    }
+                    uuid=main['uuid'],
+                    ingress_http_uri=main_ingress['uri'],
                 )
             ),
-            not_(
-                has_item(
-                    has_entries(uuid=sub['uuid']),
-                )
-            ),
+            not_(has_item(has_entries(uuid=sub['uuid']))),
         ),
     )
 
@@ -122,17 +116,11 @@ def test_list_multi_tenant(main_ingress, sub_ingress, main, sub):
     assert_that(
         response.items,
         all_of(
-            not_(
-                has_item(
-                    has_entries(uuid=main['uuid']),
-                )
-            ),
+            not_(has_item(has_entries(uuid=main['uuid']))),
             has_item(
                 has_entries(
-                    {
-                        'uuid': sub['uuid'],
-                        'ingress_http_uri': sub_ingress['uri'],
-                    }
+                    uuid=sub['uuid'],
+                    ingress_http_uri=sub_ingress['uri'],
                 ),
             ),
         ),
@@ -143,16 +131,12 @@ def test_list_multi_tenant(main_ingress, sub_ingress, main, sub):
         response.items,
         has_items(
             has_entries(
-                {
-                    'uuid': main['uuid'],
-                    'ingress_http_uri': main_ingress['uri'],
-                },
+                uuid=main['uuid'],
+                ingress_http_uri=main_ingress['uri'],
             ),
             has_entries(
-                {
-                    'uuid': sub['uuid'],
-                    'ingress_http_uri': sub_ingress['uri'],
-                }
+                uuid=sub['uuid'],
+                ingress_http_uri=sub_ingress['uri'],
             ),
         ),
     )
