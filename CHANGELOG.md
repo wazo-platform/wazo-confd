@@ -1,5 +1,11 @@
 # Changelog
 
+## 22.09
+
+* The following resources has been added:
+
+  * GET `/1.1/users/subscriptions`
+
 ## 22.06
 
 * Meeting authorizations are now only valid for 24 hours. They are automatically
