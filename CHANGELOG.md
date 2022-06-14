@@ -21,7 +21,7 @@
   * `PUT /users/me/meetings/<meeting_uuid>/authorizations/<authorization_uuid>/reject`
   * `POST /guests/<guest_uuid>/meetings/<meeting_uuid>/authorizations`
   * `GET /guests/<guest_uuid>/meetings/<meeting_uuid>/authorizations/<authorization_uuid>`
-  
+
 * the `meeting` resource now has a `require_authorization` field.
 
 ## 22.01
