@@ -121,6 +121,7 @@ setup(
             'user_line = wazo_confd.plugins.user_line.plugin:Plugin',
             'user_line_associated = wazo_confd.plugins.user_line_associated.plugin:Plugin',
             'user_schedule = wazo_confd.plugins.user_schedule.plugin:Plugin',
+            'user_subscription = wazo_confd.plugins.user_subscription.plugin:Plugin',
             'user_voicemail = wazo_confd.plugins.user_voicemail.plugin:Plugin',
             'voicemail = wazo_confd.plugins.voicemail.plugin:Plugin',
             'voicemail_general = wazo_confd.plugins.voicemail_general.plugin:Plugin',
