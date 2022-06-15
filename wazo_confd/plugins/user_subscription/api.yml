@@ -1,0 +1,36 @@
+paths:
+  /users/subscriptions:
+    get:
+      operationId: get_users_subscriptions
+      summary: Get user subscription
+      description: '**Required ACL:** `confd.users.subscriptions.read`'
+      tags:
+        - users
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+      responses:
+        '200':
+          description: User subscription
+          schema:
+            $ref: '#/definitions/UserSubscriptionItems'
+
+definitions:
+  UserSubscription:
+    title: UserSubscription
+    properties:
+      id:
+        type: integer
+      count:
+        type: integer
+        description: Total of assigned subscription
+  UserSubscriptionItems:
+    title: UserSubscriptionItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/UserSubscription'
+      total:
+        type: integer
+    required:
+    - total

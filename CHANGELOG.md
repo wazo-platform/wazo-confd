@@ -1,5 +1,11 @@
 # Changelog
 
+## 22.09
+
+* The following resources has been added:
+
+  * GET `/1.1/users/subscriptions`
+
 ## 22.06
 
 * Meeting authorizations are now only valid for 24 hours. They are automatically
@@ -15,7 +21,7 @@
   * `PUT /users/me/meetings/<meeting_uuid>/authorizations/<authorization_uuid>/reject`
   * `POST /guests/<guest_uuid>/meetings/<meeting_uuid>/authorizations`
   * `GET /guests/<guest_uuid>/meetings/<meeting_uuid>/authorizations/<authorization_uuid>`
-  
+
 * the `meeting` resource now has a `require_authorization` field.
 
 ## 22.01
