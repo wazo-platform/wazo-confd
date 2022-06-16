@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -487,17 +487,13 @@ def test_summary_view_on_user_without_line(user):
     enabled=False,
     preprocess_subroutine="leeroy_preprocess",
 )
-@fixtures.moh(label='leeroy_music_on_hold')
-def test_search_on_user_view(user, moh):
-    response = confd.users(user['id']).put(music_on_hold=moh['name'])
-    response.assert_updated()
+def test_search_on_user_view(user):
     user = confd.users(user['id']).get().item
     url = confd.users
     searches = {
         'firstname': 'léeroy',
         'lastname': 'jénkins',
         'email': 'jenkins@',
-        'music_on_hold': moh['uuid'],
         'outgoing_caller_id': '5551234567',
         'mobile_phone_number': '2423232',
         'userfield': 'jenkins userfield',

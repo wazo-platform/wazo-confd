@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -91,16 +91,6 @@ def error_checks(url):
     timeout=None,
 )
 def test_search(extension, moh_visible, moh_hidden, parking_lot, hidden):
-    response = confd.parkinglots(parking_lot['id']).put(
-        {'music_on_hold': moh_visible['name']}
-    )
-    response.assert_updated()
-
-    response = confd.parkinglots(hidden['id']).put(
-        {'music_on_hold': moh_hidden['name']}
-    )
-    response.assert_updated()
-
     parking_lot = confd.parkinglots(parking_lot['id']).get().item
     hidden = confd.parkinglots(hidden['id']).get().item
 
@@ -109,7 +99,6 @@ def test_search(extension, moh_visible, moh_hidden, parking_lot, hidden):
         'name': 'search',
         'slots_start': '701',
         'slots_end': '750',
-        'music_on_hold': 'search',
         'timeout': 100,
     }
 
