@@ -273,13 +273,12 @@ def test_get_meeting_authorization_by_guest(
         assert_that(response.json, has_entries(status='accepted'))
 
         # Test get OK, pending if authorizations is required
-        response = url(
+        _assert_authorization_status(
             guest_uuid,
             meeting_authorization_required['uuid'],
             authorization_required['uuid'],
+            'pending',
         )
-        response.assert_status(200)
-        assert_that(response.json, has_entries(status='pending'))
 
 
 @fixtures.ingress_http()
@@ -309,41 +308,27 @@ def test_get_meeting_authorization_by_guest_after_meeting_authorization_removed(
             rejected_authorization['uuid']
         ).reject.put()
         # Check rejected
-        response = url(
-            guest_uuid,
-            meeting['uuid'],
-            rejected_authorization['uuid'],
+        _assert_authorization_status(
+            guest_uuid, meeting['uuid'], rejected_authorization['uuid'], 'rejected'
         )
-        assert_that(response.json, has_entries(status='rejected'))
         # Check pending
-        response = url(
-            guest_uuid,
-            meeting['uuid'],
-            pending_authorization['uuid'],
+        _assert_authorization_status(
+            guest_uuid, meeting['uuid'], pending_authorization['uuid'], 'pending'
         )
-        assert_that(response.json, has_entries(status='pending'))
 
         # Remove require_authorization
         response = confd.meetings(meeting['uuid']).put(require_authorization=False)
         response.assert_updated()
 
-        # Test pendging => accepted
-        response = url(
-            guest_uuid,
-            meeting['uuid'],
-            pending_authorization['uuid'],
+        # Test pending => accepted
+        _assert_authorization_status(
+            guest_uuid, meeting['uuid'], pending_authorization['uuid'], 'accepted'
         )
-        response.assert_status(200)
-        assert_that(response.json, has_entries(status='accepted'))
 
         # Test rejected stays rejected
-        response = url(
-            guest_uuid,
-            meeting['uuid'],
-            rejected_authorization['uuid'],
+        _assert_authorization_status(
+            guest_uuid, meeting['uuid'], rejected_authorization['uuid'], 'rejected'
         )
-        response.assert_status(200)
-        assert_that(response.json, has_entries(status='rejected'))
 
 
 @fixtures.ingress_http()
@@ -529,7 +514,7 @@ def test_reject_meeting_authorization(_, me, another_meeting):
             f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
         )
 
-        # Test reject authorization and bus events
+        # Test reject authorization
         response = url(meeting['uuid'], authorization['uuid'])
         response.assert_status(200)
         assert_that(response.json, has_entries(status='rejected'))
@@ -789,3 +774,15 @@ def test_purge_old_meeting_authorizations(_, me):
             .get()
         )
         response.assert_status(200)
+
+
+def _assert_authorization_status(guest_uuid, meeting_uuid, authorization_uuid, status):
+    response = (
+        create_confd()
+        .guests(guest_uuid)
+        .meetings(meeting_uuid)
+        .authorizations(authorization_uuid)
+        .get()
+    )
+    response.assert_status(200)
+    assert response.json['status'] == status
