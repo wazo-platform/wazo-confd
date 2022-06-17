@@ -35,9 +35,7 @@ def test_create_meeting_authorization(_, owner):
         invalid_guest_uuid = 'invalid'
         guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
         invalid_body = {}
-        body = {
-            'guest_name': 'jane doe',
-        }
+        body = {'guest_name': 'jane doe'}
 
         # API can be used without authentication
         response = (
@@ -73,62 +71,50 @@ def test_create_meeting_authorization(_, owner):
         response.assert_status(400)
 
         # Setup bus events
-        bus_events = bus.BusClient.accumulator(
-            'config.meeting_guest_authorizations.created'
-        )
-        bus_events_user = bus.BusClient.accumulator(
-            f'config.users.{owner_uuid}.meeting_guest_authorizations.created'
-        )
+        event_name = 'config.meeting_guest_authorizations.created'
+        bus_events = bus.BusClient.accumulator(event_name)
+
+        event_name = f'config.users.{owner_uuid}.meeting_guest_authorizations.created'
+        bus_events_user = bus.BusClient.accumulator(event_name)
 
         # Test creation
-        response = (
-            confd.guests(guest_uuid).meetings(meeting['uuid']).authorizations.post(body)
-        )
+        guest_url = confd.guests(guest_uuid).meetings(meeting['uuid'])
+        response = guest_url.authorizations.post(body)
         response.assert_status(201)
 
         # Test bus events
-        bus_events.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_guest_authorization_created',
-                        'data': has_entries(
-                            {
-                                'uuid': response.json['uuid'],
-                                'guest_name': body['guest_name'],
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_guest_authorization_created',
+            'data': has_entries(
+                {
+                    'uuid': response.json['uuid'],
+                    'guest_name': body['guest_name'],
+                }
             ),
+        }
+        bus_events.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
-        bus_events_user.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_user_guest_authorization_created',
-                        'data': has_entries(
-                            {
-                                'uuid': response.json['uuid'],
-                                'guest_name': body['guest_name'],
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_user_guest_authorization_created',
+            'data': has_entries(
+                {
+                    'uuid': response.json['uuid'],
+                    'guest_name': body['guest_name'],
+                }
             ),
+        }
+        bus_events_user.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
 
         # Test max creation
         with db.queries() as queries:
             with queries.insert_max_meeting_authorizations(guest_uuid, meeting['uuid']):
-                response = (
-                    confd.guests(guest_uuid)
-                    .meetings(meeting['uuid'])
-                    .authorizations.post(body)
-                )
-
+                guest_url = confd.guests(guest_uuid).meetings(meeting['uuid'])
+                response = guest_url.authorizations.post(body)
                 response.assert_status(400)
 
 
@@ -152,13 +138,13 @@ def test_list_search_authorizations_by_user(_, me, another_meeting):
     ) as authorization_hidden:
 
         # Test unknown meeting
-        response = user_confd.users.me.meetings(unknown_uuid).authorizations.get()
+        url = user_confd.users.me.meetings(unknown_uuid).authorizations
+        response = url.get()
         response.assert_status(404)
 
         # Test another meeting
-        response = user_confd.users.me.meetings(
-            another_meeting['uuid']
-        ).authorizations.get()
+        url = user_confd.users.me.meetings(another_meeting['uuid']).authorizations
+        response = url.get()
         response.assert_status(404)
 
         # Test search
@@ -269,16 +255,17 @@ def test_get_meeting_authorization_by_guest(
 
         # Test get OK, accepted if authorizations is not required
         response = url(guest_uuid, meeting['uuid'], authorization['uuid'])
-        response.assert_status(200)
-        assert_that(response.json, has_entries(status='accepted'))
+        assert_that(response.item, has_entries(status='accepted'))
 
         # Test get OK, pending if authorizations is required
-        _assert_authorization_status(
-            guest_uuid,
-            meeting_authorization_required['uuid'],
-            authorization_required['uuid'],
-            'pending',
+        response = (
+            create_confd()
+            .guests(guest_uuid)
+            .meetings(meeting_authorization_required['uuid'])
+            .authorizations(authorization_required['uuid'])
+            .get()
         )
+        assert response.item['status'] == 'pending'
 
 
 @fixtures.ingress_http()
@@ -401,12 +388,10 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Setup bus events
-        bus_events = bus.BusClient.accumulator(
-            'config.meeting_guest_authorizations.updated'
-        )
-        bus_events_user = bus.BusClient.accumulator(
-            f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
-        )
+        event_name = 'config.meeting_guest_authorizations.updated'
+        bus_events = bus.BusClient.accumulator(event_name)
+        event_name = f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
+        bus_events_user = bus.BusClient.accumulator(event_name)
 
         # Test accept authorization
         response = url(meeting['uuid'], authorization['uuid'])
@@ -414,38 +399,32 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         assert_that(response.json, has_entries(status='accepted'))
 
         # Test bus events
-        bus_events.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_guest_authorization_updated',
-                        'data': has_entries(
-                            {
-                                'uuid': authorization['uuid'],
-                                'guest_name': authorization['guest_name'],
-                                'status': 'accepted',
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_guest_authorization_updated',
+            'data': has_entries(
+                {
+                    'uuid': authorization['uuid'],
+                    'guest_name': authorization['guest_name'],
+                    'status': 'accepted',
+                }
             ),
+        }
+        bus_events.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
-        bus_events_user.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_user_guest_authorization_updated',
-                        'data': has_entries(
-                            {
-                                'uuid': authorization['uuid'],
-                                'guest_name': authorization['guest_name'],
-                                'status': 'accepted',
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_user_guest_authorization_updated',
+            'data': has_entries(
+                {
+                    'uuid': authorization['uuid'],
+                    'guest_name': authorization['guest_name'],
+                    'status': 'accepted',
+                }
             ),
+        }
+        bus_events_user.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
 
@@ -456,9 +435,8 @@ def test_accept_meeting_authorization(_, me, another_meeting):
             .authorizations(authorization['uuid'])
             .get()
         )
-        response.assert_status(200)
         assert_that(
-            response.json,
+            response.item,
             has_entries(status='accepted', guest_sip_authorization=not_none()),
         )
 
@@ -498,51 +476,42 @@ def test_reject_meeting_authorization(_, me, another_meeting):
         url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Setup bus events
-        bus_events = bus.BusClient.accumulator(
-            'config.meeting_guest_authorizations.updated'
-        )
-        bus_events_user = bus.BusClient.accumulator(
-            f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
-        )
+        event_name = 'config.meeting_guest_authorizations.updated'
+        bus_events = bus.BusClient.accumulator(event_name)
+        event_name = f'config.users.{my_uuid}.meeting_guest_authorizations.updated'
+        bus_events_user = bus.BusClient.accumulator(event_name)
 
         # Test reject authorization
         response = url(meeting['uuid'], authorization['uuid'])
-        response.assert_status(200)
-        assert_that(response.json, has_entries(status='rejected'))
+        assert_that(response.item, has_entries(status='rejected'))
 
         # Test bus events
-        bus_events.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_guest_authorization_updated',
-                        'data': has_entries(
-                            {
-                                'uuid': authorization['uuid'],
-                                'guest_name': authorization['guest_name'],
-                                'status': 'rejected',
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_guest_authorization_updated',
+            'data': has_entries(
+                {
+                    'uuid': authorization['uuid'],
+                    'guest_name': authorization['guest_name'],
+                    'status': 'rejected',
+                }
             ),
+        }
+        bus_events.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
-        bus_events_user.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_user_guest_authorization_updated',
-                        'data': has_entries(
-                            {
-                                'uuid': authorization['uuid'],
-                                'guest_name': authorization['guest_name'],
-                                'status': 'rejected',
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_user_guest_authorization_updated',
+            'data': has_entries(
+                {
+                    'uuid': authorization['uuid'],
+                    'guest_name': authorization['guest_name'],
+                    'status': 'rejected',
+                }
             ),
+        }
+        bus_events_user.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
 
@@ -553,9 +522,8 @@ def test_reject_meeting_authorization(_, me, another_meeting):
             .authorizations(authorization['uuid'])
             .get()
         )
-        response.assert_status(200)
         assert_that(
-            response.json,
+            response.item,
             has_entries(status='rejected', guest_sip_authorization=none()),
         )
 
@@ -601,47 +569,39 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         url(meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Setup bus events
-        bus_events = bus.BusClient.accumulator(
-            'config.meeting_guest_authorizations.deleted'
-        )
-        bus_events_user = bus.BusClient.accumulator(
-            f'config.users.{my_uuid}.meeting_guest_authorizations.deleted'
-        )
+        event_name = 'config.meeting_guest_authorizations.deleted'
+        bus_events = bus.BusClient.accumulator(event_name)
+        event_name = f'config.users.{my_uuid}.meeting_guest_authorizations.deleted'
+        bus_events_user = bus.BusClient.accumulator(event_name)
 
         # Test delete OK
         url(meeting['uuid'], authorization['uuid']).assert_status(204)
 
         # Test bus events
-        bus_events.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_guest_authorization_deleted',
-                        'data': has_entries(
-                            {
-                                'uuid': authorization['uuid'],
-                                'guest_name': authorization['guest_name'],
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_guest_authorization_deleted',
+            'data': has_entries(
+                {
+                    'uuid': authorization['uuid'],
+                    'guest_name': authorization['guest_name'],
+                }
             ),
+        }
+        bus_events.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
-        bus_events_user.until_assert_that_accumulate(
-            has_item(
-                has_entries(
-                    {
-                        'name': 'meeting_user_guest_authorization_deleted',
-                        'data': has_entries(
-                            {
-                                'uuid': authorization['uuid'],
-                                'guest_name': authorization['guest_name'],
-                            }
-                        ),
-                    }
-                ),
+        expected_event = {
+            'name': 'meeting_user_guest_authorization_deleted',
+            'data': has_entries(
+                {
+                    'uuid': authorization['uuid'],
+                    'guest_name': authorization['guest_name'],
+                }
             ),
+        }
+        bus_events_user.until_assert_that_accumulate(
+            has_item(has_entries(expected_event)),
             timeout=5,
         )
 
@@ -661,74 +621,42 @@ def test_unimplemented_methods():
     user_uuid = '48c7d8a1-dbce-4681-b307-061b9f80b204'
     user_confd = create_confd(user_uuid=user_uuid)
 
+    guest_url = confd.guests(guest_uuid).meetings(meeting_uuid)
     # Guests list authorizations
-    response = (
-        create_confd().guests(guest_uuid).meetings(meeting_uuid).authorizations.get()
-    )
+    response = guest_url.authorizations.get()
     response.assert_status(405)
 
     # Guests update authorization
-    response = (
-        create_confd()
-        .guests(guest_uuid)
-        .meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .update({})
-    )
+    response = guest_url.authorizations(authorization_uuid).update({})
     response.assert_status(405)
 
     # Guests update authorization
-    response = (
-        create_confd()
-        .guests(guest_uuid)
-        .meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .delete()
-    )
+    response = guest_url.authorizations(authorization_uuid).delete()
     response.assert_status(405)
 
+    user_url = user_confd.users.me.meetings(meeting_uuid)
     # Users create authorizations
-    response = user_confd.users.me.meetings(meeting_uuid).authorizations.create({})
+    response = user_url.authorizations.create({})
     response.assert_status(405)
 
     # Users update authorization
-    response = (
-        user_confd.users.me.meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .update({})
-    )
+    response = user_url.authorizations(authorization_uuid).update({})
     response.assert_status(405)
 
     # Users get authorization accept
-    response = (
-        user_confd.users.me.meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .accept.get()
-    )
+    response = user_url.authorizations(authorization_uuid).accept.get()
     response.assert_status(405)
 
     # Users delete authorization accept
-    response = (
-        user_confd.users.me.meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .accept.delete()
-    )
+    response = user_url.authorizations(authorization_uuid).accept.delete()
     response.assert_status(405)
 
     # Users get authorization reject
-    response = (
-        user_confd.users.me.meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .reject.get()
-    )
+    response = user_url.authorizations(authorization_uuid).reject.get()
     response.assert_status(405)
 
     # Users delete authorization reject
-    response = (
-        user_confd.users.me.meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .reject.delete()
-    )
+    response = user_url.authorizations(authorization_uuid).reject.delete()
     response.assert_status(405)
 
 
@@ -752,28 +680,10 @@ def test_purge_old_meeting_authorizations(_, me):
             )
 
         BaseIntegrationTest.purge_meeting_authorizations()
+        user_url = user_confd.users.me.meetings(meeting['uuid'])
 
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization_too_old['uuid'])
-            .get()
-        )
+        response = user_url.authorizations(authorization_too_old['uuid']).get()
         response.assert_status(404)
-        response = (
-            user_confd.users.me.meetings(meeting['uuid'])
-            .authorizations(authorization_too_young['uuid'])
-            .get()
-        )
+
+        response = user_url.authorizations(authorization_too_young['uuid']).get()
         response.assert_status(200)
-
-
-def _assert_authorization_status(guest_uuid, meeting_uuid, authorization_uuid, status):
-    response = (
-        create_confd()
-        .guests(guest_uuid)
-        .meetings(meeting_uuid)
-        .authorizations(authorization_uuid)
-        .get()
-    )
-    response.assert_status(200)
-    assert response.json['status'] == status
