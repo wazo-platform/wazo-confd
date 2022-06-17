@@ -288,14 +288,6 @@ def test_get_meeting_authorization_by_guest_after_meeting_authorization_removed(
     user_confd = create_confd(user_uuid=my_uuid)
     guest_uuid = '169e4045-4f2d-4cd1-9933-97c9a1ebb3ff'
 
-    def url(guest_uuid, meeting_uuid, authorization_uuid):
-        return (
-            confd.guests(guest_uuid)
-            .meetings(meeting_uuid)
-            .authorizations(authorization_uuid)
-            .get()
-        )
-
     with fixtures.user_me_meeting(
         user_confd, require_authorization=True
     ) as meeting, fixtures.meeting_authorization(
@@ -303,32 +295,31 @@ def test_get_meeting_authorization_by_guest_after_meeting_authorization_removed(
     ) as pending_authorization, fixtures.meeting_authorization(
         guest_uuid, meeting
     ) as rejected_authorization:
+        guest_url = confd.guests(guest_uuid).meetings(meeting['uuid'])
+        user_url = user_confd.users.me.meetings(meeting['uuid'])
+
         # Make rejected authorization
-        user_confd.users.me.meetings(meeting['uuid']).authorizations(
-            rejected_authorization['uuid']
-        ).reject.put()
+        user_url.authorizations(rejected_authorization['uuid']).reject.put()
+
         # Check rejected
-        _assert_authorization_status(
-            guest_uuid, meeting['uuid'], rejected_authorization['uuid'], 'rejected'
-        )
+        response = guest_url.authorizations(rejected_authorization['uuid']).get()
+        assert response.item['status'] == 'rejected'
+
         # Check pending
-        _assert_authorization_status(
-            guest_uuid, meeting['uuid'], pending_authorization['uuid'], 'pending'
-        )
+        response = guest_url.authorizations(pending_authorization['uuid']).get()
+        assert response.item['status'] == 'pending'
 
         # Remove require_authorization
         response = confd.meetings(meeting['uuid']).put(require_authorization=False)
         response.assert_updated()
 
         # Test pending => accepted
-        _assert_authorization_status(
-            guest_uuid, meeting['uuid'], pending_authorization['uuid'], 'accepted'
-        )
+        response = guest_url.authorizations(pending_authorization['uuid']).get()
+        assert response.item['status'] == 'accepted'
 
         # Test rejected stays rejected
-        _assert_authorization_status(
-            guest_uuid, meeting['uuid'], rejected_authorization['uuid'], 'rejected'
-        )
+        response = guest_url.authorizations(rejected_authorization['uuid']).get()
+        assert response.item['status'] == 'rejected'
 
 
 @fixtures.ingress_http()
