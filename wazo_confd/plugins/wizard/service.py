@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -19,7 +19,7 @@ from .validator import build_validator
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
 NAMESERVER_REGEX = r'^nameserver (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
-DEFAULT_ADMIN_POLICY = 'wazo_default_admin_policy'
+DEFAULT_ROOT_POLICY = 'wazo_default_master_user_policy'
 ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
 ASTERISK_AUTOPROV_CONFIG_TPL = '''\
 [global](+)
@@ -149,7 +149,7 @@ class WizardService:
         user = self._auth_client.users.new(
             firstname=username, username=username, password=password
         )
-        policy = self._get_policy(DEFAULT_ADMIN_POLICY)
+        policy = self._get_policy(DEFAULT_ROOT_POLICY)
         self._auth_client.users.add_policy(user['uuid'], policy['uuid'])
 
     def _get_policy(self, policy_name):
