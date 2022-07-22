@@ -7,7 +7,7 @@ from xivo_bus.resources.queue_member.event import (
     QueueMemberUserAssociatedEvent,
     QueueMemberUserDissociatedEvent,
 )
-from xivo_bus.resources.agent.event import EditAgentEvent
+from xivo_bus.resources.agent.event import AgentEditedEvent
 from wazo_confd import bus, sysconfd
 
 
@@ -16,18 +16,9 @@ class QueueMemberNotifier:
         self.bus = bus
         self.sysconfd = sysconfd
 
-    @staticmethod
-    def _build_headers(**kwargs):
-        headers = {}
-        for key, value in kwargs.items():
-            if value:
-                headers[key] = value
-        return headers
-
     def _send_agent_edited(self, agent):
-        event = EditAgentEvent(agent.id)
-        headers = self._build_headers(tenant_uuid=str(agent.tenant_uuid))
-        self.bus.send_bus_event(event, headers=headers)
+        event = AgentEditedEvent(agent.id, agent.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def send_sysconfd_handlers(self, ipbx_command=[]):
         handlers = {'ipbx': ipbx_command}
@@ -35,22 +26,23 @@ class QueueMemberNotifier:
 
     def agent_associated(self, queue, member):
         event = QueueMemberAgentAssociatedEvent(
-            queue.id, member.agent.id, member.penalty
+            queue.id, member.agent.id, member.penalty, queue.tenant_uuid
         )
-        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
         self._send_agent_edited(member.agent)
 
     def agent_dissociated(self, queue, member):
-        event = QueueMemberAgentDissociatedEvent(queue.id, member.agent.id)
-        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
-        self.bus.send_bus_event(event, headers=headers)
+        event = QueueMemberAgentDissociatedEvent(
+            queue.id, member.agent.id, queue.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
         self._send_agent_edited(member.agent)
 
     def user_associated(self, queue, member):
-        event = QueueMemberUserAssociatedEvent(queue.id, member.user.id)
-        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
-        self.bus.send_bus_event(event, headers=headers)
+        event = QueueMemberUserAssociatedEvent(
+            queue.id, queue.tenant_uuid, member.user.id
+        )
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(
             ipbx_command=[
                 'module reload res_pjsip.so',
@@ -60,9 +52,10 @@ class QueueMemberNotifier:
         )
 
     def user_dissociated(self, queue, member):
-        event = QueueMemberUserDissociatedEvent(queue.id, member.user.id)
-        headers = self._build_headers(tenant_uuid=str(queue.tenant_uuid))
-        self.bus.send_bus_event(event, headers=headers)
+        event = QueueMemberUserDissociatedEvent(
+            queue.id, queue.tenant_uuid, member.user.id
+        )
+        self.bus.send_bus_event(event)
         self.send_sysconfd_handlers(
             ipbx_command=[
                 'module reload res_pjsip.so',

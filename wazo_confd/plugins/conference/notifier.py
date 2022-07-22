@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.conference.event import (
-    CreateConferenceEvent,
-    DeleteConferenceEvent,
-    EditConferenceEvent,
+    ConferenceCreatedEvent,
+    ConferenceDeletedEvent,
+    ConferenceEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -21,24 +21,18 @@ class ConferenceNotifier:
 
     def created(self, conference):
         self.send_sysconfd_handlers()
-        event = CreateConferenceEvent(conference.id)
-        headers = self._build_headers(conference)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ConferenceCreatedEvent(conference.id, conference.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, conference):
         self.send_sysconfd_handlers()
-        event = EditConferenceEvent(conference.id)
-        headers = self._build_headers(conference)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ConferenceEditedEvent(conference.id, conference.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, conference):
         self.send_sysconfd_handlers()
-        event = DeleteConferenceEvent(conference.id)
-        headers = self._build_headers(conference)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, conference):
-        return {'tenant_uuid': str(conference.tenant_uuid)}
+        event = ConferenceDeletedEvent(conference.id, conference.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

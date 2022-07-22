@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.application.event import (
-    CreateApplicationEvent,
-    DeleteApplicationEvent,
-    EditApplicationEvent,
+    ApplicationCreatedEvent,
+    ApplicationDeletedEvent,
+    ApplicationEditedEvent,
 )
 
 from wazo_confd import bus
@@ -26,24 +26,18 @@ class ApplicationNotifier:
 
     def created(self, application):
         app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
-        event = CreateApplicationEvent(app_serialized)
-        headers = self._build_headers(application)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ApplicationCreatedEvent(app_serialized, application.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, application):
         app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
-        event = EditApplicationEvent(app_serialized)
-        headers = self._build_headers(application)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ApplicationEditedEvent(app_serialized, application.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, application):
         app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
-        event = DeleteApplicationEvent(app_serialized)
-        headers = self._build_headers(application)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, application):
-        return {'tenant_uuid': str(application.tenant_uuid)}
+        event = ApplicationDeletedEvent(app_serialized, application.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

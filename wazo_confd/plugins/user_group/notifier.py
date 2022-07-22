@@ -24,12 +24,8 @@ class UserGroupNotifier:
     def associated(self, user, groups):
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
-        event = UserGroupsAssociatedEvent(user.uuid, group_ids)
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user):
-        return {'tenant_uuid': str(user.tenant_uuid)}
+        event = UserGroupsAssociatedEvent(group_ids, user.tenant_uuid, user.uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,7 +1,11 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.ivr.event import CreateIvrEvent, DeleteIvrEvent, EditIvrEvent
+from xivo_bus.resources.ivr.event import (
+    IVRCreatedEvent,
+    IVRDeletedEvent,
+    IVREditedEvent,
+)
 
 from wazo_confd import bus, sysconfd
 
@@ -17,24 +21,18 @@ class IvrNotifier:
 
     def created(self, ivr):
         self.send_sysconfd_handlers()
-        event = CreateIvrEvent(ivr.id)
-        headers = self._build_headers(ivr)
-        self.bus.send_bus_event(event, headers=headers)
+        event = IVRCreatedEvent(ivr.id, ivr.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, ivr):
         self.send_sysconfd_handlers()
-        event = EditIvrEvent(ivr.id)
-        headers = self._build_headers(ivr)
-        self.bus.send_bus_event(event, headers=headers)
+        event = IVREditedEvent(ivr.id, ivr.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, ivr):
         self.send_sysconfd_handlers()
-        event = DeleteIvrEvent(ivr.id)
-        headers = self._build_headers(ivr)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, ivr):
-        return {'tenant_uuid': str(ivr.tenant_uuid)}
+        event = IVRDeletedEvent(ivr.id, ivr.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

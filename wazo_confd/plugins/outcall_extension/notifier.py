@@ -20,18 +20,17 @@ class OutcallExtensionNotifier:
 
     def associated(self, outcall, extension):
         self.send_sysconfd_handlers()
-        event = OutcallExtensionAssociatedEvent(outcall.id, extension.id)
-        headers = self._build_headers(outcall)
-        self.bus.send_bus_event(event, headers=headers)
+        event = OutcallExtensionAssociatedEvent(
+            outcall.id, extension.id, outcall.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def dissociated(self, outcall, extension):
         self.send_sysconfd_handlers()
-        event = OutcallExtensionDissociatedEvent(outcall.id, extension.id)
-        headers = self._build_headers(outcall)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, outcall):
-        return {'tenant_uuid': str(outcall.tenant_uuid)}
+        event = OutcallExtensionDissociatedEvent(
+            outcall.id, extension.id, outcall.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

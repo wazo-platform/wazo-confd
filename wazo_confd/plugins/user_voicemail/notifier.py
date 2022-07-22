@@ -21,18 +21,13 @@ class UserVoicemailNotifier:
 
     def associated(self, user, voicemail):
         self._send_sysconfd_handlers()
-        event = UserVoicemailAssociatedEvent(user.uuid, voicemail.id)
-        headers = self._build_headers(user)
-        self._bus.send_bus_event(event, headers=headers)
+        event = UserVoicemailAssociatedEvent(voicemail.id, user.tenant_uuid, user.uuid)
+        self._bus.send_bus_event(event)
 
     def dissociated(self, user, voicemail):
         self._send_sysconfd_handlers()
-        event = UserVoicemailDissociatedEvent(user.uuid, voicemail.id)
-        headers = self._build_headers(user)
-        self._bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user):
-        return {'tenant_uuid': str(user.tenant_uuid)}
+        event = UserVoicemailDissociatedEvent(voicemail.id, user.tenant_uuid, user.uuid)
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():

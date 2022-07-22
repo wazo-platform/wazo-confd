@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.call_permission.event import (
-    CreateCallPermissionEvent,
-    DeleteCallPermissionEvent,
-    EditCallPermissionEvent,
+    CallPermissionCreatedEvent,
+    CallPermissionDeletedEvent,
+    CallPermissionEditedEvent,
 )
 
 from wazo_confd import bus
@@ -15,22 +15,22 @@ class CallPermissionNotifier:
         self.bus = bus
 
     def created(self, call_permission):
-        event = CreateCallPermissionEvent(call_permission.id)
-        headers = self._build_headers(call_permission)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPermissionCreatedEvent(
+            call_permission.id, call_permission.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def edited(self, call_permission):
-        event = EditCallPermissionEvent(call_permission.id)
-        headers = self._build_headers(call_permission)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPermissionEditedEvent(
+            call_permission.id, call_permission.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def deleted(self, call_permission):
-        event = DeleteCallPermissionEvent(call_permission.id)
-        headers = self._build_headers(call_permission)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, call_permission):
-        return {'tenant_uuid': str(call_permission.tenant_uuid)}
+        event = CallPermissionDeletedEvent(
+            call_permission.id, call_permission.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

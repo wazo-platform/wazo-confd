@@ -15,24 +15,15 @@ class GroupScheduleNotifier:
 
     def associated(self, group, schedule):
         event = GroupScheduleAssociatedEvent(
-            group_id=group.id,
-            group_uuid=str(group.uuid),
-            schedule_id=schedule.id,
+            group.id, group.uuid, schedule.id, group.tenant_uuid
         )
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, group, schedule):
         event = GroupScheduleDissociatedEvent(
-            group_id=group.id,
-            group_uuid=str(group.uuid),
-            schedule_id=schedule.id,
+            group.id, group.uuid, schedule.id, group.tenant_uuid
         )
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, group):
-        return {'tenant_uuid': str(group.tenant_uuid)}
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

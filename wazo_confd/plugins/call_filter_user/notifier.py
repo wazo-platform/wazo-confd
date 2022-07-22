@@ -15,18 +15,17 @@ class CallFilterUserNotifier:
 
     def recipient_users_associated(self, call_filter, users):
         user_uuids = [user.uuid for user in users]
-        event = CallFilterRecipientUsersAssociatedEvent(call_filter.id, user_uuids)
-        headers = self._build_headers(call_filter)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallFilterRecipientUsersAssociatedEvent(
+            call_filter.id, user_uuids, call_filter.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def surrogate_users_associated(self, call_filter, users):
         user_uuids = [user.uuid for user in users]
-        event = CallFilterSurrogateUsersAssociatedEvent(call_filter.id, user_uuids)
-        headers = self._build_headers(call_filter)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, call_filter):
-        return {'tenant_uuid': str(call_filter.tenant_uuid)}
+        event = CallFilterSurrogateUsersAssociatedEvent(
+            call_filter.id, user_uuids, call_filter.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

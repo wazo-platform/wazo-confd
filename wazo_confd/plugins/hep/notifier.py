@@ -1,7 +1,7 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.hep.event import HEPGeneralUpdatedEvent
+from xivo_bus.resources.hep.event import HEPGeneralEditedEvent
 
 from wazo_confd import bus, sysconfd
 
@@ -17,7 +17,7 @@ class HEPConfigurationNotifier:
 
     def edited(self, section_name, hep):
         if section_name == 'general':
-            event = HEPGeneralUpdatedEvent()
+            event = HEPGeneralEditedEvent()
             self.bus.send_bus_event(event)
 
         self.send_sysconfd_handlers(['module reload res_hep.so'])

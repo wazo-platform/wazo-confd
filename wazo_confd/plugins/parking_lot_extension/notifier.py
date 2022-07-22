@@ -20,18 +20,17 @@ class ParkingLotExtensionNotifier:
 
     def associated(self, parking_lot, extension):
         self.send_sysconfd_handlers()
-        event = ParkingLotExtensionAssociatedEvent(parking_lot.id, extension.id)
-        headers = self._build_headers(parking_lot)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ParkingLotExtensionAssociatedEvent(
+            parking_lot.id, extension.id, parking_lot.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def dissociated(self, parking_lot, extension):
         self.send_sysconfd_handlers()
-        event = ParkingLotExtensionDissociatedEvent(parking_lot.id, extension.id)
-        headers = self._build_headers(parking_lot)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, parking_lot):
-        return {'tenant_uuid': str(parking_lot.tenant_uuid)}
+        event = ParkingLotExtensionDissociatedEvent(
+            parking_lot.id, extension.id, parking_lot.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.ingress_http.event import (
-    CreateIngressHTTPEvent,
-    DeleteIngressHTTPEvent,
-    EditIngressHTTPEvent,
+    IngressHTTPCreatedEvent,
+    IngressHTTPDeletedEvent,
+    IngressHTTPEditedEvent,
 )
 
 from wazo_confd import bus
@@ -18,24 +18,18 @@ class IngressHTTPNotifier:
 
     def created(self, ingress_http):
         serialized = IngressHTTPSchema().dump(ingress_http)
-        event = CreateIngressHTTPEvent(serialized)
-        headers = self._build_headers(ingress_http)
-        self.bus.send_bus_event(event, headers=headers)
+        event = IngressHTTPCreatedEvent(serialized, ingress_http.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, ingress_http):
         serialized = IngressHTTPSchema().dump(ingress_http)
-        event = EditIngressHTTPEvent(serialized)
-        headers = self._build_headers(ingress_http)
-        self.bus.send_bus_event(event, headers=headers)
+        event = IngressHTTPEditedEvent(serialized, ingress_http.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, ingress_http):
         serialized = IngressHTTPSchema().dump(ingress_http)
-        event = DeleteIngressHTTPEvent(serialized)
-        headers = self._build_headers(ingress_http)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, ingress_http):
-        return {'tenant_uuid': str(ingress_http.tenant_uuid)}
+        event = IngressHTTPDeletedEvent(serialized, ingress_http.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

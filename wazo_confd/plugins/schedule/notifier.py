@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.schedule.event import (
-    CreateScheduleEvent,
-    DeleteScheduleEvent,
-    EditScheduleEvent,
+    ScheduleCreatedEvent,
+    ScheduleDeletedEvent,
+    ScheduleEditedEvent,
 )
 
 from wazo_confd import bus
@@ -15,22 +15,16 @@ class ScheduleNotifier:
         self.bus = bus
 
     def created(self, schedule):
-        event = CreateScheduleEvent(schedule.id)
-        headers = self._build_headers(schedule)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ScheduleCreatedEvent(schedule.id, schedule.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, schedule):
-        event = EditScheduleEvent(schedule.id)
-        headers = self._build_headers(schedule)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ScheduleEditedEvent(schedule.id, schedule.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, schedule):
-        event = DeleteScheduleEvent(schedule.id)
-        headers = self._build_headers(schedule)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, schedule):
-        return {'tenant_uuid': str(schedule.tenant_uuid)}
+        event = ScheduleDeletedEvent(schedule.id, schedule.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

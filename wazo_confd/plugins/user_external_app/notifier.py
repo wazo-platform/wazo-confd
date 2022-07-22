@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user_external_app.event import (
-    CreateUserExternalAppEvent,
-    DeleteUserExternalAppEvent,
-    EditUserExternalAppEvent,
+    UserExternalAppCreatedEvent,
+    UserExternalAppDeletedEvent,
+    UserExternalAppEditedEvent,
 )
 
 from wazo_confd import bus
@@ -19,25 +19,19 @@ class UserExternalAppNotifier:
         self.bus = bus
 
     def created(self, app, tenant_uuid):
-        app_serialized = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
-        event = CreateUserExternalAppEvent(app_serialized)
-        headers = self._build_headers(tenant_uuid)
-        self.bus.send_bus_event(event, headers=headers)
+        payload = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
+        event = UserExternalAppCreatedEvent(payload, tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, app, tenant_uuid):
-        app_serialized = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
-        event = EditUserExternalAppEvent(app_serialized)
-        headers = self._build_headers(tenant_uuid)
-        self.bus.send_bus_event(event, headers=headers)
+        payload = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
+        event = UserExternalAppEditedEvent(payload, tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, app, tenant_uuid):
-        app_serialized = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
-        event = DeleteUserExternalAppEvent(app_serialized)
-        headers = self._build_headers(tenant_uuid)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, tenant_uuid):
-        return {'tenant_uuid': str(tenant_uuid)}
+        payload = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
+        event = UserExternalAppDeletedEvent(payload, tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

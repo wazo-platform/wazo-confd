@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.group.event import (
-    CreateGroupEvent,
-    EditGroupEvent,
-    DeleteGroupEvent,
+    GroupCreatedEvent,
+    GroupDeletedEvent,
+    GroupEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -24,23 +24,22 @@ class GroupNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, group):
-        return self._dispatch_event(group, CreateGroupEvent)
+        self.send_sysconfd_handlers()
+        group_payload = GroupSchema(only=GROUP_FIELDS).dump(group)
+        event = GroupCreatedEvent(group_payload, group.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, group):
-        return self._dispatch_event(group, EditGroupEvent)
+        self.send_sysconfd_handlers()
+        group_payload = GroupSchema(only=GROUP_FIELDS).dump(group)
+        event = GroupEditedEvent(group_payload, group.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, group):
-        return self._dispatch_event(group, DeleteGroupEvent)
-
-    def _dispatch_event(self, group, Event):
         self.send_sysconfd_handlers()
-        group_serialized = GroupSchema(only=GROUP_FIELDS).dump(group)
-        event = Event(**group_serialized)
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, group):
-        return {'tenant_uuid': str(group.tenant_uuid)}
+        group_payload = GroupSchema(only=GROUP_FIELDS).dump(group)
+        event = GroupDeletedEvent(group_payload, group.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

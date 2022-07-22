@@ -1,7 +1,7 @@
 # Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.call_filter.event import EditCallFilterFallbackEvent
+from xivo_bus.resources.call_filter.event import CallFilterFallbackEditedEvent
 
 from wazo_confd import bus
 
@@ -11,12 +11,8 @@ class CallFilterFallbackNotifier:
         self.bus = bus
 
     def edited(self, call_filter):
-        event = EditCallFilterFallbackEvent(call_filter.id)
-        headers = self._build_headers(call_filter)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, call_filter):
-        return {'tenant_uuid': str(call_filter.tenant_uuid)}
+        event = CallFilterFallbackEditedEvent(call_filter.id, call_filter.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

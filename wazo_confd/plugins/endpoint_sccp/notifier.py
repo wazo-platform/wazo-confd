@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_sccp.event import (
-    CreateSccpEndpointEvent,
-    DeleteSccpEndpointEvent,
-    EditSccpEndpointEvent,
+    SCCPEndpointCreatedEvent,
+    SCCPEndpointDeletedEvent,
+    SCCPEndpointEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -29,26 +29,20 @@ class SccpEndpointNotifier:
 
     def created(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
-        event = CreateSccpEndpointEvent(sccp_serialized)
-        headers = self._build_headers(sccp)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SCCPEndpointCreatedEvent(sccp_serialized, sccp.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         self.send_sysconfd_handlers()
-        event = EditSccpEndpointEvent(sccp_serialized)
-        headers = self._build_headers(sccp)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SCCPEndpointEditedEvent(sccp_serialized, sccp.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         self.send_sysconfd_handlers()
-        event = DeleteSccpEndpointEvent(sccp_serialized)
-        headers = self._build_headers(sccp)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, sccp):
-        return {'tenant_uuid': str(sccp.tenant_uuid)}
+        event = SCCPEndpointDeletedEvent(sccp_serialized, sccp.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

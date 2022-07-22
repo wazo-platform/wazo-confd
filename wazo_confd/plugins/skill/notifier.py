@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.skill.event import (
-    CreateSkillEvent,
-    DeleteSkillEvent,
-    EditSkillEvent,
+    SkillCreatedEvent,
+    SkillDeletedEvent,
+    SkillEditedEvent,
 )
 
 from wazo_confd import bus
@@ -15,22 +15,16 @@ class SkillNotifier:
         self.bus = bus
 
     def created(self, skill):
-        event = CreateSkillEvent(skill.id)
-        headers = self._build_headers(skill)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SkillCreatedEvent(skill.id, skill.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, skill):
-        event = EditSkillEvent(skill.id)
-        headers = self._build_headers(skill)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SkillEditedEvent(skill.id, skill.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, skill):
-        event = DeleteSkillEvent(skill.id)
-        headers = self._build_headers(skill)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, skill):
-        return {'tenant_uuid': str(skill.tenant_uuid)}
+        event = SkillDeletedEvent(skill.id, skill.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

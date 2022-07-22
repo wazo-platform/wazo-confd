@@ -14,17 +14,16 @@ class TrunkRegisterIAXNotifier:
         self.bus = bus
 
     def associated(self, trunk, register):
-        event = TrunkRegisterIAXAssociatedEvent(trunk.id, register.id)
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        event = TrunkRegisterIAXAssociatedEvent(
+            trunk.id, register.id, trunk.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def dissociated(self, trunk, register):
-        event = TrunkRegisterIAXDissociatedEvent(trunk.id, register.id)
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, trunk):
-        return {'tenant_uuid': str(trunk.tenant_uuid)}
+        event = TrunkRegisterIAXDissociatedEvent(
+            trunk.id, register.id, trunk.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier_iax():

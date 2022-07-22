@@ -51,9 +51,6 @@ class TrunkEndpointNotifier:
         handlers = {'ipbx': ipbx}
         self.sysconfd.exec_request_handlers(handlers)
 
-    def _build_headers(self, trunk):
-        return {'tenant_uuid': str(trunk.tenant_uuid)}
-
 
 class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
     def associated(self, trunk, endpoint):
@@ -62,11 +59,9 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = TrunkEndpointSIPAssociatedEvent(
-            trunk=trunk_serialized,
-            sip=sip_serialized,
+            trunk_serialized, sip_serialized, trunk.tenant_uuid
         )
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, trunk, endpoint):
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
@@ -74,11 +69,9 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = TrunkEndpointSIPDissociatedEvent(
-            trunk=trunk_serialized,
-            sip=sip_serialized,
+            trunk_serialized, sip_serialized, trunk.tenant_uuid
         )
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
 
 class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
@@ -88,11 +81,9 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
         event = TrunkEndpointIAXAssociatedEvent(
-            trunk=trunk_serialized,
-            iax=iax_serialized,
+            trunk_serialized, iax_serialized, trunk.tenant_uuid
         )
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, trunk, endpoint):
         self.send_sysconfd_handlers(['iax2 reload'])
@@ -100,11 +91,9 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(endpoint)
         event = TrunkEndpointIAXDissociatedEvent(
-            trunk=trunk_serialized,
-            iax=iax_serialized,
+            trunk_serialized, iax_serialized, trunk.tenant_uuid
         )
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
 
 class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
@@ -112,21 +101,17 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
         event = TrunkEndpointCustomAssociatedEvent(
-            trunk=trunk_serialized,
-            custom=custom_serialized,
+            trunk_serialized, custom_serialized, trunk.tenant_uuid
         )
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, trunk, endpoint):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(endpoint)
         event = TrunkEndpointCustomDissociatedEvent(
-            trunk=trunk_serialized,
-            custom=custom_serialized,
+            trunk_serialized, custom_serialized, trunk.tenant_uuid
         )
-        headers = self._build_headers(trunk)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier_sip():

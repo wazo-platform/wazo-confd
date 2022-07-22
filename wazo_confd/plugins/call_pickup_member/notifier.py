@@ -25,33 +25,34 @@ class CallPickupMemberNotifier:
     def interceptor_groups_associated(self, call_pickup, groups):
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
-        event = CallPickupInterceptorGroupsAssociatedEvent(call_pickup.id, group_ids)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPickupInterceptorGroupsAssociatedEvent(
+            call_pickup.id, group_ids, call_pickup.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def target_groups_associated(self, call_pickup, groups):
         self.send_sysconfd_handlers()
         group_ids = [group.id for group in groups]
-        event = CallPickupTargetGroupsAssociatedEvent(call_pickup.id, group_ids)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPickupTargetGroupsAssociatedEvent(
+            call_pickup.id, group_ids, call_pickup.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def interceptor_users_associated(self, call_pickup, users):
         self.send_sysconfd_handlers()
         user_uuids = [user.uuid for user in users]
-        event = CallPickupInterceptorUsersAssociatedEvent(call_pickup.id, user_uuids)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPickupInterceptorUsersAssociatedEvent(
+            call_pickup.id, user_uuids, call_pickup.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def target_users_associated(self, call_pickup, users):
         self.send_sysconfd_handlers()
         user_uuids = [user.uuid for user in users]
-        event = CallPickupTargetUsersAssociatedEvent(call_pickup.id, user_uuids)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, call_pickup):
-        return {'tenant_uuid': str(call_pickup.tenant_uuid)}
+        event = CallPickupTargetUsersAssociatedEvent(
+            call_pickup.id, user_uuids, call_pickup.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.voicemail.event import (
-    CreateVoicemailEvent,
-    DeleteVoicemailEvent,
-    EditUserVoicemailEvent,
-    EditVoicemailEvent,
+    VoicemailCreatedEvent,
+    VoicemailDeletedEvent,
+    UserVoicemailEditedEvent,
+    VoicemailEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -22,9 +22,8 @@ class VoicemailNotifier:
 
     def created(self, voicemail):
         self._send_sysconfd_handlers(['voicemail reload'])
-        event = CreateVoicemailEvent(voicemail.id)
-        headers = self._build_headers(voicemail)
-        self.bus.send_bus_event(event, headers=headers)
+        event = VoicemailCreatedEvent(voicemail.id, voicemail.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, voicemail):
         self._send_sysconfd_handlers(
@@ -34,21 +33,19 @@ class VoicemailNotifier:
                 'module reload chan_sccp.so',
             ]
         )
-        event = EditVoicemailEvent(voicemail.id)
-        headers = self._build_headers(voicemail)
-        self.bus.send_bus_event(event, headers=headers)
+        event = VoicemailEditedEvent(voicemail.id, voicemail.tenant_uuid)
+        self.bus.send_bus_event(event)
+
         for user in voicemail.users:
-            event = EditUserVoicemailEvent(user.uuid, voicemail.id)
-            self.bus.send_bus_event(event, headers=headers)
+            event = UserVoicemailEditedEvent(
+                voicemail.id, voicemail.tenant_uuid, user.uuid
+            )
+            self.bus.send_bus_event(event)
 
     def deleted(self, voicemail):
         self._send_sysconfd_handlers(['voicemail reload'])
-        event = DeleteVoicemailEvent(voicemail.id)
-        headers = self._build_headers(voicemail)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, voicemail):
-        return {'tenant_uuid': str(voicemail.tenant_uuid)}
+        event = VoicemailDeletedEvent(voicemail.id, voicemail.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

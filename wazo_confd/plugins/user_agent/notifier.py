@@ -14,17 +14,12 @@ class UserAgentNotifier:
         self.bus = bus
 
     def associated(self, user, agent):
-        event = UserAgentAssociatedEvent(user.uuid, agent.id)
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
+        event = UserAgentAssociatedEvent(agent.id, user.tenant_uuid, user.uuid)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, user, agent):
-        event = UserAgentDissociatedEvent(user.uuid, agent.id)
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user):
-        return {'tenant_uuid': str(user.tenant_uuid)}
+        event = UserAgentDissociatedEvent(agent.id, user.tenant_uuid, user.uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

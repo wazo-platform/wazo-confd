@@ -1,9 +1,9 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.rtp.event import (
-    EditRTPGeneralEvent,
-    EditRTPIceHostCandidatesEvent,
+    RTPGeneralEditedEvent,
+    RTPIceHostCandidatesEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -20,10 +20,10 @@ class RTPConfigurationNotifier:
 
     def edited(self, section_name, rtp):
         if section_name == 'general':
-            event = EditRTPGeneralEvent()
+            event = RTPGeneralEditedEvent()
             self.bus.send_bus_event(event)
         elif section_name == 'ice_host_candidates':
-            event = EditRTPIceHostCandidatesEvent()
+            event = RTPIceHostCandidatesEditedEvent()
             self.bus.send_bus_event(event)
 
         self.send_sysconfd_handlers(['module reload res_rtp_asterisk.so'])

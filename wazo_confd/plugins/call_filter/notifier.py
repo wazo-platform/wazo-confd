@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.call_filter.event import (
-    CreateCallFilterEvent,
-    DeleteCallFilterEvent,
-    EditCallFilterEvent,
+    CallFilterCreatedEvent,
+    CallFilterDeletedEvent,
+    CallFilterEditedEvent,
 )
 
 from wazo_confd import bus
@@ -15,22 +15,16 @@ class CallFilterNotifier:
         self.bus = bus
 
     def created(self, call_filter):
-        event = CreateCallFilterEvent(call_filter.id)
-        headers = self._build_headers(call_filter)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallFilterCreatedEvent(call_filter.id, call_filter.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, call_filter):
-        event = EditCallFilterEvent(call_filter.id)
-        headers = self._build_headers(call_filter)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallFilterEditedEvent(call_filter.id, call_filter.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, call_filter):
-        event = DeleteCallFilterEvent(call_filter.id)
-        headers = self._build_headers(call_filter)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, call_filter):
-        return {'tenant_uuid': str(call_filter.tenant_uuid)}
+        event = CallFilterDeletedEvent(call_filter.id, call_filter.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

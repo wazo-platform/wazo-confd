@@ -20,18 +20,17 @@ class ConferenceExtensionNotifier:
 
     def associated(self, conference, extension):
         self.send_sysconfd_handlers()
-        event = ConferenceExtensionAssociatedEvent(conference.id, extension.id)
-        headers = self._build_headers(conference)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ConferenceExtensionAssociatedEvent(
+            conference.id, extension.id, conference.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
     def dissociated(self, conference, extension):
         self.send_sysconfd_handlers()
-        event = ConferenceExtensionDissociatedEvent(conference.id, extension.id)
-        headers = self._build_headers(conference)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, conference):
-        return {'tenant_uuid': str(conference.tenant_uuid)}
+        event = ConferenceExtensionDissociatedEvent(
+            conference.id, extension.id, conference.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

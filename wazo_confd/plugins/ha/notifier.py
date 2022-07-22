@@ -1,7 +1,7 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.ha.event import EditHAEvent
+from xivo_bus.resources.ha.event import HAEditedEvent
 
 
 class HANotifier:
@@ -10,7 +10,7 @@ class HANotifier:
         self.sysconfd = sysconfd
 
     def edited(self, ha):
-        event = EditHAEvent()
+        event = HAEditedEvent()
         self.bus.send_bus_event(event)
         ha_sysconf = {
             'node_type': ha['node_type'],

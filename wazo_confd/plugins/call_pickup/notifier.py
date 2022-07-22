@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.call_pickup.event import (
-    CreateCallPickupEvent,
-    DeleteCallPickupEvent,
-    EditCallPickupEvent,
+    CallPickupCreatedEvent,
+    CallPickupDeletedEvent,
+    CallPickupEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -22,23 +22,17 @@ class CallPickupNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, call_pickup):
-        event = CreateCallPickupEvent(call_pickup.id)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPickupCreatedEvent(call_pickup.id, call_pickup.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, call_pickup):
-        event = EditCallPickupEvent(call_pickup.id)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CallPickupEditedEvent(call_pickup.id, call_pickup.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, call_pickup):
         self.send_sysconfd_handlers()
-        event = DeleteCallPickupEvent(call_pickup.id)
-        headers = self._build_headers(call_pickup)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, call_pickup):
-        return {'tenant_uuid': str(call_pickup.tenant_uuid)}
+        event = CallPickupDeletedEvent(call_pickup.id, call_pickup.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -1,7 +1,11 @@
 # Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.moh.event import CreateMohEvent, DeleteMohEvent, EditMohEvent
+from xivo_bus.resources.moh.event import (
+    MOHCreatedEvent,
+    MOHDeletedEvent,
+    MOHEditedEvent,
+)
 
 from wazo_confd import bus, sysconfd
 from .schema import MohSchema
@@ -21,29 +25,23 @@ class MohNotifier:
     def created(self, moh):
         self.send_sysconfd_handlers()
         moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh)
-        event = CreateMohEvent(moh_serialized)
-        headers = self._build_headers(moh)
-        self.bus.send_bus_event(event, headers=headers)
+        event = MOHCreatedEvent(moh_serialized, moh.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, moh):
         self.send_sysconfd_handlers()
         moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh)
-        event = EditMohEvent(moh_serialized)
-        headers = self._build_headers(moh)
-        self.bus.send_bus_event(event, headers=headers)
+        event = MOHEditedEvent(moh_serialized, moh.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, moh):
         self.send_sysconfd_handlers()
         moh_serialized = MohSchema(only=MOH_FIELDS).dump(moh)
-        event = DeleteMohEvent(moh_serialized)
-        headers = self._build_headers(moh)
-        self.bus.send_bus_event(event, headers=headers)
+        event = MOHDeletedEvent(moh_serialized, moh.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def files_changed(self, moh):
         self.send_sysconfd_handlers()
-
-    def _build_headers(self, moh):
-        return {'tenant_uuid': str(moh.tenant_uuid)}
 
 
 def build_notifier():

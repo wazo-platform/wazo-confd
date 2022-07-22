@@ -18,12 +18,10 @@ class ContextContextNotifier:
     def associated_contexts(self, context, contexts):
         self.send_sysconfd_handlers()
         context_ids = [context.id for context in contexts]
-        event = ContextContextsAssociatedEvent(context.id, context_ids)
-        headers = self._build_headers(context)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, context):
-        return {'tenant_uuid': str(context.tenant_uuid)}
+        event = ContextContextsAssociatedEvent(
+            context.id, context_ids, context.tenant_uuid
+        )
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

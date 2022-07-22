@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.queue.event import (
-    CreateQueueEvent,
-    EditQueueEvent,
-    DeleteQueueEvent,
+    QueueCreatedEvent,
+    QueueDeletedEvent,
+    QueueEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -21,24 +21,18 @@ class QueueNotifier:
 
     def created(self, queue):
         self.send_sysconfd_handlers()
-        event = CreateQueueEvent(queue.id)
-        headers = self._build_headers(queue)
-        self.bus.send_bus_event(event, headers=headers)
+        event = QueueCreatedEvent(queue.id, queue.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, queue):
         self.send_sysconfd_handlers()
-        event = EditQueueEvent(queue.id)
-        headers = self._build_headers(queue)
-        self.bus.send_bus_event(event, headers=headers)
+        event = QueueEditedEvent(queue.id, queue.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, queue):
         self.send_sysconfd_handlers()
-        event = DeleteQueueEvent(queue.id)
-        headers = self._build_headers(queue)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, queue):
-        return {'tenant_uuid': str(queue.tenant_uuid)}
+        event = QueueDeletedEvent(queue.id, queue.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

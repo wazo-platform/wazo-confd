@@ -15,24 +15,15 @@ class GroupCallPermissionNotifier:
 
     def associated(self, group, call_permission):
         event = GroupCallPermissionAssociatedEvent(
-            group_id=group.id,
-            group_uuid=str(group.uuid),
-            call_permission_id=call_permission.id,
+            group.id, group.uuid, call_permission.id, group.tenant_uuid
         )
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.send_bus_event(event)
 
     def dissociated(self, group, call_permission):
         event = GroupCallPermissionDissociatedEvent(
-            group_id=group.id,
-            group_uuid=str(group.uuid),
-            call_permission_id=call_permission.id,
+            group.id, group.uuid, call_permission.id, group.tenant_uuid
         )
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, group):
-        return {'tenant_uuid': str(group.tenant_uuid)}
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

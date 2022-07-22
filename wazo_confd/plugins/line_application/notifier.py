@@ -37,10 +37,9 @@ class LineApplicationNotifier:
             application
         )
         event = LineApplicationAssociatedEvent(
-            line=line_serialized, application=application_serialized
+            line_serialized, application_serialized, line.tenant_uuid
         )
-        headers = self._build_headers(line)
-        self._bus.send_bus_event(event, headers=headers)
+        self._bus.send_bus_event(event)
 
     def dissociated(self, line, application):
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
@@ -50,13 +49,9 @@ class LineApplicationNotifier:
             application
         )
         event = LineApplicationDissociatedEvent(
-            line=line_serialized, application=application_serialized
+            line_serialized, application_serialized, line.tenant_uuid
         )
-        headers = self._build_headers(line)
-        self._bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, line):
-        return {'tenant_uuid': str(line.tenant_uuid)}
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.context.event import (
-    CreateContextEvent,
-    DeleteContextEvent,
-    EditContextEvent,
+    ContextCreatedEvent,
+    ContextDeletedEvent,
+    ContextEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -25,27 +25,21 @@ class ContextNotifier:
 
     def created(self, context):
         self.send_sysconfd_handlers()
-        context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context)
-        event = CreateContextEvent(**context_serialized)
-        headers = self._build_headers(context)
-        self.bus.send_bus_event(event, headers=headers)
+        context_payload = ContextSchema(only=CONTEXT_FIELDS).dump(context)
+        event = ContextCreatedEvent(context_payload, context.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, context):
         self.send_sysconfd_handlers()
-        context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context)
-        event = EditContextEvent(**context_serialized)
-        headers = self._build_headers(context)
-        self.bus.send_bus_event(event, headers=headers)
+        context_payload = ContextSchema(only=CONTEXT_FIELDS).dump(context)
+        event = ContextEditedEvent(context_payload, context.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, context):
         self.send_sysconfd_handlers()
-        context_serialized = ContextSchema(only=CONTEXT_FIELDS).dump(context)
-        event = DeleteContextEvent(**context_serialized)
-        headers = self._build_headers(context)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, context):
-        return {'tenant_uuid': str(context.tenant_uuid)}
+        context_payload = ContextSchema(only=CONTEXT_FIELDS).dump(context)
+        event = ContextDeletedEvent(context_payload, context.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():

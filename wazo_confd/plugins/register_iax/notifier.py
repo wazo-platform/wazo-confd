@@ -1,10 +1,10 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.register.event import (
-    CreateRegisterIAXEvent,
-    DeleteRegisterIAXEvent,
-    EditRegisterIAXEvent,
+    RegisterIAXCreatedEvent,
+    RegisterIAXDeletedEvent,
+    RegisterIAXEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -21,17 +21,17 @@ class RegisterIAXNotifier:
 
     def created(self, register):
         self.send_sysconfd_handlers()
-        event = CreateRegisterIAXEvent(register.id)
+        event = RegisterIAXCreatedEvent(register.id)
         self.bus.send_bus_event(event)
 
     def edited(self, register):
         self.send_sysconfd_handlers()
-        event = EditRegisterIAXEvent(register.id)
+        event = RegisterIAXEditedEvent(register.id)
         self.bus.send_bus_event(event)
 
     def deleted(self, register):
         self.send_sysconfd_handlers()
-        event = DeleteRegisterIAXEvent(register.id)
+        event = RegisterIAXDeletedEvent(register.id)
         self.bus.send_bus_event(event)
 
 

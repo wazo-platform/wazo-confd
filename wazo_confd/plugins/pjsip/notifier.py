@@ -1,12 +1,12 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.pjsip.event import (
     PJSIPGlobalUpdatedEvent,
     PJSIPSystemUpdatedEvent,
-    CreateSIPTransportEvent,
-    EditSIPTransportEvent,
-    DeleteSIPTransportEvent,
+    SIPTransportCreatedEvent,
+    SIPTransportDeletedEvent,
+    SIPTransportEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -51,20 +51,20 @@ class PJSIPTransportNotifier:
 
     def created(self, transport):
         self.send_sysconfd_handlers()
-        body = self.schema.dump(transport)
-        event = CreateSIPTransportEvent(body)
+        payload = self.schema.dump(transport)
+        event = SIPTransportCreatedEvent(payload)
         self.bus.send_bus_event(event)
 
     def deleted(self, transport):
         self.send_sysconfd_handlers()
-        body = self.schema.dump(transport)
-        event = DeleteSIPTransportEvent(body)
+        payload = self.schema.dump(transport)
+        event = SIPTransportDeletedEvent(payload)
         self.bus.send_bus_event(event)
 
     def edited(self, transport):
         self.send_sysconfd_handlers()
-        body = self.schema.dump(transport)
-        event = EditSIPTransportEvent(body)
+        payload = self.schema.dump(transport)
+        event = SIPTransportEditedEvent(payload)
         self.bus.send_bus_event(event)
 
 

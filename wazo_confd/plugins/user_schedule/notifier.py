@@ -14,17 +14,12 @@ class UserScheduleNotifier:
         self._bus = bus
 
     def associated(self, user, schedule):
-        event = UserScheduleAssociatedEvent(user.id, schedule.id)
-        headers = self._build_headers(user)
-        self._bus.send_bus_event(event, headers=headers)
+        event = UserScheduleAssociatedEvent(schedule.id, user.tenant_uuid, user.uuid)
+        self._bus.send_bus_event(event)
 
     def dissociated(self, user, schedule):
-        event = UserScheduleDissociatedEvent(user.id, schedule.id)
-        headers = self._build_headers(user)
-        self._bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user):
-        return {'tenant_uuid': str(user.tenant_uuid)}
+        event = UserScheduleDissociatedEvent(schedule.id, user.tenant_uuid, user.uuid)
+        self._bus.send_bus_event(event)
 
 
 def build_notifier():

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.agent.event import (
-    CreateAgentEvent,
-    DeleteAgentEvent,
-    EditAgentEvent,
+    AgentCreatedEvent,
+    AgentDeletedEvent,
+    AgentEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -22,26 +22,20 @@ class AgentNotifier:
     def created(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
-        event = CreateAgentEvent(agent.id)
-        headers = self._build_headers(agent)
-        self.bus.send_bus_event(event, headers=headers)
+        event = AgentCreatedEvent(agent.id, agent.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def edited(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
-        event = EditAgentEvent(agent.id)
-        headers = self._build_headers(agent)
-        self.bus.send_bus_event(event, headers=headers)
+        event = AgentEditedEvent(agent.id, agent.tenant_uuid)
+        self.bus.send_bus_event(event)
 
     def deleted(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
-        event = DeleteAgentEvent(agent.id)
-        headers = self._build_headers(agent)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, agent):
-        return {'tenant_uuid': str(agent.tenant_uuid)}
+        event = AgentDeletedEvent(agent.id, agent.tenant_uuid)
+        self.bus.send_bus_event(event)
 
 
 def build_notifier():
