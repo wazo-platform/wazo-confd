@@ -124,7 +124,7 @@ definitions:
           description: Numeric password used to access the voicemail
         email:
           type: string
-          description: Email address. Notifications and audio attachements will be sent
+          description: Email address. Notifications and audio attachments will be sent
             to this address
         pager:
           type: string
