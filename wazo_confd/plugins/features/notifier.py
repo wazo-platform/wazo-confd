@@ -16,7 +16,7 @@ class FeaturesConfigurationNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ipbx': ipbx, 'agentbus': []}
+        handlers = {'ipbx': ipbx}
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, section_name, features):

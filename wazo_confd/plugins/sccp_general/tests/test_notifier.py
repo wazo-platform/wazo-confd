@@ -10,7 +10,7 @@ from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 
 from ..notifier import SCCPGeneralNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['module reload chan_sccp.so'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload chan_sccp.so']}
 
 
 class TestSCCPGeneralNotifier(unittest.TestCase):

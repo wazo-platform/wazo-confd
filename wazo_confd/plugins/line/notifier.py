@@ -30,7 +30,6 @@ class LineNotifier:
                 'dialplan reload',
                 'module reload chan_sccp.so',
             ],
-            'agentbus': [],
         }
         self.sysconfd.exec_request_handlers(handlers)
 

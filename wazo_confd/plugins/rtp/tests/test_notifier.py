@@ -12,7 +12,7 @@ from xivo_bus.resources.rtp.event import (
 from ..notifier import RTPConfigurationNotifier
 
 
-SYSCONFD_HANDLERS = {'ipbx': ['module reload res_rtp_asterisk.so'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload res_rtp_asterisk.so']}
 
 
 class TestRTPConfigurationNotifier(unittest.TestCase):

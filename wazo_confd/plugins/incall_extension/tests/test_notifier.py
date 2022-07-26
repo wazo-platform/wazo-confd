@@ -15,7 +15,7 @@ from xivo_dao.alchemy.incall import Incall
 
 from ..notifier import IncallExtensionNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestIncallExtensionNotifier(unittest.TestCase):

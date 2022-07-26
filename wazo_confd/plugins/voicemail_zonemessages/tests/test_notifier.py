@@ -11,7 +11,7 @@ from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
 from ..notifier import VoicemailZoneMessagesNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['voicemail reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['voicemail reload']}
 
 
 class TestVoicemailZoneMessagesNotifier(unittest.TestCase):

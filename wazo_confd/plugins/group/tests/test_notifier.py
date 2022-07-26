@@ -13,7 +13,7 @@ from xivo_bus.resources.group.event import (
 
 from ..notifier import GroupNotifier
 
-EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
+EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so']}
 
 
 class TestGroupNotifier(unittest.TestCase):

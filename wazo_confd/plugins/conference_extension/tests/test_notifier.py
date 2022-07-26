@@ -15,7 +15,7 @@ from xivo_dao.alchemy.conference import Conference
 
 from ..notifier import ConferenceExtensionNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestConferenceExtensionNotifier(unittest.TestCase):

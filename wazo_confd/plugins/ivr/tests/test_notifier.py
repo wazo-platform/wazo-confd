@@ -11,7 +11,7 @@ from xivo_dao.alchemy.ivr import IVR
 from ..notifier import IvrNotifier
 
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestIvrNotifier(unittest.TestCase):

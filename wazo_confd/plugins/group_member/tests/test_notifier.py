@@ -18,8 +18,7 @@ SYSCONFD_HANDLERS = {
         'module reload res_pjsip.so',
         'module reload app_queue.so',
         'module reload chan_sccp.so',
-    ],
-    'agentbus': [],
+    ]
 }
 
 

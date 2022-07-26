@@ -21,7 +21,7 @@ from ..notifier import LineDeviceNotifier
 
 class TestLineDeviceNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so'], 'agentbus': []}
+    REQUEST_HANDLERS = {'ipbx': ['module reload chan_sccp.so']}
 
     def setUp(self):
         self.sysconfd = Mock()

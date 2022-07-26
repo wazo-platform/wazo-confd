@@ -9,7 +9,7 @@ from xivo_dao.alchemy.iaxcallnumberlimits import IAXCallNumberLimits
 
 from ..notifier import IAXCallNumberLimitsNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload']}
 
 
 class TestIAXCallNumberLimitsNotifier(unittest.TestCase):

@@ -16,7 +16,7 @@ class ConferenceNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ipbx': ['module reload app_confbridge.so'], 'agentbus': []}
+        handlers = {'ipbx': ['module reload app_confbridge.so']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, conference):

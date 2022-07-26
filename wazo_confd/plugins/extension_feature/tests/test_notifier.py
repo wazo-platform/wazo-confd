@@ -20,7 +20,7 @@ class TestExtensionFeatureNotifier(unittest.TestCase):
         self.notifier = ExtensionFeatureNotifier(self.sysconfd, self.bus)
 
     def test_when_extension_edited_then_handlers_sent(self):
-        expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
+        expected_handlers = {'ipbx': ['dialplan reload']}
         updated_fields = ['exten']
         self.notifier.edited(self.extension, updated_fields)
 

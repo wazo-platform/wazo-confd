@@ -48,7 +48,7 @@ class TrunkEndpointNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ipbx': ipbx, 'agentbus': []}
+        handlers = {'ipbx': ipbx}
         self.sysconfd.exec_request_handlers(handlers)
 
     def _build_headers(self, trunk):

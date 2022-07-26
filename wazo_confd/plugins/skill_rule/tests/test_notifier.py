@@ -14,7 +14,7 @@ from xivo_bus.resources.skill_rule.event import (
 
 from ..notifier import SkillRuleNotifier
 
-EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
+EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so']}
 
 
 class TestSkillRuleNotifier(unittest.TestCase):

@@ -15,8 +15,7 @@ class UserVoicemailNotifier:
 
     def _send_sysconfd_handlers(self):
         handlers = {
-            'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
-            'agentbus': [],
+            'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so']
         }
         self._sysconfd.exec_request_handlers(handlers)
 

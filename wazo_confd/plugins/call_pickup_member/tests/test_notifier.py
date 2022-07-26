@@ -19,8 +19,7 @@ from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 from ..notifier import CallPickupMemberNotifier
 
 SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
-    'agentbus': [],
+    'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so']
 }
 
 

@@ -38,7 +38,7 @@ class TestVoicemailNotifier(unittest.TestCase):
         )
 
     def test_when_voicemail_created_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': ['voicemail reload'], 'agentbus': []}
+        expected_handlers = {'ipbx': ['voicemail reload']}
         self.notifier.created(self.voicemail)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
@@ -65,8 +65,7 @@ class TestVoicemailNotifier(unittest.TestCase):
                 'voicemail reload',
                 'module reload res_pjsip.so',
                 'module reload chan_sccp.so',
-            ],
-            'agentbus': [],
+            ]
         }
         self.notifier.edited(self.voicemail)
 
@@ -82,7 +81,7 @@ class TestVoicemailNotifier(unittest.TestCase):
         )
 
     def test_when_voicemail_deleted_then_sysconfd_called(self):
-        expected_handlers = {'ipbx': ['voicemail reload'], 'agentbus': []}
+        expected_handlers = {'ipbx': ['voicemail reload']}
         self.notifier.deleted(self.voicemail)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)

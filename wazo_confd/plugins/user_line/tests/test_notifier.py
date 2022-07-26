@@ -19,8 +19,7 @@ from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema  # noqa
 
 
 EXPECTED_SYSCONFD_HANDLERS = {
-    'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
-    'agentbus': [],
+    'ipbx': ['dialplan reload', 'module reload res_pjsip.so']
 }
 
 USER_UUID = str(uuid.uuid4())

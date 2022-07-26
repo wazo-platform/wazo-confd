@@ -18,8 +18,7 @@ from ..notifier import SipEndpointNotifier, SipTemplateNotifier
 
 
 SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_pjsip.so', 'dialplan reload'],
-    'agentbus': [],
+    'ipbx': ['module reload res_pjsip.so', 'dialplan reload']
 }
 
 

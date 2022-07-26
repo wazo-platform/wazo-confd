@@ -128,4 +128,4 @@ class TestTrunkNotifier(unittest.TestCase):
             raise AssertionError(
                 'no sysconfd handlers for endpoint {}'.format(self.trunk.endpoint)
             )
-        return {'ipbx': ipbx_commands, 'agentbus': []}
+        return {'ipbx': ipbx_commands}

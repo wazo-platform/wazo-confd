@@ -12,7 +12,7 @@ from xivo_bus.resources.confbridge.event import (
 from ..notifier import ConfBridgeConfigurationNotifier
 
 
-SYSCONFD_HANDLERS = {'ipbx': ['module reload app_confbridge.so'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload app_confbridge.so']}
 
 
 class TestConfBridgeConfigurationNotifier(unittest.TestCase):

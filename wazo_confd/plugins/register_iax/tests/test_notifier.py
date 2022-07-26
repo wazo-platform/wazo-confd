@@ -13,7 +13,7 @@ from xivo_bus.resources.register.event import (
 from ..notifier import RegisterIAXNotifier
 
 
-EXPECTED_SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
+EXPECTED_SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload']}
 
 
 class TestRegisterIAXNotifier(unittest.TestCase):

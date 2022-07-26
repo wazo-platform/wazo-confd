@@ -28,8 +28,7 @@ class UserLineNotifier:
 
     def _send_sysconfd_handlers(self):
         handlers = {
-            'ipbx': ['dialplan reload', 'module reload res_pjsip.so'],
-            'agentbus': [],
+            'ipbx': ['dialplan reload', 'module reload res_pjsip.so']
         }
         self._sysconfd.exec_request_handlers(handlers)
 

@@ -20,8 +20,7 @@ SYSCONFD_HANDLERS = {
         'module reload res_pjsip.so',
         'dialplan reload',
         'module reload chan_sccp.so',
-    ],
-    'agentbus': [],
+    ]
 }
 
 

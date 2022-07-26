@@ -43,7 +43,6 @@ class Notifier:
     def send_sysconfd_handlers(self, meeting, action):
         handlers = {
             'ipbx': ['module reload res_pjsip.so'],
-            'agentbus': [],
             'context': [
                 {
                     'resource_type': 'meeting',

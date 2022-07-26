@@ -16,8 +16,7 @@ from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from ..notifier import SccpEndpointNotifier
 
 SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload chan_sccp.so', 'dialplan reload'],
-    'agentbus': [],
+    'ipbx': ['module reload chan_sccp.so', 'dialplan reload']
 }
 
 

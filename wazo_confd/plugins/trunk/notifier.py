@@ -20,7 +20,7 @@ class TrunkNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self, ipbx_commands):
-        handlers = {'ipbx': ipbx_commands, 'agentbus': []}
+        handlers = {'ipbx': ipbx_commands}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, trunk):
