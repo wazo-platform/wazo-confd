@@ -24,9 +24,7 @@ class SccpEndpointNotifier:
         self.bus = bus
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['module reload chan_sccp.so', 'dialplan reload']
-        }
+        handlers = {'ipbx': ['module reload chan_sccp.so', 'dialplan reload']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, sccp):

@@ -32,9 +32,7 @@ class SipEndpointNotifier:
         self.bus = bus
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['module reload res_pjsip.so', 'dialplan reload']
-        }
+        handlers = {'ipbx': ['module reload res_pjsip.so', 'dialplan reload']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, sip):
@@ -67,9 +65,7 @@ class SipTemplateNotifier:
         self.bus = bus
 
     def send_sysconfd_handlers(self):
-        handlers = {
-            'ipbx': ['module reload res_pjsip.so', 'dialplan reload']
-        }
+        handlers = {'ipbx': ['module reload res_pjsip.so', 'dialplan reload']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, sip):
