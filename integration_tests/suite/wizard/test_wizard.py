@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
@@ -216,7 +216,8 @@ class TestWizardDiscover(IntegrationTest):
         docker_status = self.service_status()
         hostname = docker_status['Config']['Hostname']
 
-        network_settings = docker_status['NetworkSettings']['Networks']['confd_default']
+        network_name = f'{self.service}_{self.asset}_default'
+        network_settings = docker_status['NetworkSettings']['Networks'][network_name]
         ip_address = network_settings['IPAddress']
         gateway = network_settings['Gateway']
 
