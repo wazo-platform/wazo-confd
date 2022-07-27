@@ -147,7 +147,6 @@ definitions:
             * dbsecret
             * defaultip
             * deny
-            * disallow
             * encryption
             * forceencryption
             * forcejitterbuffer
