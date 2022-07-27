@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.conference.event import (
-    CreateConferenceEvent,
-    DeleteConferenceEvent,
-    EditConferenceEvent,
+    ConferenceCreatedEvent,
+    ConferenceDeletedEvent,
+    ConferenceEditedEvent,
 )
 
 from ..notifier import ConferenceNotifier
@@ -32,13 +32,13 @@ class TestConferenceNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_conference_created_then_event_sent_on_bus(self):
-        expected_event = CreateConferenceEvent(self.conference.id)
+        expected_event = ConferenceCreatedEvent(
+            self.conference.id, self.conference.tenant_uuid
+        )
 
         self.notifier.created(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_conference_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.conference)
@@ -46,13 +46,13 @@ class TestConferenceNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_conference_edited_then_event_sent_on_bus(self):
-        expected_event = EditConferenceEvent(self.conference.id)
+        expected_event = ConferenceEditedEvent(
+            self.conference.id, self.conference.tenant_uuid
+        )
 
         self.notifier.edited(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_conference_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.conference)
@@ -60,10 +60,10 @@ class TestConferenceNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_conference_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteConferenceEvent(self.conference.id)
+        expected_event = ConferenceDeletedEvent(
+            self.conference.id, self.conference.tenant_uuid
+        )
 
         self.notifier.deleted(self.conference)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

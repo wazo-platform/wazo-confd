@@ -27,26 +27,24 @@ class TestGroupCallPermissionNotifier(unittest.TestCase):
 
     def test_when_call_permission_associate_to_group_then_event_sent_on_bus(self):
         expected_event = GroupCallPermissionAssociatedEvent(
-            group_id=self.group.id,
-            group_uuid=str(self.group.uuid),
-            call_permission_id=self.call_permission.id,
+            self.group.id,
+            self.group.uuid,
+            self.call_permission.id,
+            self.group.tenant_uuid,
         )
 
         self.notifier.associated(self.group, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_dissociate_to_group_then_event_sent_on_bus(self):
         expected_event = GroupCallPermissionDissociatedEvent(
-            group_id=self.group.id,
-            group_uuid=str(self.group.uuid),
-            call_permission_id=self.call_permission.id,
+            self.group.id,
+            self.group.uuid,
+            self.call_permission.id,
+            self.group.tenant_uuid,
         )
 
         self.notifier.dissociated(self.group, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

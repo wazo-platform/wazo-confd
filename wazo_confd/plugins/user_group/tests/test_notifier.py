@@ -28,20 +28,17 @@ class TestUserGroupNotifier(unittest.TestCase):
         self.group1 = Mock(Group, id=1)
         self.group2 = Mock(Group, id=2)
         self.user = Mock(User, uuid='abcd-1234', tenant_uuid=str(uuid4()))
-        self.expected_headers = {'tenant_uuid': self.user.tenant_uuid}
 
         self.notifier = UserGroupNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
         expected_event = UserGroupsAssociatedEvent(
-            self.user.uuid, [self.group1.id, self.group2.id]
+            [self.group1.id, self.group2.id], self.user.tenant_uuid, self.user.uuid
         )
 
         self.notifier.associated(self.user, [self.group1, self.group2])
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.user, [self.group1, self.group2])

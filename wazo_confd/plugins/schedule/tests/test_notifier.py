@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.schedule.event import (
-    CreateScheduleEvent,
-    DeleteScheduleEvent,
-    EditScheduleEvent,
+    ScheduleCreatedEvent,
+    ScheduleDeletedEvent,
+    ScheduleEditedEvent,
 )
 
 from ..notifier import ScheduleNotifier
@@ -19,33 +19,32 @@ class TestScheduleNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.schedule = Mock(id=1234, tenant_uuid=uuid4())
-        self.expected_headers = {'tenant_uuid': str(self.schedule.tenant_uuid)}
 
         self.notifier = ScheduleNotifier(self.bus)
 
     def test_when_schedule_created_then_event_sent_on_bus(self):
-        expected_event = CreateScheduleEvent(self.schedule.id)
+        expected_event = ScheduleCreatedEvent(
+            self.schedule.id, self.schedule.tenant_uuid
+        )
 
         self.notifier.created(self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_schedule_edited_then_event_sent_on_bus(self):
-        expected_event = EditScheduleEvent(self.schedule.id)
+        expected_event = ScheduleEditedEvent(
+            self.schedule.id, self.schedule.tenant_uuid
+        )
 
         self.notifier.edited(self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_schedule_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteScheduleEvent(self.schedule.id)
+        expected_event = ScheduleDeletedEvent(
+            self.schedule.id, self.schedule.tenant_uuid
+        )
 
         self.notifier.deleted(self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

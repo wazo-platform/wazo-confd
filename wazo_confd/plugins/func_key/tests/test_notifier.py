@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock, call
 
 from xivo_bus.resources.func_key.event import (
-    CreateFuncKeyTemplateEvent,
-    DeleteFuncKeyTemplateEvent,
-    EditFuncKeyTemplateEvent,
+    FuncKeyTemplateCreatedEvent,
+    FuncKeyTemplateDeletedEvent,
+    FuncKeyTemplateEditedEvent,
 )
 from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
@@ -29,22 +29,22 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.notifier = FuncKeyTemplateNotifier(self.bus, self.sysconfd, self.device_db)
 
     def test_when_func_key_template_created_then_event_sent_on_bus(self):
-        expected_event = CreateFuncKeyTemplateEvent(self.func_key_template.id)
+        expected_event = FuncKeyTemplateCreatedEvent(
+            self.func_key_template.id, self.func_key_template.tenant_uuid
+        )
 
         self.notifier.created(self.func_key_template)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_func_key_template_edited_then_event_sent_on_bus(self):
-        expected_event = EditFuncKeyTemplateEvent(self.func_key_template.id)
+        expected_event = FuncKeyTemplateEditedEvent(
+            self.func_key_template.id, self.func_key_template.tenant_uuid
+        )
 
         self.notifier.edited(self.func_key_template, None)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_edited_then_sccp_reloaded(
         self,
@@ -93,13 +93,13 @@ class TestFuncKeyTemplateNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_func_key_template_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteFuncKeyTemplateEvent(self.func_key_template.id)
+        expected_event = FuncKeyTemplateDeletedEvent(
+            self.func_key_template.id, self.func_key_template.tenant_uuid
+        )
 
         self.notifier.deleted(self.func_key_template)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_given_sccp_device_has_funckey_when_func_key_template_deleted_then_sccp_reloaded(
         self,

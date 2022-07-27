@@ -10,10 +10,10 @@ from unittest.mock import call, Mock
 from xivo_dao.alchemy.voicemail import Voicemail
 
 from xivo_bus.resources.voicemail.event import (
-    CreateVoicemailEvent,
-    DeleteVoicemailEvent,
-    EditUserVoicemailEvent,
-    EditVoicemailEvent,
+    VoicemailCreatedEvent,
+    VoicemailDeletedEvent,
+    VoicemailEditedEvent,
+    UserVoicemailEditedEvent,
 )
 
 from ..notifier import VoicemailNotifier
@@ -25,17 +25,16 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.device_db = Mock()
         self.voicemail = Mock(Voicemail, id=10, users=[], tenant_uuid=str(uuid4()))
-        self.expected_headers = {'tenant_uuid': self.voicemail.tenant_uuid}
         self.notifier = VoicemailNotifier(self.bus, self.sysconfd)
 
     def test_when_voicemail_created_then_event_sent_on_bus(self):
-        expected_event = CreateVoicemailEvent(self.voicemail.id)
+        expected_event = VoicemailCreatedEvent(
+            self.voicemail.id, self.voicemail.tenant_uuid
+        )
 
         self.notifier.created(self.voicemail)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_voicemail_created_then_sysconfd_called(self):
         expected_handlers = {'ipbx': ['voicemail reload']}
@@ -46,16 +45,20 @@ class TestVoicemailNotifier(unittest.TestCase):
     def test_when_voicemail_edited_then_event_sent_on_bus(self):
         user = Mock(uuid='abc-123')
         self.voicemail.users = [user]
-        expected_event1 = EditVoicemailEvent(self.voicemail.id)
-        expected_event2 = EditUserVoicemailEvent(user.uuid, self.voicemail.id)
+        expected_event1 = VoicemailEditedEvent(
+            self.voicemail.id, self.voicemail.tenant_uuid
+        )
+        expected_event2 = UserVoicemailEditedEvent(
+            self.voicemail.id, self.voicemail.tenant_uuid, user.uuid
+        )
 
         self.notifier.edited(self.voicemail)
 
         assert_that(
-            self.bus.send_bus_event.call_args_list,
+            self.bus.queue_event.call_args_list,
             contains(
-                call(expected_event1, headers=self.expected_headers),
-                call(expected_event2, headers=self.expected_headers),
+                call(expected_event1),
+                call(expected_event2),
             ),
         )
 
@@ -72,13 +75,13 @@ class TestVoicemailNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_voicemail_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteVoicemailEvent(self.voicemail.id)
+        expected_event = VoicemailDeletedEvent(
+            self.voicemail.id, self.voicemail.tenant_uuid
+        )
 
         self.notifier.deleted(self.voicemail)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_voicemail_deleted_then_sysconfd_called(self):
         expected_handlers = {'ipbx': ['voicemail reload']}

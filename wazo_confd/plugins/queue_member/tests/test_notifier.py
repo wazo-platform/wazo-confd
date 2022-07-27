@@ -12,7 +12,7 @@ from xivo_bus.resources.queue_member.event import (
     QueueMemberUserAssociatedEvent,
     QueueMemberUserDissociatedEvent,
 )
-from xivo_bus.resources.agent.event import EditAgentEvent
+from xivo_bus.resources.agent.event import AgentEditedEvent
 from ..notifier import QueueMemberNotifier
 
 
@@ -23,50 +23,52 @@ class TestQueueMemberNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.queue = Mock(id=1, tenant_uuid=tenant_uuid)
         self.member = Mock(agent=Mock(id=1, tenant_uuid=tenant_uuid), penalty=5)
-        self.expected_headers = {'tenant_uuid': str(tenant_uuid)}
 
         self.notifier = QueueMemberNotifier(self.bus, self.sysconfd)
 
     def test_agent_associate_then_bus_event(self):
         expected_events = [
             QueueMemberAgentAssociatedEvent(
-                self.queue.id, self.member.agent.id, self.member.penalty
+                self.queue.id,
+                self.member.agent.id,
+                self.member.penalty,
+                self.queue.tenant_uuid,
             ),
-            EditAgentEvent(self.member.agent.id),
+            AgentEditedEvent(self.member.agent.id, self.queue.tenant_uuid),
         ]
 
         self.notifier.agent_associated(self.queue, self.member)
 
         calls = [
-            call(expected_events[0], headers=self.expected_headers),
-            call(expected_events[1], headers=self.expected_headers),
+            call(expected_events[0]),
+            call(expected_events[1]),
         ]
-        self.bus.send_bus_event.assert_has_calls(calls)
+        self.bus.queue_event.assert_has_calls(calls)
 
     def test_agent_dissociate_then_bus_event(self):
         expected_events = [
-            QueueMemberAgentDissociatedEvent(self.queue.id, self.member.agent.id),
-            EditAgentEvent(self.member.agent.id),
+            QueueMemberAgentDissociatedEvent(
+                self.queue.id, self.member.agent.id, self.queue.tenant_uuid
+            ),
+            AgentEditedEvent(self.member.agent.id, self.queue.tenant_uuid),
         ]
 
         self.notifier.agent_dissociated(self.queue, self.member)
 
         calls = [
-            call(expected_events[0], headers=self.expected_headers),
-            call(expected_events[1], headers=self.expected_headers),
+            call(expected_events[0]),
+            call(expected_events[1]),
         ]
-        self.bus.send_bus_event.assert_has_calls(calls)
+        self.bus.queue_event.assert_has_calls(calls)
 
     def test_user_associate_then_bus_event(self):
         expected_event = QueueMemberUserAssociatedEvent(
-            self.queue.id, self.member.user.id
+            self.queue.id, self.queue.tenant_uuid, self.member.user.id
         )
 
         self.notifier.user_associated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_user_associate_then_sysconfd_event(self):
         expected_handlers = {
@@ -83,14 +85,12 @@ class TestQueueMemberNotifier(unittest.TestCase):
 
     def test_user_dissociate_then_bus_event(self):
         expected_event = QueueMemberUserDissociatedEvent(
-            self.queue.id, self.member.user.id
+            self.queue.id, self.queue.tenant_uuid, self.member.user.id
         )
 
         self.notifier.user_dissociated(self.queue, self.member)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_user_dissociate_then_sysconfd_event(self):
         expected_handlers = {

@@ -6,9 +6,9 @@ import uuid
 from unittest.mock import Mock
 
 from xivo_bus.resources.agent.event import (
-    CreateAgentEvent,
-    DeleteAgentEvent,
-    EditAgentEvent,
+    AgentCreatedEvent,
+    AgentDeletedEvent,
+    AgentEditedEvent,
 )
 from xivo_dao.alchemy.agentfeatures import AgentFeatures as Agent
 
@@ -33,14 +33,11 @@ class TestAgentNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_agent_created_then_event_sent_on_bus(self):
-        expected_event = CreateAgentEvent(self.agent.id)
-        expected_headers = {'tenant_uuid': self.agent.tenant_uuid}
+        expected_event = AgentCreatedEvent(self.agent.id, self.agent.tenant_uuid)
 
         self.notifier.created(self.agent)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_agent_edited_then_app_agent_reloaded(self):
         self.notifier.edited(self.agent)
@@ -49,14 +46,11 @@ class TestAgentNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_agent_edited_then_event_sent_on_bus(self):
-        expected_event = EditAgentEvent(self.agent.id)
-        expected_headers = {'tenant_uuid': self.agent.tenant_uuid}
+        expected_event = AgentEditedEvent(self.agent.id, self.agent.tenant_uuid)
 
         self.notifier.edited(self.agent)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_agent_deleted_then_app_agent_reloaded(self):
         self.notifier.deleted(self.agent)
@@ -65,11 +59,8 @@ class TestAgentNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_agent_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteAgentEvent(self.agent.id)
-        expected_headers = {'tenant_uuid': self.agent.tenant_uuid}
+        expected_event = AgentDeletedEvent(self.agent.id, self.agent.tenant_uuid)
 
         self.notifier.deleted(self.agent)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

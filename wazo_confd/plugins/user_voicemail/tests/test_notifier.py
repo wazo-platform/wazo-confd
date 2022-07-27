@@ -33,18 +33,17 @@ class TestUserVoicemailNotifier(unittest.TestCase):
             tenant_uuid=TENANT_UUID,
         )
         self.voicemail = Mock(id=2)
-        self.expected_headers = {'tenant_uuid': TENANT_UUID}
 
         self.notifier = UserVoicemailNotifier(self.bus, self.sysconfd)
 
     def test_associated_then_bus_event(self):
-        expected_event = UserVoicemailAssociatedEvent(self.user.uuid, self.voicemail.id)
+        expected_event = UserVoicemailAssociatedEvent(
+            self.voicemail.id, self.user.tenant_uuid, self.user.uuid
+        )
 
         self.notifier.associated(self.user, self.voicemail)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associated_then_sip_reload(self):
         self.notifier.associated(self.user, self.voicemail)
@@ -55,14 +54,12 @@ class TestUserVoicemailNotifier(unittest.TestCase):
 
     def test_dissociated_then_bus_event(self):
         expected_event = UserVoicemailDissociatedEvent(
-            self.user.uuid, self.voicemail.id
+            self.voicemail.id, self.user.tenant_uuid, self.user.uuid
         )
 
         self.notifier.dissociated(self.user, self.voicemail)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociated_then_sip_reload(self):
         self.notifier.dissociated(self.user, self.voicemail)

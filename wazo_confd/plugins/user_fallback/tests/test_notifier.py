@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.user.event import EditUserFallbackEvent
+from xivo_bus.resources.user.event import UserFallbackEditedEvent
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from ..notifier import UserFallbackNotifier
@@ -21,10 +21,10 @@ class TestUserFallbackNotifier(unittest.TestCase):
         self.notifier = UserFallbackNotifier(self.bus)
 
     def test_edited_then_bus_event(self):
-        expected_event = EditUserFallbackEvent(self.user.id, self.user.uuid)
+        expected_event = UserFallbackEditedEvent(
+            self.user.id, self.user.tenant_uuid, self.user.uuid
+        )
 
         self.notifier.edited(self.user)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

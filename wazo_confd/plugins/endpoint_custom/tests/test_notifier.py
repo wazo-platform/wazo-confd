@@ -7,9 +7,9 @@ import uuid
 from unittest.mock import Mock
 
 from xivo_bus.resources.endpoint_custom.event import (
-    CreateCustomEndpointEvent,
-    DeleteCustomEndpointEvent,
-    EditCustomEndpointEvent,
+    CustomEndpointCreatedEvent,
+    CustomEndpointDeletedEvent,
+    CustomEndpointEditedEvent,
 )
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
 
@@ -34,32 +34,31 @@ class TestCustomEndpointNotifier(unittest.TestCase):
             'trunk': self.custom.trunk,
             'line': self.custom.line,
         }
-        self.expected_headers = {'tenant_uuid': self.custom.tenant_uuid}
         self.notifier = CustomEndpointNotifier(self.bus)
 
     def test_when_custom_endpoint_created_then_event_sent_on_bus(self):
-        expected_event = CreateCustomEndpointEvent(self.custom_serialized)
+        expected_event = CustomEndpointCreatedEvent(
+            self.custom_serialized, self.custom.tenant_uuid
+        )
 
         self.notifier.created(self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_custom_endpoint_edited_then_event_sent_on_bus(self):
-        expected_event = EditCustomEndpointEvent(self.custom_serialized)
+        expected_event = CustomEndpointEditedEvent(
+            self.custom_serialized, self.custom.tenant_uuid
+        )
 
         self.notifier.edited(self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_custom_endpoint_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteCustomEndpointEvent(self.custom_serialized)
+        expected_event = CustomEndpointDeletedEvent(
+            self.custom_serialized, self.custom.tenant_uuid
+        )
 
         self.notifier.deleted(self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

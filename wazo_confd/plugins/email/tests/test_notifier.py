@@ -21,7 +21,7 @@ class TestEmailConfigNotifier(unittest.TestCase):
 
         self.notifier.edited()
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_email_config_edited_then_commonconf_regenerated(self):
         self.notifier.edited()

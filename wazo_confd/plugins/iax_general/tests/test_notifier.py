@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import Mock
 
-from xivo_bus.resources.iax_general.event import EditIAXGeneralEvent
+from xivo_bus.resources.iax_general.event import IAXGeneralEditedEvent
 from xivo_dao.alchemy.staticiax import StaticIAX
 
 from ..notifier import IAXGeneralNotifier
@@ -21,11 +21,11 @@ class TestIAXGeneralNotifier(unittest.TestCase):
         self.notifier = IAXGeneralNotifier(self.bus, self.sysconfd)
 
     def test_when_iax_general_edited_then_event_sent_on_bus(self):
-        expected_event = EditIAXGeneralEvent()
+        expected_event = IAXGeneralEditedEvent()
 
         self.notifier.edited(self.iax_general)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_iax_general_edited_then_iax_reloaded(self):
         self.notifier.edited(self.iax_general)

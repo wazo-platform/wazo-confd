@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import Mock
 
-from xivo_bus.resources.wizard.event import CreateWizardEvent
+from xivo_bus.resources.wizard.event import WizardCreatedEvent
 
 from ..notifier import WizardNotifier
 
@@ -16,8 +16,8 @@ class TestWizardNotifier(unittest.TestCase):
         self.notifier = WizardNotifier(self.bus)
 
     def test_when_wizard_created_then_event_sent_on_bus(self):
-        expected_event = CreateWizardEvent()
+        expected_event = WizardCreatedEvent()
 
         self.notifier.created()
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)

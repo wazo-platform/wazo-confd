@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import Mock
 
-from xivo_bus.resources.hep.event import HEPGeneralUpdatedEvent
+from xivo_bus.resources.hep.event import HEPGeneralEditedEvent
 
 from ..notifier import HEPConfigurationNotifier
 
@@ -21,11 +21,11 @@ class TestHEPConfigurationNotifier(unittest.TestCase):
         self.notifier = HEPConfigurationNotifier(self.bus, self.sysconfd)
 
     def test_when_hep_general_edited_then_event_sent_on_bus(self):
-        expected_event = HEPGeneralUpdatedEvent()
+        expected_event = HEPGeneralEditedEvent()
 
         self.notifier.edited('general', self.hep)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_hep_general_edited_then_hep_reloaded(self):
         self.notifier.edited('general', self.hep)

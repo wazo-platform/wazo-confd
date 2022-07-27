@@ -21,4 +21,4 @@ class TestLiveReloadNotifier(unittest.TestCase):
 
         self.notifier.edited(self.live_reload)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)

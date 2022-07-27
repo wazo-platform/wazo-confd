@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import Mock
 
-from xivo_bus.resources.iax_callnumberlimits.event import EditIAXCallNumberLimitsEvent
+from xivo_bus.resources.iax_callnumberlimits.event import IAXCallNumberLimitsEditedEvent
 from xivo_dao.alchemy.iaxcallnumberlimits import IAXCallNumberLimits
 
 from ..notifier import IAXCallNumberLimitsNotifier
@@ -21,11 +21,11 @@ class TestIAXCallNumberLimitsNotifier(unittest.TestCase):
         self.notifier = IAXCallNumberLimitsNotifier(self.bus, self.sysconfd)
 
     def test_when_iax_callnumberlimits_edited_then_event_sent_on_bus(self):
-        expected_event = EditIAXCallNumberLimitsEvent()
+        expected_event = IAXCallNumberLimitsEditedEvent()
 
         self.notifier.edited(self.iax_callnumberlimits)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_iax_callnumberlimits_edited_then_iax_reloaded(self):
         self.notifier.edited(self.iax_callnumberlimits)

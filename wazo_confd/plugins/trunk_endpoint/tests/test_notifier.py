@@ -49,56 +49,50 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
 
     def test_associate_sip_then_bus_event(self):
         expected_event = TrunkEndpointSIPAssociatedEvent(
-            trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            sip={
+            {'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
+            {
                 'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
                 'auth_section_options': self.sip.auth_section_options,
                 'registration_section_options': self.sip.registration_section_options,
             },
+            self.trunk.tenant_uuid,
         )
-        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_sip.associated(self.trunk, self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associate_custom_then_bus_event(self):
         expected_event = TrunkEndpointCustomAssociatedEvent(
-            trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            custom={
+            {'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
+            {
                 'id': self.custom.id,
                 'tenant_uuid': self.custom.tenant_uuid,
                 'interface': self.custom.interface,
             },
+            self.trunk.tenant_uuid,
         )
-        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_custom.associated(self.trunk, self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXAssociatedEvent(
-            trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            iax={
+            {'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
+            {
                 'id': self.iax.id,
                 'tenant_uuid': self.iax.tenant_uuid,
                 'name': self.iax.name,
             },
+            self.trunk.tenant_uuid,
         )
-        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_iax.associated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associate_sip_then_sysconfd_event(self):
         self.notifier_sip.associated(self.trunk, self.sip)
@@ -119,53 +113,47 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
 
     def test_dissociate_sip_then_bus_event(self):
         expected_event = TrunkEndpointSIPDissociatedEvent(
-            trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            sip={
+            {'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
+            {
                 'uuid': self.sip.uuid,
                 'tenant_uuid': self.sip.tenant_uuid,
                 'name': self.sip.name,
                 'auth_section_options': self.sip.auth_section_options,
                 'registration_section_options': self.sip.registration_section_options,
             },
+            self.trunk.tenant_uuid,
         )
-        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_sip.dissociated(self.trunk, self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_custom_then_bus_event(self):
         expected_event = TrunkEndpointCustomDissociatedEvent(
-            trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            custom={
+            {'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
+            {
                 'id': self.custom.id,
                 'tenant_uuid': self.custom.tenant_uuid,
                 'interface': self.custom.interface,
             },
+            self.trunk.tenant_uuid,
         )
-        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_custom.dissociated(self.trunk, self.custom)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_iax_then_bus_event(self):
         expected_event = TrunkEndpointIAXDissociatedEvent(
-            trunk={'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
-            iax={
+            {'id': self.trunk.id, 'tenant_uuid': self.trunk.tenant_uuid},
+            {
                 'id': self.iax.id,
                 'tenant_uuid': self.iax.tenant_uuid,
                 'name': self.iax.name,
             },
+            self.trunk.tenant_uuid,
         )
-        expected_headers = {'tenant_uuid': self.trunk.tenant_uuid}
 
         self.notifier_iax.dissociated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

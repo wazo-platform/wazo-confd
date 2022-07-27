@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.extension_feature.event import EditExtensionFeatureEvent
+from xivo_bus.resources.extension_feature.event import ExtensionFeatureEditedEvent
 from xivo_dao.alchemy.extension import Extension
 
 from ..notifier import ExtensionFeatureNotifier
@@ -34,9 +34,9 @@ class TestExtensionFeatureNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_extension_edited_then_event_sent_on_bus(self):
-        expected_event = EditExtensionFeatureEvent(self.extension.id)
+        expected_event = ExtensionFeatureEditedEvent(self.extension.id)
         updated_fields = []
 
         self.notifier.edited(self.extension, updated_fields)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)

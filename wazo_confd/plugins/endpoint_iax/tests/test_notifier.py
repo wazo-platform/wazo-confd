@@ -7,9 +7,9 @@ import uuid
 from unittest.mock import Mock
 
 from xivo_bus.resources.endpoint_iax.event import (
-    CreateIAXEndpointEvent,
-    DeleteIAXEndpointEvent,
-    EditIAXEndpointEvent,
+    IAXEndpointCreatedEvent,
+    IAXEndpointDeletedEvent,
+    IAXEndpointEditedEvent,
 )
 from xivo_dao.alchemy.useriax import UserIAX as IAX
 
@@ -31,18 +31,17 @@ class TestIAXEndpointNotifier(unittest.TestCase):
             'name': self.iax.name,
             'trunk': self.iax.trunk_rel,
         }
-        self.expected_headers = {'tenant_uuid': self.iax.tenant_uuid}
 
         self.notifier = IAXEndpointNotifier(self.sysconfd, self.bus)
 
     def test_when_iax_endpoint_created_then_event_sent_on_bus(self):
-        expected_event = CreateIAXEndpointEvent(self.iax_serialized)
+        expected_event = IAXEndpointCreatedEvent(
+            self.iax_serialized, self.iax.tenant_uuid
+        )
 
         self.notifier.created(self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_iax_endpoint_edited_then_iax_reloaded(self):
         self.notifier.edited(self.iax)
@@ -50,13 +49,13 @@ class TestIAXEndpointNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_iax_endpoint_edited_then_event_sent_on_bus(self):
-        expected_event = EditIAXEndpointEvent(self.iax_serialized)
+        expected_event = IAXEndpointEditedEvent(
+            self.iax_serialized, self.iax.tenant_uuid
+        )
 
         self.notifier.edited(self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_iax_endpoint_deleted_then_iax_reloaded(self):
         self.notifier.deleted(self.iax)
@@ -64,10 +63,10 @@ class TestIAXEndpointNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_iax_endpoint_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteIAXEndpointEvent(self.iax_serialized)
+        expected_event = IAXEndpointDeletedEvent(
+            self.iax_serialized, self.iax.tenant_uuid
+        )
 
         self.notifier.deleted(self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

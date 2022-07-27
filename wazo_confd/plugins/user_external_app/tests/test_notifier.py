@@ -6,9 +6,9 @@ from unittest.mock import Mock
 from uuid import uuid4
 
 from xivo_bus.resources.user_external_app.event import (
-    CreateUserExternalAppEvent,
-    DeleteUserExternalAppEvent,
-    EditUserExternalAppEvent,
+    UserExternalAppCreatedEvent,
+    UserExternalAppDeletedEvent,
+    UserExternalAppEditedEvent,
 )
 
 from ..notifier import UserExternalAppNotifier
@@ -21,33 +21,32 @@ class TestUserExternalAppNotifier(unittest.TestCase):
         self.external_app.name = 'limitation of mock instantiation with name ...'
         self.tenant_uuid = uuid4()
         self.app_serialized = {'name': self.external_app.name}
-        self.expected_headers = {'tenant_uuid': str(self.tenant_uuid)}
 
         self.notifier = UserExternalAppNotifier(self.bus)
 
     def test_when_external_app_created_then_event_sent_on_bus(self):
-        expected_event = CreateUserExternalAppEvent(self.app_serialized)
+        expected_event = UserExternalAppCreatedEvent(
+            self.app_serialized, self.tenant_uuid
+        )
 
         self.notifier.created(self.external_app, self.tenant_uuid)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_external_app_edited_then_event_sent_on_bus(self):
-        expected_event = EditUserExternalAppEvent(self.app_serialized)
+        expected_event = UserExternalAppEditedEvent(
+            self.app_serialized, self.tenant_uuid
+        )
 
         self.notifier.edited(self.external_app, self.tenant_uuid)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_external_app_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteUserExternalAppEvent(self.app_serialized)
+        expected_event = UserExternalAppDeletedEvent(
+            self.app_serialized, self.tenant_uuid
+        )
 
         self.notifier.deleted(self.external_app, self.tenant_uuid)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
