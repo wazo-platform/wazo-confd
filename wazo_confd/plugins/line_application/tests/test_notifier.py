@@ -18,7 +18,7 @@ from ..notifier import LineApplicationNotifier
 
 class TestLineApplicationNotifier(unittest.TestCase):
 
-    REQUEST_HANDLERS = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
+    REQUEST_HANDLERS = {'ipbx': ['module reload res_pjsip.so']}
 
     def setUp(self):
         self.sysconfd = Mock()

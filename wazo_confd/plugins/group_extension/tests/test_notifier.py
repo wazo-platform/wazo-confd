@@ -15,7 +15,7 @@ from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 
 from ..notifier import GroupExtensionNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestGroupExtensionNotifier(unittest.TestCase):

@@ -16,7 +16,7 @@ class ExtensionNotifier:
         self.bus = bus
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ipbx': ipbx, 'agentbus': []}
+        handlers = {'ipbx': ipbx}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, extension):

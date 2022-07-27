@@ -11,7 +11,7 @@ from xivo_dao.alchemy.context import Context
 
 from ..notifier import ContextContextNotifier
 
-EXPECTED_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+EXPECTED_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestContextContextNotifier(unittest.TestCase):

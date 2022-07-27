@@ -15,7 +15,7 @@ from xivo_dao.alchemy.parking_lot import ParkingLot
 
 from ..notifier import ParkingLotExtensionNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['module reload res_parking.so'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload res_parking.so']}
 
 
 class TestParkingLotExtensionNotifier(unittest.TestCase):

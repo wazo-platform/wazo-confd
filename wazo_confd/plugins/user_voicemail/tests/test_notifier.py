@@ -18,8 +18,7 @@ USER_LINE2_ID = 12
 TENANT_UUID = str(uuid4())
 
 EXPECTED_SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so'],
-    'agentbus': [],
+    'ipbx': ['module reload res_pjsip.so', 'module reload chan_sccp.so']
 }
 
 

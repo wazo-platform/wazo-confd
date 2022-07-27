@@ -15,7 +15,7 @@ from xivo_dao.alchemy.outcall import Outcall
 
 from ..notifier import OutcallExtensionNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestOutcallExtensionNotifier(unittest.TestCase):

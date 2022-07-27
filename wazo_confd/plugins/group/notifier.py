@@ -20,7 +20,7 @@ class GroupNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
+        handlers = {'ipbx': ['module reload app_queue.so']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, group):

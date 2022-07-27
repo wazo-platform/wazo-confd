@@ -16,7 +16,7 @@ from xivo_dao.alchemy.useriax import UserIAX as IAX
 from ..notifier import IAXEndpointNotifier
 
 
-SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload']}
 
 
 class TestIAXEndpointNotifier(unittest.TestCase):

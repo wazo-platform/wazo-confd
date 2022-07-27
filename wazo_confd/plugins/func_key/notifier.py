@@ -18,7 +18,7 @@ class FuncKeyTemplateNotifier:
         self.device_db = device_db
 
     def send_sysconfd_handlers(self, ipbx):
-        handlers = {'ipbx': ipbx, 'agentbus': []}
+        handlers = {'ipbx': ipbx}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, template):

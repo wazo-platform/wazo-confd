@@ -17,10 +17,7 @@ from xivo_bus.resources.endpoint_sip.event import (
 from ..notifier import SipEndpointNotifier, SipTemplateNotifier
 
 
-SYSCONFD_HANDLERS = {
-    'ipbx': ['module reload res_pjsip.so', 'dialplan reload'],
-    'agentbus': [],
-}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload res_pjsip.so', 'dialplan reload']}
 
 
 class TestSipEndpointNotifier(unittest.TestCase):

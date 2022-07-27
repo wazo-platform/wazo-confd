@@ -15,7 +15,7 @@ class MohNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ipbx': ['moh reload'], 'agentbus': []}
+        handlers = {'ipbx': ['moh reload']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, moh):

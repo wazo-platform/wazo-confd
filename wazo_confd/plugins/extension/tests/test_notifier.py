@@ -43,7 +43,7 @@ class TestExtensionNotifier(unittest.TestCase):
         )
 
     def test_when_extension_created_then_dialplan_reloaded(self):
-        expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
+        expected_handlers = {'ipbx': ['dialplan reload']}
         self.notifier.created(self.extension)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
@@ -55,8 +55,7 @@ class TestExtensionNotifier(unittest.TestCase):
                 'module reload res_pjsip.so',
                 'module reload chan_sccp.so',
                 'module reload app_queue.so',
-            ],
-            'agentbus': [],
+            ]
         }
         updated_fields = ['exten']
         self.notifier.edited(self.extension, updated_fields)
@@ -70,8 +69,7 @@ class TestExtensionNotifier(unittest.TestCase):
                 'module reload res_pjsip.so',
                 'module reload chan_sccp.so',
                 'module reload app_queue.so',
-            ],
-            'agentbus': [],
+            ]
         }
         self.notifier.edited(self.extension, None)
 
@@ -95,7 +93,7 @@ class TestExtensionNotifier(unittest.TestCase):
         )
 
     def test_when_extension_deleted_then_dialplan_reloaded(self):
-        expected_handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
+        expected_handlers = {'ipbx': ['dialplan reload']}
         self.notifier.deleted(self.extension)
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)

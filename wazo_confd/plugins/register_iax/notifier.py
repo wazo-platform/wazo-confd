@@ -16,7 +16,7 @@ class RegisterIAXNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ipbx': ['iax2 reload'], 'agentbus': []}
+        handlers = {'ipbx': ['iax2 reload']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, register):

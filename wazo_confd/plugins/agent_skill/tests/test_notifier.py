@@ -13,7 +13,7 @@ from xivo_bus.resources.agent_skill.event import (
 
 from ..notifier import AgentSkillNotifier
 
-EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so'], 'agentbus': []}
+EXPECTED_HANDLERS = {'ipbx': ['module reload app_queue.so']}
 
 
 class TestAgentMemberNotifier(unittest.TestCase):

@@ -16,7 +16,7 @@ class ParkingLotNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ipbx': ['module reload res_parking.so'], 'agentbus': []}
+        handlers = {'ipbx': ['module reload res_parking.so']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, parking_lot):

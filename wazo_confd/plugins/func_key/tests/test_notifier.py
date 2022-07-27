@@ -15,8 +15,8 @@ from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 from ..notifier import FuncKeyTemplateNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
-SYSCONFD_HANDLERS_SCCP = {'ipbx': ['module reload chan_sccp.so'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
+SYSCONFD_HANDLERS_SCCP = {'ipbx': ['module reload chan_sccp.so']}
 
 
 class TestFuncKeyTemplateNotifier(unittest.TestCase):

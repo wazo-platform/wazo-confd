@@ -17,8 +17,7 @@ class UserGroupNotifier:
                 'module reload res_pjsip.so',
                 'module reload app_queue.so',
                 'module reload chan_sccp.so',
-            ],
-            'agentbus': [],
+            ]
         }
         self.sysconfd.exec_request_handlers(handlers)
 

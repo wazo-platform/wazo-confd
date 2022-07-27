@@ -13,7 +13,7 @@ from xivo_bus.resources.features.event import (
 from ..notifier import FeaturesConfigurationNotifier
 
 
-SYSCONFD_HANDLERS = {'ipbx': ['module reload features'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['module reload features']}
 
 
 class TestFeaturesConfigurationNotifier(unittest.TestCase):

@@ -15,7 +15,7 @@ from xivo_dao.alchemy.queuefeatures import QueueFeatures as Queue
 
 from ..notifier import QueueExtensionNotifier
 
-SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload'], 'agentbus': []}
+SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload']}
 
 
 class TestQueueExtensionNotifier(unittest.TestCase):

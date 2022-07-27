@@ -12,7 +12,7 @@ class ContextContextNotifier:
         self.sysconfd = sysconfd
 
     def send_sysconfd_handlers(self):
-        handlers = {'ipbx': ['dialplan reload'], 'agentbus': []}
+        handlers = {'ipbx': ['dialplan reload']}
         self.sysconfd.exec_request_handlers(handlers)
 
     def associated_contexts(self, context, contexts):

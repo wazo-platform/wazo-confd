@@ -23,7 +23,7 @@ APPLICATION_FIELDS = ['uuid']
 
 class LineApplicationNotifier:
 
-    REQUEST_HANDLERS = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
+    REQUEST_HANDLERS = {'ipbx': ['module reload res_pjsip.so']}
 
     def __init__(self, bus, sysconfd):
         self._bus = bus

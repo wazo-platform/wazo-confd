@@ -102,7 +102,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
 
     def test_associate_sip_then_sysconfd_event(self):
         self.notifier_sip.associated(self.trunk, self.sip)
-        expected = {'ipbx': ['module reload res_pjsip.so'], 'agentbus': []}
+        expected = {'ipbx': ['module reload res_pjsip.so']}
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected)
 
@@ -113,7 +113,7 @@ class TestTrunkEndpointNotifier(unittest.TestCase):
 
     def test_associate_iax_then_sysconfd_event(self):
         self.notifier_iax.associated(self.trunk, self.iax)
-        expected = {'ipbx': ['iax2 reload'], 'agentbus': []}
+        expected = {'ipbx': ['iax2 reload']}
 
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected)
 
