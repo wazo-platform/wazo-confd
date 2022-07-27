@@ -3,6 +3,7 @@
 
 from collections import deque
 
+from xivo_bus.consumer import BusConsumer as Consumer
 from xivo_bus.mixins import PublisherMixin, WazoEventMixin
 from xivo_bus.base import Base
 
@@ -41,7 +42,11 @@ class FlushMixin:
 
 class BusPublisher(WazoEventMixin, FlushMixin, PublisherMixin, Base):
     @classmethod
-    def from_config(cls, config):
-        uuid = config['uuid']
-        bus = config['bus']
-        return cls(name='wazo-confd', service_uuid=uuid, **bus)
+    def from_config(cls, service_uuid, bus_config):
+        return cls(name='wazo-confd', service_uuid=service_uuid, **bus_config)
+
+
+class BusConsumer(Consumer):
+    @classmethod
+    def from_config(cls, bus_config):
+        return cls(name='wazo-confd', **bus_config)
