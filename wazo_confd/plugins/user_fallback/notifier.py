@@ -12,7 +12,7 @@ class UserFallbackNotifier:
 
     def edited(self, user):
         event = UserFallbackEditedEvent(user.id, user.tenant_uuid, user.uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

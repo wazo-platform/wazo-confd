@@ -22,17 +22,17 @@ class IvrNotifier:
     def created(self, ivr):
         self.send_sysconfd_handlers()
         event = IVRCreatedEvent(ivr.id, ivr.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, ivr):
         self.send_sysconfd_handlers()
         event = IVREditedEvent(ivr.id, ivr.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, ivr):
         self.send_sysconfd_handlers()
         event = IVRDeletedEvent(ivr.id, ivr.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

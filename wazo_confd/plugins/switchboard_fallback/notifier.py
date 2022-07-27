@@ -16,7 +16,7 @@ class SwitchboardFallbackNotifier:
         event = SwitchboardFallbackEditedEvent(
             payload, switchboard.uuid, switchboard.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

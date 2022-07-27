@@ -39,7 +39,7 @@ class LineApplicationNotifier:
         event = LineApplicationAssociatedEvent(
             line_serialized, application_serialized, line.tenant_uuid
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def dissociated(self, line, application):
         self._sysconfd.exec_request_handlers(self.REQUEST_HANDLERS)
@@ -51,7 +51,7 @@ class LineApplicationNotifier:
         event = LineApplicationDissociatedEvent(
             line_serialized, application_serialized, line.tenant_uuid
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
 
 def build_notifier():

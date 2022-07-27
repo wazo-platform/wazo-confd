@@ -15,11 +15,11 @@ class UserScheduleNotifier:
 
     def associated(self, user, schedule):
         event = UserScheduleAssociatedEvent(schedule.id, user.tenant_uuid, user.uuid)
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def dissociated(self, user, schedule):
         event = UserScheduleDissociatedEvent(schedule.id, user.tenant_uuid, user.uuid)
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
 
 def build_notifier():

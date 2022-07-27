@@ -27,17 +27,17 @@ class CustomEndpointNotifier:
     def created(self, custom):
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
         event = CustomEndpointCreatedEvent(custom_serialized, custom.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, custom):
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
         event = CustomEndpointEditedEvent(custom_serialized, custom.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, custom):
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
         event = CustomEndpointDeletedEvent(custom_serialized, custom.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

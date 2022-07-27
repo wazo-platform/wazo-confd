@@ -41,7 +41,7 @@ class UserLineNotifier:
             user_line.main_line,
             user_line.user.tenant_uuid,
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def dissociated(self, user_line):
         self._send_sysconfd_handlers()
@@ -54,7 +54,7 @@ class UserLineNotifier:
             user_line.main_line,
             user_line.user.tenant_uuid,
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
 
 def build_notifier():

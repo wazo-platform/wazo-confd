@@ -16,15 +16,15 @@ class ScheduleNotifier:
 
     def created(self, schedule):
         event = ScheduleCreatedEvent(schedule.id, schedule.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, schedule):
         event = ScheduleEditedEvent(schedule.id, schedule.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, schedule):
         event = ScheduleDeletedEvent(schedule.id, schedule.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

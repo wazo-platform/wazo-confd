@@ -17,13 +17,13 @@ class GroupScheduleNotifier:
         event = GroupScheduleAssociatedEvent(
             group.id, group.uuid, schedule.id, group.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, group, schedule):
         event = GroupScheduleDissociatedEvent(
             group.id, group.uuid, schedule.id, group.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

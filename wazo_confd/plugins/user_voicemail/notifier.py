@@ -22,12 +22,12 @@ class UserVoicemailNotifier:
     def associated(self, user, voicemail):
         self._send_sysconfd_handlers()
         event = UserVoicemailAssociatedEvent(voicemail.id, user.tenant_uuid, user.uuid)
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def dissociated(self, user, voicemail):
         self._send_sysconfd_handlers()
         event = UserVoicemailDissociatedEvent(voicemail.id, user.tenant_uuid, user.uuid)
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
 
 def build_notifier():

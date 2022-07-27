@@ -23,18 +23,18 @@ class FuncKeyTemplateNotifier:
 
     def created(self, template):
         event = FuncKeyTemplateCreatedEvent(template.id, template.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, template, updated_fields):
         event = FuncKeyTemplateEditedEvent(template.id, template.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
             self._reload_sccp(template)
 
     def deleted(self, template):
         event = FuncKeyTemplateDeletedEvent(template.id, template.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['dialplan reload'])
         self._reload_sccp(template)
 

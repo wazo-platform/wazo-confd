@@ -13,7 +13,7 @@ class OutcallTrunkNotifier:
     def associated_all_trunks(self, outcall, trunks):
         trunk_ids = [trunk.id for trunk in trunks]
         event = OutcallTrunksAssociatedEvent(outcall.id, trunk_ids, outcall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

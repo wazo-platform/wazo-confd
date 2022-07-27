@@ -31,7 +31,7 @@ class PJSIPConfigurationNotifier:
         else:
             return
 
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
 
 
@@ -53,19 +53,19 @@ class PJSIPTransportNotifier:
         self.send_sysconfd_handlers()
         payload = self.schema.dump(transport)
         event = SIPTransportCreatedEvent(payload)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, transport):
         self.send_sysconfd_handlers()
         payload = self.schema.dump(transport)
         event = SIPTransportDeletedEvent(payload)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, transport):
         self.send_sysconfd_handlers()
         payload = self.schema.dump(transport)
         event = SIPTransportEditedEvent(payload)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_pjsip_transport_notifier(schema):

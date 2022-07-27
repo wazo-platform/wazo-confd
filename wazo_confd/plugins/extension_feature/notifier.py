@@ -17,7 +17,7 @@ class ExtensionFeatureNotifier:
 
     def edited(self, extension, updated_fields):
         event = ExtensionFeatureEditedEvent(extension.id)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         if updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
 

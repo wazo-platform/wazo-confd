@@ -25,7 +25,7 @@ class TrunkNotifier:
 
     def created(self, trunk):
         event = TrunkCreatedEvent(trunk.id, trunk.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, trunk):
         if trunk.endpoint_sip_uuid:
@@ -33,7 +33,7 @@ class TrunkNotifier:
         if trunk.endpoint_iax_id:
             self.send_sysconfd_handlers(self._IAX_IPBX_COMMANDS)
         event = TrunkEditedEvent(trunk.id, trunk.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, trunk):
         if trunk.endpoint_sip_uuid:
@@ -41,7 +41,7 @@ class TrunkNotifier:
         if trunk.endpoint_iax_id:
             self.send_sysconfd_handlers(self._IAX_IPBX_COMMANDS)
         event = TrunkDeletedEvent(trunk.id, trunk.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

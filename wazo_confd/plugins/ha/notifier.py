@@ -11,7 +11,7 @@ class HANotifier:
 
     def edited(self, ha):
         event = HAEditedEvent()
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         ha_sysconf = {
             'node_type': ha['node_type'],
             'remote_address': ha.get('remote_address') or '',

@@ -27,19 +27,19 @@ class ContextNotifier:
         self.send_sysconfd_handlers()
         context_payload = ContextSchema(only=CONTEXT_FIELDS).dump(context)
         event = ContextCreatedEvent(context_payload, context.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, context):
         self.send_sysconfd_handlers()
         context_payload = ContextSchema(only=CONTEXT_FIELDS).dump(context)
         event = ContextEditedEvent(context_payload, context.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, context):
         self.send_sysconfd_handlers()
         context_payload = ContextSchema(only=CONTEXT_FIELDS).dump(context)
         event = ContextDeletedEvent(context_payload, context.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

@@ -17,13 +17,13 @@ class IncallScheduleNotifier:
         event = IncallScheduleAssociatedEvent(
             incall.id, schedule.id, incall.tenant_uuid
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def dissociated(self, incall, schedule):
         event = IncallScheduleDissociatedEvent(
             incall.id, schedule.id, incall.tenant_uuid
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
 
 def build_notifier():

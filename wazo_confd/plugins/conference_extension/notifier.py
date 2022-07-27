@@ -23,14 +23,14 @@ class ConferenceExtensionNotifier:
         event = ConferenceExtensionAssociatedEvent(
             conference.id, extension.id, conference.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, conference, extension):
         self.send_sysconfd_handlers()
         event = ConferenceExtensionDissociatedEvent(
             conference.id, extension.id, conference.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

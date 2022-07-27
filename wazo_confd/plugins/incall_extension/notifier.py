@@ -23,14 +23,14 @@ class IncallExtensionNotifier:
         event = IncallExtensionAssociatedEvent(
             incall.id, extension.id, incall.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, incall, extension):
         self.send_sysconfd_handlers()
         event = IncallExtensionDissociatedEvent(
             incall.id, extension.id, incall.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

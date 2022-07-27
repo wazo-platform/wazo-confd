@@ -23,19 +23,19 @@ class AgentNotifier:
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
         event = AgentCreatedEvent(agent.id, agent.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
         event = AgentEditedEvent(agent.id, agent.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, agent):
         ipbx_command = 'module reload app_queue.so'
         self.send_sysconfd_handlers(ipbx_command)
         event = AgentDeletedEvent(agent.id, agent.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

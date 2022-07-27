@@ -22,17 +22,17 @@ class ParkingLotNotifier:
     def created(self, parking_lot):
         self.send_sysconfd_handlers()
         event = ParkingLotCreatedEvent(parking_lot.id, parking_lot.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, parking_lot):
         self.send_sysconfd_handlers()
         event = ParkingLotEditedEvent(parking_lot.id, parking_lot.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, parking_lot):
         self.send_sysconfd_handlers()
         event = ParkingLotDeletedEvent(parking_lot.id, parking_lot.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

@@ -23,17 +23,17 @@ class AccessFeatureNotifier:
     def created(self, access_feature):
         self.sysconfd.restart_phoned()
         event = AccessFeatureCreatedEvent(self.schema.dump(access_feature))
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, access_feature):
         self.sysconfd.restart_phoned()
         event = AccessFeatureEditedEvent(self.schema.dump(access_feature))
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, access_feature):
         self.sysconfd.restart_phoned()
         event = AccessFeatureDeletedEvent(self.schema.dump(access_feature))
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

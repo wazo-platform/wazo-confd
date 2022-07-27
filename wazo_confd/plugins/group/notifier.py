@@ -27,19 +27,19 @@ class GroupNotifier:
         self.send_sysconfd_handlers()
         group_payload = GroupSchema(only=GROUP_FIELDS).dump(group)
         event = GroupCreatedEvent(group_payload, group.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, group):
         self.send_sysconfd_handlers()
         group_payload = GroupSchema(only=GROUP_FIELDS).dump(group)
         event = GroupEditedEvent(group_payload, group.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, group):
         self.send_sysconfd_handlers()
         group_payload = GroupSchema(only=GROUP_FIELDS).dump(group)
         event = GroupDeletedEvent(group_payload, group.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

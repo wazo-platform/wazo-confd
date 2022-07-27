@@ -22,13 +22,13 @@ class FeaturesConfigurationNotifier:
     def edited(self, section_name, features):
         if section_name == 'applicationmap':
             event = FeaturesApplicationmapEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
         elif section_name == 'featuremap':
             event = FeaturesFeaturemapEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
         elif section_name == 'general':
             event = FeaturesGeneralEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
         self.send_sysconfd_handlers(['module reload features'])
 

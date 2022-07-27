@@ -21,10 +21,10 @@ class RTPConfigurationNotifier:
     def edited(self, section_name, rtp):
         if section_name == 'general':
             event = RTPGeneralEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
         elif section_name == 'ice_host_candidates':
             event = RTPIceHostCandidatesEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
         self.send_sysconfd_handlers(['module reload res_rtp_asterisk.so'])
 

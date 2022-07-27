@@ -11,20 +11,25 @@ from wazo_confd import bus
 
 
 class DeviceNotifier:
-    def __init__(self, bus):
+    def __init__(self, bus, immediate=False):
         self.bus = bus
+        self.immediate = immediate
 
     def created(self, device):
         event = DeviceCreatedEvent(device.id, device.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.send_bus_event(event)
 
     def edited(self, device):
         event = DeviceEditedEvent(device.id, device.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.send_bus_event(event)
 
     def deleted(self, device):
         event = DeviceDeletedEvent(device.id, device.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.send_bus_event(event)
+
+    @property
+    def send_bus_event(self):
+        return self.bus.publish if self.immediate else self.bus.queue_event
 
 
 def build_notifier():

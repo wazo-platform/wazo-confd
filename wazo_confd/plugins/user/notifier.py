@@ -37,7 +37,7 @@ class UserNotifier:
             user.created_at,
             user.tenant_uuid,
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, user):
         self.send_sysconfd_handlers()
@@ -48,7 +48,7 @@ class UserNotifier:
             user.created_at,
             user.tenant_uuid,
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, user):
         self.send_sysconfd_handlers()
@@ -59,7 +59,7 @@ class UserNotifier:
             user.created_at,
             user.tenant_uuid,
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():
@@ -77,7 +77,7 @@ class UserServiceNotifier:
             event = UserServiceEditedEvent(
                 user.id, type_, service['enabled'], user.tenant_uuid, user.uuid
             )
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
 
 def build_notifier_service():
@@ -101,7 +101,7 @@ class UserForwardNotifier:
                 user.uuid,
             )
 
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
 
 def build_notifier_forward():

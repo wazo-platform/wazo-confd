@@ -26,12 +26,12 @@ class LineExtensionNotifier:
     def associated(self, line, extension):
         self.send_sysconfd_handlers()
         event = LineExtensionAssociatedEvent(line.id, extension.id, line.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, line, extension):
         self.send_sysconfd_handlers()
         event = LineExtensionDissociatedEvent(line.id, extension.id, line.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

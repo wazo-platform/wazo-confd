@@ -23,14 +23,14 @@ class GroupExtensionNotifier:
         event = GroupExtensionAssociatedEvent(
             group.id, group.uuid, extension.id, group.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, group, extension):
         self.send_sysconfd_handlers()
         event = GroupExtensionDissociatedEvent(
             group.id, group.uuid, extension.id, group.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

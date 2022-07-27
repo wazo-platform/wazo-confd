@@ -16,15 +16,15 @@ class OutcallNotifier:
 
     def created(self, outcall):
         event = OutcallCreatedEvent(outcall.id, outcall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, outcall):
         event = OutcallEditedEvent(outcall.id, outcall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, outcall):
         event = OutcallDeletedEvent(outcall.id, outcall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

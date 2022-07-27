@@ -37,20 +37,20 @@ class LineNotifier:
         self.send_sysconfd_handlers()
         serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
         event = LineCreatedEvent(serialized_line, line.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, line, updated_fields):
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers()
         serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
         event = LineEditedEvent(serialized_line, line.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, line):
         self.send_sysconfd_handlers()
         serialized_line = LineSchema(only=LINE_FIELDS).dump(line)
         event = LineDeletedEvent(serialized_line, line.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

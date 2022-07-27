@@ -17,13 +17,13 @@ class OutcallCallPermissionNotifier:
         event = OutcallCallPermissionAssociatedEvent(
             outcall.id, call_permission.id, outcall.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, outcall, call_permission):
         event = OutcallCallPermissionDissociatedEvent(
             outcall.id, call_permission.id, outcall.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

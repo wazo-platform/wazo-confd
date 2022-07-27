@@ -17,7 +17,7 @@ class SCCPGeneralNotifier:
 
     def edited(self, sccp_general):
         event = SCCPGeneralEditedEvent()
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['module reload chan_sccp.so'])
 
 

@@ -26,13 +26,13 @@ class Notifier:
         event = MeetingAuthorizationCreatedEvent(
             payload, meeting.uuid, meeting.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.publish(event)
 
         for owner_uuid in meeting.owner_uuids:
             event = MeetingUserAuthorizationCreatedEvent(
                 payload, meeting.uuid, meeting.tenant_uuid, owner_uuid
             )
-            self.bus.send_bus_event(event)
+            self.bus.publish(event)
 
     def edited(self, meeting_authorization):
         meeting = meeting_authorization.meeting
@@ -40,13 +40,13 @@ class Notifier:
         event = MeetingAuthorizationEditedEvent(
             payload, meeting.uuid, meeting.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.publish(event)
 
         for owner_uuid in meeting.owner_uuids:
             event = MeetingUserAuthorizationEditedEvent(
                 payload, meeting.uuid, meeting.tenant_uuid, owner_uuid
             )
-            self.bus.send_bus_event(event)
+            self.bus.publish(event)
 
     def deleted(self, meeting_authorization):
         meeting = meeting_authorization.meeting
@@ -54,13 +54,13 @@ class Notifier:
         event = MeetingAuthorizationDeletedEvent(
             payload, meeting.uuid, meeting.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.publish(event)
 
         for owner_uuid in meeting.owner_uuids:
             event = MeetingUserAuthorizationDeletedEvent(
                 payload, meeting.uuid, meeting.tenant_uuid, owner_uuid
             )
-            self.bus.send_bus_event(event)
+            self.bus.publish(event)
 
     def _schema(self):
         return self._schema_instance

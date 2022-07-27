@@ -18,7 +18,7 @@ class HEPConfigurationNotifier:
     def edited(self, section_name, hep):
         if section_name == 'general':
             event = HEPGeneralEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
         self.send_sysconfd_handlers(['module reload res_hep.so'])
 

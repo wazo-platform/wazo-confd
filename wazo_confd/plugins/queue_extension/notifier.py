@@ -21,14 +21,14 @@ class QueueExtensionNotifier:
     def associated(self, queue, extension):
         self.send_sysconfd_handlers()
         event = QueueExtensionAssociatedEvent(queue.id, extension.id, queue.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, queue, extension):
         self.send_sysconfd_handlers()
         event = QueueExtensionDissociatedEvent(
             queue.id, extension.id, queue.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

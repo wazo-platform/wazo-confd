@@ -11,7 +11,7 @@ class QueueFallbackNotifier:
 
     def edited(self, queue):
         event = QueueFallbackEditedEvent(queue.id, queue.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

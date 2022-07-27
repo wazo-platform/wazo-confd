@@ -31,19 +31,19 @@ class IAXEndpointNotifier:
     def created(self, iax):
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(iax)
         event = IAXEndpointCreatedEvent(iax_serialized, iax.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, iax):
         self.send_sysconfd_handlers()
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(iax)
         event = IAXEndpointEditedEvent(iax_serialized, iax.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, iax):
         self.send_sysconfd_handlers()
         iax_serialized = IAXSchema(only=ENDPOINT_IAX_FIELDS).dump(iax)
         event = IAXEndpointDeletedEvent(iax_serialized, iax.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

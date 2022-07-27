@@ -17,13 +17,13 @@ class TrunkRegisterIAXNotifier:
         event = TrunkRegisterIAXAssociatedEvent(
             trunk.id, register.id, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, trunk, register):
         event = TrunkRegisterIAXDissociatedEvent(
             trunk.id, register.id, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier_iax():

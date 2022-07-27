@@ -12,7 +12,7 @@ class WizardNotifier:
 
     def created(self):
         event = WizardCreatedEvent()
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

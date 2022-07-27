@@ -12,7 +12,7 @@ class CallFilterFallbackNotifier:
 
     def edited(self, call_filter):
         event = CallFilterFallbackEditedEvent(call_filter.id, call_filter.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

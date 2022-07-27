@@ -14,7 +14,7 @@ class SwitchboardMemberUserNotifier:
         event = SwitchboardMemberUserAssociatedEvent(
             switchboard.uuid, switchboard.tenant_uuid, user_uuids
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

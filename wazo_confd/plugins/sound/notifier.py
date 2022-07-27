@@ -11,11 +11,11 @@ class SoundNotifier:
 
     def created(self, sound):
         event = SoundCreatedEvent(sound.name, sound.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, sound):
         event = SoundDeletedEvent(sound.name, sound.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

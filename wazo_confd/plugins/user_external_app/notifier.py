@@ -21,17 +21,17 @@ class UserExternalAppNotifier:
     def created(self, app, tenant_uuid):
         payload = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = UserExternalAppCreatedEvent(payload, tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, app, tenant_uuid):
         payload = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = UserExternalAppEditedEvent(payload, tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, app, tenant_uuid):
         payload = UserExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = UserExternalAppDeletedEvent(payload, tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

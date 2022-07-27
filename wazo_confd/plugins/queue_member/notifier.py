@@ -18,7 +18,7 @@ class QueueMemberNotifier:
 
     def _send_agent_edited(self, agent):
         event = AgentEditedEvent(agent.id, agent.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def send_sysconfd_handlers(self, ipbx_command=[]):
         handlers = {'ipbx': ipbx_command}
@@ -28,21 +28,21 @@ class QueueMemberNotifier:
         event = QueueMemberAgentAssociatedEvent(
             queue.id, member.agent.id, member.penalty, queue.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self._send_agent_edited(member.agent)
 
     def agent_dissociated(self, queue, member):
         event = QueueMemberAgentDissociatedEvent(
             queue.id, member.agent.id, queue.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self._send_agent_edited(member.agent)
 
     def user_associated(self, queue, member):
         event = QueueMemberUserAssociatedEvent(
             queue.id, queue.tenant_uuid, member.user.id
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(
             ipbx_command=[
                 'module reload res_pjsip.so',
@@ -55,7 +55,7 @@ class QueueMemberNotifier:
         event = QueueMemberUserDissociatedEvent(
             queue.id, queue.tenant_uuid, member.user.id
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(
             ipbx_command=[
                 'module reload res_pjsip.so',

@@ -12,7 +12,7 @@ class GroupFallbackNotifier:
 
     def edited(self, group):
         event = GroupFallbackEditedEvent(group.id, group.uuid, group.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

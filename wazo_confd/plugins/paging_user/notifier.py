@@ -18,14 +18,14 @@ class PagingUserNotifier:
         event = PagingCallerUsersAssociatedEvent(
             paging.id, user_uuids, paging.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def members_associated(self, paging, users):
         user_uuids = [user.uuid for user in users]
         event = PagingMemberUsersAssociatedEvent(
             paging.id, user_uuids, paging.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

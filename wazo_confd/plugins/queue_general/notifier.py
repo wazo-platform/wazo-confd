@@ -16,7 +16,7 @@ class QueueGeneralNotifier:
 
     def edited(self, queue_general):
         event = QueueGeneralEditedEvent()
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['module reload app_queue.so'])
 
 

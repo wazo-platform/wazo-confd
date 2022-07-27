@@ -49,7 +49,7 @@ class LineEndpointSIPNotifier:
         event = LineEndpointSIPAssociatedEvent(
             line_serialized, sip_serialized, line.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -57,7 +57,7 @@ class LineEndpointSIPNotifier:
         event = LineEndpointSIPDissociatedEvent(
             line_serialized, sip_serialized, line.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 class LineEndpointSCCPNotifier:
@@ -71,7 +71,7 @@ class LineEndpointSCCPNotifier:
         event = LineEndpointSCCPAssociatedEvent(
             line_serialized, sccp_serialized, line.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -79,7 +79,7 @@ class LineEndpointSCCPNotifier:
         event = LineEndpointSCCPDissociatedEvent(
             line_serialized, sccp_serialized, line.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 class LineEndpointCustomNotifier:
@@ -93,7 +93,7 @@ class LineEndpointCustomNotifier:
         event = LineEndpointCustomAssociatedEvent(
             line_serialized, custom_serialized, line.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -101,7 +101,7 @@ class LineEndpointCustomNotifier:
         event = LineEndpointCustomDissociatedEvent(
             line_serialized, custom_serialized, line.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier_sip():

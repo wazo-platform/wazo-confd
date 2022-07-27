@@ -22,17 +22,17 @@ class RegisterIAXNotifier:
     def created(self, register):
         self.send_sysconfd_handlers()
         event = RegisterIAXCreatedEvent(register.id)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, register):
         self.send_sysconfd_handlers()
         event = RegisterIAXEditedEvent(register.id)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, register):
         self.send_sysconfd_handlers()
         event = RegisterIAXDeletedEvent(register.id)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

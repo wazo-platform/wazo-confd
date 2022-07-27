@@ -19,17 +19,17 @@ class IngressHTTPNotifier:
     def created(self, ingress_http):
         serialized = IngressHTTPSchema().dump(ingress_http)
         event = IngressHTTPCreatedEvent(serialized, ingress_http.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, ingress_http):
         serialized = IngressHTTPSchema().dump(ingress_http)
         event = IngressHTTPEditedEvent(serialized, ingress_http.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, ingress_http):
         serialized = IngressHTTPSchema().dump(ingress_http)
         event = IngressHTTPDeletedEvent(serialized, ingress_http.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

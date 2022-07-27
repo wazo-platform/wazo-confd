@@ -11,6 +11,6 @@ class DHCPNotifier:
 
     def edited(self):
         event = DHCPEditedEvent()
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.sysconfd.commonconf_generate()
         self.sysconfd.commonconf_apply()

@@ -30,19 +30,19 @@ class SccpEndpointNotifier:
     def created(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         event = SCCPEndpointCreatedEvent(sccp_serialized, sccp.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         self.send_sysconfd_handlers()
         event = SCCPEndpointEditedEvent(sccp_serialized, sccp.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, sccp):
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(sccp)
         self.send_sysconfd_handlers()
         event = SCCPEndpointDeletedEvent(sccp_serialized, sccp.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

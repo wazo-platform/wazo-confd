@@ -28,7 +28,7 @@ class CallPickupMemberNotifier:
         event = CallPickupInterceptorGroupsAssociatedEvent(
             call_pickup.id, group_ids, call_pickup.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def target_groups_associated(self, call_pickup, groups):
         self.send_sysconfd_handlers()
@@ -36,7 +36,7 @@ class CallPickupMemberNotifier:
         event = CallPickupTargetGroupsAssociatedEvent(
             call_pickup.id, group_ids, call_pickup.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def interceptor_users_associated(self, call_pickup, users):
         self.send_sysconfd_handlers()
@@ -44,7 +44,7 @@ class CallPickupMemberNotifier:
         event = CallPickupInterceptorUsersAssociatedEvent(
             call_pickup.id, user_uuids, call_pickup.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def target_users_associated(self, call_pickup, users):
         self.send_sysconfd_handlers()
@@ -52,7 +52,7 @@ class CallPickupMemberNotifier:
         event = CallPickupTargetUsersAssociatedEvent(
             call_pickup.id, user_uuids, call_pickup.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

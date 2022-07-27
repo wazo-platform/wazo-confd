@@ -27,17 +27,17 @@ class ApplicationNotifier:
     def created(self, application):
         app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = ApplicationCreatedEvent(app_serialized, application.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, application):
         app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = ApplicationEditedEvent(app_serialized, application.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, application):
         app_serialized = ApplicationSchema(only=APPLICATION_FIELDS).dump(application)
         event = ApplicationDeletedEvent(app_serialized, application.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

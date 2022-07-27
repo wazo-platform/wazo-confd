@@ -23,16 +23,16 @@ class CallPickupNotifier:
 
     def created(self, call_pickup):
         event = CallPickupCreatedEvent(call_pickup.id, call_pickup.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, call_pickup):
         event = CallPickupEditedEvent(call_pickup.id, call_pickup.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, call_pickup):
         self.send_sysconfd_handlers()
         event = CallPickupDeletedEvent(call_pickup.id, call_pickup.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

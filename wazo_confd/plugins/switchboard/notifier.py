@@ -20,21 +20,21 @@ class SwitchboardNotifier:
         event = SwitchboardCreatedEvent(
             payload, switchboard.uuid, switchboard.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, switchboard):
         payload = SwitchboardSchema().dump(switchboard)
         event = SwitchboardEditedEvent(
             payload, switchboard.uuid, switchboard.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, switchboard):
         payload = SwitchboardSchema().dump(switchboard)
         event = SwitchboardDeletedEvent(
             payload, switchboard.uuid, switchboard.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

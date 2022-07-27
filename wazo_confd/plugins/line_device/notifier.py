@@ -37,7 +37,7 @@ class LineDeviceNotifier:
         event = LineDeviceAssociatedEvent(
             line_serialized, device_serialized, line.tenant_uuid
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def dissociated(self, line, device):
         self._reload_sccp(line)
@@ -47,7 +47,7 @@ class LineDeviceNotifier:
         event = LineDeviceDissociatedEvent(
             line_serialized, device_serialized, line.tenant_uuid
         )
-        self._bus.send_bus_event(event)
+        self._bus.queue_event(event)
 
     def _reload_sccp(self, line):
         if line.endpoint_sccp_id:

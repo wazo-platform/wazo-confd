@@ -61,7 +61,7 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         event = TrunkEndpointSIPAssociatedEvent(
             trunk_serialized, sip_serialized, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, trunk, endpoint):
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
@@ -71,7 +71,7 @@ class TrunkEndpointSIPNotifier(TrunkEndpointNotifier):
         event = TrunkEndpointSIPDissociatedEvent(
             trunk_serialized, sip_serialized, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
@@ -83,7 +83,7 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
         event = TrunkEndpointIAXAssociatedEvent(
             trunk_serialized, iax_serialized, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, trunk, endpoint):
         self.send_sysconfd_handlers(['iax2 reload'])
@@ -93,7 +93,7 @@ class TrunkEndpointIAXNotifier(TrunkEndpointNotifier):
         event = TrunkEndpointIAXDissociatedEvent(
             trunk_serialized, iax_serialized, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
@@ -103,7 +103,7 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
         event = TrunkEndpointCustomAssociatedEvent(
             trunk_serialized, custom_serialized, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, trunk, endpoint):
         trunk_serialized = TrunkSchema(only=TRUNK_FIELDS).dump(trunk)
@@ -111,7 +111,7 @@ class TrunkEndpointCustomNotifier(TrunkEndpointNotifier):
         event = TrunkEndpointCustomDissociatedEvent(
             trunk_serialized, custom_serialized, trunk.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier_sip():

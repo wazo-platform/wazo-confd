@@ -23,7 +23,7 @@ class VoicemailNotifier:
     def created(self, voicemail):
         self._send_sysconfd_handlers(['voicemail reload'])
         event = VoicemailCreatedEvent(voicemail.id, voicemail.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, voicemail):
         self._send_sysconfd_handlers(
@@ -34,18 +34,18 @@ class VoicemailNotifier:
             ]
         )
         event = VoicemailEditedEvent(voicemail.id, voicemail.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
         for user in voicemail.users:
             event = UserVoicemailEditedEvent(
                 voicemail.id, voicemail.tenant_uuid, user.uuid
             )
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
     def deleted(self, voicemail):
         self._send_sysconfd_handlers(['voicemail reload'])
         event = VoicemailDeletedEvent(voicemail.id, voicemail.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

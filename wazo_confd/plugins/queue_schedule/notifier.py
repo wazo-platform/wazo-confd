@@ -15,11 +15,11 @@ class QueueScheduleNotifier:
 
     def associated(self, queue, schedule):
         event = QueueScheduleAssociatedEvent(queue.id, schedule.id, queue.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, queue, schedule):
         event = QueueScheduleDissociatedEvent(queue.id, schedule.id, queue.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

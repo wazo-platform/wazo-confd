@@ -16,7 +16,7 @@ class VoicemailGeneralNotifier:
 
     def edited(self, voicemail_general):
         event = VoicemailGeneralEditedEvent()
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['voicemail reload'])
 
 

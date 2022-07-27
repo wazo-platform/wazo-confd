@@ -19,14 +19,14 @@ class RegistrarNotifier:
     def created(self, registrar):
         payload = self.schema.dump(registrar)
         event = RegistrarCreatedEvent(payload)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, registrar):
         payload = self.schema.dump(registrar)
         event = RegistrarEditedEvent(payload)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, registrar):
-        payload = self.schema().dump(registrar)
+        payload = self.schema.dump(registrar)
         event = RegistrarDeletedEvent(payload)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)

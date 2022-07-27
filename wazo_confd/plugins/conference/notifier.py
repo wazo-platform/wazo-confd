@@ -22,17 +22,17 @@ class ConferenceNotifier:
     def created(self, conference):
         self.send_sysconfd_handlers()
         event = ConferenceCreatedEvent(conference.id, conference.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, conference):
         self.send_sysconfd_handlers()
         event = ConferenceEditedEvent(conference.id, conference.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, conference):
         self.send_sysconfd_handlers()
         event = ConferenceDeletedEvent(conference.id, conference.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

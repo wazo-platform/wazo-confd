@@ -16,15 +16,15 @@ class SkillNotifier:
 
     def created(self, skill):
         event = SkillCreatedEvent(skill.id, skill.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, skill):
         event = SkillEditedEvent(skill.id, skill.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, skill):
         event = SkillDeletedEvent(skill.id, skill.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

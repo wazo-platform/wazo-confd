@@ -21,10 +21,10 @@ class ConfBridgeConfigurationNotifier:
     def edited(self, section_name, confbridge):
         if section_name == 'wazo_default_bridge':
             event = ConfBridgeWazoDefaultBridgeEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
         elif section_name == 'wazo_default_user':
             event = ConfBridgeWazoDefaultUserEditedEvent()
-            self.bus.send_bus_event(event)
+            self.bus.queue_event(event)
 
         self.send_sysconfd_handlers(['module reload app_confbridge.so'])
 

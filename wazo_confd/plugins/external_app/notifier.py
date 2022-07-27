@@ -21,17 +21,17 @@ class ExternalAppNotifier:
     def created(self, app):
         app_serialized = ExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = ExternalAppCreatedEvent(app_serialized, app.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, app):
         app_serialized = ExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = ExternalAppEditedEvent(app_serialized, app.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, app):
         app_serialized = ExternalAppSchema(only=ONLY_FIELDS).dump(app)
         event = ExternalAppDeletedEvent(app_serialized, app.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

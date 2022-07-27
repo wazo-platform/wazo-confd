@@ -38,19 +38,19 @@ class SipEndpointNotifier:
     def created(self, sip):
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = SIPEndpointCreatedEvent(sip_serialized, sip.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = SIPEndpointEditedEvent(sip_serialized, sip.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
         event = SIPEndpointDeletedEvent(sip_serialized, sip.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 class SipTemplateNotifier:
@@ -64,17 +64,17 @@ class SipTemplateNotifier:
 
     def created(self, sip):
         event = SIPEndpointTemplateCreatedEvent({}, sip.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
         event = SIPEndpointTemplateEditedEvent({}, sip.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
         event = SIPEndpointTemplateDeletedEvent({}, sip.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_endpoint_notifier():

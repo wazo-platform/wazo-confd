@@ -24,7 +24,7 @@ class ExtensionNotifier:
         event = ExtensionCreatedEvent(
             extension.id, extension.exten, extension.context, extension.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, extension, updated_fields):
         if updated_fields is None or updated_fields:
@@ -39,14 +39,14 @@ class ExtensionNotifier:
         event = ExtensionEditedEvent(
             extension.id, extension.exten, extension.context, extension.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, extension):
         self.send_sysconfd_handlers(['dialplan reload'])
         event = ExtensionDeletedEvent(
             extension.id, extension.exten, extension.context, extension.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

@@ -23,14 +23,14 @@ class AgentSkillNotifier:
         event = AgentSkillAssociatedEvent(
             skill.id, agent_skill.skill.id, skill.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def skill_dissociated(self, skill, agent_skill):
         self.send_sysconfd_handlers()
         event = AgentSkillDissociatedEvent(
             skill.id, agent_skill.skill.id, skill.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

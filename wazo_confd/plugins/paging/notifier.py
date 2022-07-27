@@ -16,15 +16,15 @@ class PagingNotifier:
 
     def created(self, paging):
         event = PagingCreatedEvent(paging.id, paging.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, paging):
         event = PagingEditedEvent(paging.id, paging.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, paging):
         event = PagingDeletedEvent(paging.id, paging.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

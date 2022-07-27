@@ -16,15 +16,15 @@ class IncallNotifier:
 
     def created(self, incall):
         event = IncallCreatedEvent(incall.id, incall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, incall):
         event = IncallEditedEvent(incall.id, incall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, incall):
         event = IncallDeletedEvent(incall.id, incall.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

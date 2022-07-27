@@ -15,11 +15,11 @@ class UserAgentNotifier:
 
     def associated(self, user, agent):
         event = UserAgentAssociatedEvent(agent.id, user.tenant_uuid, user.uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, user, agent):
         event = UserAgentDissociatedEvent(agent.id, user.tenant_uuid, user.uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

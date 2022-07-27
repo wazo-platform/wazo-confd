@@ -22,17 +22,17 @@ class SkillRuleNotifier:
     def created(self, skill_rule):
         self.send_sysconfd_handlers()
         event = SkillRuleCreatedEvent(skill_rule.id, skill_rule.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def edited(self, skill_rule):
         self.send_sysconfd_handlers()
         event = SkillRuleEditedEvent(skill_rule.id, skill_rule.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def deleted(self, skill_rule):
         self.send_sysconfd_handlers()
         event = SkillRuleDeletedEvent(skill_rule.id, skill_rule.tenant_uuid)
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

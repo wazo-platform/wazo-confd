@@ -23,14 +23,14 @@ class ParkingLotExtensionNotifier:
         event = ParkingLotExtensionAssociatedEvent(
             parking_lot.id, extension.id, parking_lot.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
     def dissociated(self, parking_lot, extension):
         self.send_sysconfd_handlers()
         event = ParkingLotExtensionDissociatedEvent(
             parking_lot.id, extension.id, parking_lot.tenant_uuid
         )
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
 
 
 def build_notifier():
