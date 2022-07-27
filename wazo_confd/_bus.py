@@ -1,108 +1,47 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import kombu
-import logging
+from collections import deque
 
-from contextlib import contextmanager
-from threading import Thread
-
-from kombu.mixins import ConsumerMixin
-from xivo_bus import Marshaler, FailFastPublisher
-from xivo.pubsub import Pubsub
-
-logger = logging.getLogger(__name__)
+from xivo_bus.mixins import PublisherMixin, WazoEventMixin
+from xivo_bus.base import Base
 
 
-class BusPublisher:
-    @classmethod
-    def from_config(cls, bus_config, wazo_uuid):
-        bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(**bus_config)
-        bus_connection = kombu.Connection(bus_url)
-        bus_exchange = kombu.Exchange(
-            bus_config['exchange_name'], type=bus_config['exchange_type']
-        )
-        bus_producer = kombu.Producer(
-            bus_connection, exchange=bus_exchange, auto_declare=True
-        )
-        bus_marshaler = Marshaler(wazo_uuid)
-        bus_publisher = FailFastPublisher(bus_producer, bus_marshaler)
-        return cls(bus_publisher)
+class FlushMixin:
+    __saved_state = {}
 
-    def __init__(self, publisher):
-        self._publisher = publisher
-        self.messages = []
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.__deque = deque()
 
-    def send_bus_event(self, event, headers=None):
-        self.messages.append((event, headers))
+    def queue_event(self, event, *, extra_headers=None, routing_key_override=None):
+        self.__deque.append((event, extra_headers, routing_key_override))
 
     def flush(self):
-        for event, headers in self.messages:
-            self._publisher.publish(event, headers)
-        self.messages.clear()
+        while self.__deque:
+            event, extra_headers, routing_key = self.__deque.popleft()
+            self.publish(event, headers=extra_headers, routing_key=routing_key)
 
     def rollback(self):
-        self.messages.clear()
+        self.__deque.clear()
+
+    def set_as_reference(self):
+        type(self).__saved_state = self.__dict__
+
+    @classmethod
+    def from_reference(cls):
+        if not cls.__saved_state:
+            raise ValueError('a reference must be set before using this constructor')
+
+        obj = cls.__new__(cls)
+        obj.__dict__ = dict(cls.__saved_state)
+        obj.__deque = deque()
+        return obj
 
 
-class InstantBusPublisher(BusPublisher):
-    def send_bus_event(self, *args, **kwargs):
-        super().send_bus_event(*args, **kwargs)
-        super().flush()
-
-
-@contextmanager
-def bus_consumer_thread(bus_consumer):
-    thread_name = 'bus_consumer_thread'
-    thread = Thread(target=bus_consumer.run, name=thread_name)
-    thread.start()
-    try:
-        yield
-    finally:
-        logger.debug('stopping bus consumer thread')
-        bus_consumer.should_stop = True
-        thread.join()
-
-
-class BusConsumer(ConsumerMixin):
-    def __init__(self, bus_config):
-        self._bus_url = 'amqp://{username}:{password}@{host}:{port}//'.format(
-            **bus_config
-        )
-        self._exchange = kombu.Exchange(
-            bus_config['subscribe_exchange_name'], type='headers'
-        )
-        self._queue = kombu.Queue(exclusive=True)
-        self._pubsub = Pubsub()
-
-    def run(self):
-        logger.info("Running AMQP consumer")
-        with kombu.Connection(self._bus_url) as connection:
-            self.connection = connection  # For internal usage
-            super().run()
-
-    def get_consumers(self, Consumer, channel):
-        return [Consumer(self._queue, callbacks=[self._on_bus_message])]
-
-    def on_event(self, event_name, callback):
-        logger.debug('Added callback on event "%s"', event_name)
-        arguments = {'x-match': 'all', 'name': event_name}
-        self._queue.bindings.add(kombu.binding(self._exchange, arguments=arguments))
-        self._pubsub.subscribe(event_name, callback)
-
-    def _on_bus_message(self, body, message):
-        try:
-            event_type = body['name']
-            event = body['data']
-        except KeyError:
-            logger.error('Invalid event message received: %s', event)
-            message.reject()
-            return
-
-        try:
-            self._pubsub.publish(event_type, event)
-        except Exception:
-            message.reject()
-            return
-
-        message.ack()
+class BusPublisher(WazoEventMixin, FlushMixin, PublisherMixin, Base):
+    @classmethod
+    def from_config(cls, config):
+        uuid = config['uuid']
+        bus = config['bus']
+        return cls(name='wazo-confd', service_uuid=uuid, **bus)
