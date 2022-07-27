@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .resource import (
@@ -9,7 +9,6 @@ from .resource import (
     UserMeetingList,
 )
 from wazo_confd import bus, sysconfd
-from wazo_confd._bus import InstantBusPublisher
 from wazo_confd.plugins.endpoint_sip.service import (
     build_endpoint_service as build_endpoint_sip_service,
 )
@@ -35,7 +34,7 @@ class Plugin:
         api = dependencies['api']
         auth_client = dependencies['auth_client']
         bus_consumer = dependencies['bus_consumer']
-        config = dependencies['config']
+        bus_publisher = dependencies['bus_publisher']
         pjsip_doc = dependencies['pjsip_doc']
 
         ingress_http_service = build_ingress_http_service()
@@ -45,15 +44,12 @@ class Plugin:
         )
         service = build_service(api_notifier)
 
-        instant_bus_publisher = InstantBusPublisher.from_config(
-            config['bus'],
-            config['uuid'],
-        )
         bus_notifier = Notifier(
-            instant_bus_publisher,
+            bus_publisher,
             sysconfd,
             ingress_http_service,
             extension_features_service,
+            immediate=True,
         )
         bus_event_handler = MeetingBusEventHandler(service, bus_notifier)
         bus_event_handler.subscribe(bus_consumer)

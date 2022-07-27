@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -12,7 +12,7 @@ class MeetingBusEventHandler:
         self._notifier = notifier
 
     def subscribe(self, bus_consumer):
-        bus_consumer.on_event(
+        bus_consumer.subscribe(
             'request_handlers_progress', self.on_request_handlers_progress
         )
 
