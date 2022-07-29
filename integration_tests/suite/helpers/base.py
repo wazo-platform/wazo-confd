@@ -215,9 +215,14 @@ class IntegrationTest(AssetLaunchingTestCase):
         return client
 
     @classmethod
-    def create_bus(cls):
+    def create_bus(cls, exchange_name=None, exchange_type=None):
         port = cls.service_port(5672, 'rabbitmq')
-        client = BusClient.from_connection_fields(host='127.0.0.1', port=port)
+        client = BusClient.from_connection_fields(
+            host='127.0.0.1',
+            port=port,
+            exchange_name=exchange_name,
+            exchange_type=exchange_type,
+        )
         return client
 
     @classmethod

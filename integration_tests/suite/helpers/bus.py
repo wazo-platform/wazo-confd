@@ -1,6 +1,7 @@
 # Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from kombu import Exchange, Connection
 from wazo_test_helpers import bus
 
 
@@ -64,16 +65,18 @@ class BusClientWrapper:
 
 
 BusClient = BusClientWrapper()
-BusClientHeaders = BusClientWrapper()
 
 
 def setup_bus(host, port):
+    # Register `xivo(topic)` -> `wazo-headers(headers)``
+    with Connection(hostname=host, port=port) as connection:
+        topic = Exchange('xivo', 'topic', channel=connection)
+        topic.declare()
+        headers = Exchange('wazo-headers', 'headers', channel=connection)
+        headers.declare()
+        headers.bind_to(topic, routing_key='#')
+
     BusClient.host = host
     BusClient.port = port
-    BusClient.exchange_name = 'xivo'
-    BusClient.exchange_type = 'topic'
-
-    BusClientHeaders.host = host
-    BusClientHeaders.port = port
-    BusClientHeaders.exchange_name = 'wazo-headers'
-    BusClientHeaders.exchange_type = 'headers'
+    BusClient.exchange_name = 'wazo-headers'
+    BusClient.exchange_type = 'headers'
