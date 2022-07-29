@@ -50,8 +50,10 @@ DEFAULT_CONFIG = {
         'port': 5672,
         'exchange_name': 'xivo',
         'exchange_type': 'topic',
-        'exchange_durable': True,
-        'subscribe_exchange_name': 'wazo-headers',
+        'subscribe': {
+            'exchange_name': 'wazo-headers',
+            'exchange_type': 'headers',
+        },
     },
     'consul': {'scheme': 'http', 'host': 'localhost', 'port': 8500},
     'provd': {'host': 'localhost', 'port': 8666, 'prefix': None, 'https': False},
