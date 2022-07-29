@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -180,4 +180,6 @@ def _update_user_fallbacks_with_nonexistent_destination(queue_id, destination):
 @fixtures.queue()
 def test_bus_events(queue):
     url = confd.queues(queue['id']).fallbacks.put
-    yield s.check_bus_event, 'config.queues.fallbacks.edited', url
+    headers = {'tenant_uuid': queue['tenant_uuid']}
+
+    yield s.check_event, 'queue_fallback_edited', headers, url

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -229,5 +229,7 @@ def test_delete_extension_associated_to_queue(extension, queue):
 @fixtures.queue()
 def test_bus_events(extension, queue):
     url = confd.queues(queue['id']).extensions(extension['id'])
-    yield s.check_bus_event, 'config.queues.extensions.updated', url.put
-    yield s.check_bus_event, 'config.queues.extensions.deleted', url.delete
+    headers = {'tenant_uuid': queue['tenant_uuid']}
+
+    yield s.check_event, 'queue_extension_associated', headers, url.put
+    yield s.check_event, 'queue_extension_dissociated', headers, url.delete

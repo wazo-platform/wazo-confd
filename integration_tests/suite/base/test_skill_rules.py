@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -236,11 +236,10 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.skill_rule()
 def test_bus_events(skill_rule):
-    required_body = {'name': 'SkillRule'}
-    yield s.check_bus_event, 'config.queues.skillrules.created', confd.queues.skillrules.post, required_body
-    yield s.check_bus_event, 'config.queues.skillrules.edited', confd.queues.skillrules(
-        skill_rule['id']
-    ).put
-    yield s.check_bus_event, 'config.queues.skillrules.deleted', confd.queues.skillrules(
-        skill_rule['id']
-    ).delete
+    url = confd.queues.skillrules(skill_rule['id'])
+    body = {'name': 'SkillRule'}
+    headers = {'tenant_uuid': skill_rule['tenant_uuid']}
+
+    yield s.check_event, 'skill_rule_created', headers, confd.queues.skillrules.post, body
+    yield s.check_event, 'skill_rule_edited', headers, url.put
+    yield s.check_event, 'skill_rule_deleted', headers, url.delete

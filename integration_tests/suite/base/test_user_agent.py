@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, empty, has_entries, not_
@@ -162,7 +162,13 @@ def test_delete_user_when_user_and_agent_associated(agent, user):
 @fixtures.agent()
 @fixtures.user()
 def test_bus_events(agent, user):
+    headers = {
+        'tenant_uuid': user['tenant_uuid'],
+        f'user_uuid:{user["uuid"]}': True,
+    }
+
     url = confd.users(user['id']).agents(agent['id']).put
-    yield s.check_bus_event, 'config.users.{}.agents.updated'.format(user['uuid']), url
+    yield s.check_event, 'user_agent_associated', headers, url
+
     url = confd.users(user['id']).agents.delete
-    yield s.check_bus_event, 'config.users.{}.agents.deleted'.format(user['uuid']), url
+    yield s.check_event, 'user_agent_dissociated', headers, url

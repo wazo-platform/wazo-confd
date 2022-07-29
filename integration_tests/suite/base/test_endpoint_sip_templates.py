@@ -505,18 +505,23 @@ def test_delete_template(template, sip):
 
 @fixtures.sip_template()
 def test_bus_events(sip):
+    headers = {'tenant_uuid': MAIN_TENANT}
+
     yield (
-        s.check_bus_event,
-        'config.sip_endpoint_template.created',
+        s.check_event,
+        'sip_endpoint_template_created',
+        headers,
         confd.endpoints.sip.templates.post,
     )
     yield (
-        s.check_bus_event,
-        'config.sip_endpoint_template.updated',
+        s.check_event,
+        'sip_endpoint_template_edited',
+        headers,
         confd.endpoints.sip.templates(sip['uuid']).put,
     )
     yield (
-        s.check_bus_event,
-        'config.sip_endpoint_template.deleted',
+        s.check_event,
+        'sip_endpoint_template_deleted',
+        headers,
         confd.endpoints.sip.templates(sip['uuid']).delete,
     )

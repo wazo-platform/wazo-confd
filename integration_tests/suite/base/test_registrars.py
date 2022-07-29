@@ -487,11 +487,10 @@ def test_restrict_only_master_tenant(registrar):
 
 @fixtures.registrar()
 def test_bus_events(registrar):
+    url = confd.registrars(registrar['id'])
     body = {'name': 'a', 'main_host': '1.2.3.4', 'proxy_main_host': '1.2.3.4'}
-    yield s.check_bus_event_ignore_headers, 'config.registrar.created', confd.registrars.post, body
-    yield s.check_bus_event_ignore_headers, 'config.registrar.edited', confd.registrars(
-        registrar['id']
-    ).put
-    yield s.check_bus_event_ignore_headers, 'config.registrar.deleted', confd.registrars(
-        registrar['id']
-    ).delete
+    headers = {}
+
+    yield s.check_event, 'registrar_created', headers, confd.registrars.post, body
+    yield s.check_event, 'registrar_edited', headers, url.put
+    yield s.check_event, 'registrar_deleted', headers, url.delete

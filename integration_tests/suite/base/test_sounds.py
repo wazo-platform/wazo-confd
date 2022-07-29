@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -675,7 +675,9 @@ def _new_sound_file_client():
 
 
 def test_bus_events():
-    yield s.check_bus_event, 'config.sounds.created', confd.sounds.post, {
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'sound_created', headers, confd.sounds.post, {
         'name': 'bus_event'
     }
-    yield s.check_bus_event, 'config.sounds.deleted', confd.sounds('bus_event').delete
+    yield s.check_event, 'sound_deleted', headers, confd.sounds('bus_event').delete

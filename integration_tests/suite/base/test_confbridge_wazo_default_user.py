@@ -57,6 +57,8 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.confbridge.wazo_default_user
-    yield s.check_bus_event_ignore_headers, 'config.confbridge_wazo_default_user.edited', url.put, {
+    headers = {}
+
+    yield s.check_event, 'confbridge_wazo_default_user_edited', headers, url.put, {
         'options': {}
     }

@@ -205,14 +205,11 @@ def test_restrict_only_master_tenant(transport):
 
 @fixtures.transport(name='original')
 def test_bus_events(transport):
-    yield s.check_bus_event_ignore_headers, 'config.sip.transports.created', confd.sip.transports.post, {
+    url = confd.sip.transports(transport['uuid'])
+    headers = {}
+
+    yield s.check_event, 'sip_transport_created', headers, confd.sip.transports.post, {
         'name': 'a-leaked-transport',
     }
-    yield s.check_bus_event_ignore_headers, 'config.sip.transports.edited', confd.sip.transports(
-        transport['uuid']
-    ).put, {
-        'name': 'new'
-    }
-    yield s.check_bus_event_ignore_headers, 'config.sip.transports.deleted', confd.sip.transports(
-        transport['uuid']
-    ).delete
+    yield s.check_event, 'sip_transport_edited', headers, url.put, {'name': 'new'}
+    yield s.check_event, 'sip_transport_deleted', headers, url.delete

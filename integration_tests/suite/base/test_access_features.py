@@ -166,13 +166,15 @@ def test_restrict_only_master_tenant(access):
 
 @fixtures.access_feature(host='1.2.3.0/24')
 def test_bus_events(access_feature):
-    yield s.check_bus_event_ignore_headers, 'config.access_feature.created', confd.access_features.post, {
+    expected_headers = {}
+
+    yield s.check_event, 'access_feature_created', expected_headers, confd.access_features.post, {
         'host': '9.2.4.0/24',
         'feature': 'phonebook',
     }
-    yield s.check_bus_event_ignore_headers, 'config.access_feature.edited', confd.access_features(
+    yield s.check_event, 'access_feature_edited', expected_headers, confd.access_features(
         access_feature['id']
     ).put
-    yield s.check_bus_event_ignore_headers, 'config.access_feature.deleted', confd.access_features(
+    yield s.check_event, 'access_feature_deleted', expected_headers, confd.access_features(
         access_feature['id']
     ).delete

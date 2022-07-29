@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -107,4 +107,9 @@ def test_bus_events(group, user, line):
     with a.user_line(user, line):
         url = confd.users(user['uuid']).groups.put
         body = {'groups': [group]}
-        yield s.check_bus_event, 'config.users.groups.updated', url, body
+        headers = {
+            'tenant_uuid': user['tenant_uuid'],
+            f'user_uuid:{user["uuid"]}': True,
+        }
+
+        yield s.check_event, 'user_groups_associated', headers, url, body

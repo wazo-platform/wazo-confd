@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -343,9 +343,11 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.ivr()
 def test_bus_events(ivr):
-    yield s.check_bus_event, 'config.ivr.created', confd.ivr.post, {
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'ivr_created', headers, confd.ivr.post, {
         'name': 'a',
         'menu_sound': 'hello',
     }
-    yield s.check_bus_event, 'config.ivr.edited', confd.ivr(ivr['id']).put
-    yield s.check_bus_event, 'config.ivr.deleted', confd.ivr(ivr['id']).delete
+    yield s.check_event, 'ivr_edited', headers, confd.ivr(ivr['id']).put
+    yield s.check_event, 'ivr_deleted', headers, confd.ivr(ivr['id']).delete

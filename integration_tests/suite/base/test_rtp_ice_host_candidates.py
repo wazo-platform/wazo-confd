@@ -57,6 +57,8 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.rtp.ice_host_candidates
-    yield s.check_bus_event_ignore_headers, 'config.rtp_ice_host_candidates.edited', url.put, {
+    headers = {}
+
+    yield s.check_event, 'rtp_ice_host_candidates_edited', headers, url.put, {
         'options': {}
     }

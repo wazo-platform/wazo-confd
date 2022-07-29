@@ -540,27 +540,30 @@ def test_delete_multi_tenant(_, __, main, sub):
 @fixtures.ingress_http()
 @fixtures.meeting()
 def test_bus_events(_, meeting):
-    yield s.check_bus_event, 'config.meetings.created', confd.meetings.post, {
+    url = confd.meetings(meeting['uuid'])
+    headers = {'tenant_uuid': meeting['tenant_uuid']}
+
+    yield s.check_event, 'meeting_created', headers, confd.meetings.post, {
         'name': 'meeting'
     }
-    yield s.check_bus_event, 'config.meetings.updated', confd.meetings(
-        meeting['uuid']
-    ).put
-    yield s.check_bus_event, 'config.meetings.deleted', confd.meetings(
-        meeting['uuid']
-    ).delete
+
+    headers['meeting_uuid'] = meeting['uuid']
+    yield s.check_event, 'meeting_updated', headers, url.put
+    yield s.check_event, 'meeting_deleted', headers, url.delete
 
 
 @fixtures.ingress_http()
 @fixtures.user()
 @fixtures.meeting()
 def test_bus_events_progress(_, me, meeting):
-    yield s.check_bus_event, 'config.meetings.progress', bus.BusClientHeaders.send_meeting_reload_complete_event, meeting
+    headers = {'tenant_uuid': meeting['tenant_uuid']}
+    yield s.check_event, 'meeting_progress', headers, bus.BusClientHeaders.send_meeting_reload_complete_event, meeting
 
     my_uuid = me['uuid']
     user_confd = create_confd(user_uuid=my_uuid)
     with fixtures.user_me_meeting(user_confd) as mine:
-        yield s.check_bus_event, f'config.users.{my_uuid}.meetings.progress', bus.BusClientHeaders.send_meeting_reload_complete_event, mine
+        headers = {'tenant_uuid': meeting['tenant_uuid'], f'user_uuid:{my_uuid}': True}
+        yield s.check_event, 'meeting_user_progress', headers, bus.BusClientHeaders.send_meeting_reload_complete_event, mine
 
 
 @fixtures.ingress_http()

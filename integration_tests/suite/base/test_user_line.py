@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -443,13 +443,11 @@ def test_delete_user_when_user_and_line_associated(user, line):
 @fixtures.user()
 @fixtures.line_sip()
 def test_bus_events(user, line):
-    yield (
-        s.check_bus_event,
-        'config.users.{}.lines.{}.updated'.format(user['uuid'], line['id']),
-        confd.users(user['uuid']).lines(line['id']).put,
-    )
-    yield (
-        s.check_bus_event,
-        'config.users.{}.lines.{}.deleted'.format(user['uuid'], line['id']),
-        confd.users(user['uuid']).lines(line['id']).delete,
-    )
+    url = confd.users(user['uuid']).lines(line['id'])
+    headers = {
+        'tenant_uuid': user['tenant_uuid'],
+        f'user_uuid:{user["uuid"]}': True,
+    }
+
+    yield (s.check_event, 'user_line_associated', headers, url.put)
+    yield (s.check_event, 'user_line_dissociated', headers, url.delete)

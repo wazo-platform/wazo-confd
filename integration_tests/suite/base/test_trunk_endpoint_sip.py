@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, contains
@@ -206,11 +206,7 @@ def test_delete_sip_when_trunk_and_sip_associated(trunk, sip):
 @fixtures.sip()
 def test_bus_events(trunk, sip):
     url = confd.trunks(trunk['id']).endpoints.sip(sip['uuid'])
-    routing_key = 'config.trunks.{}.endpoints.sip.{}.updated'.format(
-        trunk['id'], sip['uuid']
-    )
-    yield s.check_bus_event, routing_key, url.put
-    routing_key = 'config.trunks.{}.endpoints.sip.{}.deleted'.format(
-        trunk['id'], sip['uuid']
-    )
-    yield s.check_bus_event, routing_key, url.delete
+    headers = {'tenant_uuid': trunk['tenant_uuid']}
+
+    yield s.check_event, 'trunk_endpoint_sip_associated', headers, url.put
+    yield s.check_event, 'trunk_endpoint_sip_dissociated', headers, url.delete

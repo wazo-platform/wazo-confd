@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, none
@@ -171,11 +171,7 @@ def test_delete_iax_when_trunk_and_iax_associated(trunk, iax):
 @fixtures.iax()
 def test_bus_events(trunk, iax):
     url = confd.trunks(trunk['id']).endpoints.iax(iax['id'])
-    routing_key = 'config.trunks.{}.endpoints.iax.{}.updated'.format(
-        trunk['id'], iax['id']
-    )
-    yield s.check_bus_event, routing_key, url.put
-    routing_key = 'config.trunks.{}.endpoints.iax.{}.deleted'.format(
-        trunk['id'], iax['id']
-    )
-    yield s.check_bus_event, routing_key, url.delete
+    headers = {'tenant_uuid': trunk['tenant_uuid']}
+
+    yield s.check_event, 'trunk_endpoint_iax_associated', headers, url.put
+    yield s.check_event, 'trunk_endpoint_iax_dissociated', headers, url.delete

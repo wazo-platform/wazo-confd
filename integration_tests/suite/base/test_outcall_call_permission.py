@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries, empty
@@ -196,13 +196,8 @@ def test_delete_call_permission_when_outcall_and_call_permission_associated(
 @fixtures.outcall()
 @fixtures.call_permission()
 def test_bus_events(outcall, call_permission):
-    yield (
-        s.check_bus_event,
-        'config.outcalls.{}.callpermissions.updated'.format(outcall['id']),
-        confd.outcalls(outcall['id']).callpermissions(call_permission['id']).put,
-    )
-    yield (
-        s.check_bus_event,
-        'config.outcalls.{}.callpermissions.deleted'.format(outcall['id']),
-        confd.outcalls(outcall['id']).callpermissions(call_permission['id']).delete,
-    )
+    url = confd.outcalls(outcall['id']).callpermissions(call_permission['id'])
+    headers = {'tenant_uuid': outcall['tenant_uuid']}
+
+    yield (s.check_event, 'outcall_call_permission_associated', headers, url.put)
+    yield (s.check_event, 'outcall_call_permission_dissociated', headers, url.delete)

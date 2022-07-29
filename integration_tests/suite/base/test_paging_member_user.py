@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, empty, has_entries
@@ -168,4 +168,6 @@ def test_delete_user_when_paging_and_user_associated(paging1, paging2, user):
 def test_bus_events(paging, user):
     url = confd.pagings(paging['id']).members.users.put
     body = {'users': [user]}
-    yield s.check_bus_event, 'config.pagings.members.users.updated', url, body
+    headers = {'tenant_uuid': paging['tenant_uuid']}
+
+    yield s.check_event, 'paging_member_users_associated', headers, url, body

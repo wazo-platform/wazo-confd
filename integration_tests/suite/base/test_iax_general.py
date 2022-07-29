@@ -103,7 +103,9 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.iax.general
-    yield s.check_bus_event_ignore_headers, 'config.iax_general.edited', url.put, {
+    headers = {}
+
+    yield s.check_event, 'iax_general_edited', headers, url.put, {
         'ordered_options': [],
         'options': {},
     }

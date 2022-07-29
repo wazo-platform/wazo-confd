@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -284,4 +284,6 @@ def test_bus_events(group, user, line):
     with a.user_line(user, line):
         url = confd.groups(group['uuid']).members.users.put
         body = {'users': [user]}
-        yield s.check_bus_event, 'config.groups.members.users.updated', url, body
+        headers = {'tenant_uuid': MAIN_TENANT}
+
+        yield s.check_event, 'group_member_users_associated', headers, url, body

@@ -150,12 +150,11 @@ def test_delete(register_iax):
 
 @fixtures.register_iax()
 def test_bus_events(register_iax):
-    yield s.check_bus_event_ignore_headers, 'config.register.iax.created', confd.registers.iax.post, {
+    url = confd.registers.iax(register_iax['id'])
+    headers = {}
+
+    yield s.check_event, 'register_iax_created', headers, confd.registers.iax.post, {
         'remote_host': 'bus-event'
     }
-    yield s.check_bus_event_ignore_headers, 'config.register.iax.edited', confd.registers.iax(
-        register_iax['id']
-    ).put
-    yield s.check_bus_event_ignore_headers, 'config.register.iax.deleted', confd.registers.iax(
-        register_iax['id']
-    ).delete
+    yield s.check_event, 'register_iax_edited', headers, url.put
+    yield s.check_event, 'register_iax_deleted', headers, url.delete

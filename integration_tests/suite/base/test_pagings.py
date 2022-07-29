@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -247,10 +247,11 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.paging(number='667')
 def test_bus_events(paging):
-    yield s.check_bus_event, 'config.pagings.created', confd.pagings.post, {
+    url = confd.pagings(paging['id'])
+    headers = {'tenant_uuid': paging['tenant_uuid']}
+
+    yield s.check_event, 'paging_created', headers, confd.pagings.post, {
         'number': '666'
     }
-    yield s.check_bus_event, 'config.pagings.edited', confd.pagings(paging['id']).put
-    yield s.check_bus_event, 'config.pagings.deleted', confd.pagings(
-        paging['id']
-    ).delete
+    yield s.check_event, 'paging_edited', headers, url.put
+    yield s.check_event, 'paging_deleted', headers, url.delete

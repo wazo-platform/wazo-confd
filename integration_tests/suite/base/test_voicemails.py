@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -491,7 +491,8 @@ def test_update_fields_with_null_value(voicemail, _):
 @fixtures.voicemail()
 def test_user_voicemail_edited_bus_event(user, voicemail):
     with a.user_voicemail(user, voicemail):
-        routing_key = 'config.users.{}.voicemails.edited'.format(user['uuid'])
-        yield s.check_bus_event, routing_key, confd.voicemails(voicemail['id']).put, {
-            'name': 'bostwana'
-        }
+        url = confd.voicemails(voicemail['id']).put
+        body = {'name': 'bostwana'}
+        headers = {'tenant_uuid': voicemail['tenant_uuid']}
+
+        yield s.check_event, 'user_voicemail_edited', headers, url, body

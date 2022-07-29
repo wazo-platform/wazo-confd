@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -167,7 +167,12 @@ def _update_user_fallbacks_with_nonexistent_destination(switchboard_uuid, destin
 @fixtures.switchboard()
 def test_bus_events(switchboard):
     url = confd.switchboards(switchboard['uuid']).fallbacks.put
-    yield s.check_bus_event, 'config.switchboards.fallbacks.edited', url
+    headers = {
+        'tenant_uuid': switchboard['tenant_uuid'],
+        'switchboard_uuid': switchboard['uuid'],
+    }
+
+    yield s.check_event, 'switchboard_fallback_edited', headers, url
 
 
 @fixtures.switchboard()

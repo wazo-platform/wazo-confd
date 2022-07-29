@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -373,9 +373,12 @@ def _new_moh_file_client():
 
 @fixtures.moh()
 def test_bus_events(moh):
-    yield s.check_bus_event, 'config.moh.created', confd.moh.post, {
+    url = confd.moh(moh['uuid'])
+    headers = {'tenant_uuid': moh['tenant_uuid']}
+
+    yield s.check_event, 'moh_created', headers, confd.moh.post, {
         'name': 'bus_event',
         'mode': 'files',
     }
-    yield s.check_bus_event, 'config.moh.edited', confd.moh(moh['uuid']).put
-    yield s.check_bus_event, 'config.moh.deleted', confd.moh(moh['uuid']).delete
+    yield s.check_event, 'moh_edited', headers, url.put
+    yield s.check_event, 'moh_deleted', headers, url.delete

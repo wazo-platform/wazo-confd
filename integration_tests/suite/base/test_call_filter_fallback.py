@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -181,7 +181,9 @@ def _update_user_fallbacks_with_nonexistent_destination(call_filter_id, destinat
 @fixtures.call_filter()
 def test_bus_events(call_filter):
     url = confd.callfilters(call_filter['id']).fallbacks.put
-    yield s.check_bus_event, 'config.callfilters.fallbacks.edited', url
+    expected_headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'call_filter_fallback_edited', expected_headers, url
 
 
 @fixtures.call_filter()

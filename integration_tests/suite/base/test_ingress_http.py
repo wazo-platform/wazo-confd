@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -9,15 +9,12 @@ from hamcrest import (
     has_entries,
     has_entry,
     has_items,
-    has_length,
     is_not,
     not_,
 )
 
-from wazo_test_helpers import until
-
 from . import confd
-from ..helpers import bus, errors as e, fixtures, scenarios as s
+from ..helpers import errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
@@ -206,26 +203,16 @@ def test_delete_multi_tenant(main, sub):
     response.assert_deleted()
 
 
-def test_bus_event_post():
-    routing_key = 'config.ingresses.http.created'
-    bus_events = bus.BusClient.accumulator(routing_key)
-    response = confd.ingresses.http.post(uri='post')
+def test_bus_events():
+    headers = {'tenant_uuid': MAIN_TENANT}
+    res = None
 
-    def assert_function():
-        assert_that(bus_events.accumulate(), has_length(1))
+    def post():
+        nonlocal res
+        res = confd.ingresses.http.post(uri='post')
 
-    try:
+    yield s.check_event, 'ingress_http_created', headers, post
 
-        until.assert_(assert_function, tries=5)
-    finally:
-        confd.ingresses.http(response.item['uuid']).delete()
-
-
-@fixtures.ingress_http()
-def test_bus_events(ingress_http):
-    yield s.check_bus_event, 'config.ingresses.http.updated', confd.ingresses.http(
-        ingress_http['uuid']
-    ).put, {'uri': 'put'}
-    yield s.check_bus_event, 'config.ingresses.http.deleted', confd.ingresses.http(
-        ingress_http['uuid']
-    ).delete
+    url = confd.ingresses.http(res.item['uuid'])
+    yield s.check_event, 'ingress_http_edited', headers, url.put, {'uri': 'put'}
+    yield s.check_event, 'ingress_http_deleted', headers, url.delete

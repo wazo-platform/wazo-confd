@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -253,5 +253,7 @@ def test_delete_user_when_queue_and_user_associated(queue, user, line):
 def test_bus_events(queue, user, line):
     with a.user_line(user, line):
         url = confd.queues(queue['id']).members.users(user['uuid'])
-        yield s.check_bus_event, 'config.user_queue_association.created', url.put
-        yield s.check_bus_event, 'config.user_queue_association.deleted', url.delete
+        headers = {'tenant_uuid': queue['tenant_uuid']}
+
+        yield s.check_event, 'queue_member_user_associated', headers, url.put
+        yield s.check_event, 'queue_member_user_dissociated', headers, url.delete

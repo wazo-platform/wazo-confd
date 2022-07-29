@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -317,20 +317,14 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.switchboard()
 def test_bus_events(switchboard):
-    routing_key_create = 'config.switchboards.*.created'
-    routing_key_edit = 'config.switchboards.{uuid}.edited'.format(
-        uuid=switchboard['uuid']
-    )
-    routing_key_delete = 'config.switchboards.{uuid}.deleted'.format(
-        uuid=switchboard['uuid']
-    )
+    url = confd.switchboards(switchboard['uuid'])
+    headers = {
+        'tenant_uuid': switchboard['tenant_uuid'],
+    }
 
-    yield s.check_bus_event, routing_key_create, confd.switchboards.post, {
+    yield s.check_event, 'switchboard_created', headers, confd.switchboards.post, {
         'name': 'bus_event'
     }
-    yield s.check_bus_event, routing_key_edit, confd.switchboards(
-        switchboard['uuid']
-    ).put
-    yield s.check_bus_event, routing_key_delete, confd.switchboards(
-        switchboard['uuid']
-    ).delete
+    headers['switchboard_uuid'] = switchboard['uuid']
+    yield s.check_event, 'switchboard_edited', headers, url.put
+    yield s.check_event, 'switchboard_deleted', headers, url.delete

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -183,11 +183,7 @@ def test_delete_endpoint_dissociates_line(line, sccp):
 @fixtures.sccp()
 def test_bus_events(line, sccp):
     url = confd.lines(line['id']).endpoints.sccp(sccp['id'])
-    routing_key = 'config.lines.{}.endpoints.sccp.{}.updated'.format(
-        line['id'], sccp['id']
-    )
-    yield s.check_bus_event, routing_key, url.put
-    routing_key = 'config.lines.{}.endpoints.sccp.{}.deleted'.format(
-        line['id'], sccp['id']
-    )
-    yield s.check_bus_event, routing_key, url.delete
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'line_endpoint_sccp_associated', headers, url.put
+    yield s.check_event, 'line_endpoint_sccp_dissociated', headers, url.delete

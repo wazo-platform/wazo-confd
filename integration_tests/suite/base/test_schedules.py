@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -563,11 +563,10 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.schedule()
 def test_bus_events(schedule):
-    required_body = {'closed_destination': {'type': 'none'}}
-    yield s.check_bus_event, 'config.schedules.created', confd.schedules.post, required_body
-    yield s.check_bus_event, 'config.schedules.edited', confd.schedules(
-        schedule['id']
-    ).put
-    yield s.check_bus_event, 'config.schedules.deleted', confd.schedules(
-        schedule['id']
-    ).delete
+    url = confd.schedules(schedule['id'])
+    body = {'closed_destination': {'type': 'none'}}
+    headers = {'tenant_uuid': schedule['tenant_uuid']}
+
+    yield s.check_event, 'schedule_created', headers, confd.schedules.post, body
+    yield s.check_event, 'schedule_edited', headers, url.put
+    yield s.check_event, 'schedule_deleted', headers, url.delete

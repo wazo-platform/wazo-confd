@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries
@@ -168,4 +168,6 @@ def test_delete_user_when_call_filter_and_user_associated(
 def test_bus_events(call_filter, user):
     url = confd.callfilters(call_filter['id']).recipients.users.put
     body = {'users': [user]}
-    yield s.check_bus_event, 'config.callfilters.recipients.users.updated', url, body
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'call_filter_recipient_users_associated', headers, url, body
