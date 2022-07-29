@@ -557,13 +557,13 @@ def test_bus_events(_, meeting):
 @fixtures.meeting()
 def test_bus_events_progress(_, me, meeting):
     headers = {'tenant_uuid': meeting['tenant_uuid']}
-    yield s.check_event, 'meeting_progress', headers, bus.BusClientHeaders.send_meeting_reload_complete_event, meeting
+    yield s.check_event, 'meeting_progress', headers, bus.BusClient.send_meeting_reload_complete_event, meeting
 
     my_uuid = me['uuid']
     user_confd = create_confd(user_uuid=my_uuid)
     with fixtures.user_me_meeting(user_confd) as mine:
         headers = {'tenant_uuid': meeting['tenant_uuid'], f'user_uuid:{my_uuid}': True}
-        yield s.check_event, 'meeting_user_progress', headers, bus.BusClientHeaders.send_meeting_reload_complete_event, mine
+        yield s.check_event, 'meeting_user_progress', headers, bus.BusClient.send_meeting_reload_complete_event, mine
 
 
 @fixtures.ingress_http()

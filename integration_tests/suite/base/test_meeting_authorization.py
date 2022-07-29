@@ -21,7 +21,7 @@ from . import (
     db,
 )
 from ..helpers import fixtures, scenarios as s
-from ..helpers.bus import BusClientHeaders
+from ..helpers.bus import BusClient
 
 
 def until_event(accumulator, headers_matchers, message_matcher, timeout=5):
@@ -85,11 +85,11 @@ def test_create_meeting_authorization(_, owner):
         response.assert_status(400)
 
         # Setup bus events
-        bus_events = BusClientHeaders.accumulator(
+        bus_events = BusClient.accumulator(
             headers={'name': 'meeting_guest_authorization_created'}
         )
 
-        bus_events_user = BusClientHeaders.accumulator(
+        bus_events_user = BusClient.accumulator(
             headers={'name': 'meeting_user_guest_authorization_created'}
         )
 
@@ -409,10 +409,10 @@ def test_accept_meeting_authorization(_, me, another_meeting):
         url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Setup bus events
-        bus_events = BusClientHeaders.accumulator(
+        bus_events = BusClient.accumulator(
             headers={'name': 'meeting_guest_authorization_updated'}
         )
-        bus_events_user = BusClientHeaders.accumulator(
+        bus_events_user = BusClient.accumulator(
             headers={'name': 'meeting_user_guest_authorization_updated'}
         )
 
@@ -503,10 +503,10 @@ def test_reject_meeting_authorization(_, me, another_meeting):
         url(another_meeting['uuid'], another_authorization['uuid']).assert_status(404)
 
         # Setup bus events
-        bus_events = BusClientHeaders.accumulator(
+        bus_events = BusClient.accumulator(
             headers={'name': 'meeting_guest_authorization_updated'}
         )
-        bus_events_user = BusClientHeaders.accumulator(
+        bus_events_user = BusClient.accumulator(
             headers={'name': 'meeting_user_guest_authorization_updated'}
         )
 
@@ -601,10 +601,10 @@ def test_delete_meeting_authorization_by_user(_, another_meeting, me):
         url(meeting['uuid'], unknown_uuid).assert_status(404)
 
         # Setup bus events
-        bus_events = BusClientHeaders.accumulator(
+        bus_events = BusClient.accumulator(
             headers={'name': 'meeting_guest_authorization_deleted'}
         )
-        bus_events_user = BusClientHeaders.accumulator(
+        bus_events_user = BusClient.accumulator(
             headers={'name': 'meeting_user_guest_authorization_deleted'}
         )
 
