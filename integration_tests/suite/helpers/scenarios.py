@@ -11,10 +11,8 @@ from hamcrest import (
     contains,
     equal_to,
     has_entries,
-    has_length,
     all_of,
-    has_entry,
-    has_key,
+    has_items,
 )
 from wazo_test_helpers import until
 
@@ -58,34 +56,32 @@ def random_digits(length):
     return ''.join(random.choice(string.digits) for _ in range(length))
 
 
-def check_bus_event_ignore_headers(routing_key, url, body=None):
-    bus_events = BusClient.accumulator(routing_key)
-    url(body) if body else url()
+def check_event(event_name, expected_headers, url, body=None):
+    expected_headers = {
+        'name': event_name,
+        'required_access': f'event.{event_name}',
+        **expected_headers,
+    }
 
-    def assert_function():
-        assert_that(bus_events.accumulate(), has_length(1))
-
-    until.assert_(assert_function, tries=5)
-
-
-def check_bus_event(routing_key, url, body=None):
-    bus_events = BusClient.accumulator(routing_key)
+    accumulator = BusClient.accumulator(
+        headers={'name': event_name},
+    )
     url(body) if body else url()
 
     assertions = all_of(
-        has_length(1),
-        contains(
-            has_entry(
-                'headers',
-                has_key('tenant_uuid'),
+        has_items(
+            has_entries(
+                headers=has_entries(
+                    expected_headers,
+                )
             )
-        ),
+        )
     )
 
-    def assert_function():
-        assert_that(bus_events.accumulate(with_headers=True), assertions)
+    def check_bus():
+        assert_that(accumulator.accumulate(with_headers=True), assertions)
 
-    until.assert_(assert_function, tries=5)
+    until.assert_(check_bus, tries=5)
 
 
 def search_error_checks(url):
