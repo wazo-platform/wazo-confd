@@ -107,7 +107,7 @@ class IntegrationTest(BaseIntegrationTest):
         cls.confd = cls.create_confd()
         cls.provd = cls.create_provd()
         cls.db = cls.create_database()
-        cls.bus = cls.create_bus()
+        cls.bus = cls.create_bus('wazo-headers', 'headers')
 
 
 class mocks:
@@ -307,7 +307,7 @@ class TestWizardPost(IntegrationTest):
     @mocks.auth()
     def test_post(self, sysconfd, auth):
         data = copy.deepcopy(COMPLETE_POST_BODY)
-        bus_events = self.bus.accumulator('config.wizard.created')
+        bus_events = self.bus.accumulator(headers={'name': 'wizard_created'})
 
         response = self.confd.wizard.get()
         assert_that(response.item, has_entries(configured=False))
@@ -465,7 +465,7 @@ class TestWizardSteps(IntegrationTest):
     @mocks.auth()
     def test_post(self, sysconfd, auth):
         data = copy.deepcopy(DISABLED_STEPS_POST_BODY)
-        bus_events = self.bus.accumulator('config.wizard.created')
+        bus_events = self.bus.accumulator(headers={'name': 'wizard_created'})
 
         response = self.confd.wizard.get()
         assert_that(response.item, has_entries(configured=False))
