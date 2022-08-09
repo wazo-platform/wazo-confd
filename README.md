@@ -22,7 +22,7 @@ Running unit tests
 ```
 apt-get install libpq-dev python-dev libffi-dev libyaml-dev
 pip install tox
-tox --recreate -e py27
+tox --recreate -e py37
 ```
 
 Running integration tests
