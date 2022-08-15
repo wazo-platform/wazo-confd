@@ -1,16 +1,31 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, contains_inanyorder, empty, has_entries
+from hamcrest import (
+    assert_that,
+    contains,
+    contains_inanyorder,
+    empty,
+    equal_to,
+    has_entries,
+)
 
-from ..helpers import scenarios as s, errors as e, associations as a, fixtures
+from ..helpers import (
+    scenarios as s,
+    errors as e,
+    associations as a,
+    fixtures,
+    helpers as h,
+)
 from ..helpers.config import (
+    CONTEXT,
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
     MAIN_TENANT,
     SUB_TENANT,
 )
 from . import confd, db
+from .test_extensions import error_checks
 
 FAKE_ID = 999999999
 
@@ -96,6 +111,58 @@ def test_associate_line_and_internal_extension(line, extension):
     assert_that(
         response.item['extensions'], contains(has_entries({'id': extension['id']}))
     )
+
+
+@fixtures.line_sip()
+def test_associate_line_and_create_extension(line):
+    exten = h.extension.find_available_exten(CONTEXT)
+
+    response = confd.lines(line['id']).extensions.post(exten=exten, context=CONTEXT)
+    response.assert_created('extensions')
+    extension = response.item
+
+    try:
+        response = confd.lines(line['id']).get()
+        assert_that(
+            response.item['extensions'], contains(has_entries({'id': extension['id']}))
+        )
+    finally:
+        confd.extensions(response.item['id']).delete()
+
+
+@fixtures.line_sip()
+def test_extension_creation_error(line):
+    url = confd.lines(line['id']).extensions.post
+    for check in error_checks(url):
+        yield check
+
+
+@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.line_sip(context={'name': 'sub_ctx'}, wazo_tenant=SUB_TENANT)
+@fixtures.line_sip(context={'name': 'sub_ctx'}, wazo_tenant=SUB_TENANT)
+@fixtures.line_sip()
+def test_extension_create_multi_tenant(context, line_one, line_two, line_three):
+    response = confd.lines(line_one['id']).extensions.post(
+        exten='1000',
+        context=context['name'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_created()
+
+    assert_that(response.item['tenant_uuid'], equal_to(SUB_TENANT))
+
+    response = confd.lines(line_two['id']).extensions.post(
+        exten=h.extension.find_available_exten(CONTEXT),
+        context=CONTEXT,
+    )
+    response.assert_match(400, e.different_tenant())
+
+    response = confd.lines(line_three['id']).extensions.post(
+        exten='1001',
+        context=context['name'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response.assert_match(404, e.not_found('Line'))
 
 
 @fixtures.extension(context=INCALL_CONTEXT)

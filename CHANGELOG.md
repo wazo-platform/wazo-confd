@@ -1,5 +1,11 @@
 # Changelog
 
+## 22.13
+
+* The following resource has been added:
+
+  * POST `/1.1/lines/<line_id>/extensions`
+
 ## 22.09
 
 * The following resources has been added:

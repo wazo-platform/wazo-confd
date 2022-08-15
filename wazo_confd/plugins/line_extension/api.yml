@@ -43,3 +43,30 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+  /lines/{line_id}/extensions:
+    post:
+      operationId: create_line_extension
+      summary: Create extension
+      description: '**Required ACL:** `confd.lines.{line_id}.extensions.create`
+
+        The extension number must be included in one of the extension ranges for the
+        given context.'
+      tags:
+      - extensions
+      - lines
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/lineid'
+      - name: body
+        in: body
+        description: Extension to create
+        required: true
+        schema:
+          $ref: '#/definitions/Extension'
+      responses:
+        '201':
+          description: Extension created
+          schema:
+            $ref: '#/definitions/Extension'
+        '400':
+          $ref: '#/responses/CreateError'
