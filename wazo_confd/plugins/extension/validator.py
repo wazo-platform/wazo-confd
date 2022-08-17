@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -184,15 +184,6 @@ class ExtensionAssociationValidator(Validator):
                 extension_type,
                 extension_id=extension.id,
                 associated_id=typeval,
-            )
-
-        line_extension = self.line_extension_dao.find_by_extension_id(extension.id)
-        if line_extension:
-            raise errors.resource_associated(
-                'Extension',
-                'Line',
-                extension_id=extension.id,
-                line_id=line_extension.line_id,
             )
 
 

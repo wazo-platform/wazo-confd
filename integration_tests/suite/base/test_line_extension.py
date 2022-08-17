@@ -127,7 +127,6 @@ def test_associate_line_and_create_extension(line):
             response.item['extensions'], contains(has_entries({'id': extension['id']}))
         )
     finally:
-        confd.lines(line['id']).extensions(extension['id']).delete().assert_deleted()
         confd.extensions(extension['id']).delete().assert_deleted()
 
 
@@ -160,9 +159,6 @@ def test_extension_create_multi_tenant(context, line_one, line_two, line_three):
     try:
         assert_that(extension['tenant_uuid'], equal_to(SUB_TENANT))
     finally:
-        confd.lines(line_one['id']).extensions(
-            extension['id']
-        ).delete().assert_deleted()
         confd.extensions(extension['id']).delete().assert_deleted()
 
     response = confd.lines(line_two['id']).extensions.post(
@@ -345,9 +341,9 @@ def test_dissociate_not_associated(line, extension):
 @fixtures.line_sip()
 @fixtures.extension()
 def test_delete_extension_associated_to_line(line, extension):
-    with a.line_extension(line, extension):
+    with a.line_extension(line, extension, check=False):
         response = confd.extensions(extension['id']).delete()
-        response.assert_match(400, e.resource_associated('Extension', 'Line'))
+        response.assert_deleted()
 
 
 @fixtures.line_sip()
