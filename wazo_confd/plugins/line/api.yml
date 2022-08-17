@@ -89,8 +89,6 @@ paths:
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
-        '400':
-          $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
 

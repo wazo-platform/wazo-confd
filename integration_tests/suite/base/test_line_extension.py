@@ -347,6 +347,14 @@ def test_delete_extension_associated_to_line(line, extension):
 
 
 @fixtures.line_sip()
+@fixtures.extension()
+def test_delete_line_associated_to_extension(line, extension):
+    with a.line_extension(line, extension, check=False):
+        response = confd.lines(line['id']).delete()
+        response.assert_deleted()
+
+
+@fixtures.line_sip()
 @fixtures.line_sip()
 @fixtures.extension()
 def test_get_multi_lines_extension(line1, line2, extension):
