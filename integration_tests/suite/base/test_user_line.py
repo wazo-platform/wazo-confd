@@ -435,9 +435,9 @@ def test_get_lines_relation(user, line, sip):
 @fixtures.user()
 @fixtures.line_sip()
 def test_delete_user_when_user_and_line_associated(user, line):
-    with a.user_line(user, line):
+    with a.user_line(user, line, check=False):
         response = confd.users(user['id']).delete()
-        response.assert_match(400, e.resource_associated('User', 'Line'))
+        response.assert_deleted()
 
 
 @fixtures.user()

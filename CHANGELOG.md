@@ -6,6 +6,8 @@
 
   * POST `/1.1/lines/<line_id>/extensions`
 
+* It is now possible to delete a user without dissociating the line first
+
 * The following event's name have been changed to avoid name collision:
 
   * plugin `call_filter_users`:

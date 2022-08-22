@@ -1,10 +1,9 @@
-# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.user_line import dao as user_line_dao
 
 from wazo_confd.helpers.validator import (
     MOHExists,
@@ -24,17 +23,6 @@ class NoVoicemailAssociated(Validator):
             )
 
 
-class NoLineAssociated(Validator):
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, user):
-        user_lines = self.dao.find_all_by_user_id(user.id)
-        if user_lines:
-            ids = tuple(ul.line_id for ul in user_lines)
-            raise errors.resource_associated('User', 'Line', line_ids=ids)
-
-
 class NoEmptyFieldWhenEnabled(Validator):
     def __init__(self, field, enabled):
         self.field = field
@@ -49,7 +37,7 @@ class NoEmptyFieldWhenEnabled(Validator):
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     return ValidationGroup(
-        delete=[NoVoicemailAssociated(), NoLineAssociated(user_line_dao)],
+        delete=[NoVoicemailAssociated()],
         create=[
             Optional(
                 'email',
