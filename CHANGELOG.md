@@ -6,6 +6,39 @@
 
   * POST `/1.1/lines/<line_id>/extensions`
 
+* The following event's name have been changed to avoid name collision:
+
+  * plugin `call_filter_users`:
+
+    * `users_associated` to `call_filter_surrogate_users_associated`
+    * `users_associated` to `call_filter_recipient_users_associated`
+
+  * plugin `call_pickup_members`:
+
+    * `users_associated` to `call_pickup_interceptor_users_associated`
+    * `users_associated` to `call_pickup_target_users_associated`
+    * `groups_associated` to `call_pickup_interceptor_groups_associated`
+    * `groups_associated` to `call_pickup_target_groups_associated`
+
+  * plugin `group_call_permission`:
+
+    * `call_permission_associated` to `group_call_permission_associated`
+    * `call_permission_dissocated` to `group_call_permission_dissociated`
+
+  * plugin `group_member`:
+
+    * `users_associated` to `group_member_users_associated`
+    * `extensions_associated` to `group_member_extensions_associated`
+
+  * plugin `outcall_call_permission`:
+
+    * `call_permission_associated` to `outcall_call_permission_associated`
+    * `call_permission_dissociated` to `outcall_call_permission_dissociated`
+
+  * plugin `outcall_trunk`:
+
+    * `trunks_associated` to `outcall_trunk_associated`
+
 ## 22.09
 
 * The following resources has been added:
