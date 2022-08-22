@@ -130,6 +130,13 @@ def test_associate_line_and_create_extension(line):
         confd.extensions(response.item['id']).delete()
 
 
+def test_associate_line_and_create_extension_unknown_line():
+    exten = h.extension.find_available_exten(CONTEXT)
+
+    response = confd.lines(FAKE_ID).extensions.post(exten=exten, context=CONTEXT)
+    response.assert_match(404, e.not_found(resource='Line'))
+
+
 @fixtures.line_sip()
 def test_extension_creation_error(line):
     url = confd.lines(line['id']).extensions.post

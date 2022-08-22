@@ -70,3 +70,6 @@ paths:
             $ref: '#/definitions/Extension'
         '400':
           $ref: '#/responses/CreateError'
+        '404':
+          description: Line not found
+          $ref: '#/responses/NotFoundError'
