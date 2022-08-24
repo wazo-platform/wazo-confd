@@ -127,7 +127,8 @@ def test_associate_line_and_create_extension(line):
             response.item['extensions'], contains(has_entries({'id': extension['id']}))
         )
     finally:
-        confd.extensions(response.item['id']).delete()
+        confd.lines(line['id']).extensions(extension['id']).delete().assert_deleted()
+        confd.extensions(extension['id']).delete().assert_deleted()
 
 
 def test_associate_line_and_create_extension_unknown_line():
@@ -155,8 +156,14 @@ def test_extension_create_multi_tenant(context, line_one, line_two, line_three):
         wazo_tenant=SUB_TENANT,
     )
     response.assert_created()
-
-    assert_that(response.item['tenant_uuid'], equal_to(SUB_TENANT))
+    extension = response.item
+    try:
+        assert_that(extension['tenant_uuid'], equal_to(SUB_TENANT))
+    finally:
+        confd.lines(line_one['id']).extensions(
+            extension['id']
+        ).delete().assert_deleted()
+        confd.extensions(extension['id']).delete().assert_deleted()
 
     response = confd.lines(line_two['id']).extensions.post(
         exten=h.extension.find_available_exten(CONTEXT),
