@@ -1,0 +1,67 @@
+swagger: '2.0'
+info:
+  title: Unified User API
+  version: '1.0'
+paths:
+  /unified_users:
+    post:
+      operationId: create_unified_user
+      summary: Create user (Unified API)
+      description: '**Required ACL:** `confd.unified_users.create`'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/tenant_uuid_required'
+      - name: body
+        in: body
+        description: User to create with all the associated resources
+        required: true
+        schema:
+          $ref: '#/definitions/UnifiedUserRequest'
+      responses:
+        '201':
+          description: User created with all the associated resources
+          schema:
+            $ref: '#/definitions/UnifiedUserResponse'
+
+parameters:
+  tenant_uuid_required:
+    name: Wazo-Tenant
+    type: string
+    in: header
+    description: "The tenant's UUID, defining the ownership of a given resource."
+    required: true
+
+definitions:
+  UnifiedUserRequest:
+    title: Unified User
+    properties:
+        user:
+          type: object
+          description: User Section
+          $ref: '#/definitions/User'
+        voicemail:
+          type: object
+          description: Voicemail Section
+          $ref: '#/definitions/Voicemail'
+        line:
+          type: object
+          description: Voicemail Section
+          $ref: '#/definitions/LineView'
+
+  UnifiedUserResponse:
+    title: Unified User
+    properties:
+        user:
+          type: object
+          description: User Section
+          $ref: '#/definitions/User'
+        voicemail:
+          type: object
+          description: Voicemail Section
+          $ref: '#/definitions/Voicemail'
+        line:
+          type: object
+          description: Voicemail Section
+          $ref: '#/definitions/Line'
+
