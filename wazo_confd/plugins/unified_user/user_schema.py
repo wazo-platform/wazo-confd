@@ -26,7 +26,7 @@ class StrictBoolean(fields.Boolean):
         super().__init__(*args, **kwargs, truthy={True}, falsy={False})
 
 
-class UserSchema(BaseSchema):
+class UserXivoSchema(BaseSchema):
     id = StrictInteger(dump_only=True)
     uuid = fields.String(dump_only=True)
     firstname = fields.String(validate=Length(max=128), required=True)
@@ -70,7 +70,7 @@ class UserSchema(BaseSchema):
         'CallPermissionSchema', only=['id', 'name', 'links'], many=True, dump_only=True
     )
     call_pickup_user_targets_flat = Nested(
-        'wazo_confd.plugins.unified_user.user_schema.UserSchema',
+        'wazo_confd.plugins.unified_user.user_schema.UserXivoSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
         many=True,
         dump_only=True,
@@ -195,7 +195,7 @@ class UserSchema(BaseSchema):
         return data
 
 
-class UserDirectorySchema(BaseSchema):
+class UserDirectoryXivoSchema(BaseSchema):
     id = StrictInteger()
     uuid = fields.String()
     line_id = StrictInteger(default=None)
@@ -224,7 +224,7 @@ class UserSummarySchema(BaseSchema):
     enabled = StrictBoolean()
 
 
-class UserSchemaNullable(UserSchema):
+class UserXivoSchemaNullable(UserXivoSchema):
     def __init__(self, *args, **kwargs):
         super().__init__(handle_error=False, *args, **kwargs)
 
