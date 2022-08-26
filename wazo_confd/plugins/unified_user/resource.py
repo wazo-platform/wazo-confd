@@ -21,22 +21,21 @@ logger = logging.getLogger(__name__)
 
 class ListResource(BaseListResource):
     method_decorators = [
-                            handle_validation_exception,
-                            handle_api_exception,
-                        ] + Resource.method_decorators
+        handle_validation_exception,
+        handle_api_exception,
+    ] + Resource.method_decorators
 
 
 class UserList(BaseUserList):
     schema = UserXivoSchemaNullable
 
     method_decorators = [
-                            handle_validation_exception,
-                            handle_api_exception,
-                        ] + Resource.method_decorators
+        handle_validation_exception,
+        handle_api_exception,
+    ] + Resource.method_decorators
 
 
 class UnifiedUserList(ListResource):
-
     def __init__(self, user_service: UserService, wazo_user_service: WazoUserService):
         self.user_list_resource = UserList(user_service, json_path='user')
         self.wazo_user_service = wazo_user_service
@@ -58,4 +57,10 @@ class UnifiedUserList(ListResource):
         fixed_user_dict['email_address'] = fixed_user_dict['email']
         self.wazo_user_service.create(fixed_user_dict)
 
-        return {'user': user_dict, }, 201, self.build_headers(user_dict)
+        return (
+            {
+                'user': user_dict,
+            },
+            201,
+            self.build_headers(user_dict),
+        )
