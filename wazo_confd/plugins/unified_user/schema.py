@@ -9,7 +9,7 @@ BaseSchema = mallow.Schema
 
 class UnifiedUserSchema(BaseSchema):
     user = Nested(
-        'wazo_confd.plugins.unified_user.user_schema.UserSchemaNullable',
+        'wazo_confd.plugins.unified_user.user_schema.UserXivoSchemaNullable',
         required=True,
         many=False)
 
