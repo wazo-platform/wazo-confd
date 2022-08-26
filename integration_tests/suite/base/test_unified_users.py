@@ -51,19 +51,19 @@ def test_post_basic_user_no_error():
 def test_post_user_missing_field_return_error():
     response = confd.unified_users.post({'user': {'lastname': 'Jôhn'}}).response
     assert response.status_code == 400
-    assert response.json()['details']['user']['firstname']['constraint_id'] == 'required'
+    assert (
+        response.json()['details']['user']['firstname']['constraint_id'] == 'required'
+    )
 
 
 def test_post_user_wrong_type_return_error():
-    user = {
-        "firstname": "Rîchard",
-        "enabled": "True"
-    }
+    user = {"firstname": "Rîchard", "enabled": "True"}
     response = confd.unified_users.post({'user': user}).response
     assert response.status_code == 400
     assert (
-            response.json()['details']['user']['enabled']['constraint_id'] == 'type' and
-            response.json()['details']['user']['enabled']['constraint'] == 'boolean')
+        response.json()['details']['user']['enabled']['constraint_id'] == 'type'
+        and response.json()['details']['user']['enabled']['constraint'] == 'boolean'
+    )
 
 
 def test_post_full_user_no_error():
@@ -101,8 +101,5 @@ def test_post_full_user_no_error():
 
     created_user = returned_json['user']
 
-    assert_that(
-        created_user,
-        has_entries(user)
-    )
+    assert_that(created_user, has_entries(user))
     assert 'uuid' in created_user and created_user['uuid']
