@@ -75,7 +75,7 @@ class ListResource(ConfdResource):
     def __init__(self, service, json_path=None):
         super().__init__()
         self.service = service
-        self.json_path=json_path
+        self.json_path = json_path
 
     def get(self):
         params = self.search_params()
@@ -101,9 +101,7 @@ class ListResource(ConfdResource):
         return form
 
     def post(self):
-        form = self.schema().load(
-            find(self.json_path, request.get_json())
-        )
+        form = self.schema().load(find(self.json_path, request.get_json()))
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)

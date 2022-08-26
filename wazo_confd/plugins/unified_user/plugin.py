@@ -24,5 +24,5 @@ class Plugin:
             UnifiedUserList,
             '/unified_users',
             endpoint='unified_users_list',
-            resource_class_args=(user_service, wazo_user_service)
+            resource_class_args=(user_service, wazo_user_service),
         )

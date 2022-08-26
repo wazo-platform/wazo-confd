@@ -11,7 +11,8 @@ class UnifiedUserSchema(BaseSchema):
     user = Nested(
         'wazo_confd.plugins.unified_user.user_schema.UserXivoSchemaNullable',
         required=True,
-        many=False)
+        many=False,
+    )
 
     @classmethod
     def _flatten(cls, iterable_of_iterable):
