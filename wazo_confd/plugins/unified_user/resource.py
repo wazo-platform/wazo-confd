@@ -11,8 +11,10 @@ from xivo.mallow_helpers import handle_validation_exception
 from xivo.rest_api_helpers import handle_api_exception
 
 from .schema import UnifiedUserSchema
-from .user_schema import UserSchemaNullable
+from .user_schema import UserXivoSchemaNullable
 from ..user.resource import UserList as BaseUserList
+from ..user.service import UserService
+from ..user_import.wazo_user_service import WazoUserService
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ class ListResource(BaseListResource):
 
 
 class UserList(BaseUserList):
-    schema = UserSchemaNullable
+    schema = UserXivoSchemaNullable
 
     method_decorators = [
                             handle_validation_exception,
@@ -35,8 +37,9 @@ class UserList(BaseUserList):
 
 class UnifiedUserList(ListResource):
 
-    def __init__(self, user_service):
+    def __init__(self, user_service: UserService, wazo_user_service: WazoUserService):
         self.user_list_resource = UserList(user_service, json_path='user')
+        self.wazo_user_service = wazo_user_service
 
     def build_headers(self, user):
         return {'Location': url_for('users', id=user['id'], _external=True)}
@@ -48,5 +51,11 @@ class UnifiedUserList(ListResource):
 
         logger.info("Create User resource")
         user_dict, _, _ = self.user_list_resource.post()
+
+        logger.info("Create User authentication")
+        # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
+        fixed_user_dict = user_dict.copy()
+        fixed_user_dict['email_address'] = fixed_user_dict['email']
+        self.wazo_user_service.create(fixed_user_dict)
 
         return {'user': user_dict, }, 201, self.build_headers(user_dict)
