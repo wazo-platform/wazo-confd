@@ -46,7 +46,7 @@ definitions:
           $ref: '#/definitions/Voicemail'
         line:
           type: object
-          description: Voicemail Section
+          description: Line Section
           $ref: '#/definitions/LineView'
 
   UnifiedUserResponse:
@@ -62,6 +62,6 @@ definitions:
           $ref: '#/definitions/Voicemail'
         line:
           type: object
-          description: Voicemail Section
+          description: Line Section
           $ref: '#/definitions/Line'
 
