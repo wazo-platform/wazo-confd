@@ -147,6 +147,7 @@ DEFAULT_CONFIG = {
         'trunk': True,
         'trunk_endpoint': True,
         'trunk_register': True,
+        'unified_user': True,
         'user': True,
         'user_agent': True,
         'user_external_app': True,
