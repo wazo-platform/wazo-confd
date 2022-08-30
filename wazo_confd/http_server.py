@@ -25,7 +25,8 @@ from .helpers.restful import auth_verifier
 
 logger = logging.getLogger(__name__)
 app = Flask('wazo_confd')
-api = Api(app, prefix="/1.1")
+api_v1_1 = Api(app, prefix="/1.1")
+api_v2_0 = Api(app, prefix="/2.0")
 _do_not_log_data_endpoints = []
 
 

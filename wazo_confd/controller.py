@@ -18,7 +18,7 @@ from wazo_confd.helpers.asterisk import PJSIPDoc
 
 from . import auth
 from ._bus import BusPublisher, BusConsumer
-from .http_server import api, app, HTTPServer
+from .http_server import api_v1_1, api_v2_0, app, HTTPServer
 from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)
@@ -59,7 +59,9 @@ class Controller:
             namespace='wazo_confd.plugins',
             names=config['enabled_plugins'],
             dependencies={
-                'api': api,
+                'api': api_v1_1,  # The "api" key is still there to avoid breaking plugins implemented using this key
+                'api_v1_1': api_v1_1,
+                'api_v2_2': api_v2_0,
                 'config': config,
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
                 'bus_consumer': self._bus_consumer,
