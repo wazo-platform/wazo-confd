@@ -52,7 +52,7 @@ class Controller:
             dependencies={
                 'api': api_v1_1,  # The "api" key is still there to avoid breaking plugins implemented using this key
                 'api_v1_1': api_v1_1,
-                'api_v2_2': api_v2_0,
+                'api_v2_0': api_v2_0,
                 'config': config,
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
                 'bus_consumer': self._bus_consumer,

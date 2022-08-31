@@ -2,22 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
-    all_of,
     assert_that,
-    contains,
-    contains_inanyorder,
-    empty,
-    equal_to,
     has_entries,
-    has_entry,
-    has_item,
-    has_items,
-    is_not,
-    none,
-    not_,
 )
 
-from . import confd
+from . import confd_v2_0
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -36,7 +25,7 @@ ALL_NULL_USER = {
 
 
 def test_post_basic_user_no_error():
-    response = confd.unified_users.post({'user': {'firstname': 'Jôhn'}}).response
+    response = confd_v2_0.users.post({'user': {'firstname': 'Jôhn'}}).response
     assert response.status_code == 201
 
     returned_json = response.json()
@@ -49,7 +38,7 @@ def test_post_basic_user_no_error():
 
 
 def test_post_user_missing_field_return_error():
-    response = confd.unified_users.post({'user': {'lastname': 'Jôhn'}}).response
+    response = confd_v2_0.users.post({'user': {'lastname': 'Jôhn'}}).response
     assert response.status_code == 400
     assert (
         response.json()['details']['user']['firstname']['constraint_id'] == 'required'
@@ -58,7 +47,7 @@ def test_post_user_missing_field_return_error():
 
 def test_post_user_wrong_type_return_error():
     user = {"firstname": "Rîchard", "enabled": "True"}
-    response = confd.unified_users.post({'user': user}).response
+    response = confd_v2_0.users.post({'user': user}).response
     assert response.status_code == 400
     assert (
         response.json()['details']['user']['enabled']['constraint_id'] == 'type'
@@ -91,7 +80,7 @@ def test_post_full_user_no_error():
         "username": "richardlapointe",
         "password": "secret",
     }
-    response = confd.unified_users.post({'user': user}).response
+    response = confd_v2_0.users.post({'user': user}).response
 
     assert response.status_code == 201
 

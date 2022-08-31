@@ -200,17 +200,31 @@ class IntegrationTest(AssetLaunchingTestCase):
             )
             cls.mock_auth.set_token(token)
             token_id = token.token_id
-        client = cls.new_client(headers, encoder, token=token_id)
+        client = cls.new_client(headers, encoder, token=token_id, version='1.1')
         return client.url
 
     @classmethod
-    def new_client(cls, headers=None, encoder=None, token=None):
+    def create_confd_v2_0(cls, headers=None, encoder=None, user_uuid=None):
+        token_id = None
+        if user_uuid:
+            token = MockUserToken.some_token(
+                user_uuid=user_uuid,
+                metadata={'uuid': user_uuid, 'tenant_uuid': MAIN_TENANT},
+            )
+            cls.mock_auth.set_token(token)
+            token_id = token.token_id
+        client = cls.new_client(headers, encoder, token=token_id, version='2.0')
+        return client.url
+
+    @classmethod
+    def new_client(cls, headers=None, encoder=None, token=None, version=None):
         client = ConfdClient.from_options(
             host='127.0.0.1',
             port=cls.service_port('9486', 'confd'),
             headers=headers,
             encoder=encoder,
             token=token,
+            version=version,
         )
         return client
 
