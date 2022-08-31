@@ -3,7 +3,7 @@
 
 from wazo_provd_client import Client as ProvdClient
 
-from .resource import UserItem, UserList
+from .resource import UnifiedUserList, UserItem, UserList
 from .resource_sub import (
     UserForwardBusy,
     UserForwardList,
@@ -14,11 +14,13 @@ from .resource_sub import (
     UserServiceList,
 )
 from .service import build_service, build_service_callservice, build_service_forward
+from ..user_import.wazo_user_service import build_service as build_wazo_user_service
 
 
 class Plugin:
     def load(self, dependencies):
         api_v1_1 = dependencies['api_v1_1']
+        api_v2_0 = dependencies['api_v2_0']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
 
@@ -26,6 +28,7 @@ class Plugin:
         token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client)
+        wazo_user_service = build_wazo_user_service()
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
 
@@ -39,6 +42,16 @@ class Plugin:
 
         api_v1_1.add_resource(
             UserList, '/users', endpoint='users_list', resource_class_args=(service,)
+        )
+
+        api_v2_0.add_resource(
+            UnifiedUserList,
+            '/users',
+            endpoint='users_list_v2.0',
+            resource_class_args=(
+                service,
+                wazo_user_service,
+            )
         )
 
         api_v1_1.add_resource(

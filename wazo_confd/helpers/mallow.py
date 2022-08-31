@@ -8,6 +8,8 @@ from flask_restful import abort
 from marshmallow import EXCLUDE, Schema, fields, pre_load, validate
 from marshmallow.exceptions import ValidationError
 
+from xivo import mallow
+
 
 class BaseSchema(Schema):
     def __init__(self, handle_error=True, *args, **kwargs):
@@ -68,6 +70,11 @@ class StrictBoolean(fields.Boolean):
         if not isinstance(value, bool):
             raise self.make_error('invalid')
         return value
+
+
+class StrictBooleanV2(mallow.fields.Boolean):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs, truthy={True}, falsy={False})
 
 
 class Link(fields.Field):

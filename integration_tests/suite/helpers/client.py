@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -46,8 +46,9 @@ class ConfdClient:
         headers=None,
         encoder=None,
         token=None,
+        version=None,
     ):
-        url = '{}://{}:{}/1.1'.format('https' if https else 'http', host, port)
+        url = '{}://{}:{}/{}'.format('https' if https else 'http', host, port, version)
         logger.info('CONFD URL: %s', url)
         return cls(url, headers, encoder, token)
 
