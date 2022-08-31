@@ -1,7 +1,9 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+import logging
+
+from flask import request, url_for
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
@@ -13,7 +15,10 @@ from .schema import (
     UserSchema,
     UserSchemaNullable,
     UserSummarySchema,
+    UnifiedUserSchema,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class UserList(ListResource):
@@ -61,3 +66,37 @@ class UserItem(ItemResource):
     @required_acl('confd.users.{id}.delete')
     def delete(self, id):
         return super().delete(id)
+
+
+class UnifiedUserList(ListResource):
+
+    api_version = '2.0'
+
+    def __init__(self, user_service, wazo_user_service):
+        self.user_list_resource = UserList(user_service, json_path='user')
+        self.wazo_user_service = wazo_user_service
+
+    def build_headers(self, user):
+        return {'Location': url_for('users', id=user['id'], _external=True)}
+
+    @required_acl('confd.users.create')
+    def post(self):
+        logger.info("Create Unified User NEW")
+        UnifiedUserSchema().load(request.get_json())
+
+        logger.info("Create User resource")
+        user_dict, _, _ = self.user_list_resource.post()
+
+        logger.info("Create User authentication")
+        # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
+        fixed_user_dict = user_dict.copy()
+        fixed_user_dict['email_address'] = fixed_user_dict['email']
+        self.wazo_user_service.create(fixed_user_dict)
+
+        return (
+            {
+                'user': user_dict,
+            },
+            201,
+            self.build_headers(user_dict),
+        )

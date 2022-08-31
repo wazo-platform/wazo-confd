@@ -63,6 +63,7 @@ class SingletonProxy:
 
 
 confd = SingletonProxy(BaseIntegrationTest.create_confd)
+confd_v2_0 = SingletonProxy(BaseIntegrationTest.create_confd_v2_0)
 confd_csv = SingletonProxy(
     BaseIntegrationTest.create_confd,
     {'Accept': 'text/csv; charset=utf-8', 'X-Auth-Token': TOKEN},
