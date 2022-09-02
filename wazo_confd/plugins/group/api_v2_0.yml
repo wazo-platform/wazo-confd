@@ -1,0 +1,15 @@
+definitions:
+  GroupRelationBase:
+    properties:
+      name:
+        type: string
+        description: The name of the group
+        readOnly: true
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the group
+      uuid:
+        type: string
+        description: Group UUID. This ID is globally unique across multiple Wazo instances
+        readOnly: true

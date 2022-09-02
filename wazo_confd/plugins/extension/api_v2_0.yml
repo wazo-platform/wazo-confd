@@ -1,0 +1,11 @@
+definitions:
+  ExtensionRelationBase:
+    properties:
+      id:
+        type: integer
+        description: Extension ID
+        readOnly: true
+      context:
+        type: string
+      exten:
+        type: string

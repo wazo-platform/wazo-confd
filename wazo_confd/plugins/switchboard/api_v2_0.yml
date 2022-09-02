@@ -1,0 +1,10 @@
+definitions:
+  SwitchboardRelationBase:
+    properties:
+        uuid:
+          type: string
+          description: Switchboard UUID
+          readOnly: true
+        name:
+          type: string
+          description: Switchboard name
