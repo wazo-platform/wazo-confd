@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 class SwaggerResource(Resource):
 
-    api_filename = "api.yml"
+    def __init__(self, api_filename):
+        self.api_filename = api_filename
 
     def get(self):
         api_spec = ChainMap(
