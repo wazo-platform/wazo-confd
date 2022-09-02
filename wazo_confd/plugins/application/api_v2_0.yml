@@ -1,0 +1,10 @@
+definitions:
+  ApplicationRelationBase:
+    properties:
+      uuid:
+        type: string
+        description: Application UUID
+        readOnly: true
+      name:
+        type: string
+        description: Application name
