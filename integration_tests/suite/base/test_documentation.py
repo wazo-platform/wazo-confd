@@ -6,7 +6,7 @@ import requests
 import unittest
 import yaml
 
-from openapi_spec_validator import validate_v2_spec
+from openapi_spec_validator import validate_spec, openapi_v2_spec_validator
 
 from . import BaseIntegrationTest
 
@@ -21,4 +21,4 @@ class TestDocumentation(unittest.TestCase):
         confd_port = BaseIntegrationTest.service_port(9486, 'confd')
         api_url = 'http://127.0.0.1:{port}/1.1/api/api.yml'.format(port=confd_port)
         api = requests.get(api_url)
-        validate_v2_spec(yaml.safe_load(api.text))
+        validate_spec(yaml.safe_load(api.text), validator=openapi_v2_spec_validator)

@@ -72,4 +72,5 @@ paths:
           $ref: '#/responses/CreateError'
         '404':
           description: Line not found
-          $ref: '#/responses/NotFoundError'
+          schema:
+            $ref: '#/responses/NotFoundError'
