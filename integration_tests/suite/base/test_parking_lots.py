@@ -314,13 +314,12 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.parking_lot()
 def test_bus_events(parking_lot):
-    yield s.check_bus_event, 'config.parkinglots.created', confd.parkinglots.post, {
+    url = confd.parkinglots(parking_lot['id'])
+    headers = {'tenant_uuid': parking_lot['tenant_uuid']}
+
+    yield s.check_event, 'parking_lot_created', headers, confd.parkinglots.post, {
         'slots_start': '999',
         'slots_end': '999',
     }
-    yield s.check_bus_event, 'config.parkinglots.edited', confd.parkinglots(
-        parking_lot['id']
-    ).put
-    yield s.check_bus_event, 'config.parkinglots.deleted', confd.parkinglots(
-        parking_lot['id']
-    ).delete
+    yield s.check_event, 'parking_lot_edited', headers, url.put
+    yield s.check_event, 'parking_lot_deleted', headers, url.delete

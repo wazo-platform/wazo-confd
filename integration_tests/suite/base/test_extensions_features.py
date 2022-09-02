@@ -139,6 +139,8 @@ def test_restrict_only_master_tenant(extension):
 
 @fixtures.extension_feature()
 def test_bus_events(extension):
-    yield s.check_bus_event_ignore_headers, 'config.extension_feature.edited', confd.extensions.features(
+    headers = {}
+
+    yield s.check_event, 'extension_feature_edited', headers, confd.extensions.features(
         extension['id']
     ).put

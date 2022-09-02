@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.call_pickup.event import (
-    CreateCallPickupEvent,
-    DeleteCallPickupEvent,
-    EditCallPickupEvent,
+    CallPickupCreatedEvent,
+    CallPickupDeletedEvent,
+    CallPickupEditedEvent,
 )
 from xivo_dao.alchemy.pickup import Pickup as CallPickup
 
@@ -30,31 +30,31 @@ class TestCallPickupNotifier(unittest.TestCase):
         self.notifier = CallPickupNotifier(self.bus, self.sysconfd)
 
     def test_when_call_pickup_created_then_event_sent_on_bus(self):
-        expected_event = CreateCallPickupEvent(self.call_pickup.id)
+        expected_event = CallPickupCreatedEvent(
+            self.call_pickup.id, self.call_pickup.tenant_uuid
+        )
 
         self.notifier.created(self.call_pickup)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_call_pickup_edited_then_event_sent_on_bus(self):
-        expected_event = EditCallPickupEvent(self.call_pickup.id)
+        expected_event = CallPickupEditedEvent(
+            self.call_pickup.id, self.call_pickup.tenant_uuid
+        )
 
         self.notifier.edited(self.call_pickup)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_call_pickup_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteCallPickupEvent(self.call_pickup.id)
+        expected_event = CallPickupDeletedEvent(
+            self.call_pickup.id, self.call_pickup.tenant_uuid
+        )
 
         self.notifier.deleted(self.call_pickup)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_call_pickup_deleted_then_sysconfd_event(self):
         self.notifier.deleted(self.call_pickup)

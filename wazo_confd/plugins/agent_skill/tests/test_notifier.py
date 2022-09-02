@@ -31,15 +31,12 @@ class TestAgentMemberNotifier(unittest.TestCase):
 
     def test_skill_associate_then_bus_event(self):
         expected_event = AgentSkillAssociatedEvent(
-            self.agent.id, self.agent_skill.skill.id
+            self.agent.id, self.agent_skill.skill.id, self.agent.tenant_uuid
         )
-        expected_headers = {'tenant_uuid': self.agent.tenant_uuid}
 
         self.notifier.skill_associated(self.agent, self.agent_skill)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_skill_dissociate_then_call_expected_handlers(self):
         self.notifier.skill_dissociated(self.agent, self.agent_skill)
@@ -48,12 +45,9 @@ class TestAgentMemberNotifier(unittest.TestCase):
 
     def test_skill_dissociate_then_bus_event(self):
         expected_event = AgentSkillDissociatedEvent(
-            self.agent.id, self.agent_skill.skill.id
+            self.agent.id, self.agent_skill.skill.id, self.agent.tenant_uuid
         )
-        expected_headers = {'tenant_uuid': self.agent.tenant_uuid}
 
         self.notifier.skill_dissociated(self.agent, self.agent_skill)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

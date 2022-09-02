@@ -27,26 +27,26 @@ class TestCallFilterRecipientUserNotifier(unittest.TestCase):
 
     def test_recipient_users_associate_then_bus_event(self):
         expected_event = CallFilterRecipientUsersAssociatedEvent(
-            self.call_filter.id, [self.user1.uuid, self.user2.uuid]
+            self.call_filter.id,
+            [self.user1.uuid, self.user2.uuid],
+            self.call_filter.tenant_uuid,
         )
 
         self.notifier.recipient_users_associated(
             self.call_filter, [self.user1, self.user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_surrogate_users_associate_then_bus_event(self):
         expected_event = CallFilterSurrogateUsersAssociatedEvent(
-            self.call_filter.id, [self.user1.uuid, self.user2.uuid]
+            self.call_filter.id,
+            [self.user1.uuid, self.user2.uuid],
+            self.call_filter.tenant_uuid,
         )
 
         self.notifier.surrogate_users_associated(
             self.call_filter, [self.user1, self.user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

@@ -1,13 +1,8 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
-
-from xivo_bus.resources.common.event import ArbitraryEvent
-
+from xivo_bus.resources.switchboard.event import SwitchboardMemberUserAssociatedEvent
 from wazo_confd import bus
-
-logger = logging.getLogger(__name__)
 
 
 class SwitchboardMemberUserNotifier:
@@ -15,21 +10,11 @@ class SwitchboardMemberUserNotifier:
         self.bus = bus
 
     def members_associated(self, switchboard, users):
-        name = 'switchboard_member_user_associated'
-        routing_key = 'config.switchboards.{switchboard.uuid}.members.users.updated'
-        acl = 'switchboards.{switchboard.uuid}.members.users.updated'
-        body = {
-            'switchboard_uuid': switchboard.uuid,
-            'users': [{'uuid': user.uuid} for user in users],
-        }
-        event = ArbitraryEvent(name, body, acl)
-        event.routing_key = routing_key.format(switchboard=switchboard)
-
-        headers = self._build_headers(switchboard)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, switchboard):
-        return {'tenant_uuid': str(switchboard.tenant_uuid)}
+        user_uuids = [user.uuid for user in users]
+        event = SwitchboardMemberUserAssociatedEvent(
+            switchboard.uuid, switchboard.tenant_uuid, user_uuids
+        )
+        self.bus.queue_event(event)
 
 
 def build_notifier():

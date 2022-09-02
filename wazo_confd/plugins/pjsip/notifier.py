@@ -1,12 +1,12 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.pjsip.event import (
     PJSIPGlobalUpdatedEvent,
     PJSIPSystemUpdatedEvent,
-    CreateSIPTransportEvent,
-    EditSIPTransportEvent,
-    DeleteSIPTransportEvent,
+    SIPTransportCreatedEvent,
+    SIPTransportDeletedEvent,
+    SIPTransportEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -31,7 +31,7 @@ class PJSIPConfigurationNotifier:
         else:
             return
 
-        self.bus.send_bus_event(event)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['module reload res_pjsip.so'])
 
 
@@ -51,21 +51,21 @@ class PJSIPTransportNotifier:
 
     def created(self, transport):
         self.send_sysconfd_handlers()
-        body = self.schema.dump(transport)
-        event = CreateSIPTransportEvent(body)
-        self.bus.send_bus_event(event)
+        payload = self.schema.dump(transport)
+        event = SIPTransportCreatedEvent(payload)
+        self.bus.queue_event(event)
 
     def deleted(self, transport):
         self.send_sysconfd_handlers()
-        body = self.schema.dump(transport)
-        event = DeleteSIPTransportEvent(body)
-        self.bus.send_bus_event(event)
+        payload = self.schema.dump(transport)
+        event = SIPTransportDeletedEvent(payload)
+        self.bus.queue_event(event)
 
     def edited(self, transport):
         self.send_sysconfd_handlers()
-        body = self.schema.dump(transport)
-        event = EditSIPTransportEvent(body)
-        self.bus.send_bus_event(event)
+        payload = self.schema.dump(transport)
+        event = SIPTransportEditedEvent(payload)
+        self.bus.queue_event(event)
 
 
 def build_pjsip_transport_notifier(schema):

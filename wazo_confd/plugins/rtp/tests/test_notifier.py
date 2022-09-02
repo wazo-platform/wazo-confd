@@ -5,8 +5,8 @@ import unittest
 from unittest.mock import Mock
 
 from xivo_bus.resources.rtp.event import (
-    EditRTPGeneralEvent,
-    EditRTPIceHostCandidatesEvent,
+    RTPGeneralEditedEvent,
+    RTPIceHostCandidatesEditedEvent,
 )
 
 from ..notifier import RTPConfigurationNotifier
@@ -24,11 +24,11 @@ class TestRTPConfigurationNotifier(unittest.TestCase):
         self.notifier = RTPConfigurationNotifier(self.bus, self.sysconfd)
 
     def test_when_rtp_general_edited_then_event_sent_on_bus(self):
-        expected_event = EditRTPGeneralEvent()
+        expected_event = RTPGeneralEditedEvent()
 
         self.notifier.edited('general', self.rtp)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_rtp_general_edited_then_sip_reloaded(self):
         self.notifier.edited('general', self.rtp)
@@ -36,11 +36,11 @@ class TestRTPConfigurationNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_confuser_ice_host_candidates_edited_then_event_sent_on_bus(self):
-        expected_event = EditRTPIceHostCandidatesEvent()
+        expected_event = RTPIceHostCandidatesEditedEvent()
 
         self.notifier.edited('ice_host_candidates', self.rtp)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_confuser_ice_host_candidates_edited_then_sip_reloaded(self):
         self.notifier.edited('ice_host_candidates', self.rtp)

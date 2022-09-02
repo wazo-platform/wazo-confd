@@ -126,6 +126,8 @@ def test_that_list_is_not_restricted_to_the_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.voicemail.zonemessages
-    yield s.check_bus_event_ignore_headers, 'config.voicemail_zonemessages.edited', url.put, {
+    headers = {}
+
+    yield s.check_event, 'voicemail_zonemessages_edited', headers, url.put, {
         'items': []
     }

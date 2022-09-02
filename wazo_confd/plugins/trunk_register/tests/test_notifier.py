@@ -24,19 +24,19 @@ class TestTrunkRegisterIAXNotifier(unittest.TestCase):
         self.notifier_iax = TrunkRegisterIAXNotifier(self.bus)
 
     def test_associate_iax_then_bus_event(self):
-        expected_event = TrunkRegisterIAXAssociatedEvent(self.trunk.id, self.iax.id)
+        expected_event = TrunkRegisterIAXAssociatedEvent(
+            self.trunk.id, self.iax.id, self.trunk.tenant_uuid
+        )
 
         self.notifier_iax.associated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_iax_then_bus_event(self):
-        expected_event = TrunkRegisterIAXDissociatedEvent(self.trunk.id, self.iax.id)
+        expected_event = TrunkRegisterIAXDissociatedEvent(
+            self.trunk.id, self.iax.id, self.trunk.tenant_uuid
+        )
 
         self.notifier_iax.dissociated(self.trunk, self.iax)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

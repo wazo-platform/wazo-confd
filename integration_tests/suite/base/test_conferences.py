@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -339,10 +339,12 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.conference()
 def test_bus_events(conference):
-    yield s.check_bus_event, 'config.conferences.created', confd.conferences.post
-    yield s.check_bus_event, 'config.conferences.edited', confd.conferences(
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'conference_created', headers, confd.conferences.post
+    yield s.check_event, 'conference_edited', headers, confd.conferences(
         conference['id']
     ).put
-    yield s.check_bus_event, 'config.conferences.deleted', confd.conferences(
+    yield s.check_event, 'conference_deleted', headers, confd.conferences(
         conference['id']
     ).delete

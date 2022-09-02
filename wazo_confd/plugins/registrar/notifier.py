@@ -1,10 +1,10 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.registrar.event import (
-    CreateRegistrarEvent,
-    EditRegistrarEvent,
-    DeleteRegistrarEvent,
+    RegistrarCreatedEvent,
+    RegistrarDeletedEvent,
+    RegistrarEditedEvent,
 )
 from .schema import RegistrarSchema
 
@@ -17,13 +17,16 @@ class RegistrarNotifier:
         self.bus = bus
 
     def created(self, registrar):
-        event = CreateRegistrarEvent(self.schema.dump(registrar))
-        self.bus.send_bus_event(event)
+        payload = self.schema.dump(registrar)
+        event = RegistrarCreatedEvent(payload)
+        self.bus.queue_event(event)
 
     def edited(self, registrar):
-        event = EditRegistrarEvent(self.schema.dump(registrar))
-        self.bus.send_bus_event(event)
+        payload = self.schema.dump(registrar)
+        event = RegistrarEditedEvent(payload)
+        self.bus.queue_event(event)
 
     def deleted(self, registrar):
-        event = DeleteRegistrarEvent(self.schema.dump(registrar))
-        self.bus.send_bus_event(event)
+        payload = self.schema.dump(registrar)
+        event = RegistrarDeletedEvent(payload)
+        self.bus.queue_event(event)

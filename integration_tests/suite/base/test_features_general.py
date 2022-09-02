@@ -83,6 +83,6 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.features.general
-    yield s.check_bus_event_ignore_headers, 'config.features_general.edited', url.put, {
-        'options': {}
-    }
+    headers = {}
+
+    yield s.check_event, 'features_general_edited', headers, url.put, {'options': {}}

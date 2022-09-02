@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -6,6 +6,7 @@ from hamcrest import assert_that, equal_to, has_entries
 from . import confd
 from ..helpers import scenarios as s
 from ..helpers import fixtures
+from ..helpers.config import MAIN_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 
 
@@ -164,7 +165,9 @@ def _update_user_fallbacks_with_nonexistent_destination(group_uuid, destination)
 @fixtures.group()
 def test_bus_events(group):
     url = confd.groups(group['uuid']).fallbacks.put
-    yield s.check_bus_event, 'config.groups.fallbacks.edited', url
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'group_fallback_edited', headers, url
 
 
 @fixtures.group()

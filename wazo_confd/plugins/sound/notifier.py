@@ -1,8 +1,7 @@
 # Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.sound.event import CreateSoundEvent, DeleteSoundEvent
-
+from xivo_bus.resources.sound.event import SoundCreatedEvent, SoundDeletedEvent
 from wazo_confd import bus
 
 
@@ -11,17 +10,12 @@ class SoundNotifier:
         self.bus = bus
 
     def created(self, sound):
-        event = CreateSoundEvent(sound.name)
-        headers = self._build_headers(sound)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SoundCreatedEvent(sound.name, sound.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, sound):
-        event = DeleteSoundEvent(sound.name)
-        headers = self._build_headers(sound)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, sound):
-        return {'tenant_uuid': str(sound.tenant_uuid)}
+        event = SoundDeletedEvent(sound.name, sound.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

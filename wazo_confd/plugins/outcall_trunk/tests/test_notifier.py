@@ -19,15 +19,14 @@ class TestOutcallTrunkNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.outcall = Mock(Outcall, id=2, tenant_uuid=uuid4())
         self.trunk = Mock(Trunk, id=1)
-        self.expected_headers = {'tenant_uuid': str(self.outcall.tenant_uuid)}
 
         self.notifier = OutcallTrunkNotifier(self.bus)
 
     def test_associate_then_bus_event(self):
-        expected_event = OutcallTrunksAssociatedEvent(self.outcall.id, [self.trunk.id])
+        expected_event = OutcallTrunksAssociatedEvent(
+            self.outcall.id, [self.trunk.id], self.outcall.tenant_uuid
+        )
 
         self.notifier.associated_all_trunks(self.outcall, [self.trunk])
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.outcall.event import (
-    CreateOutcallEvent,
-    DeleteOutcallEvent,
-    EditOutcallEvent,
+    OutcallCreatedEvent,
+    OutcallDeletedEvent,
+    OutcallEditedEvent,
 )
 
 from wazo_confd import bus
@@ -15,22 +15,16 @@ class OutcallNotifier:
         self.bus = bus
 
     def created(self, outcall):
-        event = CreateOutcallEvent(outcall.id)
-        headers = self._build_headers(outcall)
-        self.bus.send_bus_event(event, headers=headers)
+        event = OutcallCreatedEvent(outcall.id, outcall.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, outcall):
-        event = EditOutcallEvent(outcall.id)
-        headers = self._build_headers(outcall)
-        self.bus.send_bus_event(event, headers=headers)
+        event = OutcallEditedEvent(outcall.id, outcall.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, outcall):
-        event = DeleteOutcallEvent(outcall.id)
-        headers = self._build_headers(outcall)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, outcall):
-        return {'tenant_uuid': str(outcall.tenant_uuid)}
+        event = OutcallDeletedEvent(outcall.id, outcall.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

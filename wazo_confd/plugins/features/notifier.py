@@ -1,10 +1,10 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.features.event import (
-    EditFeaturesApplicationmapEvent,
-    EditFeaturesFeaturemapEvent,
-    EditFeaturesGeneralEvent,
+    FeaturesApplicationmapEditedEvent,
+    FeaturesFeaturemapEditedEvent,
+    FeaturesGeneralEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -21,14 +21,14 @@ class FeaturesConfigurationNotifier:
 
     def edited(self, section_name, features):
         if section_name == 'applicationmap':
-            event = EditFeaturesApplicationmapEvent()
-            self.bus.send_bus_event(event)
+            event = FeaturesApplicationmapEditedEvent()
+            self.bus.queue_event(event)
         elif section_name == 'featuremap':
-            event = EditFeaturesFeaturemapEvent()
-            self.bus.send_bus_event(event)
+            event = FeaturesFeaturemapEditedEvent()
+            self.bus.queue_event(event)
         elif section_name == 'general':
-            event = EditFeaturesGeneralEvent()
-            self.bus.send_bus_event(event)
+            event = FeaturesGeneralEditedEvent()
+            self.bus.queue_event(event)
 
         self.send_sysconfd_handlers(['module reload features'])
 

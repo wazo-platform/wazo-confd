@@ -2,35 +2,34 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.device.event import (
-    CreateDeviceEvent,
-    DeleteDeviceEvent,
-    EditDeviceEvent,
+    DeviceCreatedEvent,
+    DeviceDeletedEvent,
+    DeviceEditedEvent,
 )
 
 from wazo_confd import bus
 
 
 class DeviceNotifier:
-    def __init__(self, bus):
+    def __init__(self, bus, immediate=False):
         self.bus = bus
+        self.immediate = immediate
 
     def created(self, device):
-        event = CreateDeviceEvent(device.id)
-        headers = self._build_headers(device)
-        self.bus.send_bus_event(event, headers=headers)
+        event = DeviceCreatedEvent(device.id, device.tenant_uuid)
+        self.send_bus_event(event)
 
     def edited(self, device):
-        event = EditDeviceEvent(device.id)
-        headers = self._build_headers(device)
-        self.bus.send_bus_event(event, headers=headers)
+        event = DeviceEditedEvent(device.id, device.tenant_uuid)
+        self.send_bus_event(event)
 
     def deleted(self, device):
-        event = DeleteDeviceEvent(device.id)
-        headers = self._build_headers(device)
-        self.bus.send_bus_event(event, headers=headers)
+        event = DeviceDeletedEvent(device.id, device.tenant_uuid)
+        self.send_bus_event(event)
 
-    def _build_headers(self, device):
-        return {'tenant_uuid': str(device.tenant_uuid)}
+    @property
+    def send_bus_event(self):
+        return self.bus.publish if self.immediate else self.bus.queue_event
 
 
 def build_notifier():

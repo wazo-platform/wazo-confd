@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.line.event import (
-    CreateLineEvent,
-    DeleteLineEvent,
-    EditLineEvent,
+    LineCreatedEvent,
+    LineDeletedEvent,
+    LineEditedEvent,
 )
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
@@ -36,7 +36,6 @@ class TestLineNotifier(unittest.TestCase):
             'tenant_uuid': str(self.line.tenant_uuid),
             'protocol': self.line.protocol,
         }
-        self.expected_headers = {'tenant_uuid': str(self.line.tenant_uuid)}
 
         self.notifier = LineNotifier(self.sysconfd, self.bus)
 
@@ -46,13 +45,11 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_line_created_then_event_sent_on_bus(self):
-        expected_event = CreateLineEvent(self.line_serialized)
+        expected_event = LineCreatedEvent(self.line_serialized, self.line.tenant_uuid)
 
         self.notifier.created(self.line)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_line_edited_then_sip_reloaded(self):
         updated_fields = ['name']
@@ -72,13 +69,11 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_line_edited_then_event_sent_on_bus(self):
-        expected_event = EditLineEvent(self.line_serialized)
+        expected_event = LineEditedEvent(self.line_serialized, self.line.tenant_uuid)
 
         self.notifier.edited(self.line, None)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_line_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.line)
@@ -86,10 +81,8 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_line_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteLineEvent(self.line_serialized)
+        expected_event = LineDeletedEvent(self.line_serialized, self.line.tenant_uuid)
 
         self.notifier.deleted(self.line)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

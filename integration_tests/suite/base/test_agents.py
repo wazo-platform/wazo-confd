@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -280,8 +280,12 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.agent()
 def test_bus_events(agent):
-    yield s.check_bus_event, 'config.agent.created', confd.agents.post, {
+    expected_headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'agent_created', expected_headers, confd.agents.post, {
         'number': '123456789123456789'
     }
-    yield s.check_bus_event, 'config.agent.edited', confd.agents(agent['id']).put
-    yield s.check_bus_event, 'config.agent.deleted', confd.agents(agent['id']).delete
+    yield s.check_event, 'agent_edited', expected_headers, confd.agents(agent['id']).put
+    yield s.check_event, 'agent_deleted', expected_headers, confd.agents(
+        agent['id']
+    ).delete

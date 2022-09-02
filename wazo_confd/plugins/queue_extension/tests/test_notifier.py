@@ -24,18 +24,17 @@ class TestQueueExtensionNotifier(unittest.TestCase):
         self.sysconfd = Mock()
         self.extension = Mock(Extension, id=1)
         self.queue = Mock(Queue, id=2, tenant_uuid=uuid4())
-        self.expected_headers = {'tenant_uuid': str(self.queue.tenant_uuid)}
 
         self.notifier = QueueExtensionNotifier(self.bus, self.sysconfd)
 
     def test_associate_then_bus_event(self):
-        expected_event = QueueExtensionAssociatedEvent(self.queue.id, self.extension.id)
+        expected_event = QueueExtensionAssociatedEvent(
+            self.queue.id, self.extension.id, self.queue.tenant_uuid
+        )
 
         self.notifier.associated(self.queue, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.queue, self.extension)
@@ -44,14 +43,12 @@ class TestQueueExtensionNotifier(unittest.TestCase):
 
     def test_dissociate_then_bus_event(self):
         expected_event = QueueExtensionDissociatedEvent(
-            self.queue.id, self.extension.id
+            self.queue.id, self.extension.id, self.queue.tenant_uuid
         )
 
         self.notifier.dissociated(self.queue, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.queue, self.extension)

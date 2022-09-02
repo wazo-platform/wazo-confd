@@ -56,6 +56,8 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.features.applicationmap
-    yield s.check_bus_event_ignore_headers, 'config.features_applicationmap.edited', url.put, {
+    headers = {}
+
+    yield s.check_event, 'features_applicationmap_edited', headers, url.put, {
         'options': REQUIRED_OPTIONS
     }

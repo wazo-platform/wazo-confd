@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -32,10 +32,7 @@ _do_not_log_data_endpoints = []
 def get_bus_publisher():
     publisher = g.get('bus_publisher')
     if not publisher:
-        publisher = g.bus_publisher = BusPublisher.from_config(
-            app.config['bus'],
-            app.config['uuid'],
-        )
+        publisher = g.bus_publisher = BusPublisher.from_reference()
     return publisher
 
 

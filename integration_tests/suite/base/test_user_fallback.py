@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -219,7 +219,9 @@ def _update_user_fallbacks_with_nonexistent_destination(user_id, destination):
 @fixtures.user()
 def test_bus_events(user):
     url = confd.users(user['uuid']).fallbacks.put
-    yield s.check_bus_event, 'config.users.fallbacks.edited', url
+    headers = {'tenant_uuid': user['tenant_uuid']}
+
+    yield s.check_event, 'user_fallback_edited', headers, url
 
 
 @fixtures.user(

@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -584,8 +584,11 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.queue()
 def test_bus_events(queue):
-    yield s.check_bus_event, 'config.queue.created', confd.queues.post, {
+    url = confd.queues(queue['id'])
+    headers = {'tenant_uuid': queue['tenant_uuid']}
+
+    yield s.check_event, 'queue_created', headers, confd.queues.post, {
         'name': 'queue_bus_event'
     }
-    yield s.check_bus_event, 'config.queue.edited', confd.queues(queue['id']).put
-    yield s.check_bus_event, 'config.queue.deleted', confd.queues(queue['id']).delete
+    yield s.check_event, 'queue_edited', headers, url.put
+    yield s.check_event, 'queue_deleted', headers, url.delete

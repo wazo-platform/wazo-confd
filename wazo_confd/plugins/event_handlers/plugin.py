@@ -10,7 +10,6 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
-from wazo_confd._bus import InstantBusPublisher
 from wazo_confd.plugins.device.model import Device
 from wazo_confd.plugins.device.notifier import DeviceNotifier
 
@@ -27,8 +26,8 @@ class TenantEventHandler:
         self.device_notifier = device_notifier
 
     def subscribe(self, bus_consumer):
-        bus_consumer.on_event('auth_tenant_added', self._auth_tenant_added)
-        bus_consumer.on_event('auth_tenant_deleted', self._auth_tenant_deleted)
+        bus_consumer.subscribe('auth_tenant_added', self._auth_tenant_added)
+        bus_consumer.subscribe('auth_tenant_deleted', self._auth_tenant_deleted)
 
     def _auth_tenant_added(self, event):
         tenant_uuid = event['uuid']
@@ -67,16 +66,13 @@ class Plugin:
     def load(self, dependencies):
         config = dependencies['config']
         bus_consumer = dependencies['bus_consumer']
+        bus_publisher = dependencies['bus_publisher']
         token_changed_subscribe = dependencies['token_changed_subscribe']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
-        instant_bus_publisher = InstantBusPublisher.from_config(
-            config['bus'],
-            config['uuid'],
-        )
-        device_notifier = DeviceNotifier(instant_bus_publisher)
+        device_notifier = DeviceNotifier(bus_publisher, immediate=True)
 
         service = DefaultSIPTemplateService(sip_dao, transport_dao)
         tenant_event_handler = TenantEventHandler(

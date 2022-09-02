@@ -1,8 +1,7 @@
 # Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.queue.event import EditQueueFallbackEvent
-
+from xivo_bus.resources.queue.event import QueueFallbackEditedEvent
 from wazo_confd import bus
 
 
@@ -11,12 +10,8 @@ class QueueFallbackNotifier:
         self.bus = bus
 
     def edited(self, queue):
-        event = EditQueueFallbackEvent(queue.id)
-        headers = self._build_headers(queue)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, queue):
-        return {'tenant_uuid': str(queue.tenant_uuid)}
+        event = QueueFallbackEditedEvent(queue.id, queue.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

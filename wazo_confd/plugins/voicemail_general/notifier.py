@@ -1,8 +1,7 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.voicemail_general.event import EditVoicemailGeneralEvent
-
+from xivo_bus.resources.voicemail_general.event import VoicemailGeneralEditedEvent
 from wazo_confd import bus, sysconfd
 
 
@@ -16,8 +15,8 @@ class VoicemailGeneralNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, voicemail_general):
-        event = EditVoicemailGeneralEvent()
-        self.bus.send_bus_event(event)
+        event = VoicemailGeneralEditedEvent()
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['voicemail reload'])
 
 

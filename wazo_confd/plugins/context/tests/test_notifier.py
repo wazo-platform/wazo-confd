@@ -6,9 +6,9 @@ import unittest
 from unittest.mock import Mock
 
 from xivo_bus.resources.context.event import (
-    CreateContextEvent,
-    DeleteContextEvent,
-    EditContextEvent,
+    ContextCreatedEvent,
+    ContextDeletedEvent,
+    ContextEditedEvent,
 )
 
 from ..notifier import ContextNotifier
@@ -39,13 +39,13 @@ class TestContextNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_context_created_then_event_sent_on_bus(self):
-        expected_event = CreateContextEvent(**self.expected_body)
+        expected_event = ContextCreatedEvent(
+            self.expected_body, self.context.tenant_uuid
+        )
 
         self.notifier.created(self.context)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_context_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.context)
@@ -53,13 +53,13 @@ class TestContextNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_context_edited_then_event_sent_on_bus(self):
-        expected_event = EditContextEvent(**self.expected_body)
+        expected_event = ContextEditedEvent(
+            self.expected_body, self.context.tenant_uuid
+        )
 
         self.notifier.edited(self.context)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_context_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.context)
@@ -67,10 +67,10 @@ class TestContextNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_context_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteContextEvent(**self.expected_body)
+        expected_event = ContextDeletedEvent(
+            self.expected_body, self.context.tenant_uuid
+        )
 
         self.notifier.deleted(self.context)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

@@ -28,12 +28,9 @@ class GroupMemberNotifier:
         self.send_sysconfd_handlers()
         user_uuids = [member.user.uuid for member in members]
         event = GroupMemberUsersAssociatedEvent(
-            group_id=group.id,
-            group_uuid=str(group.uuid),
-            user_uuids=user_uuids,
+            group.id, group.uuid, user_uuids, group.tenant_uuid
         )
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.queue_event(event)
 
     def extensions_associated(self, group, members):
         self.send_sysconfd_handlers()
@@ -42,15 +39,9 @@ class GroupMemberNotifier:
             for member in members
         ]
         event = GroupMemberExtensionsAssociatedEvent(
-            group_id=group.id,
-            group_uuid=str(group.uuid),
-            extensions=extensions,
+            group.id, group.uuid, extensions, group.tenant_uuid
         )
-        headers = self._build_headers(group)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, group):
-        return {'tenant_uuid': str(group.tenant_uuid)}
+        self.bus.queue_event(event)
 
 
 def build_notifier():

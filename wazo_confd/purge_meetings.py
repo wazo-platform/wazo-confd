@@ -124,10 +124,10 @@ def main():
     init_db_from_config(config)
 
     wazo_uuid = info_dao.get().uuid
-    bus = BusPublisher.from_config(
-        config['bus'],
-        wazo_uuid,
-    )
+    if 'uuid' not in config:
+        config['uuid'] = wazo_uuid
+
+    bus = BusPublisher.from_config(config['uuid'], config['bus'])
     sysconfd = SysconfdPublisher.from_config(config)
 
     if not cli_args['authorizations_only']:

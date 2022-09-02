@@ -21,28 +21,23 @@ class TestOutcallScheduleNotifier(unittest.TestCase):
         self.bus = Mock()
         self.schedule = Mock(Schedule, id=1)
         self.outcall = Mock(Outcall, id=2, tenant_uuid=uuid4())
-        self.expected_headers = {'tenant_uuid': str(self.outcall.tenant_uuid)}
 
         self.notifier = OutcallScheduleNotifier(self.bus)
 
     def test_associate_then_bus_event(self):
         expected_event = OutcallScheduleAssociatedEvent(
-            self.outcall.id, self.schedule.id
+            self.outcall.id, self.schedule.id, self.outcall.tenant_uuid
         )
 
         self.notifier.associated(self.outcall, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):
         expected_event = OutcallScheduleDissociatedEvent(
-            self.outcall.id, self.schedule.id
+            self.outcall.id, self.schedule.id, self.outcall.tenant_uuid
         )
 
         self.notifier.dissociated(self.outcall, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

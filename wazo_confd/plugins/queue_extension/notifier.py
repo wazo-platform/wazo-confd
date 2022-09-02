@@ -20,18 +20,15 @@ class QueueExtensionNotifier:
 
     def associated(self, queue, extension):
         self.send_sysconfd_handlers()
-        event = QueueExtensionAssociatedEvent(queue.id, extension.id)
-        headers = self._build_headers(queue)
-        self.bus.send_bus_event(event, headers=headers)
+        event = QueueExtensionAssociatedEvent(queue.id, extension.id, queue.tenant_uuid)
+        self.bus.queue_event(event)
 
     def dissociated(self, queue, extension):
         self.send_sysconfd_handlers()
-        event = QueueExtensionDissociatedEvent(queue.id, extension.id)
-        headers = self._build_headers(queue)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, queue):
-        return {'tenant_uuid': str(queue.tenant_uuid)}
+        event = QueueExtensionDissociatedEvent(
+            queue.id, extension.id, queue.tenant_uuid
+        )
+        self.bus.queue_event(event)
 
 
 def build_notifier():

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -230,10 +230,9 @@ def test_delete_multi_tenant(main, sub):
 
 @fixtures.outcall()
 def test_bus_events(outcall):
-    yield s.check_bus_event, 'config.outcalls.created', confd.outcalls.post, {
-        'name': 'a'
-    }
-    yield s.check_bus_event, 'config.outcalls.edited', confd.outcalls(outcall['id']).put
-    yield s.check_bus_event, 'config.outcalls.deleted', confd.outcalls(
-        outcall['id']
-    ).delete
+    url = confd.outcalls(outcall['id'])
+    headers = {'tenant_uuid': outcall['tenant_uuid']}
+
+    yield s.check_event, 'outcall_created', headers, confd.outcalls.post, {'name': 'a'}
+    yield s.check_event, 'outcall_edited', headers, url.put
+    yield s.check_event, 'outcall_deleted', headers, url.delete

@@ -14,17 +14,16 @@ class IncallScheduleNotifier:
         self._bus = bus
 
     def associated(self, incall, schedule):
-        event = IncallScheduleAssociatedEvent(incall.id, schedule.id)
-        headers = self._build_headers(incall)
-        self._bus.send_bus_event(event, headers=headers)
+        event = IncallScheduleAssociatedEvent(
+            incall.id, schedule.id, incall.tenant_uuid
+        )
+        self._bus.queue_event(event)
 
     def dissociated(self, incall, schedule):
-        event = IncallScheduleDissociatedEvent(incall.id, schedule.id)
-        headers = self._build_headers(incall)
-        self._bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, incall):
-        return {'tenant_uuid': str(incall.tenant_uuid)}
+        event = IncallScheduleDissociatedEvent(
+            incall.id, schedule.id, incall.tenant_uuid
+        )
+        self._bus.queue_event(event)
 
 
 def build_notifier():

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.func_key.event import (
-    CreateFuncKeyTemplateEvent,
-    DeleteFuncKeyTemplateEvent,
-    EditFuncKeyTemplateEvent,
+    FuncKeyTemplateCreatedEvent,
+    FuncKeyTemplateDeletedEvent,
+    FuncKeyTemplateEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -22,31 +22,25 @@ class FuncKeyTemplateNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, template):
-        event = CreateFuncKeyTemplateEvent(template.id)
-        headers = self._build_headers(template)
-        self.bus.send_bus_event(event, headers=headers)
+        event = FuncKeyTemplateCreatedEvent(template.id, template.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, template, updated_fields):
-        event = EditFuncKeyTemplateEvent(template.id)
-        headers = self._build_headers(template)
-        self.bus.send_bus_event(event, headers=headers)
+        event = FuncKeyTemplateEditedEvent(template.id, template.tenant_uuid)
+        self.bus.queue_event(event)
         if updated_fields is None or updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
             self._reload_sccp(template)
 
     def deleted(self, template):
-        event = DeleteFuncKeyTemplateEvent(template.id)
-        headers = self._build_headers(template)
-        self.bus.send_bus_event(event, headers=headers)
+        event = FuncKeyTemplateDeletedEvent(template.id, template.tenant_uuid)
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['dialplan reload'])
         self._reload_sccp(template)
 
     def _reload_sccp(self, template):
         if self.device_db.template_has_sccp_device(template.id):
             self.send_sysconfd_handlers(['module reload chan_sccp.so'])
-
-    def _build_headers(self, template):
-        return {'tenant_uuid': str(template.tenant_uuid)}
 
 
 def build_notifier():

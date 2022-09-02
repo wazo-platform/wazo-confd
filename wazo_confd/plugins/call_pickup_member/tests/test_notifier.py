@@ -38,16 +38,16 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
 
     def test_interceptor_users_associate_then_bus_event(self):
         expected_event = CallPickupInterceptorUsersAssociatedEvent(
-            self.call_pickup.id, [self.user1.uuid, self.user2.uuid]
+            self.call_pickup.id,
+            [self.user1.uuid, self.user2.uuid],
+            self.call_pickup.tenant_uuid,
         )
 
         self.notifier.interceptor_users_associated(
             self.call_pickup, [self.user1, self.user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_interceptor_users_associate_then_sysconfd_event(self):
         self.notifier.interceptor_users_associated(
@@ -58,16 +58,16 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
 
     def test_target_users_associate_then_bus_event(self):
         expected_event = CallPickupTargetUsersAssociatedEvent(
-            self.call_pickup.id, [self.user1.uuid, self.user2.uuid]
+            self.call_pickup.id,
+            [self.user1.uuid, self.user2.uuid],
+            self.call_pickup.tenant_uuid,
         )
 
         self.notifier.target_users_associated(
             self.call_pickup, [self.user1, self.user2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_target_users_associate_then_sysconfd_event(self):
         self.notifier.target_users_associated(
@@ -78,16 +78,16 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
 
     def test_interceptor_groups_associate_then_bus_event(self):
         expected_event = CallPickupInterceptorGroupsAssociatedEvent(
-            self.call_pickup.id, [self.group1.uuid, self.group2.uuid]
+            self.call_pickup.id,
+            [self.group1.id, self.group2.id],
+            self.call_pickup.tenant_uuid,
         )
 
         self.notifier.interceptor_groups_associated(
             self.call_pickup, [self.group1, self.group2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_interceptor_groups_associate_then_sysconfd_event(self):
         self.notifier.interceptor_groups_associated(
@@ -98,16 +98,16 @@ class TestCallPickupInterceptorUserNotifier(unittest.TestCase):
 
     def test_target_groups_associate_then_bus_event(self):
         expected_event = CallPickupTargetGroupsAssociatedEvent(
-            self.call_pickup.id, [self.group1.uuid, self.group2.uuid]
+            self.call_pickup.id,
+            [self.group1.id, self.group2.id],
+            self.call_pickup.tenant_uuid,
         )
 
         self.notifier.target_groups_associated(
             self.call_pickup, [self.group1, self.group2]
         )
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_target_groups_associate_then_sysconfd_event(self):
         self.notifier.target_groups_associated(

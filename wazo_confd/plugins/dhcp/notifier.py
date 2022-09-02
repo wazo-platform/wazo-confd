@@ -1,7 +1,7 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.dhcp.event import EditDHCPEvent
+from xivo_bus.resources.dhcp.event import DHCPEditedEvent
 
 
 class DHCPNotifier:
@@ -10,7 +10,7 @@ class DHCPNotifier:
         self.sysconfd = sysconfd
 
     def edited(self):
-        event = EditDHCPEvent()
-        self.bus.send_bus_event(event)
+        event = DHCPEditedEvent()
+        self.bus.queue_event(event)
         self.sysconfd.commonconf_generate()
         self.sysconfd.commonconf_apply()

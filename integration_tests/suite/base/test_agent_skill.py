@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -235,5 +235,7 @@ def test_delete_skill_when_agent_and_skill_associated(agent, skill):
 @fixtures.skill()
 def test_bus_events(agent, skill):
     url = confd.agents(agent['id']).skills(skill['id'])
-    yield s.check_bus_event, 'config.agents.skills.updated', url.put
-    yield s.check_bus_event, 'config.agents.skills.deleted', url.delete
+    expected_headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'agent_skill_associated', expected_headers, url.put
+    yield s.check_event, 'agent_skill_dissociated', expected_headers, url.delete

@@ -22,24 +22,23 @@ class TestUserScheduleNotifier(unittest.TestCase):
         self.bus = Mock()
         self.schedule = Mock(id=1)
         self.user = Mock(id=2, tenant_uuid=TENANT_UUID)
-        self.expected_headers = {'tenant_uuid': TENANT_UUID}
 
         self.notifier = UserScheduleNotifier(self.bus)
 
     def test_associate_then_bus_event(self):
-        expected_event = UserScheduleAssociatedEvent(self.user.id, self.schedule.id)
+        expected_event = UserScheduleAssociatedEvent(
+            self.schedule.id, self.user.tenant_uuid, self.user.uuid
+        )
 
         self.notifier.associated(self.user, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):
-        expected_event = UserScheduleDissociatedEvent(self.user.id, self.schedule.id)
+        expected_event = UserScheduleDissociatedEvent(
+            self.schedule.id, self.user.tenant_uuid, self.user.uuid
+        )
 
         self.notifier.dissociated(self.user, self.schedule)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

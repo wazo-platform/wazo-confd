@@ -5,7 +5,7 @@ import unittest
 
 from unittest.mock import Mock
 
-from xivo_bus.resources.sccp_general.event import EditSCCPGeneralEvent
+from xivo_bus.resources.sccp_general.event import SCCPGeneralEditedEvent
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 
 from ..notifier import SCCPGeneralNotifier
@@ -22,11 +22,11 @@ class TestSCCPGeneralNotifier(unittest.TestCase):
         self.notifier = SCCPGeneralNotifier(self.bus, self.sysconfd)
 
     def test_when_sccp_general_edited_then_event_sent_on_bus(self):
-        expected_event = EditSCCPGeneralEvent()
+        expected_event = SCCPGeneralEditedEvent()
 
         self.notifier.edited(self.sccp_general)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_sccp_general_edited_then_sccp_reloaded(self):
         self.notifier.edited(self.sccp_general)

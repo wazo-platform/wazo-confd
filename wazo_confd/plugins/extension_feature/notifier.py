@@ -1,7 +1,7 @@
 # Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.extension_feature.event import EditExtensionFeatureEvent
+from xivo_bus.resources.extension_feature.event import ExtensionFeatureEditedEvent
 
 from wazo_confd import bus, sysconfd
 
@@ -16,8 +16,8 @@ class ExtensionFeatureNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, extension, updated_fields):
-        event = EditExtensionFeatureEvent(extension.id)
-        self.bus.send_bus_event(event)
+        event = ExtensionFeatureEditedEvent(extension.id)
+        self.bus.queue_event(event)
         if updated_fields:
             self.send_sysconfd_handlers(['dialplan reload'])
 

@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries
@@ -215,13 +215,17 @@ def test_delete_call_permission_when_group_and_call_permission_associated_by_uui
 @fixtures.group()
 @fixtures.call_permission()
 def test_bus_events(group, call_permission):
+    headers = {'tenant_uuid': group['tenant_uuid']}
+
     yield (
-        s.check_bus_event,
-        'config.groups.*.callpermissions.updated',
+        s.check_event,
+        'group_call_permission_associated',
+        headers,
         confd.groups(group['uuid']).callpermissions(call_permission['id']).put,
     )
     yield (
-        s.check_bus_event,
-        'config.groups.*.callpermissions.deleted',
+        s.check_event,
+        'group_call_permission_dissociated',
+        headers,
         confd.groups(group['uuid']).callpermissions(call_permission['id']).delete,
     )

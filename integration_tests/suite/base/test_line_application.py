@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -176,11 +176,7 @@ def test_delete_application_when_line_and_application_associated(line, applicati
 @fixtures.application()
 def test_bus_events(line, application):
     url = confd.lines(line['id']).applications(application['uuid'])
-    routing_key = 'config.lines.{}.applications.{}.updated'.format(
-        line['id'], application['uuid']
-    )
-    yield s.check_bus_event, routing_key, url.put
-    routing_key = 'config.lines.{}.applications.{}.deleted'.format(
-        line['id'], application['uuid']
-    )
-    yield s.check_bus_event, routing_key, url.delete
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'line_application_associated', headers, url.put
+    yield s.check_event, 'line_application_dissociated', headers, url.delete

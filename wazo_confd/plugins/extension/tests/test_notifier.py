@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.extension.event import (
-    CreateExtensionEvent,
-    DeleteExtensionEvent,
-    EditExtensionEvent,
+    ExtensionCreatedEvent,
+    ExtensionDeletedEvent,
+    ExtensionEditedEvent,
 )
 from xivo_dao.alchemy.extension import Extension
 
@@ -27,20 +27,20 @@ class TestExtensionNotifier(unittest.TestCase):
             context='default',
             tenant_uuid=str(uuid4()),
         )
-        self.expected_headers = {'tenant_uuid': self.extension.tenant_uuid}
 
         self.notifier = ExtensionNotifier(self.sysconfd, self.bus)
 
     def test_when_extension_created_then_event_sent_on_bus(self):
-        expected_event = CreateExtensionEvent(
-            self.extension.id, self.extension.exten, self.extension.context
+        expected_event = ExtensionCreatedEvent(
+            self.extension.id,
+            self.extension.exten,
+            self.extension.context,
+            self.extension.tenant_uuid,
         )
 
         self.notifier.created(self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_extension_created_then_dialplan_reloaded(self):
         expected_handlers = {'ipbx': ['dialplan reload']}
@@ -82,15 +82,16 @@ class TestExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_not_called()
 
     def test_when_extension_edited_then_event_sent_on_bus(self):
-        expected_event = EditExtensionEvent(
-            self.extension.id, self.extension.exten, self.extension.context
+        expected_event = ExtensionEditedEvent(
+            self.extension.id,
+            self.extension.exten,
+            self.extension.context,
+            self.extension.tenant_uuid,
         )
 
         self.notifier.edited(self.extension, None)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_extension_deleted_then_dialplan_reloaded(self):
         expected_handlers = {'ipbx': ['dialplan reload']}
@@ -99,12 +100,13 @@ class TestExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_extension_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteExtensionEvent(
-            self.extension.id, self.extension.exten, self.extension.context
+        expected_event = ExtensionDeletedEvent(
+            self.extension.id,
+            self.extension.exten,
+            self.extension.context,
+            self.extension.tenant_uuid,
         )
 
         self.notifier.deleted(self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

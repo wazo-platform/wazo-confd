@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.skill_rule.event import (
-    CreateSkillRuleEvent,
-    DeleteSkillRuleEvent,
-    EditSkillRuleEvent,
+    SkillRuleCreatedEvent,
+    SkillRuleDeletedEvent,
+    SkillRuleEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -21,24 +21,18 @@ class SkillRuleNotifier:
 
     def created(self, skill_rule):
         self.send_sysconfd_handlers()
-        event = CreateSkillRuleEvent(skill_rule.id)
-        headers = self._build_headers(skill_rule)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SkillRuleCreatedEvent(skill_rule.id, skill_rule.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, skill_rule):
         self.send_sysconfd_handlers()
-        event = EditSkillRuleEvent(skill_rule.id)
-        headers = self._build_headers(skill_rule)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SkillRuleEditedEvent(skill_rule.id, skill_rule.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, skill_rule):
         self.send_sysconfd_handlers()
-        event = DeleteSkillRuleEvent(skill_rule.id)
-        headers = self._build_headers(skill_rule)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, skill_rule):
-        return {'tenant_uuid': str(skill_rule.tenant_uuid)}
+        event = SkillRuleDeletedEvent(skill_rule.id, skill_rule.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

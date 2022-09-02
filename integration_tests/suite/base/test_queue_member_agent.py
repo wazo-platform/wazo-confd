@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -245,5 +245,7 @@ def test_delete_agent_when_queue_and_agent_associated(queue, agent):
 @fixtures.agent()
 def test_bus_events(queue, agent):
     url = confd.queues(queue['id']).members.agents(agent['id'])
-    yield s.check_bus_event, 'config.agent_queue_association.created', url.put
-    yield s.check_bus_event, 'config.agent_queue_association.deleted', url.delete
+    headers = {'tenant_uuid': queue['tenant_uuid']}
+
+    yield s.check_event, 'queue_member_agent_associated', headers, url.put
+    yield s.check_event, 'queue_member_agent_dissociated', headers, url.delete

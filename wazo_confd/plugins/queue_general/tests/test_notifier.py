@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import Mock
 
-from xivo_bus.resources.queue_general.event import EditQueueGeneralEvent
+from xivo_bus.resources.queue_general.event import QueueGeneralEditedEvent
 
 from ..notifier import QueueGeneralNotifier
 
@@ -20,11 +20,11 @@ class TestQueueGeneralNotifier(unittest.TestCase):
         self.notifier = QueueGeneralNotifier(self.bus, self.sysconfd)
 
     def test_when_queue_general_edited_then_event_sent_on_bus(self):
-        expected_event = EditQueueGeneralEvent()
+        expected_event = QueueGeneralEditedEvent()
 
         self.notifier.edited(self.queue_general)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_queue_general_edited_then_queue_reloaded(self):
         self.notifier.edited(self.queue_general)

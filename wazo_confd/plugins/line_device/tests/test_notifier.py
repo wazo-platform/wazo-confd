@@ -72,36 +72,34 @@ class TestLineDeviceNotifier(unittest.TestCase):
 
     def test_associate_then_bus_event(self):
         expected_event = LineDeviceAssociatedEvent(
-            line={
+            {
                 'id': self.line.id,
                 'name': self.line.name,
                 'endpoint_sip': self.line.endpoint_sip,
                 'endpoint_sccp': self.line.endpoint_sccp,
                 'endpoint_custom': self.line.endpoint_custom,
             },
-            device={'id': self.device.id},
+            {'id': self.device.id},
+            self.line.tenant_uuid,
         )
 
         self.notifier.associated(self.line, self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_bus_event(self):
         expected_event = LineDeviceDissociatedEvent(
-            line={
+            {
                 'id': self.line.id,
                 'name': self.line.name,
                 'endpoint_sip': self.line.endpoint_sip,
                 'endpoint_sccp': self.line.endpoint_sccp,
                 'endpoint_custom': self.line.endpoint_custom,
             },
-            device={'id': self.device.id},
+            {'id': self.device.id},
+            self.line.tenant_uuid,
         )
 
         self.notifier.dissociated(self.line, self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

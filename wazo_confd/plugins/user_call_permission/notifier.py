@@ -14,17 +14,16 @@ class UserCallPermissionNotifier:
         self.bus = bus
 
     def associated(self, user, call_permission):
-        event = UserCallPermissionAssociatedEvent(user.uuid, call_permission.id)
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
+        event = UserCallPermissionAssociatedEvent(
+            call_permission.id, user.tenant_uuid, user.uuid
+        )
+        self.bus.queue_event(event)
 
     def dissociated(self, user, call_permission):
-        event = UserCallPermissionDissociatedEvent(user.uuid, call_permission.id)
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user):
-        return {'tenant_uuid': str(user.tenant_uuid)}
+        event = UserCallPermissionDissociatedEvent(
+            call_permission.id, user.tenant_uuid, user.uuid
+        )
+        self.bus.queue_event(event)
 
 
 def build_notifier():

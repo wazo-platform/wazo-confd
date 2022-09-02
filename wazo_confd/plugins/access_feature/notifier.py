@@ -1,10 +1,10 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.access_feature.event import (
-    CreateAccessFeatureEvent,
-    DeleteAccessFeatureEvent,
-    EditAccessFeatureEvent,
+    AccessFeatureCreatedEvent,
+    AccessFeatureDeletedEvent,
+    AccessFeatureEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -22,18 +22,18 @@ class AccessFeatureNotifier:
 
     def created(self, access_feature):
         self.sysconfd.restart_phoned()
-        event = CreateAccessFeatureEvent(self.schema.dump(access_feature))
-        self.bus.send_bus_event(event)
+        event = AccessFeatureCreatedEvent(self.schema.dump(access_feature))
+        self.bus.queue_event(event)
 
     def edited(self, access_feature):
         self.sysconfd.restart_phoned()
-        event = EditAccessFeatureEvent(self.schema.dump(access_feature))
-        self.bus.send_bus_event(event)
+        event = AccessFeatureEditedEvent(self.schema.dump(access_feature))
+        self.bus.queue_event(event)
 
     def deleted(self, access_feature):
         self.sysconfd.restart_phoned()
-        event = DeleteAccessFeatureEvent(self.schema.dump(access_feature))
-        self.bus.send_bus_event(event)
+        event = AccessFeatureDeletedEvent(self.schema.dump(access_feature))
+        self.bus.queue_event(event)
 
 
 def build_notifier():

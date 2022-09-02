@@ -1,7 +1,7 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_bus.resources.iax_callnumberlimits.event import EditIAXCallNumberLimitsEvent
+from xivo_bus.resources.iax_callnumberlimits.event import IAXCallNumberLimitsEditedEvent
 
 from wazo_confd import bus, sysconfd
 
@@ -16,8 +16,8 @@ class IAXCallNumberLimitsNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def edited(self, iax_callnumberlimits):
-        event = EditIAXCallNumberLimitsEvent()
-        self.bus.send_bus_event(event)
+        event = IAXCallNumberLimitsEditedEvent()
+        self.bus.queue_event(event)
         self.send_sysconfd_handlers(['iax2 reload'])
 
 

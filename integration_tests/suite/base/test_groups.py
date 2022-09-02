@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -475,17 +475,21 @@ def test_delete_multi_tenant_by_uuid(main, sub):
 
 @fixtures.group()
 def test_bus_events(group):
-    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'group_created', headers, confd.groups.post, {
         'label': 'group_bus_event'
     }
-    yield s.check_bus_event, 'config.groups.edited', confd.groups(group['id']).put
-    yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['id']).delete
+    yield s.check_event, 'group_edited', headers, confd.groups(group['id']).put
+    yield s.check_event, 'group_deleted', headers, confd.groups(group['id']).delete
 
 
 @fixtures.group()
 def test_bus_events_by_uuid(group):
-    yield s.check_bus_event, 'config.groups.created', confd.groups.post, {
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'group_created', headers, confd.groups.post, {
         'label': 'group_bus_event_with_uuid'
     }
-    yield s.check_bus_event, 'config.groups.edited', confd.groups(group['uuid']).put
-    yield s.check_bus_event, 'config.groups.deleted', confd.groups(group['uuid']).delete
+    yield s.check_event, 'group_edited', headers, confd.groups(group['uuid']).put
+    yield s.check_event, 'group_deleted', headers, confd.groups(group['uuid']).delete

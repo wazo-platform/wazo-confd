@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -210,6 +210,9 @@ def test_delete_multi_tenant(main, sub):
 
 
 def test_bus_events():
-    yield s.check_bus_event, 'config.external_apps.created', confd.external.apps.myname.post
-    yield s.check_bus_event, 'config.external_apps.edited', confd.external.apps.myname.put
-    yield s.check_bus_event, 'config.external_apps.deleted', confd.external.apps.myname.delete
+    url = confd.external.apps.myname
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'external_app_created', headers, url.post
+    yield s.check_event, 'external_app_edited', headers, url.put
+    yield s.check_event, 'external_app_deleted', headers, url.delete

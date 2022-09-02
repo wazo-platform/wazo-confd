@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.outcall.event import (
-    CreateOutcallEvent,
-    EditOutcallEvent,
-    DeleteOutcallEvent,
+    OutcallCreatedEvent,
+    OutcallDeletedEvent,
+    OutcallEditedEvent,
 )
 from xivo_dao.alchemy.outcall import Outcall
 
@@ -20,33 +20,26 @@ class TestOutcallNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.outcall = Mock(Outcall, id=1234, tenant_uuid=uuid4())
-        self.expected_headers = {'tenant_uuid': str(self.outcall.tenant_uuid)}
 
         self.notifier = OutcallNotifier(self.bus)
 
     def test_when_outcall_created_then_event_sent_on_bus(self):
-        expected_event = CreateOutcallEvent(self.outcall.id)
+        expected_event = OutcallCreatedEvent(self.outcall.id, self.outcall.tenant_uuid)
 
         self.notifier.created(self.outcall)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_outcall_edited_then_event_sent_on_bus(self):
-        expected_event = EditOutcallEvent(self.outcall.id)
+        expected_event = OutcallEditedEvent(self.outcall.id, self.outcall.tenant_uuid)
 
         self.notifier.edited(self.outcall)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_outcall_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteOutcallEvent(self.outcall.id)
+        expected_event = OutcallDeletedEvent(self.outcall.id, self.outcall.tenant_uuid)
 
         self.notifier.deleted(self.outcall)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

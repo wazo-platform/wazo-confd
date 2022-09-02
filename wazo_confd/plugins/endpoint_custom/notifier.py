@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_custom.event import (
-    CreateCustomEndpointEvent,
-    DeleteCustomEndpointEvent,
-    EditCustomEndpointEvent,
+    CustomEndpointCreatedEvent,
+    CustomEndpointDeletedEvent,
+    CustomEndpointEditedEvent,
 )
 
 from wazo_confd import bus
@@ -26,24 +26,18 @@ class CustomEndpointNotifier:
 
     def created(self, custom):
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
-        event = CreateCustomEndpointEvent(custom_serialized)
-        headers = self._build_headers(custom)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CustomEndpointCreatedEvent(custom_serialized, custom.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, custom):
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
-        event = EditCustomEndpointEvent(custom_serialized)
-        headers = self._build_headers(custom)
-        self.bus.send_bus_event(event, headers=headers)
+        event = CustomEndpointEditedEvent(custom_serialized, custom.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, custom):
         custom_serialized = CustomSchema(only=ENDPOINT_CUSTOM_FIELDS).dump(custom)
-        event = DeleteCustomEndpointEvent(custom_serialized)
-        headers = self._build_headers(custom)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, custom):
-        return {'tenant_uuid': str(custom.tenant_uuid)}
+        event = CustomEndpointDeletedEvent(custom_serialized, custom.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

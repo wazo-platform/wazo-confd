@@ -4,7 +4,7 @@
 import unittest
 from unittest.mock import Mock
 
-from xivo_bus.resources.voicemail_general.event import EditVoicemailGeneralEvent
+from xivo_bus.resources.voicemail_general.event import VoicemailGeneralEditedEvent
 from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
 from ..notifier import VoicemailGeneralNotifier
@@ -21,11 +21,11 @@ class TestVoicemailGeneralNotifier(unittest.TestCase):
         self.notifier = VoicemailGeneralNotifier(self.bus, self.sysconfd)
 
     def test_when_voicemail_general_edited_then_event_sent_on_bus(self):
-        expected_event = EditVoicemailGeneralEvent()
+        expected_event = VoicemailGeneralEditedEvent()
 
         self.notifier.edited(self.voicemail_general)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_voicemail_general_edited_then_voicemail_reloaded(self):
         self.notifier.edited(self.voicemail_general)

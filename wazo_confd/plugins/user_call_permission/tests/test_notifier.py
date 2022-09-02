@@ -21,28 +21,23 @@ class TestUserCallPermissionNotifier(unittest.TestCase):
         self.bus = Mock()
         self.call_permission = Mock(CallPermission, id=4)
         self.user = Mock(User, uuid='abcd-1234', tenant_uuid=str(uuid4()))
-        self.expected_headers = {'tenant_uuid': self.user.tenant_uuid}
 
         self.notifier = UserCallPermissionNotifier(self.bus)
 
     def test_when_call_permission_associate_to_user_then_event_sent_on_bus(self):
         expected_event = UserCallPermissionAssociatedEvent(
-            self.user.uuid, self.call_permission.id
+            self.call_permission.id, self.user.tenant_uuid, self.user.uuid
         )
 
         self.notifier.associated(self.user, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_call_permission_dissociate_to_user_then_event_sent_on_bus(self):
         expected_event = UserCallPermissionDissociatedEvent(
-            self.user.uuid, self.call_permission.id
+            self.call_permission.id, self.user.tenant_uuid, self.user.uuid
         )
 
         self.notifier.dissociated(self.user, self.call_permission)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

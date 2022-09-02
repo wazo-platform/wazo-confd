@@ -6,12 +6,12 @@ import uuid
 from unittest.mock import Mock
 
 from xivo_bus.resources.endpoint_sip.event import (
-    CreateSipEndpointEvent,
-    CreateSipEndpointTemplateEvent,
-    DeleteSipEndpointEvent,
-    DeleteSipEndpointTemplateEvent,
-    EditSipEndpointEvent,
-    EditSipEndpointTemplateEvent,
+    SIPEndpointCreatedEvent,
+    SIPEndpointDeletedEvent,
+    SIPEndpointEditedEvent,
+    SIPEndpointTemplateCreatedEvent,
+    SIPEndpointTemplateDeletedEvent,
+    SIPEndpointTemplateEditedEvent,
 )
 
 from ..notifier import SipEndpointNotifier, SipTemplateNotifier
@@ -44,18 +44,16 @@ class TestSipEndpointNotifier(unittest.TestCase):
             'trunk': self.sip.trunk,
             'line': self.sip.line,
         }
-        self.expected_headers = {'tenant_uuid': self.sip.tenant_uuid}
-
         self.notifier = SipEndpointNotifier(self.sysconfd, self.bus)
 
     def test_when_sip_endpoint_created_then_event_sent_on_bus(self):
-        expected_event = CreateSipEndpointEvent(self.sip_serialized)
+        expected_event = SIPEndpointCreatedEvent(
+            self.sip_serialized, self.sip.tenant_uuid
+        )
 
         self.notifier.created(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_sip_endpoint_edited_then_sip_reloaded(self):
         self.notifier.edited(self.sip)
@@ -63,13 +61,13 @@ class TestSipEndpointNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_sip_endpoint_edited_then_event_sent_on_bus(self):
-        expected_event = EditSipEndpointEvent(self.sip_serialized)
+        expected_event = SIPEndpointEditedEvent(
+            self.sip_serialized, self.sip.tenant_uuid
+        )
 
         self.notifier.edited(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_sip_endpoint_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.sip)
@@ -77,13 +75,13 @@ class TestSipEndpointNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_sip_endpoint_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteSipEndpointEvent(self.sip_serialized)
+        expected_event = SIPEndpointDeletedEvent(
+            self.sip_serialized, self.sip.tenant_uuid
+        )
 
         self.notifier.deleted(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
 
 class TestSipTemplateNotifier(unittest.TestCase):
@@ -97,13 +95,11 @@ class TestSipTemplateNotifier(unittest.TestCase):
         self.notifier = SipTemplateNotifier(self.sysconfd, self.bus)
 
     def test_when_sip_template_created_then_event_sent_on_bus(self):
-        expected_event = CreateSipEndpointTemplateEvent({})
+        expected_event = SIPEndpointTemplateCreatedEvent({}, self.sip.tenant_uuid)
 
         self.notifier.created(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_sip_template_edited_then_sip_reloaded(self):
         self.notifier.edited(self.sip)
@@ -111,13 +107,11 @@ class TestSipTemplateNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_sip_template_edited_then_event_sent_on_bus(self):
-        expected_event = EditSipEndpointTemplateEvent({})
+        expected_event = SIPEndpointTemplateEditedEvent({}, self.sip.tenant_uuid)
 
         self.notifier.edited(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_sip_template_deleted_then_sip_reloaded(self):
         self.notifier.deleted(self.sip)
@@ -125,10 +119,8 @@ class TestSipTemplateNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_sip_template_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteSipEndpointTemplateEvent({})
+        expected_event = SIPEndpointTemplateDeletedEvent({}, self.sip.tenant_uuid)
 
         self.notifier.deleted(self.sip)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

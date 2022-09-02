@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -255,5 +255,7 @@ def test_delete_extension_when_group_and_extension_associated():
 @fixtures.group()
 def test_bus_events(extension, group):
     url = confd.groups(group['uuid']).extensions(extension['id'])
-    yield s.check_bus_event, 'config.groups.extensions.updated', url.put
-    yield s.check_bus_event, 'config.groups.extensions.deleted', url.delete
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'group_extension_associated', headers, url.put
+    yield s.check_event, 'group_extension_dissociated', headers, url.delete

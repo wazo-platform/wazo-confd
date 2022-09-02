@@ -5,9 +5,9 @@ import unittest
 from unittest.mock import Mock
 
 from xivo_bus.resources.register.event import (
-    CreateRegisterIAXEvent,
-    DeleteRegisterIAXEvent,
-    EditRegisterIAXEvent,
+    RegisterIAXCreatedEvent,
+    RegisterIAXDeletedEvent,
+    RegisterIAXEditedEvent,
 )
 
 from ..notifier import RegisterIAXNotifier
@@ -25,25 +25,25 @@ class TestRegisterIAXNotifier(unittest.TestCase):
         self.notifier = RegisterIAXNotifier(self.bus, self.sysconfd)
 
     def test_when_register_iax_created_then_event_sent_on_bus(self):
-        expected_event = CreateRegisterIAXEvent(self.register_iax.id)
+        expected_event = RegisterIAXCreatedEvent(self.register_iax.id)
 
         self.notifier.created(self.register_iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_register_iax_edited_then_event_sent_on_bus(self):
-        expected_event = EditRegisterIAXEvent(self.register_iax.id)
+        expected_event = RegisterIAXEditedEvent(self.register_iax.id)
 
         self.notifier.edited(self.register_iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_register_iax_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteRegisterIAXEvent(self.register_iax.id)
+        expected_event = RegisterIAXDeletedEvent(self.register_iax.id)
 
         self.notifier.deleted(self.register_iax)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_register_iax_created_then_iax_reloaded(self):
         self.notifier.created(self.register_iax)

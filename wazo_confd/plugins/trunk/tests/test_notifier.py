@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.trunk.event import (
-    CreateTrunkEvent,
-    DeleteTrunkEvent,
-    EditTrunkEvent,
+    TrunkCreatedEvent,
+    TrunkDeletedEvent,
+    TrunkEditedEvent,
 )
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 
@@ -28,36 +28,29 @@ class TestTrunkNotifier(unittest.TestCase):
             endpoint_custom_id=None,
             tenant_uuid=uuid4(),
         )
-        self.expected_headers = {'tenant_uuid': str(self.trunk.tenant_uuid)}
 
         self.notifier = TrunkNotifier(self.bus, self.sysconfd)
 
     def test_when_trunk_created_then_event_sent_on_bus(self):
-        expected_event = CreateTrunkEvent(self.trunk.id)
+        expected_event = TrunkCreatedEvent(self.trunk.id, self.trunk.tenant_uuid)
 
         self.notifier.created(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_edited_then_event_sent_on_bus(self):
-        expected_event = EditTrunkEvent(self.trunk.id)
+        expected_event = TrunkEditedEvent(self.trunk.id, self.trunk.tenant_uuid)
 
         self.notifier.edited(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteTrunkEvent(self.trunk.id)
+        expected_event = TrunkDeletedEvent(self.trunk.id, self.trunk.tenant_uuid)
 
         self.notifier.deleted(self.trunk)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_trunk_sip_edited_then_sip_reloaded(self):
         self.trunk.endpoint_sip_uuid = 123

@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.parking_lot.event import (
-    CreateParkingLotEvent,
-    DeleteParkingLotEvent,
-    EditParkingLotEvent,
+    ParkingLotCreatedEvent,
+    ParkingLotDeletedEvent,
+    ParkingLotEditedEvent,
 )
 
 from ..notifier import ParkingLotNotifier
@@ -22,7 +22,6 @@ class TestParkingLotNotifier(unittest.TestCase):
         self.bus = Mock()
         self.sysconfd = Mock()
         self.parking_lot = Mock(id=1234, tenant_uuid=uuid4())
-        self.expected_headers = {'tenant_uuid': str(self.parking_lot.tenant_uuid)}
 
         self.notifier = ParkingLotNotifier(self.bus, self.sysconfd)
 
@@ -32,13 +31,13 @@ class TestParkingLotNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_parking_lot_created_then_event_sent_on_bus(self):
-        expected_event = CreateParkingLotEvent(self.parking_lot.id)
+        expected_event = ParkingLotCreatedEvent(
+            self.parking_lot.id, self.parking_lot.tenant_uuid
+        )
 
         self.notifier.created(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_parking_lot_edited_then_res_parking_reloaded(self):
         self.notifier.edited(self.parking_lot)
@@ -46,13 +45,13 @@ class TestParkingLotNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_parking_lot_edited_then_event_sent_on_bus(self):
-        expected_event = EditParkingLotEvent(self.parking_lot.id)
+        expected_event = ParkingLotEditedEvent(
+            self.parking_lot.id, self.parking_lot.tenant_uuid
+        )
 
         self.notifier.edited(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_parking_lot_deleted_then_res_parking_reloaded(self):
         self.notifier.deleted(self.parking_lot)
@@ -60,10 +59,10 @@ class TestParkingLotNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_parking_lot_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteParkingLotEvent(self.parking_lot.id)
+        expected_event = ParkingLotDeletedEvent(
+            self.parking_lot.id, self.parking_lot.tenant_uuid
+        )
 
         self.notifier.deleted(self.parking_lot)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -185,14 +185,16 @@ def test_edit_voicemail_when_still_associated(user, voicemail):
 @fixtures.user()
 @fixtures.voicemail()
 def test_bus_events(user, voicemail):
+    headers = {
+        'tenant_uuid': voicemail['tenant_uuid'],
+        f'user_uuid:{user["uuid"]}': True,
+    }
+
     url = confd.users(user['id']).voicemails(voicemail['id']).put
-    yield s.check_bus_event, 'config.users.{}.voicemails.updated'.format(
-        user['uuid']
-    ), url
+    yield s.check_event, 'user_voicemail_associated', headers, url
+
     url = confd.users(user['id']).voicemails.delete
-    yield s.check_bus_event, 'config.users.{}.voicemails.deleted'.format(
-        user['uuid']
-    ), url
+    yield s.check_event, 'user_voicemail_dissociated', headers, url
 
 
 @fixtures.user()

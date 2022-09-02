@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -374,10 +374,12 @@ def test_delete_when_agent_is_logged(context, agent_login_status):
 
 @fixtures.context()
 def test_bus_events(context):
-    yield s.check_bus_event, 'config.contexts.created', confd.contexts.post, {
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'context_created', headers, confd.contexts.post, {
         'name': 'bus_event'
     }
-    yield s.check_bus_event, 'config.contexts.edited', confd.contexts(context['id']).put
-    yield s.check_bus_event, 'config.contexts.deleted', confd.contexts(
+    yield s.check_event, 'context_edited', headers, confd.contexts(context['id']).put
+    yield s.check_event, 'context_deleted', headers, confd.contexts(
         context['id']
     ).delete

@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.external_app.event import (
-    CreateExternalAppEvent,
-    DeleteExternalAppEvent,
-    EditExternalAppEvent,
+    ExternalAppCreatedEvent,
+    ExternalAppDeletedEvent,
+    ExternalAppEditedEvent,
 )
 
 from wazo_confd import bus
@@ -20,24 +20,18 @@ class ExternalAppNotifier:
 
     def created(self, app):
         app_serialized = ExternalAppSchema(only=ONLY_FIELDS).dump(app)
-        event = CreateExternalAppEvent(app_serialized)
-        headers = self._build_headers(app)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ExternalAppCreatedEvent(app_serialized, app.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, app):
         app_serialized = ExternalAppSchema(only=ONLY_FIELDS).dump(app)
-        event = EditExternalAppEvent(app_serialized)
-        headers = self._build_headers(app)
-        self.bus.send_bus_event(event, headers=headers)
+        event = ExternalAppEditedEvent(app_serialized, app.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, app):
         app_serialized = ExternalAppSchema(only=ONLY_FIELDS).dump(app)
-        event = DeleteExternalAppEvent(app_serialized)
-        headers = self._build_headers(app)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, app):
-        return {'tenant_uuid': str(app.tenant_uuid)}
+        event = ExternalAppDeletedEvent(app_serialized, app.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_notifier():

@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.user.event import (
-    CreateUserEvent,
-    DeleteUserEvent,
-    EditUserEvent,
-    EditUserForwardEvent,
-    EditUserServiceEvent,
+    UserCreatedEvent,
+    UserDeletedEvent,
+    UserEditedEvent,
+    UserForwardEditedEvent,
+    UserServiceEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -30,42 +30,36 @@ class UserNotifier:
 
     def created(self, user):
         self.send_sysconfd_handlers()
-        event = CreateUserEvent(
+        event = UserCreatedEvent(
             user.id,
             user.uuid,
-            subscription_type=user.subscription_type,
-            created_at=user.created_at,
-            tenant_uuid=user.tenant_uuid,
+            user.subscription_type,
+            user.created_at,
+            user.tenant_uuid,
         )
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.queue_event(event)
 
     def edited(self, user):
         self.send_sysconfd_handlers()
-        event = EditUserEvent(
+        event = UserEditedEvent(
             user.id,
             user.uuid,
-            subscription_type=user.subscription_type,
-            created_at=user.created_at,
-            tenant_uuid=user.tenant_uuid,
+            user.subscription_type,
+            user.created_at,
+            user.tenant_uuid,
         )
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
+        self.bus.queue_event(event)
 
     def deleted(self, user):
         self.send_sysconfd_handlers()
-        event = DeleteUserEvent(
+        event = UserDeletedEvent(
             user.id,
             user.uuid,
-            subscription_type=user.subscription_type,
-            created_at=user.created_at,
-            tenant_uuid=user.tenant_uuid,
+            user.subscription_type,
+            user.created_at,
+            user.tenant_uuid,
         )
-        headers = self._build_headers(user)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user):
-        return {'tenant_uuid': str(user.tenant_uuid)}
+        self.bus.queue_event(event)
 
 
 def build_notifier():
@@ -80,16 +74,10 @@ class UserServiceNotifier:
         services = schema.dump(user)
         for type_ in schema.types:
             service = services.get(type_, services)
-            event = EditUserServiceEvent(
-                user.id, user.uuid, user.tenant_uuid, type_, service['enabled']
+            event = UserServiceEditedEvent(
+                user.id, type_, service['enabled'], user.tenant_uuid, user.uuid
             )
-            self.bus.send_bus_event(
-                event,
-                headers={
-                    'user_uuid:{uuid}'.format(uuid=user.uuid): True,
-                    'tenant_uuid': str(user.tenant_uuid),
-                },
-            )
+            self.bus.queue_event(event)
 
 
 def build_notifier_service():
@@ -104,21 +92,16 @@ class UserForwardNotifier:
         forwards = schema.dump(user)
         for type_ in schema.types:
             forward = forwards.get(type_, forwards)
-            event = EditUserForwardEvent(
+            event = UserForwardEditedEvent(
                 user.id,
-                user.uuid,
-                str(user.tenant_uuid),
                 type_,
                 forward['enabled'],
                 forward['destination'],
+                user.tenant_uuid,
+                user.uuid,
             )
-            self.bus.send_bus_event(
-                event,
-                headers={
-                    'user_uuid:{uuid}'.format(uuid=user.uuid): True,
-                    'tenant_uuid': str(user.tenant_uuid),
-                },
-            )
+
+            self.bus.queue_event(event)
 
 
 def build_notifier_forward():

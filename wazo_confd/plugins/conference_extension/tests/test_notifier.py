@@ -30,14 +30,12 @@ class TestConferenceExtensionNotifier(unittest.TestCase):
 
     def test_associate_then_bus_event(self):
         expected_event = ConferenceExtensionAssociatedEvent(
-            self.conference.id, self.extension.id
+            self.conference.id, self.extension.id, self.conference.tenant_uuid
         )
 
         self.notifier.associated(self.conference, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_associate_then_sysconfd_event(self):
         self.notifier.associated(self.conference, self.extension)
@@ -46,14 +44,12 @@ class TestConferenceExtensionNotifier(unittest.TestCase):
 
     def test_dissociate_then_bus_event(self):
         expected_event = ConferenceExtensionDissociatedEvent(
-            self.conference.id, self.extension.id
+            self.conference.id, self.extension.id, self.conference.tenant_uuid
         )
 
         self.notifier.dissociated(self.conference, self.extension)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_dissociate_then_sysconfd_event(self):
         self.notifier.dissociated(self.conference, self.extension)

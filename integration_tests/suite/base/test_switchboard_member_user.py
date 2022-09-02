@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, empty, has_entries
@@ -165,7 +165,10 @@ def test_delete_user_when_switchboard_and_user_associated(
 def test_bus_events(switchboard, user):
     url = confd.switchboards(switchboard['uuid']).members.users.put
     body = {'users': [{'uuid': user['uuid']}]}
-    routing_key = 'config.switchboards.{}.members.users.updated'.format(
-        switchboard['uuid']
-    )
-    yield s.check_bus_event, routing_key, url, body
+    headers = {
+        'tenant_uuid': switchboard['tenant_uuid'],
+        'switchboard_uuid': switchboard['uuid'],
+        f'user_uuid:{user["uuid"]}': True,
+    }
+
+    yield s.check_event, 'switchboard_member_user_associated', headers, url, body

@@ -35,29 +35,26 @@ class UserLineNotifier:
         user_serialized = UserSchema(only=USER_FIELDS).dump(user_line.user)
         line_serialized = LineSchema(only=LINE_FIELDS).dump(user_line.line)
         event = UserLineAssociatedEvent(
-            user=user_serialized,
-            line=line_serialized,
-            main_user=user_line.main_user,
-            main_line=user_line.main_line,
+            user_serialized,
+            line_serialized,
+            user_line.main_user,
+            user_line.main_line,
+            user_line.user.tenant_uuid,
         )
-        headers = self._build_headers(user_line)
-        self._bus.send_bus_event(event, headers=headers)
+        self._bus.queue_event(event)
 
     def dissociated(self, user_line):
         self._send_sysconfd_handlers()
         user_serialized = UserSchema(only=USER_FIELDS).dump(user_line.user)
         line_serialized = LineSchema(only=LINE_FIELDS).dump(user_line.line)
         event = UserLineDissociatedEvent(
-            user=user_serialized,
-            line=line_serialized,
-            main_user=user_line.main_user,
-            main_line=user_line.main_line,
+            user_serialized,
+            line_serialized,
+            user_line.main_user,
+            user_line.main_line,
+            user_line.user.tenant_uuid,
         )
-        headers = self._build_headers(user_line)
-        self._bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, user_line):
-        return {'tenant_uuid': str(user_line.user.tenant_uuid)}
+        self._bus.queue_event(event)
 
 
 def build_notifier():

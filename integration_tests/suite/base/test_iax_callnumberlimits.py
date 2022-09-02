@@ -105,6 +105,6 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.iax.callnumberlimits
-    yield s.check_bus_event_ignore_headers, 'config.iax_callnumberlimits.edited', url.put, {
-        'items': []
-    }
+    headers = {}
+
+    yield s.check_event, 'iax_callnumberlimits_edited', headers, url.put, {'items': []}

@@ -5,9 +5,9 @@ import unittest
 from unittest.mock import Mock
 
 from xivo_bus.resources.features.event import (
-    EditFeaturesApplicationmapEvent,
-    EditFeaturesFeaturemapEvent,
-    EditFeaturesGeneralEvent,
+    FeaturesApplicationmapEditedEvent,
+    FeaturesFeaturemapEditedEvent,
+    FeaturesGeneralEditedEvent,
 )
 
 from ..notifier import FeaturesConfigurationNotifier
@@ -25,11 +25,11 @@ class TestFeaturesConfigurationNotifier(unittest.TestCase):
         self.notifier = FeaturesConfigurationNotifier(self.bus, self.sysconfd)
 
     def test_when_features_applicationmap_edited_then_event_sent_on_bus(self):
-        expected_event = EditFeaturesApplicationmapEvent()
+        expected_event = FeaturesApplicationmapEditedEvent()
 
         self.notifier.edited('applicationmap', self.features)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_features_applicationmap_edited_then_sip_reloaded(self):
         self.notifier.edited('applicationmap', self.features)
@@ -37,11 +37,11 @@ class TestFeaturesConfigurationNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_features_featuremap_edited_then_event_sent_on_bus(self):
-        expected_event = EditFeaturesFeaturemapEvent()
+        expected_event = FeaturesFeaturemapEditedEvent()
 
         self.notifier.edited('featuremap', self.features)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_features_featuremap_edited_then_sip_reloaded(self):
         self.notifier.edited('featuremap', self.features)
@@ -49,11 +49,11 @@ class TestFeaturesConfigurationNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_features_general_edited_then_event_sent_on_bus(self):
-        expected_event = EditFeaturesGeneralEvent()
+        expected_event = FeaturesGeneralEditedEvent()
 
         self.notifier.edited('general', self.features)
 
-        self.bus.send_bus_event.assert_called_once_with(expected_event)
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_features_general_edited_then_sip_reloaded(self):
         self.notifier.edited('general', self.features)

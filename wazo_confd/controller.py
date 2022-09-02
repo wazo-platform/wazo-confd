@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -16,7 +16,7 @@ from xivo.token_renewer import TokenRenewer
 from wazo_confd.helpers.asterisk import PJSIPDoc
 
 from . import auth
-from ._bus import BusConsumer, bus_consumer_thread
+from ._bus import BusPublisher, BusConsumer
 from .http_server import api, app, HTTPServer
 from .service_discovery import self_check
 
@@ -26,7 +26,9 @@ logger = logging.getLogger(__name__)
 class Controller:
     def __init__(self, config):
         self.config = config
-        self._bus_consumer = BusConsumer(config['bus'])
+        self._bus_consumer = BusConsumer.from_config(config['bus'])
+        self._bus_publisher = BusPublisher.from_config(config['uuid'], config['bus'])
+        self._bus_publisher.set_as_reference()
         self._service_discovery_args = [
             'wazo-confd',
             config['uuid'],
@@ -52,6 +54,7 @@ class Controller:
                 'config': config,
                 'token_changed_subscribe': self.token_renewer.subscribe_to_token_change,
                 'bus_consumer': self._bus_consumer,
+                'bus_publisher': self._bus_publisher,
                 'auth_client': auth_client,
                 'pjsip_doc': pjsip_doc,
             },
@@ -63,8 +66,8 @@ class Controller:
         signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
 
         with self.token_renewer:
-            with ServiceCatalogRegistration(*self._service_discovery_args):
-                with bus_consumer_thread(self._bus_consumer):
+            with self._bus_consumer:
+                with ServiceCatalogRegistration(*self._service_discovery_args):
                     self.http_server.run()
 
     def stop(self, reason):

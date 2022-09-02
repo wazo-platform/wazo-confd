@@ -7,9 +7,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.device.event import (
-    CreateDeviceEvent,
-    DeleteDeviceEvent,
-    EditDeviceEvent,
+    DeviceCreatedEvent,
+    DeviceDeletedEvent,
+    DeviceEditedEvent,
 )
 
 from ..notifier import DeviceNotifier
@@ -20,32 +20,25 @@ class TestDeviceNotifier(unittest.TestCase):
     def setUp(self):
         self.bus = Mock()
         self.device = Mock(Device, id='abcd1234', tenant_uuid=str(uuid4()))
-        self.expected_headers = {'tenant_uuid': self.device.tenant_uuid}
         self.notifier = DeviceNotifier(self.bus)
 
     def test_when_device_created_then_event_sent_on_bus(self):
-        expected_event = CreateDeviceEvent(self.device.id)
+        expected_event = DeviceCreatedEvent(self.device.id, self.device.tenant_uuid)
 
         self.notifier.created(self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_device_edited_then_event_sent_on_bus(self):
-        expected_event = EditDeviceEvent(self.device.id)
+        expected_event = DeviceEditedEvent(self.device.id, self.device.tenant_uuid)
 
         self.notifier.edited(self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_device_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteDeviceEvent(self.device.id)
+        expected_event = DeviceDeletedEvent(self.device.id, self.device.tenant_uuid)
 
         self.notifier.deleted(self.device)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)

@@ -19,7 +19,7 @@ from wazo_test_helpers import until
 from . import BaseIntegrationTest, confd, provd
 from ..helpers import associations, fixtures
 from ..helpers.config import CREATED_TENANT, DELETED_TENANT
-from ..helpers.bus import BusClientHeaders
+from ..helpers.bus import BusClient
 
 
 def test_create_default_templates_when_not_exist():
@@ -27,7 +27,7 @@ def test_create_default_templates_when_not_exist():
     assert_that(response.items, empty())
 
     with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
-        BusClientHeaders.send_tenant_created(CREATED_TENANT, 'myslug')
+        BusClient.send_tenant_created(CREATED_TENANT, 'myslug')
 
     def templates_created():
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
@@ -73,7 +73,7 @@ def test_delete_device_when_deleting_tenant(_, user, line, sip, extension, devic
         config = provd.configs.get(device_provd['config'])
 
         with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
-            BusClientHeaders.send_tenant_deleted(DELETED_TENANT, 'slug3')
+            BusClient.send_tenant_deleted(DELETED_TENANT, 'slug3')
 
         def device_deleted():
             assert_that(

@@ -843,7 +843,10 @@ def test_delete_by_uuid(user):
 
 @fixtures.user()
 def test_bus_events(user):
-    required_body = {'firstname': 'test-event-user'}
-    yield s.check_bus_event, 'config.user.created', confd.users.post, required_body
-    yield s.check_bus_event, 'config.user.edited', confd.users(user['id']).put
-    yield s.check_bus_event, 'config.user.deleted', confd.users(user['id']).delete
+    url = confd.users(user['id'])
+    body = {'firstname': 'test-event-user'}
+    headers = {'tenant_uuid': user['tenant_uuid']}
+
+    yield s.check_event, 'user_created', headers, confd.users.post, body
+    yield s.check_event, 'user_edited', headers, url.put
+    yield s.check_event, 'user_deleted', headers, url.delete

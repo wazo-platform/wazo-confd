@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import string
@@ -8,6 +8,7 @@ from hamcrest import assert_that, contains, has_entries
 
 from . import confd
 from ..helpers import associations as a, fixtures, scenarios as s, wrappers
+from ..helpers.config import MAIN_TENANT
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -204,4 +205,6 @@ def test_delete_group_when_group_and_extension_associated(
 def test_bus_events(group, extension):
     url = confd.groups(group['uuid']).members.extensions.put
     body = {'extensions': [extension]}
-    yield s.check_bus_event, 'config.groups.members.extensions.updated', url, body
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'group_member_extensions_associated', headers, url, body

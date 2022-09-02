@@ -3,11 +3,11 @@
 
 from xivo.xivo_helpers import clean_extension
 from xivo_bus.resources.meeting.event import (
-    CreateMeetingEvent,
-    DeleteMeetingEvent,
-    EditMeetingEvent,
+    MeetingCreatedEvent,
+    MeetingDeletedEvent,
+    MeetingEditedEvent,
     MeetingProgressEvent,
-    UserMeetingProgressEvent,
+    MeetingUserProgressEvent,
 )
 
 from wazo_confd import auth
@@ -32,13 +32,19 @@ class Notifier:
         ingress_http_service,
         extension_features_service,
         preset_tenant_uuid=None,
+        immediate=False,
     ):
         self.bus = bus
+        self.immediate = immediate
         self._schema_instance = MeetingSchema(only=MEETING_FIELDS)
         self.sysconfd = sysconfd
         self._ingress_http_service = ingress_http_service
         self._extension_features_service = extension_features_service
         self._preset_tenant_uuid = preset_tenant_uuid
+
+    @property
+    def send_bus_event(self):
+        return self.bus.publish if self.immediate else self.bus.queue_event
 
     def send_sysconfd_handlers(self, meeting, action):
         handlers = {
@@ -55,36 +61,32 @@ class Notifier:
 
     def created(self, meeting):
         self.send_sysconfd_handlers(meeting, 'created')
-        event = CreateMeetingEvent(self._schema().dump(meeting))
-        headers = self._build_headers(meeting)
-        self.bus.send_bus_event(event, headers=headers)
+        payload = self._schema().dump(meeting)
+        event = MeetingCreatedEvent(payload, meeting.tenant_uuid)
+        self.send_bus_event(event)
 
     def edited(self, meeting):
         self.send_sysconfd_handlers(meeting, 'edited')
-        event = EditMeetingEvent(self._schema().dump(meeting))
-        headers = self._build_headers(meeting)
-        self.bus.send_bus_event(event, headers=headers)
+        payload = self._schema().dump(meeting)
+        event = MeetingEditedEvent(payload, meeting.tenant_uuid)
+        self.send_bus_event(event)
 
     def deleted(self, meeting):
         self.send_sysconfd_handlers(meeting, 'deleted')
-        event = DeleteMeetingEvent(self._schema().dump(meeting))
-        headers = self._build_headers(meeting)
-        self.bus.send_bus_event(event, headers=headers)
+        payload = self._schema().dump(meeting)
+        event = MeetingDeletedEvent(payload, meeting.tenant_uuid)
+        self.send_bus_event(event)
 
     def ready(self, meeting):
         meeting_body = self._schema().dump(meeting)
-        event = MeetingProgressEvent(meeting_body, 'ready')
-        tenant_uuid = meeting.tenant_uuid
-        headers = self._build_headers(meeting)
-        self.bus.send_bus_event(event, headers=headers)
+        event = MeetingProgressEvent(meeting_body, 'ready', meeting.tenant_uuid)
+        self.send_bus_event(event)
+
         for owner_uuid in meeting_body['owner_uuids']:
-            event = UserMeetingProgressEvent(meeting_body, owner_uuid, 'ready')
-            headers = {
-                'name': UserMeetingProgressEvent.name,
-                f'user:{owner_uuid}': True,
-                'tenant_uuid': tenant_uuid,
-            }
-            self.bus.send_bus_event(event, headers)
+            event = MeetingUserProgressEvent(
+                meeting_body, 'ready', meeting.tenant_uuid, owner_uuid
+            )
+            self.send_bus_event(event)
 
     def _schema(self):
         if self._preset_tenant_uuid:
@@ -109,6 +111,3 @@ class Notifier:
             'exten_prefix': exten_prefix,
         }
         return self._schema_instance
-
-    def _build_headers(self, meeting):
-        return {'tenant_uuid': str(meeting.tenant_uuid)}

@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.endpoint_sip.event import (
-    CreateSipEndpointEvent,
-    CreateSipEndpointTemplateEvent,
-    DeleteSipEndpointEvent,
-    DeleteSipEndpointTemplateEvent,
-    EditSipEndpointEvent,
-    EditSipEndpointTemplateEvent,
+    SIPEndpointCreatedEvent,
+    SIPEndpointTemplateCreatedEvent,
+    SIPEndpointDeletedEvent,
+    SIPEndpointTemplateDeletedEvent,
+    SIPEndpointEditedEvent,
+    SIPEndpointTemplateEditedEvent,
 )
 
 from wazo_confd import bus, sysconfd
@@ -37,26 +37,20 @@ class SipEndpointNotifier:
 
     def created(self, sip):
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
-        event = CreateSipEndpointEvent(sip_serialized)
-        headers = self._build_headers(sip)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SIPEndpointCreatedEvent(sip_serialized, sip.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
-        event = EditSipEndpointEvent(sip_serialized)
-        headers = self._build_headers(sip)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SIPEndpointEditedEvent(sip_serialized, sip.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(sip)
-        event = DeleteSipEndpointEvent(sip_serialized)
-        headers = self._build_headers(sip)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, sip):
-        return {'tenant_uuid': str(sip.tenant_uuid)}
+        event = SIPEndpointDeletedEvent(sip_serialized, sip.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 class SipTemplateNotifier:
@@ -69,24 +63,18 @@ class SipTemplateNotifier:
         self.sysconfd.exec_request_handlers(handlers)
 
     def created(self, sip):
-        event = CreateSipEndpointTemplateEvent({})
-        headers = self._build_headers(sip)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SIPEndpointTemplateCreatedEvent({}, sip.tenant_uuid)
+        self.bus.queue_event(event)
 
     def edited(self, sip):
         self.send_sysconfd_handlers()
-        event = EditSipEndpointTemplateEvent({})
-        headers = self._build_headers(sip)
-        self.bus.send_bus_event(event, headers=headers)
+        event = SIPEndpointTemplateEditedEvent({}, sip.tenant_uuid)
+        self.bus.queue_event(event)
 
     def deleted(self, sip):
         self.send_sysconfd_handlers()
-        event = DeleteSipEndpointTemplateEvent({})
-        headers = self._build_headers(sip)
-        self.bus.send_bus_event(event, headers=headers)
-
-    def _build_headers(self, sip):
-        return {'tenant_uuid': sip.tenant_uuid}
+        event = SIPEndpointTemplateDeletedEvent({}, sip.tenant_uuid)
+        self.bus.queue_event(event)
 
 
 def build_endpoint_notifier():

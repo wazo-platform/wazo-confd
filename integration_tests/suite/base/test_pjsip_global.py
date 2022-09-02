@@ -61,6 +61,6 @@ def test_restrict_only_master_tenant():
 
 def test_bus_event_when_edited():
     url = confd.asterisk.pjsip.global_
-    yield s.check_bus_event_ignore_headers, 'config.pjsip_global.updated', url.put, {
-        'options': {}
-    }
+    headers = {}
+
+    yield s.check_event, 'pjsip_global_updated', headers, url.put, {'options': {}}

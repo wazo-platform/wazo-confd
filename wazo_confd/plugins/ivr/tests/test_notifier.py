@@ -5,7 +5,11 @@ import unittest
 
 from uuid import uuid4
 from unittest.mock import Mock
-from xivo_bus.resources.ivr.event import CreateIvrEvent, DeleteIvrEvent, EditIvrEvent
+from xivo_bus.resources.ivr.event import (
+    IVRCreatedEvent,
+    IVRDeletedEvent,
+    IVREditedEvent,
+)
 from xivo_dao.alchemy.ivr import IVR
 
 from ..notifier import IvrNotifier
@@ -24,31 +28,25 @@ class TestIvrNotifier(unittest.TestCase):
         self.notifier = IvrNotifier(self.bus, self.sysconfd)
 
     def test_when_ivr_created_then_event_sent_on_bus(self):
-        expected_event = CreateIvrEvent(self.ivr.id)
+        expected_event = IVRCreatedEvent(self.ivr.id, self.ivr.tenant_uuid)
 
         self.notifier.created(self.ivr)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_ivr_edited_then_event_sent_on_bus(self):
-        expected_event = EditIvrEvent(self.ivr.id)
+        expected_event = IVREditedEvent(self.ivr.id, self.ivr.tenant_uuid)
 
         self.notifier.edited(self.ivr)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_ivr_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteIvrEvent(self.ivr.id)
+        expected_event = IVRDeletedEvent(self.ivr.id, self.ivr.tenant_uuid)
 
         self.notifier.deleted(self.ivr)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)

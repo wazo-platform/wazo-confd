@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -199,11 +199,7 @@ def test_delete_endpoint_dissociates_line(line, custom):
 @fixtures.custom()
 def test_bus_events(line, custom):
     url = confd.lines(line['id']).endpoints.custom(custom['id'])
-    routing_key = 'config.lines.{}.endpoints.custom.{}.updated'.format(
-        line['id'], custom['id']
-    )
-    yield s.check_bus_event, routing_key, url.put
-    routing_key = 'config.lines.{}.endpoints.custom.{}.deleted'.format(
-        line['id'], custom['id']
-    )
-    yield s.check_bus_event, routing_key, url.delete
+    headers = {'tenant_uuid': MAIN_TENANT}
+
+    yield s.check_event, 'line_endpoint_custom_associated', headers, url.put
+    yield s.check_event, 'line_endpoint_custom_dissociated', headers, url.delete

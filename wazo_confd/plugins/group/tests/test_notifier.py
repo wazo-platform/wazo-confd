@@ -6,9 +6,9 @@ from uuid import uuid4
 from unittest.mock import Mock
 
 from xivo_bus.resources.group.event import (
-    CreateGroupEvent,
-    DeleteGroupEvent,
-    EditGroupEvent,
+    GroupCreatedEvent,
+    GroupDeletedEvent,
+    GroupEditedEvent,
 )
 
 from ..notifier import GroupNotifier
@@ -34,13 +34,13 @@ class TestGroupNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_group_created_then_event_sent_on_bus(self):
-        expected_event = CreateGroupEvent(**self.group_serialized)
+        expected_event = GroupCreatedEvent(
+            self.group_serialized, self.group.tenant_uuid
+        )
 
         self.notifier.created(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_group_edited_then_dialplan_reloaded(self):
         self.notifier.edited(self.group)
@@ -48,13 +48,11 @@ class TestGroupNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_group_edited_then_event_sent_on_bus(self):
-        expected_event = EditGroupEvent(**self.group_serialized)
+        expected_event = GroupEditedEvent(self.group_serialized, self.group.tenant_uuid)
 
         self.notifier.edited(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
 
     def test_when_group_deleted_then_dialplan_reloaded(self):
         self.notifier.deleted(self.group)
@@ -62,10 +60,10 @@ class TestGroupNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(EXPECTED_HANDLERS)
 
     def test_when_group_deleted_then_event_sent_on_bus(self):
-        expected_event = DeleteGroupEvent(**self.group_serialized)
+        expected_event = GroupDeletedEvent(
+            self.group_serialized, self.group.tenant_uuid
+        )
 
         self.notifier.deleted(self.group)
 
-        self.bus.send_bus_event.assert_called_once_with(
-            expected_event, headers=self.expected_headers
-        )
+        self.bus.queue_event.assert_called_once_with(expected_event)
