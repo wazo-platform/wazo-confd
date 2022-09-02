@@ -423,7 +423,7 @@ class UserSchemaNullableV2(UserSchemaV2):
             field_obj.allow_none = True
 
 
-class UnifiedUserSchema(mallow.Schema):
+class UserSchemaV2(mallow.Schema):
     user = Nested(
         UserSchemaNullableV2,
         required=True,

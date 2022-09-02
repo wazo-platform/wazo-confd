@@ -112,7 +112,6 @@ setup(
             'trunk = wazo_confd.plugins.trunk.plugin:Plugin',
             'trunk_endpoint = wazo_confd.plugins.trunk_endpoint.plugin:Plugin',
             'trunk_register = wazo_confd.plugins.trunk_register.plugin:Plugin',
-            'unified_user = wazo_confd.plugins.unified_user.plugin:Plugin',
             'user = wazo_confd.plugins.user.plugin:Plugin',
             'user_agent = wazo_confd.plugins.user_agent.plugin:Plugin',
             'user_call_permission = wazo_confd.plugins.user_call_permission.plugin:Plugin',
