@@ -1,0 +1,11 @@
+definitions:
+  TrunkRelationBase:
+    properties:
+      id:
+        type: integer
+        readOnly: true
+        description: The id of the trunk
+      tenant_uuid:
+        type: string
+        description: The UUID of the tenant
+        readOnly: true
