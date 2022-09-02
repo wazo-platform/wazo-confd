@@ -15,7 +15,7 @@ from .schema import (
     UserSchema,
     UserSchemaNullable,
     UserSummarySchema,
-    UnifiedUserSchema,
+    UserSchemaV2,
 )
 
 logger = logging.getLogger(__name__)
@@ -68,7 +68,7 @@ class UserItem(ItemResource):
         return super().delete(id)
 
 
-class UnifiedUserList(ListResource):
+class UserListV2(ListResource):
 
     api_version = '2.0'
 
@@ -81,8 +81,7 @@ class UnifiedUserList(ListResource):
 
     @required_acl('confd.users.create')
     def post(self):
-        logger.info("Create Unified User NEW")
-        UnifiedUserSchema().load(request.get_json())
+        UserSchemaV2().load(request.get_json())
 
         logger.info("Create User resource")
         user_dict, _, _ = self.user_list_resource.post()

@@ -3,7 +3,7 @@
 
 from wazo_provd_client import Client as ProvdClient
 
-from .resource import UnifiedUserList, UserItem, UserList
+from .resource import UserListV2, UserItem, UserList
 from .resource_sub import (
     UserForwardBusy,
     UserForwardList,
@@ -45,7 +45,7 @@ class Plugin:
         )
 
         api_v2_0.add_resource(
-            UnifiedUserList,
+            UserListV2,
             '/users',
             endpoint='users_list_v2.0',
             resource_class_args=(

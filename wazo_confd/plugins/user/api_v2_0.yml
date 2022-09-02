@@ -1,13 +1,9 @@
-swagger: '2.0'
-info:
-  title: Unified User API
-  version: '1.0'
 paths:
-  /unified_users:
+  /users:
     post:
-      operationId: create_unified_user
-      summary: Create user (Unified API)
-      description: '**Required ACL:** `confd.unified_users.create`'
+      operationId: create_user
+      summary: Create user
+      description: '**Required ACL:** `confd.users.create`'
       tags:
       - users
       parameters:
@@ -17,12 +13,12 @@ paths:
         description: User to create with all the associated resources
         required: true
         schema:
-          $ref: '#/definitions/UnifiedUserRequest'
+          $ref: '#/definitions/UserRequest'
       responses:
         '201':
           description: User created with all the associated resources
           schema:
-            $ref: '#/definitions/UnifiedUserResponse'
+            $ref: '#/definitions/UserResponse'
 
 parameters:
   tenant_uuid_required:
@@ -33,7 +29,7 @@ parameters:
     required: true
 
 definitions:
-  UnifiedUserRequest:
+  UserRequest:
     title: Unified User
     properties:
         user:
@@ -49,7 +45,7 @@ definitions:
           description: Line Section
           $ref: '#/definitions/LineView'
 
-  UnifiedUserResponse:
+  UserResponse:
     title: Unified User
     properties:
         user:
