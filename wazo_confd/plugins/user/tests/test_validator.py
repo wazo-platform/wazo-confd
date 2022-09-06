@@ -5,11 +5,10 @@ import unittest
 
 from unittest.mock import Mock, sentinel
 
-from xivo_dao.alchemy.user_line import UserLine
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.exception import ResourceError
 
-from ..validator import NoEmptyFieldWhenEnabled, NoLineAssociated, NoVoicemailAssociated
+from ..validator import NoEmptyFieldWhenEnabled, NoVoicemailAssociated
 
 
 class TestValidateNoVoicemailAssociated(unittest.TestCase):
@@ -26,30 +25,6 @@ class TestValidateNoVoicemailAssociated(unittest.TestCase):
         user = Mock(User, id=sentinel.id, voicemail=None)
 
         self.validator.validate(user)
-
-
-class TestValidateNoLineAssociated(unittest.TestCase):
-    def setUp(self):
-        self.dao = Mock()
-        self.validator = NoLineAssociated(self.dao)
-
-    def test_given_line_associated_then_validation_fails(self):
-        user = Mock(User, id=sentinel.id)
-        self.dao.find_all_by_user_id.return_value = [
-            Mock(UserLine, line_id=sentinel.line_id)
-        ]
-
-        self.assertRaises(ResourceError, self.validator.validate, user)
-
-        self.dao.find_all_by_user_id.assert_called_once_with(user.id)
-
-    def test_given_no_line_associated_then_validation_passes(self):
-        user = Mock(User, id=sentinel.id)
-        self.dao.find_all_by_user_id.return_value = []
-
-        self.validator.validate(user)
-
-        self.dao.find_all_by_user_id.assert_called_once_with(user.id)
 
 
 class TestNoEmptyFieldWhenEnabled(unittest.TestCase):
