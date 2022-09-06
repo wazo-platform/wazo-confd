@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..client import ConfdClient
@@ -9,6 +9,7 @@ class NewClientWrapper:
     def __init__(self):
         self.host = None
         self.port = None
+        self.version = None
         self.headers = None
         self.encoder = None
         self._client = None
@@ -25,7 +26,11 @@ class NewClientWrapper:
 
     def _create_client(self):
         return ConfdClient.from_options(
-            host=self.host, port=self.port, headers=self.headers, encoder=self.encoder
+            host=self.host,
+            port=self.port,
+            headers=self.headers,
+            encoder=self.encoder,
+            version=self.version,
         )
 
     def _reset(self):
@@ -67,11 +72,13 @@ provd = ProvdWrapper()
 def setup_confd(host, port):
     confd.host = host
     confd.port = port
+    confd.version = '1.1'
 
 
 def setup_new_client(host, port):
     new_client.host = host
     new_client.port = port
+    new_client.version = '1.1'
 
 
 def setup_database(host, port):
