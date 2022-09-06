@@ -7,6 +7,7 @@ from hamcrest import (
 )
 
 from . import confd, confd_v2_0
+from ..helpers import config, fixtures
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -54,8 +55,10 @@ def test_post_user_wrong_type_return_error():
         and response.json()['details']['user']['enabled']['constraint'] == 'boolean'
     )
 
-
-def test_post_full_user_no_error():
+@fixtures.transport()
+@fixtures.sip_template()
+@fixtures.registrar()
+def test_post_full_user_no_error(transport, template, registrar):
     user = {
         "subscription_type": 2,
         "firstname": "Rîchard",
@@ -80,16 +83,50 @@ def test_post_full_user_no_error():
         "username": "richardlapointe",
         "password": "secret",
     }
-    response = confd_v2_0.users.post({'user': user}).response
+    line = {
+        # 'context': config.CONTEXT,  # We will use the context from the extension
+        'position': 2,
+        'registrar': registrar['id'],
+        'provisioning_code': "887865",
+        'extension': {'context': config.CONTEXT, 'exten': '1001'},
+        'endpoint_type': 'sip',
+        'endpoint_sip': {
+            'name': 'foobar',
+            'label': 'Richard\'s line',
+            'auth_section_options': [
+                ['username', 'foobar'],
+                ['password', 'secret'],
+            ],
+            'endpoint_section_options': [
+                ['callerid', '"Rîchard Lâpointe" <1001>'],
+            ],
+            'transport': transport,
+            'templates': [template],
+        },
+    }
+
+    response = confd_v2_0.users.post({'user': user, 'lines': [line]}).response
+
     assert response.status_code == 201
 
     returned_json = response.json()
 
     assert 'user' in returned_json
+    assert 'lines' in returned_json
+
     created_user = returned_json['user']
+    created_lines = returned_json['lines'][0]
+    created_endpoint_sip = returned_json['lines'][0]['endpoint_sip']
 
     try:
         assert_that(created_user, has_entries(user))
         assert 'uuid' in created_user and created_user['uuid']
+
+        assert_that(created_lines, contains(has_entries(line)))
+        assert 'id' in created_line and created_line['id']
+
+        assert_that(created_endpoint_sip, has_entries(line['endpoint_sip']))
+        assert 'uuid' in created_endpoint_sip and created_endpoint_sip['uuid']
     finally:
         confd.users(created_user['id']).delete()
+
