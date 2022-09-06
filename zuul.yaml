@@ -2,18 +2,3 @@
     templates:
       - wazo-tox-linters
       - wazo-tox-py37
-      - debian-packaging-template
-    check:
-      jobs:
-        - confd-tox-integration
-    gate:
-      jobs:
-        - confd-tox-integration
-
-- job:
-    name: confd-tox-integration
-    description: Run confd integration tests
-    parent: wazo-tox-integration
-    timeout: 10800
-    vars:
-      integration_test_timeout: 60
