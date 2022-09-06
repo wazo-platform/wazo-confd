@@ -51,7 +51,7 @@ class Plugin:
             resource_class_args=(
                 service,
                 wazo_user_service,
-            )
+            ),
         )
 
         api_v1_1.add_resource(

@@ -35,7 +35,6 @@ class ListSchema(BaseSchema):
 
 
 class ConfdResource(ErrorCatchingResource):
-
     @property
     def method_decorators(self):
         api_version = getattr(self, 'api_version', '1.1')
