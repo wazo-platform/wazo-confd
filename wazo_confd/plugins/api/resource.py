@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class SwaggerResource(Resource):
-
     def __init__(self, api_filename):
         self.api_filename = api_filename
 

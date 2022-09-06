@@ -7,7 +7,14 @@ from marshmallow.validate import Length, Range, Regexp
 
 from xivo import mallow_helpers as mallow
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, StrictBooleanV2, Nested
+from wazo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+    StrictBoolean,
+    StrictBooleanV2,
+    Nested,
+)
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
@@ -242,7 +249,9 @@ class UserSchemaV2(BaseSchema):
     timezone = mallow.fields.String(validate=Length(max=128), allow_none=True)
     language = mallow.fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
     description = mallow.fields.String(allow_none=True)
-    caller_id = mallow.fields.String(validate=(Regexp(CALLER_ID_REGEX), Length(max=160)))
+    caller_id = mallow.fields.String(
+        validate=(Regexp(CALLER_ID_REGEX), Length(max=160))
+    )
     outgoing_caller_id = mallow.fields.String(validate=Length(max=80), allow_none=True)
     mobile_phone_number = mallow.fields.String(
         validate=(Regexp(MOBILE_PHONE_NUMBER_REGEX), Length(max=80)), allow_none=True
@@ -250,7 +259,9 @@ class UserSchemaV2(BaseSchema):
     username = mallow.fields.String(validate=Regexp(USERNAME_REGEX), allow_none=True)
     password = mallow.fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
     music_on_hold = mallow.fields.String(validate=Length(max=128), allow_none=True)
-    preprocess_subroutine = mallow.fields.String(validate=Length(max=39), allow_none=True)
+    preprocess_subroutine = mallow.fields.String(
+        validate=Length(max=39), allow_none=True
+    )
     userfield = mallow.fields.String(validate=Length(max=128), allow_none=True)
     call_transfer_enabled = StrictBooleanV2()
     dtmf_hangup_enabled = StrictBooleanV2()
