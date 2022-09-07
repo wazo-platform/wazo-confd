@@ -6,7 +6,7 @@ from hamcrest import (
     has_entries,
 )
 
-from . import confd_v2_0
+from . import confd, confd_v2_0
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -81,14 +81,15 @@ def test_post_full_user_no_error():
         "password": "secret",
     }
     response = confd_v2_0.users.post({'user': user}).response
-
     assert response.status_code == 201
 
     returned_json = response.json()
 
     assert 'user' in returned_json
-
     created_user = returned_json['user']
 
-    assert_that(created_user, has_entries(user))
-    assert 'uuid' in created_user and created_user['uuid']
+    try:
+        assert_that(created_user, has_entries(user))
+        assert 'uuid' in created_user and created_user['uuid']
+    finally:
+        confd.users(created_user['id']).delete()
