@@ -1,0 +1,34 @@
+paths:
+  /status:
+    get:
+      summary: Provides internal status of wazo-confd`
+      description: '**Required ACL:** `confd.status.read`'
+      tags:
+        - status
+      responses:
+        '200':
+          description: The internal status of wazo-confd
+          schema:
+            $ref: '#/definitions/StatusSummary'
+definitions:
+  StatusSummary:
+    type: object
+    properties:
+      bus_consumer:
+        $ref: '#/definitions/ComponentWithStatus'
+      master_tenant:
+        $ref: '#/definitions/ComponentWithStatus'
+      rest_api:
+        $ref: '#/definitions/ComponentWithStatus'
+      service_token:
+        $ref: '#/definitions/ComponentWithStatus'
+  ComponentWithStatus:
+    type: object
+    properties:
+      status:
+        $ref: '#/definitions/StatusValue'
+  StatusValue:
+    type: string
+    enum:
+      - fail
+      - ok
