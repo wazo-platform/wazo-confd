@@ -9,7 +9,8 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.resource import LineListV2
+from wazo_confd.plugins.line.resource import LineList
+from wazo_confd.plugins.extension.resource import ExtensionList
 
 from wazo_confd.plugins.line.schema import LineSchemaV2
 
@@ -75,11 +76,12 @@ class UserListV2(ListResource):
 
     api_version = '2.0'
 
-    def __init__(self, user_service, line_service, wazo_user_service):
-        self.user_list_resource = UserList(user_service, json_path='user')
-        self.line_list_resource = LineListV2(line_service, json_path='lines', many=True)
-        self.line_list_resource.schema = LineSchemaV2
-        self.wazo_user_service = wazo_user_service
+    def __init__(self, user_service, line_service, extension_service, wazo_user_service):
+        self._user_list_resource = UserList(user_service, json_path='user')
+        self._line_list_resource = LineList(line_service)
+        self._extension_list_resource = ExtensionList(extension_service)
+        self._line_list_resource.schema = LineSchemaV2
+        self._wazo_user_service = wazo_user_service
 
     def build_headers(self, user):
         return {'Location': url_for('users', id=user['id'], _external=True)}
@@ -89,22 +91,29 @@ class UserListV2(ListResource):
         body = UserSchemaV2().load(request.get_json())
 
         logger.info("Create User resource")
-        user_dict, _, _ = self.user_list_resource.post()
-        if 'lines' in body:
-            lines_list, _, _ = self.line_list_resource.post()
-        else:
-            lines_list = []
+        user_dict, _, _ = self._user_list_resource.post()
+        line_list = []
+
+        for line_body in body.get('lines') or []:
+            extensions = line_body.pop('extensions', None) or []
+            line, _, _ = self._line_list_resource._post(line_body)
+            extension_list = []
+            for extension_body in extensions:
+                extension, _, _ = self._extension_list_resource._post(extension_body)
+                extension_list.append(extension)
+            line['extensions'] = extension_list
+            line_list.append(line)
 
         logger.info("Create User authentication")
         # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
         fixed_user_dict = user_dict.copy()
         fixed_user_dict['email_address'] = fixed_user_dict['email']
-        self.wazo_user_service.create(fixed_user_dict)
+        self._wazo_user_service.create(fixed_user_dict)
 
         return (
             {
                 'user': user_dict,
-                'lines': lines_list,
+                'lines': line_list,
             },
             201,
             self.build_headers(user_dict),
