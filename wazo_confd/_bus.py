@@ -6,6 +6,7 @@ from collections import deque
 from xivo_bus.consumer import BusConsumer as Consumer
 from xivo_bus.mixins import PublisherMixin, WazoEventMixin
 from xivo_bus.base import Base
+from xivo.status import Status
 
 
 class FlushMixin:
@@ -50,3 +51,9 @@ class BusConsumer(Consumer):
     @classmethod
     def from_config(cls, bus_config):
         return cls(name='wazo-confd', **bus_config)
+
+    def provide_status(self, status):
+        status['bus_consumer']['status'] = (
+            Status.ok if self.consumer_connected() else Status.fail
+        )
+
