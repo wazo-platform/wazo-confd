@@ -9,6 +9,7 @@ from hamcrest import (
     has_entries,
 )
 
+
 def test_confd_status_is_ok():
     expected_entries = {
         'bus_consumer': {
@@ -26,5 +27,3 @@ def test_confd_status_is_ok():
     }
     response = confd.status.get()
     assert_that(response.item, has_entries(**expected_entries))
-
-

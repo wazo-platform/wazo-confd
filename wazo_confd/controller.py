@@ -48,7 +48,9 @@ class Controller:
                 auth.init_master_tenant
             )
         pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
-        self.token_renewer.subscribe_to_token_change(self.token_status.token_change_callback)
+        self.token_renewer.subscribe_to_token_change(
+            self.token_status.token_change_callback
+        )
         self.status_aggregator.add_provider(auth.provide_status)
         self.status_aggregator.add_provider(self.token_status.provide_status)
         self.status_aggregator.add_provider(self._bus_consumer.provide_status)

@@ -34,6 +34,7 @@ def get_master_tenant_uuid():
         raise NotInitializedException()
     return tenant_uuid
 
+
 def provide_status(status):
     status['master_tenant']['status'] = (
         Status.ok if app.config['auth'].get('master_tenant_uuid') else Status.fail

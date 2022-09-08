@@ -56,4 +56,3 @@ class BusConsumer(Consumer):
         status['bus_consumer']['status'] = (
             Status.ok if self.consumer_connected() else Status.fail
         )
-

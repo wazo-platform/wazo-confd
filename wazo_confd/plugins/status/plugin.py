@@ -14,11 +14,11 @@ class Plugin:
         status_aggregator.add_provider(provide_status)
 
         api.add_resource(
-            StatusChecker, 
-            '/status', 
+            StatusChecker,
+            '/status',
             resource_class_args=[status_aggregator],
         )
 
+
 def provide_status(status):
     status['rest_api']['status'] = Status.ok
-
