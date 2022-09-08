@@ -85,10 +85,11 @@ class ConfdResource(ErrorCatchingResource):
 
 
 class ListResource(ConfdResource):
-    def __init__(self, service, json_path=None):
+    def __init__(self, service, json_path=None, many=False):
         super().__init__()
         self.service = service
         self.json_path = json_path
+        self._many = many
 
     def get(self):
         params = self.search_params()
@@ -114,14 +115,41 @@ class ListResource(ConfdResource):
         return form
 
     def post(self):
-        form = self.schema().load(find(self.json_path, request.get_json()))
-        form = self.add_tenant_to_form(form)
-        model = self.model(**form)
-        model = self.service.create(model)
-        return self.schema().dump(model), 201, self.build_headers(model)
+        if self._many:
+            body = self.find_json_sub_dict(self.json_path, request.get_json())
+        else:
+            body = [self.find_json_sub_dict(self.json_path, request.get_json())]
+
+        results = []
+        headers = None
+        for item in body:
+            form = self.schema().load(item)
+            form = self.add_tenant_to_form(form)
+            model = self.model(**form)
+            model = self.service.create(model)
+            results.append(self.schema().dump(model))
+            if not headers:
+                headers = self.build_headers(model)
+
+        if self._many:
+            return results, 201, headers
+        else:
+            return results[0], 201, headers
 
     def build_headers(self, model):
         raise NotImplementedError()
+
+    @staticmethod
+    def find_json_sub_dict(path, j):
+        if not path:
+            return j
+
+        keys = path.split('.')
+        rv = j
+        for key in keys:
+            rv = rv[key]
+        return rv
+
 
 
 class ItemResource(ConfdResource):
@@ -172,13 +200,3 @@ class ItemResource(ConfdResource):
 
         tenant_uuids = self._build_tenant_list({'recurse': True})
         return {'tenant_uuids': tenant_uuids}
-
-
-def find(path, j):
-    if not path:
-        return j
-    keys = path.split('.')
-    rv = j
-    for key in keys:
-        rv = rv[key]
-    return rv

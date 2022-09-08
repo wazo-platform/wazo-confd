@@ -3,6 +3,7 @@
 
 from wazo_provd_client import Client as ProvdClient
 
+from wazo_confd.plugins.line.service import build_service as build_line_service
 from .resource import UserListV2, UserItem, UserList
 from .resource_sub import (
     UserForwardBusy,
@@ -31,6 +32,7 @@ class Plugin:
         wazo_user_service = build_wazo_user_service()
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
+        line_service = build_line_service(provd_client)
 
         api_v1_1.add_resource(
             UserItem,
@@ -50,6 +52,7 @@ class Plugin:
             endpoint='users_list_v2.0',
             resource_class_args=(
                 service,
+                line_service,
                 wazo_user_service,
             ),
         )
