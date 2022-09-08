@@ -9,7 +9,7 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.resource import LineList
+from wazo_confd.plugins.line.resource import LineListV2
 
 from wazo_confd.plugins.line.schema import LineSchemaV2
 
@@ -77,7 +77,7 @@ class UserListV2(ListResource):
 
     def __init__(self, user_service, line_service, wazo_user_service):
         self.user_list_resource = UserList(user_service, json_path='user')
-        self.line_list_resource = LineList(line_service, json_path='lines', many=True)
+        self.line_list_resource = LineListV2(line_service, json_path='lines', many=True)
         self.line_list_resource.schema = LineSchemaV2
         self.wazo_user_service = wazo_user_service
 
