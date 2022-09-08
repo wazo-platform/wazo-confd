@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -25,11 +25,26 @@ class LineList(ListResource):
 
     @required_acl('confd.lines.create')
     def post(self):
-        form = self.schema().load(request.get_json())
-        model = self.model(**form)
-        tenant_uuids = self._build_tenant_list({'recurse': True})
-        model = self.service.create(model, tenant_uuids)
-        return self.schema().dump(model), 201, self.build_headers(model)
+        if self._many:
+            body = self.find_json_sub_dict(self.json_path, request.get_json())
+        else:
+            body = [self.find_json_sub_dict(self.json_path, request.get_json())]
+
+        results = []
+        headers = None
+        for item in body:
+            form = self.schema().load(item)
+            model = self.model(**form)
+            tenant_uuids = self._build_tenant_list({'recurse': True})
+            model = self.service.create(model, tenant_uuids)
+            results.append(self.schema().dump(model))
+            if not headers:
+                headers = self.build_headers(model)
+
+        if self._many:
+            return results, 201, headers
+        else:
+            return results[0], 201, headers
 
 
 class LineItem(ItemResource):

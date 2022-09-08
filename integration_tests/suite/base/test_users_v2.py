@@ -3,6 +3,7 @@
 
 from hamcrest import (
     assert_that,
+    contains,
     has_entries,
 )
 

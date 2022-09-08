@@ -9,6 +9,9 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.plugins.line.resource import LineList
+
+from wazo_confd.plugins.line.schema import LineSchemaV2
 
 from .schema import (
     UserDirectorySchema,
@@ -72,8 +75,10 @@ class UserListV2(ListResource):
 
     api_version = '2.0'
 
-    def __init__(self, user_service, wazo_user_service):
+    def __init__(self, user_service, line_service, wazo_user_service):
         self.user_list_resource = UserList(user_service, json_path='user')
+        self.line_list_resource = LineList(line_service, json_path='lines', many=True)
+        self.line_list_resource.schema = LineSchemaV2
         self.wazo_user_service = wazo_user_service
 
     def build_headers(self, user):
@@ -81,10 +86,14 @@ class UserListV2(ListResource):
 
     @required_acl('confd.users.create')
     def post(self):
-        UserSchemaV2().load(request.get_json())
+        body = UserSchemaV2().load(request.get_json())
 
         logger.info("Create User resource")
         user_dict, _, _ = self.user_list_resource.post()
+        if 'lines' in body:
+            lines_list, _, _ = self.line_list_resource.post()
+        else:
+            lines_list = []
 
         logger.info("Create User authentication")
         # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
@@ -95,6 +104,7 @@ class UserListV2(ListResource):
         return (
             {
                 'user': user_dict,
+                'lines': lines_list,
             },
             201,
             self.build_headers(user_dict),

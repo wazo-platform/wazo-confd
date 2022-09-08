@@ -7,6 +7,8 @@ from marshmallow.validate import Length, Range, Regexp
 
 from xivo import mallow_helpers as mallow
 
+from wazo_confd.plugins.line.schema import LineSchemaV2
+
 from wazo_confd.helpers.mallow import (
     BaseSchema,
     Link,
@@ -440,6 +442,26 @@ class UserSchemaV2(mallow.Schema):
         required=True,
         many=False,
     )
+    lines = Nested(
+        LineSchemaV2,
+        required=False,
+        many=True,
+    )
+
+    @validates_schema
+    def validate_schema(self, data, **kwargs):
+        lines = data.get('lines') or []
+        if not lines:
+            return
+
+        for line in lines:
+            if line.get('context'):
+                continue
+            extension = line.get('extension')
+            if not extension:
+                raise ValidationError('A line or it\'s extension need a "context"')
+            if extension.get('context'):
+                continue
 
     @classmethod
     def _flatten(cls, iterable_of_iterable):
