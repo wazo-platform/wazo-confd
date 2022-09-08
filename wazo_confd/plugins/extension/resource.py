@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -25,7 +25,10 @@ class ExtensionList(ListResource):
 
     @required_acl('confd.extensions.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        super().post()
+
+    def _post(self, body):
+        form = self.schema().load(body)
         model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
         model = self.service.create(model, tenant_uuids)

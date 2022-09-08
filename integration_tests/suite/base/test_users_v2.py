@@ -84,12 +84,13 @@ def test_post_full_user_no_error(transport, template, registrar):
         "username": "richardlapointe",
         "password": "secret",
     }
+    extension = {'context': config.CONTEXT, 'exten': '1001'}
     line = {
         # 'context': config.CONTEXT,  # We will use the context from the extension
         'position': 2,
         'registrar': registrar['id'],
         'provisioning_code': "887865",
-        'extension': {'context': config.CONTEXT, 'exten': '1001'},
+        'extensions': [extension],
         'endpoint_type': 'sip',
         'endpoint_sip': {
             'name': 'foobar',
@@ -106,7 +107,10 @@ def test_post_full_user_no_error(transport, template, registrar):
         },
     }
 
-    response = confd_v2_0.users.post({'user': user, 'lines': [line]}).response
+    response = confd_v2_0.users.post({
+        'user': user,
+        'lines': [line],
+    }).response
 
     assert response.status_code == 201
 
@@ -116,18 +120,27 @@ def test_post_full_user_no_error(transport, template, registrar):
     assert 'lines' in returned_json
 
     created_user = returned_json['user']
-    created_lines = returned_json['lines'][0]
-    created_endpoint_sip = returned_json['lines'][0]['endpoint_sip']
+    created_line = returned_json['lines'][0]
+    created_extension = created_line['extensions'][0]
+    # created_endpoint_sip = returned_json['lines'][0]['endpoint_sip']
 
     try:
         assert_that(created_user, has_entries(user))
         assert 'uuid' in created_user and created_user['uuid']
 
-        assert_that(created_lines, contains(has_entries(line)))
+        # TODO(pc-m): removing the endpoint should not be necessary when the association gets implemented
+        del line['extensions']
+        del line['endpoint_sip']
+        del line['endpoint_type']
+        assert_that(created_line, has_entries(line))
         assert 'id' in created_line and created_line['id']
 
-        assert_that(created_endpoint_sip, has_entries(line['endpoint_sip']))
-        assert 'uuid' in created_endpoint_sip and created_endpoint_sip['uuid']
+        assert_that(created_extension, has_entries(extension))
+
+        # assert_that(created_endpoint_sip, has_entries(line['endpoint_sip']))
+        # assert 'uuid' in created_endpoint_sip and created_endpoint_sip['uuid']
     finally:
         confd.users(created_user['id']).delete()
+        confd.lines(created_line['id']).delete()
+        confd.extensions(created_extension['id']).delete()
 

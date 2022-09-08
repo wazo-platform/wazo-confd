@@ -457,11 +457,11 @@ class UserSchemaV2(mallow.Schema):
         for line in lines:
             if line.get('context'):
                 continue
-            extension = line.get('extension')
-            if not extension:
+
+            for extension in line.get('extensions') or []:
+                break
+            else:
                 raise ValidationError('A line or it\'s extension need a "context"')
-            if extension.get('context'):
-                continue
 
     @classmethod
     def _flatten(cls, iterable_of_iterable):

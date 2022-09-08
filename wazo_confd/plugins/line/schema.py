@@ -119,7 +119,6 @@ class LineSchemaV2(BaseSchema):
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
         many=True,
-        dump_only=True,
     )
     users = Nested(
         'UserSchema',
@@ -130,12 +129,15 @@ class LineSchemaV2(BaseSchema):
 
     @pre_load
     def assign_context(self, data, **kwargs):
+        logger.info('line: %s', data)
         if data.get('context'):
             return data
 
-        extension = data.get('extension')
-        if not extension:
+        for extension in data.get('extensions') or []:
+            data['context'] = extension['context']
+            break
+
+        if not data.get('context'):
             raise ValidationError('A line or it\'s extension need a context')
 
-        data['context'] = extension['context']
         return data

@@ -25,6 +25,9 @@ class LineList(ListResource):
 
     @required_acl('confd.lines.create')
     def post(self):
+        super().post()
+
+    def _post(self, item):
         form = self.schema().load(item)
         model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -53,36 +56,40 @@ class LineItem(ItemResource):
         return super().delete(id)
 
 
-class LineListV2(ListResource):
+# class LineListV2(ListResource):
 
-    api_version = '2.0'
+#     api_version = '2.0'
 
-    model = Line
-    schema = LineSchemaNullable
-    has_tenant_uuid = True
+#     model = Line
+#     schema = LineSchemaNullable
+#     has_tenant_uuid = True
 
-    def build_headers(self, line):
-        return {'Location': url_for('lines', id=line.id, _external=True)}
+#     def __init__(self, line_service, extension_service):
+#         super().__init__(line_service)
+#         self._extension_list_resource = ExtensionList(extension_service, json_path='lines.extension')
 
-    @required_acl('confd.lines.create')
-    def post(self):
-        if self._many:
-            body = self.find_json_sub_dict(self.json_path, request.get_json())
-        else:
-            body = [self.find_json_sub_dict(self.json_path, request.get_json())]
+#     def build_headers(self, line):
+#         return {'Location': url_for('lines', id=line.id, _external=True)}
 
-        results = []
-        headers = None
-        for item in body:
-            form = self.schema().load(item)
-            model = self.model(**form)
-            tenant_uuids = self._build_tenant_list({'recurse': True})
-            model = self.service.create(model, tenant_uuids)
-            results.append(self.schema().dump(model))
-            if not headers:
-                headers = self.build_headers(model)
+#     @required_acl('confd.lines.create')
+#     def post(self):
+#         if self._many:
+#             body = self.find_json_sub_dict(self.json_path, request.get_json())
+#         else:
+#             body = [self.find_json_sub_dict(self.json_path, request.get_json())]
 
-        if self._many:
-            return results, 201, headers
-        else:
-            return results[0], 201, headers
+#         results = []
+#         headers = None
+#         for item in body:
+#             form = self.schema().load(item)
+#             model = self.model(**form)
+#             tenant_uuids = self._build_tenant_list({'recurse': True})
+#             model = self.service.create(model, tenant_uuids)
+#             results.append(self.schema().dump(model))
+#             if not headers:
+#                 headers = self.build_headers(model)
+
+#         if self._many:
+#             return results, 201, headers
+#         else:
+#             return results[0], 201, headers
