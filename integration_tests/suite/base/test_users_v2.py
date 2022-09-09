@@ -6,6 +6,7 @@ from hamcrest import (
     contains,
     has_entries,
 )
+from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
 from . import confd, confd_v2_0
 from ..helpers import config, fixtures
@@ -91,12 +92,11 @@ def test_post_full_user_no_error(transport, template, registrar):
         'registrar': registrar['id'],
         'provisioning_code': "887865",
         'extensions': [extension],
-        'endpoint_type': 'sip',
         'endpoint_sip': {
-            'name': 'foobar',
+            'name': 'iddqd',
             'label': 'Richard\'s line',
             'auth_section_options': [
-                ['username', 'foobar'],
+                ['username', 'iddqd'],
                 ['password', 'secret'],
             ],
             'endpoint_section_options': [
@@ -122,25 +122,30 @@ def test_post_full_user_no_error(transport, template, registrar):
     created_user = returned_json['user']
     created_line = returned_json['lines'][0]
     created_extension = created_line['extensions'][0]
-    # created_endpoint_sip = returned_json['lines'][0]['endpoint_sip']
+    created_endpoint_sip = returned_json['lines'][0]['endpoint_sip']
 
     try:
-        assert_that(created_user, has_entries(user))
-        assert 'uuid' in created_user and created_user['uuid']
+        assert_that(created_user, has_entries(uuid=uuid_(), **user))
 
         # TODO(pc-m): removing the endpoint should not be necessary when the association gets implemented
         del line['extensions']
-        del line['endpoint_sip']
-        del line['endpoint_type']
+        expected_endpoint_sip = line.pop('endpoint_sip')
         assert_that(created_line, has_entries(line))
         assert 'id' in created_line and created_line['id']
 
         assert_that(created_extension, has_entries(extension))
 
-        # assert_that(created_endpoint_sip, has_entries(line['endpoint_sip']))
-        # assert 'uuid' in created_endpoint_sip and created_endpoint_sip['uuid']
+        assert_that(created_endpoint_sip, has_entries(
+            uuid=uuid_(),
+            name=expected_endpoint_sip['name'],
+            label=expected_endpoint_sip['label'],
+            auth_section_options=expected_endpoint_sip['auth_section_options'],
+            endpoint_section_options=expected_endpoint_sip['endpoint_section_options'],
+            transport=has_entries(uuid=transport['uuid']),
+            templates=contains(has_entries(uuid=template['uuid'])),
+        ))
     finally:
         confd.users(created_user['id']).delete()
         confd.lines(created_line['id']).delete()
         confd.extensions(created_extension['id']).delete()
-
+        confd.endpoints.sip(created_endpoint_sip['uuid']).delete()

@@ -463,6 +463,10 @@ class UserSchemaV2(mallow.Schema):
             else:
                 raise ValidationError('A line or it\'s extension need a "context"')
 
+        for line in lines:
+            if not line.get('endpoint_sip'):
+                raise ValidationError('A line needs a SIP endpoint')
+
     @classmethod
     def _flatten(cls, iterable_of_iterable):
         for item in iterable_of_iterable:
