@@ -1,4 +1,4 @@
-# Copyright 2014-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2014-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.auth_verifier import required_acl, required_tenant, no_auth
