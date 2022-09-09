@@ -11,6 +11,7 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.resource import LineList
 from wazo_confd.plugins.extension.resource import ExtensionList
+from wazo_confd.plugins.endpoint_sip.resource import SipList
 
 from wazo_confd.plugins.line.schema import LineSchemaV2
 
@@ -76,10 +77,20 @@ class UserListV2(ListResource):
 
     api_version = '2.0'
 
-    def __init__(self, user_service, line_service, extension_service, wazo_user_service):
+    def __init__(
+        self,
+        user_service,
+        line_service,
+        extension_service,
+        endpoint_sip_service,
+        wazo_user_service,
+        sip_dao,
+        transport_dao,
+    ):
         self._user_list_resource = UserList(user_service, json_path='user')
         self._line_list_resource = LineList(line_service)
         self._extension_list_resource = ExtensionList(extension_service)
+        self._endpoint_sip_list_resource = SipList(endpoint_sip_service, sip_dao, transport_dao)
         self._line_list_resource.schema = LineSchemaV2
         self._wazo_user_service = wazo_user_service
 
@@ -96,13 +107,17 @@ class UserListV2(ListResource):
 
         for line_body in body.get('lines') or []:
             extensions = line_body.pop('extensions', None) or []
+            endpoint_sip = line_body.pop('endpoint_sip')
+            created_endpoint_sip, _, _ = self._endpoint_sip_list_resource._post(endpoint_sip)
             line, _, _ = self._line_list_resource._post(line_body)
             extension_list = []
             for extension_body in extensions:
                 extension, _, _ = self._extension_list_resource._post(extension_body)
                 extension_list.append(extension)
             line['extensions'] = extension_list
+            line['endpoint_sip'] = created_endpoint_sip
             line_list.append(line)
+
 
         logger.info("Create User authentication")
         # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
