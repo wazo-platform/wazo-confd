@@ -4,6 +4,7 @@
 from hamcrest import (
     assert_that,
     contains,
+    greater_than,
     has_entries,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
@@ -31,20 +32,32 @@ def test_post_basic_user_no_error():
     response = confd_v2_0.users.post({'user': {'firstname': 'Jôhn'}}).response
     assert response.status_code == 201
 
-    returned_json = response.json()
-    assert 'user' in returned_json
-
-    created_user = returned_json['user']
-    assert created_user['firstname'] == 'Jôhn'
-    assert 'id' in created_user and created_user['id']
-    assert 'uuid' in created_user and created_user['uuid']
+    assert_that(
+        response.json(),
+        has_entries(
+            user=has_entries(
+                id=greater_than(0),
+                uuid=uuid_(),
+                firstname='Jôhn',
+            ),
+        ),
+    )
 
 
 def test_post_user_missing_field_return_error():
     response = confd_v2_0.users.post({'user': {'lastname': 'Jôhn'}}).response
     assert response.status_code == 400
-    assert (
-        response.json()['details']['user']['firstname']['constraint_id'] == 'required'
+    assert_that(
+        response.json(),
+        has_entries(
+            details=has_entries(
+                user=has_entries(
+                    firstname=has_entries(
+                        constraint_id='required',
+                    )
+                )
+            )
+        )
     )
 
 
@@ -52,9 +65,18 @@ def test_post_user_wrong_type_return_error():
     user = {"firstname": "Rîchard", "enabled": "True"}
     response = confd_v2_0.users.post({'user': user}).response
     assert response.status_code == 400
-    assert (
-        response.json()['details']['user']['enabled']['constraint_id'] == 'type'
-        and response.json()['details']['user']['enabled']['constraint'] == 'boolean'
+    assert_that(
+        response.json(),
+        has_entries(
+            details=has_entries(
+                user=has_entries(
+                    enabled=has_entries(
+                        constraint_id='type',
+                        constraint='boolean',
+                    )
+                )
+            )
+        )
     )
 
 @fixtures.transport()
@@ -113,39 +135,38 @@ def test_post_full_user_no_error(transport, template, registrar):
     }).response
 
     assert response.status_code == 201
-
-    returned_json = response.json()
-
-    assert 'user' in returned_json
-    assert 'lines' in returned_json
-
-    created_user = returned_json['user']
-    created_line = returned_json['lines'][0]
-    created_extension = created_line['extensions'][0]
-    created_endpoint_sip = returned_json['lines'][0]['endpoint_sip']
-
+    payload = response.json()
     try:
-        assert_that(created_user, has_entries(uuid=uuid_(), **user))
-
-        # TODO(pc-m): removing the endpoint should not be necessary when the association gets implemented
-        del line['extensions']
-        expected_endpoint_sip = line.pop('endpoint_sip')
-        assert_that(created_line, has_entries(line))
-        assert 'id' in created_line and created_line['id']
-
-        assert_that(created_extension, has_entries(extension))
-
-        assert_that(created_endpoint_sip, has_entries(
-            uuid=uuid_(),
-            name=expected_endpoint_sip['name'],
-            label=expected_endpoint_sip['label'],
-            auth_section_options=expected_endpoint_sip['auth_section_options'],
-            endpoint_section_options=expected_endpoint_sip['endpoint_section_options'],
-            transport=has_entries(uuid=transport['uuid']),
-            templates=contains(has_entries(uuid=template['uuid'])),
-        ))
+        assert_that(
+            payload,
+            has_entries(
+                user=has_entries(
+                    uuid=uuid_(),
+                    **user,
+                ),
+                lines=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        extensions=contains(
+                                has_entries(
+                                id=greater_than(0),
+                                **extension,
+                                )
+                        ),
+                        endpoint_sip=has_entries(
+                            uuid=uuid_(),
+                            name='iddqd',
+                            auth_section_options=line['endpoint_sip']['auth_section_options'],
+                            endpoint_section_options=line['endpoint_sip']['endpoint_section_options'],
+                            transport=has_entries(uuid=transport['uuid']),
+                            templates=contains(has_entries(uuid=template['uuid'])),
+                        ),
+                    )
+                ),
+            ),
+        )
     finally:
-        confd.users(created_user['id']).delete()
-        confd.lines(created_line['id']).delete()
-        confd.extensions(created_extension['id']).delete()
-        confd.endpoints.sip(created_endpoint_sip['uuid']).delete()
+        confd.users(payload['user']['id']).delete()
+        confd.lines(payload['lines'][0]['id']).delete()
+        confd.extensions(payload['lines'][0]['extensions'][0]['id']).delete()
+        confd.endpoints.sip(payload['lines'][0]['endpoint_sip']['uuid']).delete()
