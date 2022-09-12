@@ -118,7 +118,6 @@ class LineSchemaV2(BaseSchema):
 
     @pre_load
     def assign_context(self, data, **kwargs):
-        logger.info('line: %s', data)
         if data.get('context'):
             return data
 

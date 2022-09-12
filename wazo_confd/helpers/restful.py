@@ -12,9 +12,8 @@ from xivo.tenant_flask_helpers import Tenant, token
 from xivo_dao import tenant_dao
 
 from xivo.mallow_helpers import handle_validation_exception
-from xivo.rest_api_helpers import handle_api_exception as handle_api_exception_v2
 
-from wazo_confd.helpers.common import handle_api_exception
+from wazo_confd.helpers.common import handle_api_exception, handle_api_exception_v2
 from wazo_confd.helpers.mallow import BaseSchema
 
 auth_verifier = AuthVerifier()
