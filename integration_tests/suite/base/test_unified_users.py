@@ -2,19 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
-    all_of,
     assert_that,
-    contains,
-    contains_inanyorder,
-    empty,
-    equal_to,
-    has_entries,
-    has_entry,
-    has_item,
-    has_items,
-    is_not,
-    none,
-    not_,
+    has_entries
 )
 
 from . import confd
