@@ -1,14 +1,19 @@
 # Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
+from xivo_dao.resources.user import dao as user_dao
 
 from wazo_provd_client import Client as ProvdClient
 
 from wazo_confd.plugins.extension.service import build_service as build_extension_service
 from wazo_confd.plugins.line.service import build_service as build_line_service
+from wazo_confd.plugins.line_extension.service import build_service as build_line_extension_service
 from wazo_confd.plugins.endpoint_sip.service import build_endpoint_service
+from wazo_confd.plugins.line_endpoint.service import build_service_sip
+from wazo_confd.plugins.user_line.service import build_service as build_user_line_service
 from .resource import UserListV2, UserItem, UserList
 from .resource_sub import (
     UserForwardBusy,
@@ -39,8 +44,11 @@ class Plugin:
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
         line_service = build_line_service(provd_client)
+        line_extension_service = build_line_extension_service()
         endpoint_sip_service = build_endpoint_service(provd_client, pjsip_doc)
         extension_service = build_extension_service(provd_client)
+        line_endpoint_sip_association_service = build_service_sip(provd_client)
+        user_line_service = build_user_line_service()
 
         api_v1_1.add_resource(
             UserItem,
@@ -62,9 +70,14 @@ class Plugin:
                 service,
                 line_service,
                 extension_service,
+                line_extension_service,
+                line_endpoint_sip_association_service,
                 endpoint_sip_service,
+                user_line_service,
                 wazo_user_service,
+                line_dao,
                 sip_dao,
+                user_dao,
                 transport_dao,
             ),
         )

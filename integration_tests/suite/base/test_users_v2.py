@@ -148,10 +148,10 @@ def test_post_full_user_no_error(transport, template, registrar):
                     has_entries(
                         id=greater_than(0),
                         extensions=contains(
-                                has_entries(
+                            has_entries(
                                 id=greater_than(0),
                                 **extension,
-                                )
+                            )
                         ),
                         endpoint_sip=has_entries(
                             uuid=uuid_(),
@@ -165,6 +165,13 @@ def test_post_full_user_no_error(transport, template, registrar):
                 ),
             ),
         )
+
+        response = confd.users(payload['user']['uuid']).get()
+        assert_that(response.item, has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))))
+
+        response = confd.lines(payload['lines'][0]['id']).get()
+        assert_that(response.item, has_entries(extensions=contains(has_entries(**extension))))
+        assert_that(response.item, has_entries(endpoint_sip=has_entries(name='iddqd')))
     finally:
         confd.users(payload['user']['id']).delete()
         confd.lines(payload['lines'][0]['id']).delete()
