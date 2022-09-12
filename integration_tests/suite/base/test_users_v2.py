@@ -177,3 +177,24 @@ def test_post_full_user_no_error(transport, template, registrar):
         confd.lines(payload['lines'][0]['id']).delete()
         confd.extensions(payload['lines'][0]['extensions'][0]['id']).delete()
         confd.endpoints.sip(payload['lines'][0]['endpoint_sip']['uuid']).delete()
+
+
+def test_duplicated_email():
+    user = {
+        "subscription_type": 2,
+        "firstname": "Rîchard",
+        "lastname": "Lâpointe",
+        "email": "richard@lapointe.org",
+    }
+
+    user_1_response = confd_v2_0.users.post({'user': user})
+
+    try:
+        user_2_response = confd_v2_0.users.post({'user': user})
+        assert user_2_response.response.status_code == 400
+        assert_that(
+            user_2_response.response.json(),
+            has_entries(message="Resource Error - User already exists ('email': 'richard@lapointe.org')")
+        )
+    finally:
+        confd.users(user_1_response.item['user']['id']).delete()
