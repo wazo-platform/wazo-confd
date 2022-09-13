@@ -69,6 +69,20 @@ def test_confd_status_fails_when_rabbitmq_is_down():
 
 
 def test_confd_status_fails_when_wazo_auth_is_down():
+    expected_status_fail_entries = {
+        'bus_consumer': {
+            'status': 'fail',
+        },
+        'master_tenant': {
+            'status': 'ok',
+        },
+        'rest_api': {
+            'status': 'ok',
+        },
+        'service_token': {
+            'status': 'ok',
+        },
+    }
     BaseIntegrationTest.stop_service('confd')
     BaseIntegrationTest.stop_service('auth')
     BaseIntegrationTest.start_service('confd')
@@ -78,13 +92,9 @@ def test_confd_status_fails_when_wazo_auth_is_down():
     confd._reset()
     confd_csv._reset()
 
-    def _raises_ConnectionError():
-        assert_that(
-            calling(confd.status.get),
-            raises(ConnectionError),
-        )
-
-    until.assert_(_raises_ConnectionError, tries=10)
+    until.true(confd.is_up, tries=10)
+    response = confd.status.get()
+    assert_that(response.item, has_entries(**expected_status_fail_entries))
 
     BaseIntegrationTest.start_service('auth')
     auth._reset()
