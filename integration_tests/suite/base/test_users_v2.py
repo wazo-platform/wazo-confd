@@ -6,10 +6,11 @@ from hamcrest import (
     contains,
     greater_than,
     has_entries,
+    starts_with,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd, confd_v2_0
+from . import BaseIntegrationTest, confd, confd_v2_0
 from ..helpers import config, fixtures
 
 FULL_USER = {
@@ -198,3 +199,50 @@ def test_duplicated_email():
         )
     finally:
         confd.users(user_1_response.item['user']['id']).delete()
+
+
+@fixtures.transport()
+@fixtures.sip_template()
+@fixtures.registrar()
+def test_stopped_provd(transport, template, registrar):
+    user = {
+        "subscription_type": 2,
+        "firstname": "Rîchard",
+        "lastname": "Lâpointe",
+        "email": "richard@lapointe.org",
+    }
+    extension = {'context': config.CONTEXT, 'exten': '1001'}
+    line = {
+        # 'context': config.CONTEXT,  # We will use the context from the extension
+        'position': 2,
+        'registrar': registrar['id'],
+        'provisioning_code': "887865",
+        'extensions': [extension],
+        'endpoint_sip': {
+            'name': 'iddqd',
+            'label': 'Richard\'s line',
+            'auth_section_options': [
+                ['username', 'iddqd'],
+                ['password', 'secret'],
+            ],
+            'endpoint_section_options': [
+                ['callerid', '"Rîchard Lâpointe" <1001>'],
+            ],
+            'transport': transport,
+            'templates': [template],
+        },
+    }
+
+    BaseIntegrationTest.stop_service('provd')
+    try:
+        response = confd_v2_0.users.post({'user': user, 'lines': [line]}).response
+        assert response.status_code == 500
+        assert_that(
+            response.json(),
+            has_entries(
+                error_id='unexpected',
+                message=starts_with('Unexpected error'),
+            )
+        )
+    finally:
+        BaseIntegrationTest.start_service('provd')
