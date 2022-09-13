@@ -3,14 +3,11 @@
 
 
 from wazo_test_helpers import until
-from wazo_test_helpers.hamcrest.raises import raises
-from requests.exceptions import ConnectionError
 from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
 from . import auth, BaseIntegrationTest, confd, confd_csv
 
 from hamcrest import (
     assert_that,
-    calling,
     has_entries,
 )
 
@@ -31,9 +28,11 @@ expected_status_ok_entries = {
 
 
 def test_confd_status_is_all_ok():
+    def _bus_is_up():
+        response = confd.status.get()
+        assert_that(response.item, has_entries(**expected_status_ok_entries))
 
-    response = confd.status.get()
-    assert_that(response.item, has_entries(**expected_status_ok_entries))
+    until.assert_(_bus_is_up, tries=10)
 
 
 def test_confd_status_fails_when_rabbitmq_is_down():
@@ -71,16 +70,16 @@ def test_confd_status_fails_when_rabbitmq_is_down():
 def test_confd_status_fails_when_wazo_auth_is_down():
     expected_status_fail_entries = {
         'bus_consumer': {
-            'status': 'fail',
+            'status': 'ok',
         },
         'master_tenant': {
-            'status': 'ok',
+            'status': 'fail',
         },
         'rest_api': {
             'status': 'ok',
         },
         'service_token': {
-            'status': 'ok',
+            'status': 'fail',
         },
     }
     BaseIntegrationTest.stop_service('confd')
@@ -92,8 +91,7 @@ def test_confd_status_fails_when_wazo_auth_is_down():
     confd._reset()
     confd_csv._reset()
 
-    until.true(confd.is_up, tries=10)
-    response = confd.status.get()
+    response = until.return_(confd.status.get, timeout=5)
     assert_that(response.item, has_entries(**expected_status_fail_entries))
 
     BaseIntegrationTest.start_service('auth')
