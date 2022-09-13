@@ -4,6 +4,10 @@
 
 * The following resource has been added:
 
+  * POST `/2.0/users`
+
+* The following resource has been added:
+
   * POST `/1.1/lines/<line_id>/extensions`
 
 * It is now possible to delete a user without dissociating the line first

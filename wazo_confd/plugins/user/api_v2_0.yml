@@ -3,14 +3,17 @@ paths:
     post:
       operationId: create_user
       summary: Create user
-      description: '**Required ACL:** `confd.users.create`'
+      description: |
+        **Required ACL:** `confd.users.create`
+
+        This resource creates a user, its lines, SIP endpoints and extensions in a single API call.
       tags:
       - users
       parameters:
       - $ref: '#/parameters/tenant_uuid_required'
       - name: body
         in: body
-        description: User to create with all the associated resources
+        description: User to create with all the associated resources|
         required: true
         schema:
           $ref: '#/definitions/UserRequest'
