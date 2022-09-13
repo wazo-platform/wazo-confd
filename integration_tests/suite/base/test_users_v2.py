@@ -58,7 +58,7 @@ def test_post_user_missing_field_return_error():
                     )
                 )
             )
-        )
+        ),
     )
 
 
@@ -77,8 +77,9 @@ def test_post_user_wrong_type_return_error():
                     )
                 )
             )
-        )
+        ),
     )
+
 
 @fixtures.transport()
 @fixtures.sip_template()
@@ -130,10 +131,12 @@ def test_post_full_user_no_error(transport, template, registrar):
         },
     }
 
-    response = confd_v2_0.users.post({
-        'user': user,
-        'lines': [line],
-    }).response
+    response = confd_v2_0.users.post(
+        {
+            'user': user,
+            'lines': [line],
+        }
+    ).response
 
     assert response.status_code == 201
     payload = response.json()
@@ -157,8 +160,12 @@ def test_post_full_user_no_error(transport, template, registrar):
                         endpoint_sip=has_entries(
                             uuid=uuid_(),
                             name='iddqd',
-                            auth_section_options=line['endpoint_sip']['auth_section_options'],
-                            endpoint_section_options=line['endpoint_sip']['endpoint_section_options'],
+                            auth_section_options=line['endpoint_sip'][
+                                'auth_section_options'
+                            ],
+                            endpoint_section_options=line['endpoint_sip'][
+                                'endpoint_section_options'
+                            ],
                             transport=has_entries(uuid=transport['uuid']),
                             templates=contains(has_entries(uuid=template['uuid'])),
                         ),
@@ -168,10 +175,15 @@ def test_post_full_user_no_error(transport, template, registrar):
         )
 
         response = confd.users(payload['user']['uuid']).get()
-        assert_that(response.item, has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))))
+        assert_that(
+            response.item,
+            has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
+        )
 
         response = confd.lines(payload['lines'][0]['id']).get()
-        assert_that(response.item, has_entries(extensions=contains(has_entries(**extension))))
+        assert_that(
+            response.item, has_entries(extensions=contains(has_entries(**extension)))
+        )
         assert_that(response.item, has_entries(endpoint_sip=has_entries(name='iddqd')))
     finally:
         confd.users(payload['user']['id']).delete()
@@ -195,7 +207,9 @@ def test_duplicated_email():
         assert user_2_response.response.status_code == 400
         assert_that(
             user_2_response.response.json(),
-            has_entries(message="Resource Error - User already exists ('email': 'richard@lapointe.org')")
+            has_entries(
+                message="Resource Error - User already exists ('email': 'richard@lapointe.org')"
+            ),
         )
     finally:
         confd.users(user_1_response.item['user']['id']).delete()
@@ -242,7 +256,7 @@ def test_stopped_provd(transport, template, registrar):
             has_entries(
                 error_id='unexpected',
                 message=starts_with('Unexpected error'),
-            )
+            ),
         )
     finally:
         BaseIntegrationTest.start_service('provd')

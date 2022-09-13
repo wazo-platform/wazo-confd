@@ -81,10 +81,12 @@ class LineSchemaV2(BaseSchema):
     provisioning_extension = mallow.fields.String(dump_only=True)
 
     context = mallow.fields.String(required=True)
-    provisioning_code = mallow.fields.String(validate=(
-        mallow.validate.Predicate('isdigit'),
-        mallow.validate.Length(equal=6),
-    ))
+    provisioning_code = mallow.fields.String(
+        validate=(
+            mallow.validate.Predicate('isdigit'),
+            mallow.validate.Length(equal=6),
+        )
+    )
     position = mallow.fields.Integer(validate=mallow.validate.Range(min=1))
     caller_id_name = mallow.fields.String(
         allow_none=True

@@ -97,10 +97,18 @@ class UserListV2(ListResource):
     ):
         self._user_list_resource = UserList(user_service, json_path='user')
         self._line_list_resource = LineList(line_service)
-        self._user_line_item_resource = UserLineItem(user_line_service, user_dao, line_dao)
-        self._extension_line_list_resource = LineExtensionList(extension_line_service, extension_service, line_dao)
-        self._endpoint_sip_list_resource = SipList(endpoint_sip_service, sip_dao, transport_dao)
-        self._line_endpoint_sip_association_resource = LineEndpointAssociationSip(line_endpoint_sip_association_service, line_dao, sip_dao)
+        self._user_line_item_resource = UserLineItem(
+            user_line_service, user_dao, line_dao
+        )
+        self._extension_line_list_resource = LineExtensionList(
+            extension_line_service, extension_service, line_dao
+        )
+        self._endpoint_sip_list_resource = SipList(
+            endpoint_sip_service, sip_dao, transport_dao
+        )
+        self._line_endpoint_sip_association_resource = LineEndpointAssociationSip(
+            line_endpoint_sip_association_service, line_dao, sip_dao
+        )
         self._line_list_resource.schema = LineSchemaV2
         self._wazo_user_service = wazo_user_service
 
@@ -120,11 +128,15 @@ class UserListV2(ListResource):
             endpoint_sip = line_body.pop('endpoint_sip')
             endpoint_sip, _, _ = self._endpoint_sip_list_resource._post(endpoint_sip)
             line, _, _ = self._line_list_resource._post(line_body)
-            self._line_endpoint_sip_association_resource.put(line['id'], endpoint_sip['uuid'])
+            self._line_endpoint_sip_association_resource.put(
+                line['id'], endpoint_sip['uuid']
+            )
             line['endpoint_sip'] = endpoint_sip
             line['extensions'] = []
             for extension_body in extensions:
-                extension, _, _ = self._extension_line_list_resource._post(line['id'], extension_body)
+                extension, _, _ = self._extension_line_list_resource._post(
+                    line['id'], extension_body
+                )
                 line['extensions'].append(extension)
             line_list.append(line)
             self._user_line_item_resource.put(user_dict['id'], line['id'])
