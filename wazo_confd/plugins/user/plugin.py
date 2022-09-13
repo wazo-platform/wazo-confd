@@ -8,12 +8,18 @@ from xivo_dao.resources.user import dao as user_dao
 
 from wazo_provd_client import Client as ProvdClient
 
-from wazo_confd.plugins.extension.service import build_service as build_extension_service
+from wazo_confd.plugins.extension.service import (
+    build_service as build_extension_service,
+)
 from wazo_confd.plugins.line.service import build_service as build_line_service
-from wazo_confd.plugins.line_extension.service import build_service as build_line_extension_service
+from wazo_confd.plugins.line_extension.service import (
+    build_service as build_line_extension_service,
+)
 from wazo_confd.plugins.endpoint_sip.service import build_endpoint_service
 from wazo_confd.plugins.line_endpoint.service import build_service_sip
-from wazo_confd.plugins.user_line.service import build_service as build_user_line_service
+from wazo_confd.plugins.user_line.service import (
+    build_service as build_user_line_service,
+)
 from .resource import UserListV2, UserItem, UserList
 from .resource_sub import (
     UserForwardBusy,

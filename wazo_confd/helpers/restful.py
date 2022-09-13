@@ -139,7 +139,6 @@ class ListResource(ConfdResource):
         return rv
 
 
-
 class ItemResource(ConfdResource):
 
     has_tenant_uuid = False
