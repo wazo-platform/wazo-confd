@@ -1,10 +1,11 @@
 # Copyright 2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-
+from ..helpers.bus import BusClient as bus_client
+from ..helpers.bus import setup_bus
 from wazo_test_helpers import until
 from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
-from . import auth, BaseIntegrationTest, confd, confd_csv
+from . import auth, BaseIntegrationTest, confd, confd_csv, rabbitmq
 
 from hamcrest import (
     assert_that,
@@ -56,8 +57,11 @@ def test_confd_status_fails_when_rabbitmq_is_down():
     assert_that(response.item, has_entries(**expected_bus_status_fail_entries))
 
     BaseIntegrationTest.start_service('rabbitmq')
-    rabbitmq = BaseIntegrationTest.create_bus()
-    until.true(rabbitmq.is_up, tries=5)
+    until.true(rabbitmq.is_up, tries=10)
+    setup_bus(host='127.0.0.1', port=BaseIntegrationTest.service_port(5672, 'rabbitmq'))
+    bus_client._reset_bus()
+    bus_client._bus = bus_client._create_client()
+    until.true(bus_client._bus.is_up, tries=5)
 
     def _bus_consumer_status_is_ok():
         response = confd.status.get()

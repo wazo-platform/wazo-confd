@@ -69,6 +69,7 @@ auth = SingletonProxy(BaseIntegrationTest.create_auth)
 ari = SingletonProxy(BaseIntegrationTest.create_ari)
 provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)
+rabbitmq = SingletonProxy(BaseIntegrationTest.create_bus)
 sysconfd = SingletonProxy(BaseIntegrationTest.create_sysconfd)
 
 wazo_sound = SingletonProxy(
