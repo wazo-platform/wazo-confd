@@ -1,8 +1,9 @@
-# Copyright 2014-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2014-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.auth_verifier import required_acl, required_tenant, no_auth
 from xivo.rest_api_helpers import APIException
+from xivo.status import Status
 
 from werkzeug.local import LocalProxy as Proxy
 
@@ -32,6 +33,12 @@ def get_master_tenant_uuid():
     if not tenant_uuid:
         raise NotInitializedException()
     return tenant_uuid
+
+
+def provide_status(status):
+    status['master_tenant']['status'] = (
+        Status.ok if app.config['auth'].get('master_tenant_uuid') else Status.fail
+    )
 
 
 master_tenant_uuid = Proxy(get_master_tenant_uuid)

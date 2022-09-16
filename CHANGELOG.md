@@ -1,6 +1,12 @@
 # Changelog
 
-## 22.13
+## 22.14
+
+* `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:
+  * `master_tenant`
+  * `bus_consumer`
+  * `service_token`
+  * `rest_api`
 
 * The following resource has been added:
 

@@ -11,6 +11,7 @@ import xivo_dao
 from wazo_auth_client import Client as AuthClient
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
+from xivo.status import StatusAggregator, TokenStatus
 from xivo.token_renewer import TokenRenewer
 
 from wazo_confd.helpers.asterisk import PJSIPDoc
@@ -29,6 +30,8 @@ class Controller:
         self._bus_consumer = BusConsumer.from_config(config['bus'])
         self._bus_publisher = BusPublisher.from_config(config['uuid'], config['bus'])
         self._bus_publisher.set_as_reference()
+        self.status_aggregator = StatusAggregator()
+        self.token_status = TokenStatus()
         self._service_discovery_args = [
             'wazo-confd',
             config['uuid'],
@@ -45,6 +48,12 @@ class Controller:
                 auth.init_master_tenant
             )
         pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
+        self.token_renewer.subscribe_to_token_change(
+            self.token_status.token_change_callback
+        )
+        self.status_aggregator.add_provider(auth.provide_status)
+        self.status_aggregator.add_provider(self.token_status.provide_status)
+        self.status_aggregator.add_provider(self._bus_consumer.provide_status)
 
         plugin_helpers.load(
             namespace='wazo_confd.plugins',
@@ -57,6 +66,7 @@ class Controller:
                 'bus_publisher': self._bus_publisher,
                 'auth_client': auth_client,
                 'pjsip_doc': pjsip_doc,
+                'status_aggregator': self.status_aggregator,
             },
         )
 

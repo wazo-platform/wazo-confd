@@ -138,6 +138,7 @@ DEFAULT_CONFIG = {
         'skill_rule': True,
         'sound': True,
         'sound_language': True,
+        'status': True,
         'switchboard': True,
         'switchboard_fallback': True,
         'switchboard_member': True,

@@ -18,6 +18,9 @@ class BusClientWrapper:
             self._bus = self._create_client()
         return getattr(self._bus, attr)
 
+    def _reset_bus(self):
+        self._bus = None
+
     def _create_client(self):
         return bus.BusClient.from_connection_fields(
             host=self.host,

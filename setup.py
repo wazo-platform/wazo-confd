@@ -103,6 +103,7 @@ setup(
             'skill_rule = wazo_confd.plugins.skill_rule.plugin:Plugin',
             'sound = wazo_confd.plugins.sound.plugin:Plugin',
             'sound_language = wazo_confd.plugins.sound_language.plugin:Plugin',
+            'status = wazo_confd.plugins.status.plugin:Plugin',
             'switchboard = wazo_confd.plugins.switchboard.plugin:Plugin',
             'switchboard_fallback = wazo_confd.plugins.switchboard_fallback.plugin:Plugin',
             'switchboard_member = wazo_confd.plugins.switchboard_member.plugin:Plugin',
