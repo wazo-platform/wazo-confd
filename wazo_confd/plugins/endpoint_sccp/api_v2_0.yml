@@ -1,7 +1,0 @@
-definitions:
-  EndpointSccpRelationBase:
-    properties:
-      id:
-        type: integer
-        description: SCCP Endpoint ID
-        readOnly: true

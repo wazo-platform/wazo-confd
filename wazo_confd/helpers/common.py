@@ -1,8 +1,7 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import time
 
 from functools import wraps
 
@@ -52,85 +51,6 @@ def handle_api_exception(func):
             rollback()
             message = decode_and_log_error(error, exc_info=True)
             return ['Unexpected error: {}'.format(message)], 500
-
-    return wrapper
-
-
-def handle_api_exception_v2(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except NOT_FOUND_ERRORS as error:
-            rollback()
-            response = {
-                'message': str(error),
-                'error_id': 'not-found',
-                'details': error.details,
-                'timestamp': time.time(),
-            }
-            if error.resource:
-                response['resource'] = error.resource
-            logger.error('%s: %s', error.message, error.details)
-            return response, 404
-        except GENERIC_ERRORS as error:
-            rollback()
-            response = {
-                'message': str(error),
-                'error_id': None,
-                'details': {},
-                'timestamp': time.time(),
-            }
-            logger.error('%s', response['message'])
-            return response, 400
-        except rest_api_helpers.APIException as error:
-            rollback()
-            if error.status_code >= 500:
-                logger.error("%s: %s", error, error.details, exc_info=True)
-            response = {
-                'message': str(error),
-                'error_id': error.id_,
-                'details': error.details,
-                'timestamp': time.time(),
-            }
-            if error.resource:
-                response['resource'] = error.resource
-            return response, error.status_code
-        except ProvdError as error:
-            rollback()
-            response = {
-                'message': 'Provd client error: {}'.format(error),
-                'error_id': 'provd_error',
-                'details': error.details,
-                'timestamp': time.time(),
-            }
-            if error.resource:
-                response['resource'] = error.resource
-            logger.error('%s: %s', error.message, error.details)
-            return response, error.status_code
-        except HTTPException as error:
-            rollback()
-            messages, code = extract_http_messages(error)
-            response = {
-                'message': message,
-                'error_id': 'provd_error',
-                'details': error.details,
-                'timestamp': time.time(),
-            }
-            if error.resource:
-                response['resource'] = error.resource
-            logger.error('%s: %s', error.message, error.details)
-            return response, code
-        except Exception as error:
-            rollback()
-            response = {
-                'message': 'Unexpected error: {}'.format(error),
-                'error_id': 'unexpected',
-                'details': None,
-                'timestamp': time.time(),
-            }
-            logger.error('%s', response['message'], exc_info=True)
-            return response, 500
 
     return wrapper
 

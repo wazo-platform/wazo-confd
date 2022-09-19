@@ -36,8 +36,7 @@ from ..user_import.wazo_user_service import build_service as build_wazo_user_ser
 
 class Plugin:
     def load(self, dependencies):
-        api_v1_1 = dependencies['api_v1_1']
-        api_v2_0 = dependencies['api_v2_0']
+        api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
         pjsip_doc = dependencies['pjsip_doc']
@@ -56,7 +55,7 @@ class Plugin:
         line_endpoint_sip_association_service = build_service_sip(provd_client)
         user_line_service = build_user_line_service()
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserItem,
             '/users/<uuid:id>',
             '/users/<int:id>',
@@ -64,14 +63,10 @@ class Plugin:
             resource_class_args=(service,),
         )
 
-        api_v1_1.add_resource(
-            UserList, '/users', endpoint='users_list', resource_class_args=(service,)
-        )
-
-        api_v2_0.add_resource(
-            UserListV2,
+        api.add_resource(
+            UserList,
             '/users',
-            endpoint='users_list_v2.0',
+            endpoint='users_list',
             resource_class_args=(
                 service,
                 line_service,
@@ -88,49 +83,49 @@ class Plugin:
             ),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserServiceDND,
             '/users/<uuid:user_id>/services/dnd',
             '/users/<int:user_id>/services/dnd',
             resource_class_args=(service_callservice,),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserServiceIncallFilter,
             '/users/<uuid:user_id>/services/incallfilter',
             '/users/<int:user_id>/services/incallfilter',
             resource_class_args=(service_callservice,),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserServiceList,
             '/users/<uuid:user_id>/services',
             '/users/<int:user_id>/services',
             resource_class_args=(service_callservice,),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserForwardBusy,
             '/users/<uuid:user_id>/forwards/busy',
             '/users/<int:user_id>/forwards/busy',
             resource_class_args=(service_forward,),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserForwardNoAnswer,
             '/users/<uuid:user_id>/forwards/noanswer',
             '/users/<int:user_id>/forwards/noanswer',
             resource_class_args=(service_forward,),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserForwardUnconditional,
             '/users/<uuid:user_id>/forwards/unconditional',
             '/users/<int:user_id>/forwards/unconditional',
             resource_class_args=(service_forward,),
         )
 
-        api_v1_1.add_resource(
+        api.add_resource(
             UserForwardList,
             '/users/<uuid:user_id>/forwards',
             '/users/<int:user_id>/forwards',

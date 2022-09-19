@@ -11,9 +11,7 @@ from xivo.mallow import fields, validate
 from xivo.tenant_flask_helpers import Tenant, token
 from xivo_dao import tenant_dao
 
-from xivo.mallow_helpers import handle_validation_exception
-
-from wazo_confd.helpers.common import handle_api_exception, handle_api_exception_v2
+from wazo_confd.helpers.common import handle_api_exception
 from wazo_confd.helpers.mallow import BaseSchema
 
 auth_verifier = AuthVerifier()
@@ -34,21 +32,11 @@ class ListSchema(BaseSchema):
 
 
 class ConfdResource(ErrorCatchingResource):
-    @property
-    def method_decorators(self):
-        api_version = getattr(self, 'api_version', '1.1')
-        if api_version == '1.1':
-            return [
-                auth_verifier.verify_token,
-                auth_verifier.verify_tenant,
-            ] + ErrorCatchingResource.method_decorators
-        elif api_version == '2.0':
-            return [
-                auth_verifier.verify_token,
-                auth_verifier.verify_tenant,
-                handle_validation_exception,
-                handle_api_exception_v2,
-            ]
+
+    method_decorators = [
+        auth_verifier.verify_token,
+        auth_verifier.verify_tenant,
+    ] + ErrorCatchingResource.method_decorators
 
     def _has_write_tenant_uuid(self):
         return (
@@ -121,7 +109,6 @@ class ListResource(ConfdResource):
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
-
         return self.schema().dump(model), 201, self.build_headers(model)
 
     def build_headers(self, model):

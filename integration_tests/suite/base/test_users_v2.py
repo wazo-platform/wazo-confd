@@ -10,7 +10,7 @@ from hamcrest import (
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import BaseIntegrationTest, confd, confd_v2_0
+from . import BaseIntegrationTest, confd
 from ..helpers import config, fixtures
 
 FULL_USER = {
@@ -30,7 +30,7 @@ ALL_NULL_USER = {
 
 
 def test_post_basic_user_no_error():
-    response = confd_v2_0.users.post({'user': {'firstname': 'Jôhn'}}).response
+    response = confd.users.post({'user': {'firstname': 'Jôhn'}}).response
     assert response.status_code == 201
 
     assert_that(
@@ -46,7 +46,7 @@ def test_post_basic_user_no_error():
 
 
 def test_post_user_missing_field_return_error():
-    response = confd_v2_0.users.post({'user': {'lastname': 'Jôhn'}}).response
+    response = confd.users.post({'user': {'lastname': 'Jôhn'}}).response
     assert response.status_code == 400
     assert_that(
         response.json(),
@@ -64,7 +64,7 @@ def test_post_user_missing_field_return_error():
 
 def test_post_user_wrong_type_return_error():
     user = {"firstname": "Rîchard", "enabled": "True"}
-    response = confd_v2_0.users.post({'user': user}).response
+    response = confd.users.post({'user': user}).response
     assert response.status_code == 400
     assert_that(
         response.json(),
@@ -131,7 +131,7 @@ def test_post_full_user_no_error(transport, template, registrar):
         },
     }
 
-    response = confd_v2_0.users.post(
+    response = confd.users.post(
         {
             'user': user,
             'lines': [line],
@@ -200,10 +200,10 @@ def test_duplicated_email():
         "email": "richard@lapointe.org",
     }
 
-    user_1_response = confd_v2_0.users.post({'user': user})
+    user_1_response = confd.users.post({'user': user})
 
     try:
-        user_2_response = confd_v2_0.users.post({'user': user})
+        user_2_response = confd.users.post({'user': user})
         assert user_2_response.response.status_code == 400
         assert_that(
             user_2_response.response.json(),
@@ -249,7 +249,7 @@ def test_stopped_provd(transport, template, registrar):
 
     BaseIntegrationTest.stop_service('provd')
     try:
-        response = confd_v2_0.users.post({'user': user, 'lines': [line]}).response
+        response = confd.users.post({'user': user, 'lines': [line]}).response
         assert response.status_code == 500
         assert_that(
             response.json(),
