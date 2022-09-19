@@ -9,12 +9,32 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
 
+from wazo_confd.plugins.endpoint_sip.resource import SipList
+from wazo_confd.plugins.line_endpoint.resource import LineEndpointAssociationSip
+
 
 class LineList(ListResource):
 
     model = Line
     schema = LineSchemaNullable
     has_tenant_uuid = True
+
+    def __init__(
+        self,
+        line_service,
+        endpoint_sip_service,
+        line_endpoint_sip_association_service,
+        line_dao,
+        sip_dao,
+        transport_dao,
+    ):
+        super().__init__(line_service)
+        self._endpoint_sip_list_resource = SipList(
+            endpoint_sip_service, sip_dao, transport_dao
+        )
+        self._line_endpoint_sip_association_resource = LineEndpointAssociationSip(
+            line_endpoint_sip_association_service, line_dao, sip_dao
+        )
 
     def build_headers(self, line):
         return {'Location': url_for('lines', id=line.id, _external=True)}
@@ -25,14 +45,38 @@ class LineList(ListResource):
 
     @required_acl('confd.lines.create')
     def post(self):
-        super().post()
+        return super().post()
 
     def _post(self, item):
+        endpoint_sip_body = item.pop('endpoint_sip', None)
+        endpoint_sccp_body = item.pop('endpoint_sccp', None)
+        endpoint_custom_body = item.pop('endpoint_custom', None)
+        extensions = item.pop('extensions', None) or []
+
         form = self.schema().load(item)
         model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
         model = self.service.create(model, tenant_uuids)
-        return self.schema().dump(model), 201, self.build_headers(model)
+
+        payload = self.schema().dump(model)
+
+        if endpoint_sip_body:
+            endpoint_sip, _, _ = self._endpoint_sip_list_resource._post(
+                endpoint_sip_body
+            )
+            self._line_endpoint_sip_association_resource.put(
+                model.id,
+                endpoint_sip['uuid'],
+            )
+            payload['endpoint_sip'] = endpoint_sip
+        elif endpoint_sccp_body:
+            # TODO: implement me
+            pass
+        elif endpoint_custom_body:
+            # TODO: implement me
+            pass
+
+        return payload, 201, self.build_headers(model)
 
 
 class LineItem(ItemResource):

@@ -33,18 +33,8 @@ class LineSchema(BaseSchema):
     application = Nested(
         'ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True
     )
-    endpoint_sip = Nested(
-        'EndpointSIPSchema',
-        # TODO(pc-m): Is it really useful to have the username/password on the relation?
-        only=[
-            'uuid',
-            'label',
-            'name',
-            'auth_section_options.username',
-            'links',
-        ],
-        dump_only=True,
-    )
+    # TODO(pcm): The schema should be different for the list and the get to avoid dumping all fields on a list
+    endpoint_sip = Nested('EndpointSIPSchema')
     endpoint_sccp = Nested('SccpSchema', only=['id', 'links'], dump_only=True)
     endpoint_custom = Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True

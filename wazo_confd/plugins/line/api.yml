@@ -179,7 +179,6 @@ definitions:
   LineRelationEndpoints:
     properties:
       endpoint_sip:
-        readOnly: true
         $ref: '#/definitions/EndpointSipRelationBase'
       endpoint_sccp:
         readOnly: true
