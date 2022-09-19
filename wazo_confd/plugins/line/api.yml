@@ -188,7 +188,6 @@ definitions:
     properties:
       extensions:
         type: array
-        readOnly: true
         items:
           $ref: '#/definitions/ExtensionRelationBase'
   LineRelationUsers:

@@ -1,6 +1,6 @@
 # Changelog
 
-## 22.13
+## 22.14
 
 * `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:
   * `master_tenant`
@@ -9,10 +9,9 @@
   * `rest_api`
 
 * The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during it's creation
+* The `/1.1/lines` resource can now create the underlying extensions during it's creation
 
-* The following resource has been added:
-
-  * POST `/2.0/users`
+## 22.13
 
 * The following resource has been added:
 

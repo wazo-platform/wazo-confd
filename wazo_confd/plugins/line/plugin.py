@@ -9,6 +9,12 @@ from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
+from wazo_confd.plugins.extension.service import (
+    build_service as build_extension_service,
+)
+from wazo_confd.plugins.line_extension.service import (
+    build_service as build_extension_line_service,
+)
 from wazo_confd.plugins.endpoint_sip.service import (
     build_endpoint_service as build_endpoint_sip_service,
 )
@@ -33,6 +39,8 @@ class Plugin:
         token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client)
+        extension_line_service = build_extension_line_service()
+        extension_service = build_extension_service(provd_client)
         endpoint_custom_service = build_endpoint_custom_service()
         endpoint_sccp_service = build_endpoint_sccp_service()
         endpoint_sip_service = build_endpoint_sip_service(provd_client, pjsip_doc)
@@ -53,6 +61,8 @@ class Plugin:
                 service,
                 endpoint_custom_service,
                 endpoint_sip_service,
+                extension_line_service,
+                extension_service,
                 line_endpoint_custom_association_service,
                 line_endpoint_sip_association_service,
                 line_endpoint_sccp_association_service,

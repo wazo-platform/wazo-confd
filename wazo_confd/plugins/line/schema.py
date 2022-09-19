@@ -39,9 +39,8 @@ class LineSchema(BaseSchema):
     endpoint_custom = Nested('CustomSchema')
     extensions = Nested(
         'ExtensionSchema',
-        only=['id', 'exten', 'context', 'links'],
+        # only=['id', 'exten', 'context', 'links'],
         many=True,
-        dump_only=True,
     )
     users = Nested(
         'UserSchema',
