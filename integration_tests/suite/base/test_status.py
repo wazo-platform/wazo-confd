@@ -95,11 +95,8 @@ def test_confd_status_fails_when_wazo_auth_is_down():
     confd._reset()
     confd_csv._reset()
 
-    def _wait_until_no_exception_is_raised():
-        response = until.return_(confd.status.get, timeout=10)
-        assert_that(response.item, has_entries(**expected_status_fail_entries))
-
-    until.assert_(_wait_until_no_exception_is_raised, tries=10)
+    response = until.return_(confd.status.get, timeout=30)
+    assert_that(response.item, has_entries(**expected_status_fail_entries))
 
     BaseIntegrationTest.start_service('auth')
     auth._reset()
