@@ -99,9 +99,6 @@ class UserSchema(BaseSchema):
         if self.only and 'call_pickup_target_users' not in self.only:
             return data
 
-        if isinstance(data, dict):
-            return data
-
         all_ = [
             list(data.users_from_call_pickup_group_interceptors_user_targets),
             list(data.users_from_call_pickup_group_interceptors_group_targets),
