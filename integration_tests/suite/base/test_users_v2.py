@@ -14,58 +14,6 @@ from . import BaseIntegrationTest, confd
 from ..helpers import config, fixtures
 
 
-def test_post_basic_user_no_error():
-    response = confd.users.post({'user': {'firstname': 'Jôhn'}}).response
-    assert response.status_code == 201
-
-    assert_that(
-        response.json(),
-        has_entries(
-            user=has_entries(
-                id=greater_than(0),
-                uuid=uuid_(),
-                firstname='Jôhn',
-            ),
-        ),
-    )
-
-
-def test_post_user_missing_field_return_error():
-    response = confd.users.post({'user': {'lastname': 'Jôhn'}}).response
-    assert response.status_code == 400
-    assert_that(
-        response.json(),
-        has_entries(
-            details=has_entries(
-                user=has_entries(
-                    firstname=has_entries(
-                        constraint_id='required',
-                    )
-                )
-            )
-        ),
-    )
-
-
-def test_post_user_wrong_type_return_error():
-    user = {"firstname": "Rîchard", "enabled": "True"}
-    response = confd.users.post({'user': user}).response
-    assert response.status_code == 400
-    assert_that(
-        response.json(),
-        has_entries(
-            details=has_entries(
-                user=has_entries(
-                    enabled=has_entries(
-                        constraint_id='type',
-                        constraint='boolean',
-                    )
-                )
-            )
-        ),
-    )
-
-
 def test_duplicated_email():
     user = {
         "subscription_type": 2,
