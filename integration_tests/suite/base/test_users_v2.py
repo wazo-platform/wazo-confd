@@ -111,7 +111,7 @@ def test_post_full_user_no_error(transport, template, registrar):
     }
     extension = {'context': config.CONTEXT, 'exten': '1001'}
     line = {
-        # 'context': config.CONTEXT,  # We will use the context from the extension
+        'context': config.CONTEXT,
         'position': 2,
         'registrar': registrar['id'],
         'provisioning_code': "887865",
@@ -133,8 +133,8 @@ def test_post_full_user_no_error(transport, template, registrar):
 
     response = confd.users.post(
         {
-            'user': user,
             'lines': [line],
+            **user,
         }
     ).response
 
@@ -144,52 +144,34 @@ def test_post_full_user_no_error(transport, template, registrar):
         assert_that(
             payload,
             has_entries(
-                user=has_entries(
-                    uuid=uuid_(),
-                    **user,
-                ),
+                uuid=uuid_(),
                 lines=contains(
                     has_entries(
                         id=greater_than(0),
-                        extensions=contains(
-                            has_entries(
-                                id=greater_than(0),
-                                **extension,
-                            )
-                        ),
-                        endpoint_sip=has_entries(
-                            uuid=uuid_(),
-                            name='iddqd',
-                            auth_section_options=line['endpoint_sip'][
-                                'auth_section_options'
-                            ],
-                            endpoint_section_options=line['endpoint_sip'][
-                                'endpoint_section_options'
-                            ],
-                            transport=has_entries(uuid=transport['uuid']),
-                            templates=contains(has_entries(uuid=template['uuid'])),
-                        ),
+                        endpoint_sip=has_entries(uuid=uuid_()),
+                        extensions=contains(has_entries(id=greater_than(0))),
                     )
                 ),
+                **user,
             ),
         )
 
-        response = confd.users(payload['user']['uuid']).get()
         assert_that(
-            response.item,
+            confd.users(payload['uuid']).get().item,
             has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
         )
 
-        response = confd.lines(payload['lines'][0]['id']).get()
         assert_that(
-            response.item, has_entries(extensions=contains(has_entries(**extension)))
+            confd.lines(payload['lines'][0]['id']).get().item,
+            has_entries(
+                extensions=contains(has_entries(**extension)),
+                endpoint_sip=has_entries(name='iddqd'),
+            )
         )
-        assert_that(response.item, has_entries(endpoint_sip=has_entries(name='iddqd')))
     finally:
-        confd.users(payload['user']['id']).delete()
-        confd.lines(payload['lines'][0]['id']).delete()
-        confd.extensions(payload['lines'][0]['extensions'][0]['id']).delete()
-        confd.endpoints.sip(payload['lines'][0]['endpoint_sip']['uuid']).delete()
+        confd.users(payload['uuid']).delete().assert_deleted()
+        confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+        confd.extensions(payload['lines'][0]['extensions'][0]['id']).delete().assert_deleted()
 
 
 def test_duplicated_email():

@@ -80,20 +80,7 @@ class UserSchema(BaseSchema):
     incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
-    lines = Nested(
-        'LineSchema',
-        only=[
-            'id',
-            'name',
-            'endpoint_sip',
-            'endpoint_sccp',
-            'endpoint_custom',
-            'extensions',
-            'links',
-        ],
-        many=True,
-        dump_only=True,
-    )
+    lines = Nested('LineSchema', many=True)
     forwards = Nested('ForwardsSchema', dump_only=True)
     schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
@@ -110,6 +97,9 @@ class UserSchema(BaseSchema):
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
         if self.only and 'call_pickup_target_users' not in self.only:
+            return data
+
+        if isinstance(data, dict):
             return data
 
         all_ = [
