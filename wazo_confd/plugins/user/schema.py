@@ -224,3 +224,20 @@ class UserSchemaNullable(UserSchema):
         ]
         if field_name in nullable_fields:
             field_obj.allow_none = True
+
+
+class UserListSchema(UserSchemaNullable):
+    lines = Nested(
+        'LineSchema',
+        only=[
+            'id',
+            'name',
+            'endpoint_sip',
+            'endpoint_sccp',
+            'endpoint_custom',
+            'extensions',
+            'links',
+        ],
+        many=True,
+        dump_only=True,
+    )

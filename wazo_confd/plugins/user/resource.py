@@ -14,6 +14,7 @@ from wazo_confd.plugins.user_line.resource import UserLineItem
 
 from .schema import (
     UserDirectorySchema,
+    UserListSchema,
     UserSchema,
     UserSchemaNullable,
     UserSummarySchema,
@@ -26,6 +27,7 @@ class UserList(ListResource):
 
     model = User
     schema = UserSchemaNullable
+    _list_schema = UserListSchema
     view_schemas = {'directory': UserDirectorySchema, 'summary': UserSummarySchema}
 
     def __init__(

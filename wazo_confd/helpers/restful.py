@@ -33,6 +33,8 @@ class ListSchema(BaseSchema):
 
 class ConfdResource(ErrorCatchingResource):
 
+    _list_schema = None
+
     method_decorators = [
         auth_verifier.verify_token,
         auth_verifier.verify_tenant,
@@ -76,6 +78,9 @@ class ListResource(ConfdResource):
         super().__init__()
         self.service = service
 
+    def list_schema(self):
+        return self._list_schema() if self._list_schema else self.schema()
+
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
@@ -85,7 +90,7 @@ class ListResource(ConfdResource):
             kwargs['tenant_uuids'] = tenant_uuids
 
         total, items = self.service.search(params, **kwargs)
-        return {'total': total, 'items': self.schema().dump(items, many=True)}
+        return {'total': total, 'items': self.list_schema().dump(items, many=True)}
 
     def search_params(self):
         return ListSchema().load(request.args)

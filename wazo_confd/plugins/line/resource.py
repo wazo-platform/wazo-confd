@@ -7,7 +7,7 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
+from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable, LineListSchema
 
 from wazo_confd.plugins.endpoint_custom.resource import CustomList
 from wazo_confd.plugins.endpoint_sccp.resource import SccpList
@@ -24,6 +24,7 @@ class LineList(ListResource):
 
     model = Line
     schema = LineSchemaNullable
+    _list_schema = LineListSchema
     has_tenant_uuid = True
 
     def __init__(

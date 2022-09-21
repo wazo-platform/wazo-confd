@@ -6,6 +6,7 @@ from hamcrest import (
     contains,
     contains_inanyorder,
     has_entries,
+    has_items,
     none,
 )
 
@@ -308,8 +309,26 @@ def test_get_endpoint_sip_relation(line, sip):
                     name='my-endpoint',
                     auth_section_options=contains_inanyorder(
                         contains('username', 'my-username'),
+                        contains('password', 'my-password'),
                     ),
                 )
+            ),
+        )
+
+        response = confd.lines.get()
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(
+                    endpoint_sip=has_entries(
+                        uuid=sip['uuid'],
+                        label='my-endpoint',
+                        name='my-endpoint',
+                        auth_section_options=contains_inanyorder(
+                            contains('username', 'my-username'),
+                        ),
+                    )
+                ),
             ),
         )
 
