@@ -72,10 +72,9 @@ class ConfdResource(ErrorCatchingResource):
 
 
 class ListResource(ConfdResource):
-    def __init__(self, service, json_path=None):
+    def __init__(self, service):
         super().__init__()
         self.service = service
-        self.json_path = json_path
 
     def get(self):
         params = self.search_params()
@@ -101,8 +100,7 @@ class ListResource(ConfdResource):
         return form
 
     def post(self):
-        body = self.find_json_sub_dict(self.json_path, request.get_json())
-        return self._post(body)
+        return self._post(request.get_json())
 
     def _post(self, body):
         form = self.schema().load(body)
@@ -113,17 +111,6 @@ class ListResource(ConfdResource):
 
     def build_headers(self, model):
         raise NotImplementedError()
-
-    @staticmethod
-    def find_json_sub_dict(path, j):
-        if not path:
-            return j
-
-        keys = path.split('.')
-        rv = j
-        for key in keys:
-            rv = rv[key]
-        return rv
 
 
 class ItemResource(ConfdResource):
