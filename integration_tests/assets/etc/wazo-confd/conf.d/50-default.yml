@@ -5,6 +5,8 @@ rest_api:
   listen: 0.0.0.0
 auth:
     host: auth
+    username: the-confd-service-id
+    password: a-very-5ecre7-key
 ari:
     host: ari
 bus:
