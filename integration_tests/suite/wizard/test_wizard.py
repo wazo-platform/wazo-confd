@@ -103,6 +103,7 @@ class IntegrationTest(BaseIntegrationTest):
     def setUpClass(cls):
         super().setUpClass()
         cls.setup_token()
+        cls.setup_service_token()
         cls.confd = cls.create_confd()
         cls.wait_strategy.wait(cls)
         cls.setup_helpers()

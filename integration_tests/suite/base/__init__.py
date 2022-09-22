@@ -13,6 +13,7 @@ class BaseIntegrationTest(IntegrationTest):
     def setUpClass(cls):
         super().setUpClass()
         cls.setup_token()
+        cls.setup_service_token()
         cls.confd = cls.create_confd({'X-Auth-Token': TOKEN})
         cls.wait_strategy.wait(cls)
         cls.setup_provd()

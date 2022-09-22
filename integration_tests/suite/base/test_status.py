@@ -86,26 +86,25 @@ def test_confd_status_fails_when_wazo_auth_is_down():
             'status': 'fail',
         },
     }
-    BaseIntegrationTest.stop_service('confd')
-    BaseIntegrationTest.stop_service('auth')
-    BaseIntegrationTest.start_service('confd')
+    BaseIntegrationTest.restart_service('confd')
+    BaseIntegrationTest.restart_service('auth')
     BaseIntegrationTest.setup_helpers()
     helper_confd._reset()
     helper_new_client._reset()
     confd._reset()
     confd_csv._reset()
+    auth._reset()
+    until.true(auth.is_up, tries=10)
+    BaseIntegrationTest.setup_token()
 
-    response = until.return_(confd.status.get, timeout=30)
+    response = until.return_(confd.status.get, timeout=5)
     assert_that(response.item, has_entries(**expected_status_fail_entries))
 
-    BaseIntegrationTest.start_service('auth')
-    auth._reset()
-    until.true(auth.is_up, tries=5)
-    BaseIntegrationTest.setup_token()
+    BaseIntegrationTest.setup_service_token()
 
     def _status_is_all_ok():
         response = confd.status.get()
         response.assert_status(200)
         assert_that(response.item, has_entries(**expected_status_ok_entries))
 
-    until.assert_(_status_is_all_ok, tries=10)
+    until.assert_(_status_is_all_ok, tries=30)

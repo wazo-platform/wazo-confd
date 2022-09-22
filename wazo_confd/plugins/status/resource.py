@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.auth_verifier import required_acl
-from wazo_confd.helpers.restful import ErrorCatchingResource
+from wazo_confd.helpers.restful import ConfdResource
 
 
-class StatusChecker(ErrorCatchingResource):
+class StatusChecker(ConfdResource):
     def __init__(self, status_aggregator):
         self.status_aggregator = status_aggregator
 

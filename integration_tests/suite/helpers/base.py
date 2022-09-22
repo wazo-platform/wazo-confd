@@ -58,9 +58,13 @@ class IntegrationTest(AssetLaunchingTestCase):
             metadata={'uuid': 'user_uuid', 'tenant_uuid': SUB_TENANT},
         )
         cls.mock_auth.set_token(token)
-        credential = MockCredentials('confd-service', 'confd-password')
-        cls.mock_auth.set_valid_credentials(credential, str(TOKEN))
         cls._reset_auth_tenants()
+
+    @classmethod
+    def setup_service_token(cls):
+        auth = MockAuthClient('127.0.0.1', cls.service_port(9497, 'auth'))
+        credential = MockCredentials('confd-service', 'confd-password')
+        auth.set_valid_credentials(credential, str(TOKEN))
 
     @classmethod
     def sync_db(cls):
