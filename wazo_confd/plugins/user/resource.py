@@ -93,9 +93,10 @@ class UserList(ListResource):
             user_dict['lines'].append(line)
 
         # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
-        fixed_user_dict = user_dict.copy()
-        fixed_user_dict['email_address'] = fixed_user_dict['email']
-        self._wazo_user_service.create(fixed_user_dict)
+        if user_dict.get('username'):
+            fixed_user_dict = user_dict.copy()
+            fixed_user_dict['email_address'] = fixed_user_dict['email']
+            self._wazo_user_service.create(fixed_user_dict)
         return user_dict, 201, headers
 
     @required_acl('confd.users.read')
