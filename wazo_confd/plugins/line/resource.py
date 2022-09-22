@@ -7,7 +7,11 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable, LineListSchema
+from wazo_confd.plugins.line.schema import (
+    LineSchema,
+    LineSchemaNullable,
+    LineListSchema,
+)
 
 from wazo_confd.plugins.endpoint_custom.resource import CustomList
 from wazo_confd.plugins.endpoint_sccp.resource import SccpList
@@ -55,16 +59,22 @@ class LineList(ListResource):
             endpoint_custom_service,
         )
         self._line_endpoint_custom_association_resource = LineEndpointAssociationCustom(
-            line_endpoint_custom_association_service, line_dao, endpoint_custom_dao,
+            line_endpoint_custom_association_service,
+            line_dao,
+            endpoint_custom_dao,
         )
         self._line_endpoint_sip_association_resource = LineEndpointAssociationSip(
             line_endpoint_sip_association_service, line_dao, sip_dao
         )
         self._line_endpoint_sccp_association_resource = LineEndpointAssociationSccp(
-            line_endpoint_sccp_association_service, line_dao, endpoint_sccp_dao,
+            line_endpoint_sccp_association_service,
+            line_dao,
+            endpoint_sccp_dao,
         )
         self._extension_line_list_resource = LineExtensionList(
-            extension_line_service, extension_service, line_dao,
+            extension_line_service,
+            extension_service,
+            line_dao,
         )
 
     def build_headers(self, line):

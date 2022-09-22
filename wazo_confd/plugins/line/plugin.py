@@ -21,8 +21,12 @@ from wazo_confd.plugins.endpoint_sip.service import (
 from wazo_confd.plugins.line_endpoint.service import build_service_custom
 from wazo_confd.plugins.line_endpoint.service import build_service_sip
 from wazo_confd.plugins.line_endpoint.service import build_service_sccp
-from wazo_confd.plugins.endpoint_sccp.service import build_service as build_endpoint_sccp_service
-from wazo_confd.plugins.endpoint_custom.service import build_service as build_endpoint_custom_service
+from wazo_confd.plugins.endpoint_sccp.service import (
+    build_service as build_endpoint_sccp_service,
+)
+from wazo_confd.plugins.endpoint_custom.service import (
+    build_service as build_endpoint_custom_service,
+)
 
 from .resource import LineItem, LineList
 from .service import build_service

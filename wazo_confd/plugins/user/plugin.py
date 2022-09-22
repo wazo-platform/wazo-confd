@@ -39,8 +39,12 @@ from wazo_confd.plugins.endpoint_sip.service import (
 from wazo_confd.plugins.line_endpoint.service import build_service_custom
 from wazo_confd.plugins.line_endpoint.service import build_service_sip
 from wazo_confd.plugins.line_endpoint.service import build_service_sccp
-from wazo_confd.plugins.endpoint_sccp.service import build_service as build_endpoint_sccp_service
-from wazo_confd.plugins.endpoint_custom.service import build_service as build_endpoint_custom_service
+from wazo_confd.plugins.endpoint_sccp.service import (
+    build_service as build_endpoint_sccp_service,
+)
+from wazo_confd.plugins.endpoint_custom.service import (
+    build_service as build_endpoint_custom_service,
+)
 
 from .service import build_service, build_service_callservice, build_service_forward
 from ..user_import.wazo_user_service import build_service as build_wazo_user_service

@@ -78,7 +78,6 @@ def test_create_line_with_endpoint_sccp_with_all_parameters(registrar):
         confd.lines(response.item['id']).delete().assert_deleted()
 
 
-
 @fixtures.line()
 @fixtures.sccp()
 def test_associate_errors(line, sccp):

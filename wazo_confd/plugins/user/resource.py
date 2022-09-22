@@ -67,7 +67,6 @@ class UserList(ListResource):
             line_dao,
             sip_dao,
             transport_dao,
-
         )
         self._user_line_item_resource = UserLineItem(
             user_line_service, user_dao, line_dao

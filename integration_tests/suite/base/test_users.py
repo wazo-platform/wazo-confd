@@ -855,12 +855,14 @@ def test_post_full_user_no_error(transport, template, registrar):
             has_entries(
                 extensions=contains(has_entries(**extension)),
                 endpoint_sip=has_entries(name='iddqd'),
-            )
+            ),
         )
     finally:
         confd.users(payload['uuid']).delete().assert_deleted()
         confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
-        confd.extensions(payload['lines'][0]['extensions'][0]['id']).delete().assert_deleted()
+        confd.extensions(
+            payload['lines'][0]['extensions'][0]['id']
+        ).delete().assert_deleted()
 
 
 @fixtures.user(

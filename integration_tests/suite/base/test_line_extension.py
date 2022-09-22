@@ -40,10 +40,12 @@ def test_create_line_with_all_parameters_and_extension(registrar):
         position=2,
         registrar=registrar['id'],
         provisioning_code='887865',
-        extensions=[{
-            'context': CONTEXT,
-            'exten': exten,
-        }],
+        extensions=[
+            {
+                'context': CONTEXT,
+                'exten': exten,
+            }
+        ],
         endpoint_sip={
             'name': 'test',
         },
@@ -91,6 +93,7 @@ def test_create_line_with_all_parameters_and_extension(registrar):
 
     finally:
         confd.lines(response.item['id']).delete().assert_deleted()
+
 
 @fixtures.line()
 @fixtures.extension()
