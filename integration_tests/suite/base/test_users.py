@@ -24,6 +24,7 @@ from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
+    helpers as h,
     scenarios as s,
 )
 from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT
@@ -774,6 +775,7 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.sip_template()
 @fixtures.registrar()
 def test_post_full_user_no_error(transport, template, registrar):
+    exten = h.extension.find_available_exten(CONTEXT)
     user = {
         "subscription_type": 2,
         "firstname": "Rîchard",
@@ -798,7 +800,7 @@ def test_post_full_user_no_error(transport, template, registrar):
         "username": "richardlapointe",
         "password": "secret",
     }
-    extension = {'context': CONTEXT, 'exten': '1001'}
+    extension = {'context': CONTEXT, 'exten': exten}
     line = {
         'context': CONTEXT,
         'position': 2,
@@ -813,7 +815,7 @@ def test_post_full_user_no_error(transport, template, registrar):
                 ['password', 'secret'],
             ],
             'endpoint_section_options': [
-                ['callerid', '"Rîchard Lâpointe" <1001>'],
+                ['callerid', f'"Rîchard Lâpointe" <{exten}>'],
             ],
             'transport': transport,
             'templates': [template],
