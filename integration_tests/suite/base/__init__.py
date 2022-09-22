@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
@@ -13,6 +13,8 @@ class BaseIntegrationTest(IntegrationTest):
     def setUpClass(cls):
         super().setUpClass()
         cls.setup_token()
+        cls.confd = cls.create_confd({'X-Auth-Token': TOKEN})
+        cls.wait_strategy.wait(cls)
         cls.setup_provd()
         cls.setup_database()
         cls.setup_helpers()
