@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from marshmallow import fields, pre_load, validates_schema
+from marshmallow import fields, validates_schema
 from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
-
-from xivo import mallow_helpers as mallow
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 

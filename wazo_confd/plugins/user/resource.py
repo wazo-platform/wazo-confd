@@ -3,7 +3,7 @@
 
 import logging
 
-from flask import request, url_for
+from flask import url_for
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 

@@ -5,8 +5,6 @@ from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
-from xivo import mallow_helpers as mallow
-
 from wazo_confd.helpers.mallow import (
     BaseSchema,
     Link,

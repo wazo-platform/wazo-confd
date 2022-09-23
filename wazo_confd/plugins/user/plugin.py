@@ -27,9 +27,6 @@ from .resource_sub import (
     UserServiceIncallFilter,
     UserServiceList,
 )
-from wazo_confd.plugins.extension.service import (
-    build_service as build_extension_service,
-)
 from wazo_confd.plugins.line_extension.service import (
     build_service as build_extension_line_service,
 )

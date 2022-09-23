@@ -1,7 +1,7 @@
 # Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
+from flask import url_for
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
