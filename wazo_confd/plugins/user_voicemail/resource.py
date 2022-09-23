@@ -5,6 +5,7 @@ from flask import request, url_for
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.plugins.voicemail.resource import VoicemailList
 
 from ..voicemail.schema import VoicemailSchema
 

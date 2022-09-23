@@ -29,6 +29,10 @@
 * The `/1.1/lines` resource can now create the underlying extensions during its creation
 * The `/1.1/users` resource can now create the user's voicemail durint its creation
 
+The following resource has been added:
+
+  * POST `/1.1/users/<user_id>/voicemails`
+
 ## 22.13
 
 * `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:

@@ -47,6 +47,53 @@ def test_associate(user, voicemail):
 
 
 @fixtures.user()
+@fixtures.voicemail_zonemessages(name='eu-fr')
+def test_create_and_associate(user, _):
+    number, context = h.voicemail.generate_number_and_context()
+
+    parameters = {
+        'name': 'full',
+        'number': number,
+        'context': context,
+        'email': 'test@example.com',
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': True,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': True,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
+
+    response = confd.users(user['uuid']).voicemails.post(parameters)
+    response.assert_created('voicemails')
+    assert_that(
+        response.item,
+        has_entries(
+            name='full',
+            number=number,
+            context=context,
+            email='test@example.com',
+            pager='test@example.com',
+            language='en_US',
+            timezone='eu-fr',
+            password='1234',
+            max_messages=10,
+            attach_audio=True,
+            ask_password=False,
+            delete_messages=True,
+            enabled=True,
+            options=has_items(
+                ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
+            ),
+        ),
+    )
+
+
+@fixtures.user()
 @fixtures.voicemail()
 def test_associate_using_uuid(user, voicemail):
     response = confd.users(user['id']).voicemails(voicemail['id']).put()

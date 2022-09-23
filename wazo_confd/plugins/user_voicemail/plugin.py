@@ -4,6 +4,10 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
+from wazo_confd.plugins.voicemail.service import (
+    build_service as build_voicemail_service,
+)
+
 from .resource import (
     UserVoicemailItem,
     UserVoicemailList,
@@ -18,6 +22,7 @@ class Plugin:
         middleware_handle = dependencies['middleware_handle']
 
         service = build_service()
+        voicemail_service = build_voicemail_service()
 
         user_voicemail_middleware = UserVoicemailMiddleware(
             service,
