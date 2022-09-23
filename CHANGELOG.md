@@ -33,6 +33,8 @@ The following resource has been added:
 
   * POST `/1.1/users/<user_id>/voicemails`
 
+Deleting a voicemail that is associated to a user will not return a 400 error anymore
+
 ## 22.13
 
 * `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:

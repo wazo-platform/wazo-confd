@@ -988,7 +988,6 @@ def test_post_full_user_no_error(transport, template, registrar):
         user.pop('call_record_enabled', None)  # Deprecated field
         confd.users(payload['uuid']).put(**user).assert_updated()
     finally:
-        confd.users(payload['uuid']).voicemails.delete().assert_deleted()
         confd.voicemails(payload['voicemail']['id']).assert_deleted()
         confd.users(payload['uuid']).delete().assert_deleted()
         confd.lines(payload['lines'][0]['id']).delete().assert_deleted()

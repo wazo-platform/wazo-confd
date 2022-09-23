@@ -3,7 +3,7 @@
 
 import unittest
 
-from unittest.mock import Mock, sentinel
+from unittest.mock import Mock
 from hamcrest import assert_that, calling, raises
 
 from xivo_dao.alchemy.voicemail import Voicemail
@@ -68,22 +68,4 @@ class TestNumberContextChanged(unittest.TestCase):
 
         assert_that(
             calling(self.validator.validate).with_args(new_model), raises(ResourceError)
-        )
-
-
-class TestAssociatedToUser(unittest.TestCase):
-    def setUp(self):
-        self.dao = Mock()
-        self.validator = validator.AssociatedToUser()
-
-    def test_when_no_associations_found_then_validation_passes(self):
-        voicemail = Mock(Voicemail, id=sentinel.id, users=[])
-
-        self.validator.validate(voicemail)
-
-    def test_when_associations_found_then_validation_fails(self):
-        voicemail = Mock(Voicemail, id=sentinel.id, users=[Mock(id=sentinel.user_id)])
-
-        assert_that(
-            calling(self.validator.validate).with_args(voicemail), raises(ResourceError)
         )

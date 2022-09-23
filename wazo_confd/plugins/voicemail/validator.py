@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -39,15 +39,6 @@ class NumberContextChanged(Validator):
             )
 
 
-class AssociatedToUser(Validator):
-    def validate(self, voicemail):
-        if voicemail.users:
-            user_ids = ", ".join(str(user.id) for user in voicemail.users)
-            raise errors.resource_associated(
-                'Voicemail', 'User', voicemail_id=voicemail.id, user_ids=user_ids
-            )
-
-
 def build_validator():
     return ValidationGroup(
         common=[
@@ -61,5 +52,4 @@ def build_validator():
         ],
         create=[NumberContextExists(voicemail_dao)],
         edit=[NumberContextChanged(voicemail_dao)],
-        delete=[AssociatedToUser()],
     )

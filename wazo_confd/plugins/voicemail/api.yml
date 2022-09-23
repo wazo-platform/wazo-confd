@@ -82,10 +82,7 @@ paths:
       summary: Delete voicemail
       description: '**Required ACL:** `confd.voicemails.{voicemail_id}.delete`
 
-
-        A voicemail can not be deleted if it is still attached to a user. The user
-        must be dissociated first. Any extension that redirects to the voicemail (e.g.
-        an Incoming call) will be disabled after deletion.'
+        Any extension that redirects to the voicemail (e.g. an Incoming call) will be disabled after deletion.'
       tags:
       - voicemails
       parameters:
@@ -94,8 +91,6 @@ paths:
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
-        '400':
-          $ref: '#/responses/DeleteError'
         '404':
           $ref: '#/responses/NotFoundError'
 

@@ -3,28 +3,11 @@
 
 import unittest
 
-from unittest.mock import Mock, sentinel
+from unittest.mock import Mock
 
-from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.exception import ResourceError
 
-from ..validator import NoEmptyFieldWhenEnabled, NoVoicemailAssociated
-
-
-class TestValidateNoVoicemailAssociated(unittest.TestCase):
-    def setUp(self):
-        self.dao = Mock()
-        self.validator = NoVoicemailAssociated()
-
-    def test_given_voicemail_associated_then_validation_fails(self):
-        user = Mock(User, id=sentinel.id, voicemail=Mock(id=sentinel.id))
-
-        self.assertRaises(ResourceError, self.validator.validate, user)
-
-    def test_given_no_voicemail_associated_then_validation_passes(self):
-        user = Mock(User, id=sentinel.id, voicemail=None)
-
-        self.validator.validate(user)
+from ..validator import NoEmptyFieldWhenEnabled
 
 
 class TestNoEmptyFieldWhenEnabled(unittest.TestCase):

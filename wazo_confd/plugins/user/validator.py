@@ -15,14 +15,6 @@ from wazo_confd.helpers.validator import (
 )
 
 
-class NoVoicemailAssociated(Validator):
-    def validate(self, user):
-        if user.voicemail:
-            raise errors.resource_associated(
-                'User', 'Voicemail', user_id=user.id, voicemail_id=user.voicemail.id
-            )
-
-
 class NoEmptyFieldWhenEnabled(Validator):
     def __init__(self, field, enabled):
         self.field = field
@@ -37,7 +29,6 @@ class NoEmptyFieldWhenEnabled(Validator):
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     return ValidationGroup(
-        delete=[NoVoicemailAssociated()],
         create=[
             Optional(
                 'email',

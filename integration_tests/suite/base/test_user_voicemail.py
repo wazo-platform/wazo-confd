@@ -212,17 +212,17 @@ def test_get_users_relation(u1, u2, voicemail):
 @fixtures.user()
 @fixtures.voicemail()
 def test_delete_user_when_still_associated(user, voicemail):
-    with a.user_voicemail(user, voicemail):
+    with a.user_voicemail(user, voicemail, check=False):
         response = confd.users(user['id']).delete()
-        response.assert_match(400, e.resource_associated('User', 'Voicemail'))
+        response.assert_deleted()
 
 
 @fixtures.user()
 @fixtures.voicemail()
 def test_delete_voicemail_when_still_associated(user, voicemail):
-    with a.user_voicemail(user, voicemail):
+    with a.user_voicemail(user, voicemail, check=False):
         response = confd.voicemails(voicemail['id']).delete()
-        response.assert_match(400, e.resource_associated('Voicemail', 'User'))
+        response.assert_deleted()
 
 
 @fixtures.user()
