@@ -7,7 +7,11 @@ from contextlib import contextmanager
 
 from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from wazo_test_helpers.bus import BusClient
-from wazo_test_helpers.auth import MockUserToken, AuthClient as MockAuthClient
+from wazo_test_helpers.auth import (
+    MockUserToken,
+    MockCredentials,
+    AuthClient as MockAuthClient,
+)
 
 from .ari import ARIClient
 from .auth import AuthClient
@@ -21,6 +25,7 @@ from .helpers import setup_new_client as setup_new_client_helpers
 from .helpers import setup_provd as setup_provd_helpers
 from .provd import create_helper as provd_create_helper
 from .sysconfd import SysconfdMock
+from .wait_strategy import EverythingOkWaitStrategy
 
 from .config import (
     TOKEN,
@@ -36,6 +41,7 @@ from .config import (
 class IntegrationTest(AssetLaunchingTestCase):
     service = 'confd'
     assets_root = os.path.join(os.path.dirname(__file__), '..', '..', 'assets')
+    wait_strategy = EverythingOkWaitStrategy()
 
     @classmethod
     def setup_token(cls):
@@ -53,6 +59,12 @@ class IntegrationTest(AssetLaunchingTestCase):
         )
         cls.mock_auth.set_token(token)
         cls._reset_auth_tenants()
+
+    @classmethod
+    def setup_service_token(cls):
+        auth = MockAuthClient('127.0.0.1', cls.service_port(9497, 'auth'))
+        credential = MockCredentials('confd-service', 'confd-password')
+        auth.set_valid_credentials(credential, str(TOKEN))
 
     @classmethod
     def sync_db(cls):

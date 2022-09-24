@@ -31,6 +31,7 @@ def test_restrict_on_with_slow_wazo_auth():
     auth._reset()
     until.true(auth.is_up, tries=5)
     BaseIntegrationTest.setup_token()
+    BaseIntegrationTest.setup_service_token()
 
     def _not_return_503():
         response = confd.extensions.features.get()
