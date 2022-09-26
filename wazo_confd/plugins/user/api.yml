@@ -33,7 +33,7 @@ paths:
         description: User to create
         required: true
         schema:
-          $ref: '#/definitions/User'
+          $ref: '#/definitions/UserCreate'
       responses:
         '201':
           description: User created
@@ -288,7 +288,30 @@ parameters:
     description: the user's ID or UUID
 
 definitions:
-  User:
+  UserCreate:
+    title: User Create
+    allOf:
+    - $ref: '#/definitions/BaseUser'
+    - $ref: '#/definitions/UserRelationVoicemail'
+    - $ref: '#/definitions/UserRelationAgent'
+    - $ref: '#/definitions/UserRelationFallbacks'
+    - $ref: '#/definitions/UserRelationForwards'
+    - $ref: '#/definitions/UserRelationGroups'
+    - $ref: '#/definitions/UserRelationIncalls'
+    - $ref: '#/definitions/UserRelationLinesCreate'
+    - $ref: '#/definitions/UserRelationServices'
+    - $ref: '#/definitions/UserRelationSwitchboards'
+    - $ref: '#/definitions/UserRelationQueues'
+    - $ref: '#/definitions/UserRelationCallPickupTargets'
+
+  UserRelationLinesCreate:
+    properties:
+      lines:
+        type: array
+        items:
+          $ref: '#/definitions/UserRelationLine'
+
+  BaseUser:
     title: User
     allOf:
     - $ref: '#/definitions/UserRelationBase'
@@ -405,6 +428,11 @@ definitions:
           type: string
           description: The UUID of the tenant
           readOnly: true
+
+  User:
+    title: User
+    allOf:
+    - $ref: '#/definitions/BaseUser'
     - $ref: '#/definitions/UserRelationAgent'
     - $ref: '#/definitions/UserRelationFallbacks'
     - $ref: '#/definitions/UserRelationForwards'
