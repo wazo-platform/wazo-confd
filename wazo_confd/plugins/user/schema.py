@@ -19,6 +19,7 @@ from wazo_confd.helpers.mallow import (
     StrictBoolean,
     Nested,
 )
+from wazo_confd.plugins.voicemail.schema import VoicemailSchema
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
@@ -122,7 +123,7 @@ class UserSchema(BaseSchema):
     switchboards = Nested(
         'SwitchboardSchema', only=['uuid', 'name', 'links'], many=True, dump_only=True
     )
-    voicemail = Nested('VoicemailSchema')
+    voicemail = Nested('UserVoicemailSchema')
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
@@ -229,6 +230,10 @@ class UserSchema(BaseSchema):
             data['call_record_incoming_external_enabled'] = False
             data['call_record_incoming_internal_enabled'] = False
         return data
+
+
+class UserVoicemailSchema(VoicemailSchema):
+    id = fields.Integer()
 
 
 class UserDirectorySchema(BaseSchema):

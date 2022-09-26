@@ -60,15 +60,20 @@ class UserList(ListResource):
             self._user_line_item_resource.put(user_dict['uuid'], line['id'])
             user_dict['lines'].append(line)
 
+        if voicemail:
+            voicemail_id = voicemail.get('id')
+            if voicemail_id:
+                self._user_voicemail_item_resource.put(user_dict['uuid'], voicemail_id)
+                user_dict['voicemail'] = self._voicemail_item_resource.get(voicemail_id)
+            else:
+                user_dict['voicemail'], _, _ = self._user_voicemail_list_resource._post(
+                    user_dict['uuid'], voicemail
+                )
+
         if auth:
             auth['uuid'] = user_dict['uuid']
             auth['tenant_uuid'] = user_dict['tenant_uuid']
             user_dict['auth'] = self._wazo_user_service.create(auth)
-
-        if voicemail:
-            user_dict['voicemail'], _, _ = self._user_voicemail_list_resource._post(
-                user_dict['uuid'], voicemail
-            )
 
         return user_dict, 201, headers
 
