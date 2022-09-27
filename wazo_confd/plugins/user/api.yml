@@ -324,6 +324,11 @@ definitions:
                 type: integer
                 description: The voicemail is associated if the ID is specified
 
+  UserRelationVoicemailCreate:
+    properties:
+      voicemail:
+        $ref: '#/definitions/Voicemail'
+
   BaseUser:
     title: User
     allOf:
