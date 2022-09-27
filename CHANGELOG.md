@@ -28,6 +28,8 @@
 * The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during its creation
 * The `/1.1/lines` resource can now create the underlying extensions during its creation
 * The `/1.1/users` resource can now create the user's voicemail durint its creation
+* The `/1.1/users` resource can now create the user's fallbacks
+* The `/1.1/users` resource can now create the user's forwards
 
 The following resource has been added:
 

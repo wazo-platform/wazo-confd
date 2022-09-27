@@ -304,8 +304,8 @@ definitions:
     - $ref: '#/definitions/BaseUser'
     - $ref: '#/definitions/UserRelationVoicemailCreate'
     - $ref: '#/definitions/UserRelationAgent'
-    - $ref: '#/definitions/UserRelationFallbacks'
-    - $ref: '#/definitions/UserRelationForwards'
+    - $ref: '#/definitions/UserRelationFallbacksCreate'
+    - $ref: '#/definitions/UserRelationForwardsCreate'
     - $ref: '#/definitions/UserRelationGroups'
     - $ref: '#/definitions/UserRelationIncalls'
     - $ref: '#/definitions/UserRelationLines'
@@ -328,6 +328,15 @@ definitions:
     properties:
       voicemail:
         $ref: '#/definitions/Voicemail'
+
+  UserRelationFallbacksCreate:
+    properties:
+      fallbacks:
+        $ref: '#/definitions/UserFallbacks'
+  UserRelationForwardsCreate:
+    properties:
+      forwards:
+        $ref: '#/definitions/UserForwards'
 
   BaseUser:
     title: User
