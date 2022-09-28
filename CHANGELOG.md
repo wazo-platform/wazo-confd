@@ -1,5 +1,9 @@
 # Changelog
 
+## 22.14
+
+* `/wizard` endpoint updates now the configuration file for autoprovisionning `/etc/asterisk/pjsip.d/05-autoprov-wizard.conf` with the `language` value it receives in the request body. However, if the user wants to change the language used for audio provisionning; they will have to do it manually for now.
+
 ## 22.13
 
 * `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:
