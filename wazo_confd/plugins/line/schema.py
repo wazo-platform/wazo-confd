@@ -36,9 +36,7 @@ class LineSchema(BaseSchema):
     # TODO(pcm): The schema should be different for the list and the get to avoid dumping all fields on a list
     endpoint_sip = Nested('EndpointSIPSchema')
     endpoint_sccp = Nested('SccpSchema')
-    endpoint_custom = Nested(
-        'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
-    )
+    endpoint_custom = Nested('CustomSchema')
     extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],

@@ -8,7 +8,7 @@
   * `service_token`
   * `rest_api`
 
-* The `/1.1/lines` resource can now create the underlying SIP or SCCP endpoint during it's creation
+* The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during it's creation
 
 * The following resource has been added:
 

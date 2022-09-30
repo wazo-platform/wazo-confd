@@ -183,7 +183,6 @@ definitions:
       endpoint_sccp:
         $ref: '#/definitions/EndpointSccpRelationBase'
       endpoint_custom:
-        readOnly: true
         $ref: '#/definitions/EndpointCustomRelationBase'
   LineRelationExtensions:
     properties:

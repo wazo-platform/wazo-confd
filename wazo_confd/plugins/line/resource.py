@@ -9,9 +9,11 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
 
+from wazo_confd.plugins.endpoint_custom.resource import CustomList
 from wazo_confd.plugins.endpoint_sccp.resource import SccpList
 from wazo_confd.plugins.endpoint_sip.resource import SipList
 from wazo_confd.plugins.line_endpoint.resource import (
+    LineEndpointAssociationCustom,
     LineEndpointAssociationSccp,
     LineEndpointAssociationSip,
 )
@@ -26,10 +28,13 @@ class LineList(ListResource):
     def __init__(
         self,
         line_service,
+        endpoint_custom_service,
         endpoint_sip_service,
+        line_endpoint_custom_association_service,
         line_endpoint_sip_association_service,
         line_endpoint_sccp_association_service,
         endpoint_sccp_service,
+        endpoint_custom_dao,
         endpoint_sccp_dao,
         line_dao,
         sip_dao,
@@ -41,6 +46,12 @@ class LineList(ListResource):
         )
         self._endpoint_sccp_list_resource = SccpList(
             endpoint_sccp_service,
+        )
+        self._endpoint_custom_list_resource = CustomList(
+            endpoint_custom_service,
+        )
+        self._line_endpoint_custom_association_resource = LineEndpointAssociationCustom(
+            line_endpoint_custom_association_service, line_dao, endpoint_custom_dao,
         )
         self._line_endpoint_sip_association_resource = LineEndpointAssociationSip(
             line_endpoint_sip_association_service, line_dao, sip_dao
@@ -63,10 +74,10 @@ class LineList(ListResource):
     def _post(self, item):
         form = self.schema().load(item)
 
-        endpoint_sip_body = item.pop('endpoint_sip', None)
-        endpoint_sccp_body = item.pop('endpoint_sccp', None)
-        endpoint_custom_body = item.pop('endpoint_custom', None)
-        extensions = item.pop('extensions', None) or []
+        endpoint_sip_body = form.pop('endpoint_sip', None)
+        endpoint_sccp_body = form.pop('endpoint_sccp', None)
+        endpoint_custom_body = form.pop('endpoint_custom', None)
+        extensions = form.pop('extensions', None) or []
 
         model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -93,8 +104,14 @@ class LineList(ListResource):
             )
             payload['endpoint_sccp'] = endpoint_sccp
         elif endpoint_custom_body:
-            # TODO: implement me
-            pass
+            endpoint_custom, _, _ = self._endpoint_custom_list_resource._post(
+                endpoint_custom_body
+            )
+            self._line_endpoint_custom_association_resource.put(
+                model.id,
+                endpoint_custom['id'],
+            )
+            payload['endpoint_custom'] = endpoint_custom
 
         return payload, 201, self.build_headers(model)
 
