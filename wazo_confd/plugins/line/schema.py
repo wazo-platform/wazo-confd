@@ -1,8 +1,10 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+
+from marshmallow import fields, validates_schema
 from marshmallow.validate import Length, Predicate, Range
+from marshmallow.exceptions import ValidationError
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
@@ -29,9 +31,47 @@ class LineSchema(BaseSchema):
     application = Nested(
         'ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True
     )
+    endpoint_sip = Nested('EndpointSIPSchema')
+    endpoint_sccp = Nested('SccpSchema')
+    endpoint_custom = Nested('CustomSchema')
+    extensions = Nested('ExtensionSchema', many=True)
+    users = Nested(
+        'UserSchema',
+        only=['uuid', 'firstname', 'lastname', 'links'],
+        many=True,
+        dump_only=True,
+    )
+
+    @validates_schema
+    def _validate_only_one_endpoint(self, data, **kwargs):
+        nb_endpoint = 0
+        if data.get('endpoint_sip'):
+            nb_endpoint += 1
+        if data.get('endpoint_sccp'):
+            nb_endpoint += 1
+        if data.get('endpoint_custom'):
+            nb_endpoint += 1
+
+        if nb_endpoint > 1:
+            raise ValidationError('Only one endpoint should be configured')
+
+
+class LineSchemaNullable(LineSchema):
+    def on_bind_field(self, field_name, field_obj):
+        super().on_bind_field(field_name, field_obj)
+        nullable_fields = ['provisioning_code', 'position', 'registrar']
+        if field_name in nullable_fields:
+            field_obj.allow_none = True
+
+
+class LineListSchema(LineSchemaNullable):
+    extensions = Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
+    )
     endpoint_sip = Nested(
         'EndpointSIPSchema',
-        # TODO(pc-m): Is it really useful to have the username/password on the relation?
         only=[
             'uuid',
             'label',
@@ -45,23 +85,11 @@ class LineSchema(BaseSchema):
     endpoint_custom = Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
     )
-    extensions = Nested(
-        'ExtensionSchema',
-        only=['id', 'exten', 'context', 'links'],
-        many=True,
-        dump_only=True,
-    )
-    users = Nested(
-        'UserSchema',
-        only=['uuid', 'firstname', 'lastname', 'links'],
-        many=True,
-        dump_only=True,
-    )
 
 
-class LineSchemaNullable(LineSchema):
-    def on_bind_field(self, field_name, field_obj):
-        super().on_bind_field(field_name, field_obj)
-        nullable_fields = ['provisioning_code', 'position', 'registrar']
-        if field_name in nullable_fields:
-            field_obj.allow_none = True
+# Note: PUT still does not support creating/updating endpoints/extensions
+class LinePutSchema(LineSchema):
+    extensions = Nested('ExtensionSchema', many=True, dump_only=True)
+    endpoint_sip = Nested('EndpointSIPSchema', dump_only=True)
+    endpoint_sccp = Nested('SccpSchema', dump_only=True)
+    endpoint_custom = Nested('CustomSchema', dump_only=True)

@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -32,6 +32,8 @@ class ListSchema(BaseSchema):
 
 
 class ConfdResource(ErrorCatchingResource):
+
+    _list_schema = None
 
     method_decorators = [
         auth_verifier.verify_token,
@@ -76,6 +78,9 @@ class ListResource(ConfdResource):
         super().__init__()
         self.service = service
 
+    def list_schema(self):
+        return self._list_schema() if self._list_schema else self.schema()
+
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
@@ -85,7 +90,7 @@ class ListResource(ConfdResource):
             kwargs['tenant_uuids'] = tenant_uuids
 
         total, items = self.service.search(params, **kwargs)
-        return {'total': total, 'items': self.schema().dump(items, many=True)}
+        return {'total': total, 'items': self.list_schema().dump(items, many=True)}
 
     def search_params(self):
         return ListSchema().load(request.args)
@@ -100,7 +105,10 @@ class ListResource(ConfdResource):
         return form
 
     def post(self):
-        form = self.schema().load(request.get_json())
+        return self._post(request.get_json())
+
+    def _post(self, body):
+        form = self.schema().load(body)
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
