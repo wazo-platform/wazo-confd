@@ -9,8 +9,12 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
 
+from wazo_confd.plugins.endpoint_sccp.resource import SccpList
 from wazo_confd.plugins.endpoint_sip.resource import SipList
-from wazo_confd.plugins.line_endpoint.resource import LineEndpointAssociationSip
+from wazo_confd.plugins.line_endpoint.resource import (
+    LineEndpointAssociationSccp,
+    LineEndpointAssociationSip,
+)
 
 
 class LineList(ListResource):
@@ -24,6 +28,9 @@ class LineList(ListResource):
         line_service,
         endpoint_sip_service,
         line_endpoint_sip_association_service,
+        line_endpoint_sccp_association_service,
+        endpoint_sccp_service,
+        endpoint_sccp_dao,
         line_dao,
         sip_dao,
         transport_dao,
@@ -32,8 +39,14 @@ class LineList(ListResource):
         self._endpoint_sip_list_resource = SipList(
             endpoint_sip_service, sip_dao, transport_dao
         )
+        self._endpoint_sccp_list_resource = SccpList(
+            endpoint_sccp_service,
+        )
         self._line_endpoint_sip_association_resource = LineEndpointAssociationSip(
             line_endpoint_sip_association_service, line_dao, sip_dao
+        )
+        self._line_endpoint_sccp_association_resource = LineEndpointAssociationSccp(
+            line_endpoint_sccp_association_service, line_dao, endpoint_sccp_dao,
         )
 
     def build_headers(self, line):
@@ -48,12 +61,13 @@ class LineList(ListResource):
         return super().post()
 
     def _post(self, item):
+        form = self.schema().load(item)
+
         endpoint_sip_body = item.pop('endpoint_sip', None)
         endpoint_sccp_body = item.pop('endpoint_sccp', None)
         endpoint_custom_body = item.pop('endpoint_custom', None)
         extensions = item.pop('extensions', None) or []
 
-        form = self.schema().load(item)
         model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
         model = self.service.create(model, tenant_uuids)
@@ -70,8 +84,14 @@ class LineList(ListResource):
             )
             payload['endpoint_sip'] = endpoint_sip
         elif endpoint_sccp_body:
-            # TODO: implement me
-            pass
+            endpoint_sccp, _, _ = self._endpoint_sccp_list_resource._post(
+                endpoint_sccp_body
+            )
+            self._line_endpoint_sccp_association_resource.put(
+                model.id,
+                endpoint_sccp['id'],
+            )
+            payload['endpoint_sccp'] = endpoint_sccp
         elif endpoint_custom_body:
             # TODO: implement me
             pass

@@ -181,7 +181,6 @@ definitions:
       endpoint_sip:
         $ref: '#/definitions/EndpointSipRelationBase'
       endpoint_sccp:
-        readOnly: true
         $ref: '#/definitions/EndpointSccpRelationBase'
       endpoint_custom:
         readOnly: true

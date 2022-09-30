@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from marshmallow import fields, pre_load
+from marshmallow import fields, pre_load, validates_schema
 from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
@@ -35,7 +35,7 @@ class LineSchema(BaseSchema):
     )
     # TODO(pcm): The schema should be different for the list and the get to avoid dumping all fields on a list
     endpoint_sip = Nested('EndpointSIPSchema')
-    endpoint_sccp = Nested('SccpSchema', only=['id', 'links'], dump_only=True)
+    endpoint_sccp = Nested('SccpSchema')
     endpoint_custom = Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
     )
@@ -51,6 +51,19 @@ class LineSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+
+    @validates_schema
+    def _validate_only_one_endpoint(self, data, **kwargs):
+        nb_endpoint = 0
+        if data.get('endpoint_sip'):
+            nb_endpoint += 1
+        if data.get('endpoint_sccp'):
+            nb_endpoint += 1
+        if data.get('endpoint_custom'):
+            nb_endpoint += 1
+
+        if nb_endpoint > 1:
+            raise ValidationError('Only one endpoint should be configured')
 
 
 class LineSchemaNullable(LineSchema):
