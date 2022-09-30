@@ -239,3 +239,7 @@ class UserListSchema(UserSchemaNullable):
         many=True,
         dump_only=True,
     )
+
+
+class UserPutSchema(UserSchema):
+    lines = Nested('LineSchema', many=True, dump_only=True)

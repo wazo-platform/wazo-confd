@@ -859,6 +859,10 @@ def test_post_full_user_no_error(transport, template, registrar):
                 endpoint_sip=has_entries(name='iddqd'),
             ),
         )
+
+        user = confd.users(payload['uuid']).get().item
+        user.pop('call_record_enabled', None)  # Deprecated field
+        confd.users(payload['uuid']).put(**user).assert_updated()
     finally:
         confd.users(payload['uuid']).delete().assert_deleted()
         confd.lines(payload['lines'][0]['id']).delete().assert_deleted()

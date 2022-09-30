@@ -15,9 +15,9 @@ from wazo_confd.plugins.user_line.resource import UserLineItem
 from .schema import (
     UserDirectorySchema,
     UserListSchema,
-    UserSchema,
     UserSchemaNullable,
     UserSummarySchema,
+    UserPutSchema,
 )
 
 logger = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ class UserList(ListResource):
 
 class UserItem(ItemResource):
 
-    schema = UserSchema
+    schema = UserPutSchema
     has_tenant_uuid = True
 
     @required_acl('confd.users.{id}.read')
