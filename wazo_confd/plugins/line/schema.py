@@ -85,3 +85,11 @@ class LineListSchema(LineSchemaNullable):
     endpoint_custom = Nested(
         'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
     )
+
+
+# Note: PUT still does not support creating/updating endpoints/extensions
+class LinePutSchema(LineSchema):
+    extensions = Nested('ExtensionSchema', many=True, dump_only=True)
+    endpoint_sip = Nested('EndpointSIPSchema', dump_only=True)
+    endpoint_sccp = Nested('SccpSchema', dump_only=True)
+    endpoint_custom = Nested('CustomSchema', dump_only=True)

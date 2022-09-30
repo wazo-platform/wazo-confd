@@ -85,6 +85,7 @@ def test_create_line_with_endpoint_sip_with_all_parameters(
             'asterisk_id': 'asterisk_id',
         },
     )
+    line_id = response.item['id']
 
     try:
         assert_that(
@@ -123,19 +124,21 @@ def test_create_line_with_endpoint_sip_with_all_parameters(
             ),
         )
 
+        line = confd.lines(line_id).get().item
         assert_that(
-            confd.lines(response.item['id']).get().item,
+            line,
             has_entries(
                 endpoint_sip=has_entries(
                     uuid=uuid_(),
                     name='name',
-                    line=has_entries(id=response.item['id']),
                 ),
             ),
         )
 
+        response = confd.lines(line_id).put(**line)
+        response.assert_updated()
     finally:
-        confd.lines(response.item['id']).delete().assert_deleted()
+        confd.lines(line_id).delete().assert_deleted()
 
 
 @fixtures.line()

@@ -8,9 +8,9 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.schema import (
-    LineSchema,
     LineSchemaNullable,
     LineListSchema,
+    LinePutSchema,
 )
 
 from wazo_confd.plugins.endpoint_custom.resource import CustomList
@@ -142,7 +142,8 @@ class LineList(ListResource):
 
 class LineItem(ItemResource):
 
-    schema = LineSchema
+    # The schema should be the same as the POST once the PUT handle sub-resource updates
+    schema = LinePutSchema
     has_tenant_uuid = True
 
     @required_acl('confd.lines.{id}.read')
