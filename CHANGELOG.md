@@ -8,8 +8,9 @@
   * `service_token`
   * `rest_api`
 
-* The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during it's creation
-* The `/1.1/lines` resource can now create the underlying extensions during it's creation
+* The `/1.1/users` resource can now create the user's line during the user's creation
+* The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during its creation
+* The `/1.1/lines` resource can now create the underlying extensions during its creation
 
 ## 22.13
 
