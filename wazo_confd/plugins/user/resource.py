@@ -83,6 +83,7 @@ class UserList(ListResource):
     def _post(self, body):
         body = self.schema().load(body)
         lines = body.pop('lines', None) or []
+        auth = body.pop('auth', None)
 
         user_dict, _, headers = super()._post(body)
         user_dict['lines'] = []
@@ -92,11 +93,9 @@ class UserList(ListResource):
             self._user_line_item_resource.put(user_dict['uuid'], line['id'])
             user_dict['lines'].append(line)
 
-        # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
-        if user_dict.get('username'):
-            fixed_user_dict = user_dict.copy()
-            fixed_user_dict['email_address'] = fixed_user_dict['email']
-            self._wazo_user_service.create(fixed_user_dict)
+        if auth:
+            user_dict['auth'] = self._wazo_user_service.create(auth)
+
         return user_dict, 201, headers
 
     @required_acl('confd.users.read')
