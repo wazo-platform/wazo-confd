@@ -1,18 +1,12 @@
 # Changelog
 
-## 22.14
+## 22.13
 
 * `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:
   * `master_tenant`
   * `bus_consumer`
   * `service_token`
   * `rest_api`
-
-* The `/1.1/users` resource can now create the user's line during the user's creation
-* The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during its creation
-* The `/1.1/lines` resource can now create the underlying extensions during its creation
-
-## 22.13
 
 * The following resource has been added:
 
