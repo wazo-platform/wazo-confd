@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -53,9 +53,6 @@ class PJSIPTransportList(ListResource):
 
     schema = PJSIPTransportSchema
     model = PJSIPTransport
-
-    def __init__(self, service):
-        self.service = service
 
     def build_headers(self, transport):
         return {

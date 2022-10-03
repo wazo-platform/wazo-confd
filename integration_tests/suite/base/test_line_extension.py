@@ -7,15 +7,17 @@ from hamcrest import (
     contains_inanyorder,
     empty,
     equal_to,
+    greater_than,
     has_entries,
+    none,
 )
 
 from ..helpers import (
-    scenarios as s,
-    errors as e,
     associations as a,
+    errors as e,
     fixtures,
     helpers as h,
+    scenarios as s,
 )
 from ..helpers.config import (
     CONTEXT,
@@ -28,6 +30,69 @@ from . import confd, db
 from .test_extensions import error_checks
 
 FAKE_ID = 999999999
+
+
+@fixtures.registrar()
+def test_create_line_with_all_parameters_and_extension(registrar):
+    exten = h.extension.find_available_exten(CONTEXT)
+    response = confd.lines.post(
+        context=CONTEXT,
+        position=2,
+        registrar=registrar['id'],
+        provisioning_code='887865',
+        extensions=[
+            {
+                'context': CONTEXT,
+                'exten': exten,
+            }
+        ],
+        endpoint_sip={
+            'name': 'test',
+        },
+    )
+
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                context=CONTEXT,
+                position=2,
+                device_slot=2,
+                name=none(),
+                protocol=none(),
+                device_id=none(),
+                caller_id_name=none(),
+                caller_id_num=none(),
+                registrar=registrar['id'],
+                provisioning_code="887865",
+                provisioning_extension="887865",
+                tenant_uuid=MAIN_TENANT,
+                extensions=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        context=CONTEXT,
+                        exten=exten,
+                    )
+                ),
+            ),
+        )
+
+        assert_that(
+            confd.lines(response.item['id']).get().item,
+            has_entries(
+                extensions=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        context=CONTEXT,
+                        exten=exten,
+                        lines=contains(has_entries(id=response.item['id'])),
+                    )
+                ),
+            ),
+        )
+
+    finally:
+        confd.lines(response.item['id']).delete().assert_deleted()
 
 
 @fixtures.line()
