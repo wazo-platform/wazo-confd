@@ -94,6 +94,8 @@ class UserList(ListResource):
             user_dict['lines'].append(line)
 
         if auth:
+            auth['uuid'] = user_dict['uuid']
+            auth['tenant_uuid'] = user_dict['tenant_uuid']
             user_dict['auth'] = self._wazo_user_service.create(auth)
 
         return user_dict, 201, headers
