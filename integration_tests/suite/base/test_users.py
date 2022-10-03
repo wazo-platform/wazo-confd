@@ -899,6 +899,8 @@ def test_post_full_user_no_error(transport, template, registrar):
         "userfield": "userfield",
         "call_permission_password": "1234",
         "enabled": True,
+    }
+    auth = {
         "username": "richardlapointe",
         "password": "secret",
     }
@@ -926,6 +928,7 @@ def test_post_full_user_no_error(transport, template, registrar):
 
     response = confd.users.post(
         {
+            'auth': auth,
             'lines': [line],
             **user,
         }
