@@ -1,7 +1,7 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
+from marshmallow import fields, post_dump, pre_dump, post_load, pre_load, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
@@ -19,6 +19,17 @@ CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
 USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
 PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
 CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
+
+
+class WazoAuthUserSchema(BaseSchema):
+    uuid = fields.UUID(dump_only=True)
+    username = fields.String(validate=Length(min=1, max=256), missing=None, allow_none=True)
+    password = fields.String(validate=Length(min=1), allow_none=True)
+    firstname = fields.String(missing=None, allow_none=True)
+    lastname = fields.String(missing=None, allow_none=True)
+    purpose = fields.Constant('user')
+    enabled = fields.Boolean(missing=True)
+    email_address = fields.Email(allow_none=True)
 
 
 class UserSchema(BaseSchema):
@@ -91,6 +102,7 @@ class UserSchema(BaseSchema):
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
+    auth = Nested('WazoAuthUserSchema')
 
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
@@ -112,6 +124,23 @@ class UserSchema(BaseSchema):
         if not self.only or 'call_pickup_target_users' in self.only:
             call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
             data['call_pickup_target_users'] = call_pickup_user_targets
+        return data
+
+    @pre_load
+    def set_auth_defaults(self, data, **kwargs):
+        auth = data.get('auth')
+        if not auth:
+            return data
+
+        if not auth.get('firstname') and data.get('firstname'):
+            auth['firstname'] = data['firstname']
+
+        if not auth.get('lastname') and data.get('lastname'):
+            auth['lastname'] = data['lastname']
+
+        if not auth.get('email_address') and data.get('email'):
+            auth['email_address'] = data['email']
+
         return data
 
     @classmethod
