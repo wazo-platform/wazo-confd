@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -218,6 +218,16 @@ def test_create_line_with_all_parameters(registrar):
 def test_create_line_with_caller_id_raises_error():
     response = confd.lines.post(
         context=config.CONTEXT, caller_id_name="Jôhn Smîth", caller_id_num="1000"
+    )
+
+    response.assert_status(400)
+
+
+def test_create_line_with_multiple_endpoints_raises_error():
+    response = confd.lines.post(
+        context=config.CONTEXT,
+        endpoint_sip={'name': 'sip'},
+        endpoint_sccp={'options': [['allow', 'all']]},
     )
 
     response.assert_status(400)

@@ -26,6 +26,7 @@ from ..helpers import (
     associations as a,
     errors as e,
     fixtures,
+    helpers as h,
     scenarios as s,
     helpers as h,
 )
@@ -870,6 +871,106 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 
     response = confd.users.post(**parameters)
     response.assert_match(400, e.not_found(resource='MOH'))
+
+
+@fixtures.transport()
+@fixtures.sip_template()
+@fixtures.registrar()
+def test_post_full_user_no_error(transport, template, registrar):
+    exten = h.extension.find_available_exten(CONTEXT)
+    user = {
+        "subscription_type": 2,
+        "firstname": "Rîchard",
+        "lastname": "Lâpointe",
+        "email": "richard@lapointe.org",
+        "language": "fr_FR",
+        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
+        "mobile_phone_number": "4181234567",
+        "supervision_enabled": True,
+        "call_transfer_enabled": False,
+        "dtmf_hangup_enabled": True,
+        "call_record_outgoing_external_enabled": True,
+        "call_record_outgoing_internal_enabled": True,
+        "call_record_incoming_internal_enabled": True,
+        "call_record_incoming_external_enabled": True,
+        "online_call_record_enabled": False,
+        "simultaneous_calls": 5,
+        "ring_seconds": 30,
+        "userfield": "userfield",
+        "call_permission_password": "1234",
+        "enabled": True,
+        "username": "richardlapointe",
+        "password": "secret",
+    }
+    extension = {'context': CONTEXT, 'exten': exten}
+    line = {
+        'context': CONTEXT,
+        'position': 2,
+        'registrar': registrar['id'],
+        'provisioning_code': "887865",
+        'extensions': [extension],
+        'endpoint_sip': {
+            'name': 'iddqd',
+            'label': 'Richard\'s line',
+            'auth_section_options': [
+                ['username', 'iddqd'],
+                ['password', 'secret'],
+            ],
+            'endpoint_section_options': [
+                ['callerid', f'"Rîchard Lâpointe" <{exten}>'],
+            ],
+            'transport': transport,
+            'templates': [template],
+        },
+    }
+
+    response = confd.users.post(
+        {
+            'lines': [line],
+            **user,
+        }
+    ).response
+
+    assert response.status_code == 201
+    payload = response.json()
+    try:
+        assert_that(
+            payload,
+            has_entries(
+                uuid=uuid_(),
+                lines=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        endpoint_sip=has_entries(uuid=uuid_()),
+                        extensions=contains(has_entries(id=greater_than(0))),
+                    )
+                ),
+                **user,
+            ),
+        )
+
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
+        )
+
+        assert_that(
+            confd.lines(payload['lines'][0]['id']).get().item,
+            has_entries(
+                extensions=contains(has_entries(**extension)),
+                endpoint_sip=has_entries(name='iddqd'),
+            ),
+        )
+
+        user = confd.users(payload['uuid']).get().item
+        user.pop('call_record_enabled', None)  # Deprecated field
+        confd.users(payload['uuid']).put(**user).assert_updated()
+    finally:
+        confd.users(payload['uuid']).delete().assert_deleted()
+        confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+        confd.extensions(
+            payload['lines'][0]['extensions'][0]['id']
+        ).delete().assert_deleted()
 
 
 @fixtures.user(

@@ -1,7 +1,7 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import request, url_for
+from flask import url_for, request
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource

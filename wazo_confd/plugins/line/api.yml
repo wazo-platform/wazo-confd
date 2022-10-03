@@ -183,19 +183,15 @@ definitions:
   LineRelationEndpoints:
     properties:
       endpoint_sip:
-        readOnly: true
         $ref: '#/definitions/EndpointSipRelationBase'
       endpoint_sccp:
-        readOnly: true
         $ref: '#/definitions/EndpointSccpRelationBase'
       endpoint_custom:
-        readOnly: true
         $ref: '#/definitions/EndpointCustomRelationBase'
   LineRelationExtensions:
     properties:
       extensions:
         type: array
-        readOnly: true
         items:
           $ref: '#/definitions/ExtensionRelationBase'
   LineRelationUsers:

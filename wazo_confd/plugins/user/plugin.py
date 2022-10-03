@@ -24,16 +24,18 @@ class Plugin:
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
         middleware_handle = dependencies['middleware_handle']
+        pjsip_doc = dependencies['pjsip_doc']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
-        service = build_service(provd_client)
+        user_service = build_service(provd_client)
+        wazo_user_service = build_wazo_user_service()
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
-        wazo_user_service = build_wazo_user_service()
 
-        user_middleware = UserMiddleWare(service, wazo_user_service, middleware_handle)
+
+        user_middleware = UserMiddleWare(user_service, wazo_user_service, middleware_handle)
         middleware_handle.register('user', user_middleware)
 
         api.add_resource(
@@ -42,7 +44,7 @@ class Plugin:
             '/users/<int:id>',
             endpoint='users',
             resource_class_args=(
-                service,
+                user_service,
                 user_middleware,
             ),
         )
@@ -52,7 +54,7 @@ class Plugin:
             '/users',
             endpoint='users_list',
             resource_class_args=(
-                service,
+                user_service,
                 user_middleware,
             ),
         )

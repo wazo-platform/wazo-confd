@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
+import logging
+
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo.tenant_flask_helpers import Tenant
@@ -15,7 +17,10 @@ from .schema import (
     UserSchema,
     UserListItemSchema,
     UserSummarySchema,
+    UserPutSchema,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class UserList(ListResource):
@@ -41,6 +46,25 @@ class UserList(ListResource):
         )
         return resource, 201, self.build_headers(resource)
 
+    def _post(self, body):
+        body = self.schema().load(body)
+        lines = body.pop('lines', None) or []
+
+        user_dict, _, headers = super()._post(body)
+        user_dict['lines'] = []
+
+        for line_body in lines:
+            line, _, _ = self._line_list_resource._post(line_body)
+            self._user_line_item_resource.put(user_dict['uuid'], line['id'])
+            user_dict['lines'].append(line)
+
+        # FIX: create(...) takes a user dict containing an 'email_address' key, not an 'email' key
+        if user_dict.get('username'):
+            fixed_user_dict = user_dict.copy()
+            fixed_user_dict['email_address'] = fixed_user_dict['email']
+            self._wazo_user_service.create(fixed_user_dict)
+        return user_dict, 201, headers
+
     @required_acl('confd.users.read')
     def get(self):
         params = self.search_params()
@@ -53,7 +77,7 @@ class UserList(ListResource):
 
 class UserItem(ItemResource):
 
-    schema = UserSchema
+    schema = UserPutSchema
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):

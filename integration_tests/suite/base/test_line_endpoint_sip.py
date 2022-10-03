@@ -9,6 +9,7 @@ from hamcrest import (
     has_items,
     none,
 )
+
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
 from . import confd
@@ -22,6 +23,122 @@ from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 FAKE_ID = 999999999
+
+
+@fixtures.transport()
+@fixtures.sip_template()
+@fixtures.sip_template()
+@fixtures.registrar()
+def test_create_line_with_endpoint_sip_with_all_parameters(
+    transport, template_1, template_2, registrar
+):
+    aor_section_options = [
+        ['@custom_variable', 'custom'],
+        ['qualify_frequency', '60'],
+        ['maximum_expiration', '3600'],
+        ['remove_existing', 'yes'],
+        ['max_contacts', '1'],
+    ]
+    auth_section_options = [['username', 'yiq8yej0'], ['password', 'yagq7x0w']]
+    endpoint_section_options = [
+        ['@custom_variable', 'custom'],
+        ['force_rport', 'yes'],
+        ['rewrite_contact', 'yes'],
+        ['callerid', '"Firstname Lastname" <100>'],
+    ]
+    identify_section_options = [
+        ['match', '54.172.60.0'],
+        ['match', '54.172.60.1'],
+        ['match', '54.172.60.2'],
+    ]
+    registration_section_options = [
+        ['client_uri', 'sip:peer@proxy.example.com'],
+        ['server_uri', 'sip:proxy.example.com'],
+        ['expiration', '120'],
+    ]
+    registration_outbound_auth_section_options = [
+        ['username', 'outbound-registration-username'],
+        ['password', 'outbound-registration-password'],
+    ]
+    outbound_auth_section_options = [
+        ['username', 'outbound-auth'],
+        ['password', 'outbound-password'],
+    ]
+
+    response = confd.lines.post(
+        context=CONTEXT,
+        position=2,
+        registrar=registrar['id'],
+        provisioning_code='887865',
+        endpoint_sip={
+            'name': "name",
+            'label': "label",
+            'aor_section_options': aor_section_options,
+            'auth_section_options': auth_section_options,
+            'endpoint_section_options': endpoint_section_options,
+            'identify_section_options': identify_section_options,
+            'registration_section_options': registration_section_options,
+            'registration_outbound_auth_section_options': registration_outbound_auth_section_options,
+            'outbound_auth_section_options': outbound_auth_section_options,
+            'transport': transport,
+            'templates': [template_1, template_2],
+            'asterisk_id': 'asterisk_id',
+        },
+    )
+    line_id = response.item['id']
+
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                context=CONTEXT,
+                position=2,
+                device_slot=2,
+                name=none(),
+                protocol=none(),
+                device_id=none(),
+                caller_id_name=none(),
+                caller_id_num=none(),
+                registrar=registrar['id'],
+                provisioning_code="887865",
+                provisioning_extension="887865",
+                tenant_uuid=MAIN_TENANT,
+                endpoint_sip=has_entries(
+                    tenant_uuid=MAIN_TENANT,
+                    name='name',
+                    label='label',
+                    aor_section_options=aor_section_options,
+                    auth_section_options=auth_section_options,
+                    endpoint_section_options=endpoint_section_options,
+                    identify_section_options=identify_section_options,
+                    registration_section_options=registration_section_options,
+                    registration_outbound_auth_section_options=registration_outbound_auth_section_options,
+                    outbound_auth_section_options=outbound_auth_section_options,
+                    transport=has_entries(uuid=transport['uuid']),
+                    templates=contains(
+                        has_entries(uuid=template_1['uuid'], label=template_1['label']),
+                        has_entries(uuid=template_2['uuid'], label=template_2['label']),
+                    ),
+                    asterisk_id='asterisk_id',
+                ),
+            ),
+        )
+
+        line = confd.lines(line_id).get().item
+        assert_that(
+            line,
+            has_entries(
+                endpoint_sip=has_entries(
+                    uuid=uuid_(),
+                    name='name',
+                ),
+            ),
+        )
+
+        response = confd.lines(line_id).put(**line)
+        response.assert_updated()
+    finally:
+        confd.lines(line_id).delete().assert_deleted()
 
 
 @fixtures.line()
@@ -195,8 +312,26 @@ def test_get_endpoint_sip_relation(line, sip):
                     name='my-endpoint',
                     auth_section_options=contains_inanyorder(
                         contains('username', 'my-username'),
+                        contains('password', 'my-password'),
                     ),
                 )
+            ),
+        )
+
+        response = confd.lines.get()
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(
+                    endpoint_sip=has_entries(
+                        uuid=sip['uuid'],
+                        label='my-endpoint',
+                        name='my-endpoint',
+                        auth_section_options=contains_inanyorder(
+                            contains('username', 'my-username'),
+                        ),
+                    )
+                ),
             ),
         )
 

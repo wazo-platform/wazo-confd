@@ -12,7 +12,13 @@ from marshmallow import (
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp, OneOf
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+    StrictBoolean,
+    Nested,
+)
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"

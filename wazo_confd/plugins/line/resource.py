@@ -4,12 +4,15 @@
 from flask import url_for, request
 from xivo.tenant_flask_helpers import Tenant
 from xivo_dao import tenant_dao
+
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.schema import LinePutSchema, LineListSchema
-
+from wazo_confd.plugins.line.schema import (
+    LineListSchema,
+    LinePutSchema,
+)
 
 class LineList(ListResource):
 
@@ -41,6 +44,7 @@ class LineList(ListResource):
 
 class LineItem(ItemResource):
 
+    # The schema should be the same as the POST once the PUT handle sub-resource updates
     schema = LinePutSchema
     has_tenant_uuid = True
 

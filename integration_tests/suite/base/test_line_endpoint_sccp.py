@@ -20,6 +20,64 @@ from ..helpers import (
 from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT
 
 
+@fixtures.registrar()
+def test_create_line_with_endpoint_sccp_with_all_parameters(registrar):
+    response = confd.lines.post(
+        context=CONTEXT,
+        position=2,
+        registrar=registrar['id'],
+        provisioning_code='887865',
+        endpoint_sccp={
+            'options': [
+                ["cid_name", "cid_name"],
+                ["cid_num", "cid_num"],
+                ["allow", "allow"],
+                ["disallow", "disallow"],
+            ],
+        },
+    )
+
+    try:
+        line_id = response.item['id']
+        endpoint_sccp_id = response.item['endpoint_sccp']['id']
+        assert_that(
+            response.item,
+            has_entries(
+                context=CONTEXT,
+                position=2,
+                device_slot=2,
+                name=none(),
+                protocol=none(),
+                device_id=none(),
+                caller_id_name=none(),
+                caller_id_num=none(),
+                registrar=registrar['id'],
+                provisioning_code="887865",
+                provisioning_extension="887865",
+                tenant_uuid=MAIN_TENANT,
+                endpoint_sccp=has_entries(
+                    id=greater_than(0),
+                    options=contains_inanyorder(
+                        ["cid_name", "cid_name"],
+                        ["cid_num", "cid_num"],
+                        ["allow", "allow"],
+                        ["disallow", "disallow"],
+                    ),
+                ),
+            ),
+        )
+
+        assert_that(
+            confd.lines(line_id).get().item,
+            has_entries(
+                endpoint_sccp=has_entries(id=endpoint_sccp_id),
+            ),
+        )
+
+    finally:
+        confd.lines(response.item['id']).delete().assert_deleted()
+
+
 @fixtures.line()
 @fixtures.sccp()
 def test_associate_errors(line, sccp):

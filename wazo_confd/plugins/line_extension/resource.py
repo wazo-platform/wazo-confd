@@ -37,6 +37,9 @@ class LineExtensionList(ListResource):
 
     @required_acl('confd.lines.{line_id}.extensions.create')
     def post(self, line_id):
+        return self._post(line_id, request.get_json())
+
+    def _post(self, line_id, body):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         extension = self._middleware.create_extension(
             line_id,

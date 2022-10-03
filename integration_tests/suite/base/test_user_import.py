@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -76,8 +76,11 @@ def test_given_csv_has_minimal_fields_for_a_user_then_user_imported():
     user_id = get_import_field(response, 'user_id')
     user_uuid = get_import_field(response, 'user_uuid')
 
-    user = confd.users(user_id).get().item
-    assert_that(user, has_entries(firstname="Rîchard", uuid=user_uuid))
+    try:
+        user = confd.users(user_id).get().item
+        assert_that(user, has_entries(firstname="Rîchard", uuid=user_uuid))
+    finally:
+        confd.users(user_id).delete()
 
 
 def test_given_csv_has_all_fields_for_a_user_then_user_imported():
@@ -142,7 +145,7 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             ),
         )
     finally:
-        confd.users(user_uuid).delete().assert_deleted()
+        confd.users(user_id).delete().assert_deleted()
 
 
 @fixtures.call_permission()

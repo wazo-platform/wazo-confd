@@ -43,17 +43,16 @@ class LineSchema(BaseSchema):
 
     @validates_schema
     def _validate_only_one_endpoint(self, data, **kwargs):
-        endpoint_sip = data.get('endpoint_sip')
-        endpoint_sccp = data.get('endpoint_sccp')
-        endpoint_custom = data.get('endpoint_custom')
+        nb_endpoint = 0
+        if data.get('endpoint_sip'):
+            nb_endpoint += 1
+        if data.get('endpoint_sccp'):
+            nb_endpoint += 1
+        if data.get('endpoint_custom'):
+            nb_endpoint += 1
 
-        configured_endpoints = [
-            endpoint
-            for endpoint in [endpoint_sip, endpoint_sccp, endpoint_custom]
-            if endpoint
-        ]
-        if len(configured_endpoints) > 1:
-            raise ValidationError('Only one endpoint should be configured on a line')
+        if nb_endpoint > 1:
+            raise ValidationError('Only one endpoint should be configured')
 
     @validates_schema
     def _validate_multiple_caller_id(self, data, **kwargs):
@@ -120,9 +119,13 @@ class LineSchemaNullable(LineSchema):
 
 
 class LineListSchema(LineSchema):
+    extensions = Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
+    )
     endpoint_sip = Nested(
         'EndpointSIPSchema',
-        # TODO(pc-m): Is it really useful to have the username/password on the relation?
         only=[
             'uuid',
             'label',
@@ -150,5 +153,5 @@ class LineListSchema(LineSchema):
     )
 
 
-class LinePutSchema(LineListSchema):
+class LinePutSchema(LineSchema):
     pass
