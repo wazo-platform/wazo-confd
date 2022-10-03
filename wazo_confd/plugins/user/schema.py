@@ -5,13 +5,7 @@ from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
-from wazo_confd.helpers.mallow import (
-    BaseSchema,
-    Link,
-    ListLink,
-    StrictBoolean,
-    Nested,
-)
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
@@ -78,7 +72,20 @@ class UserSchema(BaseSchema):
     incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
-    lines = Nested('LineSchema', many=True)
+    lines = Nested(
+        'LineSchema',
+        only=[
+            'id',
+            'name',
+            'endpoint_sip',
+            'endpoint_sccp',
+            'endpoint_custom',
+            'extensions',
+            'links',
+        ],
+        many=True,
+        dump_only=True,
+    )
     forwards = Nested('ForwardsSchema', dump_only=True)
     schedules = Nested(
         'ScheduleSchema', only=['id', 'name', 'links'], many=True, dump_only=True
@@ -222,24 +229,3 @@ class UserSchemaNullable(UserSchema):
         ]
         if field_name in nullable_fields:
             field_obj.allow_none = True
-
-
-class UserListSchema(UserSchemaNullable):
-    lines = Nested(
-        'LineSchema',
-        only=[
-            'id',
-            'name',
-            'endpoint_sip',
-            'endpoint_sccp',
-            'endpoint_custom',
-            'extensions',
-            'links',
-        ],
-        many=True,
-        dump_only=True,
-    )
-
-
-class UserPutSchema(UserSchema):
-    lines = Nested('LineSchema', many=True, dump_only=True)

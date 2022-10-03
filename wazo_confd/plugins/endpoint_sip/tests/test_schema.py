@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -20,7 +20,7 @@ from werkzeug.exceptions import BadRequest
 
 # Adding schemas to the marshmallow registry
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
-from wazo_confd.plugins.line.resource import LineListSchema  # noqa
+from wazo_confd.plugins.line.resource import LineSchema  # noqa
 
 from ..schema import (
     EndpointSIPSchema,

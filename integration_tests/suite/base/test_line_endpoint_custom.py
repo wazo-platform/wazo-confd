@@ -1,7 +1,7 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_entries, greater_than, none
+from hamcrest import assert_that, has_entries
 
 from . import confd
 from ..helpers import (
@@ -10,61 +10,7 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
-from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT
-
-
-@fixtures.registrar()
-def test_create_line_with_endpoint_custom_with_all_parameters(registrar):
-    response = confd.lines.post(
-        context=CONTEXT,
-        position=2,
-        registrar=registrar['id'],
-        provisioning_code='887865',
-        endpoint_custom={
-            'interface': 'custom/createall',
-            'enabled': False,
-        },
-    )
-
-    try:
-        assert_that(
-            response.item,
-            has_entries(
-                context=CONTEXT,
-                position=2,
-                device_slot=2,
-                name=none(),
-                protocol=none(),
-                device_id=none(),
-                caller_id_name=none(),
-                caller_id_num=none(),
-                registrar=registrar['id'],
-                provisioning_code="887865",
-                provisioning_extension="887865",
-                tenant_uuid=MAIN_TENANT,
-                endpoint_custom=has_entries(
-                    id=greater_than(0),
-                    tenant_uuid=MAIN_TENANT,
-                    interface='custom/createall',
-                    enabled=False,
-                ),
-            ),
-        )
-
-        assert_that(
-            confd.lines(response.item['id']).get().item,
-            has_entries(
-                endpoint_custom=has_entries(
-                    id=response.item['endpoint_custom']['id'],
-                    interface='custom/createall',
-                    enabled=False,
-                    line=has_entries(id=response.item['id']),
-                ),
-            ),
-        )
-
-    finally:
-        confd.lines(response.item['id']).delete().assert_deleted()
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 @fixtures.line()
