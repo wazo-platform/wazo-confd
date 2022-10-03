@@ -4,6 +4,10 @@
 
 * `/wizard` endpoint updates now the configuration file for autoprovisionning `/etc/asterisk/pjsip.d/05-autoprov-wizard.conf` with the `language` value it receives in the request body. However, if the user wants to change the language used for audio provisionning; they will have to do it manually for now.
 
+* The `/1.1/users` resource can now create the user's line during the user's creation
+* The `/1.1/lines` resource can now create the underlying custom, SIP or SCCP endpoint during its creation
+* The `/1.1/lines` resource can now create the underlying extensions during its creation
+
 ## 22.13
 
 * `/status` endpoint has now been included into `wazo-confd`, and it returns the current status (`ok` or `fail`) of the following:
