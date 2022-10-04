@@ -1,7 +1,14 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_dump, pre_dump, post_load, pre_load, validates_schema
+from marshmallow import (
+    fields,
+    post_dump,
+    pre_dump,
+    post_load,
+    pre_load,
+    validates_schema,
+)
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
@@ -23,7 +30,9 @@ CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
 
 class WazoAuthUserSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
-    username = fields.String(validate=Length(min=1, max=256), missing=None, allow_none=True)
+    username = fields.String(
+        validate=Length(min=1, max=256), missing=None, allow_none=True
+    )
     password = fields.String(validate=Length(min=1), allow_none=True)
     firstname = fields.String(missing=None, allow_none=True)
     lastname = fields.String(missing=None, allow_none=True)
