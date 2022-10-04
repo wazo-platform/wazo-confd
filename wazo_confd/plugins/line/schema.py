@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from marshmallow import fields, validates_schema
+from marshmallow import fields, validates_schema, pre_load
 from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
@@ -54,6 +54,14 @@ class LineSchema(BaseSchema):
 
         if nb_endpoint > 1:
             raise ValidationError('Only one endpoint should be configured')
+
+    @pre_load
+    def populate_missing_context(self, data, **kwargs):
+        extensions = data.get('extensions', [])
+        for ext in extensions:
+            if 'context' not in ext:
+                ext['context'] = data.get('context')
+        return data
 
 
 class LineSchemaNullable(LineSchema):
