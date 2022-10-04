@@ -95,6 +95,51 @@ def test_create_line_with_all_parameters_and_extension(registrar):
         confd.lines(response.item['id']).delete().assert_deleted()
 
 
+@fixtures.registrar()
+def test_create_line_with_missing_context_for_extension(registrar):
+    exten = h.extension.find_available_exten(CONTEXT)
+    response = confd.lines.post(
+        context=CONTEXT,
+        extensions=[
+            {
+                'exten': exten,
+            }
+        ],
+        endpoint_sip={
+            'name': 'test',
+        },
+    )
+
+    try:
+        assert_that(
+            confd.lines(response.item['id']).get().item,
+            has_entries(
+                context=CONTEXT,
+                extensions=contains(
+                    has_entries(
+                        context=CONTEXT,
+                        exten=exten,
+                    )
+                ),
+            ),
+        )
+
+        assert_that(
+            confd.lines(response.item['id']).get().item,
+            has_entries(
+                extensions=contains(
+                    has_entries(
+                        context=CONTEXT,
+                        exten=exten,
+                    )
+                ),
+            ),
+        )
+
+    finally:
+        confd.lines(response.item['id']).delete().assert_deleted()
+
+
 @fixtures.line()
 @fixtures.extension()
 def test_associate_errors(line, extension):

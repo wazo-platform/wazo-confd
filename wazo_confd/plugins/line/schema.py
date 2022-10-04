@@ -107,6 +107,13 @@ class LineSchema(BaseSchema):
                 )
                 endpoint_sip['endpoint_section_options'] = endpoint_section_options
 
+    @pre_load
+    def populate_missing_context(self, data, **kwargs):
+        extensions = data.get('extensions', [])
+        for ext in extensions:
+            if 'context' not in ext:
+                ext['context'] = data.get('context')
+
         return data
 
 
