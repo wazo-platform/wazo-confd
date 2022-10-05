@@ -122,7 +122,7 @@ class UserSchema(BaseSchema):
     switchboards = Nested(
         'SwitchboardSchema', only=['uuid', 'name', 'links'], many=True, dump_only=True
     )
-    voicemail = Nested('VoicemailSchema', only=['id', 'name', 'links'], dump_only=True)
+    voicemail = Nested('VoicemailSchema')
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
@@ -335,3 +335,8 @@ class UserGroupSchema(BaseSchema):
 class UserSwitchboardSchema(BaseSchema):
     uuid = fields.String(validate=Length(max=40), required=True)
     links = ListLink(Link('switchboards', field='uuid'))
+
+
+class UserPutSchema(UserSchema):
+    lines = Nested('LineSchema', many=True, dump_only=True)
+    voicemail = Nested('VoicemailSchema', dump_only=True)

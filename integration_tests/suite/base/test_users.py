@@ -878,6 +878,23 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.registrar()
 def test_post_full_user_no_error(transport, template, registrar):
     exten = h.extension.find_available_exten(CONTEXT)
+    vm_number = h.voicemail.find_available_number(CONTEXT)
+    voicemail = {
+        'name': 'full',
+        'number': vm_number,
+        'context': CONTEXT,
+        'email': 'test@example.com',
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': True,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': True,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
     user = {
         "subscription_type": 2,
         "firstname": "Rîchard",
@@ -930,6 +947,7 @@ def test_post_full_user_no_error(transport, template, registrar):
         {
             'auth': auth,
             'lines': [line],
+            'voicemail': voicemail,
             **user,
         }
     ).response
@@ -948,6 +966,7 @@ def test_post_full_user_no_error(transport, template, registrar):
                         extensions=contains(has_entries(id=greater_than(0))),
                     )
                 ),
+                voicemail=has_entries(id=greater_than(0)),
                 **user,
             ),
         )
@@ -969,6 +988,8 @@ def test_post_full_user_no_error(transport, template, registrar):
         user.pop('call_record_enabled', None)  # Deprecated field
         confd.users(payload['uuid']).put(**user).assert_updated()
     finally:
+        confd.users(payload['uuid']).voicemails.delete().assert_deleted()
+        confd.voicemails(payload['voicemail']['id']).assert_deleted()
         confd.users(payload['uuid']).delete().assert_deleted()
         confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
         confd.extensions(

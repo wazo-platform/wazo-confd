@@ -14,6 +14,7 @@ from .sub_resources.resource import (
     UserServiceIncallFilter,
     UserServiceList,
 )
+
 from .service import build_service, build_service_callservice, build_service_forward
 from ..user_import.wazo_user_service import build_service as build_wazo_user_service
 
@@ -24,7 +25,6 @@ class Plugin:
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
         middleware_handle = dependencies['middleware_handle']
-        pjsip_doc = dependencies['pjsip_doc']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)

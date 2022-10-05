@@ -50,6 +50,7 @@ class UserList(ListResource):
         body = self.schema().load(body)
         lines = body.pop('lines', None) or []
         auth = body.pop('auth', None)
+        voicemail = body.pop('voicemail', None)
 
         user_dict, _, headers = super()._post(body)
         user_dict['lines'] = []
@@ -63,6 +64,11 @@ class UserList(ListResource):
             auth['uuid'] = user_dict['uuid']
             auth['tenant_uuid'] = user_dict['tenant_uuid']
             user_dict['auth'] = self._wazo_user_service.create(auth)
+
+        if voicemail:
+            user_dict['voicemail'], _, _ = self._user_voicemail_list_resource._post(
+                user_dict['uuid'], voicemail
+            )
 
         return user_dict, 201, headers
 
