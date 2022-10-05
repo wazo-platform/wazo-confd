@@ -28,6 +28,7 @@ default_outbound_endpoint = {username}
 [{username}](autoprov-endpoint)
 aors = {username}
 auth = {username}-auth
+language = {language}
 
 [{username}](autoprov-aor)
 
@@ -96,7 +97,10 @@ class WizardService:
             self._initialize_provd(
                 wizard['network']['ip_address'], autoprov_username, autoprov_password
             )
-            self._add_asterisk_autoprov_config(autoprov_username, autoprov_password)
+            autoprov_language = wizard.get('language', 'en_US')
+            self._add_asterisk_autoprov_config(
+                autoprov_username, autoprov_password, autoprov_language
+            )
             self.sysconfd.exec_request_handlers({'chown_autoprov_config': []})
             self.sysconfd.flush()
             self.sysconfd.exec_request_handlers(
@@ -114,9 +118,13 @@ class WizardService:
         wizard['xivo_uuid'] = self.infos_dao.get().uuid
         return wizard
 
-    def _add_asterisk_autoprov_config(self, autoprov_username, autoprov_password):
+    def _add_asterisk_autoprov_config(
+        self, autoprov_username, autoprov_password, autoprov_language
+    ):
         content = ASTERISK_AUTOPROV_CONFIG_TPL.format(
-            username=autoprov_username, password=autoprov_password
+            username=autoprov_username,
+            password=autoprov_password,
+            language=autoprov_language,
         )
 
         try:
