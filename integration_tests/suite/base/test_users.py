@@ -876,7 +876,8 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.transport()
 @fixtures.sip_template()
 @fixtures.registrar()
-def test_post_full_user_no_error(transport, template, registrar):
+@fixtures.user()
+def test_post_full_user_no_error(transport, template, registrar, user_destination):
     exten = h.extension.find_available_exten(CONTEXT)
     vm_number = h.voicemail.find_available_number(CONTEXT)
     voicemail = {
@@ -899,6 +900,12 @@ def test_post_full_user_no_error(transport, template, registrar):
         'busy': {'enabled': True, 'destination': '123'},
         'noanswer': {'enabled': True, 'destination': '456'},
         'unconditional': {'enabled': True, 'destination': '789'},
+    }
+    fallbacks = {
+        'noanswer_destination': {'type': 'user', 'user_id': user_destination['id']},
+        'busy_destination': {'type': 'user', 'user_id': user_destination['id']},
+        'congestion_destination': {'type': 'user', 'user_id': user_destination['id']},
+        'fail_destination': {'type': 'user', 'user_id': user_destination['id']},
     }
     user = {
         "subscription_type": 2,
@@ -954,6 +961,7 @@ def test_post_full_user_no_error(transport, template, registrar):
             'lines': [line],
             'voicemail': voicemail,
             'forwards': forwards,
+            'fallbacks': fallbacks,
             **user,
         }
     ).response
@@ -974,6 +982,20 @@ def test_post_full_user_no_error(transport, template, registrar):
                 ),
                 voicemail=has_entries(id=greater_than(0)),
                 forwards=has_entries(**forwards),
+                fallbacks=has_entries(
+                    noanswer_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                    busy_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                    congestion_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                    fail_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                ),
                 **user,
             ),
         )
@@ -985,6 +1007,23 @@ def test_post_full_user_no_error(transport, template, registrar):
         assert_that(
             confd.users(payload['uuid']).forwards.get().item,
             has_entries(**forwards),
+        )
+        assert_that(
+            confd.users(payload['uuid']).fallbacks.get().item,
+            has_entries(
+                noanswer_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+                busy_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+                congestion_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+                fail_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+            ),
         )
 
         assert_that(

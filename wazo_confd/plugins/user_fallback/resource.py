@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -25,7 +25,10 @@ class UserFallbackList(ConfdResource):
 
     @required_acl('confd.users.{user_id}.fallbacks.update')
     def put(self, user_id):
+        return self._put(user_id, request.get_json())
+
+    def _put(self, user_id, body):
         user = self.user_dao.get_by_id_uuid(user_id)
-        fallbacks = self.schema().load(request.get_json())
+        fallbacks = self.schema().load(body)
         self.service.edit(user, fallbacks)
         return '', 204

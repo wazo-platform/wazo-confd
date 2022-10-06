@@ -50,6 +50,7 @@ class UserList(ListResource):
     def _post(self, body):
         # forwards payload will be modified by the PUT body
         forwards = body.pop('forwards', None)
+        fallbacks = body.pop('fallbacks', None)
 
         body = self.schema().load(body)
 
@@ -78,6 +79,12 @@ class UserList(ListResource):
         if forwards:
             self._user_forward_list_resource._put(user_dict['uuid'], forwards)
             user_dict['forwards'] = self._user_forward_list_resource.get(
+                user_dict['uuid']
+            )
+
+        if fallbacks:
+            self._user_fallback_list_resource._put(user_dict['uuid'], fallbacks)
+            user_dict['fallbacks'] = self._user_fallback_list_resource.get(
                 user_dict['uuid']
             )
 
