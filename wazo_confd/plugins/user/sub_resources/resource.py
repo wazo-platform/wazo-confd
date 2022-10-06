@@ -25,12 +25,15 @@ class UserSubResource(ConfdResource):
         return self.schema().dump(user)
 
     def put(self, user_id):
+        return self._put(user_id, request.get_json())
+
+    def _put(self, user_id, body):
         user = self.service.get(user_id)
-        self.parse_and_update(user)
+        self.parse_and_update(user, body)
         return '', 204
 
-    def parse_and_update(self, model):
-        form = self.schema().load(request.get_json())
+    def parse_and_update(self, model, body):
+        form = self.schema().load(body)
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, self.schema())

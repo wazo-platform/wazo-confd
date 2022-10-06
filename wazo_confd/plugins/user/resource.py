@@ -19,6 +19,7 @@ from .schema import (
     UserSummarySchema,
     UserPutSchema,
 )
+from .resource_sub import UserForwardList
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,11 @@ class UserList(ListResource):
         return resource, 201, self.build_headers(resource)
 
     def _post(self, body):
+        # forwards payload will be modified by the PUT body
+        forwards = body.pop('forwards', None)
+
         body = self.schema().load(body)
+
         lines = body.pop('lines', None) or []
         auth = body.pop('auth', None)
         voicemail = body.pop('voicemail', None)
@@ -69,6 +74,12 @@ class UserList(ListResource):
                 user_dict['voicemail'], _, _ = self._user_voicemail_list_resource._post(
                     user_dict['uuid'], voicemail
                 )
+
+        if forwards:
+            self._user_forward_list_resource._put(user_dict['uuid'], forwards)
+            user_dict['forwards'] = self._user_forward_list_resource.get(
+                user_dict['uuid']
+            )
 
         if auth:
             auth['uuid'] = user_dict['uuid']

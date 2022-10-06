@@ -895,6 +895,11 @@ def test_post_full_user_no_error(transport, template, registrar):
         'enabled': True,
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
+    forwards = {
+        'busy': {'enabled': True, 'destination': '123'},
+        'noanswer': {'enabled': True, 'destination': '456'},
+        'unconditional': {'enabled': True, 'destination': '789'},
+    }
     user = {
         "subscription_type": 2,
         "firstname": "Rîchard",
@@ -948,6 +953,7 @@ def test_post_full_user_no_error(transport, template, registrar):
             'auth': auth,
             'lines': [line],
             'voicemail': voicemail,
+            'forwards': forwards,
             **user,
         }
     ).response
@@ -967,6 +973,7 @@ def test_post_full_user_no_error(transport, template, registrar):
                     )
                 ),
                 voicemail=has_entries(id=greater_than(0)),
+                forwards=has_entries(**forwards),
                 **user,
             ),
         )
@@ -974,6 +981,10 @@ def test_post_full_user_no_error(transport, template, registrar):
         assert_that(
             confd.users(payload['uuid']).get().item,
             has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
+        )
+        assert_that(
+            confd.users(payload['uuid']).forwards.get().item,
+            has_entries(**forwards),
         )
 
         assert_that(
