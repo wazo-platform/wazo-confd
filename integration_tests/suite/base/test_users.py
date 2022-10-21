@@ -27,7 +27,7 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT
+from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT, INCALL_CONTEXT
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -776,6 +776,7 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.registrar()
 def test_post_full_user_no_error(transport, template, registrar):
     exten = h.extension.find_available_exten(CONTEXT)
+    source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
     user = {
         "subscription_type": 2,
         "firstname": "Rîchard",
@@ -823,18 +824,25 @@ def test_post_full_user_no_error(transport, template, registrar):
             'templates': [template],
         },
     }
+    incall = {
+        'id': 'the_id',
+        'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
+    }
 
     response = confd.users.post(
         {
             'auth': auth,
             'lines': [line],
+            'incalls': [incall],
             **user,
         }
     ).response
 
     assert response.status_code == 201
     payload = response.json()
+
     try:
+        # check the data returned when the user is created
         assert_that(
             payload,
             has_entries(
@@ -846,15 +854,30 @@ def test_post_full_user_no_error(transport, template, registrar):
                         extensions=contains(has_entries(id=greater_than(0))),
                     )
                 ),
+                incalls=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        extensions=contains(
+                            has_entries(
+                                id=greater_than(0),
+                                context=INCALL_CONTEXT,
+                                exten=source_exten,
+                            )
+                        ),
+                    )
+                ),
                 **user,
             ),
         )
 
+        # retrieve the user (created before) and check their lines and incalls
         assert_that(
             confd.users(payload['uuid']).get().item,
             has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
+            has_entries(incalls=contains(has_entries(id=payload['incalls'][0]['id']))),
         )
 
+        # retrieve the line (created before) and check its data are correct
         assert_that(
             confd.lines(payload['lines'][0]['id']).get().item,
             has_entries(
@@ -863,12 +886,20 @@ def test_post_full_user_no_error(transport, template, registrar):
             ),
         )
 
+        # retrieve the incall (created before) and check its data are correct
+        assert_that(
+            confd.incalls(payload['incalls'][0]['id']).get().item,
+            has_entries(destination=has_entries(type="user", user_id=payload['id'])),
+        )
+
+        # retrieve the user and try to update the user with the same data
         user = confd.users(payload['uuid']).get().item
         user.pop('call_record_enabled', None)  # Deprecated field
         confd.users(payload['uuid']).put(**user).assert_updated()
     finally:
         confd.users(payload['uuid']).delete().assert_deleted()
         confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+        confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
         confd.extensions(
             payload['lines'][0]['extensions'][0]['id']
         ).delete().assert_deleted()

@@ -95,9 +95,7 @@ class UserSchema(BaseSchema):
     groups = Nested(
         'GroupSchema', only=['uuid', 'id', 'name', 'links'], many=True, dump_only=True
     )
-    incalls = Nested(
-        'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
-    )
+    incalls = Nested('UserIncallSchema', many=True)
     lines = Nested('LineSchema', many=True)
     forwards = Nested('ForwardsSchema', dump_only=True)
     schedules = Nested(
@@ -262,22 +260,32 @@ class UserSchemaNullable(UserSchema):
             field_obj.allow_none = True
 
 
-class UserListSchema(UserSchemaNullable):
-    lines = Nested(
-        'LineSchema',
-        only=[
-            'id',
-            'name',
-            'endpoint_sip',
-            'endpoint_sccp',
-            'endpoint_custom',
-            'extensions',
-            'links',
-        ],
+class UserItemSchema(UserSchema):
+    lines = Nested('LineSchema', many=True, dump_only=True)
+    incalls = Nested(
+        'UserIncallSchema',
+        only=['id', 'extensions', 'links'],
         many=True,
         dump_only=True,
     )
 
 
-class UserPutSchema(UserSchema):
-    lines = Nested('LineSchema', many=True, dump_only=True)
+class UserListItemSchema(UserSchemaNullable):
+    lines = Nested('LineSchema', many=True)
+    incalls = Nested('UserIncallSchema', only=['id', 'extensions', 'links'], many=True)
+
+
+class UserIncallSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    links = ListLink(Link('incalls'))
+    extensions = Nested(
+        'UserExtensionSchema',
+        many=True,
+    )
+
+
+class UserExtensionSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    exten = fields.String(validate=Length(max=40), required=True)
+    context = fields.String(required=True)
+    links = ListLink(Link('extensions'))

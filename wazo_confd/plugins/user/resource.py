@@ -11,14 +11,16 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.resource import LineList
 from wazo_confd.plugins.user_line.resource import UserLineItem
+from wazo_confd.plugins.extension.resource import ExtensionList
 
 from .schema import (
     UserDirectorySchema,
-    UserListSchema,
-    UserSchemaNullable,
     UserSummarySchema,
-    UserPutSchema,
+    UserItemSchema,
+    UserListItemSchema,
 )
+from ..incall.resource import IncallList
+from ..incall_extension.resource import IncallExtensionItem
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +28,7 @@ logger = logging.getLogger(__name__)
 class UserList(ListResource):
 
     model = User
-    schema = UserSchemaNullable
-    _list_schema = UserListSchema
+    schema = UserListItemSchema
     view_schemas = {'directory': UserDirectorySchema, 'summary': UserSummarySchema}
 
     def __init__(
@@ -44,12 +45,16 @@ class UserList(ListResource):
         line_endpoint_sccp_association_service,
         endpoint_sccp_service,
         wazo_user_service,
+        incall_service,
+        incall_extension_service,
         endpoint_custom_dao,
         endpoint_sccp_dao,
         line_dao,
         user_dao,
         sip_dao,
         transport_dao,
+        incall_dao,
+        extension_dao,
     ):
         super().__init__(user_service)
         self._line_list_resource = LineList(
@@ -72,6 +77,11 @@ class UserList(ListResource):
             user_line_service, user_dao, line_dao
         )
         self._wazo_user_service = wazo_user_service
+        self._extension_list_resource = ExtensionList(extension_service)
+        self._incall_list_resource = IncallList(incall_service)
+        self._incall_extension_resource = IncallExtensionItem(
+            incall_extension_service, incall_dao, extension_dao
+        )
 
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
@@ -84,9 +94,10 @@ class UserList(ListResource):
         body = self.schema().load(body)
         lines = body.pop('lines', None) or []
         auth = body.pop('auth', None)
-
+        incalls = body.pop('incalls', None) or []
         user_dict, _, headers = super()._post(body)
         user_dict['lines'] = []
+        user_dict['incalls'] = []
 
         for line_body in lines:
             line, _, _ = self._line_list_resource._post(line_body)
@@ -97,6 +108,32 @@ class UserList(ListResource):
             auth['uuid'] = user_dict['uuid']
             auth['tenant_uuid'] = user_dict['tenant_uuid']
             user_dict['auth'] = self._wazo_user_service.create(auth)
+
+        for incall_body in incalls:
+
+            # create incall (destination.type=user)
+            incall, _, _ = self._incall_list_resource._post(
+                {'destination': {'type': 'user', 'user_id': user_dict['id']}}
+            )
+            incall_body['id'] = incall['id']
+            user_dict['incalls'].append(incall_body)
+
+            for extension in incall_body['extensions']:
+
+                # create extension (the "source/origin/public/external")
+                source_extension_body = {
+                    'context': extension['context'],
+                    'exten': extension['exten'],
+                }
+                source_extension, _, _ = self._extension_list_resource._post(
+                    source_extension_body
+                )
+                extension['id'] = source_extension['id']
+
+                # link incall+source extension
+                self._incall_extension_resource.put(
+                    incall['id'], source_extension['id']
+                )
 
         return user_dict, 201, headers
 
@@ -112,7 +149,7 @@ class UserList(ListResource):
 
 class UserItem(ItemResource):
 
-    schema = UserPutSchema
+    schema = UserItemSchema
     has_tenant_uuid = True
 
     @required_acl('confd.users.{id}.read')

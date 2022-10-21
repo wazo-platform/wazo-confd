@@ -30,6 +30,14 @@ class IncallList(ListResource):
         model = self.service.create(model)
         return schema.dump(model), 201, self.build_headers(model)
 
+    def _post(self, body):
+        form = self.schema().load(body)
+        form['destination'] = Dialaction(**form['destination'])
+        form = self.add_tenant_to_form(form)
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
+
     @required_acl('confd.incalls.read')
     def get(self):
         return super().get()

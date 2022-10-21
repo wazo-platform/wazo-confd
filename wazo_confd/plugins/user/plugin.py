@@ -7,12 +7,11 @@ from xivo_dao.resources.endpoint_sccp import dao as endpoint_sccp_dao
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
+from xivo_dao.resources.incall import dao as incall_dao
+from xivo_dao.resources.extension import dao as extension_dao
 
 from wazo_provd_client import Client as ProvdClient
 
-from wazo_confd.plugins.extension.service import (
-    build_service as build_extension_service,
-)
 from wazo_confd.plugins.line.service import build_service as build_line_service
 from wazo_confd.plugins.user_line.service import (
     build_service as build_user_line_service,
@@ -42,6 +41,13 @@ from wazo_confd.plugins.endpoint_sccp.service import (
 from wazo_confd.plugins.endpoint_custom.service import (
     build_service as build_endpoint_custom_service,
 )
+from wazo_confd.plugins.extension.service import (
+    build_service as build_extension_service,
+)
+from wazo_confd.plugins.incall_extension.service import (
+    build_service as build_incall_extension_service,
+)
+from wazo_confd.plugins.incall.service import build_service as build_incall_service
 
 from .service import build_service, build_service_callservice, build_service_forward
 from ..user_import.wazo_user_service import build_service as build_wazo_user_service
@@ -71,6 +77,8 @@ class Plugin:
         line_endpoint_custom_association_service = build_service_custom(provd_client)
         line_endpoint_sip_association_service = build_service_sip(provd_client)
         line_endpoint_sccp_association_service = build_service_sccp(provd_client)
+        incall_service = build_incall_service()
+        incall_extension_service = build_incall_extension_service()
 
         api.add_resource(
             UserItem,
@@ -97,12 +105,16 @@ class Plugin:
                 line_endpoint_sccp_association_service,
                 endpoint_sccp_service,
                 wazo_user_service,
+                incall_service,
+                incall_extension_service,
                 endpoint_custom_dao,
                 endpoint_sccp_dao,
                 line_dao,
                 user_dao,
                 sip_dao,
                 transport_dao,
+                incall_dao,
+                extension_dao,
             ),
         )
 

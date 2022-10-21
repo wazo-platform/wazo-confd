@@ -297,7 +297,7 @@ definitions:
     - $ref: '#/definitions/UserRelationFallbacks'
     - $ref: '#/definitions/UserRelationForwards'
     - $ref: '#/definitions/UserRelationGroups'
-    - $ref: '#/definitions/UserRelationIncalls'
+    - $ref: '#/definitions/UserRelationIncallsCreate'
     - $ref: '#/definitions/UserRelationLinesCreate'
     - $ref: '#/definitions/UserRelationServices'
     - $ref: '#/definitions/UserRelationSwitchboards'
@@ -310,6 +310,13 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/UserRelationLine'
+
+  UserRelationIncallsCreate:
+    properties:
+      incalls:
+        type: array
+        items:
+          $ref: '#/definitions/UserRelationIncall'
 
   BaseUser:
     title: User
