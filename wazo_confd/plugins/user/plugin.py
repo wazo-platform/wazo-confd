@@ -9,6 +9,7 @@ from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.group import dao as group_dao
 
 from wazo_provd_client import Client as ProvdClient
 
@@ -48,6 +49,10 @@ from wazo_confd.plugins.incall_extension.service import (
     build_service as build_incall_extension_service,
 )
 from wazo_confd.plugins.incall.service import build_service as build_incall_service
+from wazo_confd.plugins.user_group.service import (
+    build_service as build_user_group_service,
+)
+
 
 from .service import build_service, build_service_callservice, build_service_forward
 from ..user_import.wazo_user_service import build_service as build_wazo_user_service
@@ -79,6 +84,7 @@ class Plugin:
         line_endpoint_sccp_association_service = build_service_sccp(provd_client)
         incall_service = build_incall_service()
         incall_extension_service = build_incall_extension_service()
+        user_group_service = build_user_group_service()
 
         api.add_resource(
             UserItem,
@@ -107,6 +113,7 @@ class Plugin:
                 wazo_user_service,
                 incall_service,
                 incall_extension_service,
+                user_group_service,
                 endpoint_custom_dao,
                 endpoint_sccp_dao,
                 line_dao,
@@ -115,6 +122,7 @@ class Plugin:
                 transport_dao,
                 incall_dao,
                 extension_dao,
+                group_dao,
             ),
         )
 

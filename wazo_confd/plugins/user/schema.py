@@ -273,6 +273,7 @@ class UserItemSchema(UserSchema):
 class UserListItemSchema(UserSchemaNullable):
     lines = Nested('LineSchema', many=True)
     incalls = Nested('UserIncallSchema', only=['id', 'extensions', 'links'], many=True)
+    groups = Nested('UserGroupSchema', many=True)
 
 
 class UserIncallSchema(BaseSchema):
@@ -289,3 +290,8 @@ class UserExtensionSchema(BaseSchema):
     exten = fields.String(validate=Length(max=40), required=True)
     context = fields.String(required=True)
     links = ListLink(Link('extensions'))
+
+
+class UserGroupSchema(BaseSchema):
+    uuid = fields.String(validate=Length(max=40), required=True)
+    links = ListLink(Link('groups'))

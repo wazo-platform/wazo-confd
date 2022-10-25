@@ -27,7 +27,13 @@ from ..helpers import (
     helpers as h,
     scenarios as s,
 )
-from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT, INCALL_CONTEXT
+from ..helpers.config import (
+    CONTEXT,
+    MAIN_TENANT,
+    SUB_TENANT,
+    INCALL_CONTEXT,
+    gen_group_exten,
+)
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -774,7 +780,11 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.transport()
 @fixtures.sip_template()
 @fixtures.registrar()
-def test_post_full_user_no_error(transport, template, registrar):
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+def test_post_full_user_no_error(
+    transport, template, registrar, group_extension, group
+):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
     user = {
@@ -828,12 +838,18 @@ def test_post_full_user_no_error(transport, template, registrar):
         'id': 'the_id',
         'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
     }
+    group = {
+        'uuid': group['uuid'],
+    }
+
+    confd.groups(group['uuid']).extensions(group_extension['id']).put()
 
     response = confd.users.post(
         {
             'auth': auth,
             'lines': [line],
             'incalls': [incall],
+            'groups': [group],
             **user,
         }
     ).response
@@ -866,6 +882,9 @@ def test_post_full_user_no_error(transport, template, registrar):
                         ),
                     )
                 ),
+                groups=contains(
+                    has_entries(uuid=group['uuid']),
+                ),
                 **user,
             ),
         )
@@ -876,7 +895,13 @@ def test_post_full_user_no_error(transport, template, registrar):
             has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
             has_entries(incalls=contains(has_entries(id=payload['incalls'][0]['id']))),
         )
-
+        # retrieve the user (created before) and check their groups
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(
+                groups=contains(has_entries(uuid=payload['groups'][0]['uuid']))
+            ),
+        )
         # retrieve the line (created before) and check its data are correct
         assert_that(
             confd.lines(payload['lines'][0]['id']).get().item,
@@ -885,13 +910,18 @@ def test_post_full_user_no_error(transport, template, registrar):
                 endpoint_sip=has_entries(name='iddqd'),
             ),
         )
-
         # retrieve the incall (created before) and check its data are correct
         assert_that(
             confd.incalls(payload['incalls'][0]['id']).get().item,
             has_entries(destination=has_entries(type="user", user_id=payload['id'])),
         )
-
+        # retrieve the group and check the user is a member
+        assert_that(
+            confd.groups(payload['groups'][0]['uuid']).get().item,
+            has_entries(
+                members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
+            ),
+        )
         # retrieve the user and try to update the user with the same data
         user = confd.users(payload['uuid']).get().item
         user.pop('call_record_enabled', None)  # Deprecated field
