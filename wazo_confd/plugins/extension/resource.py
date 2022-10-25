@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -7,6 +7,7 @@ from xivo_dao.alchemy.extension import Extension
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.plugins.line_extension.resource import LineExtensionItem
 
 from .schema import ExtensionSchema
 
@@ -42,6 +43,14 @@ class ExtensionItem(ItemResource):
     schema = ExtensionSchema
     has_tenant_uuid = True
 
+    def __init__(self, service, line_extension_service, line_dao, extension_dao):
+        super().__init__(service)
+        self._line_extension_item_resource = LineExtensionItem(
+            line_extension_service,
+            line_dao,
+            extension_dao,
+        )
+
     @required_acl('confd.extensions.{id}.read')
     def get(self, id):
         return super().get(id)
@@ -55,4 +64,9 @@ class ExtensionItem(ItemResource):
 
     @required_acl('confd.extensions.{id}.delete')
     def delete(self, id):
-        return super().delete(id)
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get(id, **kwargs)
+        for line in model.lines:
+            self._line_extension_item_resource.delete(line.id, id)
+        self.service.delete(model)
+        return '', 204
