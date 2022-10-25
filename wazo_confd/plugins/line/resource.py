@@ -8,6 +8,7 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
+from wazo_confd.plugins.line_extension.resource import LineExtensionItem
 
 
 class LineList(ListResource):
@@ -37,6 +38,14 @@ class LineItem(ItemResource):
     schema = LineSchema
     has_tenant_uuid = True
 
+    def __init__(self, service, line_extension_service, line_dao, extension_dao):
+        super().__init__(service)
+        self._line_extension_item_resource = LineExtensionItem(
+            line_extension_service,
+            line_dao,
+            extension_dao,
+        )
+
     @required_acl('confd.lines.{id}.read')
     def get(self, id):
         return super().get(id)
@@ -52,5 +61,7 @@ class LineItem(ItemResource):
     def delete(self, id):
         kwargs = self._add_tenant_uuid()
         model = self.service.get(id, **kwargs)
+        for extension in model.extensions:
+            self._line_extension_item_resource.delete(id, extension.id)
         self.service.delete(model)
         return '', 204
