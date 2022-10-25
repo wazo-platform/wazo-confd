@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -50,4 +50,7 @@ class LineItem(ItemResource):
 
     @required_acl('confd.lines.{id}.delete')
     def delete(self, id):
-        return super().delete(id)
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get(id, **kwargs)
+        self.service.delete(model)
+        return '', 204
