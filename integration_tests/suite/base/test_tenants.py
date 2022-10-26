@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -24,7 +24,6 @@ def test_get():
             has_key('sip_templates_generated'),
             has_key('global_sip_template_uuid'),
             has_key('webrtc_sip_template_uuid'),
-            has_key('webrtc_video_sip_template_uuid'),
             has_key('registration_trunk_sip_template_uuid'),
         ),
     )

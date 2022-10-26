@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -107,6 +107,8 @@ class DefaultSIPTemplateService:
                 ['webrtc', 'yes'],
                 ['dtls_auto_generate_cert', 'yes'],
                 ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
+                ['max_video_streams', '25'],
+                ['max_audio_streams', '1'],
             ],
             'registration_section_options': [],
             'registration_outbound_auth_section_options': [],
@@ -119,30 +121,13 @@ class DefaultSIPTemplateService:
             tenant.webrtc_sip_template_uuid,
         )
 
-        webrtc_video_config = {
-            'label': 'webrtc_video',
-            'template': True,
-            'tenant_uuid': tenant.uuid,
-            'transport': None,
-            'asterisk_id': None,
-            'endpoint_section_options': [
-                ['max_video_streams', '25'],
-                ['max_audio_streams', '1'],
-            ],
-            'templates': [webrtc_template],
-        }
-        webrtc_video_template = self.create_or_merge_sip_template(
-            webrtc_video_config,
-            tenant.webrtc_video_sip_template_uuid,
-        )
-
         meeting_guest_config = {
             'label': 'meeting_guest',
             'template': True,
             'tenant_uuid': tenant.uuid,
             'transport': None,
             'asterisk_id': None,
-            'templates': [webrtc_video_template],
+            'templates': [webrtc_template],
         }
         meeting_guest_template = self.create_or_merge_sip_template(
             meeting_guest_config,
@@ -230,7 +215,6 @@ class DefaultSIPTemplateService:
 
         tenant.global_sip_template_uuid = global_template.uuid
         tenant.webrtc_sip_template_uuid = webrtc_template.uuid
-        tenant.webrtc_video_sip_template_uuid = webrtc_video_template.uuid
         tenant.meeting_guest_sip_template_uuid = meeting_guest_template.uuid
         tenant.registration_trunk_sip_template_uuid = registration_trunk_template.uuid
         tenant.twilio_trunk_sip_template_uuid = twilio_trunk_template.uuid

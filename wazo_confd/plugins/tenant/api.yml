@@ -60,9 +60,6 @@ definitions:
       webrtc_sip_template_uuid:
         type: string
         readOnly: true
-      webrtc_video_sip_template_uuid:
-        type: string
-        readOnly: true
       registration_trunk_sip_template_uuid:
         type: string
         readOnly: true
