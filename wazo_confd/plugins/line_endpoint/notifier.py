@@ -10,7 +10,7 @@ from xivo_bus.resources.line_endpoint.event import (
     LineEndpointSIPDissociatedEvent,
 )
 
-from wazo_confd import bus, sysconfd
+from wazo_confd import bus
 from wazo_confd.plugins.line.schema import LineSchema
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
 from wazo_confd.plugins.endpoint_sccp.schema import SccpSchema
@@ -39,9 +39,8 @@ ENDPOINT_CUSTOM_FIELDS = ['id', 'tenant_uuid', 'interface']
 
 
 class LineEndpointSIPNotifier:
-    def __init__(self, bus, sysconfd):
+    def __init__(self, bus):
         self.bus = bus
-        self.sysconfd = sysconfd
 
     def associated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -61,9 +60,8 @@ class LineEndpointSIPNotifier:
 
 
 class LineEndpointSCCPNotifier:
-    def __init__(self, bus, sysconfd):
+    def __init__(self, bus):
         self.bus = bus
-        self.sysconfd = sysconfd
 
     def associated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -83,9 +81,8 @@ class LineEndpointSCCPNotifier:
 
 
 class LineEndpointCustomNotifier:
-    def __init__(self, bus, sysconfd):
+    def __init__(self, bus):
         self.bus = bus
-        self.sysconfd = sysconfd
 
     def associated(self, line, endpoint):
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
@@ -105,12 +102,12 @@ class LineEndpointCustomNotifier:
 
 
 def build_notifier_sip():
-    return LineEndpointSIPNotifier(bus, sysconfd)
+    return LineEndpointSIPNotifier(bus)
 
 
 def build_notifier_sccp():
-    return LineEndpointSCCPNotifier(bus, sysconfd)
+    return LineEndpointSCCPNotifier(bus)
 
 
 def build_notifier_custom():
-    return LineEndpointCustomNotifier(bus, sysconfd)
+    return LineEndpointCustomNotifier(bus)
