@@ -19,6 +19,7 @@ from .schema import (
     UserItemSchema,
     UserListItemSchema,
 )
+from ..func_key.resource import UserFuncKeyTemplateAssociation
 from ..incall.resource import IncallList
 from ..incall_extension.resource import IncallExtensionItem
 
@@ -48,6 +49,7 @@ class UserList(ListResource):
         incall_service,
         incall_extension_service,
         user_group_service,
+        user_funckey_template_association_service,
         endpoint_custom_dao,
         endpoint_sccp_dao,
         line_dao,
@@ -57,6 +59,7 @@ class UserList(ListResource):
         incall_dao,
         extension_dao,
         group_dao,
+        template_dao,
     ):
         super().__init__(user_service)
         self._line_list_resource = LineList(
@@ -78,6 +81,11 @@ class UserList(ListResource):
         self._user_line_item_resource = UserLineItem(
             user_line_service, user_dao, line_dao
         )
+        self._user_funckey_template_association_resource = (
+            UserFuncKeyTemplateAssociation(
+                user_funckey_template_association_service, user_dao, template_dao
+            )
+        )
         self._wazo_user_service = wazo_user_service
         self._extension_list_resource = ExtensionList(extension_service)
         self._incall_list_resource = IncallList(incall_service)
@@ -87,6 +95,7 @@ class UserList(ListResource):
         self._user_group_service = user_group_service
         self._group_dao = group_dao
         self._user_dao = user_dao
+        self._template_dao = template_dao
 
     def build_headers(self, user):
         return {'Location': url_for('users', id=user.id, _external=True)}
@@ -101,10 +110,12 @@ class UserList(ListResource):
         auth = body.pop('auth', None)
         incalls = body.pop('incalls', None) or []
         groups = body.pop('groups', None) or []
+        funckeys_templates = body.pop('funckeys_templates', None) or []
         user_dict, _, headers = super()._post(body)
         user_dict['lines'] = []
         user_dict['incalls'] = []
         user_dict['groups'] = []
+        user_dict['funckeys_templates'] = []
 
         for line_body in lines:
             line, _, _ = self._line_list_resource._post(line_body)
@@ -147,6 +158,14 @@ class UserList(ListResource):
             [self._group_dao.get_by(uuid=group['uuid']) for group in groups],
         )
         user_dict['groups'] = groups
+
+        # func_key_templates association
+        for funckeys_template_body in funckeys_templates:
+            self._user_funckey_template_association_resource.put(
+                user_dict['id'], funckeys_template_body['id']
+            )
+
+        user_dict['funckeys_templates'] = funckeys_templates
 
         return user_dict, 201, headers
 

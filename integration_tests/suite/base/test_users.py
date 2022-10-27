@@ -782,8 +782,11 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.registrar()
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
 def test_post_full_user_no_error(
-    transport, template, registrar, group_extension, group
+    transport, template, registrar, group_extension, group, funckey_template
 ):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
@@ -850,6 +853,7 @@ def test_post_full_user_no_error(
             'lines': [line],
             'incalls': [incall],
             'groups': [group],
+            'funckeys_templates': [{'id': funckey_template['id']}],
             **user,
         }
     ).response
@@ -885,6 +889,7 @@ def test_post_full_user_no_error(
                 groups=contains(
                     has_entries(uuid=group['uuid']),
                 ),
+                funckeys_templates=contains(has_entries(id=greater_than(0))),
                 **user,
             ),
         )
