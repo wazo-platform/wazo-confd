@@ -110,12 +110,10 @@ class UserList(ListResource):
         auth = body.pop('auth', None)
         incalls = body.pop('incalls', None) or []
         groups = body.pop('groups', None) or []
-        funckeys_templates = body.pop('funckeys_templates', None) or []
         user_dict, _, headers = super()._post(body)
         user_dict['lines'] = []
         user_dict['incalls'] = []
         user_dict['groups'] = []
-        user_dict['funckeys_templates'] = []
 
         for line_body in lines:
             line, _, _ = self._line_list_resource._post(line_body)
@@ -159,14 +157,6 @@ class UserList(ListResource):
                 [self._group_dao.get_by(uuid=group['uuid']) for group in groups],
             )
         user_dict['groups'] = groups
-
-        # func_key_templates association
-        for funckeys_template_body in funckeys_templates:
-            self._user_funckey_template_association_resource.put(
-                user_dict['id'], funckeys_template_body['id']
-            )
-
-        user_dict['funckeys_templates'] = funckeys_templates
 
         return user_dict, 201, headers
 

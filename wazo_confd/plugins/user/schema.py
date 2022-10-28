@@ -78,6 +78,7 @@ class UserSchema(BaseSchema):
     created_at = fields.DateTime(dump_only=True)
     enabled = StrictBoolean()
     tenant_uuid = fields.String(dump_only=True)
+    func_key_template_id = fields.Integer()
     links = ListLink(Link('users'))
 
     agent = Nested('AgentSchema', only=['id', 'number', 'links'], dump_only=True)
@@ -274,7 +275,6 @@ class UserListItemSchema(UserSchemaNullable):
     lines = Nested('LineSchema', many=True)
     incalls = Nested('UserIncallSchema', only=['id', 'extensions', 'links'], many=True)
     groups = Nested('UserGroupSchema', many=True)
-    funckeys_templates = Nested('FuncKeysTemplateSchema', many=True)
 
 
 class UserIncallSchema(BaseSchema):
@@ -296,7 +296,3 @@ class UserExtensionSchema(BaseSchema):
 class UserGroupSchema(BaseSchema):
     uuid = fields.String(validate=Length(max=40), required=True)
     links = ListLink(Link('groups'))
-
-
-class FuncKeysTemplateSchema(BaseSchema):
-    id = fields.Integer()

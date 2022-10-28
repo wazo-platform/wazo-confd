@@ -853,7 +853,7 @@ def test_post_full_user_no_error(
             'lines': [line],
             'incalls': [incall],
             'groups': [group],
-            'funckeys_templates': [{'id': funckey_template['id']}],
+            'func_key_template_id': funckey_template['id'],
             **user,
         }
     ).response
@@ -889,7 +889,7 @@ def test_post_full_user_no_error(
                 groups=contains(
                     has_entries(uuid=group['uuid']),
                 ),
-                funckeys_templates=contains(has_entries(id=greater_than(0))),
+                func_key_template_id=funckey_template['id'],
                 **user,
             ),
         )
@@ -926,6 +926,11 @@ def test_post_full_user_no_error(
             has_entries(
                 members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
             ),
+        )
+        # retrieve the user (created before) and check their func keys template
+        assert_that(
+            confd.users(payload['func_key_template_id']).get().item,
+            has_entries(func_key_template_id=payload['func_key_template_id']),
         )
         # retrieve the user and try to update the user with the same data
         user = confd.users(payload['uuid']).get().item
