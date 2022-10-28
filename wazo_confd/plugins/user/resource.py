@@ -142,10 +142,11 @@ class UserList(ListResource):
                     incall['id'], source_extension['id']
                 )
 
-        self._user_group_service.associate_all_groups(
-            self._user_dao.get_by_id_uuid(user_dict['id']),
-            [self._group_dao.get_by(uuid=group['uuid']) for group in groups],
-        )
+        if groups:
+            self._user_group_service.associate_all_groups(
+                self._user_dao.get_by_id_uuid(user_dict['id']),
+                [self._group_dao.get_by(uuid=group['uuid']) for group in groups],
+            )
         user_dict['groups'] = groups
 
         return user_dict, 201, headers
