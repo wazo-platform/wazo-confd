@@ -24,6 +24,18 @@ from .service_discovery import self_check
 logger = logging.getLogger(__name__)
 
 
+class ServiceHandle:
+
+    def __init__(self):
+        self._services = {}
+
+    def register(self, service_name, service):
+        self._services[service_name] = service
+
+    def get(self, service_name):
+        return self._services[service_name]
+
+
 class Controller:
     def __init__(self, config):
         self.config = config
@@ -55,6 +67,8 @@ class Controller:
         self.status_aggregator.add_provider(self.token_status.provide_status)
         self.status_aggregator.add_provider(self._bus_consumer.provide_status)
 
+        service_handle = ServiceHandle()
+
         plugin_helpers.load(
             namespace='wazo_confd.plugins',
             names=config['enabled_plugins'],
@@ -66,6 +80,7 @@ class Controller:
                 'bus_publisher': self._bus_publisher,
                 'auth_client': auth_client,
                 'pjsip_doc': pjsip_doc,
+                'service_handle': service_handle,
                 'status_aggregator': self.status_aggregator,
             },
         )

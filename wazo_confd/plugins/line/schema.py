@@ -32,18 +32,18 @@ class LineSchema(BaseSchema):
     endpoint_sip = Nested(
         'EndpointSIPSchema',
         # TODO(pc-m): Is it really useful to have the username/password on the relation?
-        only=[
-            'uuid',
-            'label',
-            'name',
-            'auth_section_options.username',
-            'links',
-        ],
-        dump_only=True,
+        # only=[
+        #     'uuid',
+        #     'label',
+        #     'name',
+        #     'auth_section_options.username',
+        #     'links',
+        # ],
+        # dump_only=True,
     )
-    endpoint_sccp = Nested('SccpSchema', only=['id', 'links'], dump_only=True)
+    endpoint_sccp = Nested('SccpSchema')
     endpoint_custom = Nested(
-        'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
+        'CustomSchema'
     )
     extensions = Nested(
         'ExtensionSchema',

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
@@ -25,6 +25,7 @@ class Plugin:
         api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
+        service_handle = dependencies['service_handle']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
@@ -32,6 +33,9 @@ class Plugin:
         service_sip = build_service_sip(provd_client)
         service_sccp = build_service_sccp(provd_client)
         service_custom = build_service_custom(provd_client)
+        service_handle.register('line_endpoint_custom', service_custom)
+        service_handle.register('line_endpoint_sccp', service_sccp)
+        service_handle.register('line_endpoint_sip', service_sip)
 
         api.add_resource(
             LineEndpointAssociationSip,

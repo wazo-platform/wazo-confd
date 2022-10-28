@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
@@ -15,6 +15,7 @@ class Plugin:
         api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
+        service_handle = dependencies['service_handle']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
@@ -22,6 +23,7 @@ class Plugin:
 
         endpoint_service = build_endpoint_service(provd_client, pjsip_doc)
         template_service = build_template_service(provd_client, pjsip_doc)
+        service_handle.register('endpoint_sip', endpoint_service)
 
         api.add_resource(
             SipItem,
