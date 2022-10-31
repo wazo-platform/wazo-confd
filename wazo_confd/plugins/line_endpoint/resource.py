@@ -50,14 +50,24 @@ class LineEndpointAssociationSip(ConfdResource):
         return '', 204
 
 
-class LineEndpointAssociationSccp(LineEndpointAssociation):
+class LineEndpointAssociationSccp(ConfdResource):
+
+    has_tenant_uuid = True
+
+    def __init__(self, middleware):
+        self._middleware = middleware
+
     @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.update')
     def put(self, line_id, endpoint_id):
-        return super().put(line_id, endpoint_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.associate(line_id, endpoint_id, tenant_uuids)
+        return '', 204
 
     @required_acl('confd.lines.{line_id}.endpoints.sccp.{endpoint_id}.delete')
     def delete(self, line_id, endpoint_id):
-        return super().delete(line_id, endpoint_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.dissociate(line_id, endpoint_id, tenant_uuids)
+        return '', 204
 
 
 class LineEndpointAssociationCustom(LineEndpointAssociation):

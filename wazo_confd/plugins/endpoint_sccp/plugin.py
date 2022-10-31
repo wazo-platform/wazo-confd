@@ -9,9 +9,12 @@ from .resource import SccpItem, SccpList
 class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
+        middleware_handle = dependencies['middleware_handle']
+
         service = build_service()
 
         endpoint_sccp_middleware = EndpointSCCPMiddleWare(service)
+        middleware_handle.register('endpoint_sccp', endpoint_sccp_middleware)
 
         api.add_resource(
             SccpItem,
