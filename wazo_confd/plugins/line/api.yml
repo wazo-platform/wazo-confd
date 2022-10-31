@@ -30,7 +30,7 @@ paths:
         in: body
         required: true
         schema:
-          $ref: '#/definitions/Line'
+          $ref: '#/definitions/LineCreate'
       - $ref: '#/parameters/tenantuuid'
       responses:
         '201':
@@ -228,3 +228,13 @@ definitions:
         description: Name of the template line used by the device
     required:
     - context
+  LineEndpointCreate:
+    oneOf:
+      - $ref: '#/definitions/EndpointSIP'
+      - $ref: '#/definitions/EndpointSccp'
+      - $ref: '#/definitions/EndpointCustom'
+  LineCreate:
+    title: Line
+    allOf:
+      - $ref: '#/definitions/LineRelationBase'
+      - $ref: '#/definitions/LineEndpointCreate'
