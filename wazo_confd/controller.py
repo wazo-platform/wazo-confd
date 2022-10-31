@@ -15,6 +15,7 @@ from xivo.status import StatusAggregator, TokenStatus
 from xivo.token_renewer import TokenRenewer
 
 from wazo_confd.helpers.asterisk import PJSIPDoc
+from wazo_confd.helpers.middleware import MiddleWareHandle
 
 from . import auth
 from ._bus import BusPublisher, BusConsumer
@@ -48,6 +49,7 @@ class Controller:
                 auth.init_master_tenant
             )
         pjsip_doc = PJSIPDoc(config['pjsip_config_doc_filename'])
+        middleware_handle = MiddleWareHandle()
         self.token_renewer.subscribe_to_token_change(
             self.token_status.token_change_callback
         )
@@ -65,6 +67,7 @@ class Controller:
                 'bus_consumer': self._bus_consumer,
                 'bus_publisher': self._bus_publisher,
                 'auth_client': auth_client,
+                'middleware_handle': middleware_handle,
                 'pjsip_doc': pjsip_doc,
                 'status_aggregator': self.status_aggregator,
             },
