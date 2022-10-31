@@ -16,6 +16,7 @@ class Plugin:
         api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
+        middleware_handle = dependencies['middleware_handle']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
@@ -26,6 +27,8 @@ class Plugin:
 
         endpoint_sip_middleware = EndpointSIPMiddleWare(endpoint_service)
         template_sip_middleware = TemplateSIPMiddleWare(template_service)
+
+        middleware_handle.register('endpoint_sip', endpoint_sip_middleware)
 
         api.add_resource(
             SipItem,

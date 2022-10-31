@@ -7,13 +7,33 @@ from .schema import LineSchemaNullable
 
 
 class LineMiddleWare:
-
-    def __init__(self, service):
+    def __init__(self, service, middleware_handle):
         self._service = service
         self._schema = LineSchemaNullable()
+        self._middleware_handle = middleware_handle
 
-    def create(self, body, tenant_uuids):
+    def create(self, body, tenant_uuid, tenant_uuids):
         form = self._schema.load(body)
+
+        endpoint_sip_body = form.pop('endpoint_sip', None)
+
         model = Line(**form)
         model = self._service.create(model, tenant_uuids)
-        return self._schema.dump(model)
+        line_response = self._schema.dump(model)
+
+        if endpoint_sip_body:
+            endpoint_sip_middleware = self._middleware_handle.get('endpoint_sip')
+            line_response['endpoint_sip'] = endpoint_sip_middleware.create(
+                endpoint_sip_body,
+                tenant_uuid,
+            )
+            line_endpoint_sip_middleware = self._middleware_handle.get(
+                'line_endpoint_sip'
+            )
+            line_endpoint_sip_middleware.associate(
+                line_response['id'],
+                line_response['endpoint_sip']['uuid'],
+                tenant_uuids,
+            )
+
+        return line_response

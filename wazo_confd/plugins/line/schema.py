@@ -29,22 +29,9 @@ class LineSchema(BaseSchema):
     application = Nested(
         'ApplicationSchema', only=['uuid', 'name', 'links'], dump_only=True
     )
-    endpoint_sip = Nested(
-        'EndpointSIPSchema',
-        # TODO(pc-m): Is it really useful to have the username/password on the relation?
-        only=[
-            'uuid',
-            'label',
-            'name',
-            'auth_section_options.username',
-            'links',
-        ],
-        dump_only=True,
-    )
-    endpoint_sccp = Nested('SccpSchema', only=['id', 'links'], dump_only=True)
-    endpoint_custom = Nested(
-        'CustomSchema', only=['id', 'interface', 'links'], dump_only=True
-    )
+    endpoint_sip = Nested('EndpointSIPSchema')
+    endpoint_sccp = Nested('SccpSchema')
+    endpoint_custom = Nested('CustomSchema')
     extensions = Nested(
         'ExtensionSchema',
         only=['id', 'exten', 'context', 'links'],
@@ -65,3 +52,32 @@ class LineSchemaNullable(LineSchema):
         nullable_fields = ['provisioning_code', 'position', 'registrar']
         if field_name in nullable_fields:
             field_obj.allow_none = True
+
+
+class LineListSchema(LineSchema):
+    endpoint_sip = Nested(
+        'EndpointSIPSchema',
+        # TODO(pc-m): Is it really useful to have the username/password on the relation?
+        only=[
+            'uuid',
+            'label',
+            'name',
+            'auth_section_options.username',
+            'links',
+        ],
+        dump_only=True,
+    )
+    endpoint_sccp = Nested(
+        'SccpSchema',
+        only=['id', 'links'],
+        dump_only=True,
+    )
+    endpoint_custom = Nested(
+        'CustomSchema',
+        only=['id', 'interface', 'links'],
+        dump_only=True,
+    )
+
+
+class LinePutSchema(LineListSchema):
+    pass

@@ -2,17 +2,19 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
+from xivo.tenant_flask_helpers import Tenant
+from xivo_dao import tenant_dao
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.schema import LineSchema, LineSchemaNullable
+from wazo_confd.plugins.line.schema import LinePutSchema, LineListSchema
 
 
 class LineList(ListResource):
 
     model = Line
-    schema = LineSchemaNullable
+    schema = LineListSchema
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):
@@ -28,14 +30,18 @@ class LineList(ListResource):
 
     @required_acl('confd.lines.create')
     def post(self):
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        resource = self._middleware.create(request.get_json(), tenant_uuids)
+        resource = self._middleware.create(
+            request.get_json(), tenant.uuid, tenant_uuids
+        )
         return resource, 201, self.build_headers(resource)
 
 
 class LineItem(ItemResource):
 
-    schema = LineSchema
+    schema = LinePutSchema
     has_tenant_uuid = True
 
     @required_acl('confd.lines.{id}.read')
