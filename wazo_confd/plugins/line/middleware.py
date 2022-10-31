@@ -15,6 +15,7 @@ class LineMiddleWare:
     def create(self, body, tenant_uuid, tenant_uuids):
         form = self._schema.load(body)
 
+        endpoint_custom_body = form.pop('endpoint_custom', None)
         endpoint_sccp_body = form.pop('endpoint_sccp', None)
         endpoint_sip_body = form.pop('endpoint_sip', None)
 
@@ -48,6 +49,20 @@ class LineMiddleWare:
             line_endpoint_sccp_middleware.associate(
                 line_response['id'],
                 line_response['endpoint_sccp']['id'],
+                tenant_uuids,
+            )
+        elif endpoint_custom_body:
+            endpoint_custom_middleware = self._middleware_handle.get('endpoint_custom')
+            line_response['endpoint_custom'] = endpoint_custom_middleware.create(
+                endpoint_custom_body,
+                tenant_uuid,
+            )
+            line_endpoint_custom_middleware = self._middleware_handle.get(
+                'line_endpoint_custom',
+            )
+            line_endpoint_custom_middleware.associate(
+                line_response['id'],
+                line_response['endpoint_custom']['id'],
                 tenant_uuids,
             )
 

@@ -4,6 +4,7 @@
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.endpoint_sip import dao as endpoint_sip_dao
 from xivo_dao.resources.endpoint_sccp import dao as endpoint_sccp_dao
+from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
 
 
 class _BaseLineEndpointMiddleWare:
@@ -22,7 +23,6 @@ class _BaseLineEndpointMiddleWare:
 
 
 class LineEndpointSIPMiddleWare(_BaseLineEndpointMiddleWare):
-
     def _get_endpoint(self, endpoint_uuid, tenant_uuids):
         return endpoint_sip_dao.get(
             endpoint_uuid,
@@ -32,9 +32,16 @@ class LineEndpointSIPMiddleWare(_BaseLineEndpointMiddleWare):
 
 
 class LineEndpointSCCPMiddleWare(_BaseLineEndpointMiddleWare):
-
     def _get_endpoint(self, endpoint_id, tenant_uuids):
         return endpoint_sccp_dao.get(
+            endpoint_id,
+            tenant_uuids=tenant_uuids,
+        )
+
+
+class LineEndpointCustomMiddleWare(_BaseLineEndpointMiddleWare):
+    def _get_endpoint(self, endpoint_id, tenant_uuids):
+        return endpoint_custom_dao.get(
             endpoint_id,
             tenant_uuids=tenant_uuids,
         )
