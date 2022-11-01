@@ -10,76 +10,13 @@ from hamcrest import (
 )
 
 from . import confd
-from ..helpers import fixtures
 from ..helpers.config import CONTEXT
 
 
-@fixtures.transport()
-@fixtures.sip_template()
-@fixtures.sip_template()
-@fixtures.registrar()
-def test_create_line_with_multiple_endpoints_error(
-    transport, template_1, template_2, registrar
-):
-    aor_section_options = [
-        ['@custom_variable', 'custom'],
-        ['qualify_frequency', '60'],
-        ['maximum_expiration', '3600'],
-        ['remove_existing', 'yes'],
-        ['max_contacts', '1'],
-    ]
-    auth_section_options = [['username', 'yiq8yej0'], ['password', 'yagq7x0w']]
-    endpoint_section_options = [
-        ['@custom_variable', 'custom'],
-        ['force_rport', 'yes'],
-        ['rewrite_contact', 'yes'],
-        ['callerid', '"Firstname Lastname" <100>'],
-    ]
-    identify_section_options = [
-        ['match', '54.172.60.0'],
-        ['match', '54.172.60.1'],
-        ['match', '54.172.60.2'],
-    ]
-    registration_section_options = [
-        ['client_uri', 'sip:peer@proxy.example.com'],
-        ['server_uri', 'sip:proxy.example.com'],
-        ['expiration', '120'],
-    ]
-    registration_outbound_auth_section_options = [
-        ['username', 'outbound-registration-username'],
-        ['password', 'outbound-registration-password'],
-    ]
-    outbound_auth_section_options = [
-        ['username', 'outbound-auth'],
-        ['password', 'outbound-password'],
-    ]
-
-    endpoint_sip_body = {
-        'name': "name",
-        'label': "label",
-        'aor_section_options': aor_section_options,
-        'auth_section_options': auth_section_options,
-        'endpoint_section_options': endpoint_section_options,
-        'identify_section_options': identify_section_options,
-        'registration_section_options': registration_section_options,
-        'registration_outbound_auth_section_options': registration_outbound_auth_section_options,
-        'outbound_auth_section_options': outbound_auth_section_options,
-        'transport': transport,
-        'templates': [template_1, template_2],
-        'asterisk_id': 'asterisk_id',
-    }
-    endpoint_sccp_body = {
-        'options': [
-            ["cid_name", "cid_name"],
-            ["cid_num", "cid_num"],
-            ["allow", "allow"],
-            ["disallow", "disallow"],
-        ],
-    }
-    endpoint_custom_body = {
-        'interface': 'custom/createall',
-        'enabled': False,
-    }
+def test_create_line_with_multiple_endpoints_error():
+    endpoint_sip_body = {'name': "name"}
+    endpoint_sccp_body = {'options': []}
+    endpoint_custom_body = {'interface': 'custom/createall'}
 
     response = confd.lines.post(
         context=CONTEXT,
@@ -105,12 +42,7 @@ def test_create_line_with_multiple_endpoints_error(
 
 
 def test_create_line_endpoint_sccp_with_caller_id():
-    endpoint_sccp_no_cid_body = {
-        'options': [
-            ["allow", "allow"],
-            ["disallow", "disallow"],
-        ],
-    }
+    endpoint_sccp_no_cid_body = {'options': []}
 
     response = confd.lines.post(
         context=CONTEXT,
@@ -127,8 +59,6 @@ def test_create_line_endpoint_sccp_with_caller_id():
                 endpoint_sccp=has_entries(
                     options=contains_inanyorder(
                         ['cid_name', 'Foobar'],
-                        ["allow", "allow"],
-                        ["disallow", "disallow"],
                     ),
                 ),
             ),
@@ -145,8 +75,6 @@ def test_create_line_endpoint_sccp_with_caller_id():
             has_entries(
                 options=contains_inanyorder(
                     ['cid_name', 'Foobar'],
-                    ["allow", "allow"],
-                    ["disallow", "disallow"],
                 )
             ),
         )
@@ -155,8 +83,6 @@ def test_create_line_endpoint_sccp_with_caller_id():
 
     endpoint_sccp_body = {
         'options': [
-            ["allow", "allow"],
-            ["disallow", "disallow"],
             ['cid_name', 'Lol'],
         ],
     }
@@ -172,10 +98,7 @@ def test_create_line_endpoint_sccp_with_caller_id():
 
 
 def test_create_line_endpoint_sip_with_caller_id():
-    endpoint_sip_no_cid_body = {
-        'name': 'no-cid',
-        'label': 'Endpoint without Caller-ID',
-    }
+    endpoint_sip_no_cid_body = {'name': 'no-cid'}
 
     response = confd.lines.post(
         context=CONTEXT,
