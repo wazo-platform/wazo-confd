@@ -1,8 +1,10 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
 
+from xivo.tenant_flask_helpers import Tenant
+from xivo_dao import tenant_dao
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
@@ -23,45 +25,23 @@ class _BaseSipList(ListResource):
     model = EndpointSIP
     schema = EndpointSIPSchema
 
-    def __init__(self, service, dao, transport_dao):
+    def __init__(self, service, dao, transport_dao, middleware):
         super().__init__(service)
         self.dao = dao
         self.transport_dao = transport_dao
+        self._middleware = middleware
 
     def build_headers(self, sip):
-        return {'Location': url_for('endpoint_sip', uuid=sip.uuid, _external=True)}
+        return {'Location': url_for('endpoint_sip', uuid=sip['uuid'], _external=True)}
 
     def get(self):
         return super().get()
 
     def post(self):
-        form = self.schema().load(request.get_json())
-        form = self.add_tenant_to_form(form)
-
-        templates = []
-        for template in form['templates']:
-            try:
-                model = self.dao.get(
-                    template['uuid'],
-                    template=True,
-                    tenant_uuids=[form['tenant_uuid']],
-                )
-                templates.append(model)
-            except NotFoundError:
-                metadata = {'templates': template}
-                raise errors.param_not_found('templates', 'endpoint_sip', **metadata)
-        form['templates'] = templates
-
-        if form.get('transport'):
-            transport_uuid = form['transport']['uuid']
-            try:
-                form['transport'] = self.transport_dao.get(transport_uuid)
-            except NotFoundError as e:
-                raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
-
-        model = self.model(**form)
-        model = self.service.create(model)
-        return self.schema().dump(model), 201, self.build_headers(model)
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        resource = self._middleware.create(request.get_json(), tenant.uuid)
+        return resource, 201, self.build_headers(resource)
 
 
 class _BaseSipItem(ItemResource):

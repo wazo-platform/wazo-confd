@@ -73,7 +73,7 @@ class UserSchema(BaseSchema):
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
     )
     lines = Nested(
-        'LineSchema',
+        'LineListSchema',
         only=[
             'id',
             'name',
