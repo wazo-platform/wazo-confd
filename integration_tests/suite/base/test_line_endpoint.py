@@ -3,6 +3,12 @@
 
 import re
 
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    has_entries,
+)
+
 from . import confd
 from ..helpers import fixtures
 from ..helpers.config import CONTEXT
@@ -95,4 +101,71 @@ def test_create_line_with_multiple_endpoints_error(
         endpoint_custom=endpoint_custom_body,
         endpoint_sccp=endpoint_sccp_body,
     )
+    response.assert_match(400, matcher)
+
+
+def test_create_line_endpoint_sccp_with_caller_id():
+    endpoint_sccp_no_cid_body = {
+        'options': [
+            ["allow", "allow"],
+            ["disallow", "disallow"],
+        ],
+    }
+
+    response = confd.lines.post(
+        context=CONTEXT,
+        caller_id_name='Foobar',
+        # caller_id_num='1004',  # SCCP is incompatible with a caller id num
+        endpoint_sccp=endpoint_sccp_no_cid_body,
+    )
+
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                caller_id_name='Foobar',
+                endpoint_sccp=has_entries(
+                    options=contains_inanyorder(
+                        ['cid_name', 'Foobar'],
+                        ["allow", "allow"],
+                        ["disallow", "disallow"],
+                    ),
+                ),
+            ),
+        )
+
+        assert_that(
+            confd.lines(response.item['id']).get().item,
+            has_entries(
+                caller_id_name='Foobar',
+            ),
+        )
+        assert_that(
+            confd.endpoints.sccp(response.item['endpoint_sccp']['id']).get().item,
+            has_entries(
+                options=contains_inanyorder(
+                    ['cid_name', 'Foobar'],
+                    ["allow", "allow"],
+                    ["disallow", "disallow"],
+                )
+            ),
+        )
+    finally:
+        confd.lines(response.item['id']).delete()
+
+    endpoint_sccp_body = {
+        'options': [
+            ["allow", "allow"],
+            ["disallow", "disallow"],
+            ['cid_name', 'Lol'],
+        ],
+    }
+    response = confd.lines.post(
+        context=CONTEXT,
+        caller_id_name='Foobar',
+        # caller_id_num='1004',  # SCCP is incompatible with a caller id num
+        endpoint_sccp=endpoint_sccp_body,
+    )
+
+    matcher = re.compile(re.escape('Ambiguous caller ID'))
     response.assert_match(400, matcher)

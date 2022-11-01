@@ -60,6 +60,24 @@ class LineSchema(BaseSchema):
         if len(configured_endpoints) > 1:
             raise ValidationError('Only one endpoint should be configured on a line')
 
+    @validates_schema
+    def _validate_multiple_caller_id(self, data, **kwargs):
+        caller_id_name = data.get('caller_id_name')
+        if not caller_id_name:
+            return data
+
+        endpoint_sccp = data.get('endpoint_sccp')
+        if endpoint_sccp:
+            for var, value in endpoint_sccp['options']:
+                if var == 'cid_name':
+                    raise ValidationError(
+                        'Ambiguous caller ID: line.caller_id_name = {} endpoint_sccp.options["cid_name"] = {}',
+                        caller_id_name,
+                        value,
+                    )
+
+        return data
+
 
 class LineSchemaNullable(LineSchema):
     def on_bind_field(self, field_name, field_obj):
