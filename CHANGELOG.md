@@ -1,5 +1,9 @@
 # Changelog
 
+## 22.15
+
+* The `/tenants` endpoints were modified to remove the field `webrtc_video_sip_template_uuid`.
+
 ## 22.14
 
 * `/wizard` endpoint updates now the configuration file for autoprovisionning `/etc/asterisk/pjsip.d/05-autoprov-wizard.conf` with the `language` value it receives in the request body. However, if the user wants to change the language used for audio provisionning; they will have to do it manually for now.

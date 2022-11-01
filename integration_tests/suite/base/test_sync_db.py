@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -68,7 +68,6 @@ def test_create_default_templates_when_not_exist():
                 label='webrtc',
                 transport=has_entries(uuid=transport_wss['uuid']),
             ),
-            has_entries(label='webrtc_video'),
             has_entries(label='meeting_guest'),
             has_entries(label='registration_trunk'),
             has_entries(label='twilio_trunk'),
@@ -80,13 +79,12 @@ def test_no_create_default_templates_when_exist():
     with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
         BaseIntegrationTest.sync_db()
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-        assert_that(response.items, has_length(6))
+        assert_that(response.items, has_length(5))
         uuid_1 = response.items[0]['uuid']
         uuid_2 = response.items[1]['uuid']
         uuid_3 = response.items[2]['uuid']
         uuid_4 = response.items[3]['uuid']
         uuid_5 = response.items[4]['uuid']
-        uuid_6 = response.items[5]['uuid']
 
         BaseIntegrationTest.sync_db()
 
@@ -99,7 +97,6 @@ def test_no_create_default_templates_when_exist():
                 has_entries(uuid=uuid_3),
                 has_entries(uuid=uuid_4),
                 has_entries(uuid=uuid_5),
-                has_entries(uuid=uuid_6),
             ),
         )
 
@@ -108,7 +105,7 @@ def test_not_reset_default_templates_when_exist():
     with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
         BaseIntegrationTest.sync_db()
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-        assert_that(response.items, has_length(6))
+        assert_that(response.items, has_length(5))
         uuid_1 = response.items[0]['uuid']
 
         response = confd.endpoints.sip.templates(uuid_1).put(
@@ -126,7 +123,7 @@ def test_reset_default_templates_when_toggle_sip_template_generated_bool():
     with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
         BaseIntegrationTest.sync_db()
         response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-        assert_that(response.items, has_length(6))
+        assert_that(response.items, has_length(5))
         uuid_1 = response.items[0]['uuid']
 
         response = confd.endpoints.sip.templates(uuid_1).put(
