@@ -19,7 +19,8 @@ class LineMiddleWare:
         endpoint_sccp_body = form.pop('endpoint_sccp', None)
         endpoint_sip_body = form.pop('endpoint_sip', None)
 
-        caller_id_name = form.pop('caller_id_name')
+        caller_id_name = form.pop('caller_id_name', None)
+        caller_id_num = form.pop('caller_id_num', None)
 
         model = Line(**form)
         model = self._service.create(model, tenant_uuids)
@@ -69,6 +70,9 @@ class LineMiddleWare:
 
         if caller_id_name:
             model.caller_id_name = caller_id_name
+        if caller_id_num and endpoint_sip_body:
+            model.caller_id_num = caller_id_num
+        if caller_id_name or caller_id_num:
             self._service.edit(model, tenant_uuids=None)
 
         updated_model = self._service.get(model.id)

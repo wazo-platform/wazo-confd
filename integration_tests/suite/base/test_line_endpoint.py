@@ -169,3 +169,64 @@ def test_create_line_endpoint_sccp_with_caller_id():
 
     matcher = re.compile(re.escape('Ambiguous caller ID'))
     response.assert_match(400, matcher)
+
+
+def test_create_line_endpoint_sip_with_caller_id():
+    endpoint_sip_no_cid_body = {
+        'name': 'no-cid',
+        'label': 'Endpoint without Caller-ID',
+    }
+
+    response = confd.lines.post(
+        context=CONTEXT,
+        caller_id_name='Foobar',
+        caller_id_num='1004',
+        endpoint_sip=endpoint_sip_no_cid_body,
+    )
+
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                caller_id_name='Foobar',
+                caller_id_num='1004',
+                endpoint_sip=has_entries(
+                    endpoint_section_options=contains_inanyorder(
+                        ['callerid', '"Foobar" <1004>'],
+                    ),
+                ),
+            ),
+        )
+
+        assert_that(
+            confd.lines(response.item['id']).get().item,
+            has_entries(
+                caller_id_name='Foobar',
+                caller_id_num='1004',
+            ),
+        )
+        assert_that(
+            confd.endpoints.sip(response.item['endpoint_sip']['uuid']).get().item,
+            has_entries(
+                endpoint_section_options=contains_inanyorder(
+                    ['callerid', '"Foobar" <1004>'],
+                ),
+            ),
+        )
+    finally:
+        confd.lines(response.item['id']).delete()
+
+    endpoint_sip_body = {
+        'endpoint_section_options': [
+            ['callerid', '"what" <666>'],
+        ],
+    }
+    response = confd.lines.post(
+        context=CONTEXT,
+        caller_id_name='Foobar',
+        caller_id_num='1004',
+        endpoint_sip=endpoint_sip_body,
+    )
+
+    matcher = re.compile(re.escape('Ambiguous caller ID'))
+    response.assert_match(400, matcher)

@@ -66,6 +66,16 @@ class LineSchema(BaseSchema):
         if not caller_id_name:
             return data
 
+        endpoint_sip = data.get('endpoint_sip')
+        if endpoint_sip:
+            for key, value in endpoint_sip.get('endpoint_section_options'):
+                if key == 'callerid':
+                    raise ValidationError(
+                        'Ambiguous caller ID: line.caller_id_name = {} endpoint_sip.endpoint_section_options["callerid"] = {}',
+                        caller_id_name,
+                        value,
+                    )
+
         endpoint_sccp = data.get('endpoint_sccp')
         if endpoint_sccp:
             for var, value in endpoint_sccp['options']:
