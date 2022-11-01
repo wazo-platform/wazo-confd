@@ -11,6 +11,7 @@ from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.switchboard import dao as switchboard_dao
 
 from wazo_provd_client import Client as ProvdClient
 
@@ -54,7 +55,9 @@ from wazo_confd.plugins.user_group.service import (
     build_service as build_user_group_service,
 )
 from wazo_confd.plugins.func_key.service import build_user_funckey_template_service
-
+from wazo_confd.plugins.switchboard_member.service import (
+    build_service as build_user_switchboard_service,
+)
 
 from .service import build_service, build_service_callservice, build_service_forward
 from ..user_import.wazo_user_service import build_service as build_wazo_user_service
@@ -90,6 +93,7 @@ class Plugin:
         user_funckey_template_association_service = build_user_funckey_template_service(
             provd_client
         )
+        user_switchboard_service = build_user_switchboard_service()
 
         api.add_resource(
             UserItem,
@@ -120,6 +124,7 @@ class Plugin:
                 incall_extension_service,
                 user_group_service,
                 user_funckey_template_association_service,
+                user_switchboard_service,
                 endpoint_custom_dao,
                 endpoint_sccp_dao,
                 line_dao,
@@ -130,6 +135,7 @@ class Plugin:
                 extension_dao,
                 group_dao,
                 template_dao,
+                switchboard_dao,
             ),
         )
 

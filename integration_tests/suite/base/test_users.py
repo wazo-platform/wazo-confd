@@ -785,8 +785,15 @@ def test_create_multi_tenant_moh(main_moh, sub_moh):
 @fixtures.funckey_template(
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
 )
+@fixtures.switchboard()
 def test_post_full_user_no_error(
-    transport, template, registrar, group_extension, group, funckey_template
+    transport,
+    template,
+    registrar,
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
 ):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
@@ -844,6 +851,9 @@ def test_post_full_user_no_error(
     group = {
         'uuid': group['uuid'],
     }
+    switchboard = {
+        'uuid': switchboard['uuid'],
+    }
 
     confd.groups(group['uuid']).extensions(group_extension['id']).put()
 
@@ -854,6 +864,7 @@ def test_post_full_user_no_error(
             'incalls': [incall],
             'groups': [group],
             'func_key_template_id': funckey_template['id'],
+            'switchboards': [switchboard],
             **user,
         }
     ).response
@@ -890,6 +901,9 @@ def test_post_full_user_no_error(
                     has_entries(uuid=group['uuid']),
                 ),
                 func_key_template_id=funckey_template['id'],
+                switchboards=contains(
+                    has_entries(uuid=switchboard['uuid']),
+                ),
                 **user,
             ),
         )
@@ -900,11 +914,16 @@ def test_post_full_user_no_error(
             has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
             has_entries(incalls=contains(has_entries(id=payload['incalls'][0]['id']))),
         )
-        # retrieve the user (created before) and check their groups
+        # retrieve the user (created before) and check their groups and switchboards
         assert_that(
             confd.users(payload['uuid']).get().item,
             has_entries(
                 groups=contains(has_entries(uuid=payload['groups'][0]['uuid']))
+            ),
+            has_entries(
+                switchboards=contains(
+                    has_entries(uuid=payload['switchboards'][0]['uuid'])
+                )
             ),
         )
         # retrieve the line (created before) and check its data are correct
@@ -923,6 +942,13 @@ def test_post_full_user_no_error(
         # retrieve the group and check the user is a member
         assert_that(
             confd.groups(payload['groups'][0]['uuid']).get().item,
+            has_entries(
+                members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
+            ),
+        )
+        # retrieve the switchboard and check the user is a member
+        assert_that(
+            confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
             has_entries(
                 members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
             ),
