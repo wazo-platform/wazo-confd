@@ -7,6 +7,7 @@ from hamcrest import (
     has_entries,
     greater_than,
     none,
+    not_,
 )
 
 from . import confd
@@ -221,11 +222,11 @@ def test_create_line_with_endpoint_sccp_with_all_parameters(registrar):
                 context=CONTEXT,
                 position=2,
                 device_slot=2,
-                name=none(),
-                protocol=none(),
+                name=not_(none()),
+                protocol='sccp',
                 device_id=none(),
-                caller_id_name=none(),
-                caller_id_num=none(),
+                caller_id_name='cid_name',
+                caller_id_num='cid_num',
                 registrar=registrar['id'],
                 provisioning_code="887865",
                 provisioning_extension="887865",
