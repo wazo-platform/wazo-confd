@@ -1,8 +1,9 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+from marshmallow import fields, validates_schema
 from marshmallow.validate import Length, Predicate, Range
+from marshmallow.exceptions import ValidationError
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
@@ -44,6 +45,20 @@ class LineSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+
+    @validates_schema
+    def _validate_only_one_endpoint(self, data, **kwargs):
+        endpoint_sip = data.get('endpoint_sip')
+        endpoint_sccp = data.get('endpoint_sccp')
+        endpoint_custom = data.get('endpoint_custom')
+
+        configured_endpoints = [
+            endpoint
+            for endpoint in [endpoint_sip, endpoint_sccp, endpoint_custom]
+            if endpoint
+        ]
+        if len(configured_endpoints) > 1:
+            raise ValidationError('Only one endpoint should be configured on a line')
 
 
 class LineSchemaNullable(LineSchema):
