@@ -9,6 +9,9 @@ from xivo_dao.alchemy.incall import Incall
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
+from xivo.tenant_flask_helpers import Tenant
+from xivo_dao import tenant_dao
+
 from .schema import IncallSchema
 
 
@@ -17,18 +20,19 @@ class IncallList(ListResource):
     model = Incall
     schema = IncallSchema
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     def build_headers(self, incall):
-        return {'Location': url_for('incalls', id=incall.id, _external=True)}
+        return {'Location': url_for('incalls', id=incall['id'], _external=True)}
 
     @required_acl('confd.incalls.create')
     def post(self):
-        schema = self.schema()
-        form = schema.load(request.get_json())
-        form['destination'] = Dialaction(**form['destination'])
-        form = self.add_tenant_to_form(form)
-        model = self.model(**form)
-        model = self.service.create(model)
-        return schema.dump(model), 201, self.build_headers(model)
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        resource = self._middleware.create(request.get_json(), tenant.uuid)
+        return resource, 201, self.build_headers(resource)
 
     @required_acl('confd.incalls.read')
     def get(self):
