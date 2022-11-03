@@ -7,7 +7,9 @@ from hamcrest import (
     contains_inanyorder,
     empty,
     equal_to,
+    greater_than,
     has_entries,
+    none,
 )
 
 from ..helpers import (
@@ -415,3 +417,65 @@ def test_get_line_relation(line, sip, extension):
                 response.item['lines'],
                 contains(has_entries(id=line['id'], name=line['name'])),
             )
+
+
+@fixtures.registrar()
+def test_create_line_with_all_parameters_and_extension(registrar):
+    exten = h.extension.find_available_exten(CONTEXT)
+    response = confd.lines.post(
+        context=CONTEXT,
+        position=2,
+        registrar=registrar['id'],
+        provisioning_code='887865',
+        extensions=[
+            {
+                'context': CONTEXT,
+                'exten': exten,
+            }
+        ],
+        endpoint_sip={
+            'name': 'test',
+        },
+    )
+
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                context=CONTEXT,
+                position=2,
+                device_slot=2,
+                name='test',
+                protocol='sip',
+                device_id=none(),
+                caller_id_name=none(),
+                caller_id_num=none(),
+                registrar=registrar['id'],
+                provisioning_code="887865",
+                provisioning_extension="887865",
+                tenant_uuid=MAIN_TENANT,
+                extensions=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        context=CONTEXT,
+                        exten=exten,
+                    )
+                ),
+            ),
+        )
+
+        assert_that(
+            confd.lines(response.item['id']).get().item,
+            has_entries(
+                extensions=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        context=CONTEXT,
+                        exten=exten,
+                    )
+                ),
+            ),
+        )
+
+    finally:
+        confd.lines(response.item['id']).delete().assert_deleted()

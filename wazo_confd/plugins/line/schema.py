@@ -33,12 +33,7 @@ class LineSchema(BaseSchema):
     endpoint_sip = Nested('EndpointSIPSchema')
     endpoint_sccp = Nested('SccpSchema')
     endpoint_custom = Nested('CustomSchema')
-    extensions = Nested(
-        'ExtensionSchema',
-        only=['id', 'exten', 'context', 'links'],
-        many=True,
-        dump_only=True,
-    )
+    extensions = Nested('ExtensionSchema', many=True)
     users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
@@ -114,6 +109,12 @@ class LineListSchema(LineSchema):
     endpoint_custom = Nested(
         'CustomSchema',
         only=['id', 'interface', 'links'],
+        dump_only=True,
+    )
+    extensions = Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
         dump_only=True,
     )
 

@@ -18,6 +18,7 @@ class LineMiddleWare:
         endpoint_custom_body = form.pop('endpoint_custom', None)
         endpoint_sccp_body = form.pop('endpoint_sccp', None)
         endpoint_sip_body = form.pop('endpoint_sip', None)
+        extension_bodies = form.pop('extensions', None) or []
 
         caller_id_name = form.pop('caller_id_name', None)
         caller_id_num = form.pop('caller_id_num', None)
@@ -75,7 +76,18 @@ class LineMiddleWare:
         if caller_id_name or caller_id_num:
             self._service.edit(model, tenant_uuids=None)
 
+        extensions = []
+        for extension_body in extension_bodies:
+            line_extension_middleware = self._middleware_handle.get('line_extension')
+            extension = line_extension_middleware.create_extension(
+                model.id,
+                extension_body,
+                tenant_uuids,
+            )
+            extensions.append(extension)
+
         updated_model = self._service.get(model.id)
         line_response = self._schema.dump(updated_model)
+        line_response['extensions'] = extensions
 
         return line_response

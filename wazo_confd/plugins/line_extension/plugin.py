@@ -13,6 +13,7 @@ class Plugin:
 
         service = build_service()
         line_extension_middleware = LineExtensionMiddleware(service, middleware_handle)
+        middleware_handle.register('line_extension', line_extension_middleware)
 
         api.add_resource(
             LineExtensionItem,
