@@ -3,6 +3,7 @@
 
 from wazo_provd_client import Client as ProvdClient
 
+from .middleware import ExtensionMiddleWare
 from .resource import ExtensionItem, ExtensionList
 from .service import build_service
 
@@ -17,6 +18,7 @@ class Plugin:
         token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client)
+        extension_middleware = ExtensionMiddleWare(service)
 
         api.add_resource(
             ExtensionItem,
@@ -24,4 +26,11 @@ class Plugin:
             endpoint='extensions',
             resource_class_args=(service,),
         )
-        api.add_resource(ExtensionList, '/extensions', resource_class_args=(service,))
+        api.add_resource(
+            ExtensionList,
+            '/extensions',
+            resource_class_args=(
+                service,
+                extension_middleware,
+            ),
+        )

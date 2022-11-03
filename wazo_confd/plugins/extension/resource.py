@@ -16,8 +16,12 @@ class ExtensionList(ListResource):
     model = Extension
     schema = ExtensionSchema
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     def build_headers(self, extension):
-        return {'Location': url_for('extensions', id=extension.id, _external=True)}
+        return {'Location': url_for('extensions', id=extension['id'], _external=True)}
 
     @required_acl('confd.extensions.read')
     def get(self):
@@ -25,11 +29,9 @@ class ExtensionList(ListResource):
 
     @required_acl('confd.extensions.create')
     def post(self):
-        form = self.schema().load(request.get_json())
-        model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        model = self.service.create(model, tenant_uuids)
-        return self.schema().dump(model), 201, self.build_headers(model)
+        resource = self._middleware.create(request.get_json(), tenant_uuids)
+        return resource, 201, self.build_headers(resource)
 
     def _has_a_tenant_uuid(self):
         # The base function does not work because the tenant_uuid is not part
