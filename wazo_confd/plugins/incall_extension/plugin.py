@@ -1,9 +1,7 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.resources.incall import dao as incall_dao
-from xivo_dao.resources.extension import dao as extension_dao
-
+from .middleware import IncallExtensionAssociationMiddleWare
 from .resource import IncallExtensionItem
 from .service import build_service
 
@@ -11,11 +9,18 @@ from .service import build_service
 class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
+        middleware_handle = dependencies['middleware_handle']
         service = build_service()
+        incall_extension_association_middleware = IncallExtensionAssociationMiddleWare(
+            service
+        )
+        middleware_handle.register(
+            'incall_extension_association', incall_extension_association_middleware
+        )
 
         api.add_resource(
             IncallExtensionItem,
             '/incalls/<int:incall_id>/extensions/<int:extension_id>',
             endpoint='incall_extensions',
-            resource_class_args=(service, incall_dao, extension_dao),
+            resource_class_args=(incall_extension_association_middleware,),
         )
