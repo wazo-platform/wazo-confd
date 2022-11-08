@@ -2,6 +2,7 @@
 
 ## 22.15
 
+* PUT on `/users/<user_id>/groups` now accepts the group `uuid` as well as the group `id` in its body
 * The `/tenants` endpoints were modified to remove the field `webrtc_video_sip_template_uuid`.
 * `/lines` endpoint now create the SIP, SCCP or custom endpoint if it is specified in the body and associates it to the line.
 
