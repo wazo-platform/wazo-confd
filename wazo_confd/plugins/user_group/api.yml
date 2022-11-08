@@ -17,7 +17,7 @@ paths:
         description: Users to associated
         required: true
         schema:
-          $ref: '#/definitions/GroupsID'
+          $ref: '#/definitions/UserGroupsID'
       responses:
         '204':
           description: Group and Users associated
@@ -25,3 +25,16 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+definitions:
+  UserGroupID:
+    properties:
+      id:
+        type: integer
+      uuid:
+        type: string
+  UserGroupsID:
+    properties:
+      groups:
+        items:
+          $ref: '#/definitions/UserGroupID'
+        type: array
