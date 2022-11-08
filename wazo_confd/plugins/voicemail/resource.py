@@ -1,9 +1,7 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
-
-from xivo_dao.alchemy.voicemail import Voicemail
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
@@ -13,20 +11,21 @@ from .schema import VoicemailSchema
 
 class VoicemailList(ListResource):
 
-    model = Voicemail
     schema = VoicemailSchema
     has_tenant_uuid = True
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     def build_headers(self, voicemail):
-        return {'Location': url_for('voicemails', id=voicemail.id, _external=True)}
+        return {'Location': url_for('voicemails', id=voicemail['id'], _external=True)}
 
     @required_acl('confd.voicemails.create')
     def post(self):
-        form = self.schema().load(request.get_json())
-        model = self.model(**form)
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        model = self.service.create(model, tenant_uuids)
-        return self.schema().dump(model), 201, self.build_headers(model)
+        voicemail = self._middleware.create(request.get_json(), tenant_uuids)
+        return voicemail, 201, self.build_headers(voicemail)
 
     @required_acl('confd.voicemails.read')
     def get(self):
@@ -37,6 +36,10 @@ class VoicemailItem(ItemResource):
 
     schema = VoicemailSchema
     has_tenant_uuid = True
+
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
 
     @required_acl('confd.voicemails.{id}.read')
     def get(self, id):
@@ -51,4 +54,6 @@ class VoicemailItem(ItemResource):
 
     @required_acl('confd.voicemails.{id}.delete')
     def delete(self, id):
-        return super().delete(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.delete(id, tenant_uuids)
+        return '', 204
