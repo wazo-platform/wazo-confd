@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import fields, validates_schema, post_load
+from marshmallow import fields, validates_schema
 from marshmallow.exceptions import ValidationError
 
 from wazo_confd.auth import required_acl
@@ -23,19 +23,11 @@ class GroupSchemaIDUUIDLoad(BaseSchema):
         if len(provided_identifiers) == 0:
             raise ValidationError('One identifier(id or uuid) must be provided')
 
-    @post_load
-    def remove_identifier_not_provided(self, data, **kwargs):
-        for k in ['id', 'uuid']:
-            try:
-                if not data[k]:
-                    del data[k]
-            except KeyError:
-                pass
-        return data
-
 
 class GroupsIDUUIDSchema(BaseSchema):
-    groups = Nested(GroupSchemaIDUUIDLoad, many=True, required=True)
+    groups = Nested(
+        GroupSchemaIDUUIDLoad, many=True, required=True, partial=['id', 'uuid']
+    )
 
 
 class UserGroupItem(ConfdResource):
