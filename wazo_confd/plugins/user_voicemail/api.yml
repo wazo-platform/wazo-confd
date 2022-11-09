@@ -1,5 +1,32 @@
 paths:
   /users/{user_id}/voicemails:
+    post:
+      operationId: create_user_voicemail
+      summary: Create user voicemail
+      description: '**Required ACL:** `confd.users.{user_id}.voicemails.create`'
+      tags:
+      - users
+      - voicemails
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        description: Voicemail to create
+        required: true
+        schema:
+          $ref: '#/definitions/Voicemail'
+      responses:
+        '201':
+          description: Voicemail created
+          schema:
+            $ref: '#/definitions/Voicemail'
+        '400':
+          $ref: '#/responses/CreateError'
+        '404':
+          description: User not found
+          schema:
+            $ref: '#/responses/NotFoundError'
     get:
       operationId: get_user_voicemail
       summary: Get user voicemails
