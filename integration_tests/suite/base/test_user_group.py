@@ -103,6 +103,30 @@ def test_dissociate(group1, group2, user, line):
 @fixtures.group()
 @fixtures.user()
 @fixtures.line_sip()
+@fixtures.line_sip()
+def test_dissociate_with_multi_line_user(group, user, line_1, line_2):
+    with a.user_line(user, line_1), a.user_line(user, line_2, check=False):
+        with a.group_member_user(group, user):
+            # The group member is the interface of the main line of the user.
+            # Deleting the any secondary line should keep the user in the group
+            # Deleting the main line will remove the user from the group
+            response = confd.lines(line_2['id']).delete()
+            response.assert_deleted()
+
+            response = confd.users(user['uuid']).get()
+            assert_that(
+                response.item,
+                has_entries(
+                    groups=contains_inanyorder(
+                        has_entries(id=group['id']),
+                    )
+                ),
+            )
+
+
+@fixtures.group()
+@fixtures.user()
+@fixtures.line_sip()
 def test_bus_events(group, user, line):
     with a.user_line(user, line):
         url = confd.users(user['uuid']).groups.put
