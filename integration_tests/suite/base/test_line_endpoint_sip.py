@@ -250,6 +250,7 @@ def test_create_line_with_endpoint_sip_with_all_parameters(
         ['force_rport', 'yes'],
         ['rewrite_contact', 'yes'],
         ['callerid', '"Firstname Lastname" <100>'],
+        ['context', CONTEXT],
     ]
     identify_section_options = [
         ['match', '54.172.60.0'],
