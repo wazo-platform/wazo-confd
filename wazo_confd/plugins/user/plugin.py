@@ -1,8 +1,9 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
 
+from .middleware import UserMiddleWare
 from .resource import UserItem, UserList
 from .resource_sub import (
     UserForwardBusy,
@@ -21,6 +22,7 @@ class Plugin:
         api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
+        middleware_handle = dependencies['middleware_handle']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
@@ -29,16 +31,28 @@ class Plugin:
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
 
+        user_middleware = UserMiddleWare(service)
+        middleware_handle.register('user', user_middleware)
+
         api.add_resource(
             UserItem,
             '/users/<uuid:id>',
             '/users/<int:id>',
             endpoint='users',
-            resource_class_args=(service,),
+            resource_class_args=(
+                service,
+                user_middleware,
+            ),
         )
 
         api.add_resource(
-            UserList, '/users', endpoint='users_list', resource_class_args=(service,)
+            UserList,
+            '/users',
+            endpoint='users_list',
+            resource_class_args=(
+                service,
+                user_middleware,
+            ),
         )
 
         api.add_resource(
