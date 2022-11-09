@@ -249,9 +249,11 @@ definitions:
         $ref: '#/definitions/EndpointCustom'
   LineExtensions:
     title: LineExtensions
-    type: array
-    items:
-      $ref: '#/definitions/Extension'
+    properties:
+      extensions:
+        type: array
+        items:
+          $ref: '#/definitions/ExtensionRelationBase'
   LineCreate:
     title: LineCreate
     allOf:
