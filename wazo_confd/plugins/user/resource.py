@@ -1,9 +1,11 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+from flask import url_for, request
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+from xivo.tenant_flask_helpers import Tenant
+from xivo_dao import tenant_dao
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
@@ -22,12 +24,19 @@ class UserList(ListResource):
     schema = UserSchemaNullable
     view_schemas = {'directory': UserDirectorySchema, 'summary': UserSummarySchema}
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     def build_headers(self, user):
-        return {'Location': url_for('users', id=user.id, _external=True)}
+        return {'Location': url_for('users', id=user['id'], _external=True)}
 
     @required_acl('confd.users.create')
     def post(self):
-        return super().post()
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        resource = self._middleware.create(request.get_json(), tenant.uuid)
+        return resource, 201, self.build_headers(resource)
 
     @required_acl('confd.users.read')
     def get(self):
@@ -43,6 +52,10 @@ class UserItem(ItemResource):
 
     schema = UserSchema
     has_tenant_uuid = True
+
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
 
     @required_acl('confd.users.{id}.read')
     def head(self, id):
@@ -60,4 +73,6 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.delete')
     def delete(self, id):
-        return super().delete(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.delete(id, tenant_uuids)
+        return '', 204
