@@ -243,10 +243,16 @@ definitions:
     properties:
       endpoint_custom:
         $ref: '#/definitions/EndpointCustom'
+  LineExtensions:
+    title: LineExtensions:
+    type: array
+    items:
+      $ref: '#/definitions/Extension'
   LineCreate:
     title: LineCreate
     allOf:
       - $ref: '#/definitions/Line'
+      - $ref: '#/definitions/LineExtensions'
       - $ref: '#/definitions/LineEndpointSIP'
       - $ref: '#/definitions/LineEndpointSCCP'
       - $ref: '#/definitions/LineEndpointCustom'
