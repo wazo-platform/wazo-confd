@@ -1,7 +1,7 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, validates_schema
+from marshmallow import fields, validates_schema, pre_load
 from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
@@ -76,6 +76,35 @@ class LineSchema(BaseSchema):
                     raise ValidationError(
                         f'Ambiguous caller ID: line.caller_id_name = {caller_id_name} endpoint_sccp.options["cid_name"] = {value}'
                     )
+
+        return data
+
+    @pre_load
+    def propagate_context(self, data, **kwargs):
+        line_context = data['context']
+
+        extensions = data.get('extensions', [])
+        for extension in extensions:
+            extension_context = extension.get('context')
+            if extension_context:
+                continue
+            extension['context'] = line_context
+
+        endpoint_sip = data.get('endpoint_sip')
+        if endpoint_sip:
+            endpoint_sip_has_context = False
+            endpoint_section_options = (
+                endpoint_sip.get('endpoint_section_options') or []
+            )
+            for key, _ in endpoint_section_options:
+                if key == 'context':
+                    endpoint_sip_has_context = True
+                    break
+            if not endpoint_sip_has_context:
+                endpoint_section_options.append(
+                    ['context', line_context],
+                )
+                endpoint_sip['endpoint_section_options'] = endpoint_section_options
 
         return data
 
