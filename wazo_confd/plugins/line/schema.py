@@ -81,7 +81,9 @@ class LineSchema(BaseSchema):
 
     @pre_load
     def propagate_context(self, data, **kwargs):
-        line_context = data['context']
+        line_context = data.get('context')
+        if not line_context:
+            return data
 
         extensions = data.get('extensions', [])
         for extension in extensions:
