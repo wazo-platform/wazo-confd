@@ -22,7 +22,11 @@ paths:
     post:
       operationId: create_line
       summary: Create line
-      description: '**Required ACL:** `confd.lines.create`'
+      description: |
+        **Required ACL:** `confd.lines.create`
+
+        When creating a line with an extension or a SIP endpoint as part of it's body, the line's context
+        will be used as a default for the endpoint and context if ommited.
       tags:
       - lines
       parameters:
@@ -243,10 +247,18 @@ definitions:
     properties:
       endpoint_custom:
         $ref: '#/definitions/EndpointCustom'
+  LineExtensions:
+    title: LineExtensions
+    properties:
+      extensions:
+        type: array
+        items:
+          $ref: '#/definitions/ExtensionRelationBase'
   LineCreate:
     title: LineCreate
     allOf:
       - $ref: '#/definitions/Line'
+      - $ref: '#/definitions/LineExtensions'
       - $ref: '#/definitions/LineEndpointSIP'
       - $ref: '#/definitions/LineEndpointSCCP'
       - $ref: '#/definitions/LineEndpointCustom'

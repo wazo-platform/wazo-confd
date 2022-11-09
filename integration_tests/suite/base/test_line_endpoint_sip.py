@@ -6,6 +6,7 @@ from hamcrest import (
     contains,
     contains_inanyorder,
     has_entries,
+    has_items,
     none,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
@@ -249,6 +250,7 @@ def test_create_line_with_endpoint_sip_with_all_parameters(
         ['force_rport', 'yes'],
         ['rewrite_contact', 'yes'],
         ['callerid', '"Firstname Lastname" <100>'],
+        ['context', CONTEXT],
     ]
     identify_section_options = [
         ['match', '54.172.60.0'],
@@ -341,5 +343,28 @@ def test_create_line_with_endpoint_sip_with_all_parameters(
 
         response = confd.lines(line_id).put(**line)
         response.assert_updated()
+    finally:
+        confd.lines(line_id).delete().assert_deleted()
+
+
+def test_create_line_with_endpoint_sip_no_context():
+    response = confd.lines.post(
+        context=CONTEXT,
+        endpoint_sip={'name': 'name'},
+    )
+    line_id = response.item['id']
+
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                context=CONTEXT,
+                endpoint_sip=has_entries(
+                    endpoint_section_options=has_items(
+                        ['context', CONTEXT],
+                    ),
+                ),
+            ),
+        )
     finally:
         confd.lines(line_id).delete().assert_deleted()

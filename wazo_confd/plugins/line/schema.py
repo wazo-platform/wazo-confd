@@ -1,7 +1,7 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, validates_schema
+from marshmallow import fields, validates_schema, pre_load
 from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
@@ -33,12 +33,7 @@ class LineSchema(BaseSchema):
     endpoint_sip = Nested('EndpointSIPSchema')
     endpoint_sccp = Nested('SccpSchema')
     endpoint_custom = Nested('CustomSchema')
-    extensions = Nested(
-        'ExtensionSchema',
-        only=['id', 'exten', 'context', 'links'],
-        many=True,
-        dump_only=True,
-    )
+    extensions = Nested('ExtensionSchema', many=True)
     users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
@@ -84,6 +79,37 @@ class LineSchema(BaseSchema):
 
         return data
 
+    @pre_load
+    def propagate_context(self, data, **kwargs):
+        line_context = data.get('context')
+        if not line_context:
+            return data
+
+        extensions = data.get('extensions', [])
+        for extension in extensions:
+            extension_context = extension.get('context')
+            if extension_context:
+                continue
+            extension['context'] = line_context
+
+        endpoint_sip = data.get('endpoint_sip')
+        if endpoint_sip:
+            endpoint_sip_has_context = False
+            endpoint_section_options = (
+                endpoint_sip.get('endpoint_section_options') or []
+            )
+            for key, _ in endpoint_section_options:
+                if key == 'context':
+                    endpoint_sip_has_context = True
+                    break
+            if not endpoint_sip_has_context:
+                endpoint_section_options.append(
+                    ['context', line_context],
+                )
+                endpoint_sip['endpoint_section_options'] = endpoint_section_options
+
+        return data
+
 
 class LineSchemaNullable(LineSchema):
     def on_bind_field(self, field_name, field_obj):
@@ -114,6 +140,12 @@ class LineListSchema(LineSchema):
     endpoint_custom = Nested(
         'CustomSchema',
         only=['id', 'interface', 'links'],
+        dump_only=True,
+    )
+    extensions = Nested(
+        'ExtensionSchema',
+        only=['id', 'exten', 'context', 'links'],
+        many=True,
         dump_only=True,
     )
 

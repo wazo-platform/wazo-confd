@@ -7,6 +7,7 @@ from hamcrest import (
     assert_that,
     contains_inanyorder,
     has_entries,
+    has_items,
 )
 
 from . import confd
@@ -114,7 +115,7 @@ def test_create_line_endpoint_sip_with_caller_id():
                 caller_id_name='Foobar',
                 caller_id_num='1004',
                 endpoint_sip=has_entries(
-                    endpoint_section_options=contains_inanyorder(
+                    endpoint_section_options=has_items(
                         ['callerid', '"Foobar" <1004>'],
                     ),
                 ),
@@ -131,7 +132,7 @@ def test_create_line_endpoint_sip_with_caller_id():
         assert_that(
             confd.endpoints.sip(response.item['endpoint_sip']['uuid']).get().item,
             has_entries(
-                endpoint_section_options=contains_inanyorder(
+                endpoint_section_options=has_items(
                     ['callerid', '"Foobar" <1004>'],
                 ),
             ),
