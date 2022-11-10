@@ -43,7 +43,8 @@ class VoicemailItem(ItemResource):
 
     @required_acl('confd.voicemails.{id}.read')
     def get(self, id):
-        return super().get(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        return self._middleware.get(id, tenant_uuids)
 
     @required_acl('confd.voicemails.{id}.update')
     def put(self, id):

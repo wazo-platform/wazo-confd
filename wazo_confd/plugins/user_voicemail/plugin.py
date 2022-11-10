@@ -23,6 +23,7 @@ class Plugin:
             service,
             middleware_handle,
         )
+        middleware_handle.register('user_voicemail', user_voicemail_middleware)
 
         api.add_resource(
             UserVoicemailList,

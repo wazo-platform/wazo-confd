@@ -26,6 +26,7 @@ class UserMiddleWare:
         incalls = form.pop('incalls', None) or []
         groups = form.pop('groups', None) or []
         switchboards = form.pop('switchboards', None) or []
+        voicemail = form.pop('voicemail', None)
 
         model = User(**form)
         model = self._service.create(model)
@@ -34,6 +35,24 @@ class UserMiddleWare:
         user_dict['incalls'] = []
         user_dict['groups'] = []
         user_dict['switchboards'] = []
+
+        if voicemail:
+            user_voicemail_middleware = self._middleware_handle.get('user_voicemail')
+            voicemail_id = voicemail.get('id')
+            if voicemail_id:
+                voicemail_middleware = self._middleware_handle.get('voicemail')
+                user_voicemail_middleware.associate(
+                    model.uuid, voicemail_id, tenant_uuids
+                )
+                voicemail = voicemail_middleware.get(voicemail_id, tenant_uuids)
+            else:
+                voicemail = user_voicemail_middleware.create_voicemail(
+                    model.uuid,
+                    voicemail,
+                    tenant_uuids,
+                )
+        user_dict['voicemail'] = voicemail
+
 
         if lines:
             for line_body in lines:

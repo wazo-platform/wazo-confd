@@ -20,3 +20,7 @@ class VoicemailMiddleWare:
     def delete(self, voicemail_id, tenant_uuids):
         voicemail = self._service.get(voicemail_id, tenant_uuids=tenant_uuids)
         self._service.delete(voicemail)
+
+    def get(self, voicemail_id, tenant_uuids):
+        voicemail = self._service.get(voicemail_id, tenant_uuids=tenant_uuids)
+        return self._schema.dump(voicemail)

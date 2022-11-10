@@ -271,4 +271,3 @@ def test_create_and_associate(user, _):
             ),
         ),
     )
-

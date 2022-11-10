@@ -17,7 +17,9 @@ The following resource has been added:
 * PUT on `/users/<user_id>/groups` now accepts the group `uuid` as well as the group `id` in its body
 * The `/tenants` endpoints were modified to remove the field `webrtc_video_sip_template_uuid`.
 * `/lines` endpoint now create the SIP, SCCP or custom endpoint if it is specified in the body and associates it to the line.
-* `/lines` endpoint new create the extension if it is specified in the body and associates it to the line.
+* `/lines` endpoint now create the extension if it is specified in the body and associates it to the line.
+* `/users` endpoint now create the voicemail if it is specified in the body and associates it to the user.
+* `/users` endpoint now associates the voicemail if it is specified in the body.
 
 ## 22.14
 

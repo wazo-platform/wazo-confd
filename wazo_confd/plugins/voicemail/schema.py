@@ -36,3 +36,7 @@ class VoicemailSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+
+
+class UserVoicemailSchema(VoicemailSchema):
+    id = fields.Integer()
