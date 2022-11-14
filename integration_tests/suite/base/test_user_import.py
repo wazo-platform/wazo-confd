@@ -107,40 +107,42 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             "password": "secret",
         }
     ]
+    try:
+        response = client.post("/users/import", csv)
+        user_id = get_import_field(response, 'user_id')
+        user_uuid = get_import_field(response, 'user_uuid')
 
-    response = client.post("/users/import", csv)
-    user_id = get_import_field(response, 'user_id')
-    user_uuid = get_import_field(response, 'user_uuid')
-
-    user = confd.users(user_id).get().item
-    assert_that(
-        user,
-        has_entries(
-            firstname="Rîchard",
-            lastname="Lâpointe",
-            email="richard@lapointe.org",
-            language="fr_FR",
-            outgoing_caller_id='"Rîchy Cool" <4185551234>',
-            mobile_phone_number="4181234567",
-            supervision_enabled=True,
-            call_transfer_enabled=False,
-            dtmf_hangup_enabled=True,
-            call_record_outgoing_external_enabled=True,
-            call_record_outgoing_internal_enabled=True,
-            call_record_incoming_internal_enabled=True,
-            call_record_incoming_external_enabled=True,
-            online_call_record_enabled=False,
-            simultaneous_calls=5,
-            ring_seconds=10,
-            userfield="userfield",
-            call_permission_password='1234',
-            enabled=True,
-            uuid=user_uuid,
-            username=None,
-            password=None,
-            subscription_type=2,
-        ),
-    )
+        user = confd.users(user_id).get().item
+        assert_that(
+            user,
+            has_entries(
+                firstname="Rîchard",
+                lastname="Lâpointe",
+                email="richard@lapointe.org",
+                language="fr_FR",
+                outgoing_caller_id='"Rîchy Cool" <4185551234>',
+                mobile_phone_number="4181234567",
+                supervision_enabled=True,
+                call_transfer_enabled=False,
+                dtmf_hangup_enabled=True,
+                call_record_outgoing_external_enabled=True,
+                call_record_outgoing_internal_enabled=True,
+                call_record_incoming_internal_enabled=True,
+                call_record_incoming_external_enabled=True,
+                online_call_record_enabled=False,
+                simultaneous_calls=5,
+                ring_seconds=10,
+                userfield="userfield",
+                call_permission_password='1234',
+                enabled=True,
+                uuid=user_uuid,
+                username=None,
+                password=None,
+                subscription_type=2,
+            ),
+        )
+    finally:
+        confd.users(user_uuid).delete().assert_deleted()
 
 
 @fixtures.call_permission()

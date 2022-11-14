@@ -15,6 +15,7 @@ from .resource_sub import (
     UserServiceList,
 )
 from .service import build_service, build_service_callservice, build_service_forward
+from ..user_import.wazo_user_service import build_service as build_wazo_user_service
 
 
 class Plugin:
@@ -30,8 +31,9 @@ class Plugin:
         service = build_service(provd_client)
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
+        wazo_user_service = build_wazo_user_service()
 
-        user_middleware = UserMiddleWare(service)
+        user_middleware = UserMiddleWare(service, wazo_user_service, middleware_handle)
         middleware_handle.register('user', user_middleware)
 
         api.add_resource(

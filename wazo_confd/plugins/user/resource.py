@@ -12,8 +12,8 @@ from wazo_confd.helpers.restful import ListResource, ItemResource
 
 from .schema import (
     UserDirectorySchema,
-    UserSchema,
-    UserSchemaNullable,
+    UserItemSchema,
+    UserListItemSchema,
     UserSummarySchema,
 )
 
@@ -21,7 +21,7 @@ from .schema import (
 class UserList(ListResource):
 
     model = User
-    schema = UserSchemaNullable
+    schema = UserListItemSchema
     view_schemas = {'directory': UserDirectorySchema, 'summary': UserSummarySchema}
 
     def __init__(self, service, middleware):
@@ -35,7 +35,10 @@ class UserList(ListResource):
     def post(self):
         tenant = Tenant.autodetect()
         tenant_dao.find_or_create_tenant(tenant.uuid)
-        resource = self._middleware.create(request.get_json(), tenant.uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        resource = self._middleware.create(
+            request.get_json(), tenant.uuid, tenant_uuids
+        )
         return resource, 201, self.build_headers(resource)
 
     @required_acl('confd.users.read')
@@ -50,7 +53,7 @@ class UserList(ListResource):
 
 class UserItem(ItemResource):
 
-    schema = UserSchema
+    schema = UserItemSchema
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):

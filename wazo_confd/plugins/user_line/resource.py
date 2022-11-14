@@ -52,6 +52,10 @@ class UserLineItem(UserLineResource):
 
     has_tenant_uuid = True
 
+    def __init__(self, service, user_dao, line_dao, middleware):
+        super().__init__(service, user_dao, line_dao)
+        self._middleware = middleware
+
     @required_acl('confd.users.{user_id}.lines.{line_id}.delete')
     def delete(self, user_id, line_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
@@ -65,9 +69,6 @@ class UserLineItem(UserLineResource):
     @required_acl('confd.users.{user_id}.lines.{line_id}.update')
     def put(self, user_id, line_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.associate(user_id, line_id, tenant_uuids)
 
-        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
-        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-
-        self.service.associate(user, line)
         return '', 204
