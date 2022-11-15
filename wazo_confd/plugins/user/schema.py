@@ -111,7 +111,7 @@ class UserSchema(BaseSchema):
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
-    func_key_template_id = fields.Integer()
+    func_key_template_id = fields.Integer(allow_none=True)
 
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
