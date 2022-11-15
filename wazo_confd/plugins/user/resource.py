@@ -12,7 +12,7 @@ from wazo_confd.helpers.restful import ListResource, ItemResource
 
 from .schema import (
     UserDirectorySchema,
-    UserItemSchema,
+    UserSchema,
     UserListItemSchema,
     UserSummarySchema,
 )
@@ -53,7 +53,7 @@ class UserList(ListResource):
 
 class UserItem(ItemResource):
 
-    schema = UserItemSchema
+    schema = UserSchema
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):

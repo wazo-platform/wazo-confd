@@ -245,15 +245,6 @@ class UserSchemaNullable(UserSchema):
             field_obj.allow_none = True
 
 
-class UserItemSchema(UserSchema):
-    lines = Nested('LineSchema', many=True, dump_only=True)
-    incalls = Nested(
-        'UserIncallSchema',
-        many=True,
-        dump_only=True,
-    )
-
-
 class UserListItemSchema(UserSchemaNullable):
     auth = Nested('WazoAuthUserSchema')
     lines = Nested('LineSchema', many=True)
