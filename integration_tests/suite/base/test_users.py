@@ -27,7 +27,13 @@ from ..helpers import (
     scenarios as s,
     helpers as h,
 )
-from ..helpers.config import MAIN_TENANT, SUB_TENANT, gen_group_exten, CONTEXT, INCALL_CONTEXT
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+    gen_group_exten,
+    CONTEXT,
+    INCALL_CONTEXT,
+)
 
 FULL_USER = {
     "firstname": "Jôhn",
