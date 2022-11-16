@@ -47,37 +47,34 @@ class UserMiddleWare:
                     user_dict['id'], line['id'], tenant_uuids
                 )
                 user_dict['lines'].append(line)
-            Session.expire(model)
+            Session.expire(model, ['user_lines'])
 
-        if incalls:
-            for incall_body in incalls:
-                incall = self._middleware_handle.get('incall').create(
-                    {'destination': {'type': 'user', 'user_id': user_dict['id']}},
-                    tenant_uuid,
+        for incall_body in incalls:
+            incall = self._middleware_handle.get('incall').create(
+                {'destination': {'type': 'user', 'user_id': user_dict['id']}},
+                tenant_uuid,
+            )
+            incall_body['id'] = incall['id']
+            user_dict['incalls'].append(incall_body)
+
+            for extension in incall_body['extensions']:
+                did_extension_body = {
+                    'context': extension['context'],
+                    'exten': extension['exten'],
+                }
+                did_extension = self._middleware_handle.get('extension').create(
+                    did_extension_body, tenant_uuids
                 )
-                incall_body['id'] = incall['id']
-                user_dict['incalls'].append(incall_body)
+                extension['id'] = did_extension['id']
 
-                for extension in incall_body['extensions']:
-                    did_extension_body = {
-                        'context': extension['context'],
-                        'exten': extension['exten'],
-                    }
-                    did_extension = self._middleware_handle.get('extension').create(
-                        did_extension_body, tenant_uuids
-                    )
-                    extension['id'] = did_extension['id']
-
-                    self._middleware_handle.get(
-                        'incall_extension_association'
-                    ).associate(incall['id'], did_extension['id'], tenant_uuids)
-            Session.expire(model)
+                self._middleware_handle.get('incall_extension_association').associate(
+                    incall['id'], did_extension['id'], tenant_uuids
+                )
 
         if groups:
             self._middleware_handle.get('user_group_association').associate_all_groups(
                 {'groups': groups}, user_dict['uuid']
             )
-            Session.expire(model)
         user_dict['groups'] = groups
 
         for _switchboard in switchboards:
