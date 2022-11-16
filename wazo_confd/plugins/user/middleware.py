@@ -59,20 +59,18 @@ class UserMiddleWare:
                 user_dict['incalls'].append(incall_body)
 
                 for extension in incall_body['extensions']:
-                    # create extension (the "source/origin/public/external")
-                    source_extension_body = {
+                    did_extension_body = {
                         'context': extension['context'],
                         'exten': extension['exten'],
                     }
-                    source_extension = self._middleware_handle.get('extension').create(
-                        source_extension_body, tenant_uuids
+                    did_extension = self._middleware_handle.get('extension').create(
+                        did_extension_body, tenant_uuids
                     )
-                    extension['id'] = source_extension['id']
+                    extension['id'] = did_extension['id']
 
-                    # link incall+source extension
                     self._middleware_handle.get(
                         'incall_extension_association'
-                    ).associate(incall['id'], source_extension['id'], tenant_uuids)
+                    ).associate(incall['id'], did_extension['id'], tenant_uuids)
             Session.expire(model)
 
         if groups:
@@ -82,19 +80,18 @@ class UserMiddleWare:
             Session.expire(model)
         user_dict['groups'] = groups
 
-        if switchboards:
-            for _switchboard in switchboards:
-                # retrieve the switchboard to add the new user to its members
-                switchboard = switchboard_dao.get(
-                    _switchboard['uuid'], tenant_uuids=tenant_uuids
-                )
-                members = []
-                for user_member in switchboard.user_members:
-                    members.append({'uuid': user_member.user.uuid})
-                members.append({'uuid': user_dict['uuid']})
-                self._middleware_handle.get('switchboard_member').associate(
-                    {'users': members}, _switchboard['uuid'], tenant_uuids
-                )
+        for _switchboard in switchboards:
+            # retrieve the switchboard to add the new user to its members
+            switchboard = switchboard_dao.get(
+                _switchboard['uuid'], tenant_uuids=tenant_uuids
+            )
+            members = []
+            for user_member in switchboard.user_members:
+                members.append({'uuid': user_member.user.uuid})
+            members.append({'uuid': user_dict['uuid']})
+            self._middleware_handle.get('switchboard_member').associate(
+                {'users': members}, _switchboard['uuid'], tenant_uuids
+            )
         user_dict['switchboards'] = switchboards
 
         return user_dict

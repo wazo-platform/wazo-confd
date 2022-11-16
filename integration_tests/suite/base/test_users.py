@@ -910,9 +910,6 @@ def test_post_full_user_no_error(
     extension = {'context': CONTEXT, 'exten': exten}
     line = {
         'context': CONTEXT,
-        'position': 2,
-        'registrar': registrar['id'],
-        'provisioning_code': "887865",
         'extensions': [extension],
         'endpoint_sip': {
             'name': 'iddqd',
@@ -929,7 +926,6 @@ def test_post_full_user_no_error(
         },
     }
     incall = {
-        'id': 'the_id',
         'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
     }
     group = {
@@ -951,15 +947,15 @@ def test_post_full_user_no_error(
             'switchboards': [switchboard],
             **user,
         }
-    ).response
+    )
 
-    assert response.status_code == 201
-    payload = response.json()
+    response.assert_created('users')
+    payload = response.json
 
     try:
         # check the data returned when the user is created
         assert_that(
-            payload,
+            response.item,
             has_entries(
                 uuid=uuid_(),
                 lines=contains(

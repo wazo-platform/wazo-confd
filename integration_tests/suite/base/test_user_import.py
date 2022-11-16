@@ -107,11 +107,11 @@ def test_given_csv_has_all_fields_for_a_user_then_user_imported():
             "password": "secret",
         }
     ]
-    try:
-        response = client.post("/users/import", csv)
-        user_id = get_import_field(response, 'user_id')
-        user_uuid = get_import_field(response, 'user_uuid')
+    response = client.post("/users/import", csv)
+    user_id = get_import_field(response, 'user_id')
+    user_uuid = get_import_field(response, 'user_uuid')
 
+    try:
         user = confd.users(user_id).get().item
         assert_that(
             user,
