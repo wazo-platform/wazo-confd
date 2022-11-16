@@ -935,117 +935,124 @@ def test_post_full_user_no_error(
         'uuid': switchboard['uuid'],
     }
 
-    confd.groups(group['uuid']).extensions(group_extension['id']).put()
-
-    response = confd.users.post(
-        {
-            'auth': auth,
-            'lines': [line],
-            'incalls': [incall],
-            'groups': [group],
-            'func_key_template_id': funckey_template['id'],
-            'switchboards': [switchboard],
-            **user,
-        }
-    )
-
-    response.assert_created('users')
-    payload = response.json
-
-    try:
-        # check the data returned when the user is created
-        assert_that(
-            response.item,
-            has_entries(
-                uuid=uuid_(),
-                lines=contains(
-                    has_entries(
-                        id=greater_than(0),
-                        endpoint_sip=has_entries(uuid=uuid_()),
-                        extensions=contains(has_entries(id=greater_than(0))),
-                    )
-                ),
-                incalls=contains(
-                    has_entries(
-                        id=greater_than(0),
-                        extensions=contains(
-                            has_entries(
-                                id=greater_than(0),
-                                context=INCALL_CONTEXT,
-                                exten=source_exten,
-                            )
-                        ),
-                    )
-                ),
-                groups=contains(
-                    has_entries(uuid=group['uuid']),
-                ),
-                func_key_template_id=funckey_template['id'],
-                switchboards=contains(
-                    has_entries(uuid=switchboard['uuid']),
-                ),
+    with a.group_extension(group, group_extension):
+        response = confd.users.post(
+            {
+                'auth': auth,
+                'lines': [line],
+                'incalls': [incall],
+                'groups': [group],
+                'func_key_template_id': funckey_template['id'],
+                'switchboards': [switchboard],
                 **user,
-            ),
+            }
         )
 
-        # retrieve the user (created before) and check their lines and incalls
-        assert_that(
-            confd.users(payload['uuid']).get().item,
-            has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
-            has_entries(incalls=contains(has_entries(id=payload['incalls'][0]['id']))),
-        )
-        # retrieve the user (created before) and check their groups and switchboards
-        assert_that(
-            confd.users(payload['uuid']).get().item,
-            has_entries(
-                groups=contains(has_entries(uuid=payload['groups'][0]['uuid']))
-            ),
-            has_entries(
-                switchboards=contains(
-                    has_entries(uuid=payload['switchboards'][0]['uuid'])
-                )
-            ),
-        )
-        # retrieve the line (created before) and check its data are correct
-        assert_that(
-            confd.lines(payload['lines'][0]['id']).get().item,
-            has_entries(
-                extensions=contains(has_entries(**extension)),
-                endpoint_sip=has_entries(name='iddqd'),
-            ),
-        )
-        # retrieve the incall (created before) and check its data are correct
-        assert_that(
-            confd.incalls(payload['incalls'][0]['id']).get().item,
-            has_entries(destination=has_entries(type="user", user_id=payload['id'])),
-        )
-        # retrieve the group and check the user is a member
-        assert_that(
-            confd.groups(payload['groups'][0]['uuid']).get().item,
-            has_entries(
-                members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
-            ),
-        )
-        # retrieve the switchboard and check the user is a member
-        assert_that(
-            confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
-            has_entries(
-                members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
-            ),
-        )
-        # retrieve the user (created before) and check their func keys template
-        assert_that(
-            confd.users(payload['func_key_template_id']).get().item,
-            has_entries(func_key_template_id=payload['func_key_template_id']),
-        )
-        # retrieve the user and try to update the user with the same data
-        user = confd.users(payload['uuid']).get().item
-        user.pop('call_record_enabled', None)  # Deprecated field
-        confd.users(payload['uuid']).put(**user).assert_updated()
-    finally:
-        confd.users(payload['uuid']).delete().assert_deleted()
-        confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
-        confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
-        confd.extensions(
-            payload['lines'][0]['extensions'][0]['id']
-        ).delete().assert_deleted()
+        response.assert_created('users')
+        payload = response.json
+
+        try:
+            # check the data returned when the user is created
+            assert_that(
+                response.item,
+                has_entries(
+                    uuid=uuid_(),
+                    lines=contains(
+                        has_entries(
+                            id=greater_than(0),
+                            endpoint_sip=has_entries(uuid=uuid_()),
+                            extensions=contains(has_entries(id=greater_than(0))),
+                        )
+                    ),
+                    incalls=contains(
+                        has_entries(
+                            id=greater_than(0),
+                            extensions=contains(
+                                has_entries(
+                                    id=greater_than(0),
+                                    context=INCALL_CONTEXT,
+                                    exten=source_exten,
+                                )
+                            ),
+                        )
+                    ),
+                    groups=contains(
+                        has_entries(uuid=group['uuid']),
+                    ),
+                    func_key_template_id=funckey_template['id'],
+                    switchboards=contains(
+                        has_entries(uuid=switchboard['uuid']),
+                    ),
+                    **user,
+                ),
+            )
+
+            # retrieve the user (created before) and check their lines and incalls
+            assert_that(
+                confd.users(payload['uuid']).get().item,
+                has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
+                has_entries(
+                    incalls=contains(has_entries(id=payload['incalls'][0]['id']))
+                ),
+            )
+            # retrieve the user (created before) and check their groups and switchboards
+            assert_that(
+                confd.users(payload['uuid']).get().item,
+                has_entries(
+                    groups=contains(has_entries(uuid=payload['groups'][0]['uuid']))
+                ),
+                has_entries(
+                    switchboards=contains(
+                        has_entries(uuid=payload['switchboards'][0]['uuid'])
+                    )
+                ),
+            )
+            # retrieve the line (created before) and check its data are correct
+            assert_that(
+                confd.lines(payload['lines'][0]['id']).get().item,
+                has_entries(
+                    extensions=contains(has_entries(**extension)),
+                    endpoint_sip=has_entries(name='iddqd'),
+                ),
+            )
+            # retrieve the incall (created before) and check its data are correct
+            assert_that(
+                confd.incalls(payload['incalls'][0]['id']).get().item,
+                has_entries(
+                    destination=has_entries(type="user", user_id=payload['id'])
+                ),
+            )
+            # retrieve the group and check the user is a member
+            assert_that(
+                confd.groups(payload['groups'][0]['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
+                ),
+            )
+            # retrieve the switchboard and check the user is a member
+            assert_that(
+                confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
+                ),
+            )
+            # retrieve the user (created before) and check their func keys template
+            assert_that(
+                confd.users(payload['func_key_template_id']).get().item,
+                has_entries(func_key_template_id=payload['func_key_template_id']),
+            )
+            # retrieve the user and try to update the user with the same data
+            user = confd.users(payload['uuid']).get().item
+            user.pop('call_record_enabled', None)  # Deprecated field
+            confd.users(payload['uuid']).put(**user).assert_updated()
+        finally:
+            confd.users(payload['uuid']).delete().assert_deleted()
+            confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+            confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
+            confd.extensions(
+                payload['lines'][0]['extensions'][0]['id']
+            ).delete().assert_deleted()
