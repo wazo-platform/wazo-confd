@@ -987,24 +987,16 @@ def test_post_full_user_no_error(
                 ),
             )
 
-            # retrieve the user (created before) and check their lines and incalls
-            assert_that(
-                confd.users(payload['uuid']).get().item,
-                has_entries(lines=contains(has_entries(id=payload['lines'][0]['id']))),
-                has_entries(
-                    incalls=contains(has_entries(id=payload['incalls'][0]['id']))
-                ),
-            )
-            # retrieve the user (created before) and check their groups and switchboards
+            # retrieve the user (created before) and check their fields
             assert_that(
                 confd.users(payload['uuid']).get().item,
                 has_entries(
-                    groups=contains(has_entries(uuid=payload['groups'][0]['uuid']))
-                ),
-                has_entries(
+                    lines=contains(has_entries(id=payload['lines'][0]['id'])),
+                    incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
+                    groups=contains(has_entries(uuid=payload['groups'][0]['uuid'])),
                     switchboards=contains(
                         has_entries(uuid=payload['switchboards'][0]['uuid'])
-                    )
+                    ),
                 ),
             )
             # retrieve the line (created before) and check its data are correct

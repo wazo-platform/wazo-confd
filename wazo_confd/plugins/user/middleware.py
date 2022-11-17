@@ -33,11 +33,6 @@ class UserMiddleWare:
         user_dict['groups'] = []
         user_dict['switchboards'] = []
 
-        if auth:
-            auth['uuid'] = user_dict['uuid']
-            auth['tenant_uuid'] = user_dict['tenant_uuid']
-            user_dict['auth'] = self._wazo_user_service.create(auth)
-
         if lines:
             for line_body in lines:
                 line = self._middleware_handle.get('line').create(
@@ -90,6 +85,11 @@ class UserMiddleWare:
                 {'users': members}, _switchboard['uuid'], tenant_uuids
             )
         user_dict['switchboards'] = switchboards
+
+        if auth:
+            auth['uuid'] = user_dict['uuid']
+            auth['tenant_uuid'] = user_dict['tenant_uuid']
+            user_dict['auth'] = self._wazo_user_service.create(auth)
 
         return user_dict
 
