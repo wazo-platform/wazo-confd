@@ -13,12 +13,12 @@ itsdangerous==0.24  # from flask
 jinja2==2.10  # from flask
 kombu==4.6.11
 markupsafe==1.1.0 # from flask
-marshmallow==3.10.0
+marshmallow==3.19.0
 netifaces==0.10.4
 psycopg2==2.7.7  # from xivo-dao
 python-consul==0.7.1
 pytz==2019.1
-pyyaml==3.13
+pyyaml==6.0
 requests==2.21.0
 sqlalchemy==1.2.18  # from xivo-dao
 stevedore==1.29.0
