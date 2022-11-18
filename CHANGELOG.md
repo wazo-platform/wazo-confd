@@ -1,5 +1,9 @@
 # Changelog
 
+## 22.16
+
+* POST on `/users` can now create a user and all their related resources.
+
 ## 22.15
 
 * PUT on `/users/<user_id>/groups` now accepts the group `uuid` as well as the group `id` in its body
