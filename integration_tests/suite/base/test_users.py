@@ -861,8 +861,6 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
-@fixtures.transport()
-@fixtures.sip_template()
 @fixtures.registrar()
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
@@ -871,8 +869,6 @@ def test_bus_events(user):
 )
 @fixtures.switchboard()
 def test_post_full_user_no_error(
-    transport,
-    template,
     registrar,
     group_extension,
     group,
@@ -911,19 +907,7 @@ def test_post_full_user_no_error(
     line = {
         'context': CONTEXT,
         'extensions': [extension],
-        'endpoint_sip': {
-            'name': 'iddqd',
-            'label': 'Richard\'s line',
-            'auth_section_options': [
-                ['username', 'iddqd'],
-                ['password', 'secret'],
-            ],
-            'endpoint_section_options': [
-                ['callerid', f'"Rîchard Lâpointe" <{exten}>'],
-            ],
-            'transport': transport,
-            'templates': [template],
-        },
+        'endpoint_sip': {'name': 'iddqd'},
     }
     incall = {
         'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
@@ -949,12 +933,12 @@ def test_post_full_user_no_error(
         )
 
         response.assert_created('users')
-        payload = response.json
+        payload = response.item
 
         try:
             # check the data returned when the user is created
             assert_that(
-                response.item,
+                payload,
                 has_entries(
                     uuid=uuid_(),
                     lines=contains(
