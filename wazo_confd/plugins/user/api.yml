@@ -677,12 +677,12 @@ definitions:
         type: array
         items:
           type: string
-          name: group_uuid
+          description: A comma separated list of groups UUIDs
       switchboards:
         type: array
         items:
           type: string
-          name: switchboard_uuid
+          description: A comma separated list of switchboards UUIDs
       auth:
         type: object
         properties:
