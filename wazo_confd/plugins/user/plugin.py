@@ -5,7 +5,7 @@ from wazo_provd_client import Client as ProvdClient
 
 from .middleware import UserMiddleWare
 from .resource import UserItem, UserList
-from .resource_sub import (
+from .sub_resources.resource import (
     UserForwardBusy,
     UserForwardList,
     UserForwardNoAnswer,

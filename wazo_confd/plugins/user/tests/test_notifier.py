@@ -17,7 +17,7 @@ from xivo_bus.resources.user.event import (
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from ..notifier import UserNotifier, UserServiceNotifier, UserForwardNotifier
-from ..resource_sub import (
+from ..sub_resources.schema import (
     ServiceDNDSchema,
     ServiceIncallFilterSchema,
     ForwardBusySchema,
