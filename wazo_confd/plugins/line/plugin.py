@@ -27,7 +27,7 @@ class Plugin:
             LineItem,
             '/lines/<int:id>',
             endpoint='lines',
-            resource_class_args=(service,),
+            resource_class_args=(service, line_middleware),
         )
         api.add_resource(
             LineList,

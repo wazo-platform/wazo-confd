@@ -19,3 +19,7 @@ class IncallMiddleWare:
         model = Incall(**form)
         model = self._service.create(model)
         return self._schema.dump(model)
+
+    def delete(self, incall_id, tenant_uuids):
+        model = self._service.get(incall_id, tenant_uuids=tenant_uuids)
+        self._service.delete(model)

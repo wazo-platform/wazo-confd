@@ -1032,3 +1032,146 @@ def test_post_full_user_no_error(
             confd.extensions(
                 payload['lines'][0]['extensions'][0]['id']
             ).delete().assert_deleted()
+
+
+@fixtures.transport()
+@fixtures.sip_template()
+@fixtures.registrar()
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_delete_full_user_no_error(
+    transport,
+    template,
+    registrar,
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    exten = h.extension.find_available_exten(CONTEXT)
+    source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
+    user = {
+        "subscription_type": 2,
+        "firstname": "Rîchard",
+        "lastname": "Lâpointe",
+        "email": "richard@lapointe.org",
+        "language": "fr_FR",
+        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
+        "mobile_phone_number": "4181234567",
+        "supervision_enabled": True,
+        "call_transfer_enabled": False,
+        "dtmf_hangup_enabled": True,
+        "call_record_outgoing_external_enabled": True,
+        "call_record_outgoing_internal_enabled": True,
+        "call_record_incoming_internal_enabled": True,
+        "call_record_incoming_external_enabled": True,
+        "online_call_record_enabled": False,
+        "simultaneous_calls": 5,
+        "ring_seconds": 30,
+        "userfield": "userfield",
+        "call_permission_password": "1234",
+        "enabled": True,
+    }
+    auth = {
+        "username": "richardlapointe",
+        "password": "secret",
+    }
+    extension = {'context': CONTEXT, 'exten': exten}
+    line = {
+        'context': CONTEXT,
+        'position': 2,
+        'registrar': registrar['id'],
+        'provisioning_code': "887865",
+        'extensions': [extension],
+        'endpoint_sip': {
+            'name': 'iddqd',
+            'label': 'Richard\'s line',
+            'auth_section_options': [
+                ['username', 'iddqd'],
+                ['password', 'secret'],
+            ],
+            'endpoint_section_options': [
+                ['callerid', f'"Rîchard Lâpointe" <{exten}>'],
+            ],
+            'transport': transport,
+            'templates': [template],
+        },
+    }
+    incall = {
+        'id': 'the_id',
+        'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
+    }
+    group = {
+        'uuid': group['uuid'],
+    }
+    switchboard = {
+        'uuid': switchboard['uuid'],
+    }
+
+    confd.groups(group['uuid']).extensions(group_extension['id']).put()
+
+    response = confd.users.post(
+        {
+            'auth': auth,
+            'lines': [line],
+            'incalls': [incall],
+            'groups': [group],
+            'func_key_template_id': funckey_template['id'],
+            'switchboards': [switchboard],
+            **user,
+        }
+    ).response
+
+    assert response.status_code == 201
+    payload = response.json()
+
+    try:
+        #user deletion
+        url = confd.users(payload['uuid'])
+
+        response = url.delete(recursive=True)
+        assert response.response.status_code == 204
+
+        #verify that user is deleted
+        response = url.get()
+        assert response.response.status_code == 404
+
+        # verify that line is deleted
+        url = confd.lines(payload['lines'][0]['id'])
+        response = url.get()
+        assert response.response.status_code == 404
+
+        # verify that incall is deleted
+        url = confd.incalls(payload['incalls'][0]['id'])
+        response = url.get()
+        assert response.response.status_code == 404
+
+        # verify that extension is deleted
+        url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
+        response = url.get()
+        assert response.response.status_code == 404
+
+        # verify that the switchboard is not deleted
+        url = confd.switchboards(payload['switchboards'][0]['uuid'])
+        response = url.get()
+        assert response.response.status_code == 200
+
+        # verify that the group is not deleted
+        url = confd.groups(payload['groups'][0]['uuid'])
+        response = url.get()
+        assert response.response.status_code == 200
+
+
+
+    finally:
+        # confd.users(payload['uuid']).delete().assert_deleted()
+        # confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+        # confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
+        # confd.extensions(
+        #     payload['lines'][0]['extensions'][0]['id']
+        # ).delete().assert_deleted()
+        pass

@@ -109,6 +109,10 @@ class SipItem(_BaseSipItem):
         'merged': MergedEndpointSIPSchema,
     }
 
+    def __init__(self, service, dao, transport_dao, middleware):
+        super().__init__(service, dao, transport_dao)
+        self._middleware = middleware
+
     @required_acl('confd.endpoints.sip.{uuid}.read')
     def get(self, uuid):
         view = GETQueryStringSchema().load(request.args)['view']
@@ -123,7 +127,9 @@ class SipItem(_BaseSipItem):
 
     @required_acl('confd.endpoints.sip.{uuid}.delete')
     def delete(self, uuid):
-        return super().delete(uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.delete(uuid, tenant_uuids)
+        return '', 204
 
 
 class SipTemplateList(_BaseSipList):

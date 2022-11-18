@@ -26,7 +26,7 @@ class Plugin:
             ExtensionItem,
             '/extensions/<int:id>',
             endpoint='extensions',
-            resource_class_args=(service,),
+            resource_class_args=(service, extension_middleware),
         )
         api.add_resource(
             ExtensionList,

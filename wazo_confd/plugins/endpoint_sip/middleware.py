@@ -43,6 +43,10 @@ class BaseSIPMiddleWare:
         model = self._service.create(model)
         return self._Schema().dump(model)
 
+    def delete(self, endpoint_id, tenant_uuids):
+        model = self._service.get(endpoint_id, tenant_uuids=tenant_uuids)
+        self._service.delete(model)
+
 
 class EndpointSIPMiddleWare(BaseSIPMiddleWare):
     _Schema = EndpointSIPSchema

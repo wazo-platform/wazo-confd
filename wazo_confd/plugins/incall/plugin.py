@@ -27,5 +27,8 @@ class Plugin:
             IncallItem,
             '/incalls/<int:id>',
             endpoint='incalls',
-            resource_class_args=(service,),
+            resource_class_args=(
+                service,
+                incall_middleware,
+            ),
         )

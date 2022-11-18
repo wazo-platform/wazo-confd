@@ -13,3 +13,13 @@ class UserLineAssociationMiddleWare:
         user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         line = line_dao.get(line_id, tenant_uuids=tenant_uuids)
         self._service.associate(user, line)
+
+    def dissociate(self, user_id, line_id, tenant_uuids):
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        line = line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        self._service.dissociate(user, line)
+
+    def dissociate_all_lines(self, user_id, tenant_uuids):
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        for line in user.lines:
+            self._service.dissociate(user, line)

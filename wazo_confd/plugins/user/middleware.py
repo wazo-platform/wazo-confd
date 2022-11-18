@@ -93,6 +93,42 @@ class UserMiddleWare:
 
         return user_dict
 
-    def delete(self, user_id, tenant_uuids):
+    def delete(self, user_id, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
-        self._service.delete(user)
+        if not recursive:
+            self._service.delete(user)
+        else:
+            for line in user.lines:
+                self._middleware_handle.get('user_line_association').dissociate(
+                    user.uuid, line.id, tenant_uuids
+                )
+                self._middleware_handle.get('line').delete(
+                    line.id, tenant_uuids, recursive=True
+                )
+
+            for incall in user.incalls:
+                for extension in incall.extensions:
+                    self._middleware_handle.get(
+                        'incall_extension_association'
+                    ).dissociate(incall.id, extension.id, tenant_uuids)
+                    self._middleware_handle.get('extension').delete(
+                        extension.id, tenant_uuids
+                    )
+                self._middleware_handle.get('incall').delete(incall.id, tenant_uuids)
+
+            # dissociation
+            self._middleware_handle.get('user_group_association').associate_all_groups(
+                {'groups': []}, user.uuid
+            )
+
+            members = []
+            for switchboard in user.switchboards:
+                for user_member in switchboard.user_members:
+                    if user_member.uuid != user.uuid:
+                        members.append({'uuid': user_member.uuid})
+                self._middleware_handle.get('switchboard_member').associate(
+                    {'users': members}, switchboard.uuid, tenant_uuids
+                )
+
+            self._service.delete(user)
+
