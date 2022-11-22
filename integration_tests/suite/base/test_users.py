@@ -1036,7 +1036,6 @@ def test_post_full_user_no_error(
 
 @fixtures.transport()
 @fixtures.sip_template()
-@fixtures.registrar()
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 @fixtures.funckey_template(
@@ -1046,7 +1045,6 @@ def test_post_full_user_no_error(
 def test_delete_full_user_no_error(
     transport,
     template,
-    registrar,
     group_extension,
     group,
     funckey_template,
@@ -1083,9 +1081,6 @@ def test_delete_full_user_no_error(
     extension = {'context': CONTEXT, 'exten': exten}
     line = {
         'context': CONTEXT,
-        'position': 2,
-        'registrar': registrar['id'],
-        'provisioning_code': "887865",
         'extensions': [extension],
         'endpoint_sip': {
             'name': 'iddqd',
@@ -1102,7 +1097,6 @@ def test_delete_full_user_no_error(
         },
     }
     incall = {
-        'id': 'the_id',
         'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
     }
     group = {
@@ -1112,66 +1106,53 @@ def test_delete_full_user_no_error(
         'uuid': switchboard['uuid'],
     }
 
-    confd.groups(group['uuid']).extensions(group_extension['id']).put()
+    with a.group_extension(group, group_extension):
 
-    response = confd.users.post(
-        {
-            'auth': auth,
-            'lines': [line],
-            'incalls': [incall],
-            'groups': [group],
-            'func_key_template_id': funckey_template['id'],
-            'switchboards': [switchboard],
-            **user,
-        }
-    ).response
+        response = confd.users.post(
+            {
+                'auth': auth,
+                'lines': [line],
+                'incalls': [incall],
+                'groups': [group],
+                'func_key_template_id': funckey_template['id'],
+                'switchboards': [switchboard],
+                **user,
+            }
+        )
 
-    assert response.status_code == 201
-    payload = response.json()
+        payload = response.json
 
-    try:
-        #user deletion
+        # user deletion
         url = confd.users(payload['uuid'])
 
         response = url.delete(recursive=True)
-        assert response.response.status_code == 204
+        response.assert_deleted()
 
-        #verify that user is deleted
+        # verify that user is deleted
         response = url.get()
-        assert response.response.status_code == 404
+        response.assert_status(404)
 
         # verify that line is deleted
         url = confd.lines(payload['lines'][0]['id'])
         response = url.get()
-        assert response.response.status_code == 404
+        response.assert_status(404)
 
         # verify that incall is deleted
         url = confd.incalls(payload['incalls'][0]['id'])
         response = url.get()
-        assert response.response.status_code == 404
+        response.assert_status(404)
 
         # verify that extension is deleted
         url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
         response = url.get()
-        assert response.response.status_code == 404
+        response.assert_status(404)
 
         # verify that the switchboard is not deleted
         url = confd.switchboards(payload['switchboards'][0]['uuid'])
         response = url.get()
-        assert response.response.status_code == 200
+        response.assert_ok()
 
         # verify that the group is not deleted
         url = confd.groups(payload['groups'][0]['uuid'])
         response = url.get()
-        assert response.response.status_code == 200
-
-
-
-    finally:
-        # confd.users(payload['uuid']).delete().assert_deleted()
-        # confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
-        # confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
-        # confd.extensions(
-        #     payload['lines'][0]['extensions'][0]['id']
-        # ).delete().assert_deleted()
-        pass
+        response.assert_ok()

@@ -98,6 +98,11 @@ class UserMiddleWare:
         if not recursive:
             self._service.delete(user)
         else:
+            # dissociation
+            self._middleware_handle.get('user_group_association').associate_all_groups(
+                {'groups': []}, user.uuid
+            )
+
             for line in user.lines:
                 self._middleware_handle.get('user_line_association').dissociate(
                     user.uuid, line.id, tenant_uuids
@@ -105,6 +110,7 @@ class UserMiddleWare:
                 self._middleware_handle.get('line').delete(
                     line.id, tenant_uuids, recursive=True
                 )
+                Session.expire(user, ['user_lines'])
 
             for incall in user.incalls:
                 for extension in incall.extensions:
@@ -116,19 +122,14 @@ class UserMiddleWare:
                     )
                 self._middleware_handle.get('incall').delete(incall.id, tenant_uuids)
 
-            # dissociation
-            self._middleware_handle.get('user_group_association').associate_all_groups(
-                {'groups': []}, user.uuid
-            )
-
-            members = []
             for switchboard in user.switchboards:
+                members = []
                 for user_member in switchboard.user_members:
                     if user_member.uuid != user.uuid:
                         members.append({'uuid': user_member.uuid})
                 self._middleware_handle.get('switchboard_member').associate(
                     {'users': members}, switchboard.uuid, tenant_uuids
                 )
+            Session.expire(user, ['switchboard_member_users'])
 
             self._service.delete(user)
-
