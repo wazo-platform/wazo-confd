@@ -96,6 +96,11 @@ NULL_USER = {
     "simultaneous_calls": 5,
 }
 
+AUTH_USER = {
+    "username": "john",
+    "password": "secret",
+}
+
 
 def test_search_errors():
     url = confd.users.get
@@ -879,10 +884,7 @@ def test_post_full_user_no_error(
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
     user = FULL_USER
-    auth = {
-        "username": "john",
-        "password": "secret",
-    }
+    auth = AUTH_USER
     extension = {'context': CONTEXT, 'exten': exten}
     line = {
         'context': CONTEXT,
@@ -1042,10 +1044,7 @@ def test_delete_full_user_no_error(
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
     user = FULL_USER
-    auth = {
-        "username": "john",
-        "password": "secret",
-    }
+    auth = AUTH_USER
     extension = {'context': CONTEXT, 'exten': exten}
     line = {
         'context': CONTEXT,
