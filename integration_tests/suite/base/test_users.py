@@ -8,6 +8,7 @@ from hamcrest import (
     contains_inanyorder,
     empty,
     equal_to,
+    greater_than,
     has_entries,
     has_entry,
     has_item,
@@ -16,6 +17,7 @@ from hamcrest import (
     none,
     not_,
 )
+from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
 from . import confd
 from ..helpers import (
@@ -23,8 +25,15 @@ from ..helpers import (
     errors as e,
     fixtures,
     scenarios as s,
+    helpers as h,
 )
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import (
+    MAIN_TENANT,
+    SUB_TENANT,
+    gen_group_exten,
+    CONTEXT,
+    INCALL_CONTEXT,
+)
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -850,3 +859,176 @@ def test_bus_events(user):
     yield s.check_event, 'user_created', headers, confd.users.post, body
     yield s.check_event, 'user_edited', headers, url.put
     yield s.check_event, 'user_deleted', headers, url.delete
+
+
+@fixtures.registrar()
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_post_full_user_no_error(
+    registrar,
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    exten = h.extension.find_available_exten(CONTEXT)
+    source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
+    user = {
+        "subscription_type": 2,
+        "firstname": "Rîchard",
+        "lastname": "Lâpointe",
+        "email": "richard@lapointe.org",
+        "language": "fr_FR",
+        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
+        "mobile_phone_number": "4181234567",
+        "supervision_enabled": True,
+        "call_transfer_enabled": False,
+        "dtmf_hangup_enabled": True,
+        "call_record_outgoing_external_enabled": True,
+        "call_record_outgoing_internal_enabled": True,
+        "call_record_incoming_internal_enabled": True,
+        "call_record_incoming_external_enabled": True,
+        "online_call_record_enabled": False,
+        "simultaneous_calls": 5,
+        "ring_seconds": 30,
+        "userfield": "userfield",
+        "call_permission_password": "1234",
+        "enabled": True,
+    }
+    auth = {
+        "username": "richardlapointe",
+        "password": "secret",
+    }
+    extension = {'context': CONTEXT, 'exten': exten}
+    line = {
+        'context': CONTEXT,
+        'extensions': [extension],
+        'endpoint_sip': {'name': 'iddqd'},
+    }
+    incall = {
+        'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
+    }
+    group = {
+        'uuid': group['uuid'],
+    }
+    switchboard = {
+        'uuid': switchboard['uuid'],
+    }
+
+    with a.group_extension(group, group_extension):
+        response = confd.users.post(
+            {
+                'auth': auth,
+                'lines': [line],
+                'incalls': [incall],
+                'groups': [group],
+                'func_key_template_id': funckey_template['id'],
+                'switchboards': [switchboard],
+                **user,
+            }
+        )
+
+        response.assert_created('users')
+        payload = response.item
+
+        try:
+            # check the data returned when the user is created
+            assert_that(
+                payload,
+                has_entries(
+                    uuid=uuid_(),
+                    lines=contains(
+                        has_entries(
+                            id=greater_than(0),
+                            endpoint_sip=has_entries(uuid=uuid_()),
+                            extensions=contains(has_entries(id=greater_than(0))),
+                        )
+                    ),
+                    incalls=contains(
+                        has_entries(
+                            id=greater_than(0),
+                            extensions=contains(
+                                has_entries(
+                                    id=greater_than(0),
+                                    context=INCALL_CONTEXT,
+                                    exten=source_exten,
+                                )
+                            ),
+                        )
+                    ),
+                    groups=contains(
+                        has_entries(uuid=group['uuid']),
+                    ),
+                    func_key_template_id=funckey_template['id'],
+                    switchboards=contains(
+                        has_entries(uuid=switchboard['uuid']),
+                    ),
+                    **user,
+                ),
+            )
+
+            # retrieve the user (created before) and check their fields
+            assert_that(
+                confd.users(payload['uuid']).get().item,
+                has_entries(
+                    lines=contains(has_entries(id=payload['lines'][0]['id'])),
+                    incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
+                    groups=contains(has_entries(uuid=payload['groups'][0]['uuid'])),
+                    switchboards=contains(
+                        has_entries(uuid=payload['switchboards'][0]['uuid'])
+                    ),
+                ),
+            )
+            # retrieve the line (created before) and check its data are correct
+            assert_that(
+                confd.lines(payload['lines'][0]['id']).get().item,
+                has_entries(
+                    extensions=contains(has_entries(**extension)),
+                    endpoint_sip=has_entries(name='iddqd'),
+                ),
+            )
+            # retrieve the incall (created before) and check its data are correct
+            assert_that(
+                confd.incalls(payload['incalls'][0]['id']).get().item,
+                has_entries(
+                    destination=has_entries(type="user", user_id=payload['id'])
+                ),
+            )
+            # retrieve the group and check the user is a member
+            assert_that(
+                confd.groups(payload['groups'][0]['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
+                ),
+            )
+            # retrieve the switchboard and check the user is a member
+            assert_that(
+                confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
+                ),
+            )
+            # retrieve the user (created before) and check their func keys template
+            assert_that(
+                confd.users(payload['func_key_template_id']).get().item,
+                has_entries(func_key_template_id=payload['func_key_template_id']),
+            )
+            # retrieve the user and try to update the user with the same data
+            user = confd.users(payload['uuid']).get().item
+            user.pop('call_record_enabled', None)  # Deprecated field
+            confd.users(payload['uuid']).put(**user).assert_updated()
+        finally:
+            confd.users(payload['uuid']).delete().assert_deleted()
+            confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+            confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
+            confd.extensions(
+                payload['lines'][0]['extensions'][0]['id']
+            ).delete().assert_deleted()

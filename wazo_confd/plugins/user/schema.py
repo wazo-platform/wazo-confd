@@ -3,7 +3,7 @@
 
 from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import Length, Range, Regexp
+from marshmallow.validate import Length, Range, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
@@ -13,6 +13,19 @@ CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
 USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
 PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
 CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
+
+
+class WazoAuthUserSchema(BaseSchema):
+    uuid = fields.UUID(dump_only=True)
+    username = fields.String(
+        validate=Length(min=1, max=256), missing=None, allow_none=True
+    )
+    password = fields.String(validate=Length(min=1), allow_none=True)
+    firstname = fields.String(missing=None, allow_none=True)
+    lastname = fields.String(missing=None, allow_none=True)
+    purpose = fields.Constant('user')
+    enabled = fields.Boolean(missing=True)
+    email_address = fields.Email(allow_none=True)
 
 
 class UserSchema(BaseSchema):
@@ -98,6 +111,7 @@ class UserSchema(BaseSchema):
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
+    func_key_template_id = fields.Integer(allow_none=True)
 
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
@@ -229,3 +243,44 @@ class UserSchemaNullable(UserSchema):
         ]
         if field_name in nullable_fields:
             field_obj.allow_none = True
+
+
+class UserListItemSchema(UserSchemaNullable):
+    auth = Nested('WazoAuthUserSchema')
+    lines = Nested('LineSchema', many=True)
+    incalls = Nested('UserIncallSchema', many=True)
+    groups = Nested('UserGroupSchema', many=True)
+    switchboards = Nested('UserSwitchboardSchema', many=True)
+
+
+class UserIncallSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
+    greeting_sound = fields.String(validate=Length(max=255), allow_none=True)
+    caller_id_mode = fields.String(
+        validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True
+    )
+    caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
+    description = fields.String(allow_none=True)
+    extensions = Nested(
+        'UserExtensionSchema',
+        many=True,
+    )
+    links = ListLink(Link('incalls'))
+
+
+class UserExtensionSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    exten = fields.String(validate=Length(max=40), required=True)
+    context = fields.String(required=True)
+    links = ListLink(Link('extensions'))
+
+
+class UserGroupSchema(BaseSchema):
+    uuid = fields.String(validate=Length(max=40), required=True)
+    links = ListLink(Link('groups'))
+
+
+class UserSwitchboardSchema(BaseSchema):
+    uuid = fields.String(validate=Length(max=40), required=True)
+    links = ListLink(Link('switchboards'))

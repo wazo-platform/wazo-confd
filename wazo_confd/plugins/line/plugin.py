@@ -21,6 +21,7 @@ class Plugin:
         service = build_service(provd_client)
 
         line_middleware = LineMiddleWare(service, middleware_handle)
+        middleware_handle.register('line', line_middleware)
 
         api.add_resource(
             LineItem,
