@@ -864,7 +864,6 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
-@fixtures.registrar()
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 @fixtures.funckey_template(
@@ -872,7 +871,6 @@ def test_bus_events(user):
 )
 @fixtures.switchboard()
 def test_post_full_user_no_error(
-    registrar,
     group_extension,
     group,
     funckey_template,
@@ -880,30 +878,9 @@ def test_post_full_user_no_error(
 ):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
-    user = {
-        "subscription_type": 2,
-        "firstname": "Rîchard",
-        "lastname": "Lâpointe",
-        "email": "richard@lapointe.org",
-        "language": "fr_FR",
-        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
-        "mobile_phone_number": "4181234567",
-        "supervision_enabled": True,
-        "call_transfer_enabled": False,
-        "dtmf_hangup_enabled": True,
-        "call_record_outgoing_external_enabled": True,
-        "call_record_outgoing_internal_enabled": True,
-        "call_record_incoming_internal_enabled": True,
-        "call_record_incoming_external_enabled": True,
-        "online_call_record_enabled": False,
-        "simultaneous_calls": 5,
-        "ring_seconds": 30,
-        "userfield": "userfield",
-        "call_permission_password": "1234",
-        "enabled": True,
-    }
+    user = FULL_USER
     auth = {
-        "username": "richardlapointe",
+        "username": "john",
         "password": "secret",
     }
     extension = {'context': CONTEXT, 'exten': exten}
@@ -1064,30 +1041,9 @@ def test_delete_full_user_no_error(
 ):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
-    user = {
-        "subscription_type": 2,
-        "firstname": "Rîchard",
-        "lastname": "Lâpointe",
-        "email": "richard@lapointe.org",
-        "language": "fr_FR",
-        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
-        "mobile_phone_number": "4181234567",
-        "supervision_enabled": True,
-        "call_transfer_enabled": False,
-        "dtmf_hangup_enabled": True,
-        "call_record_outgoing_external_enabled": True,
-        "call_record_outgoing_internal_enabled": True,
-        "call_record_incoming_internal_enabled": True,
-        "call_record_incoming_external_enabled": True,
-        "online_call_record_enabled": False,
-        "simultaneous_calls": 5,
-        "ring_seconds": 30,
-        "userfield": "userfield",
-        "call_permission_password": "1234",
-        "enabled": True,
-    }
+    user = FULL_USER
     auth = {
-        "username": "richardlapointe",
+        "username": "john",
         "password": "secret",
     }
     extension = {'context': CONTEXT, 'exten': exten}
@@ -1096,13 +1052,13 @@ def test_delete_full_user_no_error(
         'extensions': [extension],
         'endpoint_sip': {
             'name': 'iddqd',
-            'label': 'Richard\'s line',
+            'label': 'Jôhn\'s line',
             'auth_section_options': [
                 ['username', 'iddqd'],
                 ['password', 'secret'],
             ],
             'endpoint_section_options': [
-                ['callerid', f'"Rîchard Lâpointe" <{exten}>'],
+                ['callerid', f'"Jôhn Smêth" <{exten}>'],
             ],
             'transport': transport,
             'templates': [template],
