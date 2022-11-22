@@ -869,18 +869,7 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
-@fixtures.extension(exten=gen_group_exten())
-@fixtures.group()
-@fixtures.funckey_template(
-    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
-)
-@fixtures.switchboard()
-def test_post_full_user_no_error(
-    group_extension,
-    group,
-    funckey_template,
-    switchboard,
-):
+def generate_user_resources_bodies(group, switchboard):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
     user = FULL_USER
@@ -900,6 +889,32 @@ def test_post_full_user_no_error(
     switchboard = {
         'uuid': switchboard['uuid'],
     }
+    return exten, source_exten, user, auth, extension, line, incall, group, switchboard
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_post_full_user_no_error(
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(group, switchboard)
 
     with a.group_extension(group, group_extension):
         response = confd.users.post(
@@ -1025,8 +1040,6 @@ def test_post_full_user_no_error(
             ).delete().assert_deleted()
 
 
-@fixtures.transport()
-@fixtures.sip_template()
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 @fixtures.funckey_template(
@@ -1034,44 +1047,22 @@ def test_post_full_user_no_error(
 )
 @fixtures.switchboard()
 def test_delete_full_user_no_error(
-    transport,
-    template,
     group_extension,
     group,
     funckey_template,
     switchboard,
 ):
-    exten = h.extension.find_available_exten(CONTEXT)
-    source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
-    user = FULL_USER
-    auth = AUTH_USER
-    extension = {'context': CONTEXT, 'exten': exten}
-    line = {
-        'context': CONTEXT,
-        'extensions': [extension],
-        'endpoint_sip': {
-            'name': 'iddqd',
-            'label': 'Jôhn\'s line',
-            'auth_section_options': [
-                ['username', 'iddqd'],
-                ['password', 'secret'],
-            ],
-            'endpoint_section_options': [
-                ['callerid', f'"Jôhn Smêth" <{exten}>'],
-            ],
-            'transport': transport,
-            'templates': [template],
-        },
-    }
-    incall = {
-        'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
-    }
-    group = {
-        'uuid': group['uuid'],
-    }
-    switchboard = {
-        'uuid': switchboard['uuid'],
-    }
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(group, switchboard)
 
     with a.group_extension(group, group_extension):
 
