@@ -12,7 +12,8 @@ from wazo_confd.plugins.user.sub_resources.schema import (
     ForwardBusySchema,
     ForwardNoAnswerSchema,
     ForwardUnconditionalSchema,
-    ForwardsSchema)
+    ForwardsSchema,
+)
 
 
 class UserSubResource(ConfdResource):
