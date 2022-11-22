@@ -16,10 +16,12 @@ from hamcrest import (
     is_not,
     none,
     not_,
+    raises,
+    calling,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd
+from . import confd, auth as authentication
 from ..helpers import (
     associations as a,
     errors as e,
@@ -34,6 +36,7 @@ from ..helpers.config import (
     CONTEXT,
     INCALL_CONTEXT,
 )
+from requests.exceptions import HTTPError
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -1018,8 +1021,17 @@ def test_post_full_user_no_error(
             )
             # retrieve the user (created before) and check their func keys template
             assert_that(
-                confd.users(payload['func_key_template_id']).get().item,
+                confd.users(payload['uuid']).get().item,
                 has_entries(func_key_template_id=payload['func_key_template_id']),
+            )
+            # check if auth user exists
+            wazo_user = authentication.users.get(payload['uuid'])
+            assert_that(
+                wazo_user,
+                has_entries(
+                    uuid=payload['uuid'],
+                    username=auth['username'],
+                ),
             )
             # retrieve the user and try to update the user with the same data
             user = confd.users(payload['uuid']).get().item
@@ -1156,3 +1168,9 @@ def test_delete_full_user_no_error(
         url = confd.groups(payload['groups'][0]['uuid'])
         response = url.get()
         response.assert_ok()
+
+        # verify auth user is deleted
+        assert_that(
+            calling(authentication.users.get).with_args(payload['uuid']),
+            raises(HTTPError, "404 Client Error: NOT FOUND"),
+        )

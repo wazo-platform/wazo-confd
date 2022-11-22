@@ -133,3 +133,5 @@ class UserMiddleWare:
             Session.expire(user, ['switchboard_member_users'])
 
             self._service.delete(user)
+
+            self._wazo_user_service.delete(user.uuid)
