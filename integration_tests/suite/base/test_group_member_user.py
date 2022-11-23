@@ -194,6 +194,20 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
             ),
         )
 
+        # Listing use different schema
+        response = confd.users.get()
+        assert_that(
+            response.items,
+            contains_inanyorder(
+                has_entries(
+                    groups=contains_inanyorder(
+                        has_entries(id=group2['id'], uuid=group2['uuid']),
+                        has_entries(id=group1['id'], uuid=group1['uuid']),
+                    )
+                ),
+            ),
+        )
+
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
