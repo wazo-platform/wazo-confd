@@ -278,9 +278,9 @@ class UserExtensionSchema(BaseSchema):
 
 class UserGroupSchema(BaseSchema):
     uuid = fields.String(validate=Length(max=40), required=True)
-    links = ListLink(Link('groups'))
+    links = ListLink(Link('groups', field='uuid'))
 
 
 class UserSwitchboardSchema(BaseSchema):
     uuid = fields.String(validate=Length(max=40), required=True)
-    links = ListLink(Link('switchboards'))
+    links = ListLink(Link('switchboards', field='uuid'))
