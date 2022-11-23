@@ -1032,3 +1032,16 @@ def test_post_full_user_no_error(
             confd.extensions(
                 payload['lines'][0]['extensions'][0]['id']
             ).delete().assert_deleted()
+
+
+@fixtures.group()
+@fixtures.user()
+@fixtures.line_sip()
+def test_get_users_list_returns_HTTP_200(group, user, line):
+    """
+    Check if a minimalistic GET on /users returned 200
+    """
+    with a.user_line(user, line):
+        confd.users(user['uuid']).groups.put(groups=[group])
+
+        confd.users.get().assert_ok()
