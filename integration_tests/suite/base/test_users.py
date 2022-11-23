@@ -1035,13 +1035,17 @@ def test_post_full_user_no_error(
 
 
 @fixtures.group()
+@fixtures.switchboard()
 @fixtures.user()
 @fixtures.line_sip()
-def test_get_users_list_returns_HTTP_200(group, user, line):
+def test_get_users_list_returns_HTTP_200(group, switchboard, user, line):
     """
     Check if a minimalistic GET on /users returned 200
     """
     with a.user_line(user, line):
         confd.users(user['uuid']).groups.put(groups=[group])
+        confd.switchboards(switchboard['uuid']).members.users.put(
+            users=[{'uuid': user['uuid']}]
+        )
 
         confd.users.get().assert_ok()
