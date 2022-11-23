@@ -1,7 +1,13 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains_inanyorder, empty, has_entries
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    empty,
+    has_entries,
+    has_items,
+)
 
 from . import confd
 from ..helpers import (
@@ -125,6 +131,21 @@ def test_get_switchboards_associated_to_user(switchboard1, switchboard2, user):
                     has_entries(uuid=switchboard1['uuid'], name=switchboard1['name']),
                     has_entries(uuid=switchboard2['uuid'], name=switchboard2['name']),
                 )
+            ),
+        )
+
+        # Listing use different schema
+        response = confd.users.get()
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(
+                    uuid=user['uuid'],
+                    switchboards=contains_inanyorder(
+                        has_entries(uuid=switchboard1['uuid']),
+                        has_entries(uuid=switchboard2['uuid']),
+                    ),
+                ),
             ),
         )
 

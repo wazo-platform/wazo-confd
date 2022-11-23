@@ -3,7 +3,14 @@
 
 import re
 
-from hamcrest import assert_that, contains, contains_inanyorder, empty, has_entries
+from hamcrest import (
+    assert_that,
+    contains,
+    contains_inanyorder,
+    empty,
+    has_entries,
+    has_items,
+)
 
 from . import confd
 from ..helpers import associations as a, errors as e, fixtures, scenarios as s
@@ -191,6 +198,21 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
                         name=group1['name'],
                     ),
                 )
+            ),
+        )
+
+        # Listing use different schema
+        response = confd.users.get()
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(
+                    uuid=user['uuid'],
+                    groups=contains_inanyorder(
+                        has_entries(id=group2['id'], uuid=group2['uuid']),
+                        has_entries(id=group1['id'], uuid=group1['uuid']),
+                    ),
+                ),
             ),
         )
 
