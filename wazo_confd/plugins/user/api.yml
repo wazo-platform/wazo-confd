@@ -682,7 +682,7 @@ definitions:
               type: string
               description: A comma separated list of groups UUIDs
             id:
-              type: string
+              type: integer
               description: A comma separated list of groups IDs
       switchboards:
         type: array
@@ -693,7 +693,7 @@ definitions:
               type: string
               description: A comma separated list of switchboards UUIDs
             id:
-              type: string
+              type: integer
               description: A comma separated list of switchboards IDs
       auth:
         type: object
