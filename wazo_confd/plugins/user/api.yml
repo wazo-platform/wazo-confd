@@ -680,10 +680,6 @@ definitions:
           properties:
             uuid:
               type: string
-              description: A comma separated list of groups UUIDs
-            id:
-              type: integer
-              description: A comma separated list of groups IDs
       switchboards:
         type: array
         items:
@@ -691,10 +687,6 @@ definitions:
           properties:
             uuid:
               type: string
-              description: A comma separated list of switchboards UUIDs
-            id:
-              type: integer
-              description: A comma separated list of switchboards IDs
       auth:
         type: object
         properties:
