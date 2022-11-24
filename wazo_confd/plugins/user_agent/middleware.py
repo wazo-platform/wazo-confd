@@ -4,8 +4,6 @@
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.agent import dao as agent_dao
 
-from wazo_confd.plugins.user_group.resource import GroupsIDUUIDSchema
-
 
 class UserAgentAssociationMiddleWare:
     def __init__(self, service):
