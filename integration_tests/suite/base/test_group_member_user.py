@@ -201,7 +201,6 @@ def test_get_groups_associated_to_user(group1, group2, user, line):
             ),
         )
 
-        # Listing use different schema
         response = confd.users.get()
         assert_that(
             response.items,

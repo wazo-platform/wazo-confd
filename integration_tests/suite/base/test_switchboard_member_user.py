@@ -134,7 +134,6 @@ def test_get_switchboards_associated_to_user(switchboard1, switchboard2, user):
             ),
         )
 
-        # Listing use different schema
         response = confd.users.get()
         assert_that(
             response.items,
