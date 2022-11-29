@@ -1120,3 +1120,62 @@ def test_delete_full_user_no_error(
             calling(authentication.users.get).with_args(payload['uuid']),
             raises(HTTPError, "404 Client Error: NOT FOUND"),
         )
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_delete_full_user_no_auth_no_error(
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(group, switchboard)
+
+    with a.group_extension(group, group_extension):
+
+        response = confd.users.post(
+            {
+                'lines': [line],
+                'incalls': [incall],
+                'groups': [group],
+                'func_key_template_id': funckey_template['id'],
+                'switchboards': [switchboard],
+                **user,
+            }
+        )
+
+        payload = response.json
+
+        # user deletion
+        url = confd.users(payload['uuid'])
+        url.delete(recursive=True)
+
+        # verify auth user is deleted
+        assert_that(
+            calling(authentication.users.get).with_args(payload['uuid']),
+            raises(HTTPError, "404 Client Error: NOT FOUND"),
+        )
+
+
+@fixtures.user()
+def test_delete_simple_user_with_recursive_true(user):
+    response = confd.users(user['uuid']).delete(recursive=True)
+    response.assert_deleted()
+
+    response = confd.users(user['uuid']).get()
+    response.assert_status(404)

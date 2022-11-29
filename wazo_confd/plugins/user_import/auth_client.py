@@ -41,6 +41,9 @@ class AuthClientProxy:
     def delete(self, uuid):
         self._auth_client.users.delete(uuid)
 
+    def get(self, uuid):
+        self._auth_client.users.get(uuid)
+
     @classmethod
     def from_config(cls, *args, **kwargs):
         client = AuthClient(*args, **kwargs)

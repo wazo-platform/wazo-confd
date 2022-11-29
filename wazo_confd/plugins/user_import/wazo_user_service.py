@@ -31,6 +31,9 @@ class WazoUserService:
     def delete(self, uuid):
         self._auth_client.delete(uuid)
 
+    def get(self, uuid):
+        self._auth_client.get(uuid)
+
 
 def build_service():
     return WazoUserService(auth_client)

@@ -1,6 +1,8 @@
 # Copyright 2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from http import HTTPStatus
 
+from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.resources.switchboard import dao as switchboard_dao
@@ -98,10 +100,11 @@ class UserMiddleWare:
         if not recursive:
             self._service.delete(user)
         else:
-            # dissociation
-            self._middleware_handle.get('user_group_association').associate_all_groups(
-                {'groups': []}, user.uuid
-            )
+            if user.groups:
+                # dissociation
+                self._middleware_handle.get(
+                    'user_group_association'
+                ).associate_all_groups({'groups': []}, user.uuid)
 
             for line in user.lines:
                 self._middleware_handle.get('user_line_association').dissociate(
@@ -134,4 +137,9 @@ class UserMiddleWare:
 
             self._service.delete(user)
 
-            self._wazo_user_service.delete(user.uuid)
+            try:
+                self._wazo_user_service.get(user.uuid)
+                self._wazo_user_service.delete(user.uuid)
+            except HTTPError as e:
+                if e.response.status_code != HTTPStatus.NOT_FOUND:
+                    raise e
