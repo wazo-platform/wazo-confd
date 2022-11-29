@@ -676,13 +676,17 @@ definitions:
       groups:
         type: array
         items:
-          type: string
-          description: A comma separated list of groups UUIDs
+          type: object
+          properties:
+            uuid:
+              type: string
       switchboards:
         type: array
         items:
-          type: string
-          description: A comma separated list of switchboards UUIDs
+          type: object
+          properties:
+            uuid:
+              type: string
       auth:
         type: object
         properties:
