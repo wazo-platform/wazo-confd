@@ -269,14 +269,17 @@ class UserListItemSchema(UserSchemaNullable):
 
         agent = data.get('agent', {})
 
-        if 'firstname' not in agent or not agent['firstname']:
-            agent['firstname'] = data.get('firstname')
-        if 'lastname' not in agent or not agent['lastname']:
-            agent['lastname'] = data.get('lastname')
-        if 'number' not in agent or not agent['number']:
-            agent['number'] = (
-                data.get('lines', [{}])[0].get('extensions', [{}])[0].get('exten')
-            )
+        # if agent contains at least on field, the other fields are
+        # "auto-populated" if not provided
+        if agent:
+            if 'firstname' not in agent or not agent['firstname']:
+                agent['firstname'] = data.get('firstname')
+            if 'lastname' not in agent or not agent['lastname']:
+                agent['lastname'] = data.get('lastname')
+            if 'number' not in agent or not agent['number']:
+                agent['number'] = (
+                    data.get('lines', [{}])[0].get('extensions', [{}])[0].get('exten')
+                )
 
         return data
 

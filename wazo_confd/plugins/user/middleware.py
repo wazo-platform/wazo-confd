@@ -107,10 +107,11 @@ class UserMiddleWare:
             )
         user_dict['switchboards'] = switchboards
 
-        agent = self._middleware_handle.get('agent').create(agent, tenant_uuid)
-        self._middleware_handle.get('user_agent_association').associate(
-            user_dict['uuid'], agent['id'], tenant_uuids
-        )
+        if agent:
+            agent = self._middleware_handle.get('agent').create(agent, tenant_uuid)
+            self._middleware_handle.get('user_agent_association').associate(
+                user_dict['uuid'], agent['id'], tenant_uuids
+            )
         user_dict['agent'] = agent
 
         if auth:
