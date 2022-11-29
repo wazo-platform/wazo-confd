@@ -77,5 +77,11 @@ class UserItem(ItemResource):
     @required_acl('confd.users.{id}.delete')
     def delete(self, id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.delete(id, tenant_uuids, recursive='recursive' in request.args)
+        self._middleware.delete(
+            id,
+            tenant_uuids,
+            recursive=request.args.get(
+                'recursive', default=False, type=lambda v: v.lower() == 'true'
+            ),
+        )
         return '', 204
