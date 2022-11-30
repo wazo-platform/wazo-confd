@@ -2,12 +2,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-from marshmallow import fields, pre_dump, post_load
-from marshmallow.validate import Length
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Nested
 from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.plugins.user.sub_resources.schema import (
+    ServiceDNDSchema,
+    ServiceIncallFilterSchema,
+    ServicesSchema,
+    ForwardBusySchema,
+    ForwardNoAnswerSchema,
+    ForwardUnconditionalSchema,
+    ForwardsSchema,
+)
 
 
 class UserSubResource(ConfdResource):
@@ -28,37 +34,6 @@ class UserSubResource(ConfdResource):
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, self.schema())
-
-
-class ServiceDNDSchema(BaseSchema):
-    enabled = StrictBoolean(attribute='dnd_enabled', required=True)
-
-    types = ['dnd']
-
-
-class ServiceIncallFilterSchema(BaseSchema):
-    enabled = StrictBoolean(attribute='incallfilter_enabled', required=True)
-
-    types = ['incallfilter']
-
-
-class ServicesSchema(BaseSchema):
-    dnd = Nested(ServiceDNDSchema)
-    incallfilter = Nested(ServiceIncallFilterSchema)
-
-    types = ['dnd', 'incallfilter']
-
-    @pre_dump()
-    def add_envelope(self, data, **kwargs):
-        return {type_: data for type_ in self.types}
-
-    @post_load
-    def remove_envelope(self, data, **kwargs):
-        result = {}
-        for service in data.values():
-            for key, value in service.items():
-                result[key] = value
-        return result
 
 
 class UserServiceDND(UserSubResource):
@@ -98,53 +73,6 @@ class UserServiceList(UserSubResource):
     @required_acl('confd.users.{user_id}.services.update')
     def put(self, user_id):
         return super().put(user_id)
-
-
-class ForwardBusySchema(BaseSchema):
-    enabled = StrictBoolean(attribute='busy_enabled')
-    destination = fields.String(
-        attribute='busy_destination', validate=Length(max=128), allow_none=True
-    )
-
-    types = ['busy']
-
-
-class ForwardNoAnswerSchema(BaseSchema):
-    enabled = StrictBoolean(attribute='noanswer_enabled')
-    destination = fields.String(
-        attribute='noanswer_destination', validate=Length(max=128), allow_none=True
-    )
-
-    types = ['noanswer']
-
-
-class ForwardUnconditionalSchema(BaseSchema):
-    enabled = StrictBoolean(attribute='unconditional_enabled')
-    destination = fields.String(
-        attribute='unconditional_destination', validate=Length(max=128), allow_none=True
-    )
-
-    types = ['unconditional']
-
-
-class ForwardsSchema(BaseSchema):
-    busy = Nested(ForwardBusySchema)
-    noanswer = Nested(ForwardNoAnswerSchema)
-    unconditional = Nested(ForwardUnconditionalSchema)
-
-    types = ['busy', 'noanswer', 'unconditional']
-
-    @pre_dump
-    def add_envelope(self, data, **kwargs):
-        return {type_: data for type_ in self.types}
-
-    @post_load
-    def remove_envelope(self, data, **kwargs):
-        result = {}
-        for forward in data.values():
-            for key, value in forward.items():
-                result[key] = value
-        return result
 
 
 class UserForwardBusy(UserSubResource):
