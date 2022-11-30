@@ -106,12 +106,22 @@ paths:
         A user can not be deleted if he is associated to a line or a voicemail. Any
         line or voicemail attached to the user must be dissociated first. The user
         will also be removed from all queues, groups or other Wazo entities whom he
-        is member.'
+        is member.
+
+
+        **Disclaimer**: if `recursive=true`, the user is deleted, all their
+        associations with any related resources are removed, and some resources
+        (lines, extensions, incalls and auth user) are deleted too.'
       tags:
       - users
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/useriduuid'
+      - required: false
+        type: boolean
+        name: recursive
+        in: query
+        description: Indicates if the resources related to the user must be deleted too.
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'

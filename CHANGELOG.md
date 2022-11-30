@@ -1,6 +1,10 @@
 # Changelog
 
-## 22.16
+## 22.17
+
+* DELETE on `/users?recursive=true` added, to provide a way to delete a user and their related resources.
+
+* ## 22.16
 
 * POST on `/users` can now create a user and all their related resources.
 
