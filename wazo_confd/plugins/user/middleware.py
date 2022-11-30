@@ -112,7 +112,7 @@ class UserMiddleWare:
             self._middleware_handle.get('user_agent_association').associate(
                 user_dict['uuid'], agent['id'], tenant_uuids
             )
-        user_dict['agent'] = agent
+            user_dict['agent'] = agent
 
         if auth:
             auth['uuid'] = user_dict['uuid']

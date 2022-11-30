@@ -267,11 +267,10 @@ class UserListItemSchema(UserSchemaNullable):
     @pre_load
     def propagate_context(self, data, **kwargs):
 
-        agent = data.get('agent', {})
+        agent = data.get('agent')
 
-        # if agent contains at least on field, the other fields are
-        # "auto-populated" if not provided
-        if agent:
+        # if agent exists (even if empty), its missing fields are "auto-populated"
+        if agent is not None:
             if 'firstname' not in agent or not agent['firstname']:
                 agent['firstname'] = data.get('firstname')
             if 'lastname' not in agent or not agent['lastname']:
