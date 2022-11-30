@@ -1,7 +1,14 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_dump, pre_dump, post_load, validates_schema
+from marshmallow import (
+    fields,
+    post_dump,
+    pre_dump,
+    pre_load,
+    post_load,
+    validates_schema,
+)
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, Range, Regexp, OneOf
 
@@ -23,7 +30,9 @@ class WazoAuthUserSchema(BaseSchema):
     password = fields.String(validate=Length(min=1), allow_none=True)
     firstname = fields.String(missing=None, allow_none=True)
     lastname = fields.String(missing=None, allow_none=True)
-    purpose = fields.Constant('user')
+    purpose = fields.String(
+        missing='user', validate=OneOf(['user', 'internal', 'external_api'])
+    )
     enabled = fields.Boolean(missing=True)
     email_address = fields.Email(allow_none=True)
 
@@ -252,6 +261,23 @@ class UserListItemSchema(UserSchemaNullable):
     groups = Nested('UserGroupSchema', many=True)
     switchboards = Nested('UserSwitchboardSchema', many=True)
     voicemail = Nested('UserVoicemailSchema', allow_none=True)
+
+    @pre_load
+    def init_auth(self, data, **kwargs):
+        auth = data.get('auth')
+        # if auth exists (even if empty), missing fields are auto-populated
+        if auth is not None:
+            if 'firstname' not in auth or not auth['firstname']:
+                auth['firstname'] = data.get('firstname')
+            if 'lastname' not in auth or not auth['lastname']:
+                auth['lastname'] = data.get('lastname')
+            if 'username' not in auth or not auth['username']:
+                auth['username'] = data.get('username')
+            if 'password' not in auth or not auth['password']:
+                auth['password'] = data.get('password')
+            if 'email_address' not in auth or not auth['email_address']:
+                auth['email_address'] = data.get('email')
+        return data
 
 
 class UserIncallSchema(BaseSchema):

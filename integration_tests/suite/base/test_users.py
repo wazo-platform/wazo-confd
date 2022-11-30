@@ -1,5 +1,6 @@
 # Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from operator import contains
 
 from hamcrest import (
     all_of,
@@ -1051,6 +1052,13 @@ def test_post_full_user_no_error(
                     switchboards=contains(
                         has_entries(uuid=switchboard['uuid']),
                     ),
+                    auth=has_entries(
+                        uuid=payload['uuid'],
+                        firstname=user['firstname'],
+                        lastname=user['lastname'],
+                        emails=contains(has_entries(address=user['email'])),
+                        username=auth['username'],
+                    ),
                     **user,
                 ),
             )
@@ -1121,6 +1129,19 @@ def test_post_full_user_no_error(
                 'voicemail', None
             )  # The voicemail cannot be updated directly by calling POST /users
             confd.users(payload['uuid']).put(**user).assert_updated()
+
+            wazo_user = authentication.users.get(payload['uuid'])
+            assert_that(
+                wazo_user,
+                has_entries(
+                    uuid=payload['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    emails=contains(has_entries(address=user['email'])),
+                    username=auth['username'],
+                ),
+            )
+
         finally:
             confd.users(payload['uuid']).delete().assert_deleted()
             confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
@@ -1128,6 +1149,7 @@ def test_post_full_user_no_error(
             confd.extensions(
                 payload['lines'][0]['extensions'][0]['id']
             ).delete().assert_deleted()
+            authentication.users.delete(payload['uuid'])
 
 
 @fixtures.extension(exten=gen_group_exten())
