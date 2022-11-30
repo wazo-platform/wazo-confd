@@ -265,7 +265,7 @@ class UserListItemSchema(UserSchemaNullable):
     agent = Nested('UserAgentSchema')
 
     @pre_load
-    def propagate_context(self, data, **kwargs):
+    def init_agent(self, data, **kwargs):
 
         agent = data.get('agent')
 
