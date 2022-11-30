@@ -138,7 +138,6 @@ class UserMiddleWare:
             self._service.delete(user)
 
             try:
-                self._wazo_user_service.get(user.uuid)
                 self._wazo_user_service.delete(user.uuid)
             except HTTPError as e:
                 if e.response.status_code != HTTPStatus.NOT_FOUND:
