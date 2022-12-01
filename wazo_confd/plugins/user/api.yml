@@ -916,13 +916,13 @@ definitions:
             type: array
             items:
               type: object
-                properties:
-                  address:
-                    type: string
-                  main:
-                    type: boolean
-                  confirmed:
-                    type: boolean
+              properties:
+                address:
+                  type: string
+                main:
+                  type: boolean
+                confirmed:
+                  type: boolean
           uuid:
             type: string
           purpose:
