@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
+from xivo_dao.helpers.db_manager import Session
 
 from .schema import LineSchemaNullable
 
@@ -91,3 +92,30 @@ class LineMiddleWare:
         line_response['extensions'] = extensions
 
         return line_response
+
+    def delete(self, line_id, tenant_uuids, recursive=False):
+        model = self._service.get(line_id, tenant_uuids=tenant_uuids)
+
+        if recursive:
+            for extension in model.extensions:
+                # dissociate from line + delete extension
+                self._middleware_handle.get('line_extension').delete_extension(
+                    model.id,
+                    extension.id,
+                    tenant_uuids,
+                )
+            Session.expire(model)
+
+            if model.endpoint_sip:
+                endpoint_sip_uuid = model.endpoint_sip.uuid
+                self._middleware_handle.get('line_endpoint_sip').dissociate(
+                    model.id,
+                    endpoint_sip_uuid,
+                    tenant_uuids,
+                )
+                self._middleware_handle.get('endpoint_sip').delete(
+                    endpoint_sip_uuid,
+                    tenant_uuids,
+                )
+            Session.expire(model)
+        self._service.delete(model)

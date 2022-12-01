@@ -16,10 +16,12 @@ from hamcrest import (
     is_not,
     none,
     not_,
+    raises,
+    calling,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd
+from . import confd, auth as authentication
 from ..helpers import (
     associations as a,
     errors as e,
@@ -34,6 +36,7 @@ from ..helpers.config import (
     CONTEXT,
     INCALL_CONTEXT,
 )
+from requests.exceptions import HTTPError
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -91,6 +94,11 @@ NULL_USER = {
     "enabled": True,
     "ring_seconds": 30,
     "simultaneous_calls": 5,
+}
+
+AUTH_USER = {
+    "username": "john",
+    "password": "secret",
 }
 
 
@@ -861,48 +869,11 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
-@fixtures.registrar()
-@fixtures.extension(exten=gen_group_exten())
-@fixtures.group()
-@fixtures.funckey_template(
-    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
-)
-@fixtures.switchboard()
-def test_post_full_user_no_error(
-    registrar,
-    group_extension,
-    group,
-    funckey_template,
-    switchboard,
-):
+def generate_user_resources_bodies(group, switchboard):
     exten = h.extension.find_available_exten(CONTEXT)
     source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
-    user = {
-        "subscription_type": 2,
-        "firstname": "Rîchard",
-        "lastname": "Lâpointe",
-        "email": "richard@lapointe.org",
-        "language": "fr_FR",
-        "outgoing_caller_id": '"Rîchy Cool" <4185551234>',
-        "mobile_phone_number": "4181234567",
-        "supervision_enabled": True,
-        "call_transfer_enabled": False,
-        "dtmf_hangup_enabled": True,
-        "call_record_outgoing_external_enabled": True,
-        "call_record_outgoing_internal_enabled": True,
-        "call_record_incoming_internal_enabled": True,
-        "call_record_incoming_external_enabled": True,
-        "online_call_record_enabled": False,
-        "simultaneous_calls": 5,
-        "ring_seconds": 30,
-        "userfield": "userfield",
-        "call_permission_password": "1234",
-        "enabled": True,
-    }
-    auth = {
-        "username": "richardlapointe",
-        "password": "secret",
-    }
+    user = FULL_USER
+    auth = AUTH_USER
     extension = {'context': CONTEXT, 'exten': exten}
     line = {
         'context': CONTEXT,
@@ -918,6 +889,32 @@ def test_post_full_user_no_error(
     switchboard = {
         'uuid': switchboard['uuid'],
     }
+    return exten, source_exten, user, auth, extension, line, incall, group, switchboard
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_post_full_user_no_error(
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(group, switchboard)
 
     with a.group_extension(group, group_extension):
         response = confd.users.post(
@@ -1018,8 +1015,17 @@ def test_post_full_user_no_error(
             )
             # retrieve the user (created before) and check their func keys template
             assert_that(
-                confd.users(payload['func_key_template_id']).get().item,
+                confd.users(payload['uuid']).get().item,
                 has_entries(func_key_template_id=payload['func_key_template_id']),
+            )
+            # check if auth user exists
+            wazo_user = authentication.users.get(payload['uuid'])
+            assert_that(
+                wazo_user,
+                has_entries(
+                    uuid=payload['uuid'],
+                    username=auth['username'],
+                ),
             )
             # retrieve the user and try to update the user with the same data
             user = confd.users(payload['uuid']).get().item
@@ -1032,3 +1038,144 @@ def test_post_full_user_no_error(
             confd.extensions(
                 payload['lines'][0]['extensions'][0]['id']
             ).delete().assert_deleted()
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_delete_full_user_no_error(
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(group, switchboard)
+
+    with a.group_extension(group, group_extension):
+
+        response = confd.users.post(
+            {
+                'auth': auth,
+                'lines': [line],
+                'incalls': [incall],
+                'groups': [group],
+                'func_key_template_id': funckey_template['id'],
+                'switchboards': [switchboard],
+                **user,
+            }
+        )
+
+        payload = response.json
+
+        # user deletion
+        url = confd.users(payload['uuid'])
+
+        response = url.delete(recursive=True)
+        response.assert_deleted()
+
+        # verify that user is deleted
+        response = url.get()
+        response.assert_status(404)
+
+        # verify that line is deleted
+        url = confd.lines(payload['lines'][0]['id'])
+        response = url.get()
+        response.assert_status(404)
+
+        # verify that incall is deleted
+        url = confd.incalls(payload['incalls'][0]['id'])
+        response = url.get()
+        response.assert_status(404)
+
+        # verify that extension is deleted
+        url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
+        response = url.get()
+        response.assert_status(404)
+
+        # verify that the switchboard is not deleted
+        url = confd.switchboards(payload['switchboards'][0]['uuid'])
+        response = url.get()
+        response.assert_ok()
+
+        # verify that the group is not deleted
+        url = confd.groups(payload['groups'][0]['uuid'])
+        response = url.get()
+        response.assert_ok()
+
+        # verify auth user is deleted
+        assert_that(
+            calling(authentication.users.get).with_args(payload['uuid']),
+            raises(HTTPError, "404 Client Error: NOT FOUND"),
+        )
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.group()
+@fixtures.funckey_template(
+    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
+)
+@fixtures.switchboard()
+def test_delete_full_user_no_auth_no_error(
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(group, switchboard)
+
+    with a.group_extension(group, group_extension):
+
+        response = confd.users.post(
+            {
+                'lines': [line],
+                'incalls': [incall],
+                'groups': [group],
+                'func_key_template_id': funckey_template['id'],
+                'switchboards': [switchboard],
+                **user,
+            }
+        )
+
+        payload = response.json
+
+        # user deletion
+        url = confd.users(payload['uuid'])
+        url.delete(recursive=True)
+
+        # verify auth user is deleted
+        assert_that(
+            calling(authentication.users.get).with_args(payload['uuid']),
+            raises(HTTPError, "404 Client Error: NOT FOUND"),
+        )
+
+
+@fixtures.user()
+def test_delete_simple_user_with_recursive_true(user):
+    response = confd.users(user['uuid']).delete(recursive=True)
+    response.assert_deleted()
+
+    response = confd.users(user['uuid']).get()
+    response.assert_status(404)

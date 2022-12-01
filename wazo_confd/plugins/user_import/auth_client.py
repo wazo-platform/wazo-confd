@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -37,6 +37,12 @@ class AuthClientProxy:
     def rollback(self):
         for user in self._users_created:
             self._auth_client.users.delete(user['uuid'])
+
+    def delete(self, uuid):
+        self._auth_client.users.delete(uuid)
+
+    def get(self, uuid):
+        self._auth_client.users.get(uuid)
 
     @classmethod
     def from_config(cls, *args, **kwargs):

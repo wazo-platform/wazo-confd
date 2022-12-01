@@ -1,6 +1,8 @@
 # Copyright 2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from http import HTTPStatus
 
+from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.resources.switchboard import dao as switchboard_dao
@@ -93,6 +95,50 @@ class UserMiddleWare:
 
         return user_dict
 
-    def delete(self, user_id, tenant_uuids):
+    def delete(self, user_id, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
-        self._service.delete(user)
+        if not recursive:
+            self._service.delete(user)
+        else:
+            if user.groups:
+                # dissociation
+                self._middleware_handle.get(
+                    'user_group_association'
+                ).associate_all_groups({'groups': []}, user.uuid)
+
+            for line in user.lines:
+                self._middleware_handle.get('user_line_association').dissociate(
+                    user.uuid, line.id, tenant_uuids
+                )
+                self._middleware_handle.get('line').delete(
+                    line.id, tenant_uuids, recursive=True
+                )
+                Session.expire(user, ['user_lines'])
+
+            for incall in user.incalls:
+                for extension in incall.extensions:
+                    self._middleware_handle.get(
+                        'incall_extension_association'
+                    ).dissociate(incall.id, extension.id, tenant_uuids)
+                    self._middleware_handle.get('extension').delete(
+                        extension.id, tenant_uuids
+                    )
+                self._middleware_handle.get('incall').delete(incall.id, tenant_uuids)
+
+            for switchboard in user.switchboards:
+                members = []
+                for user_member in switchboard.user_members:
+                    if user_member.uuid != user.uuid:
+                        members.append({'uuid': user_member.uuid})
+                self._middleware_handle.get('switchboard_member').associate(
+                    {'users': members}, switchboard.uuid, tenant_uuids
+                )
+            Session.expire(user, ['switchboard_member_users'])
+
+            self._service.delete(user)
+
+            try:
+                self._wazo_user_service.delete(user.uuid)
+            except HTTPError as e:
+                if e.response.status_code != HTTPStatus.NOT_FOUND:
+                    raise e

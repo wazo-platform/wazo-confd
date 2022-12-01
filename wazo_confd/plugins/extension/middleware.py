@@ -16,3 +16,7 @@ class ExtensionMiddleWare:
         model = Extension(**form)
         model = self._service.create(model, tenant_uuids)
         return self._schema.dump(model)
+
+    def delete(self, extension_id, tenant_uuids):
+        model = self._service.get(extension_id, tenant_uuids=tenant_uuids)
+        self._service.delete(model)

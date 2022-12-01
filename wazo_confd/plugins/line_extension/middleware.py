@@ -25,3 +25,8 @@ class LineExtensionMiddleware:
         extension = extension_middleware.create(body, tenant_uuids)
         self.associate(line_id, extension['id'], tenant_uuids)
         return extension
+
+    def delete_extension(self, line_id, extension_id, tenant_uuids):
+        extension_middleware = self._middleware_handle.get('extension')
+        self.dissociate(line_id, extension_id, tenant_uuids)
+        extension_middleware.delete(extension_id, tenant_uuids)
