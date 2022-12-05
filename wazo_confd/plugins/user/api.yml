@@ -571,6 +571,16 @@ definitions:
         type: integer
         description: User ID
         readOnly: true
+      uuid:
+        type: string
+        description: User UUID. This ID is globally unique across multiple Wazo instances
+        readOnly: true
+      firstname:
+        type: string
+        description: User firstname
+      lastname:
+        type: string
+        description: User lastname
       email:
         type: string
         description: User's email. Used for directories (i.e. by wazo-dird)
@@ -710,6 +720,8 @@ definitions:
           password:
             type: string
             description: The password of the newly created username
+    required:
+      - firstname
     allOf:
     - $ref: '#/definitions/UserPostRelationIncalls'
   UserPostRelationIncalls:
