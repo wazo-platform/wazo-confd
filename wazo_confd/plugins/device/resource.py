@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -7,7 +7,7 @@ from xivo.tenant_flask_helpers import Tenant
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
 from wazo_confd.plugins.device.model import Device
-from xivo_dao.helpers import errors
+from xivo_dao import tenant_dao
 
 from .schema import DeviceSchema
 
@@ -61,19 +61,15 @@ class UnallocatedDeviceList(ListResource):
 
 
 class UnallocatedDeviceItem(SingleTenantConfdResource):
-    def __init__(self, service):
-        self.service = service
+    def __init__(self, middleware):
+        self._middleware = middleware
 
     @required_acl('confd.devices.unallocated.{id}.update')
     def put(self, id):
-        device = self.service.get(id)
-        if not device.is_new:
-            raise errors.not_found('Device', id=id)
-
-        kwargs = self._add_tenant_uuid()
-        self.service.assign_tenant(device, **kwargs)
-
-        return ('', 204)
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        self._middleware.associate(id, tenant.uuid)
+        return '', 204
 
 
 class DeviceItem(SingleTenantMixin, ItemResource):
