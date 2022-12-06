@@ -15,5 +15,3 @@ provd:
     host: provd
 sysconfd:
     host: sysconfd
-service_discovery:
-  enabled: false
