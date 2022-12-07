@@ -124,9 +124,9 @@ class UserMiddleWare:
 
         if device_id:
             try:
-                self._middleware_handle.get('unallocated_device_middleware').associate(
-                    device_id, tenant_uuid
-                )
+                self._middleware_handle.get(
+                    'unallocated_device_middleware'
+                ).assign_tenant(device_id, tenant_uuid)
             except FormattedError as e:
                 if e.exception != NotFoundError:
                     raise e
