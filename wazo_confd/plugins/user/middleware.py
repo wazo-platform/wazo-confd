@@ -5,6 +5,8 @@ from http import HTTPStatus
 from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
+from xivo_dao.helpers.errors import FormattedError
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
 from .schema import UserListItemSchema
@@ -28,6 +30,7 @@ class UserMiddleWare:
         switchboards = form.pop('switchboards', None) or []
         voicemail = form.pop('voicemail', None)
         agent = form.pop('agent', {})
+        device_id = form.pop('device_id', None)
 
         model = User(**form)
         model = self._service.create(model)
@@ -118,6 +121,25 @@ class UserMiddleWare:
             auth['uuid'] = user_dict['uuid']
             auth['tenant_uuid'] = user_dict['tenant_uuid']
             user_dict['auth'] = self._wazo_user_service.create(auth)
+
+        if device_id:
+            try:
+                self._middleware_handle.get('unallocated_device_middleware').associate(
+                    device_id, tenant_uuid
+                )
+            except FormattedError as e:
+                if e.exception != NotFoundError:
+                    raise e
+            try:
+                self._middleware_handle.get(
+                    'line_device_association_middleware'
+                ).associate(
+                    user_dict['lines'][0]['id'], device_id, tenant_uuid, tenant_uuids
+                )
+            except (KeyError, IndexError) as e:
+                # if no line, the association between a line and a device is ignored
+                pass
+            user_dict['device_id'] = device_id
 
         return user_dict
 

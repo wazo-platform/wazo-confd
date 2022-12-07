@@ -263,6 +263,7 @@ class UserListItemSchema(UserSchemaNullable):
     switchboards = Nested('UserSwitchboardSchema', many=True)
     voicemail = Nested('UserVoicemailSchema', allow_none=True)
     agent = Nested('UserAgentSchema')
+    device_id = fields.String(validate=Length(max=255))
 
     @pre_load
     def init_agent(self, data, **kwargs):

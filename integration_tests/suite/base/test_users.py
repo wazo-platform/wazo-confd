@@ -985,11 +985,9 @@ def generate_user_resources_bodies(group, switchboard):
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
 )
 @fixtures.switchboard()
+@fixtures.device(wazo_tenant=MAIN_TENANT)
 def test_post_full_user_no_error(
-    group_extension,
-    group,
-    funckey_template,
-    switchboard,
+    group_extension, group, funckey_template, switchboard, device
 ):
     (
         exten,
@@ -1014,6 +1012,7 @@ def test_post_full_user_no_error(
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
                 'agent': agent,
+                'device_id': device['id'],
                 **user,
             }
         )
@@ -1064,6 +1063,7 @@ def test_post_full_user_no_error(
                         number=line['extensions'][0]['exten'],
                         firstname=user['firstname'],
                     ),
+                    device_id=device['id'],
                     **user,
                 ),
             )
