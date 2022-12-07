@@ -143,7 +143,7 @@ class UserMiddleWare:
 
         return user_dict
 
-    def delete(self, user_id, tenant_uuids, recursive=False):
+    def delete(self, user_id, tenant_uuid, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
         if not recursive:
             self._service.delete(user)
@@ -153,6 +153,11 @@ class UserMiddleWare:
                 self._middleware_handle.get(
                     'user_group_association'
                 ).associate_all_groups({'groups': []}, user.uuid)
+
+            for line in user.lines:
+                self._middleware_handle.get(
+                    'line_device_association_middleware'
+                ).dissociate(line.id, line.device, tenant_uuid, tenant_uuids)
 
             for line in user.lines:
                 self._middleware_handle.get('user_line_association').dissociate(

@@ -956,26 +956,32 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
-def generate_user_resources_bodies(group, switchboard):
-    exten = h.extension.find_available_exten(CONTEXT)
-    source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
+def generate_user_resources_bodies(
+    group=None, switchboard=None, context_name=None, incall_context_name=None
+):
+    exten = h.extension.find_available_exten(context_name)
+    if incall_context_name:
+        source_exten = h.extension.find_available_exten(incall_context_name)
     user = FULL_USER
     auth = AUTH_USER
-    extension = {'context': CONTEXT, 'exten': exten}
+    extension = {'context': context_name, 'exten': exten}
     line = {
-        'context': CONTEXT,
+        'context': context_name,
         'extensions': [extension],
         'endpoint_sip': {'name': 'iddqd'},
     }
-    incall = {
-        'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
-    }
-    group = {
-        'uuid': group['uuid'],
-    }
-    switchboard = {
-        'uuid': switchboard['uuid'],
-    }
+    if incall_context_name:
+        incall = {
+            'extensions': [{'context': incall_context_name, 'exten': source_exten}],
+        }
+    if group:
+        group = {
+            'uuid': group['uuid'],
+        }
+    if switchboard:
+        switchboard = {
+            'uuid': switchboard['uuid'],
+        }
     return exten, source_exten, user, auth, extension, line, incall, group, switchboard
 
 
@@ -985,7 +991,7 @@ def generate_user_resources_bodies(group, switchboard):
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
 )
 @fixtures.switchboard()
-@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.device()
 def test_post_full_user_no_error(
     group_extension, group, funckey_template, switchboard, device
 ):
@@ -999,7 +1005,12 @@ def test_post_full_user_no_error(
         incall,
         group,
         switchboard,
-    ) = generate_user_resources_bodies(group, switchboard)
+    ) = generate_user_resources_bodies(
+        group=group,
+        switchboard=switchboard,
+        context_name=CONTEXT,
+        incall_context_name=INCALL_CONTEXT,
+    )
     agent = {}
 
     with a.group_extension(group, group_extension):
@@ -1086,6 +1097,7 @@ def test_post_full_user_no_error(
                 has_entries(
                     extensions=contains(has_entries(**extension)),
                     endpoint_sip=has_entries(name='iddqd'),
+                    device_id=device['id'],
                 ),
             )
             # retrieve the incall (created before) and check its data are correct
@@ -1163,11 +1175,13 @@ def test_post_full_user_no_error(
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
 )
 @fixtures.switchboard()
+@fixtures.device()
 def test_delete_full_user_no_error(
     group_extension,
     group,
     funckey_template,
     switchboard,
+    device,
 ):
     (
         exten,
@@ -1179,7 +1193,12 @@ def test_delete_full_user_no_error(
         incall,
         group,
         switchboard,
-    ) = generate_user_resources_bodies(group, switchboard)
+    ) = generate_user_resources_bodies(
+        group=group,
+        switchboard=switchboard,
+        context_name=CONTEXT,
+        incall_context_name=INCALL_CONTEXT,
+    )
 
     with a.group_extension(group, group_extension):
 
@@ -1191,6 +1210,7 @@ def test_delete_full_user_no_error(
                 'groups': [group],
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
+                'device_id': device['id'],
                 **user,
             }
         )
@@ -1261,7 +1281,12 @@ def test_delete_full_user_no_auth_no_error(
         incall,
         group,
         switchboard,
-    ) = generate_user_resources_bodies(group, switchboard)
+    ) = generate_user_resources_bodies(
+        group=group,
+        switchboard=switchboard,
+        context_name=CONTEXT,
+        incall_context_name=INCALL_CONTEXT,
+    )
 
     with a.group_extension(group, group_extension):
 
@@ -1296,3 +1321,76 @@ def test_delete_simple_user_with_recursive_true(user):
 
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, name='default2')
+def test_post_minimalistic_user_with_unallocated_device_no_error(device, context):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(context_name=context['name'])
+
+    response = confd.users.post(
+        {
+            'lines': [line],
+            'device_id': device['id'],
+            **user,
+        },
+        wazo_tenant=SUB_TENANT,
+    )
+
+    response.assert_created('users')
+    payload = response.item
+
+    try:
+        # check the data returned when the user is created
+        assert_that(
+            payload,
+            has_entries(
+                uuid=uuid_(),
+                lines=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        endpoint_sip=has_entries(uuid=uuid_()),
+                        extensions=contains(has_entries(id=greater_than(0))),
+                    )
+                ),
+                device_id=device['id'],
+                **user,
+            ),
+        )
+
+        # retrieve the user (created before) and check their fields
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(
+                lines=contains(has_entries(id=payload['lines'][0]['id'])),
+            ),
+        )
+        # retrieve the line (created before) and check its data are correct
+        assert_that(
+            confd.lines(payload['lines'][0]['id']).get().item,
+            has_entries(
+                extensions=contains(has_entries(**extension)),
+                endpoint_sip=has_entries(name='iddqd'),
+                device_id=device['id'],
+            ),
+        )
+        # retrieve the device (created as an unallocated device) and check its tenant is
+        # now the user tenant
+        assert_that(
+            confd.devices(device['id']).get().item,
+            has_entries(tenant_uuid=SUB_TENANT),
+        )
+    finally:
+        confd.users(payload['uuid']).delete().assert_deleted()
+        confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
+        confd.devices(device['id']).delete().assert_deleted()
