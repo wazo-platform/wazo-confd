@@ -8,7 +8,7 @@ class UnallocatedDeviceMiddleWare:
     def __init__(self, service):
         self._service = service
 
-    def associate(self, device_id, tenant_uuid):
+    def assign_tenant(self, device_id, tenant_uuid):
         device = self._service.get(device_id)
         if not device.is_new:
             raise errors.not_found('Device', id=device_id)

@@ -68,7 +68,7 @@ class UnallocatedDeviceItem(SingleTenantConfdResource):
     def put(self, id):
         tenant = Tenant.autodetect()
         tenant_dao.find_or_create_tenant(tenant.uuid)
-        self._middleware.associate(id, tenant.uuid)
+        self._middleware.assign_tenant(id, tenant.uuid)
         return '', 204
 
 
