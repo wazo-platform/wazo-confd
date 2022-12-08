@@ -55,12 +55,6 @@ bus:
     exchange_durable: True
     subscribe_exchange_name: wazo-headers
 
-# Consul connection settings
-consul:
-    scheme: http
-    host: localhost
-    port: 8500
-
 # wazo-provd connection settings
 provd:
     host: localhost
@@ -73,24 +67,38 @@ sysconfd:
     host: localhost
     port: 8668
 
-# Service discovery configuration. all time intervals are in seconds
 service_discovery:
-  # The address that will be received by other services using service discovery.
-  # Use "advertise_address: auto" to enable ip address detection based on
-  # advertise_address_interface
-  advertise_address: auto
-  # If advertise_address is "auto" this interface will be used to find the ip
-  # address to advertise. Ignored otherwise
-  advertise_address_interface: eth0
-  advertise_port: 9486
-  # The number of seconds that consul will wait between 2 ttl messages to mark
-  # this service as up
-  ttl_interval: 30
-  # The time interval before the service sends a new ttl message to consul
-  refresh_interval: 27
-  # The time interval to detect that the service is running when starting
-  retry_interval: 2
-  extra_tags: []
+  enabled: false
+
+# Example settings to enable service discovery
+#
+# Necessary to use service discovery
+# consul:
+#   scheme: http
+#   host: consul.example.com
+#   port: 8500
+#   token: 'the_one_ring'
+#
+# # All time intervals are in seconds
+# service_discovery:
+#   # Indicates whether of not to use service discovery.
+#   enabled: true
+#   # The address that will be received by other services using service discovery.
+#   # Use "advertise_address: auto" to enable ip address detection based on
+#   # advertise_address_interface
+#   advertise_address: auto
+#   # If advertise_address is "auto" this interface will be used to find the ip
+#   # address to advertise. Ignored otherwise
+#   advertise_address_interface: eth0
+#   advertise_port: 9486
+#   # The number of seconds that consul will wait between 2 ttl messages to mark
+#   # this service as up
+#   ttl_interval: 30
+#   # The time interval before the service sends a new ttl message to consul
+#   refresh_interval: 27
+#   # The time interval to detect that the service is running when starting
+#   retry_interval: 2
+#   extra_tags: []
 
 # Activate confd plugins
 # This is the recommended way to add plugins.
