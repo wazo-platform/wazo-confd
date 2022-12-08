@@ -13,3 +13,7 @@ class UnallocatedDeviceMiddleWare:
         if not device.is_new:
             raise errors.not_found('Device', id=device_id)
         self._service.assign_tenant(device, tenant_uuid=tenant_uuid)
+
+    def reset_autoprov(self, device_id, tenant_uuid):
+        device = self._service.get(device_id, tenant_uuid=tenant_uuid)
+        self._service.reset_autoprov(device, tenant_uuid=tenant_uuid)

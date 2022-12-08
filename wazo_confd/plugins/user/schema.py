@@ -14,7 +14,11 @@ from marshmallow.validate import Length, Range, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
+<<<<<<< HEAD
 from wazo_confd.plugins.agent.schema import AgentSchema, NUMBER_REGEX
+=======
+from wazo_confd.plugins.line.schema import LineSchema
+>>>>>>> a0203b48 (Update test and deletion when a device is used)
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
@@ -257,7 +261,7 @@ class UserSchemaNullable(UserSchema):
 
 class UserListItemSchema(UserSchemaNullable):
     auth = Nested('WazoAuthUserSchema')
-    lines = Nested('LineSchema', many=True)
+    lines = Nested('UserLineSchema', many=True)
     incalls = Nested('UserIncallSchema', many=True)
     groups = Nested('UserGroupSchema', many=True)
     switchboards = Nested('UserSwitchboardSchema', many=True)
@@ -336,3 +340,7 @@ class UserSwitchboardSchema(BaseSchema):
 
 class UserAgentSchema(AgentSchema):
     number = fields.String(validate=Regexp(NUMBER_REGEX))
+
+
+class UserLineSchema(LineSchema):
+    device_id = fields.String()

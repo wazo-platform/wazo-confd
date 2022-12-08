@@ -6,7 +6,7 @@ from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.errors import FormattedError
-from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers.exception import NotFoundError, ResourceError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
 from .schema import UserListItemSchema
@@ -66,6 +66,28 @@ class UserMiddleWare:
                     user_dict['id'], line['id'], tenant_uuids
                 )
                 user_dict['lines'].append(line)
+
+                device_id = line_body.get('device_id', None)
+                if device_id:
+                    try:
+                        self._middleware_handle.get(
+                            'unallocated_device_middleware'
+                        ).assign_tenant(device_id, tenant_uuid)
+                    except FormattedError as e:
+                        if (
+                            e.exception != NotFoundError
+                            or self._middleware_handle.get(
+                                'unallocated_device_middleware'
+                            )
+                            .get(device_id)
+                            .is_new()
+                        ):
+                            raise e
+                    self._middleware_handle.get(
+                        'line_device_association_middleware'
+                    ).associate(line['id'], device_id, tenant_uuid, tenant_uuids)
+                    line['device_id'] = device_id
+
             Session.expire(model, ['user_lines'])
 
         for incall_body in incalls:
@@ -122,25 +144,6 @@ class UserMiddleWare:
             auth['tenant_uuid'] = user_dict['tenant_uuid']
             user_dict['auth'] = self._wazo_user_service.create(auth)
 
-        if device_id:
-            try:
-                self._middleware_handle.get(
-                    'unallocated_device_middleware'
-                ).assign_tenant(device_id, tenant_uuid)
-            except FormattedError as e:
-                if e.exception != NotFoundError:
-                    raise e
-            try:
-                self._middleware_handle.get(
-                    'line_device_association_middleware'
-                ).associate(
-                    user_dict['lines'][0]['id'], device_id, tenant_uuid, tenant_uuids
-                )
-            except (KeyError, IndexError) as e:
-                # if no line, the association between a line and a device is ignored
-                pass
-            user_dict['device_id'] = device_id
-
         return user_dict
 
     def delete(self, user_id, tenant_uuid, tenant_uuids, recursive=False):
@@ -155,17 +158,21 @@ class UserMiddleWare:
                 ).associate_all_groups({'groups': []}, user.uuid)
 
             for line in user.lines:
-                self._middleware_handle.get(
-                    'line_device_association_middleware'
-                ).dissociate(line.id, line.device, tenant_uuid, tenant_uuids)
+                # process the device associated to the line
+                device_id = line.device
+                if device_id:
+                    self._middleware_handle.get(
+                        'unallocated_device_middleware'
+                    ).reset_autoprov(device_id, tenant_uuid)
 
-            for line in user.lines:
+                # process the line itself
                 self._middleware_handle.get('user_line_association').dissociate(
                     user.uuid, line.id, tenant_uuids
                 )
                 self._middleware_handle.get('line').delete(
                     line.id, tenant_uuids, recursive=True
                 )
+
                 Session.expire(user, ['user_lines'])
 
             for incall in user.incalls:

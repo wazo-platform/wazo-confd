@@ -18,6 +18,7 @@ from hamcrest import (
     not_,
     raises,
     calling,
+    starts_with,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
@@ -957,11 +958,17 @@ def test_bus_events(user):
 
 
 def generate_user_resources_bodies(
-    group=None, switchboard=None, context_name=None, incall_context_name=None
+    group=None,
+    switchboard=None,
+    context_name=None,
+    incall_context_name=None,
+    device=None,
 ):
     exten = h.extension.find_available_exten(context_name)
     if incall_context_name:
         source_exten = h.extension.find_available_exten(incall_context_name)
+    else:
+        source_exten = None
     user = FULL_USER
     auth = AUTH_USER
     extension = {'context': context_name, 'exten': exten}
@@ -970,10 +977,14 @@ def generate_user_resources_bodies(
         'extensions': [extension],
         'endpoint_sip': {'name': 'iddqd'},
     }
+    if device:
+        line['device_id'] = device['id']
     if incall_context_name:
         incall = {
             'extensions': [{'context': incall_context_name, 'exten': source_exten}],
         }
+    else:
+        incall = None
     if group:
         group = {
             'uuid': group['uuid'],
@@ -1010,6 +1021,7 @@ def test_post_full_user_no_error(
         switchboard=switchboard,
         context_name=CONTEXT,
         incall_context_name=INCALL_CONTEXT,
+        device=device,
     )
     agent = {}
 
@@ -1023,7 +1035,6 @@ def test_post_full_user_no_error(
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
                 'agent': agent,
-                'device_id': device['id'],
                 **user,
             }
         )
@@ -1042,6 +1053,7 @@ def test_post_full_user_no_error(
                             id=greater_than(0),
                             endpoint_sip=has_entries(uuid=uuid_()),
                             extensions=contains(has_entries(id=greater_than(0))),
+                            device_id=device['id'],
                         )
                     ),
                     incalls=contains(
@@ -1074,7 +1086,6 @@ def test_post_full_user_no_error(
                         number=line['extensions'][0]['exten'],
                         firstname=user['firstname'],
                     ),
-                    device_id=device['id'],
                     **user,
                 ),
             )
@@ -1198,6 +1209,7 @@ def test_delete_full_user_no_error(
         switchboard=switchboard,
         context_name=CONTEXT,
         incall_context_name=INCALL_CONTEXT,
+        device=device,
     )
 
     with a.group_extension(group, group_extension):
@@ -1210,7 +1222,6 @@ def test_delete_full_user_no_error(
                 'groups': [group],
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
-                'device_id': device['id'],
                 **user,
             }
         )
@@ -1257,6 +1268,11 @@ def test_delete_full_user_no_error(
             calling(authentication.users.get).with_args(payload['uuid']),
             raises(HTTPError, "404 Client Error: NOT FOUND"),
         )
+
+        # verify that the device is not deleted
+        url = confd.devices(device['id'])
+        response = url.get()
+        response.assert_ok()
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -1319,6 +1335,7 @@ def test_delete_simple_user_with_recursive_true(user):
     response = confd.users(user['uuid']).delete(recursive=True)
     response.assert_deleted()
 
+    # check that the user does not exist anymore
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
 
@@ -1336,12 +1353,11 @@ def test_post_minimalistic_user_with_unallocated_device_no_error(device, context
         incall,
         group,
         switchboard,
-    ) = generate_user_resources_bodies(context_name=context['name'])
+    ) = generate_user_resources_bodies(context_name=context['name'], device=device)
 
     response = confd.users.post(
         {
             'lines': [line],
-            'device_id': device['id'],
             **user,
         },
         wazo_tenant=SUB_TENANT,
@@ -1351,40 +1367,27 @@ def test_post_minimalistic_user_with_unallocated_device_no_error(device, context
     payload = response.item
 
     try:
-        # check the data returned when the user is created
+        # check if the returned data contains the device_id
         assert_that(
             payload,
             has_entries(
                 uuid=uuid_(),
                 lines=contains(
                     has_entries(
-                        id=greater_than(0),
-                        endpoint_sip=has_entries(uuid=uuid_()),
-                        extensions=contains(has_entries(id=greater_than(0))),
+                        device_id=device['id'],
                     )
                 ),
-                device_id=device['id'],
                 **user,
             ),
         )
 
-        # retrieve the user (created before) and check their fields
-        assert_that(
-            confd.users(payload['uuid']).get().item,
-            has_entries(
-                lines=contains(has_entries(id=payload['lines'][0]['id'])),
-            ),
-        )
-        # retrieve the line (created before) and check its data are correct
+        # retrieve the line (created before) and check if the device is associated to the line
         assert_that(
             confd.lines(payload['lines'][0]['id']).get().item,
-            has_entries(
-                extensions=contains(has_entries(**extension)),
-                endpoint_sip=has_entries(name='iddqd'),
-                device_id=device['id'],
-            ),
+            has_entries(device_id=device['id']),
         )
-        # retrieve the device (created as an unallocated device) and check its tenant is
+
+        # retrieve the device (created as an unallocated device) and check if its tenant is
         # now the user tenant
         assert_that(
             confd.devices(device['id']).get().item,
@@ -1394,3 +1397,41 @@ def test_post_minimalistic_user_with_unallocated_device_no_error(device, context
         confd.users(payload['uuid']).delete().assert_deleted()
         confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
         confd.devices(device['id']).delete().assert_deleted()
+
+
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, name='default2')
+def test_delete_minimalistic_user_with_device_no_error(device, context):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(context_name=context['name'], device=device)
+
+    response = confd.users.post(
+        {
+            'lines': [line],
+            **user,
+        },
+        wazo_tenant=SUB_TENANT,
+    )
+
+    response.assert_created('users')
+
+    response = confd.users(response.item['uuid']).delete(recursive=True)
+    response.assert_deleted()
+
+    # retrieve the device (previously created as an unallocated device)
+    # and check if its tenant is always the user tenant and if status=autoprov
+    from . import provd
+
+    device_cfg = provd.devices.get(device['id'])
+    assert_that(
+        device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
+    )
