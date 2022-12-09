@@ -6,7 +6,7 @@ from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.errors import FormattedError
-from xivo_dao.helpers.exception import NotFoundError, ResourceError
+from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
 from .schema import UserListItemSchema
