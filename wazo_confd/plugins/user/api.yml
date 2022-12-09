@@ -723,7 +723,7 @@ definitions:
       lines:
         type: array
         items:
-          $ref: '#/definitions/LineCreate'
+          $ref: '#/definitions/UserPostRelationLine'
       groups:
         type: array
         items:
@@ -847,3 +847,14 @@ definitions:
                     type: string
                   exten:
                     type: string
+  UserPostRelationLine:
+    properties:
+      device_id:
+        type: string
+        description: ID of the device associated to the line
+    allOf:
+      - $ref: '#/definitions/Line'
+      - $ref: '#/definitions/LineExtensions'
+      - $ref: '#/definitions/LineEndpointSIP'
+      - $ref: '#/definitions/LineEndpointSCCP'
+      - $ref: '#/definitions/LineEndpointCustom'
