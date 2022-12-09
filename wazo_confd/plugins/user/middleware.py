@@ -53,7 +53,6 @@ class UserMiddleWare:
                 )
         user_dict['voicemail'] = voicemail
 
-
         if lines:
             for line_body in lines:
                 line = self._middleware_handle.get('line').create(
