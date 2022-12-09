@@ -107,7 +107,7 @@ class UserSchema(BaseSchema):
     switchboards = Nested(
         'SwitchboardSchema', only=['uuid', 'name', 'links'], many=True, dump_only=True
     )
-    voicemail = Nested('UserVoicemailSchema')
+    voicemail = Nested('VoicemailSchema', only=['id', 'name', 'links'], dump_only=True)
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
@@ -251,7 +251,8 @@ class UserListItemSchema(UserSchemaNullable):
     incalls = Nested('UserIncallSchema', many=True)
     groups = Nested('UserGroupSchema', many=True)
     switchboards = Nested('UserSwitchboardSchema', many=True)
-    voicemail = Nested('VoicemailSchema', only=['id', 'name', 'links'])
+    voicemail = Nested('UserVoicemailSchema', allow_none=True)
+
 
 class UserIncallSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
