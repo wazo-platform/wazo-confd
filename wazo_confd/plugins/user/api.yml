@@ -775,138 +775,13 @@ definitions:
     allOf:
     - $ref: '#/definitions/UserPostRelationIncalls'
   UserPostResponse:
-    title: User
+    title: UserCreateResponse
+    allOf:
+      - $ref: '#/definitions/UserPost'
+      - $ref: '#/definitions/AuthUserPost'
+      - $ref: '#/definitions/UserPostRelationIncalls'
+  AuthUserPost:
     properties:
-      id:
-        type: integer
-        description: User ID
-        readOnly: true
-      email:
-        type: string
-        description: User's email. Used for directories (i.e. by wazo-dird)
-      timezone:
-        type: string
-        description: User timezone
-      language:
-        type: string
-        enum:
-        - de_DE
-        - en_US
-        - es_ES
-        - fr_FR
-        - fr_CA
-        - it_IT
-        - nl_NL
-        description: User language (e.g. "en_US")
-      description:
-        type: string
-        description: Additional information about the user
-      call_transfer_enabled:
-        type: boolean
-        default: false
-        description: Authorize call transfers
-      dtmf_hangup_enabled:
-        type: boolean
-        default: false
-        description: Authorize to hangup with DTMF
-      call_record_enabled:
-        type: boolean
-        default: false
-        description: Record all calls made by this user (deprecated). If set, all `call_record_*_enabled` will be affected
-      call_record_outgoing_external_enabled:
-        type: boolean
-        default: false
-        description: Record all external calls made by this user
-      call_record_incoming_external_enabled:
-        type: boolean
-        default: false
-        description: "Record all external calls received by this user."
-      call_record_outgoing_internal_enabled:
-        type: boolean
-        default: false
-        description: Record all internal calls received by this user
-      call_record_incoming_internal_enabled:
-        type: boolean
-        default: false
-        description: "Record all internal calls received by this user."
-      online_call_record_enabled:
-        type: boolean
-        default: false
-        description: Allow user to record a call by pressing *3
-      caller_id:
-        type: string
-        description: Name that appears on the phone when calling. Formatted as "Firstname
-          Lastname" < number >
-      outgoing_caller_id:
-        type: string
-        enum:
-        - default
-        - anonymous
-        - '"Firstname Lastname" < number >'
-        description: Name that appears on the phone when calling
-      mobile_phone_number:
-        type: string
-        description: Phone number for the user’s mobile device
-      username:
-        type: string
-        description: Username for connecting to the CTI (deprecated)
-      password:
-        type: string
-        minLength: 4
-        description: Password for connecting to the CTI (deprecated)
-      music_on_hold:
-        type: string
-        description: Name of the MOH category to use for music on hold
-      ring_seconds:
-        type: integer
-        default: 30
-        description: Number of seconds a user's phone will ring before falling back
-      simultaneous_calls:
-        type: integer
-        default: 5
-        description: Number of allowed simultaneous calls on a user's phone
-      supervision_enabled:
-        type: boolean
-        default: true
-        description: Activate presence sharing in the xivo client
-      preprocess_subroutine:
-        type: string
-        description: Name of the subroutine to execute in asterisk before receiving
-          a call
-      userfield:
-        type: string
-        description: A custom field which purpose is left to the client. If the user
-          has no userfield, then this field is an empty string.
-      call_permission_password:
-        type: string
-        description: Overwrite all passwords set in call permissions associated to
-          the user
-      enabled:
-        type: boolean
-        default: true
-        description: Enable/Disable the user
-      tenant_uuid:
-        type: string
-        description: The UUID of the tenant
-        readOnly: true
-      lines:
-        type: array
-        items:
-          $ref: '#/definitions/LineCreate'
-      groups:
-        type: array
-        items:
-          type: object
-          properties:
-            uuid:
-              type: string
-      switchboards:
-        type: array
-        items:
-          type: object
-          properties:
-            uuid:
-              type: string
       auth:
         type: object
         properties:
@@ -931,8 +806,6 @@ definitions:
               - user
               - internal
               - external_api
-    allOf:
-    - $ref: '#/definitions/UserPostRelationIncalls'
   UserPostRelationIncalls:
     properties:
       incalls:
