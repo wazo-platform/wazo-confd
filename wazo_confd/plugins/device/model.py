@@ -1,5 +1,9 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Device:
@@ -24,10 +28,9 @@ class Device:
     @property
     def config(self):
         if self._config is None:
-            raise Exception(
-                "Provd Device({}) has no config associated. The device may be corrupt".format(
-                    self.id
-                )
+            logger.error(
+                "Provd Device(%s) has no config associated. The device may be corrupt",
+                self.id,
             )
         return self._config
 

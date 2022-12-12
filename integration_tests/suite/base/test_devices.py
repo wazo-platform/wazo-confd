@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -157,6 +157,23 @@ def test_list_unallocated(main, sub):
 
     response = confd.devices.unallocated.get(wazo_tenant=SUB_TENANT)
     assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
+
+
+@fixtures.device()
+@fixtures.device()
+def test_list_device_no_config(dev1, dev2):
+    real_device = provd.devices.get(dev1['id'])
+    real_device['config'] = None
+    provd.devices.update(real_device)
+
+    response = confd.devices.get()
+    assert_that(
+        response.items,
+        all_of(
+            has_item(has_entries({'id': dev1['id']})),
+            has_item(has_entries({'id': dev2['id']})),
+        ),
+    )
 
 
 @fixtures.device(
