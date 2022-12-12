@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.line import dao as line_dao
@@ -8,6 +8,7 @@ from wazo_confd.plugins.device.builder import (
     build_dao as build_device_dao,
     build_device_updater,
 )
+from .middleware import LineDeviceAssociationMiddleWare
 
 from .resource import LineDeviceAssociation, LineDeviceGet, DeviceLineGet
 from .service import build_service
@@ -18,6 +19,7 @@ class Plugin:
         api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
+        middleware_handle = dependencies['middleware_handle']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
@@ -26,11 +28,18 @@ class Plugin:
         device_updater = build_device_updater(provd_client)
         service = build_service(provd_client, device_updater)
 
+        line_device_association_middleware = LineDeviceAssociationMiddleWare(
+            service, device_dao
+        )
+        middleware_handle.register(
+            'line_device_association', line_device_association_middleware
+        )
+
         api.add_resource(
             LineDeviceAssociation,
             '/lines/<int:line_id>/devices/<device_id>',
             endpoint='line_devices',
-            resource_class_args=(line_dao, device_dao, service),
+            resource_class_args=(line_device_association_middleware,),
         )
 
         api.add_resource(

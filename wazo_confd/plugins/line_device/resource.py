@@ -1,10 +1,10 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 
 from xivo.tenant_flask_helpers import Tenant
-
+from xivo_dao import tenant_dao
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from wazo_confd.helpers.restful import ConfdResource
@@ -27,26 +27,28 @@ class LineDevice(ConfdResource):
         self.service = service
 
 
-class LineDeviceAssociation(LineDevice):
+class LineDeviceAssociation(ConfdResource):
 
     has_tenant_uuid = True
 
+    def __init__(self, middleware):
+        super().__init__()
+        self._middleware = middleware
+
     @required_acl('confd.lines.{line_id}.devices.{device_id}.update')
     def put(self, line_id, device_id):
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-        tenant_uuid = Tenant.autodetect().uuid
-        device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
-        self.service.associate(line, device)
+        self._middleware.associate(line_id, device_id, tenant.uuid, tenant_uuids)
         return '', 204
 
     @required_acl('confd.lines.{line_id}.devices.{device_id}.delete')
     def delete(self, line_id, device_id):
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
-        tenant_uuid = Tenant.autodetect().uuid
-        device = self.device_dao.get(device_id, tenant_uuid=tenant_uuid)
-        self.service.dissociate(line, device)
+        self._middleware.dissociate(line_id, device_id, tenant.uuid, tenant_uuids)
         return '', 204
 
 

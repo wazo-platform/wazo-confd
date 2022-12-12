@@ -1,9 +1,10 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
 
 from .builder import build_dao, build_service
+from .middleware import UnallocatedDeviceMiddleWare
 from .resource import (
     DeviceItem,
     DeviceList,
@@ -19,12 +20,18 @@ class Plugin:
         api = dependencies['api']
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
+        middleware_handle = dependencies['middleware_handle']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
         dao = build_dao(provd_client)
         service = build_service(dao, provd_client)
+
+        unallocated_device_middleware = UnallocatedDeviceMiddleWare(service)
+        middleware_handle.register(
+            'unallocated_device_middleware', unallocated_device_middleware
+        )
 
         api.add_resource(
             DeviceItem,
@@ -54,5 +61,5 @@ class Plugin:
         api.add_resource(
             UnallocatedDeviceItem,
             '/devices/unallocated/<id>',
-            resource_class_args=(service,),
+            resource_class_args=(unallocated_device_middleware,),
         )
