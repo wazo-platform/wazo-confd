@@ -16,3 +16,7 @@ class UserFallbackMiddleWare:
         user = user_dao.get_by_id_uuid(user_id)
         fallbacks = self._schema.load(body)
         self._user_fallback_service.edit(user, fallbacks)
+
+    def get(self, user_id):
+        user = user_dao.get_by_id_uuid(user_id)
+        return self._schema.dump(user.fallbacks)

@@ -111,18 +111,16 @@ class UserMiddleWare:
             )
         user_dict['switchboards'] = switchboards
 
-        #TODO
-        # if forwards:
-        #     self._user_forward_list_resource._put(user_dict['uuid'], forwards)
-        #     user_dict['forwards'] = self._user_forward_list_resource.get(
-        #         user_dict['uuid']
-        #     )
-        #TODO
-        # if fallbacks:
-        #     self._user_fallback_list_resource._put(user_dict['uuid'], fallbacks)
-        #     user_dict['fallbacks'] = self._user_fallback_list_resource.get(
-        #         user_dict['uuid']
-        #    )
+        if forwards:
+            self._middleware_handle.get('user_forward_association').associate(user_dict['uuid'], forwards)
+            user_dict['forwards'] = self._middleware_handle.get('user_forward_association').get(
+                user_dict['uuid']
+            )
+        if fallbacks:
+            self._middleware_handle.get('user_fallback_association').associate(user_dict['uuid'], fallbacks)
+            user_dict['fallbacks'] = self._middleware_handle.get('user_fallback_association').get(
+                user_dict['uuid']
+           )
 
         if auth:
             auth['uuid'] = user_dict['uuid']

@@ -127,7 +127,7 @@ class UserForwardList(UserSubResource):
 
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):
-        return super().get(user_id)
+        return self._user_forward_association.get(user_id)
 
     @required_acl('confd.users.{user_id}.forwards.update')
     def put(self, user_id):

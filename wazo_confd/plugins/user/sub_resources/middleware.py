@@ -19,7 +19,6 @@ class UserForwardMiddleWare:
             setattr(user, name, value)
         self._service_forward.edit(user, self._schema)
 
-
-
-class UserFallbackMiddleWare:
-    pass
+    def get(self, user_id):
+        user = self._service_forward.get(user_id)
+        return self._schema.dump(user)
