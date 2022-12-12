@@ -9,7 +9,7 @@ class WazoUserService:
         self._auth_client = auth_client
 
     def create(self, user):
-        self._auth_client.new_user(
+        return self._auth_client.new_user(
             uuid=user.get('uuid'),
             firstname=user.get('firstname'),
             lastname=user.get('lastname'),

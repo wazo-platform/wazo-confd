@@ -38,7 +38,7 @@ paths:
         '201':
           description: User created
           schema:
-            $ref: '#/definitions/UserPost'
+            $ref: '#/definitions/UserPostResponse'
         '400':
           $ref: '#/responses/CreateError'
   /users/{user_id}:
@@ -746,18 +746,66 @@ definitions:
         properties:
           uuid:
             type: string
-            readOnly: true
             description: "The user's UUID"
+            readOnly: true
           username:
             type: string
             description: The username that will identify that new username
           password:
             type: string
             description: The password of the newly created username
-    required:
-      - firstname
+          firstname:
+            type: string
+            description: "The user's firstname"
+          lastname:
+            type: string
+            description: "The user's lastname"
+          enabled:
+            type: boolean
+          email_address:
+            type: string
+            description: The main email address of the new username
+          purpose:
+            type: string
+            default: user
+            enum:
+              - user
+              - internal
+              - external_api
     allOf:
     - $ref: '#/definitions/UserPostRelationIncalls'
+  UserPostResponse:
+    title: UserCreateResponse
+    allOf:
+      - $ref: '#/definitions/UserPost'
+      - $ref: '#/definitions/AuthUserPost'
+      - $ref: '#/definitions/UserPostRelationIncalls'
+  AuthUserPost:
+    properties:
+      auth:
+        type: object
+        properties:
+          username:
+            type: string
+          emails:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                main:
+                  type: boolean
+                confirmed:
+                  type: boolean
+          uuid:
+            type: string
+          purpose:
+            type: string
+            enum:
+              - user
+              - internal
+              - external_api
   UserPostRelationIncalls:
     properties:
       incalls:
