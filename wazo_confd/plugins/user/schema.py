@@ -123,12 +123,11 @@ class UserSchema(BaseSchema):
     switchboards = Nested(
         'SwitchboardSchema', only=['uuid', 'name', 'links'], many=True, dump_only=True
     )
-    voicemail = Nested('UserVoicemailSchema')
+    voicemail = Nested('VoicemailSchema', only=['id', 'name', 'links'], dump_only=True)
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True
     )
     func_key_template_id = fields.Integer(allow_none=True)
-    auth = Nested('WazoAuthUserSchema')
 
     @pre_dump
     def flatten_call_pickup_targets(self, data, **kwargs):
@@ -150,23 +149,6 @@ class UserSchema(BaseSchema):
         if not self.only or 'call_pickup_target_users' in self.only:
             call_pickup_user_targets = data.pop('call_pickup_user_targets_flat', [])
             data['call_pickup_target_users'] = call_pickup_user_targets
-        return data
-
-    @pre_load
-    def set_auth_defaults(self, data, **kwargs):
-        auth = data.get('auth')
-        if not auth:
-            return data
-
-        if not auth.get('firstname') and data.get('firstname'):
-            auth['firstname'] = data['firstname']
-
-        if not auth.get('lastname') and data.get('lastname'):
-            auth['lastname'] = data['lastname']
-
-        if not auth.get('email_address') and data.get('email'):
-            auth['email_address'] = data['email']
-
         return data
 
     @classmethod
@@ -230,10 +212,6 @@ class UserSchema(BaseSchema):
             data['call_record_incoming_external_enabled'] = False
             data['call_record_incoming_internal_enabled'] = False
         return data
-
-
-class UserVoicemailSchema(VoicemailSchema):
-    id = fields.Integer()
 
 
 class UserDirectorySchema(BaseSchema):
@@ -340,8 +318,3 @@ class UserGroupSchema(BaseSchema):
 class UserSwitchboardSchema(BaseSchema):
     uuid = fields.String(validate=Length(max=40), required=True)
     links = ListLink(Link('switchboards', field='uuid'))
-
-
-class UserPutSchema(UserSchema):
-    lines = Nested('LineSchema', many=True, dump_only=True)
-    voicemail = Nested('VoicemailSchema', dump_only=True)

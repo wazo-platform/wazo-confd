@@ -312,7 +312,6 @@ def test_get_endpoint_sip_relation(line, sip):
                     name='my-endpoint',
                     auth_section_options=contains_inanyorder(
                         contains('username', 'my-username'),
-                        contains('password', 'my-password'),
                     ),
                 )
             ),

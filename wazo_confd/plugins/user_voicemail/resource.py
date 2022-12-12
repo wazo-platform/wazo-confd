@@ -14,14 +14,15 @@ class UserVoicemailItem(ConfdResource):
 
     has_tenant_uuid = True
 
-    def __init__(self, middleware):
+    def __init__(self,  user_voicemail_association_middleware):
         super().__init__()
-        self._middleware = middleware
+
+        self._user_voicemail_association_middleware=user_voicemail_association_middleware
 
     @required_acl('confd.users.{user_id}.voicemails.{voicemail_id}.update')
     def put(self, user_id, voicemail_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.associate(user_id, voicemail_id, tenant_uuids)
+        self._user_voicemail_association_middleware.associate(user_id, voicemail_id,tenant_uuids)
         return '', 204
 
 
@@ -30,12 +31,17 @@ class UserVoicemailList(ConfdResource):
     schema = VoicemailSchema
     has_tenant_uuid = True
 
-    def __init__(self, service, user_dao, voicemail_dao, middleware):
+    def __init__(self, service, voicemail_service, user_dao, voicemail_dao, voicemail_middleware,user_voicemail_association_middleware):
         super().__init__()
         self.service = service
         self.user_dao = user_dao
         self.voicemail_dao = voicemail_dao
-        self._middleware = middleware
+        self._voicemail_list_resource = VoicemailList(voicemail_service, voicemail_middleware)
+        self._user_voicemail_item_resource = UserVoicemailItem(
+            user_voicemail_association_middleware
+        )
+        self._voicemail_middleware=voicemail_middleware
+        self._user_voicemail_association_middleware=user_voicemail_association_middleware
 
     def build_headers(self, voicemail):
         return {'Location': url_for('voicemails', id=voicemail['id'], _external=True)}
@@ -43,7 +49,7 @@ class UserVoicemailList(ConfdResource):
     @required_acl('confd.users.{user_id}.voicemails.create')
     def post(self, user_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        voicemail = self._middleware.create_voicemail(
+        voicemail = self._user_voicemail_association_middleware.create_voicemail(
             user_id,
             request.get_json(),
             tenant_uuids,

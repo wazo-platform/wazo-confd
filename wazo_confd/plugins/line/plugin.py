@@ -40,20 +40,11 @@ class Plugin:
         config = dependencies['config']
         token_changed_subscribe = dependencies['token_changed_subscribe']
         middleware_handle = dependencies['middleware_handle']
-        pjsip_doc = dependencies['pjsip_doc']
 
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
         service = build_service(provd_client)
-        extension_line_service = build_extension_line_service()
-        extension_service = build_extension_service(provd_client)
-        endpoint_custom_service = build_endpoint_custom_service()
-        endpoint_sccp_service = build_endpoint_sccp_service()
-        endpoint_sip_service = build_endpoint_sip_service(provd_client, pjsip_doc)
-        line_endpoint_custom_association_service = build_service_custom(provd_client)
-        line_endpoint_sip_association_service = build_service_sip(provd_client)
-        line_endpoint_sccp_association_service = build_service_sccp(provd_client)
 
         line_middleware = LineMiddleWare(service, middleware_handle)
         middleware_handle.register('line', line_middleware)
@@ -68,24 +59,4 @@ class Plugin:
             LineList,
             '/lines',
             resource_class_args=(service, line_middleware),
-        )
-        api.add_resource(
-            LineList,
-            '/lines',
-            resource_class_args=(
-                service,
-                endpoint_custom_service,
-                endpoint_sip_service,
-                extension_line_service,
-                extension_service,
-                line_endpoint_custom_association_service,
-                line_endpoint_sip_association_service,
-                line_endpoint_sccp_association_service,
-                endpoint_sccp_service,
-                endpoint_custom_dao,
-                endpoint_sccp_dao,
-                line_dao,
-                sip_dao,
-                transport_dao,
-            ),
         )

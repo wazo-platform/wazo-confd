@@ -27,6 +27,8 @@ class UserMiddleWare:
         groups = form.pop('groups', None) or []
         switchboards = form.pop('switchboards', None) or []
         voicemail = form.pop('voicemail', None)
+        forwards=form.pop('forwards',None) or []
+        fallbacks=form.pop('fallbacks',None) or []
 
         model = User(**form)
         model = self._service.create(model)
@@ -52,6 +54,9 @@ class UserMiddleWare:
                     tenant_uuids,
                 )
         user_dict['voicemail'] = voicemail
+
+        user_dict['forwards'] = []
+        user_dict['fallbacks'] = []
 
         if lines:
             for line_body in lines:
@@ -105,6 +110,19 @@ class UserMiddleWare:
                 {'users': members}, _switchboard['uuid'], tenant_uuids
             )
         user_dict['switchboards'] = switchboards
+
+        #TODO
+        # if forwards:
+        #     self._user_forward_list_resource._put(user_dict['uuid'], forwards)
+        #     user_dict['forwards'] = self._user_forward_list_resource.get(
+        #         user_dict['uuid']
+        #     )
+        #TODO
+        # if fallbacks:
+        #     self._user_fallback_list_resource._put(user_dict['uuid'], fallbacks)
+        #     user_dict['fallbacks'] = self._user_fallback_list_resource.get(
+        #         user_dict['uuid']
+        #    )
 
         if auth:
             auth['uuid'] = user_dict['uuid']

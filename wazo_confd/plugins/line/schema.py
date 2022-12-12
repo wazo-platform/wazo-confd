@@ -52,7 +52,7 @@ class LineSchema(BaseSchema):
             nb_endpoint += 1
 
         if nb_endpoint > 1:
-            raise ValidationError('Only one endpoint should be configured')
+            raise ValidationError('Only one endpoint should be configured on a line')
 
     @validates_schema
     def _validate_multiple_caller_id(self, data, **kwargs):
@@ -106,6 +106,7 @@ class LineSchema(BaseSchema):
                     ['context', line_context],
                 )
                 endpoint_sip['endpoint_section_options'] = endpoint_section_options
+        return data
 
     @pre_load
     def populate_missing_context(self, data, **kwargs):
@@ -152,13 +153,7 @@ class LineListSchema(LineSchema):
         only=['id', 'interface', 'links'],
         dump_only=True,
     )
-    extensions = Nested(
-        'ExtensionSchema',
-        only=['id', 'exten', 'context', 'links'],
-        many=True,
-        dump_only=True,
-    )
 
 
-class LinePutSchema(LineSchema):
+class LinePutSchema(LineListSchema):
     pass

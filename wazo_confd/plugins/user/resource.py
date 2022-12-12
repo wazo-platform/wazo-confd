@@ -2,8 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
-import logging
-
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo.tenant_flask_helpers import Tenant
@@ -17,11 +15,7 @@ from .schema import (
     UserSchema,
     UserListItemSchema,
     UserSummarySchema,
-    UserPutSchema,
 )
-from .resource_sub import UserForwardList
-
-logger = logging.getLogger(__name__)
 
 
 class UserList(ListResource):
@@ -47,54 +41,6 @@ class UserList(ListResource):
         )
         return resource, 201, self.build_headers(resource)
 
-    def _post(self, body):
-        # forwards payload will be modified by the PUT body
-        forwards = body.pop('forwards', None)
-        fallbacks = body.pop('fallbacks', None)
-
-        body = self.schema().load(body)
-
-        lines = body.pop('lines', None) or []
-        auth = body.pop('auth', None)
-        voicemail = body.pop('voicemail', None)
-
-        user_dict, _, headers = super()._post(body)
-        user_dict['lines'] = []
-
-        for line_body in lines:
-            line, _, _ = self._line_list_resource._post(line_body)
-            self._user_line_item_resource.put(user_dict['uuid'], line['id'])
-            user_dict['lines'].append(line)
-
-        if voicemail:
-            voicemail_id = voicemail.get('id')
-            if voicemail_id:
-                self._user_voicemail_item_resource.put(user_dict['uuid'], voicemail_id)
-                user_dict['voicemail'] = self._voicemail_item_resource.get(voicemail_id)
-            else:
-                user_dict['voicemail'], _, _ = self._user_voicemail_list_resource._post(
-                    user_dict['uuid'], voicemail
-                )
-
-        if forwards:
-            self._user_forward_list_resource._put(user_dict['uuid'], forwards)
-            user_dict['forwards'] = self._user_forward_list_resource.get(
-                user_dict['uuid']
-            )
-
-        if fallbacks:
-            self._user_fallback_list_resource._put(user_dict['uuid'], fallbacks)
-            user_dict['fallbacks'] = self._user_fallback_list_resource.get(
-                user_dict['uuid']
-            )
-
-        if auth:
-            auth['uuid'] = user_dict['uuid']
-            auth['tenant_uuid'] = user_dict['tenant_uuid']
-            user_dict['auth'] = self._wazo_user_service.create(auth)
-
-        return user_dict, 201, headers
-
     @required_acl('confd.users.read')
     def get(self):
         params = self.search_params()
@@ -107,7 +53,7 @@ class UserList(ListResource):
 
 class UserItem(ItemResource):
 
-    schema = UserPutSchema
+    schema = UserSchema
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):
