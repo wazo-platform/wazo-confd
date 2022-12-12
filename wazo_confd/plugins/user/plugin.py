@@ -5,6 +5,7 @@ from wazo_provd_client import Client as ProvdClient
 
 from .middleware import UserMiddleWare
 from .resource import UserItem, UserList
+from .sub_resources.middleware import UserForwardMiddleWare
 from .sub_resources.resource import (
     UserForwardBusy,
     UserForwardList,
@@ -35,10 +36,15 @@ class Plugin:
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
 
-
-
-        user_middleware = UserMiddleWare(user_service, wazo_user_service, middleware_handle)
+        user_middleware = UserMiddleWare(
+            user_service, wazo_user_service, middleware_handle
+        )
         middleware_handle.register('user', user_middleware)
+
+        user_forward_association_middleware = UserForwardMiddleWare(service_forward)
+        middleware_handle.register(
+            'user_forward_association', user_forward_association_middleware
+        )
 
         api.add_resource(
             UserItem,
@@ -107,5 +113,5 @@ class Plugin:
             UserForwardList,
             '/users/<uuid:user_id>/forwards',
             '/users/<int:user_id>/forwards',
-            resource_class_args=(service_forward,),
+            resource_class_args=(service_forward, user_forward_association_middleware),
         )
