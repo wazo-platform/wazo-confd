@@ -32,7 +32,7 @@ class Plugin:
             service, device_dao
         )
         middleware_handle.register(
-            'line_device_association_middleware', line_device_association_middleware
+            'line_device_association', line_device_association_middleware
         )
 
         api.add_resource(
