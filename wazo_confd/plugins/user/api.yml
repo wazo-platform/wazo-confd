@@ -738,6 +738,9 @@ definitions:
           properties:
             uuid:
               type: string
+      voicemail:
+        $ref: '#/definitions/Voicemail'
+        description: The body of a new voicemail or a body containing an existing voicemail id that should be associated to the user.
       auth:
         type: object
         properties:
