@@ -1,7 +1,7 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields
+from marshmallow import fields, validates_schema, ValidationError
 from marshmallow.validate import Length, Range, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
@@ -36,3 +36,22 @@ class VoicemailSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+
+
+class UserVoicemailSchema(VoicemailSchema):
+    id = fields.Integer()
+    name = fields.String(validate=Length(max=80))
+    number = fields.String(validate=Regexp(NUMBER_REGEX))
+    context = fields.String()
+
+    @validates_schema
+    def check_required_fields(self, data, **kwargs):
+        voicemail_id = data.get('id', None)
+        name = data.get('name', None)
+        number = data.get('number', None)
+        context = data.get('context', None)
+        if not voicemail_id:
+            if not name and not number and not context:
+                raise ValidationError(
+                    'name, number and context must be provided if no id provided'
+                )

@@ -1,7 +1,12 @@
 # Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains_inanyorder, has_entries
+from hamcrest import (
+    assert_that,
+    contains_inanyorder,
+    has_entries,
+    has_items,
+)
 
 from . import confd
 from ..helpers import (
@@ -219,3 +224,50 @@ def test_list_user_voicemail_multi_tenant(_, __, main_vm, sub_vm, main_user, sub
 
         response = confd.users(sub_user['uuid']).voicemails.get(wazo_tenant=MAIN_TENANT)
         assert_that(response.items[0], has_entries(name=sub_vm['name']))
+
+
+@fixtures.user()
+@fixtures.voicemail_zonemessages(name='eu-fr')
+def test_create_and_associate(user, _):
+    number, context = h.voicemail.generate_number_and_context()
+
+    parameters = {
+        'name': 'full',
+        'number': number,
+        'context': context,
+        'email': 'test@example.com',
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': True,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': True,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
+
+    response = confd.users(user['uuid']).voicemails.post(parameters)
+    response.assert_created('voicemails')
+    assert_that(
+        response.item,
+        has_entries(
+            name='full',
+            number=number,
+            context=context,
+            email='test@example.com',
+            pager='test@example.com',
+            language='en_US',
+            timezone='eu-fr',
+            password='1234',
+            max_messages=10,
+            attach_audio=True,
+            ask_password=False,
+            delete_messages=True,
+            enabled=True,
+            options=has_items(
+                ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
+            ),
+        ),
+    )

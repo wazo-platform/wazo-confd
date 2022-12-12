@@ -744,8 +744,95 @@ def test_create_with_all_parameters():
     response = confd.users.post(**FULL_USER)
 
     response.assert_created('users')
-    assert_that(response.item, has_entries(FULL_USER))
-    assert_that(response.item, has_entries(created_at=is_not(none())))
+    try:
+        assert_that(response.item, has_entries(FULL_USER))
+        assert_that(response.item, has_entries(created_at=is_not(none())))
+    finally:
+        confd.users(response.item['uuid']).delete().assert_deleted()
+
+
+def test_create_with_voicemail_relation():
+    vm_number = h.voicemail.find_available_number(CONTEXT)
+    voicemail = {
+        'name': 'full',
+        'number': vm_number,
+        'context': CONTEXT,
+        'email': 'test@example.com',
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': True,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': True,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
+
+    response = confd.users.post(
+        {
+            'voicemail': voicemail,
+            **FULL_USER,
+        }
+    )
+    user_uuid = response.item['uuid']
+
+    response.assert_created()
+    try:
+        assert_that(
+            confd.users(user_uuid).get().item,
+            has_entries(
+                voicemail=has_entries(id=greater_than(0)),
+            ),
+        )
+        voicemail_id = response.item['voicemail']['id']
+        assert_that(
+            response.item,
+            has_entries(
+                voicemail=has_entries(
+                    id=greater_than(0),
+                )
+            ),
+        )
+    finally:
+        confd.users(user_uuid).voicemails.delete().assert_deleted()
+        confd.voicemails(voicemail_id).delete().assert_deleted()
+        confd.users(user_uuid).delete().assert_deleted()
+
+
+@fixtures.voicemail()
+def test_post_full_user_existing_voicemail(voicemail):
+    response = confd.users.post(
+        {
+            'voicemail': {'id': voicemail['id']},
+            **FULL_USER,
+        }
+    )
+
+    response.assert_created()
+    user_uuid = response.item['uuid']
+    try:
+        assert_that(
+            response.item,
+            has_entries(
+                voicemail=has_entries(
+                    id=voicemail['id'],
+                )
+            ),
+        )
+
+        assert_that(
+            confd.users(user_uuid).get().item,
+            has_entries(
+                voicemail=has_entries(
+                    id=voicemail['id'],
+                )
+            ),
+        )
+    finally:
+        confd.users(user_uuid).voicemails.delete().assert_deleted()
+        confd.users(user_uuid).delete().assert_deleted()
 
 
 def test_create_with_all_parameters_null():
@@ -1030,6 +1117,9 @@ def test_post_full_user_no_error(
             # retrieve the user and try to update the user with the same data
             user = confd.users(payload['uuid']).get().item
             user.pop('call_record_enabled', None)  # Deprecated field
+            user.pop(
+                'voicemail', None
+            )  # The voicemail cannot be updated directly by calling POST /users
             confd.users(payload['uuid']).put(**user).assert_updated()
         finally:
             confd.users(payload['uuid']).delete().assert_deleted()

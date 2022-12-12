@@ -3,6 +3,11 @@
 ## 22.17
 
 * DELETE on `/users?recursive=true` added, to provide a way to delete a user and their related resources.
+* `/users` endpoint now create the voicemail if it is specified in the body and associates it to the user.
+* `/users` endpoint now associates the voicemail if it is specified in the body.
+* The following resource has been added:
+
+  * POST `/1.1/users/<user_id>/voicemails`
 
 * ## 22.16
 
@@ -13,7 +18,7 @@
 * PUT on `/users/<user_id>/groups` now accepts the group `uuid` as well as the group `id` in its body
 * The `/tenants` endpoints were modified to remove the field `webrtc_video_sip_template_uuid`.
 * `/lines` endpoint now create the SIP, SCCP or custom endpoint if it is specified in the body and associates it to the line.
-* `/lines` endpoint new create the extension if it is specified in the body and associates it to the line.
+* `/lines` endpoint now create the extension if it is specified in the body and associates it to the line.
 
 ## 22.14
 

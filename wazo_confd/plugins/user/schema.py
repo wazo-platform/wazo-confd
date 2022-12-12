@@ -251,6 +251,7 @@ class UserListItemSchema(UserSchemaNullable):
     incalls = Nested('UserIncallSchema', many=True)
     groups = Nested('UserGroupSchema', many=True)
     switchboards = Nested('UserSwitchboardSchema', many=True)
+    voicemail = Nested('UserVoicemailSchema', allow_none=True)
 
 
 class UserIncallSchema(BaseSchema):
