@@ -55,8 +55,3 @@ class UserVoicemailSchema(VoicemailSchema):
                 raise ValidationError(
                     'name, number and context must be provided if no id provided'
                 )
-        if voicemail_id:
-            if name or number or context:
-                raise ValidationError(
-                    'name, number and context must not be provided if the id provided'
-                )
