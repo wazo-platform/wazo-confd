@@ -1002,6 +1002,7 @@ def test_post_full_user_no_error(
         group,
         switchboard,
     ) = generate_user_resources_bodies(group, switchboard)
+    agent = {}
 
     with a.group_extension(group, group_extension):
         response = confd.users.post(
@@ -1012,6 +1013,7 @@ def test_post_full_user_no_error(
                 'groups': [group],
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
+                'agent': agent,
                 **user,
             }
         )
@@ -1057,6 +1059,10 @@ def test_post_full_user_no_error(
                         lastname=user['lastname'],
                         emails=contains(has_entries(address=user['email'])),
                         username=auth['username'],
+                    ),
+                    agent=has_entries(
+                        number=line['extensions'][0]['exten'],
+                        firstname=user['firstname'],
                     ),
                     **user,
                 ),

@@ -14,6 +14,7 @@ from marshmallow.validate import Length, Range, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
+from wazo_confd.plugins.agent.schema import AgentSchema, NUMBER_REGEX
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
@@ -261,6 +262,25 @@ class UserListItemSchema(UserSchemaNullable):
     groups = Nested('UserGroupSchema', many=True)
     switchboards = Nested('UserSwitchboardSchema', many=True)
     voicemail = Nested('UserVoicemailSchema', allow_none=True)
+    agent = Nested('UserAgentSchema')
+
+    @pre_load
+    def init_agent(self, data, **kwargs):
+
+        agent = data.get('agent')
+
+        # if agent exists (even if empty), its missing fields are "auto-populated"
+        if agent is not None:
+            if 'firstname' not in agent or not agent['firstname']:
+                agent['firstname'] = data.get('firstname')
+            if 'lastname' not in agent or not agent['lastname']:
+                agent['lastname'] = data.get('lastname')
+            if 'number' not in agent or not agent['number']:
+                agent['number'] = (
+                    data.get('lines', [{}])[0].get('extensions', [{}])[0].get('exten')
+                )
+
+        return data
 
     @pre_load
     def init_auth(self, data, **kwargs):
@@ -311,3 +331,7 @@ class UserGroupSchema(BaseSchema):
 class UserSwitchboardSchema(BaseSchema):
     uuid = fields.String(validate=Length(max=40), required=True)
     links = ListLink(Link('switchboards', field='uuid'))
+
+
+class UserAgentSchema(AgentSchema):
+    number = fields.String(validate=Regexp(NUMBER_REGEX))

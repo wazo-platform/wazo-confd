@@ -27,6 +27,7 @@ class UserMiddleWare:
         groups = form.pop('groups', None) or []
         switchboards = form.pop('switchboards', None) or []
         voicemail = form.pop('voicemail', None)
+        agent = form.pop('agent', {})
 
         model = User(**form)
         model = self._service.create(model)
@@ -105,6 +106,13 @@ class UserMiddleWare:
                 {'users': members}, _switchboard['uuid'], tenant_uuids
             )
         user_dict['switchboards'] = switchboards
+
+        if agent:
+            agent = self._middleware_handle.get('agent').create(agent, tenant_uuid)
+            self._middleware_handle.get('user_agent_association').associate(
+                user_dict['uuid'], agent['id'], tenant_uuids
+            )
+            user_dict['agent'] = agent
 
         if auth:
             auth['uuid'] = user_dict['uuid']
