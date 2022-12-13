@@ -118,10 +118,15 @@ class UserForwardList(UserSubResource):
 
     schema = ForwardsSchema
 
+    def __init__(self, service, user_forward_association):
+        super().__init__(service)
+        self._user_forward_association = user_forward_association
+
     @required_acl('confd.users.{user_id}.forwards.read')
     def get(self, user_id):
-        return super().get(user_id)
+        return self._user_forward_association.get(user_id)
 
     @required_acl('confd.users.{user_id}.forwards.update')
     def put(self, user_id):
-        return super().put(user_id)
+        self._user_forward_association.associate(user_id, request.get_json())
+        return '', 204
