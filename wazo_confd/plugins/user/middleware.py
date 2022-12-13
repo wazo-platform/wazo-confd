@@ -142,15 +142,19 @@ class UserMiddleWare:
             user_dict['agent'] = agent
 
         if forwards:
-            self._middleware_handle.get('user_forward_association').associate(user_dict['uuid'], forwards)
-            user_dict['forwards'] = self._middleware_handle.get('user_forward_association').get(
-                user_dict['uuid']
+            self._middleware_handle.get('user_forward_association').associate(
+                user_dict['uuid'], forwards
             )
+            user_dict['forwards'] = self._middleware_handle.get(
+                'user_forward_association'
+            ).get(user_dict['uuid'])
         if fallbacks:
-            self._middleware_handle.get('user_fallback_association').associate(user_dict['uuid'], fallbacks)
-            user_dict['fallbacks'] = self._middleware_handle.get('user_fallback_association').get(
-                user_dict['uuid']
-           )
+            self._middleware_handle.get('user_fallback_association').associate(
+                user_dict['uuid'], fallbacks
+            )
+            user_dict['fallbacks'] = self._middleware_handle.get(
+                'user_fallback_association'
+            ).get(user_dict['uuid'])
 
         if auth:
             auth['uuid'] = user_dict['uuid']
