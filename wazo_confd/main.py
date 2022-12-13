@@ -37,3 +37,5 @@ def main(argv=None):
 
     controller = Controller(config)
     controller.run()
+
+print("test")
