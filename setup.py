@@ -8,7 +8,7 @@ from setuptools import find_packages
 setup(
     name='wazo-confd',
     version='0.1',
-    description='Wazo configuration daemon',
+    description='Wazo configuration daemon test',
     author='Wazo Authors',
     author_email='dev@wazo.community',
     url='http://wazo.community',
