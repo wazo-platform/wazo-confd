@@ -1146,7 +1146,9 @@ def test_post_delete_full_user_no_error(
         # retrieve the user and try to update the user with the same data
         user = confd.users(payload['uuid']).get().item
         user.pop('call_record_enabled', None)  # Deprecated field
-        user.pop('voicemail', None)  # The voicemail cannot be updated directly by calling POST /users
+        user.pop(
+            'voicemail', None
+        )  # The voicemail cannot be updated directly by calling POST /users
         confd.users(payload['uuid']).put(**user).assert_updated()
 
         # user deletion

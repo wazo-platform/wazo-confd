@@ -83,9 +83,9 @@ class UserMiddleWare:
                             .is_new()
                         ):
                             raise e
-                    self._middleware_handle.get(
-                        'line_device_association'
-                    ).associate(line['id'], device_id, tenant_uuid, tenant_uuids)
+                    self._middleware_handle.get('line_device_association').associate(
+                        line['id'], device_id, tenant_uuid, tenant_uuids
+                    )
                     line['device_id'] = device_id
 
             Session.expire(model, ['user_lines'])
