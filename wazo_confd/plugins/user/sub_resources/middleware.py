@@ -6,11 +6,11 @@ from .schema import ForwardsSchema
 
 
 class UserForwardMiddleWare:
-    def __init__(self,service_forward  ):
-        self._service_forward=service_forward
+    def __init__(self, service_forward):
+        self._service_forward = service_forward
         self._schema = ForwardsSchema()
 
-    def associate(self, user_id,body):
+    def associate(self, user_id, body):
         user = self._service_forward.get(user_id)
 
         form = self._schema.load(body)
