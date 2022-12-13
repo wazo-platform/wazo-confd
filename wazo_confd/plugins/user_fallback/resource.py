@@ -17,7 +17,7 @@ class UserFallbackList(ConfdResource):
         super().__init__()
         self.service = service
         self.user_dao = user_dao
-        self._user_fallback_middleware=user_fallback_middleware
+        self._user_fallback_middleware = user_fallback_middleware
 
     @required_acl('confd.users.{user_id}.fallbacks.read')
     def get(self, user_id):

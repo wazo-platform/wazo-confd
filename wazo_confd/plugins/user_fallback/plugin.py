@@ -14,7 +14,9 @@ class Plugin:
         middleware_handle = dependencies['middleware_handle']
         user_fallback_service = build_service()
 
-        user_fallback_association_middleware = UserFallbackMiddleWare(user_fallback_service)
+        user_fallback_association_middleware = UserFallbackMiddleWare(
+            user_fallback_service
+        )
         middleware_handle.register(
             'user_fallback_association', user_fallback_association_middleware
         )
@@ -23,5 +25,9 @@ class Plugin:
             UserFallbackList,
             '/users/<uuid:user_id>/fallbacks',
             '/users/<int:user_id>/fallbacks',
-            resource_class_args=(user_fallback_service, user_dao,user_fallback_association_middleware),
+            resource_class_args=(
+                user_fallback_service,
+                user_dao,
+                user_fallback_association_middleware,
+            ),
         )
