@@ -20,6 +20,9 @@ class UserMiddleWare:
         self._schema = UserListItemSchema()
 
     def create(self, body, tenant_uuid, tenant_uuids):
+        forwards = body.pop('forwards', None) or []
+        fallbacks = body.pop('fallbacks', None) or []
+
         form = self._schema.load(body)
         form['tenant_uuid'] = tenant_uuid
 
@@ -31,8 +34,7 @@ class UserMiddleWare:
         voicemail = form.pop('voicemail', None)
         agent = form.pop('agent', {})
         device_id = form.pop('device_id', None)
-        forwards = form.pop('forwards', None) or []
-        fallbacks = form.pop('fallbacks', None) or []
+
 
         model = User(**form)
         model = self._service.create(model)
@@ -174,6 +176,13 @@ class UserMiddleWare:
                     'user_group_association'
                 ).associate_all_groups({'groups': []}, user.uuid)
 
+            if user.voicemail:
+                # dissociation
+                self._middleware_handle.get(
+                    'user_voicemail'
+                ).dissociate(user.uuid,tenant_uuids)
+                Session.expire(user, ['voicemail'])
+
             for line in user.lines:
                 # process the device associated to the line
                 device_id = line.device
@@ -211,6 +220,9 @@ class UserMiddleWare:
                     {'users': members}, switchboard.uuid, tenant_uuids
                 )
             Session.expire(user, ['switchboard_member_users'])
+
+
+
 
             self._service.delete(user)
 

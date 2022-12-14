@@ -963,8 +963,10 @@ def generate_user_resources_bodies(
     context_name=None,
     incall_context_name=None,
     device=None,
+    user_destination=None
 ):
     exten = h.extension.find_available_exten(context_name)
+    vm_number = h.voicemail.find_available_number(context_name)
     if incall_context_name:
         source_exten = h.extension.find_available_exten(incall_context_name)
     else:
@@ -993,7 +995,38 @@ def generate_user_resources_bodies(
         switchboard = {
             'uuid': switchboard['uuid'],
         }
-    return exten, source_exten, user, auth, extension, line, incall, group, switchboard
+    voicemail = {
+        'name': 'full',
+        'number': vm_number,
+        'context': CONTEXT,
+        'email': 'test@example.com',
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': True,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': True,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
+    if user_destination:
+        forwards = {
+            'busy': {'enabled': True, 'destination': '123'},
+            'noanswer': {'enabled': True, 'destination': '456'},
+            'unconditional': {'enabled': True, 'destination': '789'},
+        }
+        fallbacks = {
+            'noanswer_destination': {'type': 'user', 'user_id': user_destination['id']},
+            'busy_destination': {'type': 'user', 'user_id': user_destination['id']},
+            'congestion_destination': {'type': 'user', 'user_id': user_destination['id']},
+            'fail_destination': {'type': 'user', 'user_id': user_destination['id']},
+        }
+    else:
+        forwards=None
+        fallbacks=None
+    return exten, source_exten, user, auth, extension, line, incall, group, switchboard, voicemail, forwards, fallbacks
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -1003,8 +1036,9 @@ def generate_user_resources_bodies(
 )
 @fixtures.switchboard()
 @fixtures.device()
+@fixtures.user()
 def test_post_delete_full_user_no_error(
-    group_extension, group, funckey_template, switchboard, device
+    group_extension, group, funckey_template, switchboard, device, user_destination
 ):
     (
         exten,
@@ -1016,12 +1050,16 @@ def test_post_delete_full_user_no_error(
         incall,
         group,
         switchboard,
+        voicemail,
+        forwards,
+        fallbacks
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
         context_name=CONTEXT,
         incall_context_name=INCALL_CONTEXT,
         device=device,
+        user_destination=user_destination,
     )
     agent = {}
 
@@ -1035,6 +1073,9 @@ def test_post_delete_full_user_no_error(
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
                 'agent': agent,
+                'voicemail': voicemail,
+                'forwards': forwards,
+                'fallbacks': fallbacks,
                 **user,
             }
         )
@@ -1085,6 +1126,22 @@ def test_post_delete_full_user_no_error(
                     number=line['extensions'][0]['exten'],
                     firstname=user['firstname'],
                 ),
+                voicemail=has_entries(id=greater_than(0)),
+                forwards=has_entries(**forwards),
+                fallbacks=has_entries(
+                    noanswer_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                    busy_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                    congestion_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                    fail_destination=has_entries(
+                        type='user', user_id=user_destination['id']
+                    ),
+                ),
                 **user,
             ),
         )
@@ -1129,6 +1186,29 @@ def test_post_delete_full_user_no_error(
                 members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
             ),
         )
+        # retrieve the forwards for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).forwards.get().item,
+            has_entries(**forwards),
+        )
+        # retrieve the fallbacks for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).fallbacks.get().item,
+            has_entries(
+                noanswer_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+                busy_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+                congestion_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+                fail_destination=has_entries(
+                    type='user', user_id=user_destination['id']
+                ),
+            ),
+        )
         # retrieve the user (created before) and check their func keys template
         assert_that(
             confd.users(payload['uuid']).get().item,
@@ -1158,6 +1238,11 @@ def test_post_delete_full_user_no_error(
         response.assert_deleted()
 
         # verify that user is deleted
+        response = url.get()
+        response.assert_status(404)
+
+        # verify that voicemail is deleted
+        url = confd.lines(payload['voicemail']['id'])
         response = url.get()
         response.assert_status(404)
 
@@ -1220,6 +1305,9 @@ def test_delete_full_user_no_auth_no_error(
         incall,
         group,
         switchboard,
+        voicemail,
+        forwards,
+        fallbacks
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
@@ -1278,6 +1366,9 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
         incall,
         group,
         switchboard,
+        voicemail,
+        forwards,
+        fallbacks
     ) = generate_user_resources_bodies(context_name=context['name'], device=device)
 
     response = confd.users.post(
