@@ -963,7 +963,7 @@ def generate_user_resources_bodies(
     context_name=None,
     incall_context_name=None,
     device=None,
-    user_destination=None
+    user_destination=None,
 ):
     exten = h.extension.find_available_exten(context_name)
     vm_number = h.voicemail.find_available_number(context_name)
@@ -1020,13 +1020,29 @@ def generate_user_resources_bodies(
         fallbacks = {
             'noanswer_destination': {'type': 'user', 'user_id': user_destination['id']},
             'busy_destination': {'type': 'user', 'user_id': user_destination['id']},
-            'congestion_destination': {'type': 'user', 'user_id': user_destination['id']},
+            'congestion_destination': {
+                'type': 'user',
+                'user_id': user_destination['id'],
+            },
             'fail_destination': {'type': 'user', 'user_id': user_destination['id']},
         }
     else:
-        forwards=None
-        fallbacks=None
-    return exten, source_exten, user, auth, extension, line, incall, group, switchboard, voicemail, forwards, fallbacks
+        forwards = None
+        fallbacks = None
+    return (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+        voicemail,
+        forwards,
+        fallbacks,
+    )
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -1052,7 +1068,7 @@ def test_post_delete_full_user_no_error(
         switchboard,
         voicemail,
         forwards,
-        fallbacks
+        fallbacks,
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
@@ -1307,7 +1323,7 @@ def test_delete_full_user_no_auth_no_error(
         switchboard,
         voicemail,
         forwards,
-        fallbacks
+        fallbacks,
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
@@ -1368,7 +1384,7 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
         switchboard,
         voicemail,
         forwards,
-        fallbacks
+        fallbacks,
     ) = generate_user_resources_bodies(context_name=context['name'], device=device)
 
     response = confd.users.post(

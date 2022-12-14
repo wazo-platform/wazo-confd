@@ -4,6 +4,7 @@
 
 from .schema import ForwardsSchema
 
+
 class UserForwardMiddleWare:
     def __init__(self, service_forward):
         self._service_forward = service_forward

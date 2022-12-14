@@ -35,7 +35,6 @@ class UserMiddleWare:
         agent = form.pop('agent', {})
         device_id = form.pop('device_id', None)
 
-
         model = User(**form)
         model = self._service.create(model)
         user_dict = self._schema.dump(model)
@@ -178,9 +177,9 @@ class UserMiddleWare:
 
             if user.voicemail:
                 # dissociation
-                self._middleware_handle.get(
-                    'user_voicemail'
-                ).dissociate(user.uuid,tenant_uuids)
+                self._middleware_handle.get('user_voicemail').dissociate(
+                    user.uuid, tenant_uuids
+                )
                 Session.expire(user, ['voicemail'])
 
             for line in user.lines:
@@ -220,9 +219,6 @@ class UserMiddleWare:
                     {'users': members}, switchboard.uuid, tenant_uuids
                 )
             Session.expire(user, ['switchboard_member_users'])
-
-
-
 
             self._service.delete(user)
 

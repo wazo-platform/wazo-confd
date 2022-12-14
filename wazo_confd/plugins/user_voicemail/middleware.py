@@ -21,6 +21,6 @@ class UserVoicemailMiddleware:
         self.associate(user_id, voicemail['id'], tenant_uuids)
         return voicemail
 
-    def dissociate(self, user_id,tenant_uuids):
+    def dissociate(self, user_id, tenant_uuids):
         user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         self._service.dissociate_all_by_user(user)
