@@ -31,8 +31,8 @@ class UserMiddleWare:
         voicemail = form.pop('voicemail', None)
         agent = form.pop('agent', {})
         device_id = form.pop('device_id', None)
-        forwards=form.pop('forwards',None) or []
-        fallbacks=form.pop('fallbacks',None) or []
+        forwards = form.pop('forwards', None) or []
+        fallbacks = form.pop('fallbacks', None) or []
 
         model = User(**form)
         model = self._service.create(model)
