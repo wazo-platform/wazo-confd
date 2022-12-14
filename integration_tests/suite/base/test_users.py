@@ -18,10 +18,11 @@ from hamcrest import (
     not_,
     raises,
     calling,
+    starts_with,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd, auth as authentication
+from . import confd, provd, auth as authentication
 from ..helpers import (
     associations as a,
     errors as e,
@@ -956,26 +957,42 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
-def generate_user_resources_bodies(group, switchboard):
-    exten = h.extension.find_available_exten(CONTEXT)
-    source_exten = h.extension.find_available_exten(INCALL_CONTEXT)
+def generate_user_resources_bodies(
+    group=None,
+    switchboard=None,
+    context_name=None,
+    incall_context_name=None,
+    device=None,
+):
+    exten = h.extension.find_available_exten(context_name)
+    if incall_context_name:
+        source_exten = h.extension.find_available_exten(incall_context_name)
+    else:
+        source_exten = None
     user = FULL_USER
     auth = AUTH_USER
-    extension = {'context': CONTEXT, 'exten': exten}
+    extension = {'context': context_name, 'exten': exten}
     line = {
-        'context': CONTEXT,
+        'context': context_name,
         'extensions': [extension],
         'endpoint_sip': {'name': 'iddqd'},
     }
-    incall = {
-        'extensions': [{'context': INCALL_CONTEXT, 'exten': source_exten}],
-    }
-    group = {
-        'uuid': group['uuid'],
-    }
-    switchboard = {
-        'uuid': switchboard['uuid'],
-    }
+    if device:
+        line['device_id'] = device['id']
+    if incall_context_name:
+        incall = {
+            'extensions': [{'context': incall_context_name, 'exten': source_exten}],
+        }
+    else:
+        incall = None
+    if group:
+        group = {
+            'uuid': group['uuid'],
+        }
+    if switchboard:
+        switchboard = {
+            'uuid': switchboard['uuid'],
+        }
     return exten, source_exten, user, auth, extension, line, incall, group, switchboard
 
 
@@ -985,11 +1002,9 @@ def generate_user_resources_bodies(group, switchboard):
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
 )
 @fixtures.switchboard()
-def test_post_full_user_no_error(
-    group_extension,
-    group,
-    funckey_template,
-    switchboard,
+@fixtures.device()
+def test_post_delete_full_user_no_error(
+    group_extension, group, funckey_template, switchboard, device
 ):
     (
         exten,
@@ -1001,7 +1016,13 @@ def test_post_full_user_no_error(
         incall,
         group,
         switchboard,
-    ) = generate_user_resources_bodies(group, switchboard)
+    ) = generate_user_resources_bodies(
+        group=group,
+        switchboard=switchboard,
+        context_name=CONTEXT,
+        incall_context_name=INCALL_CONTEXT,
+        device=device,
+    )
     agent = {}
 
     with a.group_extension(group, group_extension):
@@ -1021,181 +1042,114 @@ def test_post_full_user_no_error(
         response.assert_created('users')
         payload = response.item
 
-        try:
-            # check the data returned when the user is created
-            assert_that(
-                payload,
-                has_entries(
-                    uuid=uuid_(),
-                    lines=contains(
-                        has_entries(
-                            id=greater_than(0),
-                            endpoint_sip=has_entries(uuid=uuid_()),
-                            extensions=contains(has_entries(id=greater_than(0))),
-                        )
-                    ),
-                    incalls=contains(
-                        has_entries(
-                            id=greater_than(0),
-                            extensions=contains(
-                                has_entries(
-                                    id=greater_than(0),
-                                    context=INCALL_CONTEXT,
-                                    exten=source_exten,
-                                )
-                            ),
-                        )
-                    ),
-                    groups=contains(
-                        has_entries(uuid=group['uuid']),
-                    ),
-                    func_key_template_id=funckey_template['id'],
-                    switchboards=contains(
-                        has_entries(uuid=switchboard['uuid']),
-                    ),
-                    auth=has_entries(
-                        uuid=payload['uuid'],
-                        firstname=user['firstname'],
-                        lastname=user['lastname'],
-                        emails=contains(has_entries(address=user['email'])),
-                        username=auth['username'],
-                    ),
-                    agent=has_entries(
-                        number=line['extensions'][0]['exten'],
-                        firstname=user['firstname'],
-                    ),
-                    **user,
-                ),
-            )
-
-            # retrieve the user (created before) and check their fields
-            assert_that(
-                confd.users(payload['uuid']).get().item,
-                has_entries(
-                    lines=contains(has_entries(id=payload['lines'][0]['id'])),
-                    incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
-                    groups=contains(has_entries(uuid=payload['groups'][0]['uuid'])),
-                    switchboards=contains(
-                        has_entries(uuid=payload['switchboards'][0]['uuid'])
-                    ),
-                ),
-            )
-            # retrieve the line (created before) and check its data are correct
-            assert_that(
-                confd.lines(payload['lines'][0]['id']).get().item,
-                has_entries(
-                    extensions=contains(has_entries(**extension)),
-                    endpoint_sip=has_entries(name='iddqd'),
-                ),
-            )
-            # retrieve the incall (created before) and check its data are correct
-            assert_that(
-                confd.incalls(payload['incalls'][0]['id']).get().item,
-                has_entries(
-                    destination=has_entries(type="user", user_id=payload['id'])
-                ),
-            )
-            # retrieve the group and check the user is a member
-            assert_that(
-                confd.groups(payload['groups'][0]['uuid']).get().item,
-                has_entries(
-                    members=has_entries(
-                        users=contains(has_entries(uuid=payload['uuid']))
+        # check the data returned when the user is created
+        assert_that(
+            payload,
+            has_entries(
+                uuid=uuid_(),
+                lines=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        endpoint_sip=has_entries(uuid=uuid_()),
+                        extensions=contains(has_entries(id=greater_than(0))),
+                        device_id=device['id'],
                     )
                 ),
-            )
-            # retrieve the switchboard and check the user is a member
-            assert_that(
-                confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
-                has_entries(
-                    members=has_entries(
-                        users=contains(has_entries(uuid=payload['uuid']))
+                incalls=contains(
+                    has_entries(
+                        id=greater_than(0),
+                        extensions=contains(
+                            has_entries(
+                                id=greater_than(0),
+                                context=INCALL_CONTEXT,
+                                exten=source_exten,
+                            )
+                        ),
                     )
                 ),
-            )
-            # retrieve the user (created before) and check their func keys template
-            assert_that(
-                confd.users(payload['uuid']).get().item,
-                has_entries(func_key_template_id=payload['func_key_template_id']),
-            )
-            # check if auth user exists
-            wazo_user = authentication.users.get(payload['uuid'])
-            assert_that(
-                wazo_user,
-                has_entries(
-                    uuid=payload['uuid'],
-                    username=auth['username'],
+                groups=contains(
+                    has_entries(uuid=group['uuid']),
                 ),
-            )
-            # retrieve the user and try to update the user with the same data
-            user = confd.users(payload['uuid']).get().item
-            user.pop('call_record_enabled', None)  # Deprecated field
-            user.pop(
-                'voicemail', None
-            )  # The voicemail cannot be updated directly by calling POST /users
-            confd.users(payload['uuid']).put(**user).assert_updated()
-
-            wazo_user = authentication.users.get(payload['uuid'])
-            assert_that(
-                wazo_user,
-                has_entries(
+                func_key_template_id=funckey_template['id'],
+                switchboards=contains(
+                    has_entries(uuid=switchboard['uuid']),
+                ),
+                auth=has_entries(
                     uuid=payload['uuid'],
                     firstname=user['firstname'],
                     lastname=user['lastname'],
                     emails=contains(has_entries(address=user['email'])),
                     username=auth['username'],
                 ),
-            )
-
-        finally:
-            confd.users(payload['uuid']).delete().assert_deleted()
-            confd.lines(payload['lines'][0]['id']).delete().assert_deleted()
-            confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
-            confd.extensions(
-                payload['lines'][0]['extensions'][0]['id']
-            ).delete().assert_deleted()
-            authentication.users.delete(payload['uuid'])
-
-
-@fixtures.extension(exten=gen_group_exten())
-@fixtures.group()
-@fixtures.funckey_template(
-    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
-)
-@fixtures.switchboard()
-def test_delete_full_user_no_error(
-    group_extension,
-    group,
-    funckey_template,
-    switchboard,
-):
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-    ) = generate_user_resources_bodies(group, switchboard)
-
-    with a.group_extension(group, group_extension):
-
-        response = confd.users.post(
-            {
-                'auth': auth,
-                'lines': [line],
-                'incalls': [incall],
-                'groups': [group],
-                'func_key_template_id': funckey_template['id'],
-                'switchboards': [switchboard],
+                agent=has_entries(
+                    number=line['extensions'][0]['exten'],
+                    firstname=user['firstname'],
+                ),
                 **user,
-            }
+            ),
         )
 
-        payload = response.json
+        # retrieve the user (created before) and check their fields
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(
+                lines=contains(has_entries(id=payload['lines'][0]['id'])),
+                incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
+                groups=contains(has_entries(uuid=payload['groups'][0]['uuid'])),
+                switchboards=contains(
+                    has_entries(uuid=payload['switchboards'][0]['uuid'])
+                ),
+            ),
+        )
+        # retrieve the line (created before) and check its data are correct
+        assert_that(
+            confd.lines(payload['lines'][0]['id']).get().item,
+            has_entries(
+                extensions=contains(has_entries(**extension)),
+                endpoint_sip=has_entries(name='iddqd'),
+                device_id=device['id'],
+            ),
+        )
+        # retrieve the incall (created before) and check its data are correct
+        assert_that(
+            confd.incalls(payload['incalls'][0]['id']).get().item,
+            has_entries(destination=has_entries(type="user", user_id=payload['id'])),
+        )
+        # retrieve the group and check the user is a member
+        assert_that(
+            confd.groups(payload['groups'][0]['uuid']).get().item,
+            has_entries(
+                members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
+            ),
+        )
+        # retrieve the switchboard and check the user is a member
+        assert_that(
+            confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
+            has_entries(
+                members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
+            ),
+        )
+        # retrieve the user (created before) and check their func keys template
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(func_key_template_id=payload['func_key_template_id']),
+        )
+        # check if auth user exists
+        wazo_user = authentication.users.get(payload['uuid'])
+        assert_that(
+            wazo_user,
+            has_entries(
+                uuid=payload['uuid'],
+                username=auth['username'],
+            ),
+        )
+        # retrieve the user and try to update the user with the same data
+        user = confd.users(payload['uuid']).get().item
+        user.pop('call_record_enabled', None)  # Deprecated field
+        user.pop(
+            'voicemail', None
+        )  # The voicemail cannot be updated directly by calling POST /users
+        confd.users(payload['uuid']).put(**user).assert_updated()
 
         # user deletion
         url = confd.users(payload['uuid'])
@@ -1238,6 +1192,11 @@ def test_delete_full_user_no_error(
             raises(HTTPError, "404 Client Error: NOT FOUND"),
         )
 
+        # verify that the device is not deleted
+        url = confd.devices(device['id'])
+        response = url.get()
+        response.assert_ok()
+
 
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
@@ -1261,7 +1220,12 @@ def test_delete_full_user_no_auth_no_error(
         incall,
         group,
         switchboard,
-    ) = generate_user_resources_bodies(group, switchboard)
+    ) = generate_user_resources_bodies(
+        group=group,
+        switchboard=switchboard,
+        context_name=CONTEXT,
+        incall_context_name=INCALL_CONTEXT,
+    )
 
     with a.group_extension(group, group_extension):
 
@@ -1294,5 +1258,73 @@ def test_delete_simple_user_with_recursive_true(user):
     response = confd.users(user['uuid']).delete(recursive=True)
     response.assert_deleted()
 
+    # check that the user does not exist anymore
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.device(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, name='default2')
+def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
+    device, context
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+    ) = generate_user_resources_bodies(context_name=context['name'], device=device)
+
+    response = confd.users.post(
+        {
+            'lines': [line],
+            **user,
+        },
+        wazo_tenant=SUB_TENANT,
+    )
+
+    response.assert_created('users')
+    payload = response.item
+
+    # check if the returned data contains the device_id
+    assert_that(
+        payload,
+        has_entries(
+            uuid=uuid_(),
+            lines=contains(
+                has_entries(
+                    device_id=device['id'],
+                )
+            ),
+            **user,
+        ),
+    )
+
+    # retrieve the line (created before) and check if the device is associated to the line
+    assert_that(
+        confd.lines(payload['lines'][0]['id']).get().item,
+        has_entries(device_id=device['id']),
+    )
+
+    # retrieve the device (created as an unallocated device) and check if its tenant is
+    # now the user tenant
+    assert_that(
+        confd.devices(device['id']).get().item,
+        has_entries(tenant_uuid=SUB_TENANT),
+    )
+
+    # user deletion
+    response = confd.users(response.item['uuid']).delete(recursive=True)
+    response.assert_deleted()
+
+    # retrieve the device (previously created as an unallocated device)
+    # and check if its tenant is always the user tenant and if status=autoprov
+    device_cfg = provd.devices.get(device['id'])
+    assert_that(
+        device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
+    )

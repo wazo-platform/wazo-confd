@@ -43,7 +43,9 @@ class Plugin:
         api.add_resource(DeviceList, '/devices', resource_class_args=(service,))
 
         api.add_resource(
-            DeviceAutoprov, '/devices/<id>/autoprov', resource_class_args=(service,)
+            DeviceAutoprov,
+            '/devices/<id>/autoprov',
+            resource_class_args=(unallocated_device_middleware,),
         )
 
         api.add_resource(

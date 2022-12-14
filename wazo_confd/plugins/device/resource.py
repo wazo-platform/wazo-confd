@@ -90,14 +90,14 @@ class DeviceItem(SingleTenantMixin, ItemResource):
 
 
 class DeviceAutoprov(SingleTenantConfdResource):
-    def __init__(self, service):
-        self.service = service
+    def __init__(self, middleware):
+        self._middleware = middleware
 
     @required_acl('confd.devices.{id}.autoprov.read')
     def get(self, id):
-        kwargs = self._add_tenant_uuid()
-        device = self.service.get(id, **kwargs)
-        self.service.reset_autoprov(device, tenant_uuid=kwargs['tenant_uuid'])
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        self._middleware.reset_autoprov(id, tenant.uuid)
         return ('', 204)
 
 
