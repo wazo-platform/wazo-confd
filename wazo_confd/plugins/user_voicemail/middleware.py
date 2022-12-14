@@ -11,7 +11,7 @@ class UserVoicemailMiddleware:
         self._middleware_handle = middleware_handle
 
     def associate(self, user_id, voicemail_id, tenant_uuids):
-        user = user_dao.get_by_id_uuid(user_id, tenant_uuids)
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         voicemail = voicemail_dao.get(voicemail_id, tenant_uuids=tenant_uuids)
         self._service.associate(user, voicemail)
 
@@ -20,3 +20,7 @@ class UserVoicemailMiddleware:
         voicemail = voicemail_middleware.create(body, tenant_uuids)
         self.associate(user_id, voicemail['id'], tenant_uuids)
         return voicemail
+
+    def dissociate(self, user_id, tenant_uuids):
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        self._service.dissociate_all_by_user(user)

@@ -61,8 +61,5 @@ class UserVoicemailList(ConfdResource):
     @required_acl('confd.users.{user_id}.voicemails.delete')
     def delete(self, user_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-
-        user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids)
-
-        self.service.dissociate_all_by_user(user)
+        self._middleware.dissociate(user_id, tenant_uuids)
         return '', 204

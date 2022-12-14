@@ -20,6 +20,9 @@ class UserMiddleWare:
         self._schema = UserListItemSchema()
 
     def create(self, body, tenant_uuid, tenant_uuids):
+        forwards = body.pop('forwards', None) or []
+        fallbacks = body.pop('fallbacks', None) or []
+
         form = self._schema.load(body)
         form['tenant_uuid'] = tenant_uuid
 
@@ -139,6 +142,21 @@ class UserMiddleWare:
             )
             user_dict['agent'] = agent
 
+        if forwards:
+            self._middleware_handle.get('user_forward_association').associate(
+                user_dict['uuid'], forwards
+            )
+            user_dict['forwards'] = self._middleware_handle.get(
+                'user_forward_association'
+            ).get(user_dict['uuid'])
+        if fallbacks:
+            self._middleware_handle.get('user_fallback_association').associate(
+                user_dict['uuid'], fallbacks
+            )
+            user_dict['fallbacks'] = self._middleware_handle.get(
+                'user_fallback_association'
+            ).get(user_dict['uuid'])
+
         if auth:
             auth['uuid'] = user_dict['uuid']
             auth['tenant_uuid'] = user_dict['tenant_uuid']
@@ -156,6 +174,13 @@ class UserMiddleWare:
                 self._middleware_handle.get(
                     'user_group_association'
                 ).associate_all_groups({'groups': []}, user.uuid)
+
+            if user.voicemail:
+                # dissociation
+                self._middleware_handle.get('user_voicemail').dissociate(
+                    user.uuid, tenant_uuids
+                )
+                Session.expire(user, ['voicemail'])
 
             for line in user.lines:
                 # process the device associated to the line
