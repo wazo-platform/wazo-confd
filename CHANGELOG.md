@@ -5,6 +5,10 @@
 * DELETE on `/users?recursive=true` added, to provide a way to delete a user and their related resources.
 * `/users` endpoint now create the voicemail if it is specified in the body and associates it to the user.
 * `/users` endpoint now associates the voicemail if it is specified in the body.
+* `/users` endpoint now associates forwards if specified in the body.
+* `/users` endpoint now associates fallbacks if specified in the body.
+* `/users` endpoint now associates an unallocated device if specified in the body.
+* `/users` endpoint now create the agent if it is specified in the body and associates it to the user.
 * The following resource has been added:
 
   * POST `/1.1/users/<user_id>/voicemails`
