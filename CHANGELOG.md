@@ -13,7 +13,7 @@
 
   * POST `/1.1/users/<user_id>/voicemails`
 
-* ## 22.16
+## 22.16
 
 * POST on `/users` can now create a user and all their related resources.
 
