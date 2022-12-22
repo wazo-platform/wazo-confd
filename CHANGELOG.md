@@ -1,5 +1,14 @@
 # Changelog
 
+## 23.01
+
+* Bus configuration keys changes:
+
+  * key `exchange_name` now defaults to `wazo-headers`
+  * key `exchange_type` removed
+  * key `exchange_durable` removed
+  * key `subscribe_exchange_name` removed
+
 ## 22.17
 
 * DELETE on `/users?recursive=true` added, to provide a way to delete a user and their related resources.
