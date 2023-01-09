@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import deque
@@ -16,13 +16,13 @@ class FlushMixin:
         super().__init__(**kwargs)
         self.__deque = deque()
 
-    def queue_event(self, event, *, extra_headers=None, routing_key_override=None):
-        self.__deque.append((event, extra_headers, routing_key_override))
+    def queue_event(self, event, *, extra_headers=None):
+        self.__deque.append((event, extra_headers))
 
     def flush(self):
         while self.__deque:
-            event, extra_headers, routing_key = self.__deque.popleft()
-            self.publish(event, headers=extra_headers, routing_key=routing_key)
+            event, extra_headers = self.__deque.popleft()
+            self.publish(event, headers=extra_headers)
 
     def rollback(self):
         self.__deque.clear()
