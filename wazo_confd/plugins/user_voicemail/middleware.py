@@ -1,6 +1,7 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
@@ -24,3 +25,15 @@ class UserVoicemailMiddleware:
     def dissociate(self, user_id, tenant_uuids):
         user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         self._service.dissociate_all_by_user(user)
+
+    def delete_voicemail(self, user_id, tenant_uuids):
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
+        voicemail_middleware = self._middleware_handle.get('voicemail')
+        voicemail = voicemail_middleware.get(user.voicemailid, tenant_uuids)
+
+        self.dissociate(user_id, tenant_uuids)
+        Session.expire(user, ['voicemail'])
+
+        # if there is no other user using the voicemail
+        if len(voicemail['users']) == 1:
+            voicemail_middleware.delete(voicemail['id'], tenant_uuids)

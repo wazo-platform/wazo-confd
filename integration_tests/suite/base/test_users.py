@@ -1452,3 +1452,52 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
     assert_that(
         device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
     )
+
+
+@fixtures.extension(exten=gen_group_exten())
+@fixtures.user()
+@fixtures.voicemail()
+def test_delete_voicemail_2_users_not_deleted(
+    group_extension,
+    user2,
+    voicemail2,
+):
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+        voicemail,
+        forwards,
+        fallbacks,
+    ) = generate_user_resources_bodies()
+
+    with a.user_voicemail(user2, voicemail2, check=False):
+        response = confd.users.post(
+            {
+                'voicemail': {**voicemail2},
+                **user,
+            }
+        )
+
+        payload = response.item
+
+        url = confd.users(payload['uuid'])
+
+        # user deletion
+        response = url.delete(recursive=True)
+        response.assert_deleted()
+
+        # verify that user is deleted
+        response = url.get()
+        response.assert_status(404)
+
+        # verify that voicemail is not deleted because user2 uses the same voicemail
+        url = confd.voicemails(payload['voicemail']['id'])
+        response = url.get()
+        response.assert_ok()
