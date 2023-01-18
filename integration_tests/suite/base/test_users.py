@@ -1045,6 +1045,10 @@ def generate_user_resources_bodies(
     )
 
 
+from nose.plugins.attrib import attr
+
+
+@attr('now')
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 @fixtures.funckey_template(
@@ -1287,7 +1291,7 @@ def test_post_delete_full_user_no_error(
         response = url.get()
         response.assert_ok()
 
-        # verify auth user is deleted
+        # verify that auth user is deleted
         assert_that(
             calling(authentication.users.get).with_args(payload['uuid']),
             raises(HTTPError, "404 Client Error: NOT FOUND"),
@@ -1297,6 +1301,11 @@ def test_post_delete_full_user_no_error(
         url = confd.devices(device['id'])
         response = url.get()
         response.assert_ok()
+
+        # verify that agent is deleted
+        url = confd.agents(payload['agent']['id'])
+        response = url.get()
+        response.assert_status(404)
 
 
 @fixtures.extension(exten=gen_group_exten())

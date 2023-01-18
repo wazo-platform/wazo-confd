@@ -169,6 +169,13 @@ class UserMiddleWare:
         if not recursive:
             self._service.delete(user)
         else:
+            if user.agent:
+                agentid = user.agentid
+                self._middleware_handle.get('user_agent_association').dissociate(
+                    user.uuid, tenant_uuids
+                )
+                self._middleware_handle.get('agent').delete(agentid, tenant_uuids)
+
             if user.groups:
                 # dissociation
                 self._middleware_handle.get(
@@ -176,7 +183,6 @@ class UserMiddleWare:
                 ).associate_all_groups({'groups': []}, user.uuid)
 
             if user.voicemail:
-                # dissociation
                 self._middleware_handle.get('user_voicemail').dissociate(
                     user.uuid, tenant_uuids
                 )
