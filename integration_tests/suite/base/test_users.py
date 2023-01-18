@@ -1045,10 +1045,6 @@ def generate_user_resources_bodies(
     )
 
 
-from nose.plugins.attrib import attr
-
-
-@attr('now')
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 @fixtures.funckey_template(
