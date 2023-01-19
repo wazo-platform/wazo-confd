@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from http import HTTPStatus
 
@@ -170,6 +170,13 @@ class UserMiddleWare:
         if not recursive:
             self._service.delete(user)
         else:
+            if user.agent:
+                agentid = user.agentid
+                self._middleware_handle.get('user_agent_association').dissociate(
+                    user.uuid, tenant_uuids
+                )
+                self._middleware_handle.get('agent').delete(agentid, tenant_uuids)
+
             if user.groups:
                 # dissociation
                 self._middleware_handle.get(
@@ -177,7 +184,6 @@ class UserMiddleWare:
                 ).associate_all_groups({'groups': []}, user.uuid)
 
             if user.voicemail:
-                # dissociation
                 self._middleware_handle.get('user_voicemail').dissociate(
                     user.uuid, tenant_uuids
                 )

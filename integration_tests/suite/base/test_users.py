@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -1287,7 +1287,7 @@ def test_post_delete_full_user_no_error(
         response = url.get()
         response.assert_ok()
 
-        # verify auth user is deleted
+        # verify that auth user is deleted
         assert_that(
             calling(authentication.users.get).with_args(payload['uuid']),
             raises(HTTPError, "404 Client Error: NOT FOUND"),
@@ -1297,6 +1297,11 @@ def test_post_delete_full_user_no_error(
         url = confd.devices(device['id'])
         response = url.get()
         response.assert_ok()
+
+        # verify that agent is deleted
+        url = confd.agents(payload['agent']['id'])
+        response = url.get()
+        response.assert_status(404)
 
 
 @fixtures.extension(exten=gen_group_exten())
