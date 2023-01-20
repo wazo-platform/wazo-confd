@@ -72,7 +72,18 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.update')
     def put(self, id):
-        return super().put(id)
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(
+            id,
+            request.get_json(),
+            tenant_uuids,
+            recursive=request.args.get(
+                'recursive', default=False, type=lambda v: v.lower() == 'true'
+            ),
+        )
+        return '', 204
 
     @required_acl('confd.users.{id}.delete')
     def delete(self, id):
