@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.dialaction import Dialaction
@@ -23,3 +23,32 @@ class IncallMiddleWare:
     def delete(self, incall_id, tenant_uuids):
         model = self._service.get(incall_id, tenant_uuids=tenant_uuids)
         self._service.delete(model)
+
+    def update(self, incall_id, body, tenant_uuids):
+        model = self._service.get(incall_id, tenant_uuids=tenant_uuids)
+        self.parse_and_update(body, model, self._service)
+        self._service.delete(model)
+
+    def parse_and_update(self, body, model, service):
+        form = self._schema.load(body, partial=True)
+        updated_fields = self.find_updated_fields(model, form)
+        if 'destination' in form:
+            form['destination'] = Dialaction(**form['destination'])
+
+        for name, value in form.items():
+            setattr(model, name, value)
+        service.edit(model, updated_fields)
+
+    def find_updated_fields(self, model, form):
+        updated_fields = []
+        for name, value in form.items():
+            try:
+                if isinstance(value, dict):
+                    if self.find_updated_fields(getattr(model, name), value):
+                        updated_fields.append(name)
+
+                elif getattr(model, name) != value:
+                    updated_fields.append(name)
+            except AttributeError:
+                pass
+        return updated_fields
