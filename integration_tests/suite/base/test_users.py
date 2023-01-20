@@ -1475,6 +1475,7 @@ def test_delete_voicemail_2_users_not_deleted(
         voicemail,
         forwards,
         fallbacks,
+        agent,
     ) = generate_user_resources_bodies()
 
     with a.user_voicemail(user2, voicemail2, check=False):
