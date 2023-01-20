@@ -27,7 +27,6 @@ class IncallMiddleWare:
     def update(self, incall_id, body, tenant_uuids):
         model = self._service.get(incall_id, tenant_uuids=tenant_uuids)
         self.parse_and_update(body, model)
-        self._service.delete(model)
 
     def parse_and_update(self, body, model):
         form = self._schema.load(body, partial=True)
