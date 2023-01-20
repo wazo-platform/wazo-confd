@@ -1029,6 +1029,7 @@ def generate_user_resources_bodies(
     else:
         forwards = None
         fallbacks = None
+    agent = {}
     return (
         exten,
         source_exten,
@@ -1042,6 +1043,7 @@ def generate_user_resources_bodies(
         voicemail,
         forwards,
         fallbacks,
+        agent,
     )
 
 
@@ -1069,6 +1071,7 @@ def test_post_delete_full_user_no_error(
         voicemail,
         forwards,
         fallbacks,
+        agent,
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
@@ -1077,7 +1080,6 @@ def test_post_delete_full_user_no_error(
         device=device,
         user_destination=user_destination,
     )
-    agent = {}
 
     with a.group_extension(group, group_extension):
         response = confd.users.post(
@@ -1239,6 +1241,14 @@ def test_post_delete_full_user_no_error(
                 username=auth['username'],
             ),
         )
+        # retrieve the agent for the user and check the data
+        assert_that(
+            confd.agents(payload['agent']['id']).get().item,
+            has_entries(
+                number=line['extensions'][0]['exten'],
+                firstname=user['firstname'],
+            ),
+        )
         # retrieve the user and try to update the user with the same data
         user = confd.users(payload['uuid']).get().item
         user.pop('call_record_enabled', None)  # Deprecated field
@@ -1329,6 +1339,7 @@ def test_delete_full_user_no_auth_no_error(
         voicemail,
         forwards,
         fallbacks,
+        agent,
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
@@ -1390,6 +1401,7 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
         voicemail,
         forwards,
         fallbacks,
+        agent,
     ) = generate_user_resources_bodies(context_name=context['name'], device=device)
 
     response = confd.users.post(
