@@ -1053,7 +1053,7 @@ def generate_user_resources_bodies(
 @fixtures.switchboard()
 @fixtures.device()
 @fixtures.user()
-def test_post_delete_full_user_no_error(
+def test_post_update_delete_full_user_no_error(
     group_extension, group, funckey_template, switchboard, device, user_destination
 ):
     (
@@ -1247,9 +1247,26 @@ def test_post_delete_full_user_no_error(
         )  # The voicemail cannot be updated directly by calling POST /users
         confd.users(payload['uuid']).put(**user).assert_updated()
 
-        # user deletion
         url = confd.users(payload['uuid'])
 
+        # user update
+        new_forwards = {
+            'busy': {'enabled': True, 'destination': '456'},
+            'noanswer': {'enabled': True, 'destination': '789'},
+            'unconditional': {'enabled': True, 'destination': '101'},
+        }
+        response = url.put(
+            {'forwards': {**new_forwards}}, query_string="recursive=True"
+        )
+        response.assert_updated()
+
+        # retrieve the forwards for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).forwards.get().item,
+            has_entries(**new_forwards),
+        )
+
+        # user deletion
         response = url.delete(recursive=True)
         response.assert_deleted()
 
@@ -1440,79 +1457,3 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
     assert_that(
         device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
     )
-
-
-@fixtures.extension(exten=gen_group_exten())
-@fixtures.group()
-@fixtures.funckey_template(
-    keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
-)
-@fixtures.switchboard()
-@fixtures.device()
-@fixtures.user()
-def test_update_full_user_no_error(
-    group_extension, group, funckey_template, switchboard, device, user_destination
-):
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-        voicemail,
-        forwards,
-        fallbacks,
-    ) = generate_user_resources_bodies(
-        group=group,
-        switchboard=switchboard,
-        context_name=CONTEXT,
-        incall_context_name=INCALL_CONTEXT,
-        device=device,
-        user_destination=user_destination,
-    )
-    agent = {}
-
-    with a.group_extension(group, group_extension):
-        response = confd.users.post(
-            {
-                'auth': auth,
-                'lines': [line],
-                'incalls': [incall],
-                'groups': [group],
-                'func_key_template_id': funckey_template['id'],
-                'switchboards': [switchboard],
-                'agent': agent,
-                'voicemail': voicemail,
-                'forwards': forwards,
-                'fallbacks': fallbacks,
-                **user,
-            }
-        )
-
-        response.assert_created('users')
-        payload = response.item
-        user_uuid = response.item['uuid']
-        try:
-            url = confd.users(payload['uuid'])
-
-            new_forwards = {
-                'busy': {'enabled': True, 'destination': '456'},
-                'noanswer': {'enabled': True, 'destination': '789'},
-                'unconditional': {'enabled': True, 'destination': '101'},
-            }
-            response = url.put(
-                {'forwards': {**new_forwards}}, query_string="recursive=True"
-            )
-            response.assert_updated()
-
-            # retrieve the forwards for the user and check the data
-            assert_that(
-                confd.users(payload['uuid']).forwards.get().item,
-                has_entries(**new_forwards),
-            )
-        finally:
-            confd.users(user_uuid).delete(recursive=True).assert_deleted()
