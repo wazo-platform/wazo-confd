@@ -26,10 +26,10 @@ class IncallMiddleWare:
 
     def update(self, incall_id, body, tenant_uuids):
         model = self._service.get(incall_id, tenant_uuids=tenant_uuids)
-        self.parse_and_update(body, model, self._service)
+        self.parse_and_update(body, model)
         self._service.delete(model)
 
-    def parse_and_update(self, body, model, service):
+    def parse_and_update(self, body, model):
         form = self._schema.load(body, partial=True)
         updated_fields = self.find_updated_fields(model, form)
         if 'destination' in form:
@@ -37,7 +37,7 @@ class IncallMiddleWare:
 
         for name, value in form.items():
             setattr(model, name, value)
-        service.edit(model, updated_fields)
+        self._service.edit(model, updated_fields)
 
     def find_updated_fields(self, model, form):
         updated_fields = []
