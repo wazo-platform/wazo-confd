@@ -1055,7 +1055,7 @@ def generate_user_resources_bodies(
 @fixtures.switchboard()
 @fixtures.device()
 @fixtures.user()
-def test_post_delete_full_user_no_error(
+def test_post_update_delete_full_user_no_error(
     group_extension, group, funckey_template, switchboard, device, user_destination
 ):
     (
@@ -1257,9 +1257,26 @@ def test_post_delete_full_user_no_error(
         )  # The voicemail cannot be updated directly by calling POST /users
         confd.users(payload['uuid']).put(**user).assert_updated()
 
-        # user deletion
         url = confd.users(payload['uuid'])
 
+        # user update
+        new_forwards = {
+            'busy': {'enabled': True, 'destination': '456'},
+            'noanswer': {'enabled': True, 'destination': '789'},
+            'unconditional': {'enabled': True, 'destination': '101'},
+        }
+        response = url.put(
+            {'forwards': {**new_forwards}}, query_string="recursive=True"
+        )
+        response.assert_updated()
+
+        # retrieve the forwards for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).forwards.get().item,
+            has_entries(**new_forwards),
+        )
+
+        # user deletion
         response = url.delete(recursive=True)
         response.assert_deleted()
 
