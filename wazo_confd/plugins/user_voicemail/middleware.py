@@ -29,7 +29,7 @@ class UserVoicemailMiddleware:
     def delete_voicemail(self, user_id, tenant_uuids):
         user = user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         voicemail_middleware = self._middleware_handle.get('voicemail')
-        voicemail_id=user.voicemailid
+        voicemail_id = user.voicemailid
 
         self.dissociate(user_id, tenant_uuids)
         Session.expire(user, ['voicemail'])
