@@ -184,10 +184,9 @@ class UserMiddleWare:
                 ).associate_all_groups({'groups': []}, user.uuid)
 
             if user.voicemail:
-                self._middleware_handle.get('user_voicemail').dissociate(
+                self._middleware_handle.get('user_voicemail').delete_voicemail(
                     user.uuid, tenant_uuids
                 )
-                Session.expire(user, ['voicemail'])
 
             for line in user.lines:
                 # process the device associated to the line
