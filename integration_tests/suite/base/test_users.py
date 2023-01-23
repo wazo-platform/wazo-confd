@@ -1080,8 +1080,7 @@ def test_post_update_delete_full_user_no_error(
     agent = {}
 
     with a.group_extension(group, group_extension):
-        response = confd.users.post(
-            {
+        user_body = {
                 'auth': auth,
                 'lines': [line],
                 'incalls': [incall],
@@ -1094,6 +1093,8 @@ def test_post_update_delete_full_user_no_error(
                 'fallbacks': fallbacks,
                 **user,
             }
+        response = confd.users.post(
+            user_body
         )
 
         response.assert_created('users')
@@ -1256,7 +1257,7 @@ def test_post_update_delete_full_user_no_error(
             'unconditional': {'enabled': True, 'destination': '101'},
         }
         response = url.put(
-            {'forwards': {**new_forwards}}, query_string="recursive=True"
+            {**user_body, 'forwards': {**new_forwards}}, query_string="recursive=True"
         )
         response.assert_updated()
 
