@@ -2,7 +2,7 @@
 
 ## IN PROGRESS
 
-* PUT on `/users?recursive=true` added, to provide a way to update fallbacks for a specific user.
+* PUT on `/users?recursive=true` added, to provide a way to update fallbacks and forwards for a specific user.
 
 ## 23.01
 
