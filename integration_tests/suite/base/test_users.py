@@ -1083,21 +1083,19 @@ def test_post_update_delete_full_user_no_error(
 
     with a.group_extension(group, group_extension):
         user_body = {
-                'auth': auth,
-                'lines': [line],
-                'incalls': [incall],
-                'groups': [group],
-                'func_key_template_id': funckey_template['id'],
-                'switchboards': [switchboard],
-                'agent': agent,
-                'voicemail': voicemail,
-                'forwards': forwards,
-                'fallbacks': fallbacks,
-                **user,
-            }
-        response = confd.users.post(
-            user_body
-        )
+            'auth': auth,
+            'lines': [line],
+            'incalls': [incall],
+            'groups': [group],
+            'func_key_template_id': funckey_template['id'],
+            'switchboards': [switchboard],
+            'agent': agent,
+            'voicemail': voicemail,
+            'forwards': forwards,
+            'fallbacks': fallbacks,
+            **user,
+        }
+        response = confd.users.post(user_body)
 
         response.assert_created('users')
         payload = response.item
@@ -1266,8 +1264,16 @@ def test_post_update_delete_full_user_no_error(
             'noanswer': {'enabled': True, 'destination': '789'},
             'unconditional': {'enabled': True, 'destination': '101'},
         }
+        destination = {'type': 'voicemail', 'voicemail_id': payload['voicemail']['id']}
+        new_fallbacks = {
+            'noanswer_destination': destination,
+            'busy_destination': destination,
+            'congestion_destination': destination,
+            'fail_destination': destination,
+        }
         response = url.put(
-            {**user_body, 'forwards': {**new_forwards}}, query_string="recursive=True"
+            {**user_body, 'forwards': {**new_forwards}, 'fallbacks': {**new_fallbacks}},
+            query_string="recursive=True",
         )
         response.assert_updated()
 
@@ -1275,6 +1281,31 @@ def test_post_update_delete_full_user_no_error(
         assert_that(
             confd.users(payload['uuid']).forwards.get().item,
             has_entries(**new_forwards),
+        )
+
+        # retrieve the fallbacks for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).fallbacks.get().item,
+            has_entries(
+                noanswer_destination=has_entries(**destination),
+                busy_destination=has_entries(**destination),
+                congestion_destination=has_entries(**destination),
+                fail_destination=has_entries(**destination),
+            ),
+        )
+
+        # retrieve the data for the user and check the data returned (forwards, fallbacks)
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(
+                forwards=has_entries(**new_forwards),
+                fallbacks=has_entries(
+                    noanswer_destination=has_entries(**destination),
+                    busy_destination=has_entries(**destination),
+                    congestion_destination=has_entries(**destination),
+                    fail_destination=has_entries(**destination),
+                ),
+            ),
         )
 
         # user deletion
