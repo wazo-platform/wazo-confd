@@ -1295,7 +1295,7 @@ def test_post_update_delete_full_user_no_error(
             has_entries(**new_forwards),
         )
 
-        # retrieve the data for the user and check the data returned (fallbacks)
+        # retrieve the data for the user and check the data returned (fallbacks and forwards)
         assert_that(
             confd.users(payload['uuid']).get().item,
             has_entries(
@@ -1305,6 +1305,7 @@ def test_post_update_delete_full_user_no_error(
                     congestion_destination=has_entries(**destination),
                     fail_destination=has_entries(**destination),
                 ),
+                forwards=has_entries(**new_forwards),
             ),
         )
 
