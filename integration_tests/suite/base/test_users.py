@@ -1577,6 +1577,7 @@ def test_update_full_user_no_error(
         voicemail,
         forwards,
         fallbacks,
+        agent,
     ) = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
