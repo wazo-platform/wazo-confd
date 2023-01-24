@@ -258,7 +258,17 @@ class UserMiddleWare:
             self.parse_and_update(user, body)
         else:
             fallbacks = body.pop('fallbacks', None) or []
+            forwards = body.pop('forwards', None) or []
+
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
                     user_id, fallbacks
+                )
+
+            if forwards:
+                self._middleware_handle.get('user_forward_association').dissociate(
+                    user_id
+                )
+                self._middleware_handle.get('user_forward_association').associate(
+                    user_id, forwards
                 )
