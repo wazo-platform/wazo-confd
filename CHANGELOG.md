@@ -1,5 +1,9 @@
 # Changelog
 
+## IN PROGRESS
+
+* PUT on `/users?recursive=true` added, to provide a way to update fallbacks for a specific user.
+
 ## 23.01
 
 * Bus configuration keys changes:
