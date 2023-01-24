@@ -1283,7 +1283,7 @@ def test_post_update_delete_full_user_no_error(
             ),
         )
 
-        # retrieve the data for the user and check the data returned (forwards, fallbacks)
+        # retrieve the data for the user and check the data returned (fallbacks)
         assert_that(
             confd.users(payload['uuid']).get().item,
             has_entries(
