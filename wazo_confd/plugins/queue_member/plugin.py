@@ -5,6 +5,7 @@ from xivo_dao.resources.agent import dao as agent_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
+from .middleware import QueueMemberMiddleWare
 from .resource import (
     QueueMemberAgentItem,
     QueueMemberUserItem,
@@ -15,13 +16,20 @@ from .service import build_service
 class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
+        middleware_handle = dependencies['middleware_handle']
+
         service = build_service()
+
+        queue_member_middleware = QueueMemberMiddleWare(service)
+        middleware_handle.register('queue_member', queue_member_middleware)
 
         api.add_resource(
             QueueMemberAgentItem,
             '/queues/<int:queue_id>/members/agents/<int:agent_id>',
             endpoint='queue_member_agents',
-            resource_class_args=(service, queue_dao, agent_dao),
+            resource_class_args=(
+                queue_member_middleware,
+            ),
         )
 
         api.add_resource(

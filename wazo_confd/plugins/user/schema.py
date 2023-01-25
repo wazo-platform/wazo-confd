@@ -14,7 +14,10 @@ from marshmallow.validate import Length, Range, Regexp, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
-from wazo_confd.plugins.agent.schema import AgentSchema, NUMBER_REGEX
+from wazo_confd.plugins.agent.schema import (
+    AgentSchema,
+    NUMBER_REGEX,
+)
 from wazo_confd.plugins.line.schema import LineSchema
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
@@ -335,8 +338,15 @@ class UserSwitchboardSchema(BaseSchema):
     links = ListLink(Link('switchboards', field='uuid'))
 
 
+class UserAgentQueueSchema(BaseSchema):
+    id = fields.Integer()
+    penalty = fields.Integer(validate=Range(min=0), missing=0)
+    priority = fields.Integer(validate=Range(min=0), missing=0)
+
+
 class UserAgentSchema(AgentSchema):
     number = fields.String(validate=Regexp(NUMBER_REGEX))
+    queues = Nested('UserAgentQueueSchema', many=True)
 
 
 class UserLineSchema(LineSchema):

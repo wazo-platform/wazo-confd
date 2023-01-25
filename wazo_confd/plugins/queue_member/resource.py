@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -26,38 +26,21 @@ class QueueMemberAgentItem(ConfdResource):
     schema = QueueMemberAgentSchema
     has_tenant_uuid = True
 
-    def __init__(self, service, queue_dao, agent_dao):
+    def __init__(self, middleware):
         super().__init__()
-        self.service = service
-        self.queue_dao = queue_dao
-        self.agent_dao = agent_dao
+        self._middleware = middleware
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.update')
     def put(self, queue_id, agent_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
-        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
-        member = self._find_or_create_member(queue, agent)
-        form = self.schema().load(request.get_json())
-        member.penalty = form['penalty']
-        member.priority = form['priority']
-        self.service.associate_member_agent(queue, member)
+        self._middleware.associate(request.get_json(), queue_id, agent_id, tenant_uuids)
         return '', 204
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.delete')
     def delete(self, queue_id, agent_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
-        agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
-        member = self._find_or_create_member(queue, agent)
-        self.service.dissociate_member_agent(queue, member)
+        self._middleware.dissociate(queue_id, agent_id, tenant_uuids)
         return '', 204
-
-    def _find_or_create_member(self, queue, agent):
-        member = self.service.find_member_agent(queue, agent)
-        if not member:
-            member = QueueMember(agent=agent)
-        return member
 
 
 class QueueMemberUserItem(ConfdResource):

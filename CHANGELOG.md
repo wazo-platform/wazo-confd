@@ -3,6 +3,7 @@
 ## IN PROGRESS
 
 * PUT on `/users?recursive=true` added, to provide a way to update fallbacks and forwards for a specific user.
+* POST on `/users?recursive=true` updated, to provide a way to create a user agent associated to existing queues.
 
 ## 23.01
 
