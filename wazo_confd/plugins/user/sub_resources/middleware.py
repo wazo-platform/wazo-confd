@@ -17,6 +17,15 @@ class UserForwardMiddleWare:
             setattr(user, name, value)
         self._service_forward.edit(user, self._schema)
 
+    def dissociate(self, user_id):
+        user = self._service_forward.get(user_id)
+        for t in ForwardsSchema.types:
+            try:
+                delattr(user, t)
+            except AttributeError:
+                pass
+        self._service_forward.edit(user, self._schema)
+
     def get(self, user_id):
         user = self._service_forward.get(user_id)
         return self._schema.dump(user)

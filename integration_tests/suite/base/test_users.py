@@ -1266,8 +1266,14 @@ def test_post_update_delete_full_user_no_error(
             'congestion_destination': destination,
             'fail_destination': destination,
         }
+        new_forwards = {
+            'busy': {'enabled': True, 'destination': '456'},
+            'noanswer': {'enabled': True, 'destination': '789'},
+            'unconditional': {'enabled': True, 'destination': '101'},
+        }
+
         response = url.put(
-            {**user_body, 'fallbacks': {**new_fallbacks}},
+            {**user_body, 'fallbacks': {**new_fallbacks}, 'forwards': {**new_forwards}},
             query_string="recursive=True",
         )
         response.assert_updated()
@@ -1283,7 +1289,13 @@ def test_post_update_delete_full_user_no_error(
             ),
         )
 
-        # retrieve the data for the user and check the data returned (fallbacks)
+        # retrieve the forwards for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).forwards.get().item,
+            has_entries(**new_forwards),
+        )
+
+        # retrieve the data for the user and check the data returned (fallbacks and forwards)
         assert_that(
             confd.users(payload['uuid']).get().item,
             has_entries(
@@ -1293,6 +1305,7 @@ def test_post_update_delete_full_user_no_error(
                     congestion_destination=has_entries(**destination),
                     fail_destination=has_entries(**destination),
                 ),
+                forwards=has_entries(**new_forwards),
             ),
         )
 
