@@ -9,7 +9,7 @@ from xivo_dao.helpers.errors import FormattedError
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
-from .schema import UserListItemSchema
+from .schema import UserListItemSchema, UserSchema
 
 
 class UserMiddleWare:
@@ -18,6 +18,7 @@ class UserMiddleWare:
         self._wazo_user_service = wazo_user_service
         self._middleware_handle = middleware_handle
         self._schema = UserListItemSchema()
+        self._schema_update = UserSchema()
 
     def create(self, body, tenant_uuid, tenant_uuids):
         forwards = body.pop('forwards', None) or []
@@ -233,3 +234,31 @@ class UserMiddleWare:
             except HTTPError as e:
                 if e.response.status_code != HTTPStatus.NOT_FOUND:
                     raise e
+
+    def parse_and_update(self, model, body, **kwargs):
+        form = self._schema_update.load(body, partial=True)
+        updated_fields = self.find_updated_fields(model, form)
+        for name, value in form.items():
+            setattr(model, name, value)
+        self._service.edit(model, updated_fields=updated_fields, **kwargs)
+
+    def find_updated_fields(self, model, form):
+        updated_fields = []
+        for name, value in form.items():
+            try:
+                if getattr(model, name) != value:
+                    updated_fields.append(name)
+            except AttributeError:
+                pass
+        return updated_fields
+
+    def update(self, user_id, body, tenant_uuids, recursive=False):
+        user = self._service.get(user_id, tenant_uuids=tenant_uuids)
+        if not recursive:
+            self.parse_and_update(user, body)
+        else:
+            fallbacks = body.pop('fallbacks', None) or []
+            if fallbacks:
+                self._middleware_handle.get('user_fallback_association').associate(
+                    user_id, fallbacks
+                )

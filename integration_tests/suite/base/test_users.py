@@ -1055,7 +1055,7 @@ def generate_user_resources_bodies(
 @fixtures.switchboard()
 @fixtures.device()
 @fixtures.user()
-def test_post_delete_full_user_no_error(
+def test_post_update_delete_full_user_no_error(
     group_extension, group, funckey_template, switchboard, device, user_destination
 ):
     (
@@ -1082,21 +1082,20 @@ def test_post_delete_full_user_no_error(
     )
 
     with a.group_extension(group, group_extension):
-        response = confd.users.post(
-            {
-                'auth': auth,
-                'lines': [line],
-                'incalls': [incall],
-                'groups': [group],
-                'func_key_template_id': funckey_template['id'],
-                'switchboards': [switchboard],
-                'agent': agent,
-                'voicemail': voicemail,
-                'forwards': forwards,
-                'fallbacks': fallbacks,
-                **user,
-            }
-        )
+        user_body = {
+            'auth': auth,
+            'lines': [line],
+            'incalls': [incall],
+            'groups': [group],
+            'func_key_template_id': funckey_template['id'],
+            'switchboards': [switchboard],
+            'agent': agent,
+            'voicemail': voicemail,
+            'forwards': forwards,
+            'fallbacks': fallbacks,
+            **user,
+        }
+        response = confd.users.post(user_body)
 
         response.assert_created('users')
         payload = response.item
@@ -1257,9 +1256,47 @@ def test_post_delete_full_user_no_error(
         )  # The voicemail cannot be updated directly by calling POST /users
         confd.users(payload['uuid']).put(**user).assert_updated()
 
-        # user deletion
         url = confd.users(payload['uuid'])
 
+        # user update
+        destination = {'type': 'voicemail', 'voicemail_id': payload['voicemail']['id']}
+        new_fallbacks = {
+            'noanswer_destination': destination,
+            'busy_destination': destination,
+            'congestion_destination': destination,
+            'fail_destination': destination,
+        }
+        response = url.put(
+            {**user_body, 'fallbacks': {**new_fallbacks}},
+            query_string="recursive=True",
+        )
+        response.assert_updated()
+
+        # retrieve the fallbacks for the user and check the data
+        assert_that(
+            confd.users(payload['uuid']).fallbacks.get().item,
+            has_entries(
+                noanswer_destination=has_entries(**destination),
+                busy_destination=has_entries(**destination),
+                congestion_destination=has_entries(**destination),
+                fail_destination=has_entries(**destination),
+            ),
+        )
+
+        # retrieve the data for the user and check the data returned (fallbacks)
+        assert_that(
+            confd.users(payload['uuid']).get().item,
+            has_entries(
+                fallbacks=has_entries(
+                    noanswer_destination=has_entries(**destination),
+                    busy_destination=has_entries(**destination),
+                    congestion_destination=has_entries(**destination),
+                    fail_destination=has_entries(**destination),
+                ),
+            ),
+        )
+
+        # user deletion
         response = url.delete(recursive=True)
         response.assert_deleted()
 
