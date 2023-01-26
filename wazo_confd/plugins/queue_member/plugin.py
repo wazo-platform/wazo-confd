@@ -27,9 +27,7 @@ class Plugin:
             QueueMemberAgentItem,
             '/queues/<int:queue_id>/members/agents/<int:agent_id>',
             endpoint='queue_member_agents',
-            resource_class_args=(
-                queue_member_middleware,
-            ),
+            resource_class_args=(queue_member_middleware,),
         )
 
         api.add_resource(
