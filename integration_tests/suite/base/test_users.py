@@ -1047,6 +1047,10 @@ def generate_user_resources_bodies(
     )
 
 
+from nose.plugins.attrib import attr
+
+
+@attr('now')
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.group()
 @fixtures.funckey_template(
@@ -1098,7 +1102,7 @@ def test_post_update_delete_full_user_no_error(
                 'incalls': [incall],
                 'groups': [group],
                 'func_key_template_id': funckey_template['id'],
-                'switchboards': [switchboard],
+                'switchboards': [switchboard, switchboard2],
                 'agent': agent,
                 'voicemail': voicemail,
                 'forwards': forwards,
@@ -1139,8 +1143,9 @@ def test_post_update_delete_full_user_no_error(
                         has_entries(uuid=group['uuid']),
                     ),
                     func_key_template_id=funckey_template['id'],
-                    switchboards=contains(
+                    switchboards=contains_inanyorder(
                         has_entries(uuid=switchboard['uuid']),
+                        has_entries(uuid=switchboard2['uuid']),
                     ),
                     auth=has_entries(
                         uuid=payload['uuid'],
@@ -1180,8 +1185,9 @@ def test_post_update_delete_full_user_no_error(
                     lines=contains(has_entries(id=payload['lines'][0]['id'])),
                     incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
                     groups=contains(has_entries(uuid=payload['groups'][0]['uuid'])),
-                    switchboards=contains(
-                        has_entries(uuid=payload['switchboards'][0]['uuid'])
+                    switchboards=contains_inanyorder(
+                        has_entries(uuid=payload['switchboards'][0]['uuid']),
+                        has_entries(uuid=switchboard2['uuid']),
                     ),
                 ),
             )
@@ -1216,6 +1222,18 @@ def test_post_update_delete_full_user_no_error(
                 has_entries(
                     members=has_entries(
                         users=contains(has_entries(uuid=payload['uuid']))
+                    )
+                ),
+            )
+            # retrieve the switchboard2 and check the user is a member
+            assert_that(
+                confd.switchboards(switchboard2['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains_inanyorder(
+                            has_entries(uuid=user2['uuid']),
+                            has_entries(uuid=payload['uuid']),
+                        )
                     )
                 ),
             )
@@ -1362,6 +1380,11 @@ def test_post_update_delete_full_user_no_error(
 
             # verify that the switchboard is not deleted
             url = confd.switchboards(payload['switchboards'][0]['uuid'])
+            response = url.get()
+            response.assert_ok()
+
+            # verify that the switchboard2 is not deleted
+            url = confd.switchboards(switchboard2['uuid'])
             response = url.get()
             response.assert_ok()
 
