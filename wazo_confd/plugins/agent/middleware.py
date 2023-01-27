@@ -6,15 +6,25 @@ from .schema import AgentSchema
 
 
 class AgentMiddleWare:
-    def __init__(self, service):
+    def __init__(self, service, middleware_handle):
         self._service = service
         self._schema = AgentSchema()
+        self._middleware_handle = middleware_handle
 
-    def create(self, body, tenant_uuid):
+    def create(self, body, tenant_uuid, tenant_uuids):
+        queues = body.pop('queues', None) or []
+
         form = self._schema.load(body)
         form['tenant_uuid'] = tenant_uuid
         model = Agent(**form)
         model = self._service.create(model)
+
+        queue_member_middleware = self._middleware_handle.get('queue_member')
+        for queue in queues:
+            queue_member_middleware.associate(
+                queue, queue['id'], model.id, tenant_uuids
+            )
+
         return self._schema.dump(model)
 
     def delete(self, user_id, tenant_uuids):

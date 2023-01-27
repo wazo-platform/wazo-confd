@@ -11,7 +11,7 @@ class Plugin:
         api = dependencies['api']
         middleware_handle = dependencies['middleware_handle']
         service = build_service()
-        agent_middleware = AgentMiddleWare(service)
+        agent_middleware = AgentMiddleWare(service, middleware_handle)
         middleware_handle.register('agent', agent_middleware)
 
         api.add_resource(

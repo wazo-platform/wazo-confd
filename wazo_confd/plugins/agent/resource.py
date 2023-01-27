@@ -29,7 +29,10 @@ class AgentList(ListResource):
     def post(self):
         tenant = Tenant.autodetect()
         tenant_dao.find_or_create_tenant(tenant.uuid)
-        resource = self._middleware.create(request.get_json(), tenant.uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        resource = self._middleware.create(
+            request.get_json(), tenant.uuid, tenant_uuids
+        )
         return resource, 201, self.build_headers(resource)
 
     @required_acl('confd.agents.read')
