@@ -1058,7 +1058,14 @@ def generate_user_resources_bodies(
 @fixtures.switchboard()
 @fixtures.user()
 def test_post_update_delete_full_user_no_error(
-    group_extension, group, funckey_template, switchboard, device, user_destination, switchboard2, user2
+    group_extension,
+    group,
+    funckey_template,
+    switchboard,
+    device,
+    user_destination,
+    switchboard2,
+    user2,
 ):
     (
         exten,
@@ -1190,20 +1197,26 @@ def test_post_update_delete_full_user_no_error(
             # retrieve the incall (created before) and check its data are correct
             assert_that(
                 confd.incalls(payload['incalls'][0]['id']).get().item,
-                has_entries(destination=has_entries(type="user", user_id=payload['id'])),
+                has_entries(
+                    destination=has_entries(type="user", user_id=payload['id'])
+                ),
             )
             # retrieve the group and check the user is a member
             assert_that(
                 confd.groups(payload['groups'][0]['uuid']).get().item,
                 has_entries(
-                    members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
                 ),
             )
             # retrieve the switchboard and check the user is a member
             assert_that(
                 confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
                 has_entries(
-                    members=has_entries(users=contains(has_entries(uuid=payload['uuid'])))
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
                 ),
             )
             # retrieve the forwards for the user and check the data
@@ -1262,7 +1275,10 @@ def test_post_update_delete_full_user_no_error(
             url = confd.users(payload['uuid'])
 
             # user update
-            destination = {'type': 'voicemail', 'voicemail_id': payload['voicemail']['id']}
+            destination = {
+                'type': 'voicemail',
+                'voicemail_id': payload['voicemail']['id'],
+            }
             new_fallbacks = {
                 'noanswer_destination': destination,
                 'busy_destination': destination,
@@ -1276,7 +1292,11 @@ def test_post_update_delete_full_user_no_error(
             }
 
             response = url.put(
-                {**user_body, 'fallbacks': {**new_fallbacks}, 'forwards': {**new_forwards}},
+                {
+                    **user_body,
+                    'fallbacks': {**new_fallbacks},
+                    'forwards': {**new_forwards},
+                },
                 query_string="recursive=True",
             )
             response.assert_updated()
