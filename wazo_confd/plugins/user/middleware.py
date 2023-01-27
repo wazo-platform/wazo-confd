@@ -129,7 +129,7 @@ class UserMiddleWare:
             )
             members = []
             for user_member in switchboard.user_members:
-                members.append({'uuid': user_member.user.uuid})
+                members.append({'uuid': user_member.uuid})
             members.append({'uuid': user_dict['uuid']})
             self._middleware_handle.get('switchboard_member').associate(
                 {'users': members}, _switchboard['uuid'], tenant_uuids
