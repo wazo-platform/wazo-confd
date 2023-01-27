@@ -10,4 +10,4 @@ openapi-spec-validator
 psycopg2-binary  # sqlalchemy engine
 pyhamcrest
 requests
-sqlalchemy
+sqlalchemy<2
