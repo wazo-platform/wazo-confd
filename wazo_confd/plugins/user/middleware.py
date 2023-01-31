@@ -137,11 +137,15 @@ class UserMiddleWare:
         user_dict['switchboards'] = switchboards
 
         if agent:
-            agent = self._middleware_handle.get('agent').create(agent, tenant_uuid)
-            self._middleware_handle.get('user_agent_association').associate(
-                user_dict['uuid'], agent['id'], tenant_uuids
+            queues = agent['queues']
+            created_agent = self._middleware_handle.get('agent').create(
+                agent, tenant_uuid, tenant_uuids
             )
-            user_dict['agent'] = agent
+            created_agent['queues'] = queues
+            self._middleware_handle.get('user_agent_association').associate(
+                user_dict['uuid'], created_agent['id'], tenant_uuids
+            )
+            user_dict['agent'] = created_agent
 
         if forwards:
             self._middleware_handle.get('user_forward_association').associate(

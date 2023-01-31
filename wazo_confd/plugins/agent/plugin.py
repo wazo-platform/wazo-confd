@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .middleware import AgentMiddleWare
@@ -11,7 +11,7 @@ class Plugin:
         api = dependencies['api']
         middleware_handle = dependencies['middleware_handle']
         service = build_service()
-        agent_middleware = AgentMiddleWare(service)
+        agent_middleware = AgentMiddleWare(service, middleware_handle)
         middleware_handle.register('agent', agent_middleware)
 
         api.add_resource(

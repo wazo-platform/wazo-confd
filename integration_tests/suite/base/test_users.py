@@ -964,6 +964,7 @@ def generate_user_resources_bodies(
     incall_context_name=None,
     device=None,
     user_destination=None,
+    queue=None,
 ):
     exten = h.extension.find_available_exten(context_name)
     vm_number = h.voicemail.find_available_number(context_name)
@@ -1030,6 +1031,8 @@ def generate_user_resources_bodies(
         forwards = None
         fallbacks = None
     agent = {}
+    if queue:
+        agent['queues'] = [{'id': queue['id'], 'penalty': 1, 'priority': 2}]
     return (
         exten,
         source_exten,
@@ -1057,6 +1060,7 @@ def generate_user_resources_bodies(
 @fixtures.user()
 @fixtures.switchboard()
 @fixtures.user()
+@fixtures.queue()
 def test_post_update_delete_full_user_no_error(
     group_extension,
     group,
@@ -1066,6 +1070,7 @@ def test_post_update_delete_full_user_no_error(
     user_destination,
     switchboard2,
     user2,
+    queue,
 ):
     (
         exten,
@@ -1088,6 +1093,7 @@ def test_post_update_delete_full_user_no_error(
         incall_context_name=INCALL_CONTEXT,
         device=device,
         user_destination=user_destination,
+        queue=queue,
     )
 
     with (a.switchboard_member_user(switchboard2, [user2])):
@@ -1153,6 +1159,13 @@ def test_post_update_delete_full_user_no_error(
                     agent=has_entries(
                         number=line['extensions'][0]['exten'],
                         firstname=user['firstname'],
+                        queues=contains(
+                            has_entries(
+                                id=agent['queues'][0]['id'],
+                                penalty=agent['queues'][0]['penalty'],
+                                priority=agent['queues'][0]['priority'],
+                            )
+                        ),
                     ),
                     voicemail=has_entries(id=greater_than(0)),
                     forwards=has_entries(**forwards),
@@ -1276,6 +1289,7 @@ def test_post_update_delete_full_user_no_error(
                 has_entries(
                     number=line['extensions'][0]['exten'],
                     firstname=user['firstname'],
+                    queues=contains(has_entries(id=queue['id'])),
                 ),
             )
             # retrieve the user and try to update the user with the same data
