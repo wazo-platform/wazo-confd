@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -41,7 +41,6 @@ class SCCPGeneralSchema(BaseSchema):
 
 
 class SCCPGeneralList(ConfdResource):
-
     model = SCCPGeneralSettings
     schema = SCCPGeneralSchema
 

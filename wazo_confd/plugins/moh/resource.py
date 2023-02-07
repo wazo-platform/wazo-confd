@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -13,7 +13,6 @@ from .schema import MohSchema, MohSchemaPUT
 
 
 class MohList(ListResource):
-
     model = MOH
     schema = MohSchema
     moh_name_fmt = 'moh-{tenant_slug}-{moh_uuid}'
@@ -47,7 +46,6 @@ class MohList(ListResource):
 
 
 class MohItem(ItemResource):
-
     schema = MohSchemaPUT
     has_tenant_uuid = True
 
@@ -65,7 +63,6 @@ class MohItem(ItemResource):
 
 
 class MohFileItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service):

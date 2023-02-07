@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -28,7 +28,6 @@ class LineDevice(ConfdResource):
 
 
 class LineDeviceAssociation(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, middleware):
@@ -53,7 +52,6 @@ class LineDeviceAssociation(ConfdResource):
 
 
 class LineDeviceGet(LineDevice):
-
     schema = LineDeviceSchema
     has_tenant_uuid = True
 
@@ -66,7 +64,6 @@ class LineDeviceGet(LineDevice):
 
 
 class DeviceLineGet(LineDevice):
-
     schema = LineDeviceSchema
 
     @required_acl('confd.devices.{device_id}.lines.read')

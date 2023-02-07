@@ -22,7 +22,6 @@ class QueueMemberUserSchema(BaseSchema):
 
 
 class QueueMemberAgentItem(ConfdResource):
-
     schema = QueueMemberAgentSchema
     has_tenant_uuid = True
 
@@ -44,7 +43,6 @@ class QueueMemberAgentItem(ConfdResource):
 
 
 class QueueMemberUserItem(ConfdResource):
-
     schema = QueueMemberUserSchema
     has_tenant_uuid = True
 

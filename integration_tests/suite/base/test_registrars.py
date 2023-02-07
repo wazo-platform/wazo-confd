@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -199,7 +199,6 @@ def test_create_registrar_no_parameters():
 
 
 def test_create_registrar_all_parameters():
-
     parameters = {
         'deletable': True,
         'name': 'TestRegistrar',
@@ -298,7 +297,6 @@ def test_edit_registrar_null_parameters(registrar):
 
 
 def test_edit_registrar_no_parameters():
-
     parameters = {
         'deletable': True,
         'name': 'TestRegistrar',

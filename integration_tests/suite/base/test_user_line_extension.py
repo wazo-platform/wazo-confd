@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -36,7 +36,6 @@ def test_dissociate_user_then_line_then_extension(user, line, extension):
     with a.user_line(user, line, check=False), a.line_extension(
         line, extension, check=False
     ):
-
         response = confd.users(user['id']).lines(line['id']).delete()
         response.assert_deleted()
 
@@ -51,7 +50,6 @@ def test_dissociate_extension_then_line_then_user(user, line, extension):
     with a.user_line(user, line, check=False), a.line_extension(
         line, extension, check=False
     ):
-
         response = confd.lines(line['id']).extensions(extension['id']).delete()
         response.assert_deleted()
 

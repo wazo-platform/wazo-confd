@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -6,7 +6,6 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class QueueExtensionItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service, queue_dao, extension_dao):

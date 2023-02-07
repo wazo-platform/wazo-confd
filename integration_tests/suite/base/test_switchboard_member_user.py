@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -93,7 +93,7 @@ def test_associate_multi_tenant(main_switchboard, sub_switchboard, main_user, su
 @fixtures.user()
 @fixtures.user()
 def test_get_users_associated_to_switchboard(switchboard, user1, user2):
-    with (a.switchboard_member_user(switchboard, [user1, user2])):
+    with a.switchboard_member_user(switchboard, [user1, user2]):
         response = confd.switchboards(switchboard['uuid']).get()
         assert_that(
             response.item,

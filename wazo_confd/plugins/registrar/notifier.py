@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.registrar.event import (
@@ -10,7 +10,6 @@ from .schema import RegistrarSchema
 
 
 class RegistrarNotifier:
-
     schema = RegistrarSchema(exclude=['links'])
 
     def __init__(self, bus):

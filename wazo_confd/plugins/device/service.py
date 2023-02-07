@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.utils.search import SearchResult
@@ -48,7 +48,6 @@ class DeviceService(CRUDService):
 
 
 class SearchEngine:
-
     PROVD_DEVICE_KEYS = [
         'id',
         'ip',

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -52,7 +52,6 @@ class Creator(metaclass=abc.ABCMeta):
 
 
 class UserCreator(Creator):
-
     schema = UserSchema
     schema_nullable = UserSchemaNullable
 
@@ -68,7 +67,6 @@ class UserCreator(Creator):
 
 
 class WazoUserCreator(Creator):
-
     schema = WazoUserSchema
 
     def find(self, fields, tenant_uuid):
@@ -110,7 +108,6 @@ class ContextCreator(Creator):
 
 
 class VoicemailCreator(Creator):
-
     schema = VoicemailSchema
 
     def find(self, fields, tenant_uuid):
@@ -152,7 +149,6 @@ class LineCreator(Creator):
 
 
 class SipCreator(Creator):
-
     schema = EndpointSIPSchema
 
     def __init__(self, sip_service, tenant_service, *args, **kwargs):
@@ -213,7 +209,6 @@ class SccpCreator(Creator):
 
 
 class ExtensionCreator(Creator):
-
     schema = ExtensionSchema
 
     def find(self, fields, tenant_uuid):

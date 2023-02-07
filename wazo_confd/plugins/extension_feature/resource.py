@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl, required_master_tenant
@@ -8,7 +8,6 @@ from .schema import ExtensionFeatureSchema
 
 
 class ExtensionFeatureList(ListResource):
-
     schema = ExtensionFeatureSchema
 
     @required_master_tenant()
@@ -21,7 +20,6 @@ class ExtensionFeatureList(ListResource):
 
 
 class ExtensionFeatureItem(ItemResource):
-
     schema = ExtensionFeatureSchema
 
     @required_master_tenant()

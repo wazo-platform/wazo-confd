@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -84,7 +84,6 @@ def check_associate_without_required_resources(endpoint, line_endpoint):
     error = e.missing_association()
 
     with fixtures.user() as user, fixtures.line() as line, fixtures.extension() as extension, fixtures.device() as device:
-
         url = confd.lines(line['id']).devices(device['id'])
         url.put().assert_match(400, error)
         with line_endpoint(line, endpoint):
@@ -339,7 +338,6 @@ def test_associate_2_sip_lines(device):
         extension2,
         sip2,
     ):
-
         confd.lines(line2['id']).put(position=2).assert_updated()
         confd.lines(line1['id']).devices(device['id']).put().assert_updated()
         confd.lines(line2['id']).devices(device['id']).put().assert_updated()
@@ -402,7 +400,6 @@ def test_associate_2_sccp_lines(device):
     with line_fellowship('sccp') as (user1, line1, extension1, sccp1), line_fellowship(
         'sccp'
     ) as (user2, line2, extension2, sccp2):
-
         confd.lines(line2['id']).put(position=2).assert_updated()
         confd.lines(line1['id']).devices(device['id']).put().assert_updated()
 
@@ -418,7 +415,6 @@ def test_associate_lines_with_different_endpoints(device):
         extension1,
         sip,
     ), line_fellowship('sccp') as (user2, line2, extension2, sccp):
-
         confd.lines(line2['id']).put(position=2).assert_updated()
         confd.lines(line1['id']).devices(device['id']).put().assert_updated()
 

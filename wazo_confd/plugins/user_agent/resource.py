@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -6,7 +6,6 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class UserAgentItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):
@@ -22,7 +21,6 @@ class UserAgentItem(ConfdResource):
 
 
 class UserAgentList(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):

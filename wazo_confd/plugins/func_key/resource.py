@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -93,7 +93,6 @@ class FuncKeyDestination(ConfdResource):
 
 
 class FuncKeyTemplateList(ListResource):
-
     context = {'exclude_destination': ['agent', 'bsfilter']}
     schema = FuncKeyTemplateSchema
     model = FuncKeyTemplate
@@ -131,7 +130,6 @@ class FuncKeyTemplateList(ListResource):
 
 
 class FuncKeyTemplateItem(ItemResource, FindUpdateFieldsMixin):
-
     context = {'exclude_destination': ['agent', 'bsfilter']}
     schema = FuncKeyTemplateSchema
     has_tenant_uuid = True
@@ -166,7 +164,6 @@ class FuncKeyTemplateItem(ItemResource, FindUpdateFieldsMixin):
 
 
 class FuncKeyTemplateItemPosition(ItemResource):
-
     context = {'exclude_destination': ['agent', 'bsfilter']}
     schema = FuncKeySchema
     has_tenant_uuid = True
@@ -206,7 +203,6 @@ class UserFuncKey(ConfdResource):
 
 
 class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
-
     schema = FuncKeyUnifiedTemplateSchema
     has_tenant_uuid = True
 
@@ -237,7 +233,6 @@ class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
 
 
 class UserFuncKeyItemPosition(UserFuncKey):
-
     schema = FuncKeySchema
     has_tenant_uuid = True
 
@@ -276,7 +271,6 @@ class UserFuncKeyTemplate(ConfdResource):
 
 
 class UserFuncKeyTemplateAssociation(UserFuncKeyTemplate):
-
     has_tenant_uuid = True
 
     def __init__(self, service, user_dao, template_dao, middleware):
@@ -297,7 +291,6 @@ class UserFuncKeyTemplateAssociation(UserFuncKeyTemplate):
 
 
 class UserFuncKeyTemplateGet(UserFuncKeyTemplate):
-
     schema = FuncKeyTemplateUserSchema
     has_tenant_uuid = True
 
@@ -313,7 +306,6 @@ class UserFuncKeyTemplateGet(UserFuncKeyTemplate):
 
 
 class FuncKeyTemplateUserGet(UserFuncKeyTemplate):
-
     schema = FuncKeyTemplateUserSchema
     has_tenant_uuid = True
 

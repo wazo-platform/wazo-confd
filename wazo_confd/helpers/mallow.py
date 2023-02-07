@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -71,7 +71,6 @@ class StrictBoolean(fields.Boolean):
 
 
 class Link(fields.Field):
-
     _CHECK_ATTRIBUTE = False
 
     def __init__(self, resource, route=None, field='id', target=None, **kwargs):
@@ -95,7 +94,6 @@ class Link(fields.Field):
 
 
 class ListLink(fields.Field):
-
     _CHECK_ATTRIBUTE = False
 
     def __init__(self, *links, **kwargs):
@@ -112,7 +110,6 @@ class ListLink(fields.Field):
 
 
 class PJSIPSectionOption(fields.List):
-
     DEFAULT_OPTION_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
 
     def __init__(self, option_regex=DEFAULT_OPTION_REGEX, **kwargs):
@@ -127,7 +124,6 @@ class PJSIPSectionOption(fields.List):
 
 
 class AsteriskSection:
-
     DEFAULT_REGEX = re.compile(r'^[-_.a-zA-Z0-9]+$')
     DEFAULT_RESERVED_NAMES = ['general']
 
@@ -156,5 +152,4 @@ class AsteriskSection:
 
 
 class PJSIPSection(AsteriskSection):
-
     DEFAULT_RESERVED_NAMES = ['global', 'system']

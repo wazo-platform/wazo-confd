@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from uuid import uuid4
@@ -14,7 +14,6 @@ from .schema import GroupSchema
 
 
 class GroupList(ListResource):
-
     model = Group
     schema = GroupSchema
     group_name_fmt = 'grp-{tenant_slug}-{group_uuid}'
@@ -48,7 +47,6 @@ class GroupList(ListResource):
 
 
 class GroupItem(ItemResource):
-
     schema = GroupSchema
     has_tenant_uuid = True
 

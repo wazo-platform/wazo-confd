@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -12,7 +12,6 @@ from .schema import ParkingLotSchema
 
 
 class ParkingLotList(ListResource):
-
     model = ParkingLot
     schema = ParkingLotSchema
 
@@ -29,7 +28,6 @@ class ParkingLotList(ListResource):
 
 
 class ParkingLotItem(ItemResource):
-
     schema = ParkingLotSchema
     has_tenant_uuid = True
 

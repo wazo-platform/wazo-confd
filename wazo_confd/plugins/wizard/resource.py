@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -65,7 +65,6 @@ class ConfiguredSchema(BaseSchema):
 
 
 class WizardResource(ErrorCatchingResource):
-
     wizard_schema = WizardSchema
     configured_schema = ConfiguredSchema
 
@@ -104,7 +103,6 @@ class WizardDiscoverSchema(BaseSchema):
 
 
 class WizardDiscoverResource(ErrorCatchingResource):
-
     schema = WizardDiscoverSchema
 
     def __init__(self, service):
@@ -112,7 +110,6 @@ class WizardDiscoverResource(ErrorCatchingResource):
 
     @wazo_unconfigured
     def get(self):
-
         discover = {
             'interfaces': self.service.get_interfaces(),
             'gateways': self.service.get_gateways(),

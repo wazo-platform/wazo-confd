@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -157,7 +157,6 @@ def test_list_search_authorizations_by_user(_, me, another_meeting):
     ) as authorization_found, fixtures.meeting_authorization(
         hidden_guest_uuid, meeting, guest_name='hidden'
     ) as authorization_hidden:
-
         # Test unknown meeting
         url = user_confd.users.me.meetings(unknown_uuid).authorizations
         response = url.get()
@@ -235,7 +234,6 @@ def test_get_meeting_authorization_by_guest(
     ) as another_authorization, fixtures.meeting_authorization(
         guest_uuid, meeting_authorization_required
     ) as authorization_required:
-
         # Test invalid guest_uuid
         url(invalid_uuid, meeting['uuid'], authorization['uuid']).assert_status(400)
 
@@ -398,7 +396,6 @@ def test_accept_meeting_authorization(_, me, another_meeting):
     ) as authorization, fixtures.meeting_authorization(
         another_guest_uuid, another_meeting
     ) as another_authorization:
-
         # Test unknown meeting
         url(unknown_uuid, authorization['uuid']).assert_status(404)
 
@@ -492,7 +489,6 @@ def test_reject_meeting_authorization(_, me, another_meeting):
     ) as authorization, fixtures.meeting_authorization(
         another_guest_uuid, another_meeting
     ) as another_authorization:
-
         # Test unknown meeting
         url(unknown_uuid, authorization['uuid']).assert_status(404)
 

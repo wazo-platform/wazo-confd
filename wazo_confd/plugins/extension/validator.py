@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -68,7 +68,6 @@ class ExtenAvailableOnUpdateValidator(ExtenAvailableValidator):
 
 
 class ExtenRegexValidator(Validator):
-
     exten_regex = re.compile(EXTEN_REGEX)
     exten_outcall_regex = re.compile(EXTEN_OUTCALL_REGEX)
 

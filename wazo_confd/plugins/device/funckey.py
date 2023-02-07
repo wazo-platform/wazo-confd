@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -38,7 +38,6 @@ def build_converters():
 
 
 class FuncKeyConverter(metaclass=abc.ABCMeta):
-
     INVALID_CHARS = "\n\r\t;"
 
     @abc.abstractmethod
@@ -176,7 +175,6 @@ class PagingConverter(FuncKeyConverter):
 
 
 class ServiceConverter(FuncKeyConverter):
-
     PROGFUNCKEYS = ('callrecord', 'incallfilter', 'enablednd', 'enablevm')
 
     def __init__(self, extension_dao):

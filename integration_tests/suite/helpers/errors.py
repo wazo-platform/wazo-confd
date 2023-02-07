@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from functools import partial
@@ -8,7 +8,6 @@ import re
 
 
 class RegexError:
-
     NO_ERROR_FOUND = "{} did not match on {}"
     NO_MATCH = "{} not found in error {}"
 

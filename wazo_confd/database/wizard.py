@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.infos import Infos
@@ -10,7 +10,6 @@ from xivo_dao.helpers.db_manager import Session
 
 
 def set_language(language):
-
     row = Session.query(StaticIAX).filter(StaticIAX.var_name == 'language').first()
     row.var_val = language
     Session.add(row)

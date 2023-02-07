@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -15,7 +15,6 @@ from .schema import (
 
 
 class GuestMeetingAuthorizationList(ListResource):
-
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
 
@@ -103,7 +102,6 @@ class _MeResourceMixin:
 
 
 class UserMeetingAuthorizationList(ListResource, _MeResourceMixin):
-
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
 
@@ -145,7 +143,6 @@ class UserMeetingAuthorizationList(ListResource, _MeResourceMixin):
 
 
 class UserMeetingAuthorizationItem(ItemResource, _MeResourceMixin):
-
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
 
@@ -210,7 +207,6 @@ class UserMeetingAuthorizationItem(ItemResource, _MeResourceMixin):
 
 
 class UserMeetingAuthorizationAccept(ItemResource, _MeResourceMixin):
-
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
 
@@ -257,7 +253,6 @@ class UserMeetingAuthorizationAccept(ItemResource, _MeResourceMixin):
 
 
 class UserMeetingAuthorizationReject(ItemResource, _MeResourceMixin):
-
     model = MeetingAuthorization
     schema = MeetingAuthorizationSchema
 

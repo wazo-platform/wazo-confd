@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.access_feature.event import (
@@ -13,7 +13,6 @@ from .schema import AccessFeatureSchema
 
 
 class AccessFeatureNotifier:
-
     schema = AccessFeatureSchema(exclude=['links'])
 
     def __init__(self, bus, sysconfd):

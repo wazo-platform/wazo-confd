@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -21,7 +21,6 @@ def test_when_extension_updated_on_sip_line_then_provd_is_updated(
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(
         line, extension
     ), a.line_device(line, device):
-
         response = confd.extensions(extension['id']).put(exten=exten)
         response.assert_updated()
 
@@ -89,7 +88,6 @@ def test_when_sip_username_and_password_are_updated_then_provd_is_updated(
     with a.line_endpoint_sip(line, sip), a.user_line(user, line), a.line_extension(
         line, extension
     ), a.line_device(line, device):
-
         response = confd.endpoints.sip(sip['uuid']).put(
             auth_section_options=[['username', 'myusername'], ['password', 'mysecret']],
         )
@@ -131,7 +129,6 @@ def test_updating_user_line_or_extension_associated_with_autoprov_device_does_no
     with a.line_endpoint_sip(line, sip, check=False), a.line_extension(
         line, extension, check=False
     ), a.user_line(user, line, check=False):
-
         with db.queries() as queries:
             queries.associate_line_device(line['id'], device['id'])
 

@@ -1,4 +1,4 @@
-# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -12,7 +12,6 @@ from .schema import AccessFeatureSchema
 
 
 class AccessFeatureList(ListResource):
-
     model = AccessFeatures
     schema = AccessFeatureSchema
 
@@ -33,7 +32,6 @@ class AccessFeatureList(ListResource):
 
 
 class AccessFeatureItem(ItemResource):
-
     schema = AccessFeatureSchema
 
     @required_master_tenant()

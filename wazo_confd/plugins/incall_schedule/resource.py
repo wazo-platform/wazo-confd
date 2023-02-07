@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -6,7 +6,6 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class IncallScheduleItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service, incall_dao, schedule_dao):

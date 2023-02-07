@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -17,7 +17,6 @@ class AgentSkillSchema(BaseSchema):
 
 
 class AgentSkillItem(ConfdResource):
-
     schema = AgentSkillSchema
     has_tenant_uuid = True
 

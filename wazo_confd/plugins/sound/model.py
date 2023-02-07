@@ -1,9 +1,8 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
 class SoundCategory:
-
     has_tenant_uuid = True
 
     def __init__(self, name=None, files=None, tenant_uuid=None):
@@ -26,7 +25,6 @@ class SoundCategory:
 
 
 class SoundFile:
-
     has_tenant_uuid = True
 
     def __init__(self, name=None, formats=None, tenant_uuid=None):
@@ -51,7 +49,6 @@ class SoundFile:
 
 
 class SoundFormat:
-
     has_tenant_uuid = True
 
     extension_map = {'wav': 'slin'}

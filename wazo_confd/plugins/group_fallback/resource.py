@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -10,7 +10,6 @@ from .schema import GroupFallbackSchema
 
 
 class GroupFallbackList(ConfdResource):
-
     schema = GroupFallbackSchema
 
     def __init__(self, service, group_dao):

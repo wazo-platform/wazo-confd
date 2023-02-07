@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .wrappers import IsolatedAction
@@ -6,17 +6,14 @@ from . import helpers as h
 
 
 class user(IsolatedAction):
-
     actions = {'generate': h.user.generate_user, 'delete': h.user.delete_user}
 
 
 class line(IsolatedAction):
-
     actions = {'generate': h.line.generate_line, 'delete': h.line.delete_line}
 
 
 class line_sip(IsolatedAction):
-
     actions = {
         'generate': h.line_sip.generate_line_sip,
         'delete': h.line_sip.delete_line_sip,
@@ -24,7 +21,6 @@ class line_sip(IsolatedAction):
 
 
 class sip(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.endpoint_sip.generate_sip,
@@ -33,7 +29,6 @@ class sip(IsolatedAction):
 
 
 class sip_template(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.endpoint_sip.generate_sip_template,
@@ -42,7 +37,6 @@ class sip_template(IsolatedAction):
 
 
 class sccp(IsolatedAction):
-
     actions = {
         'generate': h.endpoint_sccp.generate_sccp,
         'delete': h.endpoint_sccp.delete_sccp,
@@ -50,7 +44,6 @@ class sccp(IsolatedAction):
 
 
 class extension(IsolatedAction):
-
     actions = {
         'generate': h.extension.generate_extension,
         'delete': h.extension.delete_extension,
@@ -58,17 +51,14 @@ class extension(IsolatedAction):
 
 
 class device(IsolatedAction):
-
     actions = {'generate': h.device.generate_device, 'delete': h.device.delete_device}
 
 
 class autoprov(IsolatedAction):
-
     actions = {'generate': h.device.generate_autoprov, 'delete': h.device.delete_device}
 
 
 class voicemail(IsolatedAction):
-
     actions = {
         'generate': h.voicemail.generate_voicemail,
         'delete': h.voicemail.delete_voicemail,
@@ -76,7 +66,6 @@ class voicemail(IsolatedAction):
 
 
 class context(IsolatedAction):
-
     actions = {
         'generate': h.context.generate_context,
         'delete': h.context.delete_context,
@@ -84,12 +73,10 @@ class context(IsolatedAction):
 
 
 class csv_entry(IsolatedAction):
-
     actions = {'generate': h.user_import.generate_entry}
 
 
 class custom(IsolatedAction):
-
     actions = {
         'generate': h.endpoint_custom.generate_custom,
         'delete': h.endpoint_custom.delete_custom,
@@ -97,7 +84,6 @@ class custom(IsolatedAction):
 
 
 class registrar(IsolatedAction):
-
     actions = {
         'generate': h.registrar.generate_registrar,
         'delete': h.registrar.delete_registrar,
@@ -105,7 +91,6 @@ class registrar(IsolatedAction):
 
 
 class call_permission(IsolatedAction):
-
     actions = {
         'generate': h.call_permission.generate_call_permission,
         'delete': h.call_permission.delete_call_permission,
@@ -113,12 +98,10 @@ class call_permission(IsolatedAction):
 
 
 class agent(IsolatedAction):
-
     actions = {'generate': h.agent.generate_agent, 'delete': h.agent.delete_agent}
 
 
 class funckey_template(IsolatedAction):
-
     actions = {
         'generate': h.funckey_template.generate_funckey_template,
         'delete': h.funckey_template.delete_funckey_template,
@@ -126,7 +109,6 @@ class funckey_template(IsolatedAction):
 
 
 class call_pickup(IsolatedAction):
-
     actions = {
         'generate': h.call_pickup.generate_call_pickup,
         'delete': h.call_pickup.delete_call_pickup,
@@ -134,7 +116,6 @@ class call_pickup(IsolatedAction):
 
 
 class call_filter(IsolatedAction):
-
     actions = {
         'generate': h.call_filter.generate_call_filter,
         'delete': h.call_filter.delete_call_filter,
@@ -142,7 +123,6 @@ class call_filter(IsolatedAction):
 
 
 class schedule(IsolatedAction):
-
     actions = {
         'generate': h.schedule.generate_schedule,
         'delete': h.schedule.delete_schedule,
@@ -150,28 +130,23 @@ class schedule(IsolatedAction):
 
 
 class queue(IsolatedAction):
-
     actions = {'generate': h.queue.generate_queue, 'delete': h.queue.delete_queue}
 
 
 class trunk(IsolatedAction):
-
     actions = {'generate': h.trunk.generate_trunk, 'delete': h.trunk.delete_trunk}
 
 
 class incall(IsolatedAction):
-
     actions = {'generate': h.incall.generate_incall, 'delete': h.incall.delete_incall}
 
 
 class group(IsolatedAction):
-
     id_field = 'uuid'
     actions = {'generate': h.group.generate_group, 'delete': h.group.delete_group}
 
 
 class outcall(IsolatedAction):
-
     actions = {
         'generate': h.outcall.generate_outcall,
         'delete': h.outcall.delete_outcall,
@@ -179,12 +154,10 @@ class outcall(IsolatedAction):
 
 
 class ivr(IsolatedAction):
-
     actions = {'generate': h.ivr.generate_ivr, 'delete': h.ivr.delete_ivr}
 
 
 class agent_login_status(IsolatedAction):
-
     actions = {
         'generate': h.agent_login_status.generate_agent_login_status,
         'delete': h.agent_login_status.delete_agent_login_status,
@@ -192,7 +165,6 @@ class agent_login_status(IsolatedAction):
 
 
 class conference(IsolatedAction):
-
     actions = {
         'generate': h.conference.generate_conference,
         'delete': h.conference.delete_conference,
@@ -200,7 +172,6 @@ class conference(IsolatedAction):
 
 
 class ingress_http(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.ingress_http.generate_ingress_http,
@@ -209,7 +180,6 @@ class ingress_http(IsolatedAction):
 
 
 class parking_lot(IsolatedAction):
-
     actions = {
         'generate': h.parking_lot.generate_parking_lot,
         'delete': h.parking_lot.delete_parking_lot,
@@ -217,12 +187,10 @@ class parking_lot(IsolatedAction):
 
 
 class paging(IsolatedAction):
-
     actions = {'generate': h.paging.generate_paging, 'delete': h.paging.delete_paging}
 
 
 class switchboard(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.switchboard.generate_switchboard,
@@ -231,18 +199,15 @@ class switchboard(IsolatedAction):
 
 
 class moh(IsolatedAction):
-
     id_field = 'uuid'
     actions = {'generate': h.moh.generate_moh, 'delete': h.moh.delete_moh}
 
 
 class voicemail_zonemessages(IsolatedAction):
-
     actions = {'generate': h.voicemail_zonemessages.generate_voicemail_zonemessages}
 
 
 class register_iax(IsolatedAction):
-
     actions = {
         'generate': h.register_iax.generate_register_iax,
         'delete': h.register_iax.delete_register_iax,
@@ -250,13 +215,11 @@ class register_iax(IsolatedAction):
 
 
 class sound(IsolatedAction):
-
     id_field = 'name'
     actions = {'generate': h.sound.generate_sound, 'delete': h.sound.delete_sound}
 
 
 class extension_feature(IsolatedAction):
-
     actions = {
         'generate': h.extension_feature.generate_extension_feature,
         'delete': h.extension_feature.delete_extension_feature,
@@ -264,7 +227,6 @@ class extension_feature(IsolatedAction):
 
 
 class iax(IsolatedAction):
-
     actions = {
         'generate': h.endpoint_iax.generate_iax,
         'delete': h.endpoint_iax.delete_iax,
@@ -272,12 +234,10 @@ class iax(IsolatedAction):
 
 
 class skill(IsolatedAction):
-
     actions = {'generate': h.skill.generate_skill, 'delete': h.skill.delete_skill}
 
 
 class skill_rule(IsolatedAction):
-
     actions = {
         'generate': h.skill_rule.generate_skill_rule,
         'delete': h.skill_rule.delete_skill_rule,
@@ -285,7 +245,6 @@ class skill_rule(IsolatedAction):
 
 
 class application(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.application.generate_application,
@@ -294,7 +253,6 @@ class application(IsolatedAction):
 
 
 class access_feature(IsolatedAction):
-
     actions = {
         'generate': h.access_feature.generate_access_feature,
         'delete': h.access_feature.delete_access_feature,
@@ -302,7 +260,6 @@ class access_feature(IsolatedAction):
 
 
 class transport(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.transport.generate_transport,
@@ -311,7 +268,6 @@ class transport(IsolatedAction):
 
 
 class external_app(IsolatedAction):
-
     id_field = 'name'
     actions = {
         'generate': h.external_app.generate_external_app,
@@ -320,7 +276,6 @@ class external_app(IsolatedAction):
 
 
 class user_external_app(IsolatedAction):
-
     id_field = ('user_uuid', 'name')
     actions = {
         'generate': h.user_external_app.generate_user_external_app,
@@ -329,7 +284,6 @@ class user_external_app(IsolatedAction):
 
 
 class meeting(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.meeting.generate,
@@ -338,7 +292,6 @@ class meeting(IsolatedAction):
 
 
 class user_me_meeting(IsolatedAction):
-
     id_field = 'uuid'
     actions = {
         'generate': h.user_me_meeting.generate,
@@ -347,7 +300,6 @@ class user_me_meeting(IsolatedAction):
 
 
 class meeting_authorization(IsolatedAction):
-
     id_field = ['guest_uuid', 'meeting_uuid', 'uuid']
     actions = {
         'generate': h.meeting_authorization.generate,

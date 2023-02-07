@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -72,7 +72,6 @@ class _BaseSIPSchema(BaseSchema):
 
 
 class EndpointSIPSchema(_BaseSIPSchema):
-
     links = ListLink(Link('endpoint_sip', field='uuid'))
 
     trunk = Nested('TrunkSchema', only=['id', 'links'], dump_only=True)
@@ -119,5 +118,4 @@ class MergedEndpointSIPSchema(EndpointSIPSchema):
 
 
 class TemplateSIPSchema(_BaseSIPSchema):
-
     links = ListLink(Link('endpoint_sip_templates', field='uuid'))

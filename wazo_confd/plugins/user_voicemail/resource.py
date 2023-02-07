@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -10,7 +10,6 @@ from ..voicemail.schema import VoicemailSchema
 
 
 class UserVoicemailItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, middleware):
@@ -25,7 +24,6 @@ class UserVoicemailItem(ConfdResource):
 
 
 class UserVoicemailList(ConfdResource):
-
     schema = VoicemailSchema
     has_tenant_uuid = True
 

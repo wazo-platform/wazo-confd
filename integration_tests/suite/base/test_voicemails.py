@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -128,7 +128,7 @@ def test_fake_fields(voicemail):
     ]
     requests = [confd.voicemails.post, confd.voicemails(voicemail['id']).put]
 
-    for (field, value, error_field) in fake:
+    for field, value, error_field in fake:
         for request in requests:
             fields = _generate_fields()
             fields[field] = value

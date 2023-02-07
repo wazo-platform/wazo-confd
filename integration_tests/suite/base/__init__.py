@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.base import IntegrationTest
@@ -32,12 +32,10 @@ def tearDownModule():
 class mocks:
     @classmethod
     class provd(IsolatedAction):
-
         actions = {'generate': BaseIntegrationTest.setup_provd}
 
     @classmethod
     class sysconfd(IsolatedAction):
-
         actions = {'generate': BaseIntegrationTest.setup_sysconfd}
 
 
