@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -14,7 +14,6 @@ from .schema import CallFilterRecipientUsersSchema, CallFilterSurrogateUsersSche
 
 
 class CallFilterRecipientUserList(ConfdResource):
-
     schema = CallFilterRecipientUsersSchema
     has_tenant_uuid = True
 
@@ -51,7 +50,6 @@ class CallFilterRecipientUserList(ConfdResource):
 
 
 class CallFilterSurrogateUserList(ConfdResource):
-
     schema = CallFilterSurrogateUsersSchema
     has_tenant_uuid = True
 

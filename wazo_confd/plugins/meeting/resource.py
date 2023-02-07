@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -70,7 +70,6 @@ def find_owners(form, tenant_uuid, user_service):
 
 
 class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
-
     model = Meeting
 
     def __init__(
@@ -252,7 +251,6 @@ class UserMeetingItem(MeetingItem, _MeResourceMixin):
 
 
 class UserMeetingList(MeetingList):
-
     model = Meeting
 
     def __init__(

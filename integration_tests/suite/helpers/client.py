@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 
 class ConfdClient:
-
     DEFAULT_HEADERS = {
         'Accept': 'application/json',
         'X-Auth-Token': TOKEN,
@@ -186,7 +185,6 @@ class RestUrlClient(UrlFragment):
 
 
 class Response:
-
     STATUS_OK = (200, 201, 204)
 
     def __init__(self, response):

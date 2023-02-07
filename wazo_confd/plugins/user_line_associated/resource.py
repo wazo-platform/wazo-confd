@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -13,7 +13,6 @@ from wazo_confd.plugins.endpoint_sip.schema import (
 
 
 class UserLineAssociatedEndpointSipItem(ConfdResource):
-
     schema = EndpointSIPSchema
     view_schemas = {
         'merged': MergedEndpointSIPSchema,

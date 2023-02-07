@@ -1,4 +1,4 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -18,7 +18,6 @@ from .schema import (
 
 
 class CallPickupInterceptorGroupList(ConfdResource):
-
     schema = CallPickupInterceptorGroupsSchema
     has_tenant_uuid = True
 
@@ -47,7 +46,6 @@ class CallPickupInterceptorGroupList(ConfdResource):
 
 
 class CallPickupTargetGroupList(ConfdResource):
-
     schema = CallPickupTargetGroupsSchema
     has_tenant_uuid = True
 
@@ -76,7 +74,6 @@ class CallPickupTargetGroupList(ConfdResource):
 
 
 class CallPickupInterceptorUserList(ConfdResource):
-
     schema = CallPickupInterceptorUsersSchema
     has_tenant_uuid = True
 
@@ -105,7 +102,6 @@ class CallPickupInterceptorUserList(ConfdResource):
 
 
 class CallPickupTargetUserList(ConfdResource):
-
     schema = CallPickupTargetUsersSchema
     has_tenant_uuid = True
 

@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 class PJSIPConfigurationService(AsteriskConfigurationService):
-
     file_name = 'pjsip.conf'
 
     def __init__(self, asterisk_file_dao, notifier, pjsip_doc):

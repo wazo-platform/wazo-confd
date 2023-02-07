@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -8,7 +8,6 @@ from wazo_confd.helpers.restful import ConfdResource, ListResource
 
 
 class LineExtensionItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, middleware):

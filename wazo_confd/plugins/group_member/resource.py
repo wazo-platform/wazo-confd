@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -27,7 +27,6 @@ class GroupMemberItem(ConfdResource):
 
 
 class GroupMemberUserItem(GroupMemberItem):
-
     schema = GroupUsersSchema
     has_tenant_uuid = True
 
@@ -64,7 +63,6 @@ class GroupMemberUserItem(GroupMemberItem):
 
 
 class GroupMemberExtensionItem(GroupMemberItem):
-
     schema = GroupExtensionsSchema
 
     @required_acl('confd.groups.{group_uuid}.members.extensions.update')

@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.bus import BusClient as bus_client
@@ -37,7 +37,6 @@ def test_confd_status_is_all_ok():
 
 
 def test_confd_status_fails_when_rabbitmq_is_down():
-
     expected_bus_status_fail_entries = {
         'bus_consumer': {
             'status': 'fail',

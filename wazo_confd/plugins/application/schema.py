@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, pre_dump
@@ -10,7 +10,6 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 
 
 class NodeApplicationDestinationOptionsSchema(BaseSchema):
-
     type = fields.String(attribute='type_', validate=OneOf(['holding']), required=True)
     music_on_hold = fields.String(
         validate=Length(max=128), allow_none=True, missing=None
@@ -19,7 +18,6 @@ class NodeApplicationDestinationOptionsSchema(BaseSchema):
 
 
 class ApplicationDestinationOptionsField(fields.Field):
-
     _options = {'node': Nested(NodeApplicationDestinationOptionsSchema)}
 
     def _deserialize(self, value, attr, data, **kwargs):

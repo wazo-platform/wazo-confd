@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -16,7 +16,6 @@ class SubscriptionCountSchema(BaseSchema):
 
 
 class UserSubscription(ConfdResource):
-
     schema = SubscriptionCountSchema
 
     def __init__(self, service):

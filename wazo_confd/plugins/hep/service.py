@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.asterisk_file import dao as asterisk_file_dao
@@ -9,7 +9,6 @@ from .notifier import build_notifier
 
 
 class HEPConfigurationService(AsteriskConfigurationService):
-
     file_name = 'hep.conf'
 
 

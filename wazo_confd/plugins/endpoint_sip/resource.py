@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -21,7 +21,6 @@ from .schema import (
 
 
 class _BaseSipList(ListResource):
-
     model = EndpointSIP
     schema = EndpointSIPSchema
 
@@ -45,7 +44,6 @@ class _BaseSipList(ListResource):
 
 
 class _BaseSipItem(ItemResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service, sip_dao, transport_dao):

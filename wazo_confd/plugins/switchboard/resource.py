@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -42,7 +42,6 @@ class _BaseSwitchboardResource:
 
 
 class SwitchboardList(_BaseSwitchboardResource, ListResource):
-
     model = Switchboard
     schema = SwitchboardSchema
 
@@ -66,7 +65,6 @@ class SwitchboardList(_BaseSwitchboardResource, ListResource):
 
 
 class SwitchboardItem(_BaseSwitchboardResource, ItemResource):
-
     schema = SwitchboardSchema
     has_tenant_uuid = True
 

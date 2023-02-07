@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump, pre_dump, post_load
@@ -82,7 +82,6 @@ class GetMohFromClosedSchedule(Validator):
 # This is a copy of the Destination validator with the difference that not all resources are
 # validated and the fields are not the same as the dialaction table
 class ClosedDestinationValidator:
-
     _VALIDATORS = {
         'user': [
             GetResource('fallback_actionid', user_dao.get, 'User'),

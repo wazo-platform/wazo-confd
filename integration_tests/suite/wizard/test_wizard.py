@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
@@ -115,12 +115,10 @@ class IntegrationTest(BaseIntegrationTest):
 class mocks:
     @classmethod
     class sysconfd(IsolatedAction):
-
         actions = {'generate': IntegrationTest.setup_sysconfd}
 
     @classmethod
     class auth(IsolatedAction):
-
         actions = {'generate': IntegrationTest.setup_auth}
 
 

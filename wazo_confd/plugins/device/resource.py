@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -23,7 +23,6 @@ class SingleTenantConfdResource(SingleTenantMixin, ConfdResource):
 
 
 class DeviceList(SingleTenantMixin, ListResource):
-
     model = Device.from_args
     schema = DeviceSchema
 
@@ -47,7 +46,6 @@ class DeviceList(SingleTenantMixin, ListResource):
 
 
 class UnallocatedDeviceList(ListResource):
-
     model = Device.from_args
     schema = DeviceSchema
 
@@ -73,7 +71,6 @@ class UnallocatedDeviceItem(SingleTenantConfdResource):
 
 
 class DeviceItem(SingleTenantMixin, ItemResource):
-
     schema = DeviceSchema
 
     @required_acl('confd.devices.{id}.read')

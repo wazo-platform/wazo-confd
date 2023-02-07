@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.tenant_flask_helpers import Tenant
@@ -58,7 +58,6 @@ class UserImportResource(ConfdResource):
 
 
 class UserExportResource(ConfdResource):
-
     representations = {'text/csv; charset=utf-8': output_csv}
 
     def __init__(self, service):

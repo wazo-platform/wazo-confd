@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -12,7 +12,6 @@ from wazo_confd.plugins.line.schema import LinePutSchema, LineListSchema
 
 
 class LineList(ListResource):
-
     model = Line
     schema = LineListSchema
     has_tenant_uuid = True
@@ -40,7 +39,6 @@ class LineList(ListResource):
 
 
 class LineItem(ItemResource):
-
     schema = LinePutSchema
     has_tenant_uuid = True
 

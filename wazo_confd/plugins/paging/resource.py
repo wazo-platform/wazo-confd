@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -12,7 +12,6 @@ from .schema import PagingSchema
 
 
 class PagingList(ListResource):
-
     model = Paging
     schema = PagingSchema
 
@@ -29,7 +28,6 @@ class PagingList(ListResource):
 
 
 class PagingItem(ItemResource):
-
     schema = PagingSchema
     has_tenant_uuid = True
 

@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -26,7 +26,6 @@ class UserCallPermission(ConfdResource):
 
 
 class UserCallPermissionAssociation(UserCallPermission):
-
     has_tenant_uuid = True
 
     @required_acl('confd.users.{user_id}.callpermissions.{call_permission_id}.update')

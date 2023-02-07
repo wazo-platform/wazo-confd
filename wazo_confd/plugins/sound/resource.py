@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -12,7 +12,6 @@ from .schema import SoundSchema, SoundQueryParametersSchema
 
 
 class SoundList(ListResource):
-
     model = SoundCategory
     schema = SoundSchema
     has_tenant_uuid = True
@@ -30,7 +29,6 @@ class SoundList(ListResource):
 
 
 class SoundItem(ItemResource):
-
     schema = SoundSchema
     has_tenant_uuid = True
 
@@ -52,7 +50,6 @@ class SoundItem(ItemResource):
 
 
 class SoundFileItem(ConfdResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service):

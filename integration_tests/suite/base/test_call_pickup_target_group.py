@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, empty, has_entries
@@ -121,7 +121,6 @@ def test_get_user_interceptor_user_relation(
     with a.user_line(user1, line1), a.user_line(user2, line2), a.user_line(
         user3, line3
     ), a.group_member_user(group1, user2), a.group_member_user(group2, user3):
-
         with a.call_pickup_interceptor_user(call_pickup, user1):
             with a.call_pickup_target_group(call_pickup, group1, group2):
                 response = confd.users(user1['id']).get()
@@ -156,7 +155,6 @@ def test_get_group_interceptor_user_relation(
     ), a.group_member_user(
         group3, user3
     ):
-
         with a.call_pickup_interceptor_group(call_pickup, group1):
             with a.call_pickup_target_group(call_pickup, group2, group3):
                 response = confd.users(user1['id']).get()

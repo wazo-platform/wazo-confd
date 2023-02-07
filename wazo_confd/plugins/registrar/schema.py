@@ -1,4 +1,4 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -7,7 +7,6 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 
 class RegistrarSchema(BaseSchema):
-
     id = fields.String()
     deletable = fields.Boolean(missing=True, default=True)
     name = fields.String(allow_none=True)

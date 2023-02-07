@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -32,7 +32,6 @@ class UserLineResource(ConfdResource):
 
 
 class UserLineList(UserLineResource):
-
     schema = LinesIDSchema
 
     @required_acl('confd.users.{user_id}.lines.update')
@@ -49,7 +48,6 @@ class UserLineList(UserLineResource):
 
 
 class UserLineItem(UserLineResource):
-
     has_tenant_uuid = True
 
     def __init__(self, service, user_dao, line_dao, middleware):

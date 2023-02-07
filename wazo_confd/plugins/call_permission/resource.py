@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -12,7 +12,6 @@ from .schema import CallPermissionSchema
 
 
 class CallPermissionList(ListResource):
-
     model = CallPermission
     schema = CallPermissionSchema
 
@@ -33,7 +32,6 @@ class CallPermissionList(ListResource):
 
 
 class CallPermissionItem(ItemResource):
-
     schema = CallPermissionSchema
     has_tenant_uuid = True
 

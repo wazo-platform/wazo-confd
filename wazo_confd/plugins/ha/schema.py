@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import validates_schema
@@ -10,7 +10,6 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 
 class HASchema(BaseSchema):
-
     node_type = fields.String(
         validate=OneOf(['disabled', 'master', 'slave']), required=True
     )

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -480,7 +480,6 @@ class VoicemailDestinationSchema(BaseDestinationSchema):
 
 
 class DestinationField(Nested):
-
     application_schemas = {
         'callback_disa': CallBackDISADestinationSchema,
         'callbackdisa': CallBackDISADestinationSchema,
@@ -595,7 +594,6 @@ class GetMohFromActionArg2Resource(Validator):
 
 
 class DestinationValidator:
-
     _VALIDATORS = {
         'application:callbackdisa': [],
         'application:custom': [

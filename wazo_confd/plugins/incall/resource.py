@@ -14,7 +14,6 @@ from .schema import IncallSchema
 
 
 class IncallList(ListResource):
-
     model = Incall
     schema = IncallSchema
 
@@ -38,7 +37,6 @@ class IncallList(ListResource):
 
 
 class IncallItem(ItemResource):
-
     schema = IncallSchema
     has_tenant_uuid = True
 

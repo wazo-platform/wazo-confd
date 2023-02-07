@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -9,7 +9,6 @@ from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 
 def find_all_dst_user(user_id):
-
     query = (
         Session.query(FuncKeyTemplate)
         .join(FuncKeyMapping, FuncKeyTemplate.id == FuncKeyMapping.template_id)

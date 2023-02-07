@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -73,7 +73,6 @@ class FuncKeyMappingValidator(Validator):
 
 
 class FuncKeyValidator(Validator):
-
     INVALID_CHARS = "\n\r\t;"
     INVALID_CHARS_MSG = "string without special characters (\\n \\r \\t ;)"
 

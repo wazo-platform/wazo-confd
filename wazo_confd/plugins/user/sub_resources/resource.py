@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -37,7 +37,6 @@ class UserSubResource(ConfdResource):
 
 
 class UserServiceDND(UserSubResource):
-
     schema = ServiceDNDSchema
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
@@ -50,7 +49,6 @@ class UserServiceDND(UserSubResource):
 
 
 class UserServiceIncallFilter(UserSubResource):
-
     schema = ServiceIncallFilterSchema
 
     @required_acl('confd.users.{user_id}.services.dnd.read')
@@ -63,7 +61,6 @@ class UserServiceIncallFilter(UserSubResource):
 
 
 class UserServiceList(UserSubResource):
-
     schema = ServicesSchema
 
     @required_acl('confd.users.{user_id}.services.read')
@@ -76,7 +73,6 @@ class UserServiceList(UserSubResource):
 
 
 class UserForwardBusy(UserSubResource):
-
     schema = ForwardBusySchema
 
     @required_acl('confd.users.{user_id}.forwards.busy.read')
@@ -89,7 +85,6 @@ class UserForwardBusy(UserSubResource):
 
 
 class UserForwardNoAnswer(UserSubResource):
-
     schema = ForwardNoAnswerSchema
 
     @required_acl('confd.users.{user_id}.forwards.noanswer.read')
@@ -102,7 +97,6 @@ class UserForwardNoAnswer(UserSubResource):
 
 
 class UserForwardUnconditional(UserSubResource):
-
     schema = ForwardUnconditionalSchema
 
     @required_acl('confd.users.{user_id}.forwards.unconditional.read')
@@ -115,7 +109,6 @@ class UserForwardUnconditional(UserSubResource):
 
 
 class UserForwardList(UserSubResource):
-
     schema = ForwardsSchema
 
     def __init__(self, service, user_forward_association):

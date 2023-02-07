@@ -1,4 +1,4 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -10,7 +10,6 @@ from .schema import TenantSchema
 
 
 class TenantList(ListResource):
-
     model = Tenant
     schema = TenantSchema
     has_tenant_uuid = True
@@ -24,7 +23,6 @@ class TenantList(ListResource):
 
 
 class TenantItem(ItemResource):
-
     schema = TenantSchema
     has_tenant_uuid = True
 

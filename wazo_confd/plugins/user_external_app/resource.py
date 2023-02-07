@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -18,7 +18,6 @@ from .schema import (
 
 
 class UserExternalAppList(ListResource):
-
     schema = UserExternalAppSchema
     has_tenant_uuid = True
 
@@ -40,7 +39,6 @@ class UserExternalAppList(ListResource):
 
 
 class UserExternalAppItem(ItemResource):
-
     schema = UserExternalAppSchema
     name_schema = UserExternalAppNameSchema
     model = UserExternalApp
