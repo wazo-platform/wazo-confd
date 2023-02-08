@@ -95,8 +95,8 @@ class UserMiddleWare:
             Session.expire(model, ['user_lines'])
 
         def process_context(context_name, extension_number):
-            existing_context = self._middleware_handle.get('context').get_by_name(
-                context_name, tenant_uuids
+            existing_context = self._middleware_handle.get('context').get(
+                tenant_uuids, name=context_name
             )
             if existing_context['type'] != 'incall':
                 raise InputError(

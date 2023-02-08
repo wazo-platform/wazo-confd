@@ -40,7 +40,7 @@ class ContextItem(ItemResource):
     @required_acl('confd.contexts.{id}.read')
     def get(self, id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        return self._middleware.get(id, tenant_uuids)
+        return self._middleware.get(id=id, tenant_uuids=tenant_uuids)
 
     @required_acl('confd.contexts.{id}.update')
     def put(self, id):

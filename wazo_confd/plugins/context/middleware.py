@@ -10,12 +10,8 @@ class ContextMiddleWare:
         self._schema_update = ContextSchemaPUT()
         self._service = service
 
-    def get(self, context_id, tenant_uuids):
-        model = self._service.get(context_id, tenant_uuids=tenant_uuids)
-        return self._schema.dump(model)
-
-    def get_by_name(self, context_name, tenant_uuids):
-        model = self._service.get_by(name=context_name, tenant_uuids=tenant_uuids)
+    def get(self, **criteria):
+        model = self._service.get_by(**criteria)
         return self._schema.dump(model)
 
     def parse_and_update(self, model, body, **kwargs):
