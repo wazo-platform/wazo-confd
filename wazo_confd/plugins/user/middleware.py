@@ -96,7 +96,7 @@ class UserMiddleWare:
 
         def process_context(context_name, extension_number):
             existing_context = self._middleware_handle.get('context').get(
-                tenant_uuids, name=context_name
+                tenant_uuids=tenant_uuids, name=context_name
             )
             if existing_context['type'] != 'incall':
                 raise InputError(
