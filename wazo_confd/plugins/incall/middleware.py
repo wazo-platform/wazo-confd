@@ -51,3 +51,7 @@ class IncallMiddleWare:
             except AttributeError:
                 pass
         return updated_fields
+
+    def get(self, incall_id, tenant_uuids):
+        model = self._service.get(incall_id, tenant_uuids=tenant_uuids)
+        return self._schema.dump(model)

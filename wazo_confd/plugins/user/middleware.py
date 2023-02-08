@@ -6,7 +6,7 @@ from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.errors import FormattedError
-from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.helpers.exception import NotFoundError, ResourceError, InputError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
 from .schema import UserListItemSchema, UserSchema
@@ -94,27 +94,104 @@ class UserMiddleWare:
 
             Session.expire(model, ['user_lines'])
 
-        for incall_body in incalls:
-            incall = self._middleware_handle.get('incall').create(
-                {'destination': {'type': 'user', 'user_id': user_dict['id']}},
-                tenant_uuid,
+        def process_context(context_name, extension_number):
+            existing_context = self._middleware_handle.get('context').get_by_name(
+                context_name, tenant_uuids
             )
+            if existing_context['type'] != 'incall':
+                raise InputError(
+                    "Context associated to the extension is not of type 'incall'"
+                )
+            # verify range, if no existing range-> create one
+            range_found = False
+            for r in existing_context['incall_ranges']:
+                if r['start'] <= extension_number <= r['end']:
+                    range_found = True
+                    break
+            if not range_found:
+                existing_context['incall_ranges'].append(
+                    {
+                        'start': extension_number,
+                        'end': extension_number,
+                        'did_length': len(extension_number),
+                    }
+                )
+                self._middleware_handle.get('context').update(
+                    existing_context['id'], existing_context, tenant_uuids
+                )
+
+        def process_incall(extension_id, user_id, incall_id=None):
+            if not incall_id:
+                incall = self._middleware_handle.get('incall').create(
+                    {'destination': {'type': 'user', 'user_id': user_id}}, tenant_uuid
+                )
+            else:
+                incall = self._middleware_handle.get('incall').get(
+                    incall_id, tenant_uuids
+                )
+
+                if incall['destination']['type'] == 'none':
+                    incall['destination'] = {'type': 'user', 'user_id': user_id}
+                    self._middleware_handle.get('incall').update(
+                        incall_id, incall, tenant_uuids
+                    )
+
+                elif (
+                    incall['destination']['type'] != 'user'
+                    or incall['destination']['user_id'] != user_id
+                ):
+                    raise InputError(
+                        "Existing incall does not have the new user as a destination"
+                    )
+
+            self._middleware_handle.get('incall_extension_association').associate(
+                incall['id'], extension_id, tenant_uuids
+            )
+
+            return incall
+
+        for incall_body in incalls:
+            for extension_body in incall_body['extensions']:
+
+                extension_id = extension_body.get('id', None)
+                if extension_id:
+                    extension = self._middleware_handle.get('extension').get(
+                        extension_id, tenant_uuids
+                    )
+                    if not extension:
+                        raise InputError("Extension not found")
+
+                else:
+                    try:
+                        extension = self._middleware_handle.get('extension').create(
+                            extension_body, tenant_uuids
+                        )
+                    except ResourceError as e:
+                        if str(e).startswith(
+                            'Resource Error - Extension already exists'
+                        ):
+                            extension = self._middleware_handle.get('extension').get_by(
+                                exten=extension_body['exten'],
+                                context=extension_body['context'],
+                                tenant_uuids=tenant_uuids,
+                            )
+                        else:
+                            raise e
+
+                process_context(extension['context'], extension['exten'])
+
+                incall = process_incall(
+                    extension['id'],
+                    user_dict['id'],
+                    (
+                        {} if not extension.get('incall', None) else extension['incall']
+                    ).get('id', None),
+                )
+
+                extension_body['id'] = extension['id']
+
             incall_body['id'] = incall['id']
             user_dict['incalls'].append(incall_body)
-
-            for extension in incall_body['extensions']:
-                did_extension_body = {
-                    'context': extension['context'],
-                    'exten': extension['exten'],
-                }
-                did_extension = self._middleware_handle.get('extension').create(
-                    did_extension_body, tenant_uuids
-                )
-                extension['id'] = did_extension['id']
-
-                self._middleware_handle.get('incall_extension_association').associate(
-                    incall['id'], did_extension['id'], tenant_uuids
-                )
 
         if groups:
             self._middleware_handle.get('user_group_association').associate_all_groups(

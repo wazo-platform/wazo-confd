@@ -1,7 +1,7 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+from flask import url_for, request
 
 from xivo_dao.alchemy.context import Context
 
@@ -33,13 +33,20 @@ class ContextItem(ItemResource):
     schema = ContextSchemaPUT
     has_tenant_uuid = True
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     @required_acl('confd.contexts.{id}.read')
     def get(self, id):
-        return super().get(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        return self._middleware.get(id, tenant_uuids)
 
     @required_acl('confd.contexts.{id}.update')
     def put(self, id):
-        return super().put(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(id, request.get_json(), tenant_uuids)
+        return '', 204
 
     @required_acl('confd.contexts.{id}.delete')
     def delete(self, id):

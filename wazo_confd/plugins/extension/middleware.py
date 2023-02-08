@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.extension import Extension
@@ -20,3 +20,11 @@ class ExtensionMiddleWare:
     def delete(self, extension_id, tenant_uuids):
         model = self._service.get(extension_id, tenant_uuids=tenant_uuids)
         self._service.delete(model)
+
+    def get(self, extension_id, tenant_uuids):
+        model = self._service.get(extension_id, tenant_uuids=tenant_uuids)
+        return self._schema.dump(model)
+
+    def get_by(self, tenant_uuids, **criteria):
+        model = self._service.get_by(tenant_uuids=tenant_uuids, **criteria)
+        return self._schema.dump(model)

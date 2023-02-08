@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import (
@@ -322,9 +322,9 @@ class UserIncallSchema(BaseSchema):
 
 
 class UserExtensionSchema(BaseSchema):
-    id = fields.Integer(dump_only=True)
-    exten = fields.String(validate=Length(max=40), required=True)
-    context = fields.String(required=True)
+    id = fields.Integer()
+    exten = fields.String(validate=Length(max=40))
+    context = fields.String()
     links = ListLink(Link('extensions'))
 
 
