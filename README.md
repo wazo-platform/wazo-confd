@@ -31,7 +31,7 @@ On a Wazo Platform environment, wazo-confd is launched automatically at system b
 ```sh
 apt-get install libpq-dev python-dev libffi-dev libyaml-dev
 pip install tox
-tox --recreate -e py37
+tox --recreate -e py39
 ```
 
 ### Running integration tests
