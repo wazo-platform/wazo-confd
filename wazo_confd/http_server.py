@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -9,8 +9,8 @@ from flask import Flask, g
 from flask_cors import CORS
 from flask_restful import Api
 from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.contrib.profiler import ProfilerMiddleware
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.profiler import ProfilerMiddleware
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from xivo import http_helpers
 from xivo.http_helpers import ReverseProxied

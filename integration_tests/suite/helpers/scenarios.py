@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -9,7 +9,6 @@ from datetime import datetime
 from hamcrest import (
     assert_that,
     contains,
-    equal_to,
     has_entries,
     all_of,
     has_items,
@@ -137,5 +136,7 @@ def check_db_requests(cls, url, nb_requests):
     nb_logs_start = cls.count_database_logs(since=time_start)
     url()
     nb_logs_end = cls.count_database_logs(since=time_start)
-    nb_db_requests = nb_logs_end - nb_logs_start
-    assert_that(nb_db_requests, equal_to(OVERHEAD_DB_REQUESTS + nb_requests))
+    actual_count = nb_logs_end - nb_logs_start
+    expected_count = OVERHEAD_DB_REQUESTS + nb_requests
+    # Allow margin of one extra request to account for occasional "REFRESH MATERIALIZED VIEW"
+    assert expected_count <= actual_count <= expected_count + 1
