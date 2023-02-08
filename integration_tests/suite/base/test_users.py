@@ -1615,107 +1615,68 @@ def test_delete_voicemail_2_users_not_deleted(
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_post_incalls_existing_extension_no_error(incall, extension):
 
-    # try to use an existing extension by using its id
-    with a.incall_extension(incall, extension):
-        user = FULL_USER
-        user_body = {
-            'incalls': [
-                {
-                    'extensions': [{'id': extension['id']}],
-                }
-            ],
-            **user,
-        }
-        response = confd.users.post(user_body)
+    incalls_list = [
+        [
+            {
+                'extensions': [{'id': extension['id']}],
+            }
+        ],
+        [
+            {
+                'extensions': [
+                    {'context': extension['context'], 'exten': extension['exten']}
+                ],
+            }
+        ],
+    ]
 
-        response.assert_created('users')
-        payload = response.item
-
-        # check the data returned when the user is created
-        assert_that(
-            payload,
-            has_entries(
-                uuid=uuid_(),
-                incalls=contains(
-                    has_entries(
-                        id=greater_than(0),
-                        extensions=contains(
-                            has_entries(
-                                id=greater_than(0),
-                            )
-                        ),
-                    )
-                ),
+    for incalls_elt in incalls_list:
+        with a.incall_extension(incall, extension):
+            user = FULL_USER
+            user_body = {
+                'incalls': incalls_elt,
                 **user,
-            ),
-        )
-        # retrieve the user (created before) and check their fields
-        assert_that(
-            confd.users(payload['uuid']).get().item,
-            has_entries(
-                incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
-            ),
-        )
-        # retrieve the incall (created before) and check its data are correct
-        assert_that(
-            confd.incalls(payload['incalls'][0]['id']).get().item,
-            has_entries(destination=has_entries(type="user", user_id=payload['id'])),
-        )
-    # user deletion
-    url = confd.users(payload['uuid'])
-    url.delete()
+            }
+            response = confd.users.post(user_body)
 
-    # try to use an existing extension by using its context and extension
-    with a.incall_extension(incall, extension):
-        user = FULL_USER
-        user_body = {
-            'incalls': [
-                {
-                    'extensions': [
-                        {'context': extension['context'], 'exten': extension['exten']}
-                    ],
-                }
-            ],
-            **user,
-        }
-        response = confd.users.post(user_body)
+            response.assert_created('users')
+            payload = response.item
 
-        response.assert_created('users')
-        payload = response.item
-
-        # check the data returned when the user is created
-        assert_that(
-            payload,
-            has_entries(
-                uuid=uuid_(),
-                incalls=contains(
-                    has_entries(
-                        id=greater_than(0),
-                        extensions=contains(
-                            has_entries(
-                                id=greater_than(0),
-                            )
-                        ),
-                    )
+            # check the data returned when the user is created
+            assert_that(
+                payload,
+                has_entries(
+                    uuid=uuid_(),
+                    incalls=contains(
+                        has_entries(
+                            id=greater_than(0),
+                            extensions=contains(
+                                has_entries(
+                                    id=greater_than(0),
+                                )
+                            ),
+                        )
+                    ),
+                    **user,
                 ),
-                **user,
-            ),
-        )
-        # retrieve the user (created before) and check their fields
-        assert_that(
-            confd.users(payload['uuid']).get().item,
-            has_entries(
-                incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
-            ),
-        )
-        # retrieve the incall (created before) and check its data are correct
-        assert_that(
-            confd.incalls(payload['incalls'][0]['id']).get().item,
-            has_entries(destination=has_entries(type="user", user_id=payload['id'])),
-        )
-    # user deletion
-    url = confd.users(payload['uuid'])
-    url.delete(recursive=True)
+            )
+            # retrieve the user (created before) and check their fields
+            assert_that(
+                confd.users(payload['uuid']).get().item,
+                has_entries(
+                    incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
+                ),
+            )
+            # retrieve the incall (created before) and check its data are correct
+            assert_that(
+                confd.incalls(payload['incalls'][0]['id']).get().item,
+                has_entries(
+                    destination=has_entries(type="user", user_id=payload['id'])
+                ),
+            )
+        # user deletion
+        url = confd.users(payload['uuid'])
+        url.delete()
 
 
 @fixtures.incall()
