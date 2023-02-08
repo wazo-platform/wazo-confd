@@ -16,12 +16,6 @@ class ContextMiddleWare:
 
     def parse_and_update(self, model, body, **kwargs):
         form = self._schema_update.load(body, partial=True)
-        updated_fields = self.find_updated_fields(model, form)
-        for name, value in form.items():
-            setattr(model, name, value)
-        self._service.edit(model, updated_fields=updated_fields, **kwargs)
-
-    def find_updated_fields(self, model, form):
         updated_fields = []
         for name, value in form.items():
             try:
@@ -29,7 +23,8 @@ class ContextMiddleWare:
                     updated_fields.append(name)
             except AttributeError:
                 pass
-        return updated_fields
+            setattr(model, name, value)
+        self._service.edit(model, updated_fields=updated_fields, **kwargs)
 
     def update(self, context_id, body, tenant_uuids):
         model = self._service.get(context_id, tenant_uuids=tenant_uuids)
