@@ -152,7 +152,6 @@ class UserMiddleWare:
 
         for incall_body in incalls:
             for extension_body in incall_body['extensions']:
-
                 extension_id = extension_body.get('id', None)
                 if extension_id:
                     extension = self._middleware_handle.get('extension').get(

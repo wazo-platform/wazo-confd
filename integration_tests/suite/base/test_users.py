@@ -393,7 +393,6 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
     with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), a.user_line(
         user, line
     ):
-
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
@@ -422,7 +421,6 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
     with a.line_endpoint_sccp(line, sccp), a.line_extension(
         line, extension
     ), a.user_line(user, line):
-
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
@@ -451,7 +449,6 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
     with a.line_endpoint_custom(line, custom), a.line_extension(
         line, extension
     ), a.user_line(user, line):
-
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
@@ -1097,7 +1094,7 @@ def test_post_update_delete_full_user_no_error(
         queue=queue,
     )
 
-    with (a.switchboard_member_user(switchboard2, [user2])):
+    with a.switchboard_member_user(switchboard2, [user2]):
         with a.group_extension(group, group_extension):
             user_body = {
                 'auth': auth,
@@ -1455,7 +1452,6 @@ def test_delete_full_user_no_auth_no_error(
     )
 
     with a.group_extension(group, group_extension):
-
         response = confd.users.post(
             {
                 'lines': [line],
@@ -1614,7 +1610,6 @@ def test_delete_voicemail_2_users_not_deleted(
 @fixtures.incall(wazo_tenant=MAIN_TENANT)
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_post_incalls_existing_extension_no_error(incall, extension):
-
     incalls_list = [
         [
             {
