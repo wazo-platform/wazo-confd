@@ -3,6 +3,7 @@
 ## IN PROGRESS
 
 * POST on `/users?recursive=true` updated, to provide a way to create/reuse incalls.
+* PUT on `/users?recursive=true` added, to provide a way to update groups for a specific user.
 
 ## 23.02
 

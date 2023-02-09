@@ -340,6 +340,10 @@ class UserMiddleWare:
             fallbacks = body.pop('fallbacks', None) or []
             forwards = body.pop('forwards', None) or []
 
+            form = self._schema.load(body)
+
+            groups = form.pop('groups', None) or []
+
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
                     user_id, fallbacks
@@ -352,3 +356,8 @@ class UserMiddleWare:
                 self._middleware_handle.get('user_forward_association').associate(
                     user_id, forwards
                 )
+
+            if groups:
+                self._middleware_handle.get(
+                    'user_group_association'
+                ).associate_all_groups({'groups': groups}, user_id)
