@@ -3,10 +3,13 @@
 
 from xivo_dao.helpers import errors
 
+from wazo_confd.plugins.device.schema import DeviceSchema
 
-class UnallocatedDeviceMiddleWare:
+
+class DeviceMiddleWare:
     def __init__(self, service):
         self._service = service
+        self._schema = DeviceSchema()
 
     def assign_tenant(self, device_id, tenant_uuid):
         device = self._service.get(device_id)
@@ -17,3 +20,7 @@ class UnallocatedDeviceMiddleWare:
     def reset_autoprov(self, device_id, tenant_uuid):
         device = self._service.get(device_id, tenant_uuid=tenant_uuid)
         self._service.reset_autoprov(device, tenant_uuid=tenant_uuid)
+
+    def get(self, device_id, tenant_uuids):
+        model = self._service.get(device_id, tenant_uuids=tenant_uuids)
+        return self._schema.dump(model)

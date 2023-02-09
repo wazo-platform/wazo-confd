@@ -73,9 +73,14 @@ class UnallocatedDeviceItem(SingleTenantConfdResource):
 class DeviceItem(SingleTenantMixin, ItemResource):
     schema = DeviceSchema
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     @required_acl('confd.devices.{id}.read')
     def get(self, id):
-        return super().get(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        return self._middleware.get(id, tenant_uuids)
 
     @required_acl('confd.devices.{id}.update')
     def put(self, id):

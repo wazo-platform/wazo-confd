@@ -4,7 +4,7 @@
 from wazo_provd_client import Client as ProvdClient
 
 from .builder import build_dao, build_service
-from .middleware import UnallocatedDeviceMiddleWare
+from .middleware import DeviceMiddleWare
 from .resource import (
     DeviceItem,
     DeviceList,
@@ -28,16 +28,17 @@ class Plugin:
         dao = build_dao(provd_client)
         service = build_service(dao, provd_client)
 
-        unallocated_device_middleware = UnallocatedDeviceMiddleWare(service)
-        middleware_handle.register(
-            'unallocated_device_middleware', unallocated_device_middleware
-        )
+        device_middleware = DeviceMiddleWare(service)
+        middleware_handle.register('device', device_middleware)
 
         api.add_resource(
             DeviceItem,
             '/devices/<id>',
             endpoint='devices',
-            resource_class_args=(service,),
+            resource_class_args=(
+                service,
+                device_middleware,
+            ),
         )
 
         api.add_resource(DeviceList, '/devices', resource_class_args=(service,))
@@ -45,7 +46,7 @@ class Plugin:
         api.add_resource(
             DeviceAutoprov,
             '/devices/<id>/autoprov',
-            resource_class_args=(unallocated_device_middleware,),
+            resource_class_args=(device_middleware,),
         )
 
         api.add_resource(
@@ -63,5 +64,5 @@ class Plugin:
         api.add_resource(
             UnallocatedDeviceItem,
             '/devices/unallocated/<id>',
-            resource_class_args=(unallocated_device_middleware,),
+            resource_class_args=(device_middleware,),
         )
