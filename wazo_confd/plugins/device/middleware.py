@@ -21,6 +21,6 @@ class DeviceMiddleWare:
         device = self._service.get(device_id, tenant_uuid=tenant_uuid)
         self._service.reset_autoprov(device, tenant_uuid=tenant_uuid)
 
-    def get(self, device_id, tenant_uuids):
-        model = self._service.get(device_id, tenant_uuids=tenant_uuids)
+    def get(self, device_id, tenant_uuid):
+        model = self._service.get(device_id, tenant_uuid=tenant_uuid)
         return self._schema.dump(model)
