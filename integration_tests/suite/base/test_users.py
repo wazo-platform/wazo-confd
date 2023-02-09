@@ -36,6 +36,7 @@ from ..helpers.config import (
     gen_group_exten,
     CONTEXT,
     INCALL_CONTEXT,
+    OUTCALL_CONTEXT,
 )
 from requests.exceptions import HTTPError
 
@@ -1604,3 +1605,114 @@ def test_delete_voicemail_2_users_not_deleted(
         url = confd.voicemails(payload['voicemail']['id'])
         response = url.get()
         response.assert_ok()
+
+
+@fixtures.incall(wazo_tenant=MAIN_TENANT)
+@fixtures.extension(context=INCALL_CONTEXT)
+def test_post_incalls_existing_extension_no_error(incall, extension):
+    incalls_list = [
+        [
+            {
+                'extensions': [{'id': extension['id']}],
+            }
+        ],
+        [
+            {
+                'extensions': [
+                    {'context': extension['context'], 'exten': extension['exten']}
+                ],
+            }
+        ],
+    ]
+
+    for incalls_elt in incalls_list:
+        with a.incall_extension(incall, extension):
+            user = FULL_USER
+            user_body = {
+                'incalls': incalls_elt,
+                **user,
+            }
+            response = confd.users.post(user_body)
+
+            response.assert_created('users')
+            payload = response.item
+
+            # retrieve the incall (created before) and check its data are correct
+            assert_that(
+                confd.incalls(payload['incalls'][0]['id']).get().item,
+                has_entries(
+                    destination=has_entries(type="user", user_id=payload['id'])
+                ),
+            )
+        # user deletion
+        url = confd.users(payload['uuid'])
+        url.delete()
+
+
+@fixtures.incall()
+@fixtures.context(
+    name='test-context',
+    label='test-context',
+    type='incall',
+    description='test-context',
+    incall_ranges=[],
+)
+@fixtures.extension(context='test-context')
+def test_post_incalls_existing_extension_missing_range_no_error(
+    incall, context, extension
+):
+    with a.incall_extension(incall, extension):
+        user = FULL_USER
+        user_body = {
+            'incalls': [
+                {
+                    'extensions': [{'id': extension['id']}],
+                }
+            ],
+            **user,
+        }
+        response = confd.users.post(user_body)
+
+        response.assert_created('users')
+        payload = response.item
+
+        # retrieve the context and check if the incall range has been added
+        assert_that(
+            confd.contexts(context['id']).get().item,
+            has_entries(
+                incall_ranges=contains(
+                    has_entries(
+                        start=extension['exten'],
+                        end=extension['exten'],
+                        did_length=len(extension['exten']),
+                    )
+                )
+            ),
+        )
+    # user deletion
+    url = confd.users(payload['uuid'])
+    url.delete(recursive=True)
+
+
+@fixtures.outcall()
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_post_incalls_existing_extension_wrong_context_type_error(outcall, extension):
+    with a.outcall_extension(outcall, extension):
+        user = FULL_USER
+        user_body = {
+            'incalls': [
+                {
+                    'extensions': [{'id': extension['id']}],
+                }
+            ],
+            **user,
+        }
+        response = confd.users.post(user_body)
+
+        response.assert_status(400)
+        assert_that(
+            response.raw,
+            equal_to(
+                '["Context associated to the extension is not of type \'incall\'"]\n'
+            ),
+        )
