@@ -54,6 +54,12 @@ class UserMiddleWare:
                 )
                 voicemail = voicemail_middleware.get(voicemail_id, tenant_uuids)
             else:
+                if (
+                    not voicemail.get('name', None)
+                    and model.firstname
+                    and model.lastname
+                ):
+                    voicemail['name'] = f"{model.firstname} {model.lastname}"
                 voicemail = user_voicemail_middleware.create_voicemail(
                     model.uuid,
                     voicemail,
