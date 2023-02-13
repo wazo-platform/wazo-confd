@@ -84,12 +84,12 @@ class UserMiddleWare:
                         ).assign_tenant(device_id, tenant_uuid)
                     except FormattedError as e:
                         if (
-                                e.exception != NotFoundError
-                                or self._middleware_handle.get(
-                            'unallocated_device_middleware'
-                        )
-                                .get(device_id)
-                                .is_new()
+                            e.exception != NotFoundError
+                            or self._middleware_handle.get(
+                                'unallocated_device_middleware'
+                            )
+                            .get(device_id)
+                            .is_new()
                         ):
                             raise e
                     self._middleware_handle.get('line_device_association').associate(
@@ -142,8 +142,8 @@ class UserMiddleWare:
                     )
 
                 elif (
-                        incall['destination']['type'] != 'user'
-                        or incall['destination']['user_id'] != user_id
+                    incall['destination']['type'] != 'user'
+                    or incall['destination']['user_id'] != user_id
                 ):
                     raise InputError(
                         "Existing incall does not have the new user as a destination"
@@ -172,7 +172,7 @@ class UserMiddleWare:
                         )
                     except ResourceError as e:
                         if str(e).startswith(
-                                'Resource Error - Extension already exists'
+                            'Resource Error - Extension already exists'
                         ):
                             extension = self._middleware_handle.get('extension').get_by(
                                 exten=extension_body['exten'],
