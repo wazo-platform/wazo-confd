@@ -1585,7 +1585,7 @@ def test_post_delete_minimalistic_user_with_non_existing_device_id_error():
     assert_that(
         response.raw,
         equal_to(
-            f'["Resource Not Found - Device was not found (\'id\': \'my_device\')"]\n'
+            '["Resource Not Found - Device was not found (\'id\': \'my_device\')"]\n'
         ),
     )
 
