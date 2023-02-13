@@ -73,9 +73,15 @@ class UnallocatedDeviceItem(SingleTenantConfdResource):
 class DeviceItem(SingleTenantMixin, ItemResource):
     schema = DeviceSchema
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     @required_acl('confd.devices.{id}.read')
     def get(self, id):
-        return super().get(id)
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        return self._middleware.get(id, tenant.uuid)
 
     @required_acl('confd.devices.{id}.update')
     def put(self, id):

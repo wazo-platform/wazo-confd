@@ -5,7 +5,6 @@ from http import HTTPStatus
 from requests import HTTPError
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.helpers.errors import FormattedError
 from xivo_dao.helpers.exception import NotFoundError, ResourceError, InputError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
@@ -79,18 +78,11 @@ class UserMiddleWare:
                 device_id = line_body.get('device_id', None)
                 if device_id:
                     try:
-                        self._middleware_handle.get(
-                            'unallocated_device_middleware'
-                        ).assign_tenant(device_id, tenant_uuid)
-                    except FormattedError as e:
-                        if (
-                            e.exception != NotFoundError
-                            or self._middleware_handle.get(
-                                'unallocated_device_middleware'
-                            )
-                            .get(device_id)
-                            .is_new()
-                        ):
+                        self._middleware_handle.get('device').assign_tenant(
+                            device_id, tenant_uuid
+                        )
+                    except Exception as e:
+                        if e is not NotFoundError:
                             raise e
                     self._middleware_handle.get('line_device_association').associate(
                         line['id'], device_id, tenant_uuid, tenant_uuids
@@ -278,9 +270,9 @@ class UserMiddleWare:
                 # process the device associated to the line
                 device_id = line.device
                 if device_id:
-                    self._middleware_handle.get(
-                        'unallocated_device_middleware'
-                    ).reset_autoprov(device_id, tenant_uuid)
+                    self._middleware_handle.get('device').reset_autoprov(
+                        device_id, tenant_uuid
+                    )
 
                 # process the line itself
                 self._middleware_handle.get('user_line_association').dissociate(
