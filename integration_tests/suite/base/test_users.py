@@ -1557,6 +1557,39 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
     )
 
 
+def test_post_delete_minimalistic_user_with_non_existing_device_id_error():
+    (
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+        voicemail,
+        forwards,
+        fallbacks,
+        agent,
+    ) = generate_user_resources_bodies(context_name=CONTEXT, device={'id': 'my_device'})
+
+    response = confd.users.post(
+        {
+            'lines': [line],
+            **user,
+        },
+    )
+
+    response.assert_status(404)
+    assert_that(
+        response.raw,
+        equal_to(
+            f'["Resource Not Found - Device was not found (\'id\': \'my_device\')"]\n'
+        ),
+    )
+
+
 @fixtures.extension(exten=gen_group_exten())
 @fixtures.user()
 @fixtures.voicemail()

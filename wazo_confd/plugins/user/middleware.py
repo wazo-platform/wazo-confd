@@ -77,12 +77,7 @@ class UserMiddleWare:
                             device_id, tenant_uuid
                         )
                     except Exception as e:
-                        if (
-                            e is not NotFoundError
-                            or self._middleware_handle.get('device')
-                            .get(device_id, tenant_uuids)
-                            .is_new()
-                        ):
+                        if e is not NotFoundError:
                             raise e
                     self._middleware_handle.get('line_device_association').associate(
                         line['id'], device_id, tenant_uuid, tenant_uuids
