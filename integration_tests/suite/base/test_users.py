@@ -995,7 +995,6 @@ def generate_user_resources_bodies(
             'uuid': switchboard['uuid'],
         }
     voicemail = {
-        'name': 'full',
         'number': vm_number,
         'context': CONTEXT,
         'email': 'test@example.com',
@@ -1288,6 +1287,14 @@ def test_post_update_delete_full_user_no_error(
                     number=line['extensions'][0]['exten'],
                     firstname=user['firstname'],
                     queues=contains(has_entries(id=queue['id'])),
+                ),
+            )
+            # retrieve the voicemail (created before) and check its data are correct
+            assert_that(
+                confd.voicemails(payload['voicemail']['id']).get().item,
+                has_entries(
+                    name=f"{user['firstname']} {user['lastname']}",
+                    id=payload['voicemail']['id'],
                 ),
             )
             # retrieve the user and try to update the user with the same data
