@@ -16,8 +16,8 @@ build-confd:
 update-db: $(UPDATE_DB_TARGET)
 
 update-db-pull:
-	docker pull wazoplatform/wazo-confd-db-test
-	docker tag wazoplatform/wazo-confd-db-test:latest wazoplatform/wazo-confd-db-test:local
+	docker pull wazoplatform/wazo-confd-db-test:bullseye
+	docker tag wazoplatform/wazo-confd-db-test:bullseye wazoplatform/wazo-confd-db-test:local
 
 update-db-build:
 	docker build --pull --no-cache -t wazoplatform/wazo-confd-db-test:local -f $(POSTGRES_DOCKER) $(MANAGE_DB_DIR)
