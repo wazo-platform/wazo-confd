@@ -357,7 +357,7 @@ class UserMiddleWare:
                     user_id, forwards
                 )
 
-            if groups:
-                self._middleware_handle.get(
-                    'user_group_association'
-                ).associate_all_groups({'groups': groups}, user_id)
+            # groups
+            self._middleware_handle.get('user_group_association').associate_all_groups(
+                {'groups': groups}, user_id
+            )
