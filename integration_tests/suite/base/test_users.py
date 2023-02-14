@@ -1058,6 +1058,7 @@ def generate_user_resources_bodies(
 @fixtures.switchboard()
 @fixtures.user()
 @fixtures.queue()
+@fixtures.group()
 def test_post_update_delete_full_user_no_error(
     group_extension,
     group,
@@ -1068,6 +1069,7 @@ def test_post_update_delete_full_user_no_error(
     switchboard2,
     user2,
     queue,
+    new_group,
 ):
     (
         exten,
@@ -1329,6 +1331,7 @@ def test_post_update_delete_full_user_no_error(
                     **user_body,
                     'fallbacks': {**new_fallbacks},
                     'forwards': {**new_forwards},
+                    'groups': [{'uuid': new_group['uuid']}],
                 },
                 query_string="recursive=True",
             )
@@ -1351,7 +1354,17 @@ def test_post_update_delete_full_user_no_error(
                 has_entries(**new_forwards),
             )
 
-            # retrieve the data for the user and check the data returned (fallbacks and forwards)
+            # retrieve the groups for the user and check the data
+            assert_that(
+                confd.groups(new_group['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
+                ),
+            )
+
+            # retrieve the data for the user and check the data returned (fallbacks, forwards and groups)
             assert_that(
                 confd.users(payload['uuid']).get().item,
                 has_entries(
@@ -1362,6 +1375,13 @@ def test_post_update_delete_full_user_no_error(
                         fail_destination=has_entries(**destination),
                     ),
                     forwards=has_entries(**new_forwards),
+                    groups=contains(
+                        has_entries(
+                            id=new_group['id'],
+                            uuid=new_group['uuid'],
+                            name=new_group['name'],
+                        )
+                    ),
                 ),
             )
 
