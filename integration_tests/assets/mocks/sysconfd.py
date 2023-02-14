@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+#!/usr/bin/env python3
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -31,8 +31,8 @@ def log_request():
             'method': request.method,
             'path': path,
             'query': dict(request.args.items()),
-            'body': request.data,
-            'json': request.json,
+            'body': request.data.decode('utf-8'),
+            'json': request.json if request.is_json else None,
             'headers': dict(request.headers),
         }
         _requests.append(log)

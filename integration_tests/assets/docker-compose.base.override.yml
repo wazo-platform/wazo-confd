@@ -16,7 +16,7 @@ services:
     command: "-c 'log_min_duration_statement=0'"
 
   ari:
-    image: p0bailey/docker-flask
+    image: wazoplatform/flask
     ports:
       - "5039"
     volumes:

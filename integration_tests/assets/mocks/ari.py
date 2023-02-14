@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+#!/usr/bin/env python3
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -34,9 +34,9 @@ def log_request():
         log = {
             'method': request.method,
             'path': path,
-            'query': request.args.items(multi=True),
-            'body': request.data,
-            'json': request.json,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'json': request.json if request.is_json else None,
             'headers': dict(request.headers),
         }
         _requests.append(log)
@@ -74,10 +74,10 @@ def get_sounds():
 
 @app.route('/ari/sounds/<sound_id>', methods=['GET'])
 def get_sound(sound_id):
-    sound = _responses.get('sounds/{}'.format(sound_id))
+    sound = _responses.get(f'sounds/{sound_id}')
     if not sound:
         return '', 404
-    return make_response(json.dumps(sound), 200, {'Content-Type': 'application/json'})
+    return jsonify(sound)
 
 
 _reset()

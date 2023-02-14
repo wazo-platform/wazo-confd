@@ -3,6 +3,7 @@
 .coverage
 .tox
 coverage.xml
+unit-tests.xml
 nosetests.xml
 pycodestyle.txt
 pylint.txt

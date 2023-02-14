@@ -34,7 +34,7 @@ services:
         target: /var/lib/rabbitmq
 
   sysconfd:
-    image: p0bailey/docker-flask
+    image: wazoplatform/flask
     ports:
       - "8668"
     volumes:
@@ -50,8 +50,8 @@ services:
       - "../..:/usr/src/wazo-confd"
       - "./etc/wazo-confd/conf.d/50-default.yml:/etc/wazo-confd/conf.d/50-default.yml"
       - "./doc/pjsip.json.gz:/usr/share/doc/asterisk-doc/json/pjsip.json.gz"
-      # - "${LOCAL_GIT_REPOS}/wazo-auth-client/wazo_auth_client:/opt/venv/lib/python3.7/site-packages/wazo_auth_client"
-      # - "${LOCAL_GIT_REPOS}/wazo-provd-client/wazo_provd_client:/opt/venv/lib/python3.7/site-packages/wazo_provd_client"
-      # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/opt/venv/lib/python3.7/site-packages/xivo_bus"
-      # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/opt/venv/lib/python3.7/site-packages/xivo_dao"
-      # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/opt/venv/lib/python3.7/site-packages/xivo"
+      # - "${LOCAL_GIT_REPOS}/wazo-auth-client/wazo_auth_client:/opt/venv/lib/python3.9/site-packages/wazo_auth_client"
+      # - "${LOCAL_GIT_REPOS}/wazo-provd-client/wazo_provd_client:/opt/venv/lib/python3.9/site-packages/wazo_provd_client"
+      # - "${LOCAL_GIT_REPOS}/xivo-bus/xivo_bus:/opt/venv/lib/python3.9/site-packages/xivo_bus"
+      # - "${LOCAL_GIT_REPOS}/xivo-dao/xivo_dao:/opt/venv/lib/python3.9/site-packages/xivo_dao"
+      # - "${LOCAL_GIT_REPOS}/xivo-lib-python/xivo:/opt/venv/lib/python3.9/site-packages/xivo"
