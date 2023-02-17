@@ -41,13 +41,19 @@ class CustomItem(ItemResource):
     schema = CustomSchema
     has_tenant_uuid = True
 
+    def __init__(self, service, middleware):
+        super().__init__(service)
+        self._middleware = middleware
+
     @required_acl('confd.endpoints.custom.{id}.read')
     def get(self, id):
         return super().get(id)
 
     @required_acl('confd.endpoints.custom.{id}.update')
     def put(self, id):
-        return super().put(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(id, request.get_json(), tenant_uuids)
+        return '', 204
 
     @required_acl('confd.endpoints.custom.{id}.delete')
     def delete(self, id):
