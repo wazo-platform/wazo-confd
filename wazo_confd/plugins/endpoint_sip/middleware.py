@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
@@ -46,6 +46,35 @@ class BaseSIPMiddleWare:
     def delete(self, endpoint_id, tenant_uuids):
         model = self._service.get(endpoint_id, tenant_uuids=tenant_uuids)
         self._service.delete(model)
+
+    def update(self, endpoint_sip_id, body, tenant_uuids):
+        sip = self._service.get(endpoint_sip_id, tenant_uuids=tenant_uuids)
+        form = self._Schema().load(body, partial=True)
+
+        if form.get('templates'):
+            templates = []
+            for template in form['templates']:
+                try:
+                    model = sip_dao.get(
+                        template['uuid'], template=True, tenant_uuids=tenant_uuids
+                    )
+                    templates.append(model)
+                except NotFoundError:
+                    metadata = {'templates': template}
+                    raise errors.param_not_found(
+                        'templates', 'endpoint_sip', **metadata
+                    )
+            form['templates'] = templates
+
+        if form.get('transport'):
+            transport_uuid = form['transport']['uuid']
+            try:
+                form['transport'] = transport_dao.get(transport_uuid)
+            except NotFoundError as e:
+                raise errors.param_not_found('transport', 'SIPTransport', **e.metadata)
+        for name, value in form.items():
+            setattr(sip, name, value)
+        self._service.edit(sip)
 
 
 class EndpointSIPMiddleWare(BaseSIPMiddleWare):
