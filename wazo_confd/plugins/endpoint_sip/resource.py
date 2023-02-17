@@ -121,7 +121,9 @@ class SipItem(_BaseSipItem):
 
     @required_acl('confd.endpoints.sip.{uuid}.update')
     def put(self, uuid):
-        return super().put(uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(uuid, request.get_json(), tenant_uuids)
+        return '', 204
 
     @required_acl('confd.endpoints.sip.{uuid}.delete')
     def delete(self, uuid):
