@@ -20,7 +20,7 @@ class Plugin:
             SccpItem,
             '/endpoints/sccp/<int:id>',
             endpoint='endpoint_sccp',
-            resource_class_args=(service,),
+            resource_class_args=(service, endpoint_sccp_middleware),
         )
         api.add_resource(
             SccpList,
