@@ -15,7 +15,9 @@ class LineExtensionMiddleware:
         extension = extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
         self._service.associate(line, extension)
 
-    def dissociate(self, line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=False):
+    def dissociate(
+        self, line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=False
+    ):
         line = line_dao.get(line_id, tenant_uuids=tenant_uuids)
         if line.device_id and reset_autoprov:
             self._middleware_handle.get('device').reset_autoprov(
@@ -32,5 +34,7 @@ class LineExtensionMiddleware:
 
     def delete_extension(self, line_id, extension_id, tenant_uuid, tenant_uuids):
         extension_middleware = self._middleware_handle.get('extension')
-        self.dissociate(line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=True)
+        self.dissociate(
+            line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=True
+        )
         extension_middleware.delete(extension_id, tenant_uuids)

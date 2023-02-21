@@ -29,11 +29,9 @@ class UserMiddleWare:
         )
         return line
 
-    def associate_line_device(self,line,device_id, tenant_uuid,tenant_uuids):
+    def associate_line_device(self, line, device_id, tenant_uuid, tenant_uuids):
         try:
-            self._middleware_handle.get(
-                'device'
-            ).assign_tenant(device_id, tenant_uuid)
+            self._middleware_handle.get('device').assign_tenant(device_id, tenant_uuid)
         except Exception as e:
             if e is not NotFoundError:
                 raise e
@@ -42,8 +40,7 @@ class UserMiddleWare:
         )
 
     def create_line(self, user_id, line_body, tenant_uuid, tenant_uuids):
-        line = self.create_associate_line(user_id, line_body, tenant_uuid,
-                                          tenant_uuids)
+        line = self.create_associate_line(user_id, line_body, tenant_uuid, tenant_uuids)
 
         device_id = line_body.get('device_id', None)
         if device_id:
@@ -99,8 +96,9 @@ class UserMiddleWare:
 
         if lines:
             for line_body in lines:
-                line=self.create_line(user_dict['id'], line_body, tenant_uuid,
-                                                  tenant_uuids)
+                line = self.create_line(
+                    user_dict['id'], line_body, tenant_uuid, tenant_uuids
+                )
                 user_dict['lines'].append(line)
 
             Session.expire(model, ['user_lines'])
@@ -257,11 +255,9 @@ class UserMiddleWare:
 
         return user_dict
 
-    def delete_line(self,device_id, line_id, user_id, tenant_uuid, tenant_uuids):
+    def delete_line(self, device_id, line_id, user_id, tenant_uuid, tenant_uuids):
         if device_id:
-            self._middleware_handle.get(
-                'device'
-            ).reset_autoprov(device_id, tenant_uuid)
+            self._middleware_handle.get('device').reset_autoprov(device_id, tenant_uuid)
 
         # process the line itself
         self._middleware_handle.get('user_line_association').dissociate(
@@ -296,7 +292,9 @@ class UserMiddleWare:
 
             for line in user.lines:
                 # process the device associated to the line
-                self.delete_line(line.device, line.id, user.uuid, tenant_uuid, tenant_uuids)
+                self.delete_line(
+                    line.device, line.id, user.uuid, tenant_uuid, tenant_uuids
+                )
 
                 Session.expire(user, ['user_lines'])
 
@@ -378,24 +376,38 @@ class UserMiddleWare:
 
             # lines
             user = self._service.get(user_id, tenant_uuids=tenant_uuids)
-            existing_lines= {el.id: el for el in user.lines}
+            existing_lines = {el.id: el for el in user.lines}
 
             for line_body in lines:
                 device_id = line_body.get('device_id', None)
                 if 'id' in line_body and line_body['id'] in existing_lines:
-                    old_device_id=existing_lines[line_body['id']].device_id
-                    self._middleware_handle.get('line').update(line_body['id'], line_body, tenant_uuid, tenant_uuids)
-                    #if device_id not the same, so we must dissociate the old one and associate the new line
-                    if device_id!=old_device_id:
-                        self._middleware_handle.get(
-                        'device'
-                    ).reset_autoprov(old_device_id, tenant_uuid)
-                    self.associate_line_device({'id':line_body['id']}, device_id, tenant_uuid, tenant_uuids)
+                    old_device_id = existing_lines[line_body['id']].device_id
+                    self._middleware_handle.get('line').update(
+                        line_body['id'], line_body, tenant_uuid, tenant_uuids
+                    )
+                    # if device_id not the same, so we must dissociate the old one and associate the new line
+                    if device_id != old_device_id:
+                        self._middleware_handle.get('device').reset_autoprov(
+                            old_device_id, tenant_uuid
+                        )
+                    self.associate_line_device(
+                        {'id': line_body['id']}, device_id, tenant_uuid, tenant_uuids
+                    )
 
                     del existing_lines[line_body['id']]
                 else:
-                    line = self.create_associate_line(user_id, line_body,tenant_uuid, tenant_uuids)
+                    line = self.create_associate_line(
+                        user_id, line_body, tenant_uuid, tenant_uuids
+                    )
                     if device_id:
-                        self.associate_line_device(line, device_id, tenant_uuid, tenant_uuids)
+                        self.associate_line_device(
+                            line, device_id, tenant_uuid, tenant_uuids
+                        )
             for line_id in existing_lines:
-                self.delete_line(existing_lines[line_id].device, line_id, user.uuid, tenant_uuid, tenant_uuids)
+                self.delete_line(
+                    existing_lines[line_id].device,
+                    line_id,
+                    user.uuid,
+                    tenant_uuid,
+                    tenant_uuids,
+                )

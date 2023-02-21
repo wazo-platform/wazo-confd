@@ -963,7 +963,7 @@ def generate_user_resources_bodies(
     device=None,
     user_destination=None,
     queue=None,
-    endpoint_name=None
+    endpoint_name=None,
 ):
     exten = h.extension.find_available_exten(context_name)
     vm_number = h.voicemail.find_available_number(context_name)
@@ -1309,7 +1309,10 @@ def test_post_update_delete_full_user_no_error(
             user.pop(
                 'voicemail', None
             )  # The voicemail cannot be updated directly by calling POST /users
-            confd.users(payload['uuid']).put(**user,query_string="recursive=True",).assert_updated()
+            confd.users(payload['uuid']).put(
+                **user,
+                query_string="recursive=True",
+            ).assert_updated()
 
             url = confd.users(payload['uuid'])
 
@@ -1332,8 +1335,12 @@ def test_post_update_delete_full_user_no_error(
 
             payload.pop('call_record_enabled', None)  # Deprecated field
             payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
-            payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
-            payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
+            payload['lines'][0].pop(
+                'caller_id_name', None
+            )  # cannot set caller id to none
+            payload['lines'][0].pop(
+                'caller_id_num', None
+            )  # cannot set caller id to none
 
             response = url.put(
                 {
@@ -1786,12 +1793,10 @@ def test_post_incalls_existing_extension_wrong_context_type_error(outcall, exten
             ),
         )
 
+
 @fixtures.device()
 @fixtures.device()
-def test_update_lines_no_error(
-    device,
-    new_device
-):
+def test_update_lines_no_error(device, new_device):
     (
         _,
         _,
@@ -1807,9 +1812,7 @@ def test_update_lines_no_error(
         _,
         _,
     ) = generate_user_resources_bodies(
-        context_name=CONTEXT,
-        device=device,
-        endpoint_name='abc'
+        context_name=CONTEXT, device=device, endpoint_name='abc'
     )
 
     user_body = {
@@ -1841,16 +1844,11 @@ def test_update_lines_no_error(
         _,
         _,
     ) = generate_user_resources_bodies(
-        context_name=CONTEXT,
-        device=new_device,
-        endpoint_name='def'
+        context_name=CONTEXT, device=new_device, endpoint_name='def'
     )
     payload.pop('call_record_enabled', None)  # Deprecated field
     response = url.put(
-        {
-            **payload,
-            'lines': [new_line_to_create]
-        },
+        {**payload, 'lines': [new_line_to_create]},
         query_string="recursive=True",
     )
     response.assert_updated()
@@ -1870,12 +1868,9 @@ def test_update_lines_no_error(
     )
 
     # update the label of the SIP endpoint
-    new_line['endpoint_sip']['label']='new label'
+    new_line['endpoint_sip']['label'] = 'new label'
     response = url.put(
-        {
-            **payload,
-            'lines': [new_line]
-        },
+        {**payload, 'lines': [new_line]},
         query_string="recursive=True",
     )
     response.assert_updated()
@@ -1931,9 +1926,7 @@ def test_update_lines_sip_sccp_error(
         _,
         _,
     ) = generate_user_resources_bodies(
-        context_name=CONTEXT,
-        device=device,
-        endpoint_name='abc'
+        context_name=CONTEXT, device=device, endpoint_name='abc'
     )
 
     user_body = {
@@ -1951,21 +1944,21 @@ def test_update_lines_sip_sccp_error(
     user.pop(
         'voicemail', None
     )  # The voicemail cannot be updated directly by calling POST /users
-    confd.users(payload['uuid']).put(**user,query_string="recursive=True",).assert_updated()
+    confd.users(payload['uuid']).put(
+        **user,
+        query_string="recursive=True",
+    ).assert_updated()
 
     url = confd.users(payload['uuid'])
 
     # user update
     del payload['lines'][0]['endpoint_sip']
-    payload['lines'][0]['endpoint_sccp']= {}
+    payload['lines'][0]['endpoint_sccp'] = {}
     payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
     response = url.put(
-        {
-            **user,
-            'lines': [payload['lines'][0]]
-        },
+        {**user, 'lines': [payload['lines'][0]]},
         query_string="recursive=True",
     )
     response.assert_status(400)
@@ -1976,7 +1969,7 @@ def test_update_lines_sip_sccp_error(
         ),
     )
 
-     # user deletion
+    # user deletion
     response = url.delete(recursive=True)
     response.assert_deleted()
 
@@ -2000,13 +1993,9 @@ def test_update_lines_sip_sccp_error(
     response.assert_ok()
 
 
-
 @fixtures.device()
 @fixtures.device()
-def test_update_extension_lines_no_error(
-    device,
-    new_device
-):
+def test_update_extension_lines_no_error(device, new_device):
     (
         _,
         _,
@@ -2022,9 +2011,7 @@ def test_update_extension_lines_no_error(
         _,
         _,
     ) = generate_user_resources_bodies(
-        context_name=CONTEXT,
-        device=device,
-        endpoint_name='abc'
+        context_name=CONTEXT, device=device, endpoint_name='abc'
     )
 
     user_body = {
@@ -2054,22 +2041,17 @@ def test_update_extension_lines_no_error(
         _,
         _,
     ) = generate_user_resources_bodies(
-        context_name=CONTEXT,
-        device=new_device,
-        endpoint_name='def'
+        context_name=CONTEXT, device=new_device, endpoint_name='def'
     )
-    created_line=payload['lines'][0]
-    created_line['extensions']=[new_extension_to_create]
+    created_line = payload['lines'][0]
+    created_line['extensions'] = [new_extension_to_create]
 
     payload.pop('call_record_enabled', None)  # Deprecated field
     payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
     response = url.put(
-        {
-            **payload,
-            'lines': [created_line]
-        },
+        {**payload, 'lines': [created_line]},
         query_string="recursive=True",
     )
     response.assert_updated()
@@ -2081,18 +2063,21 @@ def test_update_extension_lines_no_error(
     assert_that(
         confd.users(payload['uuid']).get().item,
         has_entries(
-            lines=contains(has_entries(extensions=contains(has_entries(**new_extension_to_create)))),
+            lines=contains(
+                has_entries(extensions=contains(has_entries(**new_extension_to_create)))
+            ),
         ),
     )
     assert_that(
         confd.users(payload['uuid']).get().item,
         has_entries(
-            lines=not_(contains(
-                has_entries(extensions=contains(has_entries(**extension))))),
+            lines=not_(
+                contains(has_entries(extensions=contains(has_entries(**extension))))
+            ),
         ),
     )
 
-     # user deletion
+    # user deletion
     response = url.delete(recursive=True)
     response.assert_deleted()
 

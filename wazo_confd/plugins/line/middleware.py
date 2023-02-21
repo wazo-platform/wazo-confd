@@ -206,7 +206,9 @@ class LineMiddleWare:
                 )
             for extension in extensions_body_to_be_updated:
                 self._middleware_handle.get('extension').update(
-                    extension.id, extensions_body_to_be_updated[extension.id], tenant_uuids
+                    extension.id,
+                    extensions_body_to_be_updated[extension.id],
+                    tenant_uuids,
                 )
 
             for extension in extensions_body_to_be_created:

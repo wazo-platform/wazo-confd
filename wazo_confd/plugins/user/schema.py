@@ -343,14 +343,18 @@ class UserAgentSchema(AgentSchema):
 class UserLineSchema(LineSchema):
     device_id = fields.String()
 
+
 class UserEndpointSIPSchemaPut(EndpointSIPSchema):
     uuid = fields.UUID()
+
 
 class UserSccpSchemaPut(EndpointSIPSchema):
     uuid = fields.UUID()
 
+
 class UserCustomSchemaPut(EndpointSIPSchema):
     uuid = fields.UUID()
+
 
 class UserLinePutSchema(LineSchema):
     id = fields.Integer()
@@ -359,6 +363,7 @@ class UserLinePutSchema(LineSchema):
     endpoint_custom = Nested('UserCustomSchemaPut')
     extensions = Nested('ExtensionSchema', many=True)
     device_id = fields.String()
+
 
 class UserListItemSchemaPut(UserListItemSchema):
     lines = Nested('UserLinePutSchema', many=True)
