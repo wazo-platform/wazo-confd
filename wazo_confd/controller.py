@@ -1,8 +1,9 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 import signal
+import threading
 
 from functools import partial
 
@@ -76,17 +77,25 @@ class Controller:
     def run(self):
         logger.info('wazo-confd starting...')
         xivo_dao.init_db_from_config(self.config)
-        signal.signal(signal.SIGTERM, partial(_sigterm_handler, self))
+        signal.signal(signal.SIGTERM, partial(_signal_handler, self))
+        signal.signal(signal.SIGINT, partial(_signal_handler, self))
 
-        with self.token_renewer:
-            with self._bus_consumer:
-                with ServiceCatalogRegistration(*self._service_discovery_args):
-                    self.http_server.run()
+        try:
+            with self.token_renewer:
+                with self._bus_consumer:
+                    with ServiceCatalogRegistration(*self._service_discovery_args):
+                        self.http_server.run()
+        finally:
+            if self._stopping_thread:
+                self._stopping_thread.join()
 
     def stop(self, reason):
         logger.warning('Stopping wazo-confd: %s', reason)
-        self.http_server.stop()
+        self._stopping_thread = threading.Thread(
+            target=self.http_server.stop, name=reason
+        )
+        self._stopping_thread.start()
 
 
-def _sigterm_handler(controller, signum, frame):
-    controller.stop(reason='SIGTERM')
+def _signal_handler(controller, signum, frame):
+    controller.stop(reason=signal.Signals(signum).name)
