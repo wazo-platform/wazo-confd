@@ -1,16 +1,18 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.helpers.db_manager import Session
+from xivo_dao.helpers.exception import InputError
 
-from .schema import LineSchemaNullable
+from .schema import LineSchemaNullable, LinePutSchema
 
 
 class LineMiddleWare:
     def __init__(self, service, middleware_handle):
         self._service = service
         self._schema = LineSchemaNullable()
+        self._schema_update = LinePutSchema()
         self._middleware_handle = middleware_handle
 
     def create(self, body, tenant_uuid, tenant_uuids):
@@ -93,7 +95,7 @@ class LineMiddleWare:
 
         return line_response
 
-    def delete(self, line_id, tenant_uuids, recursive=False):
+    def delete(self, line_id, tenant_uuid, tenant_uuids, recursive=False):
         model = self._service.get(line_id, tenant_uuids=tenant_uuids)
 
         if recursive:
@@ -102,6 +104,7 @@ class LineMiddleWare:
                 self._middleware_handle.get('line_extension').delete_extension(
                     model.id,
                     extension.id,
+                    tenant_uuid,
                     tenant_uuids,
                 )
             Session.expire(model)
@@ -119,3 +122,97 @@ class LineMiddleWare:
                 )
             Session.expire(model)
         self._service.delete(model)
+
+    def parse_and_update(self, model, body, **kwargs):
+        form = self._schema_update.load(body, partial=True)
+        updated_fields = self.find_updated_fields(model, form)
+        for name, value in form.items():
+            setattr(model, name, value)
+        self._service.edit(model, updated_fields=updated_fields, **kwargs)
+
+    def find_updated_fields(self, model, form):
+        updated_fields = []
+        for name, value in form.items():
+            try:
+                if getattr(model, name) != value:
+                    updated_fields.append(name)
+            except AttributeError:
+                pass
+        return updated_fields
+
+    def update(self, line_id, body, tenant_uuid, tenant_uuids):
+        model = self._service.get(line_id, tenant_uuids=tenant_uuids)
+
+        endpoint_custom_body = body.pop('endpoint_custom', None)
+        endpoint_sccp_body = body.pop('endpoint_sccp', None)
+        endpoint_sip_body = body.pop('endpoint_sip', None)
+        extension_bodies = body.pop('extensions', None) or []
+
+        if endpoint_sip_body is not None:
+            if not model.endpoint_sip:
+                raise InputError(
+                    "There is already an endpoint associated to the line that is not of type SIP. Cannot update the line with another endpoint type"
+                )
+            endpoint_sip_middleware = self._middleware_handle.get('endpoint_sip')
+            endpoint_sip_middleware.update(
+                endpoint_sip_body['uuid'], endpoint_sip_body, tenant_uuids
+            )
+
+        elif endpoint_sccp_body is not None:
+            if not model.endpoint_sccp:
+                raise InputError(
+                    "There is already an endpoint associated to the line that is not of type SCCP. Cannot update the line with another endpoint type"
+                )
+            endpoint_sccp_middleware = self._middleware_handle.get('endpoint_sccp')
+            endpoint_sccp_middleware.update(
+                endpoint_sccp_body['uuid'], endpoint_sccp_body, tenant_uuids
+            )
+
+        elif endpoint_custom_body is not None:
+            if not model.endpoint_custom:
+                raise InputError(
+                    "There is already an endpoint associated to the line that is not of type custom. Cannot update the line with another endpoint type"
+                )
+            endpoint_custom_middleware = self._middleware_handle.get('endpoint_custom')
+            endpoint_custom_middleware.update(
+                endpoint_custom_body['uuid'], endpoint_custom_body, tenant_uuids
+            )
+
+        if extension_bodies:
+            line_extension_middleware = self._middleware_handle.get('line_extension')
+            existing_extensions = {ext.id: ext for ext in model.extensions}
+
+            extensions_body_to_be_updated = {}
+            extensions_body_to_be_created = []
+            extensions_body_to_be_deleted = []
+            for extension_body in extension_bodies:
+                try:
+                    extensions_body_to_be_updated[extension_body['id']] = extension_body
+                except KeyError:
+                    extensions_body_to_be_created.append(extension_body)
+
+            for existing_extension_id in existing_extensions:
+                if existing_extension_id not in extensions_body_to_be_updated:
+                    extensions_body_to_be_deleted.append(
+                        existing_extensions[existing_extension_id]
+                    )
+
+            for extension in extensions_body_to_be_deleted:
+                line_extension_middleware.delete_extension(
+                    model.id,
+                    extension.id,
+                    tenant_uuid,
+                    tenant_uuids,
+                )
+            for extension in extensions_body_to_be_updated:
+                self._middleware_handle.get('extension').update(
+                    extension.id, extensions_body_to_be_updated[extension.id], tenant_uuids
+                )
+
+            for extension in extensions_body_to_be_created:
+                self._middleware_handle.get('line_extension').create_extension(
+                    model.id, extension, tenant_uuids
+                )
+            Session.expire(model, ['line_extensions'])
+
+        self.parse_and_update(model, body, tenant_uuids=tenant_uuids)

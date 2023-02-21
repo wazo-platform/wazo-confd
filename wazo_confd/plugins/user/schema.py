@@ -18,6 +18,7 @@ from wazo_confd.plugins.agent.schema import (
     AgentSchema,
     NUMBER_REGEX,
 )
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
 from wazo_confd.plugins.line.schema import LineSchema
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
@@ -101,15 +102,6 @@ class UserSchema(BaseSchema):
     )
     lines = Nested(
         'LineListSchema',
-        only=[
-            'id',
-            'name',
-            'endpoint_sip',
-            'endpoint_sccp',
-            'endpoint_custom',
-            'extensions',
-            'links',
-        ],
         many=True,
         dump_only=True,
     )
@@ -350,3 +342,24 @@ class UserAgentSchema(AgentSchema):
 
 class UserLineSchema(LineSchema):
     device_id = fields.String()
+
+class UserEndpointSIPSchemaPut(EndpointSIPSchema):
+    uuid = fields.UUID()
+
+class UserSccpSchemaPut(EndpointSIPSchema):
+    uuid = fields.UUID()
+
+class UserCustomSchemaPut(EndpointSIPSchema):
+    uuid = fields.UUID()
+
+class UserLinePutSchema(LineSchema):
+    id = fields.Integer()
+    endpoint_sip = Nested('UserEndpointSIPSchemaPut')
+    endpoint_sccp = Nested('UserSccpSchemaPut')
+    endpoint_custom = Nested('UserCustomSchemaPut')
+    extensions = Nested('ExtensionSchema', many=True)
+    device_id = fields.String()
+
+class UserListItemSchemaPut(UserListItemSchema):
+    lines = Nested('UserLinePutSchema', many=True)
+    agent = Nested('UserAgentSchema', allow_none=True)

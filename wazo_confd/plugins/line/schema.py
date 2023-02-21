@@ -1,7 +1,7 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, validates_schema, pre_load
+from marshmallow import fields, validates_schema, pre_load, post_dump
 from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
@@ -110,6 +110,16 @@ class LineSchema(BaseSchema):
 
         return data
 
+    @pre_load()
+    def remove_endpoints_none(self, data, **kwargs):
+        for endpoint in ['endpoint_sip', 'endpoint_sccp', 'endpoint_custom']:
+            try:
+                if data[endpoint] is None:
+                    del data[endpoint]
+            except KeyError:
+                pass
+        return data
+
 
 class LineSchemaNullable(LineSchema):
     def on_bind_field(self, field_name, field_obj):
@@ -150,5 +160,17 @@ class LineListSchema(LineSchema):
     )
 
 
-class LinePutSchema(LineListSchema):
-    pass
+class LinePutSchema(LineSchema):
+    endpoint_sip = Nested(
+        'EndpointSIPSchema',
+    )
+    endpoint_sccp = Nested(
+        'SccpSchema',
+    )
+    endpoint_custom = Nested(
+        'CustomSchema',
+    )
+    extensions = Nested(
+        'ExtensionSchema',
+        many=True,
+    )
