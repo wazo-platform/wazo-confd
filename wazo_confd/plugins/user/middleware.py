@@ -62,7 +62,6 @@ class UserMiddleWare:
         switchboards = form.pop('switchboards', None) or []
         voicemail = form.pop('voicemail', None)
         agent = form.pop('agent', {})
-        device_id = form.pop('device_id', None)
 
         model = User(**form)
         model = self._service.create(model)
