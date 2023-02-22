@@ -6,6 +6,10 @@ from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
+from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
+from wazo_confd.plugins.endpoint_sccp.schema import SccpSchema
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+from wazo_confd.plugins.extension.schema import ExtensionSchema
 
 
 class LineSchema(BaseSchema):
@@ -160,17 +164,33 @@ class LineListSchema(LineSchema):
     )
 
 
+class UserEndpointSIPSchema(EndpointSIPSchema):
+    uuid = fields.UUID()
+
+
+class UserSccpSchema(SccpSchema):
+    id = fields.Integer()
+
+
+class UserCustomSchema(CustomSchema):
+    id = fields.Integer()
+
+
+class UserLineExtensionSchema(ExtensionSchema):
+    id = fields.Integer(allow_none=False)
+
+
 class LinePutSchema(LineSchema):
     endpoint_sip = Nested(
-        'EndpointSIPSchema',
+        'UserEndpointSIPSchema',
     )
     endpoint_sccp = Nested(
-        'SccpSchema',
+        'UserSccpSchema',
     )
     endpoint_custom = Nested(
-        'CustomSchema',
+        'UserCustomSchema',
     )
     extensions = Nested(
-        'ExtensionSchema',
+        'UserLineExtensionSchema',
         many=True,
     )

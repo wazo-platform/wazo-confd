@@ -361,7 +361,7 @@ class UserLinePutSchema(LineSchema):
     endpoint_sip = Nested('UserEndpointSIPSchemaPut')
     endpoint_sccp = Nested('UserSccpSchemaPut')
     endpoint_custom = Nested('UserCustomSchemaPut')
-    extensions = Nested('ExtensionSchema', many=True)
+    extensions = Nested('UserLineExtensionSchema', many=True)
     device_id = fields.String()
 
 

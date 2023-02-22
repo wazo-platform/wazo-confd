@@ -364,7 +364,11 @@ class UserMiddleWare(ResourceMiddleware):
                 if 'id' in line_body and line_body['id'] in existing_lines:
                     old_device_id = existing_lines[line_body['id']].device_id
                     self._middleware_handle.get('line').update(
-                        line_body['id'], line_body, tenant_uuid, tenant_uuids
+                        line_body['id'],
+                        line_body,
+                        tenant_uuid,
+                        tenant_uuids,
+                        recursive=True,
                     )
                     # if device_id not the same, so we must dissociate the old one and associate the new line
                     if device_id != old_device_id:

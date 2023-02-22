@@ -1985,6 +1985,19 @@ def test_update_extension_lines_no_error(device, new_device):
         ),
     )
 
+    created_line['extensions'][0]['id'] = None
+    response = url.put(
+        {**payload, 'lines': [created_line]},
+        query_string="recursive=True",
+    )
+    response.assert_status(400)
+    assert_that(
+        response.raw,
+        equal_to(
+            '["Input Error - lines: {0: {\'extensions\': {0: {\'id\': [\'Field may not be null.\']}}}}"]\n'
+        ),
+    )
+
     # user deletion
     response = url.delete(recursive=True)
     response.assert_deleted()
