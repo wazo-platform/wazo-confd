@@ -9,16 +9,15 @@ from xivo_dao.helpers.exception import NotFoundError, ResourceError, InputError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
 from .schema import UserListItemSchema, UserSchema, UserListItemSchemaPut
+from ...middleware import ResourceMiddleware
 
 
-class UserMiddleWare:
+class UserMiddleWare(ResourceMiddleware):
     def __init__(self, service, wazo_user_service, middleware_handle):
-        self._service = service
+        super().__init__(service, UserListItemSchema(), update_schema=UserSchema())
         self._wazo_user_service = wazo_user_service
         self._middleware_handle = middleware_handle
-        self._schema = UserListItemSchema()
-        self._schema_update = UserSchema()
-        self._schema_update_recursive = UserListItemSchemaPut()
+        self._update_schema_recursive = UserListItemSchemaPut()
 
     def create_associate_line(self, user_id, line_body, tenant_uuid, tenant_uuids):
         line = self._middleware_handle.get('line').create(
@@ -325,23 +324,6 @@ class UserMiddleWare:
                 if e.response.status_code != HTTPStatus.NOT_FOUND:
                     raise e
 
-    def parse_and_update(self, model, body, **kwargs):
-        form = self._schema_update.load(body, partial=True)
-        updated_fields = self.find_updated_fields(model, form)
-        for name, value in form.items():
-            setattr(model, name, value)
-        self._service.edit(model, updated_fields=updated_fields, **kwargs)
-
-    def find_updated_fields(self, model, form):
-        updated_fields = []
-        for name, value in form.items():
-            try:
-                if getattr(model, name) != value:
-                    updated_fields.append(name)
-            except AttributeError:
-                pass
-        return updated_fields
-
     def update(self, user_id, body, tenant_uuid, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
         if not recursive:
@@ -350,7 +332,7 @@ class UserMiddleWare:
             fallbacks = body.pop('fallbacks', None) or []
             forwards = body.pop('forwards', None) or []
 
-            form = self._schema_update_recursive.load(body)
+            form = self._update_schema_recursive.load(body)
 
             groups = form.pop('groups', None) or []
             lines = form.pop('lines', None) or []

@@ -6,13 +6,12 @@ from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import InputError
 
 from .schema import LineSchemaNullable, LinePutSchema
+from ...middleware import ResourceMiddleware
 
 
-class LineMiddleWare:
+class LineMiddleWare(ResourceMiddleware):
     def __init__(self, service, middleware_handle):
-        self._service = service
-        self._schema = LineSchemaNullable()
-        self._schema_update = LinePutSchema()
+        super().__init__(service, LineSchemaNullable(), update_schema=LinePutSchema())
         self._middleware_handle = middleware_handle
 
     def create(self, body, tenant_uuid, tenant_uuids):
@@ -122,23 +121,6 @@ class LineMiddleWare:
                 )
             Session.expire(model)
         self._service.delete(model)
-
-    def parse_and_update(self, model, body, **kwargs):
-        form = self._schema_update.load(body, partial=True)
-        updated_fields = self.find_updated_fields(model, form)
-        for name, value in form.items():
-            setattr(model, name, value)
-        self._service.edit(model, updated_fields=updated_fields, **kwargs)
-
-    def find_updated_fields(self, model, form):
-        updated_fields = []
-        for name, value in form.items():
-            try:
-                if getattr(model, name) != value:
-                    updated_fields.append(name)
-            except AttributeError:
-                pass
-        return updated_fields
 
     def update(self, line_id, body, tenant_uuid, tenant_uuids):
         model = self._service.get(line_id, tenant_uuids=tenant_uuids)

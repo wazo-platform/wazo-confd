@@ -4,12 +4,12 @@
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
 from .schema import SccpSchema
+from ...middleware import ResourceMiddleware
 
 
-class EndpointSCCPMiddleWare:
+class EndpointSCCPMiddleWare(ResourceMiddleware):
     def __init__(self, service):
-        self._service = service
-        self._schema = SccpSchema()
+        super().__init__(service, SccpSchema())
 
     def create(self, body, tenant_uuid):
         form = self._schema.load(body)
@@ -17,23 +17,6 @@ class EndpointSCCPMiddleWare:
         model = SCCPEndpoint(**form)
         model = self._service.create(model)
         return self._schema.dump(model)
-
-    def parse_and_update(self, model, body, **kwargs):
-        form = self._schema.load(body, partial=True)
-        updated_fields = self.find_updated_fields(model, form)
-        for name, value in form.items():
-            setattr(model, name, value)
-        self._service.edit(model, updated_fields=updated_fields, **kwargs)
-
-    def find_updated_fields(self, model, form):
-        updated_fields = []
-        for name, value in form.items():
-            try:
-                if getattr(model, name) != value:
-                    updated_fields.append(name)
-            except AttributeError:
-                pass
-        return updated_fields
 
     def update(self, endpoint_sccp_id, body, tenant_uuids):
         model = self._service.get(endpoint_sccp_id, tenant_uuids=tenant_uuids)

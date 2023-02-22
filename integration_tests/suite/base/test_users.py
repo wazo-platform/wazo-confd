@@ -1963,7 +1963,7 @@ def test_update_extension_lines_no_error(device, new_device):
 
     # retrieve the data for the user and check the lines
     assert_that(
-        confd.users(payload['uuid']).get().item,
+        user,
         has_entries(
             lines=contains(
                 has_entries(
@@ -1973,7 +1973,7 @@ def test_update_extension_lines_no_error(device, new_device):
         ),
     )
     assert_that(
-        confd.users(payload['uuid']).get().item,
+        user,
         has_entries(
             lines=not_(
                 contains(
