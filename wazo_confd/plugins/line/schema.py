@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, validates_schema, pre_load
@@ -6,6 +6,10 @@ from marshmallow.validate import Length, Predicate, Range
 from marshmallow.exceptions import ValidationError
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
+from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
+from wazo_confd.plugins.endpoint_sccp.schema import SccpSchema
+from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+from wazo_confd.plugins.extension.schema import ExtensionSchema
 
 
 class LineSchema(BaseSchema):
@@ -110,6 +114,16 @@ class LineSchema(BaseSchema):
 
         return data
 
+    @pre_load()
+    def remove_endpoints_none(self, data, **kwargs):
+        for endpoint in ['endpoint_sip', 'endpoint_sccp', 'endpoint_custom']:
+            try:
+                if data[endpoint] is None:
+                    del data[endpoint]
+            except KeyError:
+                pass
+        return data
+
 
 class LineSchemaNullable(LineSchema):
     def on_bind_field(self, field_name, field_obj):
@@ -150,5 +164,33 @@ class LineListSchema(LineSchema):
     )
 
 
-class LinePutSchema(LineListSchema):
-    pass
+class UserEndpointSIPSchema(EndpointSIPSchema):
+    uuid = fields.UUID()
+
+
+class UserSccpSchema(SccpSchema):
+    id = fields.Integer()
+
+
+class UserCustomSchema(CustomSchema):
+    id = fields.Integer()
+
+
+class UserLineExtensionSchema(ExtensionSchema):
+    id = fields.Integer(allow_none=False)
+
+
+class LinePutSchema(LineSchema):
+    endpoint_sip = Nested(
+        'UserEndpointSIPSchema',
+    )
+    endpoint_sccp = Nested(
+        'UserSccpSchema',
+    )
+    endpoint_custom = Nested(
+        'UserCustomSchema',
+    )
+    extensions = Nested(
+        'UserLineExtensionSchema',
+        many=True,
+    )

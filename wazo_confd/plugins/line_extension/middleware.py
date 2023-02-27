@@ -1,4 +1,4 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.line import dao as line_dao
@@ -13,12 +13,18 @@ class LineExtensionMiddleware:
     def associate(self, line_id, extension_id, tenant_uuids):
         line = line_dao.get(line_id, tenant_uuids=tenant_uuids)
         extension = extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
-        return self._service.associate(line, extension)
+        self._service.associate(line, extension)
 
-    def dissociate(self, line_id, extension_id, tenant_uuids):
+    def dissociate(
+        self, line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=False
+    ):
         line = line_dao.get(line_id, tenant_uuids=tenant_uuids)
+        if line.device_id and reset_autoprov:
+            self._middleware_handle.get('device').reset_autoprov(
+                line.device_id, tenant_uuid
+            )
         extension = extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
-        return self._service.dissociate(line, extension)
+        self._service.dissociate(line, extension)
 
     def create_extension(self, line_id, body, tenant_uuids):
         extension_middleware = self._middleware_handle.get('extension')
@@ -26,7 +32,9 @@ class LineExtensionMiddleware:
         self.associate(line_id, extension['id'], tenant_uuids)
         return extension
 
-    def delete_extension(self, line_id, extension_id, tenant_uuids):
+    def delete_extension(self, line_id, extension_id, tenant_uuid, tenant_uuids):
         extension_middleware = self._middleware_handle.get('extension')
-        self.dissociate(line_id, extension_id, tenant_uuids)
+        self.dissociate(
+            line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=True
+        )
         extension_middleware.delete(extension_id, tenant_uuids)

@@ -1,5 +1,9 @@
 # Changelog
 
+## 23.04
+
+* PUT on `/users?recursive=true` updated, to provide a way to update lines for a specific user.
+
 ## 23.03
 
 * POST on `/users?recursive=true` updated, to provide a way to create/reuse incalls.

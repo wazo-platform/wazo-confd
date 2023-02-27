@@ -8,7 +8,7 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
-from wazo_confd.plugins.line.schema import LinePutSchema, LineListSchema
+from wazo_confd.plugins.line.schema import LineListSchema
 
 
 class LineList(ListResource):
@@ -39,7 +39,7 @@ class LineList(ListResource):
 
 
 class LineItem(ItemResource):
-    schema = LinePutSchema
+    schema = LineListSchema
     has_tenant_uuid = True
 
     def __init__(self, service, middleware):
@@ -52,13 +52,16 @@ class LineItem(ItemResource):
 
     @required_acl('confd.lines.{id}.update')
     def put(self, id):
-        kwargs = self._add_tenant_uuid()
-        model = self.service.get(id, **kwargs)
-        self.parse_and_update(model, **kwargs)
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(id, request.get_json(), tenant.uuid, tenant_uuids)
         return '', 204
 
     @required_acl('confd.lines.{id}.delete')
     def delete(self, id):
+        tenant = Tenant.autodetect()
+        tenant_dao.find_or_create_tenant(tenant.uuid)
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.delete(id, tenant_uuids)
+        self._middleware.delete(id, tenant.uuid, tenant_uuids)
         return '', 204

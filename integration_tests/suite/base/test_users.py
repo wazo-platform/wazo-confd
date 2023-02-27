@@ -955,6 +955,38 @@ def test_bus_events(user):
     yield s.check_event, 'user_deleted', headers, url.delete
 
 
+class UserResources:
+    def __init__(
+        self,
+        exten,
+        source_exten,
+        user,
+        auth,
+        extension,
+        line,
+        incall,
+        group,
+        switchboard,
+        voicemail,
+        forwards,
+        fallbacks,
+        agent,
+    ):
+        self.exten = exten
+        self.source_exten = source_exten
+        self.user = user
+        self.auth = auth
+        self.extension = extension
+        self.line = line
+        self.incall = incall
+        self.group = group
+        self.switchboard = switchboard
+        self.voicemail = voicemail
+        self.forwards = forwards
+        self.fallbacks = fallbacks
+        self.agent = agent
+
+
 def generate_user_resources_bodies(
     group=None,
     switchboard=None,
@@ -963,7 +995,8 @@ def generate_user_resources_bodies(
     device=None,
     user_destination=None,
     queue=None,
-):
+    endpoint_name=None,
+) -> UserResources:
     exten = h.extension.find_available_exten(context_name)
     vm_number = h.voicemail.find_available_number(context_name)
     if incall_context_name:
@@ -973,10 +1006,13 @@ def generate_user_resources_bodies(
     user = FULL_USER
     auth = AUTH_USER
     extension = {'context': context_name, 'exten': exten}
+    if not endpoint_name:
+        endpoint_name = s.random_string(5)
+
     line = {
         'context': context_name,
         'extensions': [extension],
-        'endpoint_sip': {'name': 'iddqd'},
+        'endpoint_sip': {'name': endpoint_name},
     }
     if device:
         line['device_id'] = device['id']
@@ -1030,7 +1066,7 @@ def generate_user_resources_bodies(
     agent = {}
     if queue:
         agent['queues'] = [{'id': queue['id'], 'penalty': 1, 'priority': 2}]
-    return (
+    return UserResources(
         exten,
         source_exten,
         user,
@@ -1071,21 +1107,7 @@ def test_post_update_delete_full_user_no_error(
     queue,
     new_group,
 ):
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-        voicemail,
-        forwards,
-        fallbacks,
-        agent,
-    ) = generate_user_resources_bodies(
+    user_resources = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
         context_name=CONTEXT,
@@ -1098,17 +1120,17 @@ def test_post_update_delete_full_user_no_error(
     with a.switchboard_member_user(switchboard2, [user2]):
         with a.group_extension(group, group_extension):
             user_body = {
-                'auth': auth,
-                'lines': [line],
-                'incalls': [incall],
+                'auth': user_resources.auth,
+                'lines': [user_resources.line],
+                'incalls': [user_resources.incall],
                 'groups': [group],
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard, switchboard2],
-                'agent': agent,
-                'voicemail': voicemail,
-                'forwards': forwards,
-                'fallbacks': fallbacks,
-                **user,
+                'agent': user_resources.agent,
+                'voicemail': user_resources.voicemail,
+                'forwards': user_resources.forwards,
+                'fallbacks': user_resources.fallbacks,
+                **user_resources.user,
             }
             response = confd.users.post(user_body)
 
@@ -1135,7 +1157,7 @@ def test_post_update_delete_full_user_no_error(
                                 has_entries(
                                     id=greater_than(0),
                                     context=INCALL_CONTEXT,
-                                    exten=source_exten,
+                                    exten=user_resources.source_exten,
                                 )
                             ),
                         )
@@ -1150,24 +1172,26 @@ def test_post_update_delete_full_user_no_error(
                     ),
                     auth=has_entries(
                         uuid=payload['uuid'],
-                        firstname=user['firstname'],
-                        lastname=user['lastname'],
-                        emails=contains(has_entries(address=user['email'])),
-                        username=auth['username'],
+                        firstname=user_resources.user['firstname'],
+                        lastname=user_resources.user['lastname'],
+                        emails=contains(
+                            has_entries(address=user_resources.user['email'])
+                        ),
+                        username=user_resources.auth['username'],
                     ),
                     agent=has_entries(
-                        number=line['extensions'][0]['exten'],
-                        firstname=user['firstname'],
+                        number=user_resources.line['extensions'][0]['exten'],
+                        firstname=user_resources.user['firstname'],
                         queues=contains(
                             has_entries(
-                                id=agent['queues'][0]['id'],
-                                penalty=agent['queues'][0]['penalty'],
-                                priority=agent['queues'][0]['priority'],
+                                id=user_resources.agent['queues'][0]['id'],
+                                penalty=user_resources.agent['queues'][0]['penalty'],
+                                priority=user_resources.agent['queues'][0]['priority'],
                             )
                         ),
                     ),
                     voicemail=has_entries(id=greater_than(0)),
-                    forwards=has_entries(**forwards),
+                    forwards=has_entries(**user_resources.forwards),
                     fallbacks=has_entries(
                         noanswer_destination=has_entries(
                             type='user', user_id=user_destination['id']
@@ -1182,7 +1206,7 @@ def test_post_update_delete_full_user_no_error(
                             type='user', user_id=user_destination['id']
                         ),
                     ),
-                    **user,
+                    **user_resources.user,
                 ),
             )
 
@@ -1203,8 +1227,10 @@ def test_post_update_delete_full_user_no_error(
             assert_that(
                 confd.lines(payload['lines'][0]['id']).get().item,
                 has_entries(
-                    extensions=contains(has_entries(**extension)),
-                    endpoint_sip=has_entries(name='iddqd'),
+                    extensions=contains(has_entries(**user_resources.extension)),
+                    endpoint_sip=has_entries(
+                        name=user_resources.line['endpoint_sip']['name']
+                    ),
                     device_id=device['id'],
                 ),
             )
@@ -1248,7 +1274,7 @@ def test_post_update_delete_full_user_no_error(
             # retrieve the forwards for the user and check the data
             assert_that(
                 confd.users(payload['uuid']).forwards.get().item,
-                has_entries(**forwards),
+                has_entries(**user_resources.forwards),
             )
             # retrieve the fallbacks for the user and check the data
             assert_that(
@@ -1279,15 +1305,15 @@ def test_post_update_delete_full_user_no_error(
                 wazo_user,
                 has_entries(
                     uuid=payload['uuid'],
-                    username=auth['username'],
+                    username=user_resources.auth['username'],
                 ),
             )
             # retrieve the agent for the user and check the data
             assert_that(
                 confd.agents(payload['agent']['id']).get().item,
                 has_entries(
-                    number=line['extensions'][0]['exten'],
-                    firstname=user['firstname'],
+                    number=user_resources.line['extensions'][0]['exten'],
+                    firstname=user_resources.user['firstname'],
                     queues=contains(has_entries(id=queue['id'])),
                 ),
             )
@@ -1295,7 +1321,7 @@ def test_post_update_delete_full_user_no_error(
             assert_that(
                 confd.voicemails(payload['voicemail']['id']).get().item,
                 has_entries(
-                    name=f"{user['firstname']} {user['lastname']}",
+                    name=f"{user_resources.user['firstname']} {user_resources.user['lastname']}",
                     id=payload['voicemail']['id'],
                 ),
             )
@@ -1305,7 +1331,10 @@ def test_post_update_delete_full_user_no_error(
             user.pop(
                 'voicemail', None
             )  # The voicemail cannot be updated directly by calling POST /users
-            confd.users(payload['uuid']).put(**user).assert_updated()
+            confd.users(payload['uuid']).put(
+                **user,
+                query_string="recursive=True",
+            ).assert_updated()
 
             url = confd.users(payload['uuid'])
 
@@ -1326,9 +1355,18 @@ def test_post_update_delete_full_user_no_error(
                 'unconditional': {'enabled': True, 'destination': '101'},
             }
 
+            payload.pop('call_record_enabled', None)  # Deprecated field
+            payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
+            payload['lines'][0].pop(
+                'caller_id_name', None
+            )  # cannot set caller id to none
+            payload['lines'][0].pop(
+                'caller_id_num', None
+            )  # cannot set caller id to none
+
             response = url.put(
                 {
-                    **user_body,
+                    **payload,
                     'fallbacks': {**new_fallbacks},
                     'forwards': {**new_forwards},
                     'groups': [{'uuid': new_group['uuid']}],
@@ -1457,21 +1495,7 @@ def test_delete_full_user_no_auth_no_error(
     funckey_template,
     switchboard,
 ):
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-        voicemail,
-        forwards,
-        fallbacks,
-        agent,
-    ) = generate_user_resources_bodies(
+    user_resources = generate_user_resources_bodies(
         group=group,
         switchboard=switchboard,
         context_name=CONTEXT,
@@ -1481,12 +1505,12 @@ def test_delete_full_user_no_auth_no_error(
     with a.group_extension(group, group_extension):
         response = confd.users.post(
             {
-                'lines': [line],
-                'incalls': [incall],
+                'lines': [user_resources.line],
+                'incalls': [user_resources.incall],
                 'groups': [group],
                 'func_key_template_id': funckey_template['id'],
                 'switchboards': [switchboard],
-                **user,
+                **user_resources.user,
             }
         )
 
@@ -1518,26 +1542,14 @@ def test_delete_simple_user_with_recursive_true(user):
 def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
     device, context
 ):
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-        voicemail,
-        forwards,
-        fallbacks,
-        agent,
-    ) = generate_user_resources_bodies(context_name=context['name'], device=device)
+    user_resources = generate_user_resources_bodies(
+        context_name=context['name'], device=device
+    )
 
     response = confd.users.post(
         {
-            'lines': [line],
-            **user,
+            'lines': [user_resources.line],
+            **user_resources.user,
         },
         wazo_tenant=SUB_TENANT,
     )
@@ -1555,7 +1567,7 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
                     device_id=device['id'],
                 )
             ),
-            **user,
+            **user_resources.user,
         ),
     )
 
@@ -1585,26 +1597,14 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
 
 
 def test_post_delete_minimalistic_user_with_non_existing_device_id_error():
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-        voicemail,
-        forwards,
-        fallbacks,
-        agent,
-    ) = generate_user_resources_bodies(context_name=CONTEXT, device={'id': 'my_device'})
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device={'id': 'my_device'}
+    )
 
     response = confd.users.post(
         {
-            'lines': [line],
-            **user,
+            'lines': [user_resources.line],
+            **user_resources.user,
         },
     )
 
@@ -1625,27 +1625,13 @@ def test_delete_voicemail_2_users_not_deleted(
     user2,
     voicemail2,
 ):
-    (
-        exten,
-        source_exten,
-        user,
-        auth,
-        extension,
-        line,
-        incall,
-        group,
-        switchboard,
-        voicemail,
-        forwards,
-        fallbacks,
-        agent,
-    ) = generate_user_resources_bodies()
+    user_resources = generate_user_resources_bodies()
 
     with a.user_voicemail(user2, voicemail2, check=False):
         response = confd.users.post(
             {
                 'voicemail': {**voicemail2},
-                **user,
+                **user_resources.user,
             }
         )
 
@@ -1776,3 +1762,256 @@ def test_post_incalls_existing_extension_wrong_context_type_error(outcall, exten
                 '["Context associated to the extension is not of type \'incall\'"]\n'
             ),
         )
+
+
+@fixtures.device()
+@fixtures.device()
+def test_update_lines_no_error(device, new_device):
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device=device, endpoint_name='abc'
+    )
+
+    user_body = {
+        'lines': [user_resources.line],
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+
+    response.assert_created('users')
+    payload = response.item
+
+    first_line_id = confd.users(payload['uuid']).get().item['lines'][0]['id']
+
+    url = confd.users(payload['uuid'])
+
+    # user update
+    new_user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device=new_device, endpoint_name='def'
+    )
+    payload.pop('call_record_enabled', None)  # Deprecated field
+    response = url.put(
+        {**payload, 'lines': [new_user_resources.line]},
+        query_string="recursive=True",
+    )
+    response.assert_updated()
+
+    # retrieve the data for the user and check the lines
+    new_line = confd.users(payload['uuid']).get().item['lines'][0]
+    assert_that(new_line['id'], is_not(equal_to(first_line_id)))
+
+    # retrieve the line associated to the user and check its data are correct
+    assert_that(
+        confd.lines(new_line['id']).get().item,
+        has_entries(
+            extensions=contains(has_entries(**new_user_resources.extension)),
+            endpoint_sip=has_entries(
+                name=new_user_resources.line['endpoint_sip']['name']
+            ),
+            device_id=new_device['id'],
+        ),
+    )
+
+    # update the label of the SIP endpoint
+    new_line['endpoint_sip']['label'] = 'new label'
+    response = url.put(
+        {**payload, 'lines': [new_line]},
+        query_string="recursive=True",
+    )
+    response.assert_updated()
+
+    # retrieve the data for the user and check the lines
+    assert_that(
+        confd.users(payload['uuid']).get().item,
+        has_entries(
+            lines=contains(has_entries(endpoint_sip=has_entries(label='new label'))),
+        ),
+    )
+
+    # user deletion
+    response = url.delete(recursive=True)
+    response.assert_deleted()
+
+    # verify that user is deleted
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that line is deleted
+    url = confd.lines(new_line['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that extension is deleted
+    url = confd.extensions(new_line['extensions'][0]['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that the device is not deleted
+    url = confd.devices(device['id'])
+    response = url.get()
+    response.assert_ok()
+
+
+@fixtures.device()
+def test_update_lines_sip_sccp_error(
+    device,
+):
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device=device, endpoint_name='abc'
+    )
+
+    user_body = {
+        'lines': [user_resources.line],
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+
+    response.assert_created('users')
+    payload = response.item
+
+    # retrieve the user and try to update the user with the same data
+    user = confd.users(payload['uuid']).get().item
+    user.pop('call_record_enabled', None)  # Deprecated field
+    user.pop(
+        'voicemail', None
+    )  # The voicemail cannot be updated directly by calling POST /users
+    confd.users(payload['uuid']).put(
+        **user,
+        query_string="recursive=True",
+    ).assert_updated()
+
+    url = confd.users(payload['uuid'])
+
+    # user update
+    del payload['lines'][0]['endpoint_sip']
+    payload['lines'][0]['endpoint_sccp'] = {}
+    payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
+    payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
+    payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
+    response = url.put(
+        {**user, 'lines': [payload['lines'][0]]},
+        query_string="recursive=True",
+    )
+    response.assert_status(400)
+    assert_that(
+        response.raw,
+        equal_to(
+            '["There is already an endpoint associated to the line that is not of type SCCP. Cannot update the line with another endpoint type"]\n'
+        ),
+    )
+
+    # user deletion
+    response = url.delete(recursive=True)
+    response.assert_deleted()
+
+    # verify that user is deleted
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that line is deleted
+    url = confd.lines(payload['lines'][0]['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that extension is deleted
+    url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that the device is not deleted
+    url = confd.devices(device['id'])
+    response = url.get()
+    response.assert_ok()
+
+
+@fixtures.device()
+@fixtures.device()
+def test_update_extension_lines_no_error(device, new_device):
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device=device, endpoint_name='abc'
+    )
+
+    user_body = {
+        'lines': [user_resources.line],
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+
+    response.assert_created('users')
+    payload = response.item
+
+    url = confd.users(payload['uuid'])
+
+    # user update
+    new_user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device=new_device, endpoint_name='def'
+    )
+    created_line = payload['lines'][0]
+    created_line['extensions'] = [new_user_resources.extension]
+
+    payload.pop('call_record_enabled', None)  # Deprecated field
+    payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
+    payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
+    payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
+    response = url.put(
+        {**payload, 'lines': [created_line]},
+        query_string="recursive=True",
+    )
+    response.assert_updated()
+
+    # retrieve the user
+    user = confd.users(payload['uuid']).get().item
+
+    # retrieve the data for the user and check the lines
+    assert_that(
+        user,
+        has_entries(
+            lines=contains(
+                has_entries(
+                    extensions=contains(has_entries(**new_user_resources.extension))
+                )
+            ),
+        ),
+    )
+    assert_that(
+        user,
+        has_entries(
+            lines=not_(
+                contains(
+                    has_entries(
+                        extensions=contains(has_entries(**user_resources.extension))
+                    )
+                )
+            ),
+        ),
+    )
+
+    created_line['extensions'][0]['id'] = None
+    response = url.put(
+        {**payload, 'lines': [created_line]},
+        query_string="recursive=True",
+    )
+    response.assert_status(400)
+    assert_that(
+        response.raw,
+        equal_to(
+            '["Input Error - lines: {0: {\'extensions\': {0: {\'id\': [\'Field may not be null.\']}}}}"]\n'
+        ),
+    )
+
+    # user deletion
+    response = url.delete(recursive=True)
+    response.assert_deleted()
+
+    # verify that user is deleted
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that line is deleted
+    url = confd.lines(payload['lines'][0]['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that the device is not deleted
+    url = confd.devices(device['id'])
+    response = url.get()
+    response.assert_ok()
