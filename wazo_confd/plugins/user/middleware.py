@@ -336,6 +336,7 @@ class UserMiddleWare(ResourceMiddleware):
 
             groups = form.pop('groups', None) or []
             lines = form.pop('lines', None) or []
+            agent = form.pop('agent', None) or []
 
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
@@ -395,4 +396,18 @@ class UserMiddleWare(ResourceMiddleware):
                     user.uuid,
                     tenant_uuid,
                     tenant_uuids,
+                )
+
+            if agent:
+                agent_id = user.agentid
+                self._middleware_handle.get('user_agent_association').dissociate(
+                    user_id, tenant_uuids
+                )
+                self._middleware_handle.get('agent').delete(agent_id, tenant_uuids)
+
+                agent = self._middleware_handle.get('agent').create(
+                    agent, tenant_uuid, tenant_uuids
+                )
+                self._middleware_handle.get('user_agent_association').associate(
+                    user_id, agent['id'], tenant_uuids
                 )
