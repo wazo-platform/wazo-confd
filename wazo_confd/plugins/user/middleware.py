@@ -400,14 +400,19 @@ class UserMiddleWare(ResourceMiddleware):
 
             if agent:
                 agent_id = user.agentid
-                self._middleware_handle.get('user_agent_association').dissociate(
-                    user_id, tenant_uuids
-                )
-                self._middleware_handle.get('agent').delete(agent_id, tenant_uuids)
+                if agent_id:
+                    self._middleware_handle.get('agent').update(
+                        agent_id, agent, tenant_uuids
+                    )
+                else:
+                    self._middleware_handle.get('user_agent_association').dissociate(
+                        user_id, tenant_uuids
+                    )
+                    self._middleware_handle.get('agent').delete(agent_id, tenant_uuids)
 
-                agent = self._middleware_handle.get('agent').create(
-                    agent, tenant_uuid, tenant_uuids
-                )
-                self._middleware_handle.get('user_agent_association').associate(
-                    user_id, agent['id'], tenant_uuids
-                )
+                    agent = self._middleware_handle.get('agent').create(
+                        agent, tenant_uuid, tenant_uuids
+                    )
+                    self._middleware_handle.get('user_agent_association').associate(
+                        user_id, agent['id'], tenant_uuids
+                    )

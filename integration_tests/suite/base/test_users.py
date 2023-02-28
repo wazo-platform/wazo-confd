@@ -1354,7 +1354,7 @@ def test_post_update_delete_full_user_no_error(
                 'noanswer': {'enabled': True, 'destination': '789'},
                 'unconditional': {'enabled': True, 'destination': '101'},
             }
-            agent_number = '456'
+            agent_language = 'es_ES'
 
             payload.pop('call_record_enabled', None)  # Deprecated field
             payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
@@ -1371,7 +1371,7 @@ def test_post_update_delete_full_user_no_error(
                     'fallbacks': {**new_fallbacks},
                     'forwards': {**new_forwards},
                     'groups': [{'uuid': new_group['uuid']}],
-                    'agent': {'number': agent_number},
+                    'agent': {'id': payload['agent']['id'], 'language': agent_language},
                 },
                 query_string="recursive=True",
             )
@@ -1431,15 +1431,9 @@ def test_post_update_delete_full_user_no_error(
             assert_that(
                 confd.agents(payload['agent']['id']).get().item,
                 has_entries(
-                    number=agent_number,
+                    language=agent_language,
                     firstname=user['firstname'],
                 ),
-            )
-
-            # retrieve the data for the user and check the data returned (agent)
-            assert_that(
-                confd.users(payload['uuid']).get().item,
-                has_entries(agent=has_entries(number=agent_number)),
             )
 
             # user deletion
