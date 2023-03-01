@@ -2028,3 +2028,141 @@ def test_update_extension_lines_no_error(device, new_device):
     url = confd.devices(device['id'])
     response = url.get()
     response.assert_ok()
+
+
+@fixtures.device()
+@fixtures.device()
+@fixtures.queue()
+@fixtures.queue()
+def test_update_agent_no_error(
+    device,
+    device2,
+    queue,
+    queue2,
+):
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT,
+        device=device,
+        queue=queue,
+    )
+
+    user_body = {
+        'lines': [user_resources.line],
+        'agent': user_resources.agent,
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+
+    response.assert_created('users')
+    payload = response.item
+
+    agent_id = payload['agent']['id']
+
+    # check the data returned when the user is created
+    assert_that(
+        payload,
+        has_entries(
+            uuid=uuid_(),
+            agent=has_entries(
+                number=user_resources.line['extensions'][0]['exten'],
+                firstname=user_resources.user['firstname'],
+                queues=contains(
+                    has_entries(
+                        id=user_resources.agent['queues'][0]['id'],
+                        penalty=user_resources.agent['queues'][0]['penalty'],
+                        priority=user_resources.agent['queues'][0]['priority'],
+                    )
+                ),
+            ),
+            **user_resources.user,
+        ),
+    )
+
+    # retrieve the agent for the user and check the data
+    assert_that(
+        confd.agents(agent_id).get().item,
+        has_entries(
+            number=user_resources.line['extensions'][0]['exten'],
+            firstname=user_resources.user['firstname'],
+            queues=contains(has_entries(id=queue['id'])),
+        ),
+    )
+
+    url = confd.users(payload['uuid'])
+
+    # update the agent
+    agent_language = 'es_ES'
+
+    payload.pop('call_record_enabled', None)  # Deprecated field
+    response = url.put(
+        {
+            **payload,
+            'agent': {'id': agent_id, 'language': agent_language},
+        },
+        query_string="recursive=True",
+    )
+    response.assert_updated()
+
+    # retrieve the agent for the user and check the data is up-to-date
+    response = url.get()
+    payload = response.item
+
+    assert_that(
+        confd.agents(agent_id).get().item,
+        has_entries(
+            language=agent_language,
+            firstname=payload['firstname'],
+        ),
+    )
+
+    # replace the agent
+
+    user_resources2 = generate_user_resources_bodies(
+        context_name=CONTEXT,
+        device=device2,
+        queue=queue2,
+    )
+    payload.pop('call_record_enabled', None)  # Deprecated field
+    response = url.put(
+        {
+            **payload,
+            'agent': user_resources2.agent,
+        },
+        query_string="recursive=True",
+    )
+    response.assert_updated()
+
+    # retrieve the agent for the user and check if this is a new agent
+    response = url.get()
+    payload = response.item
+    assert_that(
+        payload,
+        has_entries(
+            agent=has_entries(
+                id=is_not(agent_id),
+            ),
+        ),
+    )
+
+    # user deletion
+    response = url.delete(recursive=True)
+    response.assert_deleted()
+
+    # verify that user is deleted
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that line is deleted
+    url = confd.lines(payload['lines'][0]['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that extension is deleted
+    url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
+    response = url.get()
+    response.assert_status(404)
+
+    # verify that agent is deleted
+    url = confd.agents(payload['agent']['id'])
+    response = url.get()
+    response.assert_status(404)
