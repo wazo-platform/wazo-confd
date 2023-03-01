@@ -46,9 +46,8 @@ class VoicemailItem(ItemResource):
 
     @required_acl('confd.voicemails.{id}.update')
     def put(self, id):
-        kwargs = self._add_tenant_uuid()
-        model = self.service.get(id, **kwargs)
-        self.parse_and_update(model, **kwargs)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(id, request.get_json(), tenant_uuids)
         return '', 204
 
     @required_acl('confd.voicemails.{id}.delete')

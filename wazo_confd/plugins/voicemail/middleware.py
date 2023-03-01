@@ -4,12 +4,14 @@
 from xivo_dao.alchemy.voicemail import Voicemail
 
 from .schema import VoicemailSchema
+from ...middleware import ResourceMiddleware
 
 
-class VoicemailMiddleWare:
+class VoicemailMiddleWare(ResourceMiddleware):
     def __init__(self, service):
         self._service = service
         self._schema = VoicemailSchema()
+        self._update_schema = VoicemailSchema()
 
     def create(self, body, tenant_uuids):
         form = self._schema.load(body)
@@ -24,3 +26,7 @@ class VoicemailMiddleWare:
     def get(self, voicemail_id, tenant_uuids):
         voicemail = self._service.get(voicemail_id, tenant_uuids=tenant_uuids)
         return self._schema.dump(voicemail)
+
+    def update(self, voicemail_id, body, tenant_uuids):
+        model = self._service.get(voicemail_id, tenant_uuids=tenant_uuids)
+        self.parse_and_update(model, body, tenant_uuids=tenant_uuids)
