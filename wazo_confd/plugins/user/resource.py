@@ -4,11 +4,9 @@
 from flask import url_for, request
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo.tenant_flask_helpers import Tenant
-from xivo_dao import tenant_dao
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant
 
 from .schema import (
     UserDirectorySchema,
@@ -32,11 +30,10 @@ class UserList(ListResource):
 
     @required_acl('confd.users.create')
     def post(self):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
         resource = self._middleware.create(
-            request.get_json(), tenant.uuid, tenant_uuids
+            request.get_json(), tenant_uuid, tenant_uuids
         )
         return resource, 201, self.build_headers(resource)
 
@@ -70,13 +67,12 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.update')
     def put(self, id):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
         self._middleware.update(
             id,
             request.get_json(),
-            tenant.uuid,
+            tenant_uuid,
             tenant_uuids,
             recursive=request.args.get(
                 'recursive', default=False, type=lambda v: v.lower() == 'true'
@@ -86,12 +82,11 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.delete')
     def delete(self, id):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
         self._middleware.delete(
             id,
-            tenant.uuid,
+            tenant_uuid,
             tenant_uuids,
             recursive=request.args.get(
                 'recursive', default=False, type=lambda v: v.lower() == 'true'

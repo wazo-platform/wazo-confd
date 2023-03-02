@@ -1,12 +1,8 @@
 # Changelog
 
-## IN PROGRESS
-
-* PUT on `/users?recursive=true` added, to provide a way to update agent for a specific user.
-
 ## 23.04
 
-* PUT on `/users?recursive=true` updated, to provide a way to update lines for a specific user.
+* PUT on `/users?recursive=true` updated, to provide a way to update lines, switchboards and agent for a specific user.
 
 ## 23.03
 
