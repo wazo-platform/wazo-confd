@@ -331,6 +331,7 @@ class UserMiddleWare(ResourceMiddleware):
         else:
             fallbacks = body.pop('fallbacks', None) or []
             forwards = body.pop('forwards', None) or []
+            switchboards = body.pop('switchboards', None) or []
 
             form = self._update_schema_recursive.load(body)
 
@@ -442,3 +443,12 @@ class UserMiddleWare(ResourceMiddleware):
                                 self._middleware_handle.get(
                                     'user_agent_association'
                                 ).associate(user_id, agent['id'], tenant_uuids)
+
+            for _switchboard in user.switchboards:
+                self._middleware_handle.get('switchboard_member').dissociate(
+                    str(user_id), _switchboard.uuid, tenant_uuids
+                )
+
+            self._middleware_handle.get(
+                'switchboard_member'
+            ).associate_user_to_switchboards(str(user_id), switchboards, tenant_uuids)

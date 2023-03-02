@@ -1095,6 +1095,7 @@ def generate_user_resources_bodies(
 @fixtures.user()
 @fixtures.queue()
 @fixtures.group()
+@fixtures.switchboard()
 def test_post_update_delete_full_user_no_error(
     group_extension,
     group,
@@ -1106,6 +1107,7 @@ def test_post_update_delete_full_user_no_error(
     user2,
     queue,
     new_group,
+    new_switchboard,
 ):
     user_resources = generate_user_resources_bodies(
         group=group,
@@ -1372,6 +1374,7 @@ def test_post_update_delete_full_user_no_error(
                     'forwards': {**new_forwards},
                     'groups': [{'uuid': new_group['uuid']}],
                     'agent': {'id': payload['agent']['id'], 'language': agent_language},
+                    'switchboards': [{'uuid': new_switchboard['uuid']}],
                 },
                 query_string="recursive=True",
             )
@@ -1404,7 +1407,8 @@ def test_post_update_delete_full_user_no_error(
                 ),
             )
 
-            # retrieve the data for the user and check the data returned (fallbacks, forwards and groups)
+            # retrieve the data for the user and check the data returned (fallbacks, forwards,
+            # groups and switchboards)
             assert_that(
                 confd.users(payload['uuid']).get().item,
                 has_entries(
@@ -1422,6 +1426,11 @@ def test_post_update_delete_full_user_no_error(
                             name=new_group['name'],
                         )
                     ),
+                    switchboards=contains(
+                        has_entries(
+                            uuid=new_switchboard['uuid'], name=new_switchboard['name']
+                        )
+                    ),
                 ),
             )
 
@@ -1433,6 +1442,16 @@ def test_post_update_delete_full_user_no_error(
                 has_entries(
                     language=agent_language,
                     firstname=user['firstname'],
+                ),
+            )
+
+            # retrieve the switchboards for the user and check the data
+            assert_that(
+                confd.switchboards(new_switchboard['uuid']).get().item,
+                has_entries(
+                    members=has_entries(
+                        users=contains(has_entries(uuid=payload['uuid']))
+                    )
                 ),
             )
 
