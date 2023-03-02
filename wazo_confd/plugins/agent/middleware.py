@@ -1,14 +1,16 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.agentfeatures import AgentFeatures as Agent
-from .schema import AgentSchema
+from .schema import AgentSchema, AgentSchemaPUT
+from ...middleware import ResourceMiddleware
 
 
-class AgentMiddleWare:
+class AgentMiddleWare(ResourceMiddleware):
     def __init__(self, service, middleware_handle):
         self._service = service
         self._schema = AgentSchema()
+        self._update_schema = AgentSchemaPUT()
         self._middleware_handle = middleware_handle
 
     def create(self, body, tenant_uuid, tenant_uuids):
@@ -30,3 +32,7 @@ class AgentMiddleWare:
     def delete(self, user_id, tenant_uuids):
         agent = self._service.get(user_id, tenant_uuids=tenant_uuids)
         self._service.delete(agent)
+
+    def update(self, agent_id, body, tenant_uuids):
+        model = self._service.get(agent_id, tenant_uuids=tenant_uuids)
+        self.parse_and_update(model, body)
