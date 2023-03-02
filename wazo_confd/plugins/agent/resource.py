@@ -53,7 +53,9 @@ class AgentItem(ItemResource):
 
     @required_acl('confd.agents.{id}.update')
     def put(self, id):
-        return super().put(id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        self._middleware.update(id, request.get_json(), tenant_uuids)
+        return '', 204
 
     @required_acl('confd.agents.{id}.delete')
     def delete(self, id):

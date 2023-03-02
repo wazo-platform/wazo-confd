@@ -336,6 +336,7 @@ class UserAgentQueueSchema(BaseSchema):
 
 
 class UserAgentSchema(AgentSchema):
+    id = fields.Integer()
     number = fields.String(validate=Regexp(NUMBER_REGEX))
     queues = fields.List(Nested('UserAgentQueueSchema'))
 

@@ -331,11 +331,13 @@ class UserMiddleWare(ResourceMiddleware):
         else:
             fallbacks = body.pop('fallbacks', None) or []
             forwards = body.pop('forwards', None) or []
+            switchboards = body.pop('switchboards', None) or []
 
             form = self._update_schema_recursive.load(body)
 
             groups = form.pop('groups', None) or []
             lines = form.pop('lines', None) or []
+            agent = form.pop('agent', None) or []
 
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
@@ -396,3 +398,57 @@ class UserMiddleWare(ResourceMiddleware):
                     tenant_uuid,
                     tenant_uuids,
                 )
+
+            if agent:
+                existing_agent_id = user.agentid
+                provided_agent_id = agent.get('id', None)
+
+                # if the agent ids are the same -> update
+                if existing_agent_id and existing_agent_id == provided_agent_id:
+                    self._middleware_handle.get('agent').update(
+                        existing_agent_id, agent, tenant_uuids
+                    )
+                else:
+                    # if no existing agent and no provided agent id -> create/associate
+                    if not existing_agent_id and not provided_agent_id:
+                        agent = self._middleware_handle.get('agent').create(
+                            agent, tenant_uuid, tenant_uuids
+                        )
+                        self._middleware_handle.get('user_agent_association').associate(
+                            user_id, agent['id'], tenant_uuids
+                        )
+                    else:
+                        # if no existing agent and there is a provided agent id -> associate
+                        if not existing_agent_id and provided_agent_id:
+                            # even if details are provided for the agent (firstname,
+                            # language, ...), there are ignored
+                            # there is only an association, no update here
+                            self._middleware_handle.get(
+                                'user_agent_association'
+                            ).associate(user_id, provided_agent_id, tenant_uuids)
+                        else:
+                            # if there is an existing agent id and no provided agent id
+                            # -> dissociate/delete + create/associate
+                            if not provided_agent_id and existing_agent_id:
+                                self._middleware_handle.get(
+                                    'user_agent_association'
+                                ).dissociate(user_id, tenant_uuids)
+                                self._middleware_handle.get('agent').delete(
+                                    existing_agent_id, tenant_uuids
+                                )
+
+                                agent = self._middleware_handle.get('agent').create(
+                                    agent, tenant_uuid, tenant_uuids
+                                )
+                                self._middleware_handle.get(
+                                    'user_agent_association'
+                                ).associate(user_id, agent['id'], tenant_uuids)
+
+            for _switchboard in user.switchboards:
+                self._middleware_handle.get('switchboard_member').dissociate(
+                    str(user_id), _switchboard.uuid, tenant_uuids
+                )
+
+            self._middleware_handle.get(
+                'switchboard_member'
+            ).associate_user_to_switchboards(str(user_id), switchboards, tenant_uuids)

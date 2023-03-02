@@ -156,3 +156,9 @@ class ItemResource(ConfdResource):
 
         tenant_uuids = self._build_tenant_list({'recurse': True})
         return {'tenant_uuids': tenant_uuids}
+
+
+def build_tenant():
+    tenant = Tenant.autodetect()
+    tenant_dao.find_or_create_tenant(tenant.uuid)
+    return tenant.uuid
