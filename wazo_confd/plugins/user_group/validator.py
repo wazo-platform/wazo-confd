@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -8,7 +8,9 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 
 class UserGroupAssociationValidator(ValidatorAssociation):
     def validate(self, user, groups):
-        self.validate_user_has_endpoint(user)
+        # if there is no group to associate to the user, lines are not required
+        if len(groups):
+            self.validate_user_has_endpoint(user)
         self.validate_no_duplicate_group(groups)
 
     def validate_user_has_endpoint(self, user):

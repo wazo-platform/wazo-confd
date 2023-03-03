@@ -258,7 +258,7 @@ class UserListItemSchema(UserSchemaNullable):
     groups = Nested('UserGroupSchema', many=True)
     switchboards = Nested('UserSwitchboardSchema', many=True)
     voicemail = Nested('UserVoicemailSchema', allow_none=True)
-    agent = Nested('UserAgentSchema')
+    agent = Nested('UserAgentSchema', allow_none=True)
     device_id = fields.String(validate=Length(max=255))
 
     @pre_load

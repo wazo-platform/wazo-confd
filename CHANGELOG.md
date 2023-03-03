@@ -2,7 +2,7 @@
 
 ## 23.04
 
-* PUT on `/users?recursive=true` updated, to provide a way to update lines, switchboards and agent for a specific user.
+* PUT on `/users?recursive=true` updated, to provide a way to update lines, switchboards, agent and voicemail for a specific user.
 
 ## 23.03
 
