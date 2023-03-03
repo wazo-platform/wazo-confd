@@ -459,7 +459,7 @@ class UserMiddleWare(ResourceMiddleware):
             ).associate_user_to_switchboards(str(user_id), switchboards, tenant_uuids)
 
             if voicemail:
-                if 'id' in voicemail:
+                if 'id' in voicemail and voicemail['id'] == user.voicemailid:
                     # update voicemail
                     self._middleware_handle.get('voicemail').update(
                         voicemail['id'], voicemail, tenant_uuids

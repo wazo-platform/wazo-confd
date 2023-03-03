@@ -9,7 +9,7 @@ from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssocia
 class UserGroupAssociationValidator(ValidatorAssociation):
     def validate(self, user, groups):
         # if there is no group to associate to the user, lines are not required
-        if len(groups):
+        if groups:
             self.validate_user_has_endpoint(user)
         self.validate_no_duplicate_group(groups)
 
