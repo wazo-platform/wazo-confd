@@ -47,6 +47,28 @@ class UserMiddleWare(ResourceMiddleware):
             line['device_id'] = device_id
         return line
 
+    def create_voicemail(self, user_model, voicemail, tenant_uuids):
+        user_voicemail_middleware = self._middleware_handle.get('user_voicemail')
+        voicemail_id = voicemail.get('id')
+        if voicemail_id:
+            voicemail_middleware = self._middleware_handle.get('voicemail')
+            user_voicemail_middleware.associate(
+                user_model.uuid, voicemail_id, tenant_uuids
+            )
+            voicemail = voicemail_middleware.get(voicemail_id, tenant_uuids)
+        else:
+            if not voicemail.get('name', None):
+                if user_model.lastname:
+                    voicemail['name'] = f"{user_model.firstname} {user_model.lastname}"
+                else:
+                    voicemail['name'] = user_model.firstname
+            voicemail = user_voicemail_middleware.create_voicemail(
+                user_model.uuid,
+                voicemail,
+                tenant_uuids,
+            )
+        return voicemail
+
     def create(self, body, tenant_uuid, tenant_uuids):
         forwards = body.pop('forwards', None) or []
         fallbacks = body.pop('fallbacks', None) or []
@@ -71,25 +93,7 @@ class UserMiddleWare(ResourceMiddleware):
         user_dict['switchboards'] = []
 
         if voicemail:
-            user_voicemail_middleware = self._middleware_handle.get('user_voicemail')
-            voicemail_id = voicemail.get('id')
-            if voicemail_id:
-                voicemail_middleware = self._middleware_handle.get('voicemail')
-                user_voicemail_middleware.associate(
-                    model.uuid, voicemail_id, tenant_uuids
-                )
-                voicemail = voicemail_middleware.get(voicemail_id, tenant_uuids)
-            else:
-                if not voicemail.get('name', None):
-                    if model.lastname:
-                        voicemail['name'] = f"{model.firstname} {model.lastname}"
-                    else:
-                        voicemail['name'] = model.firstname
-                voicemail = user_voicemail_middleware.create_voicemail(
-                    model.uuid,
-                    voicemail,
-                    tenant_uuids,
-                )
+            voicemail = self.create_voicemail(model, voicemail, tenant_uuids)
         user_dict['voicemail'] = voicemail
 
         if lines:
@@ -338,6 +342,7 @@ class UserMiddleWare(ResourceMiddleware):
             groups = form.pop('groups', None) or []
             lines = form.pop('lines', None) or []
             agent = form.pop('agent', None) or []
+            voicemail = form.pop('voicemail', None)
 
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
@@ -452,3 +457,19 @@ class UserMiddleWare(ResourceMiddleware):
             self._middleware_handle.get(
                 'switchboard_member'
             ).associate_user_to_switchboards(str(user_id), switchboards, tenant_uuids)
+
+            if voicemail:
+                if 'id' in voicemail and voicemail['id'] == user.voicemailid:
+                    # update voicemail
+                    self._middleware_handle.get('voicemail').update(
+                        voicemail['id'], voicemail, tenant_uuids
+                    )
+                else:
+                    # if existing voicemail attached
+                    if user.voicemailid:
+                        # detach voicemail and delete if not used by any other user
+                        self._middleware_handle.get('user_voicemail').delete_voicemail(
+                            user_id, tenant_uuids
+                        )
+
+                    self.create_voicemail(user, voicemail, tenant_uuids)

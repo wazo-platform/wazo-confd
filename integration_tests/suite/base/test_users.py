@@ -2216,3 +2216,68 @@ def test_update_agent_no_error(
     url = confd.agents(retrieved_user['agent']['id'])
     response = url.get()
     response.assert_status(404)
+
+
+def test_update_voicemail_field():
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT,
+    )
+    user_body = {
+        'voicemail': user_resources.voicemail,
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+
+    response.assert_created('users')
+    payload = response.item
+
+    url = confd.users(payload['uuid'])
+
+    payload['voicemail']['language'] = 'es_ES'
+    payload.pop('call_record_enabled', None)  # Deprecated field
+    url.put({**payload}, query_string="recursive=True")
+
+    assert_that(
+        confd.voicemails(payload['voicemail']['id']).get().item,
+        has_entries(language='es_ES'),
+    )
+
+    url.delete(recursive=True)
+
+
+@fixtures.voicemail()
+def test_update_voicemail_new_voicemail(new_voicemail):
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT,
+    )
+    user_body = {
+        'voicemail': user_resources.voicemail,
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+
+    response.assert_created('users')
+    payload = response.item
+
+    url = confd.users(payload['uuid'])
+
+    payload.pop('call_record_enabled', None)  # Deprecated field
+
+    url.put(
+        {
+            **payload,
+            'voicemail': {'id': new_voicemail['id']},
+        },
+        query_string="recursive=True",
+    )
+
+    assert_that(
+        confd.users(payload['uuid']).get().item,
+        has_entries(
+            voicemail=has_entries(
+                id=new_voicemail['id'],
+            )
+        ),
+    )
+
+    url.delete(recursive=True)
