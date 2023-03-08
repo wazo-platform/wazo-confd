@@ -224,7 +224,11 @@ class UserMiddleWare(ResourceMiddleware):
         user_dict['switchboards'] = switchboards
 
         if agent:
-            queues = agent['queues']
+            queues = None
+            try:
+                queues = agent['queues']
+            except KeyError:
+                pass
             created_agent = self._middleware_handle.get('agent').create(
                 agent, tenant_uuid, tenant_uuids
             )
