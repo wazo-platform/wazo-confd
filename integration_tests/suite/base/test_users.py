@@ -2281,3 +2281,80 @@ def test_update_voicemail_new_voicemail(new_voicemail):
     )
 
     url.delete(recursive=True)
+
+
+def test_update_incall_new_extension():
+    user_resources = generate_user_resources_bodies(
+        incall_context_name=INCALL_CONTEXT,
+    )
+    new_user_resources = generate_user_resources_bodies(
+        incall_context_name=INCALL_CONTEXT,
+    )
+    user_body = {
+        'incalls': [user_resources.incall],
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+    response.assert_created('users')
+
+    payload = response.item
+    url = confd.users(payload['uuid'])
+
+    payload.pop('call_record_enabled', None)  # Deprecated field
+
+    # update existing incall with a new extension
+    new_incall = user_resources.incall
+    new_incall['extensions'][0]['exten'] = new_user_resources.source_exten
+
+    url.put({**payload, "incalls": [new_incall]}, query_string="recursive=True")
+
+    # check the incall id is always the same
+    assert_that(
+        confd.users(payload['uuid']).get().item,
+        has_entries(
+            incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
+        ),
+    )
+
+    # check the new extension is associated to the incall
+    assert_that(
+        confd.incalls(payload['incalls'][0]['id']).get().item,
+        has_entries(
+            extensions=contains(has_entries(exten=new_user_resources.source_exten))
+        ),
+    )
+    url.delete(recursive=True)
+
+
+def test_update_incall_new_incall():
+    user_resources = generate_user_resources_bodies(
+        incall_context_name=INCALL_CONTEXT,
+    )
+    user_body = {
+        'incalls': [user_resources.incall],
+        **user_resources.user,
+    }
+    response = confd.users.post(user_body)
+    response.assert_created('users')
+
+    payload = response.item
+    url = confd.users(payload['uuid'])
+
+    payload.pop('call_record_enabled', None)  # Deprecated field
+
+    new_user_resources = generate_user_resources_bodies(
+        incall_context_name=INCALL_CONTEXT,
+    )
+
+    # replace existing incall with a new incall
+    new_incall = new_user_resources.incall
+    url.put({**payload, "incalls": [new_incall]}, query_string="recursive=True")
+
+    # check the incall id is a new one
+    assert_that(
+        confd.users(payload['uuid']).get().item,
+        has_entries(
+            incalls=contains(has_entries(id=is_not(payload['incalls'][0]['id']))),
+        ),
+    )
+    url.delete(recursive=True)

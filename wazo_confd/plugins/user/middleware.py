@@ -69,6 +69,63 @@ class UserMiddleWare(ResourceMiddleware):
             )
         return voicemail
 
+    def create_or_get(self, extension_body, tenant_uuids):
+        try:
+            extension = self._middleware_handle.get('extension').create(
+                extension_body, tenant_uuids
+            )
+        except ResourceError as e:
+            if str(e).startswith('Resource Error - Extension already exists'):
+                extension = self._middleware_handle.get('extension').get_by(
+                    exten=extension_body['exten'],
+                    context=extension_body['context'],
+                    tenant_uuids=tenant_uuids,
+                )
+            else:
+                raise e
+        return extension
+
+    def update_incall(self, user_id, incall, tenant_uuids):
+        if incall['destination']['type'] == 'none':
+            incall['destination'] = {'type': 'user', 'user_id': user_id}
+            self._middleware_handle.get('incall').update(
+                incall['id'], incall, tenant_uuids
+            )
+
+        elif (
+            incall['destination']['type'] != 'user'
+            or incall['destination']['user_id'] != user_id
+        ):
+            raise InputError(
+                "Existing incall does not have the new user as a destination"
+            )
+
+    def update_context(self, context_name, extension_number, tenant_uuids):
+        existing_context = self._middleware_handle.get('context').get(
+            tenant_uuids=tenant_uuids, name=context_name
+        )
+        if existing_context['type'] != 'incall':
+            raise InputError(
+                "Context associated to the extension is not of type 'incall'"
+            )
+        # verify range, if no existing range-> create one
+        range_found = False
+        for r in existing_context['incall_ranges']:
+            if r['start'] <= extension_number <= r['end']:
+                range_found = True
+                break
+        if not range_found:
+            existing_context['incall_ranges'].append(
+                {
+                    'start': extension_number,
+                    'end': extension_number,
+                    'did_length': len(extension_number),
+                }
+            )
+            self._middleware_handle.get('context').update(
+                existing_context['id'], existing_context, tenant_uuids
+            )
+
     def create(self, body, tenant_uuid, tenant_uuids):
         forwards = body.pop('forwards', None) or []
         fallbacks = body.pop('fallbacks', None) or []
@@ -105,32 +162,6 @@ class UserMiddleWare(ResourceMiddleware):
 
             Session.expire(model, ['user_lines'])
 
-        def process_context(context_name, extension_number):
-            existing_context = self._middleware_handle.get('context').get(
-                tenant_uuids=tenant_uuids, name=context_name
-            )
-            if existing_context['type'] != 'incall':
-                raise InputError(
-                    "Context associated to the extension is not of type 'incall'"
-                )
-            # verify range, if no existing range-> create one
-            range_found = False
-            for r in existing_context['incall_ranges']:
-                if r['start'] <= extension_number <= r['end']:
-                    range_found = True
-                    break
-            if not range_found:
-                existing_context['incall_ranges'].append(
-                    {
-                        'start': extension_number,
-                        'end': extension_number,
-                        'did_length': len(extension_number),
-                    }
-                )
-                self._middleware_handle.get('context').update(
-                    existing_context['id'], existing_context, tenant_uuids
-                )
-
         def process_incall(extension_id, user_id, incall_id=None):
             if not incall_id:
                 incall = self._middleware_handle.get('incall').create(
@@ -140,20 +171,7 @@ class UserMiddleWare(ResourceMiddleware):
                 incall = self._middleware_handle.get('incall').get(
                     incall_id, tenant_uuids
                 )
-
-                if incall['destination']['type'] == 'none':
-                    incall['destination'] = {'type': 'user', 'user_id': user_id}
-                    self._middleware_handle.get('incall').update(
-                        incall_id, incall, tenant_uuids
-                    )
-
-                elif (
-                    incall['destination']['type'] != 'user'
-                    or incall['destination']['user_id'] != user_id
-                ):
-                    raise InputError(
-                        "Existing incall does not have the new user as a destination"
-                    )
+                self.update_incall(user_id, incall, tenant_uuids)
 
             self._middleware_handle.get('incall_extension_association').associate(
                 incall['id'], extension_id, tenant_uuids
@@ -172,23 +190,11 @@ class UserMiddleWare(ResourceMiddleware):
                         raise InputError("Extension not found")
 
                 else:
-                    try:
-                        extension = self._middleware_handle.get('extension').create(
-                            extension_body, tenant_uuids
-                        )
-                    except ResourceError as e:
-                        if str(e).startswith(
-                            'Resource Error - Extension already exists'
-                        ):
-                            extension = self._middleware_handle.get('extension').get_by(
-                                exten=extension_body['exten'],
-                                context=extension_body['context'],
-                                tenant_uuids=tenant_uuids,
-                            )
-                        else:
-                            raise e
+                    extension = self.create_or_get(extension_body, tenant_uuids)
 
-                process_context(extension['context'], extension['exten'])
+                self.update_context(
+                    extension['context'], extension['exten'], tenant_uuids
+                )
 
                 incall = process_incall(
                     extension['id'],
@@ -332,6 +338,100 @@ class UserMiddleWare(ResourceMiddleware):
                 if e.response.status_code != HTTPStatus.NOT_FOUND:
                     raise e
 
+    def update_incalls(self, user, incalls, tenant_uuid, tenant_uuids):
+        def create_or_update_incall(incall_id, incall_body, user_id, tenant_uuid):
+            if incall_id:
+                # update incall
+                self.update_incall(user_id, incall_body, tenant_uuids)
+                return None
+            else:
+                # new_incall=create incall
+                new_incall = self._middleware_handle.get('incall').create(
+                    {
+                        **incall_body,
+                        'destination': {'type': 'user', 'user_id': user_id},
+                    },
+                    tenant_uuid,
+                )
+                return new_incall
+
+        def create_or_update_extension(extension_id, extension_body, tenant_uuids):
+            if extension_id:
+                # update extension
+                self._middleware_handle.get('extension').update(
+                    extension_id, extension_body, tenant_uuids
+                )
+                return None
+            else:
+                # new_extension=create extension
+                new_extension = self.create_or_get(extension_body, tenant_uuids)
+                return new_extension
+
+        existing_incalls_ids = {}
+        existing_extensions_ids = {}
+        # dissociate all existing incalls / extensions
+        for i in user.incalls:
+            existing_incalls_ids[i.id] = None
+            for e in i.extensions:
+                existing_extensions_ids[e.id] = None
+                self._middleware_handle.get('incall_extension_association').dissociate(
+                    i.id, e.id, tenant_uuids
+                )
+
+        for incall_body in incalls:
+            incall_id = incall_body.get('id', None)
+            new_incall = create_or_update_incall(
+                incall_id, incall_body, user.id, tenant_uuid
+            )
+
+            for extension_body in incall_body['extensions']:
+                extension_id = extension_body.get('id', None)
+                new_extension = create_or_update_extension(
+                    extension_id, extension_body, tenant_uuids
+                )
+
+                if new_extension:
+                    if new_incall:
+                        # associate new incall and new extension
+                        self._middleware_handle.get(
+                            'incall_extension_association'
+                        ).associate(new_incall['id'], new_extension['id'], tenant_uuids)
+                    else:
+                        # as there is a new extension, context should be updated
+                        self.update_context(
+                            new_extension['context'],
+                            new_extension['exten'],
+                            tenant_uuids,
+                        )
+                        # associate old incall and new extension
+                        self._middleware_handle.get(
+                            'incall_extension_association'
+                        ).associate(incall_id, new_extension['id'], tenant_uuids)
+                else:
+                    if new_incall:
+                        # associate new incall and old extension
+                        self._middleware_handle.get(
+                            'incall_extension_association'
+                        ).associate(new_incall['id'], extension_id, tenant_uuids)
+
+                # the extension has been processed, so removed from the list
+                if extension_id in existing_extensions_ids:
+                    del existing_extensions_ids[extension_id]
+
+            # the incall has been processed, so removed from the list
+            if incall_id in existing_incalls_ids:
+                del existing_incalls_ids[incall_id]
+
+        # all the incalls (that have not been processed previously)
+        # are not used anymore so can be removed
+        for i in existing_incalls_ids:
+            self._middleware_handle.get('incall').delete(i, tenant_uuids)
+
+        # all the extensions (that have not been processed previously)
+        # are not used anymore so can be removed
+        for e in existing_extensions_ids:
+            self._middleware_handle.get('extension').delete(e, tenant_uuids)
+
     def update(self, user_id, body, tenant_uuid, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
         if not recursive:
@@ -347,6 +447,7 @@ class UserMiddleWare(ResourceMiddleware):
             lines = form.pop('lines', None) or []
             agent = form.pop('agent', None) or []
             voicemail = form.pop('voicemail', None)
+            incalls = form.pop('incalls', None) or []
 
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
@@ -477,3 +578,5 @@ class UserMiddleWare(ResourceMiddleware):
                         )
 
                     self.create_voicemail(user, voicemail, tenant_uuids)
+
+            self.update_incalls(user, incalls, tenant_uuid, tenant_uuids)
