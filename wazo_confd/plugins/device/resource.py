@@ -5,9 +5,8 @@ from flask import request, url_for
 from xivo.tenant_flask_helpers import Tenant
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource, ConfdResource
+from wazo_confd.helpers.restful import ListResource, ItemResource, ConfdResource, build_tenant
 from wazo_confd.plugins.device.model import Device
-from xivo_dao import tenant_dao
 
 from .schema import DeviceSchema
 
@@ -64,9 +63,8 @@ class UnallocatedDeviceItem(SingleTenantConfdResource):
 
     @required_acl('confd.devices.unallocated.{id}.update')
     def put(self, id):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
-        self._middleware.assign_tenant(id, tenant.uuid)
+        tenant_uuid = build_tenant()
+        self._middleware.assign_tenant(id, tenant_uuid)
         return '', 204
 
 
@@ -79,9 +77,8 @@ class DeviceItem(SingleTenantMixin, ItemResource):
 
     @required_acl('confd.devices.{id}.read')
     def get(self, id):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
-        return self._middleware.get(id, tenant.uuid)
+        tenant_uuid = build_tenant()
+        return self._middleware.get(id, tenant_uuid)
 
     @required_acl('confd.devices.{id}.update')
     def put(self, id):
@@ -98,9 +95,8 @@ class DeviceAutoprov(SingleTenantConfdResource):
 
     @required_acl('confd.devices.{id}.autoprov.read')
     def get(self, id):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
-        self._middleware.reset_autoprov(id, tenant.uuid)
+        tenant_uuid = build_tenant()
+        self._middleware.reset_autoprov(id, tenant_uuid)
         return ('', 204)
 
 

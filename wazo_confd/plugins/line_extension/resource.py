@@ -2,11 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
-from xivo.tenant_flask_helpers import Tenant
-from xivo_dao import tenant_dao
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ConfdResource, ListResource
+from wazo_confd.helpers.restful import ConfdResource, ListResource, build_tenant
 
 
 class LineExtensionItem(ConfdResource):
@@ -18,10 +16,9 @@ class LineExtensionItem(ConfdResource):
 
     @required_acl('confd.lines.{line_id}.extensions.{extension_id}.delete')
     def delete(self, line_id, extension_id):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.dissociate(line_id, extension_id, tenant.uuid, tenant_uuids)
+        self._middleware.dissociate(line_id, extension_id, tenant_uuid, tenant_uuids)
         return '', 204
 
     @required_acl('confd.lines.{line_id}.extensions.{extension_id}.update')

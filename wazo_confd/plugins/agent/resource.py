@@ -3,12 +3,10 @@
 
 from flask import url_for, request
 
-from xivo_dao import tenant_dao
 from xivo_dao.alchemy.agentfeatures import AgentFeatures as Agent
-from xivo.tenant_flask_helpers import Tenant
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant
 
 from .schema import AgentSchema, AgentSchemaPUT
 
@@ -26,11 +24,10 @@ class AgentList(ListResource):
 
     @required_acl('confd.agents.create')
     def post(self):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
+        tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
         resource = self._middleware.create(
-            request.get_json(), tenant.uuid, tenant_uuids
+            request.get_json(), tenant_uuid, tenant_uuids
         )
         return resource, 201, self.build_headers(resource)
 
