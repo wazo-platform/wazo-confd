@@ -6,7 +6,12 @@ from flask import url_for, request
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant, is_recursive
+from wazo_confd.helpers.restful import (
+    ListResource,
+    ItemResource,
+    build_tenant,
+    is_recursive,
+)
 
 from .schema import (
     UserDirectorySchema,
