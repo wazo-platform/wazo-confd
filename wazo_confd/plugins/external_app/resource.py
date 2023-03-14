@@ -3,12 +3,10 @@
 
 from flask import url_for, request
 
-from xivo.tenant_flask_helpers import Tenant
-from xivo_dao import tenant_dao
 from xivo_dao.alchemy.external_app import ExternalApp
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant
 
 from .schema import ExternalAppSchema, ExternalAppNameSchema
 
@@ -35,9 +33,8 @@ class ExternalAppItem(ItemResource):
         return {'Location': url_for('external_apps', name=app.name, _external=True)}
 
     def add_tenant_to_form(self, form):
-        tenant = Tenant.autodetect()
-        tenant_dao.find_or_create_tenant(tenant.uuid)
-        form['tenant_uuid'] = tenant.uuid
+        tenant_uuid = build_tenant()
+        form['tenant_uuid'] = tenant_uuid
         return form
 
     @required_acl('confd.external.apps.{name}.create')

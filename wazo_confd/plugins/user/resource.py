@@ -6,7 +6,12 @@ from flask import url_for, request
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant
+from wazo_confd.helpers.restful import (
+    ListResource,
+    ItemResource,
+    build_tenant,
+    is_recursive,
+)
 
 from .schema import (
     UserDirectorySchema,
@@ -74,9 +79,7 @@ class UserItem(ItemResource):
             request.get_json(),
             tenant_uuid,
             tenant_uuids,
-            recursive=request.args.get(
-                'recursive', default=False, type=lambda v: v.lower() == 'true'
-            ),
+            recursive=is_recursive(),
         )
         return '', 204
 
@@ -88,8 +91,6 @@ class UserItem(ItemResource):
             id,
             tenant_uuid,
             tenant_uuids,
-            recursive=request.args.get(
-                'recursive', default=False, type=lambda v: v.lower() == 'true'
-            ),
+            recursive=is_recursive(),
         )
         return '', 204

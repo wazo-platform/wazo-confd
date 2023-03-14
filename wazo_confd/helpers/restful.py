@@ -162,3 +162,9 @@ def build_tenant():
     tenant = Tenant.autodetect()
     tenant_dao.find_or_create_tenant(tenant.uuid)
     return tenant.uuid
+
+
+def is_recursive():
+    return request.args.get(
+        'recursive', default=False, type=lambda v: v.lower() == 'true'
+    )
