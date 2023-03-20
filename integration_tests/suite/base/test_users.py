@@ -1686,6 +1686,7 @@ def test_post_delete_minimalistic_user_with_device_on_subtenant_no_error(
         device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
     )
 
+
 def test_post_delete_minimalistic_user_with_non_existing_device_id_error():
     user_resources = generate_user_resources_bodies(
         context_name=CONTEXT, device={'id': 'my_device'}

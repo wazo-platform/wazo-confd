@@ -36,7 +36,9 @@ class UserMiddleWare(ResourceMiddleware):
             if e is not NotFoundError:
                 try:
                     # check if the device is on the current tenant
-                    self._middleware_handle.get('device').get(device_id, tenant_uuid=tenant_uuid)
+                    self._middleware_handle.get('device').get(
+                        device_id, tenant_uuid=tenant_uuid
+                    )
                 except Exception as e:
                     # if the device is not on the current tenant
                     if e is not NotFoundError:
