@@ -32,8 +32,17 @@ class UserMiddleWare(ResourceMiddleware):
         try:
             self._middleware_handle.get('device').assign_tenant(device_id, tenant_uuid)
         except Exception as e:
+            # if not found => the device is not on the master tenant
             if e is not NotFoundError:
-                raise e
+                try:
+                    # check if the device is on the current tenant
+                    self._middleware_handle.get('device').get(
+                        device_id, tenant_uuid=tenant_uuid
+                    )
+                except Exception as e:
+                    # if the device is not on the current tenant
+                    if e is not NotFoundError:
+                        raise e
         self._middleware_handle.get('line_device_association').associate(
             line['id'], device_id, tenant_uuid, tenant_uuids
         )
