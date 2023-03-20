@@ -777,10 +777,12 @@ definitions:
               - external_api
       forwards:
         $ref: '#/definitions/UserForwards'
-        description: The forwards for the user
+        description: The forwards related to the user
       fallbacks:
         $ref: '#/definitions/UserFallbacks'
+        description: The fallbacks related to the user
       agent:
+        description: The agent related to the user
         $ref: '#/definitions/UserRelationAgent'
     allOf:
     - $ref: '#/definitions/UserPostRelationIncalls'
