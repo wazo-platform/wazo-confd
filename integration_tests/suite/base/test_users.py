@@ -1628,6 +1628,64 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
     )
 
 
+@fixtures.device(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT, name='default2')
+def test_post_delete_minimalistic_user_with_device_on_subtenant_no_error(
+    device, context
+):
+    user_resources = generate_user_resources_bodies(
+        context_name=context['name'], device=device
+    )
+
+    response = confd.users.post(
+        {
+            'lines': [user_resources.line],
+            **user_resources.user,
+        },
+        wazo_tenant=SUB_TENANT,
+    )
+
+    response.assert_created('users')
+    payload = response.item
+
+    # check if the returned data contains the device_id
+    assert_that(
+        payload,
+        has_entries(
+            uuid=uuid_(),
+            lines=contains(
+                has_entries(
+                    device_id=device['id'],
+                )
+            ),
+            **user_resources.user,
+        ),
+    )
+
+    # retrieve the line (created before) and check if the device is associated to the line
+    assert_that(
+        confd.lines(payload['lines'][0]['id']).get().item,
+        has_entries(device_id=device['id']),
+    )
+
+    # retrieve the device (created as an unallocated device) and check if its tenant is
+    # now the user tenant
+    assert_that(
+        confd.devices(device['id']).get().item,
+        has_entries(tenant_uuid=SUB_TENANT),
+    )
+
+    # user deletion
+    response = confd.users(response.item['uuid']).delete(recursive=True)
+    response.assert_deleted()
+
+    # retrieve the device (previously created as an unallocated device)
+    # and check if its tenant is always the user tenant and if status=autoprov
+    device_cfg = provd.devices.get(device['id'])
+    assert_that(
+        device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
+    )
+
 def test_post_delete_minimalistic_user_with_non_existing_device_id_error():
     user_resources = generate_user_resources_bodies(
         context_name=CONTEXT, device={'id': 'my_device'}
