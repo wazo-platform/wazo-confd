@@ -2417,3 +2417,59 @@ def test_update_incall_new_incall():
         ),
     )
     url.delete(recursive=True)
+
+
+@fixtures.device()
+@fixtures.device()
+def test_post_lines_same_unallocated_device_no_error(device, device2):
+    user_resources = generate_user_resources_bodies(context_name=CONTEXT, device=device)
+
+    # define another line with the same extension
+    line2 = {
+        'context': CONTEXT,
+        'extensions': [user_resources.extension],
+        'endpoint_sip': {'name': s.random_string(5)},
+    }
+    line2['device_id'] = device2['id']
+
+    # user creation with 2 lines
+    response = confd.users.post(
+        {
+            'lines': [user_resources.line, line2],
+            **user_resources.user,
+        }
+    )
+
+    response.assert_created('users')
+    payload = response.item
+
+    # check if the returned data contains the device_id
+    assert_that(
+        payload,
+        has_entries(
+            uuid=uuid_(),
+            lines=contains_inanyorder(
+                has_entries(
+                    device_id=device['id'],
+                ),
+                has_entries(
+                    device_id=device2['id'],
+                ),
+            ),
+            **user_resources.user,
+        ),
+    )
+
+    # retrieve the lines (created before) and check if the device is associated to the line
+    assert_that(
+        confd.lines(payload['lines'][0]['id']).get().item,
+        has_entries(device_id=device['id']),
+    )
+    assert_that(
+        confd.lines(payload['lines'][1]['id']).get().item,
+        has_entries(device_id=device2['id']),
+    )
+
+    # user deletion
+    response = confd.users(response.item['uuid']).delete(recursive=True)
+    response.assert_deleted()
