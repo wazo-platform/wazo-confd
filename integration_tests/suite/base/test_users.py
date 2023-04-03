@@ -2465,6 +2465,5 @@ def test_post_lines_same_extension_no_error(device, device2):
         has_entries(extensions=contains(has_entries(exten=exten))),
     )
 
-    # user deletion
     response = confd.users(response.item['uuid']).delete(recursive=True)
     response.assert_deleted()
