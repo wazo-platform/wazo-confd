@@ -2421,7 +2421,7 @@ def test_update_incall_new_incall():
 
 @fixtures.device()
 @fixtures.device()
-def test_post_lines_same_unallocated_device_no_error(device, device2):
+def test_post_lines_same_extension_no_error(device, device2):
     user_resources = generate_user_resources_bodies(context_name=CONTEXT, device=device)
 
     # define another line with the same extension
@@ -2432,12 +2432,8 @@ def test_post_lines_same_unallocated_device_no_error(device, device2):
     }
     line2['device_id'] = device2['id']
 
-    # user creation with 2 lines
     response = confd.users.post(
-        {
-            'lines': [user_resources.line, line2],
-            **user_resources.user,
-        }
+        lines=[user_resources.line, line2], **user_resources.user
     )
 
     response.assert_created('users')
