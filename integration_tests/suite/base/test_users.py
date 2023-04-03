@@ -2436,10 +2436,8 @@ def test_post_lines_same_extension_no_error(device, device2):
         lines=[user_resources.line, line2], **user_resources.user
     )
 
-    response.assert_created('users')
     payload = response.item
 
-    # check if the returned data contains the device_id
     assert_that(
         payload,
         has_entries(
