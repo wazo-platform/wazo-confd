@@ -2438,30 +2438,31 @@ def test_post_lines_same_extension_no_error(device, device2):
 
     payload = response.item
 
+    exten = user_resources.extension['exten']
+
     assert_that(
         payload,
         has_entries(
             uuid=uuid_(),
-            lines=contains_inanyorder(
+            lines=contains(
                 has_entries(
-                    device_id=device['id'],
+                    extensions=contains(has_entries(exten=exten)),
                 ),
                 has_entries(
-                    device_id=device2['id'],
+                    extensions=contains(has_entries(exten=exten)),
                 ),
             ),
             **user_resources.user,
         ),
     )
 
-    # retrieve the lines (created before) and check if the device is associated to the line
     assert_that(
         confd.lines(payload['lines'][0]['id']).get().item,
-        has_entries(device_id=device['id']),
+        has_entries(extensions=contains(has_entries(exten=exten))),
     )
     assert_that(
         confd.lines(payload['lines'][1]['id']).get().item,
-        has_entries(device_id=device2['id']),
+        has_entries(extensions=contains(has_entries(exten=exten))),
     )
 
     # user deletion
