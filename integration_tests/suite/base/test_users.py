@@ -2417,3 +2417,53 @@ def test_update_incall_new_incall():
         ),
     )
     url.delete(recursive=True)
+
+
+@fixtures.device()
+@fixtures.device()
+def test_post_lines_same_extension_no_error(device, device2):
+    user_resources = generate_user_resources_bodies(context_name=CONTEXT, device=device)
+
+    # define another line with the same extension
+    line2 = {
+        'context': CONTEXT,
+        'extensions': [user_resources.extension],
+        'endpoint_sip': {'name': s.random_string(5)},
+    }
+    line2['device_id'] = device2['id']
+
+    response = confd.users.post(
+        lines=[user_resources.line, line2], **user_resources.user
+    )
+
+    payload = response.item
+
+    exten = user_resources.extension['exten']
+
+    assert_that(
+        payload,
+        has_entries(
+            uuid=uuid_(),
+            lines=contains(
+                has_entries(
+                    extensions=contains(has_entries(exten=exten)),
+                ),
+                has_entries(
+                    extensions=contains(has_entries(exten=exten)),
+                ),
+            ),
+            **user_resources.user,
+        ),
+    )
+
+    assert_that(
+        confd.lines(payload['lines'][0]['id']).get().item,
+        has_entries(extensions=contains(has_entries(exten=exten))),
+    )
+    assert_that(
+        confd.lines(payload['lines'][1]['id']).get().item,
+        has_entries(extensions=contains(has_entries(exten=exten))),
+    )
+
+    response = confd.users(response.item['uuid']).delete(recursive=True)
+    response.assert_deleted()

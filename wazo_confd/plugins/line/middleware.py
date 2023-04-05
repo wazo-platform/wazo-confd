@@ -3,7 +3,7 @@
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.helpers.exception import InputError
+from xivo_dao.helpers.exception import InputError, ResourceError
 
 from .schema import LineSchemaNullable, LinePutSchema, LineListSchema
 from ...middleware import ResourceMiddleware
@@ -14,6 +14,22 @@ class LineMiddleWare(ResourceMiddleware):
         super().__init__(service, LineSchemaNullable(), update_schema=LineListSchema())
         self._update_schema_recursive = LinePutSchema()
         self._middleware_handle = middleware_handle
+
+    def create_or_get(self, extension_body, tenant_uuids):
+        try:
+            extension = self._middleware_handle.get('extension').create(
+                extension_body, tenant_uuids
+            )
+        except ResourceError as e:
+            if str(e).startswith('Resource Error - Extension already exists'):
+                extension = self._middleware_handle.get('extension').get_by(
+                    exten=extension_body['exten'],
+                    context=extension_body['context'],
+                    tenant_uuids=tenant_uuids,
+                )
+            else:
+                raise e
+        return extension
 
     def create(self, body, tenant_uuid, tenant_uuids):
         form = self._schema.load(body)
@@ -82,11 +98,8 @@ class LineMiddleWare(ResourceMiddleware):
         extensions = []
         for extension_body in extension_bodies:
             line_extension_middleware = self._middleware_handle.get('line_extension')
-            extension = line_extension_middleware.create_extension(
-                model.id,
-                extension_body,
-                tenant_uuids,
-            )
+            extension = self.create_or_get(extension_body, tenant_uuids)
+            line_extension_middleware.associate(model.id, extension['id'], tenant_uuids)
             extensions.append(extension)
 
         updated_model = self._service.get(model.id)
