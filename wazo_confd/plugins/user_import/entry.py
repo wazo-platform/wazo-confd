@@ -1,18 +1,33 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
+
+from typing import TypedDict, TYPE_CHECKING
 
 from xivo_dao.helpers import errors
 
 from .constants import VALID_ENDPOINT_TYPES
 
+if TYPE_CHECKING:
+    from .csvparse import CsvRow
+
+
+class UserDict(TypedDict):
+    uuid: str
+    # first/last name are two words...
+    firstname: str
+    lastname: str
+    username: str
+    emails: list[str]
+
 
 class Entry:
-    def __init__(self, number, entry_dict):
+    def __init__(self, number: int, entry_dict):
         self.number = number
         self.entry_dict = entry_dict
         self.context = None
         self.user = None
-        self.wazo_user = None  # will be a dictionnary instead of sql object
+        self.wazo_user: UserDict | None = None
         self.voicemail = None
         self.line = None
         self.sip = None
@@ -87,7 +102,7 @@ class EntryCreator:
     def __init__(self, creators):
         self.creators = creators
 
-    def create(self, row, tenant_uuid):
+    def create(self, row: CsvRow, tenant_uuid: str) -> Entry:
         entry_dict = row.parse()
         entry = Entry(row.position, entry_dict)
         entry.find('context', self.creators['context'], tenant_uuid)
