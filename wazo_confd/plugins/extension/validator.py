@@ -196,7 +196,7 @@ class ExtensionAssociationValidator(Validator):
         if extension.parking_lot:
             raise errors.resource_associated(
                 'Extension',
-                'conference',
+                'parking_lot',
                 extension_id=extension.id,
                 associated_id=extension.parking_lot.id,
             )
@@ -213,7 +213,7 @@ class ExtensionAssociationValidator(Validator):
             if len(extension.lines) == 1:
                 raise errors.resource_associated(
                     'Extension',
-                    'lines',
+                    'line',
                     extension_id=extension.id,
                     associated_id=extension.lines[0].id,
                 )
