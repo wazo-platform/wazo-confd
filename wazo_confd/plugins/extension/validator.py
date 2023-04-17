@@ -222,7 +222,7 @@ class ExtensionAssociationValidator(Validator):
                     'Extension',
                     'lines',
                     extension_id=extension.id,
-                    associated_ids=[l.id for l in extension.lines],
+                    associated_ids=[line.id for line in extension.lines],
                 )
 
         if extension.incall:
