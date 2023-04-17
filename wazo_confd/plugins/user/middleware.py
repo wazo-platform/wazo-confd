@@ -95,7 +95,7 @@ class UserMiddleWare(ResourceMiddleware):
         return extension
 
     def update_incall(self, user_id, incall, tenant_uuids):
-        if incall['destination']['type'] == 'none':
+        if 'destination' not in incall or incall['destination']['type'] == 'none':
             incall['destination'] = {'type': 'user', 'user_id': user_id}
             self._middleware_handle.get('incall').update(
                 incall['id'], incall, tenant_uuids
@@ -324,9 +324,15 @@ class UserMiddleWare(ResourceMiddleware):
                     self._middleware_handle.get(
                         'incall_extension_association'
                     ).dissociate(incall.id, extension.id, tenant_uuids)
-                    self._middleware_handle.get('extension').delete(
-                        extension.id, tenant_uuids
-                    )
+                    try:
+                        self._middleware_handle.get('extension').delete(
+                            extension.id, tenant_uuids
+                        )
+                    except ResourceError as e:
+                        if not str(e).startswith(
+                            'Resource Error - Extension is associated'
+                        ):
+                            raise e
                 self._middleware_handle.get('incall').delete(incall.id, tenant_uuids)
 
             for switchboard in user.switchboards:
@@ -439,7 +445,11 @@ class UserMiddleWare(ResourceMiddleware):
         # all the extensions (that have not been processed previously)
         # are not used anymore so can be removed
         for e in existing_extensions_ids:
-            self._middleware_handle.get('extension').delete(e, tenant_uuids)
+            try:
+                self._middleware_handle.get('extension').delete(e, tenant_uuids)
+            except ResourceError as e:
+                if not str(e).startswith('Resource Error - Extension is associated'):
+                    raise e
 
     def update(self, user_id, body, tenant_uuid, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)

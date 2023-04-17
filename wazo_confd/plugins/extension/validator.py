@@ -185,6 +185,70 @@ class ExtensionAssociationValidator(Validator):
                 associated_id=typeval,
             )
 
+        if extension.conference:
+            raise errors.resource_associated(
+                'Extension',
+                'conference',
+                extension_id=extension.id,
+                associated_id=extension.conference.id,
+            )
+
+        if extension.parking_lot:
+            raise errors.resource_associated(
+                'Extension',
+                'conference',
+                extension_id=extension.id,
+                associated_id=extension.parking_lot.id,
+            )
+
+        if extension.group:
+            raise errors.resource_associated(
+                'Extension',
+                'group',
+                extension_id=extension.id,
+                associated_id=extension.group.id,
+            )
+
+        if extension.lines:
+            if len(extension.lines) == 1:
+                raise errors.resource_associated(
+                    'Extension',
+                    'lines',
+                    extension_id=extension.id,
+                    associated_id=extension.lines[0].id,
+                )
+            else:
+                raise errors.resource_associated(
+                    'Extension',
+                    'lines',
+                    extension_id=extension.id,
+                    associated_ids=[l.id for l in extension.lines],
+                )
+
+        if extension.incall:
+            raise errors.resource_associated(
+                'Extension',
+                'incall',
+                extension_id=extension.id,
+                associated_id=extension.incall.id,
+            )
+
+        if extension.outcall:
+            raise errors.resource_associated(
+                'Extension',
+                'outcall',
+                extension_id=extension.id,
+                associated_id=extension.outcall.id,
+            )
+
+        if extension.queue:
+            raise errors.resource_associated(
+                'Extension',
+                'queue',
+                extension_id=extension.id,
+                associated_id=extension.queue.id,
+            )
+
 
 def build_validator():
     return ValidationGroup(

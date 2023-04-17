@@ -1,6 +1,6 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
+from xivo_dao.helpers.exception import ResourceError
 from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
@@ -37,4 +37,8 @@ class LineExtensionMiddleware:
         self.dissociate(
             line_id, extension_id, tenant_uuid, tenant_uuids, reset_autoprov=True
         )
-        extension_middleware.delete(extension_id, tenant_uuids)
+        try:
+            extension_middleware.delete(extension_id, tenant_uuids)
+        except ResourceError as e:
+            if not str(e).startswith('Resource Error - Extension is associated'):
+                raise e

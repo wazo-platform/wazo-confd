@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -129,6 +129,7 @@ def test_associate_line_and_create_extension(line):
             response.item['extensions'], contains(has_entries({'id': extension['id']}))
         )
     finally:
+        confd.lines(line['id']).extensions(extension['id']).delete()
         confd.extensions(extension['id']).delete().assert_deleted()
 
 
@@ -161,6 +162,7 @@ def test_extension_create_multi_tenant(context, line_one, line_two, line_three):
     try:
         assert_that(extension['tenant_uuid'], equal_to(SUB_TENANT))
     finally:
+        confd.lines(line_one['id']).extensions(extension['id']).delete()
         confd.extensions(extension['id']).delete().assert_deleted()
 
     response = confd.lines(line_two['id']).extensions.post(
@@ -345,7 +347,7 @@ def test_dissociate_not_associated(line, extension):
 def test_delete_extension_associated_to_line(line, extension):
     with a.line_extension(line, extension, check=False):
         response = confd.extensions(extension['id']).delete()
-        response.assert_deleted()
+        response.assert_status(400)
 
 
 @fixtures.line_sip()
