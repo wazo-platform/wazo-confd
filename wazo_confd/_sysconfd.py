@@ -1,4 +1,4 @@
-# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
@@ -12,7 +12,7 @@ class SysconfdError(Exception):
         self.value = value
 
     def __str__(self):
-        return "sysconfd error: status {} - {}".format(self.code, self.value)
+        return f"sysconfd error: status {self.code} - {self.value}"
 
 
 class SysconfdPublisher:
@@ -45,36 +45,36 @@ class SysconfdPublisher:
             'new_mailbox': number,
             'new_context': context,
         }
-        url = "{}/move_voicemail".format(self.base_url)
+        url = f"{self.base_url}/move_voicemail"
         self.add_request('GET', url, params=params)
 
     def delete_voicemail(self, number, context):
         params = {'mailbox': number, 'context': context}
-        url = "{}/delete_voicemail".format(self.base_url)
+        url = f"{self.base_url}/delete_voicemail"
         self.add_request('GET', url, params=params)
 
     def commonconf_apply(self):
-        url = "{}/commonconf_apply".format(self.base_url)
+        url = f"{self.base_url}/commonconf_apply"
         self.add_request('GET', url)
 
     def commonconf_generate(self):
-        url = "{}/commonconf_generate".format(self.base_url)
+        url = f"{self.base_url}/commonconf_generate"
         self.add_request('POST', url, json={})
 
     def set_hosts(self, hostname, domain):
         data = {'hostname': hostname, 'domain': domain}
-        url = "{}/hosts".format(self.base_url)
+        url = f"{self.base_url}/hosts"
         self.add_request('POST', url, json=data)
 
     def set_resolvconf(self, nameserver, domain):
         data = {'nameservers': nameserver, 'search': [domain]}
-        url = "{}/resolv_conf".format(self.base_url)
+        url = f"{self.base_url}/resolv_conf"
         self.add_request('POST', url, json=data)
         self.flush()
 
     def service_action(self, service_name, action):
         data = {service_name: action}
-        url = "{}/services".format(self.base_url)
+        url = f"{self.base_url}/services"
         self.add_request('POST', url, json=data)
 
     def restart_provd(self):
@@ -84,26 +84,26 @@ class SysconfdPublisher:
         self.service_action('wazo-phoned', 'restart')
 
     def dhcpd_update(self):
-        url = "{}/dhcpd_update".format(self.base_url)
+        url = f"{self.base_url}/dhcpd_update"
         self.add_request('GET', url)
 
     def xivo_service_start(self):
         data = {'wazo-service': 'start'}
-        url = "{}/xivoctl".format(self.base_url)
+        url = f"{self.base_url}/xivoctl"
         self.add_request('POST', url, json=data)
 
     def xivo_service_enable(self):
         data = {'wazo-service': 'enable'}
-        url = "{}/xivoctl".format(self.base_url)
+        url = f"{self.base_url}/xivoctl"
         self.add_request('POST', url, json=data)
 
     def get_ha_config(self):
         session = self._session()
-        url = "{}/get_ha_config".format(self.base_url)
+        url = f"{self.base_url}/get_ha_config"
         return session.get(url).json()
 
     def update_ha_config(self, ha):
-        url = "{}/update_ha_config".format(self.base_url)
+        url = f"{self.base_url}/update_ha_config"
         self.add_request('POST', url, json=ha)
 
     def _session(self):
@@ -126,7 +126,7 @@ class SysconfdPublisher:
 
     def flush_handlers(self, session):
         if len(self.handlers) > 0:
-            url = "{}/exec_request_handlers".format(self.base_url)
+            url = f"{self.base_url}/exec_request_handlers"
             body = {key: tuple(commands) for key, commands in self.handlers.items()}
             if self.handlers_contexts:
                 body['context'] = self.handlers_contexts

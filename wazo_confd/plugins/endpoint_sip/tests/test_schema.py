@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -106,16 +106,12 @@ class TestEndpointSIPSchema(TestCase):
 
     def test_option_length(self):
         body = {
-            'aor_section_options': [
-                ['key_{}'.format(i), '{}'.format(i)] for i in range(513)
-            ],
+            'aor_section_options': [[f'key_{i}', f'{i}'] for i in range(513)],
         }
         assert_that(calling(self.schema.load).with_args(body), raises(BadRequest))
 
         body = {
-            'aor_section_options': [
-                ['key_{}'.format(i), '{}'.format(i)] for i in range(512)
-            ],
+            'aor_section_options': [[f'key_{i}', f'{i}'] for i in range(512)],
         }
         assert_that(calling(self.schema.load).with_args(body), not_(raises(BadRequest)))
 

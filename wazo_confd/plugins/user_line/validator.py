@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -24,18 +24,18 @@ class UserLineAssociationValidator(ValidatorAssociation):
         if not main_line_extension:
             return
 
-        lines_reachable_from_extension = set(
+        lines_reachable_from_extension = {
             line_extension.line_id
             for line_extension in line_extension_dao.find_all_by(
                 extension_id=main_line_extension.extension_id
             )
-        )
+        }
 
-        users_reachable_from_extension = set(
+        users_reachable_from_extension = {
             user_line.user_id
             for line_id in lines_reachable_from_extension
             for user_line in user_line_dao.find_all_by(line_id=line_id, main_user=True)
-        )
+        }
         users_reachable_from_extension.add(user.id)
 
         if len(users_reachable_from_extension) == 1:

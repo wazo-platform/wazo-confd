@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -63,7 +63,7 @@ def main():
     del config['auth']['username']
     del config['auth']['password']
     tenants = AuthClient(token=token, **config['auth']).tenants.list()['items']
-    auth_tenants = set(tenant['uuid'] for tenant in tenants)
+    auth_tenants = {tenant['uuid'] for tenant in tenants}
     auth_tenant_slugs = {tenant['uuid']: tenant['slug'] for tenant in tenants}
     logger.debug('wazo-auth tenants: %s', auth_tenants)
 

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -22,8 +22,7 @@ def test_put_errors(user):
     yield s.check_resource_not_found, fake_user, 'User'
 
     url = confd.users(user['uuid']).fallbacks.put
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 def error_checks(url, user):

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -89,7 +89,7 @@ class TestWizardService(unittest.TestCase):
         ) as mopen:
             result = self.service.get_timezone()
 
-        mopen.assert_called_once_with('/etc/timezone', 'r')
+        mopen.assert_called_once_with('/etc/timezone')
         assert_that(result, equal_to('America/Montreal'))
 
     @patch('wazo_confd.plugins.wizard.service.open', create=True)
@@ -114,7 +114,7 @@ class TestWizardService(unittest.TestCase):
         ) as mopen:
             result = self.service.get_nameservers()
 
-        mopen.assert_called_once_with('/etc/resolv.conf', 'r')
+        mopen.assert_called_once_with('/etc/resolv.conf')
         assert_that(result, equal_to(expected_result))
 
     @patch('wazo_confd.plugins.wizard.service.open', create=True)

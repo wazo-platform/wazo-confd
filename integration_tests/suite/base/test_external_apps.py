@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -32,8 +32,7 @@ def test_delete_errors():
 @fixtures.external_app(name='unique')
 def test_post_errors(external_app):
     url = confd.external.apps.myapp.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     url = confd.external.apps(s.random_string(129)).post
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
@@ -45,8 +44,7 @@ def test_post_errors(external_app):
 @fixtures.external_app()
 def test_put_errors(external_app):
     url = confd.external.apps(external_app['name']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

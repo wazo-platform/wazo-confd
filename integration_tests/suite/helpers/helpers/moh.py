@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -26,7 +26,7 @@ def delete_moh(moh_uuid, check=False, **parameters):
 
 def generate_name():
     response = confd.moh.get()
-    forbidden_names = set(d['name'] for d in response.items)
+    forbidden_names = {d['name'] for d in response.items}
     return _random_name(forbidden_names)
 
 

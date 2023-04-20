@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import requests
@@ -95,5 +95,5 @@ class AuthClient(AuthClient):
         ]
 
         if not results:
-            raise AssertionError("Request not found: {} {}".format(method, path))
+            raise AssertionError(f"Request not found: {method} {path}")
         return results

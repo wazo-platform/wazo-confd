@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that
@@ -11,8 +11,7 @@ from ..helpers.config import TOKEN_SUB_TENANT
 def test_put_errors():
     url = confd.configuration.live_reload.put
 
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

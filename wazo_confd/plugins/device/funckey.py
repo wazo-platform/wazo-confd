@@ -167,7 +167,7 @@ class PagingConverter(FuncKeyConverter):
     def build(self, user, line, position, funckey):
         prefix_exten = self.extension_dao.get_by(type='extenfeatures', typeval='paging')
         extension = self.paging_dao.get(funckey.destination.paging_id).number
-        value = '{}{}'.format(prefix_exten.clean_exten(), extension)
+        value = f'{prefix_exten.clean_exten()}{extension}'
         return self.provd_funckey(line, position, funckey, value)
 
     def determine_type(self, funckey):
@@ -279,7 +279,7 @@ class AgentConverter(FuncKeyConverter):
             prog_exten.exten,
             user.id,
             action_exten.exten,
-            '*{}'.format(funckey.destination.agent_id),
+            f'*{funckey.destination.agent_id}',
         )
 
         return self.provd_funckey(line, position, funckey, value)

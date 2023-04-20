@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -52,21 +52,18 @@ def test_get_errors(me):
 @fixtures.user()
 def test_post_errors(me):
     url = confd.meetings.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     user_confd = create_confd(user_uuid=me['uuid'])
     url = user_confd.users.me.meetings.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.ingress_http()
 @fixtures.meeting()
 def test_put_errors(_, meeting):
     url = confd.meetings(meeting['uuid']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.ingress_http()
@@ -75,8 +72,7 @@ def test_put_errors_users_me(_, me):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as meeting:
         url = user_confd.users.me.meetings(meeting['uuid']).put
-        for check in error_checks(url):
-            yield check
+        yield from error_checks(url)
 
 
 def error_checks(url):
@@ -384,7 +380,7 @@ def test_guest_endpoint_sip_creation(_):
     assert_that(endpoint_context, equal_to('wazo-meeting-guest'))
 
     guest_sip_authorization = b64encode(
-        '{}:{}'.format(endpoint_username, endpoint_password).encode()
+        f'{endpoint_username}:{endpoint_password}'.encode()
     ).decode()
     assert_that(
         meeting,

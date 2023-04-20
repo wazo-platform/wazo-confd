@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -87,8 +87,7 @@ def test_delete_errors():
 @fixtures.user()
 def test_post_errors(user):
     url = confd.queues.post
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
@@ -99,16 +98,14 @@ def test_post_errors(user):
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.queue()
 @fixtures.user()
 def test_put_errors(queue, user):
     url = confd.queues(queue['id']).put
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 def error_checks(url, user):

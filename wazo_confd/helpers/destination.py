@@ -439,7 +439,7 @@ class UserDestinationSchema(BaseDestinationSchema):
         if ring_time is not None:
             actionarg2 += str(ring_time)
         if moh_uuid is not None:
-            actionarg2 += ';{}'.format(moh_uuid)
+            actionarg2 += f';{moh_uuid}'
 
         data['actionarg2'] = actionarg2
         return data

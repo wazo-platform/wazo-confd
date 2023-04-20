@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -28,16 +28,14 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.endpoints.custom.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.custom()
 def test_put_errors(custom):
     url = confd.endpoints.custom(custom['id']).put
 
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

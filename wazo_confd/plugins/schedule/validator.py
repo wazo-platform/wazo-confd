@@ -56,7 +56,7 @@ class UserDestinationSchema(BaseDestinationSchema):
         if ring_time is not None:
             fallback_actionargs += str(ring_time)
         if moh_uuid is not None:
-            fallback_actionargs += ';{}'.format(moh_uuid)
+            fallback_actionargs += f';{moh_uuid}'
 
         data['fallback_actionargs'] = fallback_actionargs
         return data

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -142,8 +142,7 @@ def test_associate_line_and_create_extension_unknown_line():
 @fixtures.line_sip()
 def test_extension_creation_error(line):
     url = confd.lines(line['id']).extensions.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)

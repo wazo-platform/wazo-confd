@@ -255,9 +255,7 @@ class Response:
 
     def assert_content_disposition(self, filename):
         headers = {key.lower(): value for key, value in self.response.headers.items()}
-        expected = has_entry(
-            'content-disposition', ends_with('filename={}'.format(filename))
-        )
+        expected = has_entry('content-disposition', ends_with(f'filename={filename}'))
         assert_that(headers, expected, 'Content-Disposition header not found')
 
     def assert_link(self, resource):
@@ -283,4 +281,4 @@ class Response:
                 match is not None, explanation.format(assertion.pattern, self.raw)
             )
         else:
-            raise AssertionError("Unable to assert on '{}'".format(repr(assertion)))
+            raise AssertionError(f"Unable to assert on '{repr(assertion)}'")

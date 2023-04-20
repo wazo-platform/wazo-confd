@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -25,7 +25,7 @@ def delete_external_app(name, check=False, **parameters):
 
 def generate_name():
     response = confd.external.apps.get()
-    names = set(d['name'] for d in response.items)
+    names = {d['name'] for d in response.items}
     return _random_name(names)
 
 

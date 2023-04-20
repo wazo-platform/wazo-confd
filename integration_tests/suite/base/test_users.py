@@ -106,8 +106,7 @@ AUTH_USER = {
 
 def test_search_errors():
     url = confd.users.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_head_errors():
@@ -125,8 +124,7 @@ def test_post_errors():
     user_post = confd.users(firstname="Jôhn").post
 
     yield s.check_missing_required_field_returns_error, empty_post, 'firstname'
-    for check in error_checks(user_post):
-        yield check
+    yield from error_checks(user_post)
 
 
 def error_checks(url):
@@ -293,23 +291,19 @@ def put_error_checks(url):
 def test_put_errors(user):
     user_put = confd.users(user['id']).put
 
-    for check in error_checks(user_put):
-        yield check
-    for check in put_error_checks(user_put):
-        yield check
+    yield from error_checks(user_put)
+    yield from put_error_checks(user_put)
 
 
 @fixtures.user(firstname='user1', username='unique_username', email='unique@email.com')
 @fixtures.user()
 def test_unique_errors(user1, user2):
     url = confd.users(user2['id']).put
-    for check in unique_error_checks(url, user1):
-        yield check
+    yield from unique_error_checks(url, user1)
 
     required_body = {'firstname': 'user2'}
     url = confd.users.post
-    for check in unique_error_checks(url, user1, required_body):
-        yield check
+    yield from unique_error_checks(url, user1, required_body)
 
 
 def unique_error_checks(url, existing_resource, required_body=None):

@@ -1,4 +1,4 @@
-# Copyright 2018-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -13,7 +13,7 @@ class FileSystemClient:
         self.execute(
             [
                 'install',
-                '-dm{mode}'.format(mode=mode),
+                f'-dm{mode}',
                 os.path.join(self.base_path, name),
             ]
         )
@@ -49,7 +49,7 @@ class TenantFileSystemClient:
         self.execute(
             [
                 'install',
-                '-dm{mode}'.format(mode=mode),
+                f'-dm{mode}',
                 os.path.join(self.base_path, 'tenants', tenant_uuid, name),
             ]
         )

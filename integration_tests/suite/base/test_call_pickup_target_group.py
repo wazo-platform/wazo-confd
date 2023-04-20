@@ -17,8 +17,7 @@ def test_associate_errors(call_pickup, group):
     response.assert_status(404)
 
     url = confd.callpickups(call_pickup['id']).targets.groups.put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

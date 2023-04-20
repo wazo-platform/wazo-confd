@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -34,8 +34,7 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.moh.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
         129
@@ -45,8 +44,7 @@ def test_post_errors():
 @fixtures.moh()
 def test_put_errors(moh):
     url = confd.moh(moh['uuid']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):
@@ -355,7 +353,7 @@ def test_add_filename_errors(moh):
         assert_that(
             response.status,
             equal_to(404),
-            'unexpected status for MOH filename {}'.format(filename),
+            f'unexpected status for MOH filename {filename}',
         )
 
 

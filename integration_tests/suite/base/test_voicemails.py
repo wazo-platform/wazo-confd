@@ -22,8 +22,7 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 def test_search_errors():
     url = confd.voicemails.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -33,11 +32,9 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.voicemails.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
-    for check in error_required_checks(url):
-        yield check
+    yield from error_required_checks(url)
 
 
 @fixtures.voicemail()
@@ -46,8 +43,7 @@ def test_put_errors(voicemail):
     yield s.check_resource_not_found, fake_put, 'Voicemail'
 
     url = confd.voicemails(voicemail['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

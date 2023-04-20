@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -119,6 +119,6 @@ class TestTrunkNotifier(unittest.TestCase):
             ipbx_commands = ['iax2 reload']
         else:
             raise AssertionError(
-                'no sysconfd handlers for endpoint {}'.format(self.trunk.endpoint)
+                f'no sysconfd handlers for endpoint {self.trunk.endpoint}'
             )
         return {'ipbx': ipbx_commands}

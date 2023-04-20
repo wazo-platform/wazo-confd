@@ -35,8 +35,7 @@ def line_device(endpoint_type='sip', registrar=None):
 
 def test_search_errors():
     url = confd.registrars.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -46,15 +45,13 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.registrars.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.registrar()
 def test_put_errors(registrar):
     url = confd.registrars(registrar['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

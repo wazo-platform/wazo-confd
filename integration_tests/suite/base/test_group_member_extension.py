@@ -31,12 +31,10 @@ def test_associate_errors(group, extension):
     response.assert_status(404)
 
     url = confd.groups(group['id']).members.extensions.put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     url = confd.groups(group['uuid']).members.extensions.put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

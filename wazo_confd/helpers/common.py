@@ -1,4 +1,4 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -41,7 +41,7 @@ def handle_api_exception(func):
             return [str(error)], error.status_code
         except ProvdError as error:
             rollback()
-            return 'Provd client error: {}'.format(error), error.status_code
+            return f'Provd client error: {error}', error.status_code
         except HTTPException as error:
             rollback()
             messages, code = extract_http_messages(error)
@@ -50,7 +50,7 @@ def handle_api_exception(func):
         except Exception as error:
             rollback()
             message = decode_and_log_error(error, exc_info=True)
-            return ['Unexpected error: {}'.format(message)], 500
+            return [f'Unexpected error: {message}'], 500
 
     return wrapper
 
@@ -86,9 +86,7 @@ def extract_http_messages(error):
     message = data.get('message', None)
     if isinstance(message, dict):
         code = error.code
-        messages = [
-            "Input Error - {}: {}".format(key, value) for key, value in message.items()
-        ]
+        messages = [f"Input Error - {key}: {value}" for key, value in message.items()]
     elif isinstance(message, str):
         code = error.code
         messages = [message]

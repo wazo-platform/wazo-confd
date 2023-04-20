@@ -111,7 +111,7 @@ class PJSIPDocError(APIException):
 
 
 class PJSIPDoc:
-    _internal_fields = set(['type'])
+    _internal_fields = {'type'}
 
     def __init__(self, filename):
         logger.debug('%s initialized with file %s', self.__class__.__name__, filename)
@@ -191,6 +191,6 @@ class PJSIPDocValidator(Validator):
         for option_name in option_names:
             if not self.pjsip_doc.is_valid_in_section(self.section, option_name):
                 raise errors.invalid_choice(
-                    field='{}: invalid variable ({})'.format(self.field, option_name),
+                    field=f'{self.field}: invalid variable ({option_name})',
                     choices=self.pjsip_doc.get_section_variables(self.section),
                 )

@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -24,12 +24,12 @@ class SysconfdMock:
         self.clear_requests()
 
     def clear_requests(self):
-        url = "{}/_reset".format(self.base_url)
+        url = f"{self.base_url}/_reset"
         response = requests.post(url)
         response.raise_for_status()
 
     def requests(self):
-        url = "{}/_requests".format(self.base_url)
+        url = f"{self.base_url}/_requests"
         response = requests.get(url)
         response.raise_for_status()
         return response.json()['requests']
@@ -87,11 +87,11 @@ class SysconfdMock:
         ]
 
         if not results:
-            raise AssertionError("Request not found: {} {}".format(method, path))
+            raise AssertionError(f"Request not found: {method} {path}")
         return results
 
     def set_response(self, response, content):
-        url = "{}/_set_response".format(self.base_url)
+        url = f"{self.base_url}/_set_response"
         content = {'response': response, 'content': content}
         response = requests.post(url, json=content)
         response.raise_for_status()

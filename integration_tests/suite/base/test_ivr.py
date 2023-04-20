@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -32,16 +32,14 @@ def test_delete_errors():
 @fixtures.user()
 def test_post_errors(user):
     url = confd.ivr.post
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 @fixtures.ivr()
 @fixtures.user()
 def test_put_errors(ivr, user):
     url = confd.ivr(ivr['id']).put
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 def error_checks(url, user):

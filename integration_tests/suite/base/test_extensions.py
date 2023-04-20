@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -49,8 +49,7 @@ FAKE_ID = 999999999
 
 def test_search_errors():
     url = confd.extensions.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -61,15 +60,13 @@ def test_get_errors():
 @fixtures.extension()
 def test_post_errors(extension):
     url = confd.extensions.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.extension()
 def test_put_errors(extension):
     url = confd.extensions(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def test_delete_errors():

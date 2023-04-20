@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -39,8 +39,7 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.funckeys.templates.post
-    for check in error_funckeys_checks(url):
-        yield check
+    yield from error_funckeys_checks(url)
 
     regex = r'keys.*1.*destination.*type'
     for destination in invalid_template_destinations:
@@ -65,8 +64,7 @@ def test_get_position_errors(funckey_template):
 @fixtures.funckey_template()
 def test_put_position_errors(funckey_template):
     url = confd.funckeys.templates(funckey_template['id'])(1).put
-    for check in error_funckey_checks(url):
-        yield check
+    yield from error_funckey_checks(url)
 
     for destination in invalid_template_destinations:
         yield s.check_bogus_field_returns_error, url, 'destination', destination

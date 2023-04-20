@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -83,7 +83,7 @@ class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
         for required in FUNC_KEY_FEATUREMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required),
+                    f'The following option are required: {required}',
                     field_name='options',
                 )
 
@@ -98,7 +98,7 @@ class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
         for required in FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required),
+                    f'The following option are required: {required}',
                     field_name='options',
                 )
 

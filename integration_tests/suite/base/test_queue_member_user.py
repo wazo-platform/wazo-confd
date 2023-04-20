@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -23,8 +23,7 @@ def test_associate_errors(queue, user):
     yield s.check_resource_not_found, fake_user, 'User'
 
     url = confd.queues(queue['id']).members.users(user['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

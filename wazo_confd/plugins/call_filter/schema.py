@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -32,7 +32,7 @@ class CallFilterSurrogatesSchema(BaseSchema):
     def _get_callfilter_exten(self, obj):
         exten = obj.callfilter_exten
         if exten:
-            return '{prefix}{id}'.format(prefix=clean_extension(exten), id=obj.id)
+            return f'{clean_extension(exten)}{obj.id}'
         return None
 
     @post_dump

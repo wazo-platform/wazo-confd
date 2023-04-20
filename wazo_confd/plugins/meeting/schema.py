@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -53,7 +53,7 @@ class MeetingSchema(BaseSchema):
                 'cannot add the meeting exten, no "meetingjoin" extension_features configured'
             )
             return
-        return '{}{}'.format(prefix, meeting.number)
+        return f'{prefix}{meeting.number}'
 
     def _guest_sip_authorization(self, model):
         if not model.guest_endpoint_sip:
@@ -77,4 +77,4 @@ class MeetingSchema(BaseSchema):
         if username is None or password is None:
             return None
 
-        return b64encode('{}:{}'.format(username, password).encode()).decode()
+        return b64encode(f'{username}:{password}'.encode()).decode()

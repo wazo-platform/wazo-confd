@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -10,7 +10,7 @@ from ..schema import CustomDestinationSchema, ForwardDestinationSchema
 
 class TestCustomDestinationSchema(unittest.TestCase):
     def test_trailing_nbsp(self):
-        exten = '123' + u'\xa0'
+        exten = '123' + '\xa0'
         schema = CustomDestinationSchema()
         body = {'exten': exten, 'type': 'custom'}
 
@@ -30,7 +30,7 @@ class TestCustomDestinationSchema(unittest.TestCase):
 
 class TestForwardDestinationSchema(unittest.TestCase):
     def test_trailing_nbsp(self):
-        exten = '123' + u'\xa0'
+        exten = '123' + '\xa0'
         schema = ForwardDestinationSchema()
         body = {'exten': exten, 'type': 'forward', 'forward': 'busy'}
 

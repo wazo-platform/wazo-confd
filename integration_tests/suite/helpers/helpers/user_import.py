@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -22,7 +22,7 @@ def csv_client():
 def generate_csv(rows):
     header = set()
     for row in rows:
-        keys = set(key for key in row.keys())
+        keys = {key for key in row.keys()}
         header.update(keys)
 
     output = StringIO()
@@ -49,7 +49,7 @@ def make_entry(params):
         'lastname': params.get('lastname', words.name()),
         'username': params.get('username', words.alphanumeric()),
         'password': params.get('password', words.alphanumeric()),
-        'email': params.get('email', '{}@example.com'.format(words.alphanumeric())),
+        'email': params.get('email', f'{words.alphanumeric()}@example.com'),
     }
 
     if params.get('voicemail'):

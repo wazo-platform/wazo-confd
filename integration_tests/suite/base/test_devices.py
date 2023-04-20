@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -55,8 +55,7 @@ class TestDeviceCreateWithTemplate(unittest.TestCase):
 
 def test_search_errors():
     url = confd.devices.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -66,15 +65,13 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.devices.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.device()
 def test_put_errors(device):
     url = confd.devices(device['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -29,15 +29,13 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.lines.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.line()
 def test_put_errors(line):
     url = confd.lines(line['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     yield s.check_bogus_field_returns_error, url, 'provisioning_code', None
     yield s.check_bogus_field_returns_error, url, 'position', None

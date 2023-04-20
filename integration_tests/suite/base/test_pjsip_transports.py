@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -24,11 +24,9 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 def test_post_errors():
     url = confd.sip.transports.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 def error_checks(url):
@@ -49,8 +47,7 @@ def error_checks(url):
         ['one', 'two', 'three']
     ], {'name': 'transport'}
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.transport(name='transport_unique')
@@ -98,11 +95,9 @@ def test_create_all_parameters():
 @fixtures.transport()
 def test_put_errors(transport):
     url = confd.sip.transports(transport['uuid']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.transport()

@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, has_entry, has_item, is_not
@@ -12,8 +12,7 @@ FAKE_ID = 999999999
 
 def test_search_errors():
     url = confd.extensions.features.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -27,8 +26,7 @@ def test_put_errors(extension):
     yield s.check_resource_not_found, url, 'Extension'
 
     url = confd.extensions.features(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

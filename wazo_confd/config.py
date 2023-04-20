@@ -1,4 +1,4 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -182,9 +182,9 @@ DEFAULT_CONFIG = {
 
 def load(argv):
     try:
-        with open(WIZARD_KEY_FILE, 'r') as f:
+        with open(WIZARD_KEY_FILE) as f:
             key_config = {'wizard': yaml.safe_load(f)}
-    except IOError:
+    except OSError:
         key_config = {}
 
     cli_config = _parse_cli_args(argv)
