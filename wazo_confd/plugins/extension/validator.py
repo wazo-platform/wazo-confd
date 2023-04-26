@@ -210,20 +210,12 @@ class ExtensionAssociationValidator(Validator):
             )
 
         if extension.lines:
-            if len(extension.lines) == 1:
-                raise errors.resource_associated(
-                    'Extension',
-                    'line',
-                    extension_id=extension.id,
-                    associated_id=extension.lines[0].id,
-                )
-            else:
-                raise errors.resource_associated(
-                    'Extension',
-                    'lines',
-                    extension_id=extension.id,
-                    associated_ids=[line.id for line in extension.lines],
-                )
+            raise errors.resource_associated(
+                'Extension',
+                'lines',
+                extension_id=extension.id,
+                associated_ids=[line.id for line in extension.lines],
+            )
 
         if extension.incall:
             raise errors.resource_associated(
