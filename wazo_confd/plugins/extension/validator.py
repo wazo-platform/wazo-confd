@@ -212,7 +212,7 @@ class ExtensionAssociationValidator(Validator):
         if extension.lines:
             raise errors.resource_associated(
                 'Extension',
-                'lines',
+                'line',
                 extension_id=extension.id,
                 associated_ids=[line.id for line in extension.lines],
             )
