@@ -361,3 +361,32 @@ def test_delete_line_then_associatons_are_removed(
 
         response = confd.extensions(extension['id']).get()
         assert_that(response.item, has_entries(lines=empty()))
+
+
+@fixtures.line_sip()
+@fixtures.line_sip()
+@fixtures.extension()
+def test_recursive_delete_line_with_extension_used_by_other_line_then_extension_not_removed(
+    line1, line2, extension
+):
+    with a.line_extension(line1, extension, check=False), a.line_extension(
+        line2, extension, check=False
+    ):
+        response = confd.lines(line1['id']).delete(recursive=True)
+        response.assert_deleted()
+
+        response = confd.extensions(extension['id']).get()
+        response.assert_ok()
+
+
+@fixtures.line_sip()
+@fixtures.extension()
+def test_recursive_delete_line_with_extension_not_used_by_other_line_then_extension_removed(
+    line1, extension
+):
+    with a.line_extension(line1, extension, check=False):
+        response = confd.lines(line1['id']).delete(recursive=True)
+        response.assert_deleted()
+
+        response = confd.extensions(extension['id']).get()
+        response.assert_status(404)

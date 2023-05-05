@@ -5,7 +5,12 @@ from flask import url_for, request
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant
+from wazo_confd.helpers.restful import (
+    ListResource,
+    ItemResource,
+    build_tenant,
+    is_recursive,
+)
 from wazo_confd.plugins.line.schema import LineListSchema
 
 
@@ -58,5 +63,5 @@ class LineItem(ItemResource):
     def delete(self, id):
         tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.delete(id, tenant_uuid, tenant_uuids)
+        self._middleware.delete(id, tenant_uuid, tenant_uuids, recursive=is_recursive())
         return '', 204
