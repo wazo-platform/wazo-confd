@@ -139,4 +139,6 @@ def check_db_requests(cls, url, nb_requests):
     actual_count = nb_logs_end - nb_logs_start
     expected_count = OVERHEAD_DB_REQUESTS + nb_requests
     # Allow margin of one extra request to account for occasional "REFRESH MATERIALIZED VIEW"
-    assert expected_count <= actual_count <= expected_count + 1
+    assert (
+        expected_count <= actual_count <= expected_count + 1
+    ), f'Expected: {expected_count} Count: {actual_count}\n{cls.database_logs(service_name="postgres", since=time_start)}'
