@@ -1,4 +1,4 @@
-# Copyright 2013-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -11,8 +11,8 @@ class CRUDService:
         self.notifier = notifier
         self.extra_parameters = extra_parameters or []
 
-    def search(self, parameters, tenant_uuids=None):
-        return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
+    def search(self, parameters, tenant_uuids=None,is_db_sort_limit=True):
+        return self.dao.search(tenant_uuids=tenant_uuids, is_db_sort_limit=is_db_sort_limit, **parameters)
 
     def get(self, resource_id, **kwargs):
         return self.dao.get(resource_id, **kwargs)
