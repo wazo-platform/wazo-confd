@@ -280,10 +280,6 @@ class UserMiddleWare(ResourceMiddleware):
         if device_id:
             self._middleware_handle.get('device').reset_autoprov(device_id, tenant_uuid)
 
-        # process the line itself
-        self._middleware_handle.get('user_line_association').dissociate(
-            user_id, line_id, tenant_uuids
-        )
         self._middleware_handle.get('line').delete(
             line_id, tenant_uuid, tenant_uuids, recursive=True
         )
