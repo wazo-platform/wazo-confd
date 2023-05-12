@@ -394,9 +394,7 @@ def test_recursive_delete_line_with_extension_not_used_by_other_line_then_extens
 
 @fixtures.user()
 @fixtures.line_sip()
-def test_recursive_delete_line_then_user_associaton_removed(
-    user, line1
-):
+def test_recursive_delete_line_then_user_associaton_removed(user, line1):
     with a.user_line(user, line1, check=False):
         response = confd.users(user['id']).get()
         assert_that(
@@ -411,6 +409,4 @@ def test_recursive_delete_line_then_user_associaton_removed(
         confd.lines(line1['id']).delete(recursive=True)
 
         response = confd.users(user['id']).get()
-        assert_that(
-            response.item, has_entries(lines=empty())
-        )
+        assert_that(response.item, has_entries(lines=empty()))
