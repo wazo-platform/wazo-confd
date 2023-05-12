@@ -86,6 +86,7 @@ def test_create_all_parameters():
             ['local_net', '192.168.0.0/16'],
             ['local_net', '10.37.1.0/24'],
         ],
+        'cipher': 'ECDHE-RSA-AES128-GCM-SHA256,TLS_CHACHA20_POLY1305_SHA256',
     }
     response = confd.sip.transports.post(parameters)
     response.assert_created()
