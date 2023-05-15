@@ -1,5 +1,8 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+import io
+import wave
 
 from hamcrest import (
     all_of,
@@ -20,6 +23,45 @@ from ..helpers import errors as e, fixtures, scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT, TOKEN
 
 NOT_FOUND_UUID = 'uuid-not-found'
+VALID_WAV_FILE = io.BytesIO()
+VALID_WAV_FILE_2 = io.BytesIO()
+INVALID_WAV_FILE_CHANNELS = io.BytesIO()
+INVALID_WAV_FILE_SAMPLE = io.BytesIO()
+INVALID_WAV_FILE_FRAMERATE = io.BytesIO()
+
+with wave.open(VALID_WAV_FILE, 'wb') as wav_file:
+    wav_file.setnchannels(1)  # mono
+    wav_file.setsampwidth(2)  # 16 bits
+    wav_file.setframerate(8000)  # 8 kHz
+    wav_file.writeframes(b'random content')
+
+
+with wave.open(VALID_WAV_FILE_2, 'wb') as wav_file:
+    wav_file.setnchannels(1)  # mono
+    wav_file.setsampwidth(2)  # 16 bits
+    wav_file.setframerate(16000)  # 16 kHz
+    wav_file.writeframes(b'random content 2')
+
+
+with wave.open(INVALID_WAV_FILE_CHANNELS, 'wb') as wav_file:
+    wav_file.setnchannels(2)  # stereo (2) channels
+    wav_file.setsampwidth(2)  # 16 bits
+    wav_file.setframerate(8000)  # 8 kHz
+    wav_file.writeframes(b'random content 3')
+
+
+with wave.open(INVALID_WAV_FILE_SAMPLE, 'wb') as wav_file:
+    wav_file.setnchannels(1)  # mono
+    wav_file.setsampwidth(4)  # 32 bits (4 bytes)
+    wav_file.setframerate(8000)  # 8 kHz
+    wav_file.writeframes(b'random content 4')
+
+
+with wave.open(INVALID_WAV_FILE_FRAMERATE, 'wb') as wav_file:
+    wav_file.setnchannels(1)  # mono
+    wav_file.setsampwidth(2)  # 16 bits
+    wav_file.setframerate(44100)  # 44.1kHz frame (sample) rate
+    wav_file.writeframes(b'random content 5')
 
 
 def test_get_errors():
@@ -278,12 +320,12 @@ def test_add_update_delete_filename(moh):
     response = (
         client.url.moh(moh['uuid'])
         .files('foo.wav')
-        .put(content='content is not checked')
+        .put(content=VALID_WAV_FILE.getvalue())
     )
     response.assert_status(204)
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get()
-    assert_that(response.raw, equal_to('content is not checked'))
+    assert_that(response.content, equal_to(VALID_WAV_FILE.getvalue()))
     response.assert_content_disposition('foo.wav')
 
     response = confd.moh(moh['uuid']).get()
@@ -291,12 +333,14 @@ def test_add_update_delete_filename(moh):
 
     # update/overwrite the file
     response = (
-        client.url.moh(moh['uuid']).files('foo.wav').put(content='some new content')
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content=VALID_WAV_FILE_2.getvalue())
     )
     response.assert_status(204)
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get()
-    assert_that(response.raw, equal_to('some new content'))
+    assert_that(response.content, equal_to(VALID_WAV_FILE_2.getvalue()))
 
     # delete the file
     response = client.url.moh(moh['uuid']).files('foo.wav').delete()
@@ -304,6 +348,28 @@ def test_add_update_delete_filename(moh):
 
     response = confd.moh(moh['uuid']).get()
     assert_that(response.item, has_entries(files=empty()))
+
+    # Test invalid WAV files
+    response = (
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content=INVALID_WAV_FILE_CHANNELS.getvalue())
+    )
+    response.assert_status(400)
+
+    response = (
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content=INVALID_WAV_FILE_SAMPLE.getvalue())
+    )
+    response.assert_status(400)
+
+    response = (
+        client.url.moh(moh['uuid'])
+        .files('foo.wav')
+        .put(content=INVALID_WAV_FILE_FRAMERATE.getvalue())
+    )
+    response.assert_status(400)
 
 
 @fixtures.moh(tenant_uuid=MAIN_TENANT)
@@ -313,7 +379,7 @@ def test_add_update_delete_filename_multi_tenant(moh):
     response = (
         client.url.moh(moh['uuid'])
         .files('foo.wav')
-        .put(content='content', wazo_tenant=SUB_TENANT)
+        .put(content=VALID_WAV_FILE.getvalue(), wazo_tenant=SUB_TENANT)
     )
     response.assert_match(404, e.not_found(resource='MOH'))
 
@@ -329,12 +395,12 @@ def test_add_update_delete_filename_multi_tenant(moh):
     response = (
         client.url.moh(moh['uuid'])
         .files('foo.wav')
-        .put(content='content', wazo_tenant=MAIN_TENANT)
+        .put(content=VALID_WAV_FILE.getvalue(), wazo_tenant=MAIN_TENANT)
     )
     response.assert_status(204)
 
     response = client.url.moh(moh['uuid']).files('foo.wav').get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.raw, equal_to('content'))
+    assert_that(response.content, equal_to(VALID_WAV_FILE.getvalue()))
 
     response = (
         client.url.moh(moh['uuid']).files('foo.wav').delete(wazo_tenant=MAIN_TENANT)
@@ -350,7 +416,7 @@ def test_add_filename_errors(moh):
         response = (
             client.url.moh(moh['uuid'])
             .files(filename)
-            .put(content='content is not checked')
+            .put(content=VALID_WAV_FILE.getvalue())
         )
         assert_that(
             response.status,

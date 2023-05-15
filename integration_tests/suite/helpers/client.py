@@ -202,6 +202,10 @@ class Response:
         return self.response.text
 
     @property
+    def content(self):
+        return self.response.content
+
+    @property
     def json(self):
         return self.response.json() if self.response.text else None
 

@@ -9,7 +9,7 @@ from xivo_dao.alchemy.moh import MOH
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
-from .schema import MohSchema, MohSchemaPUT
+from .schema import MohFileUploadSchema, MohSchema, MohSchemaPUT
 
 
 class MohList(ListResource):
@@ -63,6 +63,7 @@ class MohItem(ItemResource):
 
 
 class MohFileItem(ConfdResource):
+    schema = MohFileUploadSchema
     has_tenant_uuid = True
 
     def __init__(self, service):
@@ -77,9 +78,10 @@ class MohFileItem(ConfdResource):
 
     @required_acl('confd.moh.{uuid}.files.{filename}.update')
     def put(self, uuid, filename):
+        uploaded_file = self.schema().load(request.data)
         tenant_uuids = self._build_tenant_list({'recurse': True})
         moh = self.service.get(uuid, tenant_uuids=tenant_uuids)
-        self.service.save_file(moh, filename, request.data)
+        self.service.save_file(moh, filename, uploaded_file['wav_file'])
         return '', 204
 
     @required_acl('confd.moh.{uuid}.files.{filename}.delete')
