@@ -22,7 +22,6 @@ setup(
             'wazo-confd-sync-db=wazo_confd.sync_db:main',
             'wazo-confd-wait=wazo_confd.wait:main',
             'wazo-confd=wazo_confd.main:main',
-
         ],
         'wazo_confd.plugins': [
             'access_feature = wazo_confd.plugins.access_feature.plugin:Plugin',
