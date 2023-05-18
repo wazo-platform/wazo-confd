@@ -12,9 +12,7 @@ class CRUDService:
         self.extra_parameters = extra_parameters or []
 
     def search(self, parameters, tenant_uuids=None):
-        return self.dao.search(
-            tenant_uuids=tenant_uuids, **parameters
-        )
+        return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
 
     def get(self, resource_id, **kwargs):
         return self.dao.get(resource_id, **kwargs)

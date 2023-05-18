@@ -36,9 +36,8 @@ class UserService(UserBaseService):
             self.device_updater.update_for_user(user_with_fk)
 
     def search_collated(self, parameters, tenant_uuids=None):
-        return self.dao.search_collated(
-            tenant_uuids=tenant_uuids, **parameters
-        )
+        return self.dao.search_collated(tenant_uuids=tenant_uuids, **parameters)
+
 
 def build_service(provd_client):
     updater = build_device_updater(provd_client)
