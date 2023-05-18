@@ -11,9 +11,9 @@ class CRUDService:
         self.notifier = notifier
         self.extra_parameters = extra_parameters or []
 
-    def search(self, parameters, tenant_uuids=None, is_db_sort_limit=True):
+    def search(self, parameters, tenant_uuids=None):
         return self.dao.search(
-            tenant_uuids=tenant_uuids, is_db_sort_limit=is_db_sort_limit, **parameters
+            tenant_uuids=tenant_uuids, **parameters
         )
 
     def get(self, resource_id, **kwargs):
