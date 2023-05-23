@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2012-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
@@ -18,9 +18,10 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'wazo-confd=wazo_confd.main:main',
-            'wazo-confd-sync-db=wazo_confd.sync_db:main',
             'wazo-confd-purge-meetings=wazo_confd.purge_meetings:main',
+            'wazo-confd-sync-db=wazo_confd.sync_db:main',
+            'wazo-confd-wait=wazo_confd.wait:main',
+            'wazo-confd=wazo_confd.main:main',
         ],
         'wazo_confd.plugins': [
             'access_feature = wazo_confd.plugins.access_feature.plugin:Plugin',
