@@ -2364,8 +2364,10 @@ def test_update_incall_new_extension():
     # update existing incall with a new extension
     new_incall = user_resources.incall
     new_incall['extensions'][0]['exten'] = new_user_resources.source_exten
+    new_incall['id'] = payload['incalls'][0]['id']
 
     url.put({**payload, "incalls": [new_incall]}, query_string="recursive=True")
+    response.assert_status(201)
 
     # check the incall id is always the same
     assert_that(

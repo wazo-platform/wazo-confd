@@ -84,7 +84,11 @@ paths:
     delete:
       operationId: delete_line
       summary: Delete line
-      description: '**Required ACL:** `confd.lines.{line_id}.delete`'
+      description: '**Required ACL:** `confd.lines.{line_id}.delete`
+
+
+        **Disclaimer**: if `recursive=true`, the line is deleted, all their
+        associations with any related resources are removed.'
       tags:
       - lines
       parameters:

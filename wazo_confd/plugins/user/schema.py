@@ -312,6 +312,10 @@ class UserIncallSchema(BaseSchema):
     links = ListLink(Link('incalls'))
 
 
+class UserIncallPutSchema(UserIncallSchema):
+    id = fields.Integer()
+
+
 class UserExtensionSchema(BaseSchema):
     id = fields.Integer()
     exten = fields.String(validate=Length(max=40))
@@ -369,3 +373,4 @@ class UserLinePutSchema(LineSchema):
 class UserListItemSchemaPut(UserListItemSchema):
     lines = Nested('UserLinePutSchema', many=True)
     agent = Nested('UserAgentSchema', allow_none=True)
+    incalls = Nested('UserIncallPutSchema', many=True)

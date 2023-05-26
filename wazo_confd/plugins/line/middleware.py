@@ -112,6 +112,10 @@ class LineMiddleWare(ResourceMiddleware):
         model = self._service.get(line_id, tenant_uuids=tenant_uuids)
 
         if recursive:
+            for user in model.users:
+                self._middleware_handle.get('user_line_association').dissociate(
+                    user.uuid, line_id, tenant_uuids
+                )
             for extension in model.extensions:
                 # dissociate from line + delete extension
                 self._middleware_handle.get('line_extension').delete_extension(
