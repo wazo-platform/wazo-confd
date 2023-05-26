@@ -6,6 +6,7 @@ StartLimitIntervalSec=150
 
 [Service]
 ExecStart=/usr/bin/wazo-confd
+ExecStartPost=/usr/bin/wazo-confd-wait
 Restart=on-failure
 RestartSec=5
 

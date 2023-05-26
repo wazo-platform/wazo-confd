@@ -111,6 +111,17 @@ def test_edit_minimal_parameters(transport):
     response.assert_updated()
 
 
+@fixtures.transport()
+def test_edit_options_with_commas(transport):
+    parameters = {
+        'options': [
+            ['cipher', 'ECDHE-RSA-AES128-GCM-SHA256,TLS_CHACHA20_POLY1305_SHA256']
+        ]
+    }
+    response = confd.sip.transports(transport['uuid']).put(parameters)
+    response.assert_updated()
+
+
 def test_get_errors():
     fake_transport = confd.sip.transports(FAKE_UUID).get
     yield s.check_resource_not_found, fake_transport, 'Transport'

@@ -110,7 +110,7 @@ class ListLink(fields.Field):
 
 
 class PJSIPSectionOption(fields.List):
-    DEFAULT_OPTION_REGEX = r"^[a-zA-Z0-9-_\/\.:]*$"
+    DEFAULT_OPTION_REGEX = r"^[a-zA-Z0-9-_\/\.:,]*$"
 
     def __init__(self, option_regex=DEFAULT_OPTION_REGEX, **kwargs):
         kwargs['validate'] = [validate.Length(min=1, max=4092)]
