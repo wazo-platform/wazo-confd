@@ -12,6 +12,6 @@ class Plugin:
     def load(self, dependencies):
         api = dependencies['api']
         notifier = DHCPNotifier(bus, sysconfd)
-        service = DHCPService(notifier)
+        service = DHCPService(notifier, sysconfd)
 
         api.add_resource(DHCPResource, '/dhcp', resource_class_args=(service,))
