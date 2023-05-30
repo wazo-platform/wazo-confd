@@ -183,3 +183,12 @@ class TestSysconfdClient(TestCase):
         assert_that(method, equal_to("POST"))
         assert_that(url, equal_to(expected_url))
         assert_that(json, expected_body)
+    
+    def test_get_available_network_interfaces(self):
+        self.session.request.return_value = Mock(status_code=200)
+        expected_url = "http://localhost:8668/networking/interfaces"
+
+        method, url, _ = self.extract_request()
+
+        assert_that(method, equal_to("GET"))
+        assert_that(url, equal_to(expected_url))
