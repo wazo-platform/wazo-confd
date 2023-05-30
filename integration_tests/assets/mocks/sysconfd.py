@@ -8,7 +8,9 @@ from flask import Flask, request, jsonify
 
 logging.basicConfig(level=logging.DEBUG)
 
-_EMPTY_RESPONSES = {'get_ha_config': {'node_type': 'disabled', 'remote_address': ''}}
+_EMPTY_RESPONSES = {
+    'get_ha_config': {'node_type': 'disabled', 'remote_address': ''},
+}
 
 app = Flask(__name__)
 
@@ -56,12 +58,15 @@ def set_response():
     set_response = request_body['response']
     set_response_body = request_body['content']
     _responses[set_response] = set_response_body
+    logging.debug('_responses: %s', _responses)
     return '', 204
 
 
 @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def fallback(path):
-    return ''
+    global _responses
+    logging.info("fallback handler for path: %s", path)
+    return _responses.get(path, '')
 
 
 @app.route('/get_ha_config')
