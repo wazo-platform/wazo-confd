@@ -48,7 +48,7 @@ class UserList(ListResource):
         tenant_uuids = self._build_tenant_list(params)
         view = params.get('view')
         schema = self.view_schemas.get(view, UserSchema)
-        result = self.service.search(params, tenant_uuids)
+        result = self.service.search_collated(params, tenant_uuids)
         return {'total': result.total, 'items': schema().dump(result.items, many=True)}
 
 
