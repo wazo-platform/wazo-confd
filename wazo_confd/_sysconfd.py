@@ -110,7 +110,7 @@ class SysconfdPublisher:
         url = "{}/networking/interfaces".format(self.base_url)
         response = self._session().get(url)
         response.raise_for_status()
-        return response.json()
+        return response.json()['data']
 
     def _session(self):
         session = requests.Session()

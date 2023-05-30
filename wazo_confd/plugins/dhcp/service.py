@@ -17,7 +17,7 @@ class DHCPService:
 
     def edit(self, form: dict):
         if 'network_interfaces' in form and form['network_interfaces']:
-            valid_interfaces = self.sysconfd.get_available_network_interfaces()["data"]
+            valid_interfaces = self.sysconfd.get_available_network_interfaces()
             valid_names = [interface['name'] for interface in valid_interfaces]
             proposed_interfaces = form['network_interfaces'].split(",")
             invalid_interfaces = [
