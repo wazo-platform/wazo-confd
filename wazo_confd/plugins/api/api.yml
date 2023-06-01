@@ -19,9 +19,13 @@ info:
     name: GPL v3
     url: http://www.gnu.org/licenses/gpl.txt
   contact:
-    name: Dev Team
+    name: Wazo Dev Team
     url: https://wazo-platform.org/
     email: dev@wazo.community
+  x-logo:
+    url: "https://wazo-platform.org/images/logo-black.svg"
+    backgroundColor: "#FAFAFA"
+    altText: "Wazo Logo"
 schemes:
 - http
 basePath: /1.1
