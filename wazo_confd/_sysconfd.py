@@ -106,6 +106,12 @@ class SysconfdPublisher:
         url = "{}/update_ha_config".format(self.base_url)
         self.add_request('POST', url, json=ha)
 
+    def get_available_network_interfaces(self):
+        url = "{}/networking/interfaces".format(self.base_url)
+        response = self._session().get(url)
+        response.raise_for_status()
+        return response.json()['data']
+
     def _session(self):
         session = requests.Session()
         session.trust_env = False

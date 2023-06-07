@@ -5,7 +5,7 @@ import re
 
 from hamcrest import assert_that, has_entries
 
-from . import confd
+from . import confd, sysconfd
 from ..helpers.config import TOKEN_SUB_TENANT
 
 
@@ -39,6 +39,15 @@ def test_put_minimal_parameters():
 
 
 def test_put_all_parameters():
+    sysconfd.set_response(
+        'networking/interfaces',
+        {
+            'data': [
+                {'name': 'ens0p2', 'address': '00:00:00:00:00:00'},
+                {'name': 'ens0p3', 'address': '00:11:22:33:44:55'},
+            ]
+        },
+    )
     body = {
         'active': True,
         'pool_start': '10.0.0.1',
@@ -71,6 +80,25 @@ def test_put_errors():
     body = {'active': True, 'pool_start': '10.0.0.2', 'pool_end': '10.0.0.1'}
     result = confd.dhcp.put(body)
     result.assert_match(400, re.compile(re.escape('pool_end')))
+
+    # wrong network interface name
+    sysconfd.set_response(
+        'networking/interfaces',
+        {
+            'data': [
+                {'name': 'lo', 'address': '00:00:00:00:00:00'},
+                {'name': 'eth0', 'address': '00:11:22:33:44:55'},
+            ]
+        },
+    )
+    body = {
+        'active': True,
+        'network_interfaces': ['not-an-interface', 'lo'],
+        'pool_start': '10.0.0.1',
+        'pool_end': '10.0.0.254',
+    }
+    result = confd.dhcp.put(body)
+    result.assert_match(400, re.compile(r'Invalid network interfaces'))
 
 
 def test_restrict_only_master_tenant():
