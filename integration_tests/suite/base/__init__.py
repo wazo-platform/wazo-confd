@@ -1,6 +1,7 @@
 # Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import cast
 from ..helpers.sysconfd import SysconfdMock
 from ..helpers.base import IntegrationTest
 from ..helpers.config import TOKEN
@@ -72,7 +73,9 @@ ari = SingletonProxy(BaseIntegrationTest.create_ari)
 provd = SingletonProxy(BaseIntegrationTest.create_provd)
 db = SingletonProxy(BaseIntegrationTest.create_database)
 rabbitmq = SingletonProxy(BaseIntegrationTest.create_bus)
-sysconfd: SysconfdMock = SingletonProxy(BaseIntegrationTest.create_sysconfd)
+sysconfd: SysconfdMock = cast(
+    SysconfdMock, SingletonProxy(BaseIntegrationTest.create_sysconfd)
+)
 
 wazo_sound = SingletonProxy(
     BaseIntegrationTest.create_tenant_filesystem, '/var/lib/wazo/sounds'
