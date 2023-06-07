@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -15,11 +15,12 @@ class MohModelValidator(Validator):
 
 def build_validator():
     moh_validator = MohModelValidator()
-
-    return ValidationGroup(
+    validation_group = ValidationGroup(
         create=[
             UniqueField('name', lambda name: moh_dao.find_by(name=name), 'MOH'),
             moh_validator,
         ],
         edit=[moh_validator],
     )
+
+    return validation_group
