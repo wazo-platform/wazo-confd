@@ -364,12 +364,18 @@ def test_add_update_delete_filename(moh):
     )
     response.assert_status(400)
 
+
+@fixtures.moh(mode='mp3')
+def test_add_file_when_mp3(moh):
+    client = _new_moh_file_client()
+
+    # An invalid WAV file uploaded in MP3 mode should not raise an error
     response = (
         client.url.moh(moh['uuid'])
         .files('foo.wav')
-        .put(content=INVALID_WAV_FILE_FRAMERATE.getvalue())
+        .put(content=INVALID_WAV_FILE_SAMPLE.getvalue())
     )
-    response.assert_status(400)
+    response.assert_status(204)
 
 
 @fixtures.moh(tenant_uuid=MAIN_TENANT)
