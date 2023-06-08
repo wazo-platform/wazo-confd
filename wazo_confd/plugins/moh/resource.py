@@ -78,10 +78,12 @@ class MohFileItem(ConfdResource):
 
     @required_acl('confd.moh.{uuid}.files.{filename}.update')
     def put(self, uuid, filename):
-        uploaded_file = self.schema().load(request.data)
         tenant_uuids = self._build_tenant_list({'recurse': True})
         moh = self.service.get(uuid, tenant_uuids=tenant_uuids)
-        self.service.save_file(moh, filename, uploaded_file['wav_file'])
+        uploaded_file = request.data
+        if moh.mode == 'files':
+            uploaded_file = self.schema().load(uploaded_file)['wav_file']
+        self.service.save_file(moh, filename, uploaded_file)
         return '', 204
 
     @required_acl('confd.moh.{uuid}.files.{filename}.delete')
