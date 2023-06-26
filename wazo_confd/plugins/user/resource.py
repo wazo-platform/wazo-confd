@@ -68,7 +68,9 @@ class UserItem(ItemResource):
 
     @required_acl('confd.users.{id}.read')
     def get(self, id):
-        return super().get(id)
+        tenant_uuids = self._add_tenant_uuid()
+        model = self.service.get(id, **tenant_uuids, view='default')
+        return self.schema().dump(model)
 
     @required_acl('confd.users.{id}.update')
     def put(self, id):
