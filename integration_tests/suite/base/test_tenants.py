@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -9,10 +9,13 @@ from hamcrest import (
     has_key,
     not_,
 )
-from ..helpers import errors as e, fixtures
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
-from . import confd
+from wazo_test_helpers import until
+
+from . import confd, BaseIntegrationTest
+from ..helpers import errors as e, fixtures
+from ..helpers.bus import BusClient
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, DELETED_TENANT
 
 
 def test_get():
@@ -63,3 +66,94 @@ def test_list_multi_tenant(_):
         response.items,
         has_items(has_entries(uuid=MAIN_TENANT), has_entries(uuid=SUB_TENANT)),
     )
+
+
+
+@fixtures.user(wazo_tenant=DELETED_TENANT)
+@fixtures.group(wazo_tenant=DELETED_TENANT)
+@fixtures.incall(wazo_tenant=DELETED_TENANT)
+@fixtures.outcall(wazo_tenant=DELETED_TENANT)
+@fixtures.trunk(wazo_tenant=DELETED_TENANT)
+@fixtures.conference(wazo_tenant=DELETED_TENANT)
+@fixtures.context(name='mycontext', wazo_tenant=DELETED_TENANT)
+@fixtures.voicemail(context='mycontext', wazo_tenant=DELETED_TENANT)
+def test_delete_tenant_by_event(
+    user, group, incall, outcall, trunk, conference, context, voicemail
+):
+    BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
+
+    def tenant_deleted():
+        response = confd.tenants(DELETED_TENANT).get(wazo_tenant=MAIN_TENANT)
+        response.assert_match(404, e.not_found(resource='Tenant'))
+
+        response = confd.users(user['uuid']).get()
+        response.assert_status(404)
+
+        response = confd.groups(group['uuid']).get()
+        response.assert_status(404)
+
+        response = confd.incalls(incall['id']).get()
+        response.assert_status(404)
+
+        response = confd.outcalls(outcall['id']).get()
+        response.assert_status(404)
+
+        response = confd.trunks(trunk['id']).get()
+        response.assert_status(404)
+
+        response = confd.conferences(conference['id']).get()
+        response.assert_status(404)
+
+        response = confd.context(context['id']).get()
+        response.assert_status(404)
+
+        response = confd.voicemails(voicemail['id']).get()
+        response.assert_status(404)
+
+    until.assert_(tenant_deleted, tries=5, interval=5)
+
+
+@fixtures.user(wazo_tenant=DELETED_TENANT)
+@fixtures.group(wazo_tenant=DELETED_TENANT)
+@fixtures.incall(wazo_tenant=DELETED_TENANT)
+@fixtures.outcall(wazo_tenant=DELETED_TENANT)
+@fixtures.trunk(wazo_tenant=DELETED_TENANT)
+@fixtures.conference(wazo_tenant=DELETED_TENANT)
+@fixtures.context(name='mycontext', wazo_tenant=DELETED_TENANT)
+@fixtures.voicemail(context='mycontext', wazo_tenant=DELETED_TENANT)
+def test_delete_tenant_by_sync_db(
+    user, group, incall, outcall, trunk, conference, context, voicemail
+):
+
+    with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+        BaseIntegrationTest.sync_db()
+
+        def tenant_deleted():
+            response = confd.tenants(DELETED_TENANT).get(wazo_tenant=MAIN_TENANT)
+            response.assert_match(404, e.not_found(resource='Tenant'))
+
+            response = confd.users(user['uuid']).get()
+            response.assert_status(404)
+
+            response = confd.groups(group['uuid']).get()
+            response.assert_status(404)
+
+            response = confd.incalls(incall['id']).get()
+            response.assert_status(404)
+
+            response = confd.outcalls(outcall['id']).get()
+            response.assert_status(404)
+
+            response = confd.trunks(trunk['id']).get()
+            response.assert_status(404)
+
+            response = confd.conferences(conference['id']).get()
+            response.assert_status(404)
+
+            response = confd.context(context['id']).get()
+            response.assert_status(404)
+
+            response = confd.voicemails(voicemail['id']).get()
+            response.assert_status(404)
+
+        until.assert_(tenant_deleted, tries=5, interval=5)

@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -25,11 +25,11 @@ def test_remove_user_with_voicemail(_, user, voicemail):
         with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
             BaseIntegrationTest.sync_db()
 
-        response = confd.users(user['uuid']).get()
-        response.assert_status(404)
+            response = confd.users(user['uuid']).get()
+            response.assert_status(404)
 
-        response = confd.voicemails(voicemail['id']).get()
-        assert_that(response.item, has_entries(users=empty()))
+            response = confd.voicemails(voicemail['id']).get()
+            response.assert_status(404)
 
 
 @fixtures.context(name='DELETED', wazo_tenant=DELETED_TENANT)
@@ -40,11 +40,11 @@ def test_remove_user_with_line(context, user):
             with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
                 BaseIntegrationTest.sync_db()
 
-            response = confd.users(user['uuid']).get()
-            response.assert_status(404)
+                response = confd.users(user['uuid']).get()
+                response.assert_status(404)
 
-            response = confd.lines(line['id']).get()
-            assert_that(response.item, has_entries(users=empty()))
+                response = confd.lines(line['id']).get()
+                response.assert_status(404)
 
 
 def test_create_default_templates_when_not_exist():
@@ -55,24 +55,23 @@ def test_create_default_templates_when_not_exist():
 
     with BaseIntegrationTest.create_auth_tenant(CREATED_TENANT):
         BaseIntegrationTest.sync_db()
-
-    response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
-    assert_that(
-        response.items,
-        contains_inanyorder(
-            has_entries(
-                label='global',
-                transport=has_entries(uuid=transport_udp['uuid']),
+        response = confd.endpoints.sip.templates.get(wazo_tenant=CREATED_TENANT)
+        assert_that(
+            response.items,
+            contains_inanyorder(
+                has_entries(
+                    label='global',
+                    transport=has_entries(uuid=transport_udp['uuid']),
+                ),
+                has_entries(
+                    label='webrtc',
+                    transport=has_entries(uuid=transport_wss['uuid']),
+                ),
+                has_entries(label='meeting_guest'),
+                has_entries(label='registration_trunk'),
+                has_entries(label='twilio_trunk'),
             ),
-            has_entries(
-                label='webrtc',
-                transport=has_entries(uuid=transport_wss['uuid']),
-            ),
-            has_entries(label='meeting_guest'),
-            has_entries(label='registration_trunk'),
-            has_entries(label='twilio_trunk'),
-        ),
-    )
+        )
 
 
 def test_no_create_default_templates_when_exist():

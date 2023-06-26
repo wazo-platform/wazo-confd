@@ -1,4 +1,4 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -10,9 +10,9 @@ from xivo.config_helper import read_config_file_hierarchy
 from xivo_dao import init_db_from_config
 from xivo_dao.alchemy.tenant import Tenant
 from xivo_dao.helpers.db_utils import session_scope
-from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
+from xivo_dao.resources.tenant import dao as tenant_resources_dao
 from xivo_dao import tenant_dao
 from wazo_auth_client import Client as AuthClient
 
@@ -84,7 +84,6 @@ def main():
 
         removed_tenants = confd_tenants - auth_tenants
         for tenant_uuid in removed_tenants:
-            logger.info('Removing tenant: %s... (SKIP)', tenant_uuid)
             remove_tenant(tenant_uuid)
 
     with session_scope() as session:
@@ -102,10 +101,10 @@ def main():
 
 
 def remove_tenant(tenant_uuid):
-    for user in user_dao.find_all_by(tenant_uuid=tenant_uuid):
-        logger.debug('Removing user: %s', user.uuid)
-        user_dao.delete(user)
+    logger.debug('Removing tenant : %s', tenant_uuid)
+    with session_scope():
+        tenant = tenant_resources_dao.get(tenant_uuid)
+        tenant_resources_dao.delete(tenant)
 
-    # FIXME(fblackburn):
-    # * Add all other resources related to tenant_uuid
-    # * Reset device to autoprov
+if __name__ == '__main__':
+    main()
