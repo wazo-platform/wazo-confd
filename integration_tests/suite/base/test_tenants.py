@@ -68,7 +68,6 @@ def test_list_multi_tenant(_):
     )
 
 
-
 @fixtures.user(wazo_tenant=DELETED_TENANT)
 @fixtures.group(wazo_tenant=DELETED_TENANT)
 @fixtures.incall(wazo_tenant=DELETED_TENANT)
@@ -124,7 +123,6 @@ def test_delete_tenant_by_event(
 def test_delete_tenant_by_sync_db(
     user, group, incall, outcall, trunk, conference, context, voicemail
 ):
-
     with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
         BaseIntegrationTest.sync_db()
 

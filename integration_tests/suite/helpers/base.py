@@ -82,21 +82,15 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def _create_auth_tenant(cls):
-        cls.mock_auth.set_tenants(
-            *DEFAULT_TENANTS
-        )
+        cls.mock_auth.set_tenants(*DEFAULT_TENANTS)
 
     @classmethod
     def _delete_auth_tenant(cls):
-        cls.mock_auth.set_tenants(
-            *DEFAULT_TENANTS
-        )
+        cls.mock_auth.set_tenants(*DEFAULT_TENANTS)
 
     @classmethod
     def _reset_auth_tenants(cls):
-        cls.mock_auth.set_tenants(
-            *ALL_TENANTS
-        )
+        cls.mock_auth.set_tenants(*ALL_TENANTS)
 
     @classmethod
     @contextmanager
