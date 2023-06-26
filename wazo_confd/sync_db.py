@@ -106,5 +106,6 @@ def remove_tenant(tenant_uuid):
         tenant = tenant_resources_dao.get(tenant_uuid)
         tenant_resources_dao.delete(tenant)
 
+
 if __name__ == '__main__':
     main()
