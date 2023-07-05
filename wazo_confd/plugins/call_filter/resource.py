@@ -16,6 +16,10 @@ class CallFilterList(ListResource):
     schema = CallFilterSchema
     call_filter_name_fmt = 'callfilter-{tenant_slug}-{callfilter_uuid}'
 
+    def __init__(self, tenant_dao, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._tenant_dao = tenant_dao
+
     def build_headers(self, call_filter):
         return {'Location': url_for('callfilters', id=call_filter.id, _external=True)}
 
