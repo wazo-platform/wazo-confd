@@ -14,7 +14,7 @@ from .schema import CallFilterSchema
 class CallFilterList(ListResource):
     model = CallFilter
     schema = CallFilterSchema
-    call_filter_name_fmt = 'callfilter-{tenant_slug}-{callfilter_uuid}'
+    call_filter_name_fmt = 'callfilter-{tenant_slug}-{callfilter_id}'
 
     def __init__(self, tenant_dao, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,9 +29,9 @@ class CallFilterList(ListResource):
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])
-        form['name'] = self.callfilter_name_fmt.format(
+        form['name'] = self.call_filter_name_fmt.format(
             tenant_slug=tenant.slug,
-            callfilter_uuid=form['uuid'],
+            callfilter_id=form['id'],
         )
         model = self.model(**form)
         model = self.service.create(model)
