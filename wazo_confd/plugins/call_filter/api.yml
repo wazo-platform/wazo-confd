@@ -164,7 +164,7 @@ definitions:
           default: true
           description: Disable or enable the call filter
       required:
-      - name
+      - label
       - source
       - strategy
     - $ref: '#/definitions/CallFilterRecipients'
