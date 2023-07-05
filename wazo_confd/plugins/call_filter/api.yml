@@ -123,6 +123,10 @@ definitions:
         name:
           type: string
           description: The name of the call filter
+          readOnly: true
+        label:
+          type: string
+          description: The label of the call filter
         source:
           type: string
           enum:
