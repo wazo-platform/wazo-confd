@@ -1,7 +1,8 @@
 # Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for
+from flask import request, url_for
+
 from xivo_dao.alchemy.callfilter import Callfilter as CallFilter
 
 from wazo_confd.auth import required_acl
@@ -13,13 +14,24 @@ from .schema import CallFilterSchema
 class CallFilterList(ListResource):
     model = CallFilter
     schema = CallFilterSchema
+    call_filter_name_fmt = 'callfilter-{tenant_slug}-{callfilter_uuid}'
 
     def build_headers(self, call_filter):
         return {'Location': url_for('callfilters', id=call_filter.id, _external=True)}
 
     @required_acl('confd.callfilters.create')
     def post(self):
-        return super().post()
+        form = self.schema().load(request.get_json())
+        form = self.add_tenant_to_form(form)
+
+        tenant = self._tenant_dao.get(form['tenant_uuid'])
+        form['name'] = self.callfilter_name_fmt.format(
+            tenant_slug=tenant.slug,
+            callfilter_uuid=form['uuid'],
+        )
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.callfilters.read')
     def get(self):

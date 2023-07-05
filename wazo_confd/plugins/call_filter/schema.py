@@ -1,11 +1,15 @@
 # Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_dump
-from marshmallow.validate import Length, OneOf, Range
+import logging
+
+from marshmallow import fields, post_dump, pre_load
+from marshmallow.validate import OneOf, Length, Range
 from xivo.xivo_helpers import clean_extension
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
+
+logger = logging.getLogger(__name__)
 
 
 class CallFilterRecipientsSchema(BaseSchema):
@@ -46,7 +50,8 @@ class CallFilterSurrogatesSchema(BaseSchema):
 class CallFilterSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=Length(max=128), required=True)
+    name = fields.String(dump_only=True)
+    label = fields.String(validate=Length(max=128), required=True)
     strategy = fields.String(
         validate=OneOf(
             [
@@ -87,4 +92,16 @@ class CallFilterSchema(BaseSchema):
         if not self.only or 'surrogates' in self.only:
             data['surrogates'] = {'users': surrogate_users}
 
+        return data
+
+    # DEPRECATED 23.10
+    @pre_load
+    def copy_name_to_label(self, data, **kwargs):
+        if 'label' in data:
+            return data
+        if 'name' in data:
+            logger.warning(
+                'The "name" field of call_filter is deprecated. Use "label" instead'
+            )
+            data['label'] = data['name']
         return data

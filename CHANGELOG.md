@@ -1,5 +1,11 @@
 # Changelog
 
+## 25.09
+
+* A call filter now has a read-only auto-generated `name` and a required `label` instead
+  of a user-provided `name` and optional `label`. For compatibility purposes, if a call filter is
+  created using only a `name`, it will be used as the `label` and auto-generated.
+
 ## 25.08
 
 * The `groups` resource now has a `ignore_forward` field.

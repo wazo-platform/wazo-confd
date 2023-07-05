@@ -43,6 +43,11 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'name', True)
     s.check_bogus_field_returns_error(url, 'name', {})
     s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'label', 123)
+    s.check_bogus_field_returns_error(url, 'label', None)
+    s.check_bogus_field_returns_error(url, 'label', True)
+    s.check_bogus_field_returns_error(url, 'label', {})
+    s.check_bogus_field_returns_error(url, 'label', [])
     s.check_bogus_field_returns_error(url, 'source', 123)
     s.check_bogus_field_returns_error(url, 'source', True)
     s.check_bogus_field_returns_error(url, 'source', 'invalid')
@@ -78,27 +83,11 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'enabled', {})
     s.check_bogus_field_returns_error(url, 'enabled', [])
 
-    unique_error_checks(url)
-
-
-@fixtures.call_filter(name='unique')
-def unique_error_checks(url, call_filter):
-    s.check_bogus_field_returns_error(
-        url,
-        'name',
-        call_filter['name'],
-        {
-            'strategy': 'all',
-            'source': 'all',
-        },
-    )
-
-
-@fixtures.call_filter(name="search", description="SearchDesc")
-@fixtures.call_filter(name="hidden", description="HiddenDesc")
+@fixtures.call_filter(label="search", description="SearchDesc")
+@fixtures.call_filter(label="hidden", description="HiddenDesc")
 def test_search(call_filter, hidden):
     url = confd.callfilters
-    searches = {'name': 'search', 'description': 'Search'}
+    searches = {'label': 'search', 'description': 'Search'}
 
     for field, term in searches.items():
         check_search(url, call_filter, hidden, field, term)
@@ -114,15 +103,15 @@ def check_search(url, call_filter, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.call_filter(name="sort1", description="Sort 1")
-@fixtures.call_filter(name="sort2", description="Sort 2")
+@fixtures.call_filter(label="sort1", description="Sort 1")
+@fixtures.call_filter(label="sort2", description="Sort 2")
 def test_sorting_offset_limit(call_filter1, call_filter2):
     url = confd.callfilters.get
-    s.check_sorting(url, call_filter1, call_filter2, 'name', 'sort')
+    s.check_sorting(url, call_filter1, call_filter2, 'label', 'sort')
     s.check_sorting(url, call_filter1, call_filter2, 'description', 'Sort')
 
-    s.check_offset(url, call_filter1, call_filter2, 'name', 'sort')
-    s.check_limit(url, call_filter1, call_filter2, 'name', 'sort')
+    s.check_offset(url, call_filter1, call_filter2, 'label', 'sort')
+    s.check_limit(url, call_filter1, call_filter2, 'label', 'sort')
 
 
 @fixtures.call_filter(wazo_tenant=MAIN_TENANT)
@@ -145,6 +134,7 @@ def test_get(call_filter):
         response.item,
         has_entries(
             name=call_filter['name'],
+            label=call_filter['label'],
             source=call_filter['source'],
             caller_id_mode=none(),
             caller_id_name=none(),
@@ -170,7 +160,7 @@ def test_get_multi_tenant(main, sub):
 
 
 def test_create_minimal_parameters():
-    response = confd.callfilters.post(name='minimal', source='all', strategy='all')
+    response = confd.callfilters.post(label='minimal', source='all', strategy='all')
     response.assert_created('callfilters')
 
     assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
@@ -180,7 +170,7 @@ def test_create_minimal_parameters():
 
 def test_create_all_parameters():
     parameters = {
-        'name': 'allparameter',
+        'label': 'all parameters',
         'source': 'all',
         'strategy': 'all',
         'surrogates_timeout': 10,
@@ -192,7 +182,21 @@ def test_create_all_parameters():
 
     response = confd.callfilters.post(**parameters)
     response.assert_created('callfilters')
-    assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
+    assert_that(
+        response.item,
+        has_entries(
+            tenant_uuid=MAIN_TENANT,
+            name=not_(empty()),
+            label='all parameters',
+            source='all',
+            strategy='all',
+            surrogates_timeout=10,
+            caller_id_mode='prepend',
+            caller_id_name='callidname',
+            description='Create description',
+            enabled=False,
+        ),
+    )
     confd.callfilters(response.item['id']).delete().assert_deleted()
 
 
@@ -211,7 +215,7 @@ def test_create_with_every_enum(self, *call_filters):
     pass
 
 
-def test_create_without_name():
+def test_create_without_label():
     response = confd.callfilters.post()
     response.assert_status(400)
 
@@ -225,7 +229,7 @@ def test_edit_minimal_parameters(call_filter):
 @fixtures.call_filter()
 def test_edit_all_parameters(call_filter):
     parameters = {
-        'name': 'editallparameter',
+        'label': 'edit label',
         'source': 'all',
         'strategy': 'all',
         'surrogates_timeout': 10,
