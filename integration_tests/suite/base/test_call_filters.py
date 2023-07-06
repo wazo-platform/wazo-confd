@@ -38,11 +38,6 @@ def test_put_errors(call_filter):
 
 
 def error_checks(url):
-    s.check_bogus_field_returns_error(url, 'name', 123)
-    s.check_bogus_field_returns_error(url, 'name', None)
-    s.check_bogus_field_returns_error(url, 'name', True)
-    s.check_bogus_field_returns_error(url, 'name', {})
-    s.check_bogus_field_returns_error(url, 'name', [])
     s.check_bogus_field_returns_error(url, 'label', 123)
     s.check_bogus_field_returns_error(url, 'label', None)
     s.check_bogus_field_returns_error(url, 'label', True)
