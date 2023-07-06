@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
+from uuid import uuid4
 
 from xivo_dao.alchemy.callfilter import Callfilter as CallFilter
 
@@ -14,7 +15,7 @@ from .schema import CallFilterSchema
 class CallFilterList(ListResource):
     model = CallFilter
     schema = CallFilterSchema
-    call_filter_name_fmt = 'callfilter-{tenant_slug}-{callfilter_id}'
+    call_filter_name_fmt = 'callfilter-{tenant_slug}-{callfilter_uuid}'
 
     def __init__(self, tenant_dao, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,9 +30,11 @@ class CallFilterList(ListResource):
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])
+        # NOTE(afournier): we use a UUID as if it was the callfilter UUID but it's not
+        # Call filters do not use UUIDs yet
         form['name'] = self.call_filter_name_fmt.format(
             tenant_slug=tenant.slug,
-            callfilter_id=form['id'],
+            callfilter_uuid=uuid4(),
         )
         model = self.model(**form)
         model = self.service.create(model)
