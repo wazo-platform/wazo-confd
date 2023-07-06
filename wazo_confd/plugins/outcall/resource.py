@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
+from uuid import uuid4
 
 from xivo_dao.alchemy.outcall import Outcall
 
@@ -14,7 +15,7 @@ from .schema import OutcallSchema
 class OutcallList(ListResource):
     model = Outcall
     schema = OutcallSchema
-    outcall_name_fmt = 'outcall-{tenant_slug}-{outcall_id}'
+    outcall_name_fmt = 'outcall-{tenant_slug}-{outcall_uuid}'
 
     def __init__(self, tenant_dao, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,9 +30,11 @@ class OutcallList(ListResource):
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])
+        # NOTE(afournier): we use a UUID as if it was the outcall UUID but it's not
+        # Outcalls do not use UUIDs yet
         form['name'] = self.outcall_name_fmt.format(
             tenant_slug=tenant.slug,
-            outcall_id=form['id'],
+            outcall_uuid=uuid4(),
         )
         model = self.model(**form)
         model = self.service.create(model)
