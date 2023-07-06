@@ -133,7 +133,7 @@ definitions:
     - $ref: '#/definitions/OutcallRelationSchedules'
     - $ref: '#/definitions/OutcallRelationCallPermissions'
     - required:
-      - name
+      - label
   OutcallRelationBase:
     properties:
       id:
@@ -143,6 +143,10 @@ definitions:
       name:
         type: string
         description: The name of the outcall
+        readOnly: true
+      label:
+        type: string
+        description: The label of the outcall
   OutcallRelationTrunks:
     properties:
       trunks:

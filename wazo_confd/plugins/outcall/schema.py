@@ -1,17 +1,21 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import logging
 
-from marshmallow import fields, post_dump
+from marshmallow import fields, post_dump, pre_load
 from marshmallow.validate import Length, Range
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
+
+logger = logging.getLogger(__name__)
 
 
 class OutcallSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    name = fields.String(validate=Length(max=128), required=True)
+    name = fields.String(dump_only=True)
+    label = fields.String(validate=Length(max=128), required=True)
     internal_caller_id = StrictBoolean()
     preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
     ring_time = fields.Integer(validate=Range(min=0), allow_none=True)
@@ -39,6 +43,18 @@ class OutcallSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+
+    # DEPRECATED 23.10
+    @pre_load
+    def copy_name_to_label(self, data, **kwargs):
+        if 'label' in data:
+            return data
+        if 'name' in data:
+            logger.warning(
+                'The "name" field of outcall is deprecated. Use "label" instead'
+            )
+            data['label'] = data['name']
+        return data
 
 
 class DialPatternSchema(BaseSchema):

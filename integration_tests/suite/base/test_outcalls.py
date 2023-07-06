@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -53,6 +53,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', 1234
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
+    yield s.check_bogus_field_returns_error, url, 'name', 'name'
+    yield s.check_bogus_field_returns_error, url, 'label', 123
+    yield s.check_bogus_field_returns_error, url, 'label', None
+    yield s.check_bogus_field_returns_error, url, 'label', True
+    yield s.check_bogus_field_returns_error, url, 'label', {}
+    yield s.check_bogus_field_returns_error, url, 'label', []
     yield s.check_bogus_field_returns_error, url, 'internal_caller_id', 1234
     yield s.check_bogus_field_returns_error, url, 'internal_caller_id', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'internal_caller_id', None
@@ -69,20 +75,12 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'enabled', []
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
 
-    for check in unique_error_checks(url):
-        yield check
 
-
-@fixtures.outcall(name='unique')
-def unique_error_checks(url, outcall):
-    yield s.check_bogus_field_returns_error, url, 'name', outcall['name']
-
-
-@fixtures.outcall(description='search')
+@fixtures.outcall(label='search', description='search')
 @fixtures.outcall(description='hidden')
 def test_search(outcall, hidden):
     url = confd.outcalls
-    searches = {'description': 'search'}
+    searches = {'label': 'search', 'description': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, outcall, hidden, field, term
