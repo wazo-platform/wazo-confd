@@ -1,7 +1,8 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
+from flask import request, url_for
+from uuid import uuid4
 
 from xivo_dao.alchemy.context import Context
 
@@ -14,13 +15,30 @@ from .schema import ContextSchema, ContextSchemaPUT
 class ContextList(ListResource):
     model = Context
     schema = ContextSchema
+    context_name_fmt = 'ctx-{tenant_slug}-{context_uuid}'
+
+    def __init__(self, tenant_dao, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._tenant_dao = tenant_dao
 
     def build_headers(self, context):
         return {'Location': url_for('contexts', id=context.id, _external=True)}
 
     @required_acl('confd.contexts.create')
     def post(self):
-        return super().post()
+        form = self.schema().load(request.get_json())
+        form = self.add_tenant_to_form(form)
+
+        tenant = self._tenant_dao.get(form['tenant_uuid'])
+        # NOTE(afournier): we use a UUID as if it was the context UUID but it's not
+        # Contexts do not use UUIDs yet
+        form['name'] = self.context_name_fmt.format(
+            tenant_slug=tenant.slug,
+            context_uuid=uuid4(),
+        )
+        model = self.model(**form)
+        model = self.service.create(model)
+        return self.schema().dump(model), 201, self.build_headers(model)
 
     @required_acl('confd.contexts.read')
     def get(self):

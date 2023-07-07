@@ -148,7 +148,7 @@ definitions:
           readOnly: true
     - $ref: '#/definitions/ContextRelationContexts'
     - required:
-      - name
+      - label
   ContextRelationBase:
     properties:
       id:
@@ -157,7 +157,8 @@ definitions:
         description: The id of the context
       name:
         type: string
-        description: The name used by Asterisk (can only by set on create)
+        description: The name used by Asterisk
+        readOnly: true
   ContextRange:
     title: ContextRange
     properties:
