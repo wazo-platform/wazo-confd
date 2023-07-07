@@ -47,13 +47,6 @@ def error_checks(url):
     )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'name', 'name'
     yield s.check_bogus_field_returns_error, url, 'label', 123
     yield s.check_bogus_field_returns_error, url, 'label', None
     yield s.check_bogus_field_returns_error, url, 'label', True
@@ -131,6 +124,7 @@ def test_get(outcall):
             description=outcall['description'],
             internal_caller_id=outcall['internal_caller_id'],
             name=outcall['name'],
+            label=outcall['label'],
             ring_time=outcall['ring_time'],
             trunks=empty(),
         ),
@@ -158,7 +152,7 @@ def test_create_minimal_parameters():
 
 def test_create_all_parameters():
     parameters = {
-        'name': 'MyOutcall',
+        'label': 'My Outcall',
         'internal_caller_id': True,
         'preprocess_subroutine': 'subroutine',
         'ring_time': 10,
@@ -183,7 +177,7 @@ def test_edit_minimal_parameters(outcall):
 @fixtures.outcall()
 def test_edit_all_parameters(outcall):
     parameters = {
-        'name': 'MyOutcall',
+        'label': 'MyOutcall',
         'internal_caller_id': True,
         'preprocess_subroutine': 'subroutine',
         'ring_time': 10,
