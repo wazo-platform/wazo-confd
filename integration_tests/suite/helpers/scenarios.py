@@ -19,7 +19,7 @@ from .bus import BusClient
 
 from . import errors as e
 
-OVERHEAD_DB_REQUESTS = 4  # BEGIN, COMMIT, SELECT 1, COMMIT
+OVERHEAD_DB_REQUESTS = 3  # BEGIN, SELECT 1, COMMIT
 
 
 def check_resource_not_found(request, resource):

@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -176,7 +176,11 @@ def test_sorting_offset_limit(sip1, sip2):
 @fixtures.sip()
 @fixtures.sip()
 def test_list_db_requests(*_):
-    s.check_db_requests(BaseIntegrationTest, confd.endpoints.sip.get, nb_requests=1)
+    expected_request_count = (
+        1  # list
+        + 1  # count
+    )
+    s.check_db_requests(BaseIntegrationTest, confd.endpoints.sip.get, nb_requests=expected_request_count)
 
 
 @fixtures.sip()
