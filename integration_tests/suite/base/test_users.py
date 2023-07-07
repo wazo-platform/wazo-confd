@@ -22,7 +22,7 @@ from hamcrest import (
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd, provd, auth as authentication
+from . import confd, provd, auth as authentication, BaseIntegrationTest
 from ..helpers import (
     associations as a,
     errors as e,
@@ -683,6 +683,23 @@ def test_get(user):
             call_pickup_target_users=empty(),
         ),
     )
+
+@fixtures.user()
+@fixtures.call_permission()
+def test_get_db_requests(user, perm):
+    with a.user_call_permission(user, perm):
+        expected_request_count = (
+            1  # user + joins
+            + 1  # groups
+            + 1  # pickups
+            + 2  # rightcalls
+            + 2  # dialactions
+            + 1  # lines
+            + 1  # schedules
+            + 1  # switchboards
+            + 1  # queues
+        )
+        s.check_db_requests(BaseIntegrationTest, confd.users(user['id']).get, nb_requests=expected_request_count)
 
 
 @fixtures.user(firstname="Snôm", lastname="Whîte")
