@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from . import confd
@@ -19,7 +19,7 @@ def generate_number_and_context():
 
 
 def new_number_and_context(context):
-    generate_context(name=context)
+    generate_context(label=context)
     return find_available_number(context), context
 
 
