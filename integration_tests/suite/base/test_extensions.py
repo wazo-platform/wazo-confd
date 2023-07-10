@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -572,7 +572,10 @@ def test_search_extensions_by_type(internal, incall):
 @fixtures.extension()
 @fixtures.extension()
 def test_list_db_requests(*_):
-    s.check_db_requests(BaseIntegrationTest, confd.extensions.get, nb_requests=1)
+    expected_request_count = 1 + 1  # 1 list + 1 count
+    s.check_db_requests(
+        BaseIntegrationTest, confd.extensions.get, nb_requests=expected_request_count
+    )
 
 
 @fixtures.extension()
