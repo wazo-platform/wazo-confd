@@ -155,12 +155,11 @@ def test_list_multi_tenant(_, __, main, sub):
 @fixtures.line()
 @fixtures.line()
 def test_list_db_requests(user1, line1, *_):
-    expected_request_count = (
-        1  # list
-        + 1  # count
-    )
+    expected_request_count = 1 + 1  # 1 list + 1 count
     with a.user_line(user1, line1):
-        s.check_db_requests(BaseIntegrationTest, confd.lines.get, nb_requests=expected_request_count)
+        s.check_db_requests(
+            BaseIntegrationTest, confd.lines.get, nb_requests=expected_request_count
+        )
 
 
 def test_create_line_with_fake_context():

@@ -572,11 +572,10 @@ def test_search_extensions_by_type(internal, incall):
 @fixtures.extension()
 @fixtures.extension()
 def test_list_db_requests(*_):
-    expected_request_count = (
-        1  # list
-        + 1  # count
+    expected_request_count = 1 + 1  # 1 list + 1 count
+    s.check_db_requests(
+        BaseIntegrationTest, confd.extensions.get, nb_requests=expected_request_count
     )
-    s.check_db_requests(BaseIntegrationTest, confd.extensions.get, nb_requests=expected_request_count)
 
 
 @fixtures.extension()

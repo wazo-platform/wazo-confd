@@ -191,12 +191,11 @@ def test_sorting_offset_limit(sip1, sip2):
 @fixtures.sip()
 @fixtures.sip()
 def test_list_db_requests(*_):
-    expected_request_count = (
-        1  # list
-        + 1  # count
-    )
+    expected_request_count = 1 + 1  # 1 list + 1 count
     s.check_db_requests(
-        BaseIntegrationTest, confd.endpoints.sip.templates.get, nb_requests=expected_request_count
+        BaseIntegrationTest,
+        confd.endpoints.sip.templates.get,
+        nb_requests=expected_request_count,
     )
 
 

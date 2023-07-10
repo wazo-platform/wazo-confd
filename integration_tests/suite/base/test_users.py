@@ -684,6 +684,7 @@ def test_get(user):
         ),
     )
 
+
 @fixtures.user()
 @fixtures.call_permission()
 def test_get_db_requests(user, perm):
@@ -699,7 +700,11 @@ def test_get_db_requests(user, perm):
             + 1  # switchboards
             + 1  # queues
         )
-        s.check_db_requests(BaseIntegrationTest, confd.users(user['id']).get, nb_requests=expected_request_count)
+        s.check_db_requests(
+            BaseIntegrationTest,
+            confd.users(user['id']).get,
+            nb_requests=expected_request_count,
+        )
 
 
 @fixtures.user(firstname="Snôm", lastname="Whîte")
