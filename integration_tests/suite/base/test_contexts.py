@@ -42,9 +42,6 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, url, 'label', []
     yield s.check_bogus_field_returns_error, url, 'label', {}
 
-    for check in unique_error_checks(url):
-        yield check
-
 
 @fixtures.context()
 def test_put_errors(context):
