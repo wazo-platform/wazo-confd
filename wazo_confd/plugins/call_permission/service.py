@@ -1,8 +1,11 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.call_permission import dao as call_permission_dao
+from xivo_dao.resources.call_permission.query_options import (
+    call_permission_preload_relationships,
+)
 
 from wazo_confd.helpers.resource import CRUDService
 
@@ -26,6 +29,14 @@ class CallPermissionService(CRUDService):
             )
         self.dao.edit(call_permission)
         self.notifier.edited(call_permission)
+
+    @call_permission_dao.query_options(*call_permission_preload_relationships)
+    def get(self, resource_id, **kwargs):
+        return super().get(resource_id, **kwargs)
+
+    @call_permission_dao.query_options(*call_permission_preload_relationships)
+    def search(self, parameters, tenant_uuids=None):
+        return super().search(parameters, tenant_uuids)
 
 
 def build_service():
