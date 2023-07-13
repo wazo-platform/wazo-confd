@@ -198,19 +198,19 @@ def check_search(url, voicemail, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.voicemail(context='main_ctx')
-@fixtures.voicemail(context='sub_ctx')
-def test_list_multi_tenant(_, __, main, sub):
-    response = confd.voicemails.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.voicemail(context=main_ctx['name']) as main:
+        with fixtures.voicemail(context=sub_ctx['name']) as sub:
+            response = confd.voicemails.get(wazo_tenant=MAIN_TENANT)
+            assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
 
-    response = confd.voicemails.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
+            response = confd.voicemails.get(wazo_tenant=SUB_TENANT)
+            assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
-    response = confd.voicemails.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(main, sub))
+            response = confd.voicemails.get(wazo_tenant=MAIN_TENANT, recurse=True)
+            assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.voicemail(
@@ -244,16 +244,16 @@ def test_get_voicemail(voicemail):
     assert_that(response.item, has_entries(users=empty()))
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.voicemail(context='main_ctx')
-@fixtures.voicemail(context='sub_ctx')
-def test_get_multi_tenant(_, __, main, sub):
-    response = confd.voicemails(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Voicemail'))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.voicemail(context=main_ctx['name']) as main:
+        with fixtures.voicemail(context=sub_ctx['name']) as sub:
+            response = confd.voicemails(main['id']).get(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found(resource='Voicemail'))
 
-    response = confd.voicemails(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+            response = confd.voicemails(sub['id']).get(wazo_tenant=MAIN_TENANT)
+            assert_that(response.item, has_entries(**sub))
 
 
 def test_create_minimal_voicemail():
@@ -278,7 +278,7 @@ def test_create_minimal_voicemail():
 
 def test_create_voicemails_same_number_different_contexts():
     number, context = vm_helper.new_number_and_context('vmctx1')
-    other_context = context_helper.generate_context(name='vmctx2')
+    other_context = context_helper.generate_context(label='vmctx2')
 
     response = confd.voicemails.post(name='samenumber1', number=number, context=context)
     response.assert_ok()
@@ -405,21 +405,21 @@ def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
     )
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.voicemail(context='main_ctx')
-@fixtures.voicemail(context='sub_ctx')
-def test_edit_multi_tenant(main_ctx, _, main, sub):
-    response = confd.voicemails(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Voicemail'))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.voicemail(context=main_ctx['name']) as main:
+        with fixtures.voicemail(context=sub_ctx['name']) as sub:
+            response = confd.voicemails(main['id']).put(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found(resource='Voicemail'))
 
-    response = confd.voicemails(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+            response = confd.voicemails(sub['id']).put(wazo_tenant=MAIN_TENANT)
+            response.assert_updated()
 
-    response = confd.voicemails(sub['id']).put(
-        context=main_ctx['name'], wazo_tenant=SUB_TENANT
-    )
-    response.assert_status(400)
+            response = confd.voicemails(sub['id']).put(
+                context=main_ctx['name'], wazo_tenant=SUB_TENANT
+            )
+            response.assert_status(400)
 
 
 @fixtures.voicemail()
@@ -428,16 +428,16 @@ def test_delete_voicemail(voicemail):
     response.assert_deleted()
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.voicemail(context='main_ctx')
-@fixtures.voicemail(context='sub_ctx')
-def test_delete_multi_tenant(_, __, main, sub):
-    response = confd.voicemails(main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Voicemail'))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_delete_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.voicemail(context=main_ctx['name']) as main:
+        with fixtures.voicemail(context=sub_ctx['name']) as sub:
+            response = confd.voicemails(main['id']).delete(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found(resource='Voicemail'))
 
-    response = confd.voicemails(sub['id']).delete(wazo_tenant=MAIN_TENANT)
-    response.assert_deleted()
+            response = confd.voicemails(sub['id']).delete(wazo_tenant=MAIN_TENANT)
+            response.assert_deleted()
 
 
 @fixtures.voicemail()

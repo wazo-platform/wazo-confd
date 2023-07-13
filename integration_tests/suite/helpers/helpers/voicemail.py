@@ -18,9 +18,9 @@ def generate_number_and_context():
     return number, config.CONTEXT
 
 
-def new_number_and_context(context):
-    generate_context(label=context)
-    return find_available_number(context), context
+def new_number_and_context(context_label):
+    context = generate_context(label=context_label)
+    return find_available_number(context['name']), context['name']
 
 
 def find_available_number(context=config.CONTEXT, exclude=None):
