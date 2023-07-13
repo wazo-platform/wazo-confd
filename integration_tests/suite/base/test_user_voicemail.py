@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -72,33 +72,33 @@ def test_associate_multiple_users_to_voicemail(user1, user2, voicemail):
     response.assert_updated()
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.voicemail(context='main_ctx')
-@fixtures.voicemail(context='sub_ctx')
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
-    response = (
-        confd.users(main_user['uuid'])
-        .voicemails(sub_vm['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('User'))
+def test_associate_multi_tenant(main_ctx, sub_ctx, main_user, sub_user):
+    with fixtures.voicemail(context=main_ctx['name']) as main_vm:
+        with fixtures.voicemail(context=sub_ctx['name']) as sub_vm:
+            response = (
+                confd.users(main_user['uuid'])
+                .voicemails(sub_vm['id'])
+                .put(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_match(404, e.not_found('User'))
 
-    response = (
-        confd.users(sub_user['uuid'])
-        .voicemails(main_vm['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Voicemail'))
+            response = (
+                confd.users(sub_user['uuid'])
+                .voicemails(main_vm['id'])
+                .put(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_match(404, e.not_found('Voicemail'))
 
-    response = (
-        confd.users(main_user['uuid'])
-        .voicemails(sub_vm['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+            response = (
+                confd.users(main_user['uuid'])
+                .voicemails(sub_vm['id'])
+                .put(wazo_tenant=MAIN_TENANT)
+            )
+            response.assert_match(400, e.different_tenant())
 
 
 @fixtures.user()
@@ -211,19 +211,19 @@ def test_list_user_voicemail(user, voicemail):
         assert_that(response.items, contains_inanyorder(has_entries(voicemail)))
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.voicemail(context='main_ctx')
-@fixtures.voicemail(context='sub_ctx')
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
-def test_list_user_voicemail_multi_tenant(_, __, main_vm, sub_vm, main_user, sub_user):
-    with a.user_voicemail(main_user, main_vm), a.user_voicemail(sub_user, sub_vm):
-        response = confd.users(main_user['uuid']).voicemails.get(wazo_tenant=SUB_TENANT)
-        response.assert_match(404, e.not_found(resource='User'))
+def test_list_user_voicemail_multi_tenant(main_ctx, sub_ctx, main_vm, sub_vm, main_user, sub_user):
+    with fixtures.voicemail(context=main_ctx['name']) as main_vm:
+        with fixtures.voicemail(context=sub_ctx['name']) as sub_vm:
+            with a.user_voicemail(main_user, main_vm), a.user_voicemail(sub_user, sub_vm):
+                response = confd.users(main_user['uuid']).voicemails.get(wazo_tenant=SUB_TENANT)
+                response.assert_match(404, e.not_found(resource='User'))
 
-        response = confd.users(sub_user['uuid']).voicemails.get(wazo_tenant=MAIN_TENANT)
-        assert_that(response.items[0], has_entries(name=sub_vm['name']))
+                response = confd.users(sub_user['uuid']).voicemails.get(wazo_tenant=MAIN_TENANT)
+                assert_that(response.items[0], has_entries(name=sub_vm['name']))
 
 
 @fixtures.user()
