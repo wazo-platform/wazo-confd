@@ -522,17 +522,23 @@ def test_reset_to_autoprov_device_associated_to_line(provd, device, line):
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 @fixtures.device(wazo_tenant=MAIN_TENANT)
 @fixtures.device(wazo_tenant=SUB_TENANT)
-def test_reset_to_autoprov_multi_tenant(provd, main_ctx, sub_ctx, main_device, sub_device):
+def test_reset_to_autoprov_multi_tenant(
+    provd, main_ctx, sub_ctx, main_device, sub_device
+):
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):
         with a.line_device(main_line, main_device, check=False) and a.line_device(
             sub_line, sub_device, check=False
         ):
-            response = confd.devices(main_device['id']).autoprov.get(wazo_tenant=SUB_TENANT)
+            response = confd.devices(main_device['id']).autoprov.get(
+                wazo_tenant=SUB_TENANT
+            )
             response.assert_match(404, e.not_found('Device'))
 
-            response = confd.devices(sub_device['id']).autoprov.get(wazo_tenant=MAIN_TENANT)
+            response = confd.devices(sub_device['id']).autoprov.get(
+                wazo_tenant=MAIN_TENANT
+            )
             response.assert_ok()
 
             device_cfg = provd.devices.get(sub_device['id'])

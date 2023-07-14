@@ -69,7 +69,6 @@ def test_associate_multiple_lines_to_application(line1, line2, application):
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_ctx, sub_ctx, main_app, sub_app):
-
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):
@@ -117,7 +116,6 @@ def test_dissociate_not_associated(line, application):
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_app, sub_app):
-
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):

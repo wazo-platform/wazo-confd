@@ -98,7 +98,6 @@ def test_associate_when_trunk_already_associated(line, trunk, sip):
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_ctx, sub_ctx, main_sip, sub_sip):
-
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):
@@ -164,7 +163,6 @@ def test_dissociate_when_associated_to_extension(line, sip, extension):
 @fixtures.sip(wazo_tenant=MAIN_TENANT)
 @fixtures.sip(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_sip, sub_sip):
-
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):

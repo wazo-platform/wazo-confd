@@ -218,11 +218,17 @@ def test_list_user_voicemail(user, voicemail):
 def test_list_user_voicemail_multi_tenant(main_ctx, sub_ctx, main_user, sub_user):
     with fixtures.voicemail(context=main_ctx['name']) as main_vm:
         with fixtures.voicemail(context=sub_ctx['name']) as sub_vm:
-            with a.user_voicemail(main_user, main_vm), a.user_voicemail(sub_user, sub_vm):
-                response = confd.users(main_user['uuid']).voicemails.get(wazo_tenant=SUB_TENANT)
+            with a.user_voicemail(main_user, main_vm), a.user_voicemail(
+                sub_user, sub_vm
+            ):
+                response = confd.users(main_user['uuid']).voicemails.get(
+                    wazo_tenant=SUB_TENANT
+                )
                 response.assert_match(404, e.not_found(resource='User'))
 
-                response = confd.users(sub_user['uuid']).voicemails.get(wazo_tenant=MAIN_TENANT)
+                response = confd.users(sub_user['uuid']).voicemails.get(
+                    wazo_tenant=MAIN_TENANT
+                )
                 assert_that(response.items[0], has_entries(name=sub_vm['name']))
 
 
