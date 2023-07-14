@@ -261,7 +261,6 @@ def test_create_in_authorized_tenant():
 
 def test_create_all_parameters():
     parameters = {
-        'name': 'MyContext',
         'label': 'Context Power',
         'type': 'outcall',
         'user_ranges': [{'start': '1000', 'end': '1999'}],
