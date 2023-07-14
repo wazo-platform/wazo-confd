@@ -78,7 +78,6 @@ def test_associate_multiple_lines_to_sccp(line1, line2, sccp):
 @fixtures.sccp(wazo_tenant=MAIN_TENANT)
 @fixtures.sccp(wazo_tenant=SUB_TENANT)
 def test_associate_multi_tenant(main_ctx, sub_ctx, main_sccp, sub_sccp):
-
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):
@@ -144,7 +143,6 @@ def test_dissociate_when_associated_to_extension(line, sccp, extension):
 @fixtures.sccp(wazo_tenant=MAIN_TENANT)
 @fixtures.sccp(wazo_tenant=SUB_TENANT)
 def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_sccp, sub_sccp):
-
     @fixtures.line(context=main_ctx['name'])
     @fixtures.line(context=sub_ctx['name'])
     def aux(main_line, sub_line):

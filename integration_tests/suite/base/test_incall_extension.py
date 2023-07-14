@@ -84,10 +84,7 @@ def test_associate_when_not_incall_context(incall, extension):
 @fixtures.incall(wazo_tenant=SUB_TENANT)
 @fixtures.context(wazo_tenant=SUB_TENANT, type='incall', label='sub-incall')
 @fixtures.extension(context=INCALL_CONTEXT)
-def test_associate_multi_tenant(
-    main_incall, sub_incall, sub_ctx, main_exten
-):
-
+def test_associate_multi_tenant(main_incall, sub_incall, sub_ctx, main_exten):
     @fixtures.extension(context=sub_ctx['name'])
     def aux(sub_exten):
         response = (
@@ -126,10 +123,7 @@ def test_dissociate(incall, extension):
 @fixtures.incall(wazo_tenant=SUB_TENANT)
 @fixtures.context(wazo_tenant=SUB_TENANT, type='incall', label='sub-incall')
 @fixtures.extension(context=INCALL_CONTEXT)
-def test_dissociate_multi_tenant(
-    main_incall, sub_incall, sub_ctx, main_exten
-):
-
+def test_dissociate_multi_tenant(main_incall, sub_incall, sub_ctx, main_exten):
     @fixtures.extension(context=sub_ctx['name'])
     def aux(sub_exten):
         response = (

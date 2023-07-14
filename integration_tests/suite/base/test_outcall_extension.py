@@ -126,9 +126,7 @@ def test_associate_when_not_outcall_context(outcall, extension):
 @fixtures.outcall(wazo_tenant=SUB_TENANT)
 @fixtures.context(wazo_tenant=SUB_TENANT, type='outcall', label='sub-outcall')
 @fixtures.extension(context=OUTCALL_CONTEXT)
-def test_associate_multi_tenant(
-    main_outcall, sub_outcall, sub_ctx, main_exten
-):
+def test_associate_multi_tenant(main_outcall, sub_outcall, sub_ctx, main_exten):
     with fixtures.extension(context=sub_ctx['name']) as sub_exten:
         response = (
             confd.outcalls(sub_outcall['id'])
@@ -156,9 +154,7 @@ def test_associate_multi_tenant(
 @fixtures.outcall(wazo_tenant=SUB_TENANT)
 @fixtures.context(wazo_tenant=SUB_TENANT, type='outcall', label='sub-outcall')
 @fixtures.extension(context=OUTCALL_CONTEXT)
-def test_dissociate_multi_tenant(
-    main_outcall, sub_outcall, sub_ctx, main_exten
-):
+def test_dissociate_multi_tenant(main_outcall, sub_outcall, sub_ctx, main_exten):
     with fixtures.extension(context=sub_ctx['name']) as sub_exten:
         response = (
             confd.outcalls(sub_outcall['id'])

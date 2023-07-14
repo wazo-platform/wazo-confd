@@ -100,7 +100,6 @@ def error_checks(url):
 @fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
 @fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
 def test_get_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(exten='1001', context=main_ctx['name'])
     @fixtures.extension(exten='1001', context=sub_ctx['name'])
     def aux(in_main, in_sub):
@@ -303,7 +302,6 @@ def test_edit_outcall_pattern(extension):
 @fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 def test_edit_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'])
     @fixtures.extension(context=sub_ctx['name'])
     def aux(main, sub):
@@ -347,7 +345,6 @@ def test_update_additional_parameters(extension1):
 @fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
 @fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
 def test_update_and_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(exten='1001', context=main_ctx['name'])
     @fixtures.extension(exten='1001', context=sub_ctx['name'])
     def aux(in_main, in_sub):
@@ -356,7 +353,9 @@ def test_update_and_multi_tenant(main_ctx, sub_ctx):
         )
         response.assert_match(404, e.not_found('Extension'))
 
-        response = confd.extensions(in_sub['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
+        response = confd.extensions(in_sub['id']).put(
+            wazo_tenant=SUB_TENANT, enabled=False
+        )
         response.assert_updated()
 
         response = confd.extensions(in_sub['id']).get()
@@ -373,7 +372,6 @@ def test_update_and_multi_tenant(main_ctx, sub_ctx):
 @fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
 @fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
 def test_that_changing_tenant_is_not_possible(main_ctx, sub_ctx):
-
     @fixtures.extension(exten='1001', context=main_ctx['name'])
     @fixtures.extension(exten='1001', context=sub_ctx['name'])
     def aux(in_main, in_sub):
@@ -382,6 +380,7 @@ def test_that_changing_tenant_is_not_possible(main_ctx, sub_ctx):
         response.assert_match(400, e.different_tenant())
 
     aux()
+
 
 @fixtures.user()
 @fixtures.user()
@@ -499,7 +498,6 @@ def check_search(url, extension, hidden, field, term):
 @fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
 @fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
 def test_search_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(exten='1001', context=main_ctx['name'])
     @fixtures.extension(exten='1001', context=sub_ctx['name'])
     def aux(*_):
@@ -515,13 +513,19 @@ def test_search_multi_tenant(main_ctx, sub_ctx):
         response = confd.extensions.get(wazo_tenant=MAIN_TENANT)
         assert_that(
             response.items,
-            has_items(has_entries(context=main_ctx['name']), not_(has_entries(context=sub_ctx['name']))),
+            has_items(
+                has_entries(context=main_ctx['name']),
+                not_(has_entries(context=sub_ctx['name'])),
+            ),
         )
 
         response = confd.extensions.get(recurse=True, wazo_tenant=MAIN_TENANT)
         assert_that(
             response.items,
-            has_items(has_entries(context=main_ctx['name']), has_entries(context=sub_ctx['name'])),
+            has_items(
+                has_entries(context=main_ctx['name']),
+                has_entries(context=sub_ctx['name']),
+            ),
         )
 
     aux()
@@ -606,7 +610,6 @@ def test_delete(extension):
 @fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
 @fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
 def test_delete_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(exten='1001', context=main_ctx['name'])
     @fixtures.extension(exten='1001', context=sub_ctx['name'])
     def aux(in_main, in_sub):

@@ -121,7 +121,6 @@ def test_associate_when_exten_pattern(extension, group):
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 def test_associate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'], exten=gen_group_exten())
     @fixtures.extension(context=sub_ctx['name'], exten=gen_group_exten())
     def aux(main_exten, sub_exten):
@@ -177,7 +176,6 @@ def test_dissociate_not_associated(extension, group):
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 def test_dissociate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'], exten=gen_group_exten())
     @fixtures.extension(context=sub_ctx['name'], exten=gen_group_exten())
     def aux(main_exten, sub_exten):

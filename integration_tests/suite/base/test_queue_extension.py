@@ -105,8 +105,12 @@ def test_associate_when_exten_pattern(extension, queue):
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 def test_associate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx):
-    with fixtures.extension(context=main_ctx['name'], exten=gen_queue_exten()) as main_exten:
-        with fixtures.extension(context=sub_ctx['name'], exten=gen_queue_exten()) as sub_exten:
+    with fixtures.extension(
+        context=main_ctx['name'], exten=gen_queue_exten()
+    ) as main_exten:
+        with fixtures.extension(
+            context=sub_ctx['name'], exten=gen_queue_exten()
+        ) as sub_exten:
             response = (
                 confd.queues(sub_queue['id'])
                 .extensions(main_exten['id'])
@@ -149,8 +153,12 @@ def test_dissociate_not_associated(extension, queue):
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 def test_dissociate_multi_tenant(main_queue, sub_queue, main_ctx, sub_ctx):
-    with fixtures.extension(context=main_ctx['name'], exten=gen_queue_exten()) as main_exten:
-        with fixtures.extension(context=sub_ctx['name'], exten=gen_queue_exten()) as sub_exten:
+    with fixtures.extension(
+        context=main_ctx['name'], exten=gen_queue_exten()
+    ) as main_exten:
+        with fixtures.extension(
+            context=sub_ctx['name'], exten=gen_queue_exten()
+        ) as sub_exten:
             response = (
                 confd.queues(sub_queue['id'])
                 .extensions(main_exten['id'])

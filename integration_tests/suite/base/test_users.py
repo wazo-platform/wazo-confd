@@ -1815,9 +1815,7 @@ def test_post_incalls_existing_extension_no_error(incall, extension):
     description='test-context',
     incall_ranges=[],
 )
-def test_post_incalls_existing_extension_missing_range_no_error(
-    incall, context
-):
+def test_post_incalls_existing_extension_missing_range_no_error(incall, context):
     with fixtures.extension(context=context['name']) as extension:
         with a.incall_extension(incall, extension):
             user = FULL_USER

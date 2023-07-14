@@ -45,7 +45,6 @@ def test_associate_errors(line, extension):
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 def test_associate_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'])
     @fixtures.extension(context=sub_ctx['name'])
     @fixtures.line_sip(context=main_ctx, wazo_tenant=MAIN_TENANT)
@@ -88,7 +87,6 @@ def test_dissociate_errors(line, extension):
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
 @fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 def test_dissociate_multi_tenant(main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'])
     @fixtures.extension(context=sub_ctx['name'])
     @fixtures.line_sip(context=main_ctx, wazo_tenant=MAIN_TENANT)
@@ -151,7 +149,6 @@ def test_extension_creation_error(line):
 
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 def test_extension_create_multi_tenant(context):
-
     @fixtures.line_sip(context={'name': context['name']}, wazo_tenant=SUB_TENANT)
     @fixtures.line_sip(context={'name': context['name']}, wazo_tenant=SUB_TENANT)
     @fixtures.line_sip()

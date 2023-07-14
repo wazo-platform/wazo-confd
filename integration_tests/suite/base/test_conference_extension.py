@@ -56,7 +56,6 @@ def test_associate(extension, conference):
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
 def test_associate_multi_tenant(main, sub, main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'], exten=gen_conference_exten())
     @fixtures.extension(context=sub_ctx['name'], exten=gen_conference_exten())
     def aux(main_exten, sub_exten):
@@ -172,7 +171,6 @@ def test_dissociate(conference, extension):
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
 def test_dissociate_multi_tenant(main, sub, main_ctx, sub_ctx):
-
     @fixtures.extension(context=main_ctx['name'], exten=gen_conference_exten())
     @fixtures.extension(context=sub_ctx['name'], exten=gen_conference_exten())
     def aux(main_exten, sub_exten):
