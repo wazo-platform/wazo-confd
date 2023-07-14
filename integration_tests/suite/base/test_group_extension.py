@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -118,33 +118,35 @@ def test_associate_when_exten_pattern(extension, group):
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.extension(context='main-internal', exten=gen_group_exten())
-@fixtures.extension(context='sub-internal', exten=gen_group_exten())
-def test_associate_multi_tenant(
-    main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten
-):
-    response = (
-        confd.groups(sub_group['uuid'])
-        .extensions(main_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
+def test_associate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx):
 
-    response = (
-        confd.groups(main_group['uuid'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Group'))
+    @fixtures.extension(context=main_ctx['name'], exten=gen_group_exten())
+    @fixtures.extension(context=sub_ctx['name'], exten=gen_group_exten())
+    def aux(main_exten, sub_exten):
+        response = (
+            confd.groups(sub_group['uuid'])
+            .extensions(main_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.groups(main_group['uuid'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.groups(main_group['uuid'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Group'))
+
+        response = (
+            confd.groups(main_group['uuid'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -172,26 +174,28 @@ def test_dissociate_not_associated(extension, group):
 
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.extension(context='main-internal', exten=gen_group_exten())
-@fixtures.extension(context='sub-internal', exten=gen_group_exten())
-def test_dissociate_multi_tenant(
-    main_group, sub_group, main_ctx, sub_ctx, main_exten, sub_exten
-):
-    response = (
-        confd.groups(sub_group['uuid'])
-        .extensions(main_exten['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
+def test_dissociate_multi_tenant(main_group, sub_group, main_ctx, sub_ctx):
 
-    response = (
-        confd.groups(main_group['uuid'])
-        .extensions(sub_exten['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Group'))
+    @fixtures.extension(context=main_ctx['name'], exten=gen_group_exten())
+    @fixtures.extension(context=sub_ctx['name'], exten=gen_group_exten())
+    def aux(main_exten, sub_exten):
+        response = (
+            confd.groups(sub_group['uuid'])
+            .extensions(main_exten['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
+
+        response = (
+            confd.groups(main_group['uuid'])
+            .extensions(sub_exten['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Group'))
+
+    aux()
 
 
 @fixtures.extension(exten=gen_group_exten())
