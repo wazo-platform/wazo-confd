@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -73,33 +73,37 @@ def test_associate_multiple_lines_to_sccp(line1, line2, sccp):
         response.assert_match(400, e.resource_associated('Line', 'Endpoint'))
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line(context='main-internal')
-@fixtures.line(context='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.sccp(wazo_tenant=MAIN_TENANT)
 @fixtures.sccp(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp):
-    response = (
-        confd.lines(main_line['id'])
-        .endpoints.sccp(sub_sccp['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+def test_associate_multi_tenant(main_ctx, sub_ctx, main_sccp, sub_sccp):
 
-    response = (
-        confd.lines(sub_line['id'])
-        .endpoints.sccp(main_sccp['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('SCCPEndpoint'))
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(main_line['id'])
+            .endpoints.sccp(sub_sccp['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
 
-    response = (
-        confd.lines(main_line['id'])
-        .endpoints.sccp(sub_sccp['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.lines(sub_line['id'])
+            .endpoints.sccp(main_sccp['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('SCCPEndpoint'))
+
+        response = (
+            confd.lines(main_line['id'])
+            .endpoints.sccp(sub_sccp['id'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.line()
@@ -135,26 +139,30 @@ def test_dissociate_when_associated_to_extension(line, sccp, extension):
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line(context='main-internal')
-@fixtures.line(context='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.sccp(wazo_tenant=MAIN_TENANT)
 @fixtures.sccp(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_sccp, sub_sccp):
-    response = (
-        confd.lines(main_line['id'])
-        .endpoints.sccp(sub_sccp['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_sccp, sub_sccp):
 
-    response = (
-        confd.lines(sub_line['id'])
-        .endpoints.sccp(main_sccp['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('SCCPEndpoint'))
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(main_line['id'])
+            .endpoints.sccp(sub_sccp['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
+
+        response = (
+            confd.lines(sub_line['id'])
+            .endpoints.sccp(main_sccp['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('SCCPEndpoint'))
+
+    aux()
 
 
 @fixtures.line()
