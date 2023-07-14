@@ -215,7 +215,7 @@ def test_list_user_voicemail(user, voicemail):
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
-def test_list_user_voicemail_multi_tenant(main_ctx, sub_ctx, main_vm, sub_vm, main_user, sub_user):
+def test_list_user_voicemail_multi_tenant(main_ctx, sub_ctx, main_user, sub_user):
     with fixtures.voicemail(context=main_ctx['name']) as main_vm:
         with fixtures.voicemail(context=sub_ctx['name']) as sub_vm:
             with a.user_voicemail(main_user, main_vm), a.user_voicemail(sub_user, sub_vm):
