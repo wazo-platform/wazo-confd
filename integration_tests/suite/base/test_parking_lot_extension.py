@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -114,33 +114,33 @@ def test_associate_when_exten_is_pattern(parking_lot, extension):
     response.assert_status(400)
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
 @fixtures.parking_lot(wazo_tenant=SUB_TENANT)
-@fixtures.extension(context='main-internal')
-@fixtures.extension(context='sub-internal')
-def test_associate_multi_tenant(_, __, main_pl, sub_pl, main_extension, sub_extension):
-    response = (
-        confd.parkinglots(sub_pl['id'])
-        .extensions(main_extension['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_associate_multi_tenant(main_ctx, sub_ctx, main_pl, sub_pl):
+    with fixtures.extension(context=main_ctx['name']) as main_extension:
+        with fixtures.extension(context=sub_ctx['name']) as sub_extension:
+            response = (
+                confd.parkinglots(sub_pl['id'])
+                .extensions(main_extension['id'])
+                .put(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.parkinglots(main_pl['id'])
-        .extensions(sub_extension['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('ParkingLot'))
+            response = (
+                confd.parkinglots(main_pl['id'])
+                .extensions(sub_extension['id'])
+                .put(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_match(404, e.not_found('ParkingLot'))
 
-    response = (
-        confd.parkinglots(main_pl['id'])
-        .extensions(sub_extension['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+            response = (
+                confd.parkinglots(main_pl['id'])
+                .extensions(sub_extension['id'])
+                .put(wazo_tenant=MAIN_TENANT)
+            )
+            response.assert_match(400, e.different_tenant())
 
 
 @fixtures.parking_lot()
@@ -160,26 +160,26 @@ def test_dissociate_not_associated(parking_lot, extension):
     response.assert_deleted()
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.parking_lot(wazo_tenant=MAIN_TENANT)
 @fixtures.parking_lot(wazo_tenant=SUB_TENANT)
-@fixtures.extension(context='main-internal')
-@fixtures.extension(context='sub-internal')
-def test_dissociate_multi_tenant(_, __, main_pl, sub_pl, main_extension, sub_extension):
-    response = (
-        confd.parkinglots(sub_pl['id'])
-        .extensions(main_extension['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_pl, sub_pl):
+    with fixtures.extension(context=main_ctx['name']) as main_extension:
+        with fixtures.extension(context=sub_ctx['name']) as sub_extension:
+            response = (
+                confd.parkinglots(sub_pl['id'])
+                .extensions(main_extension['id'])
+                .delete(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.parkinglots(main_pl['id'])
-        .extensions(sub_extension['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('ParkingLot'))
+            response = (
+                confd.parkinglots(main_pl['id'])
+                .extensions(sub_extension['id'])
+                .delete(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_match(404, e.not_found('ParkingLot'))
 
 
 @fixtures.parking_lot()
