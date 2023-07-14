@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -47,37 +47,41 @@ def test_associate(extension, conference):
 @fixtures.conference(wazo_tenant=SUB_TENANT)
 @fixtures.context(
     wazo_tenant=MAIN_TENANT,
-    name='main-internal',
+    label='main-internal',
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
 @fixtures.context(
     wazo_tenant=SUB_TENANT,
-    name='sub-internal',
+    label='sub-internal',
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
-@fixtures.extension(context='main-internal', exten=gen_conference_exten())
-@fixtures.extension(context='sub-internal', exten=gen_conference_exten())
-def test_associate_multi_tenant(main, sub, _, __, main_exten, sub_exten):
-    response = (
-        confd.conferences(sub['id'])
-        .extensions(main_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_associate_multi_tenant(main, sub, main_ctx, sub_ctx):
 
-    response = (
-        confd.conferences(main['id'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Conference'))
+    @fixtures.extension(context=main_ctx['name'], exten=gen_conference_exten())
+    @fixtures.extension(context=sub_ctx['name'], exten=gen_conference_exten())
+    def aux(main_exten, sub_exten):
+        response = (
+            confd.conferences(sub['id'])
+            .extensions(main_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.conferences(main['id'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.conferences(main['id'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Conference'))
+
+        response = (
+            confd.conferences(main['id'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.conference()
@@ -159,30 +163,34 @@ def test_dissociate(conference, extension):
 @fixtures.conference(wazo_tenant=SUB_TENANT)
 @fixtures.context(
     wazo_tenant=MAIN_TENANT,
-    name='main-internal',
+    label='main-internal',
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
 @fixtures.context(
     wazo_tenant=SUB_TENANT,
-    name='sub-internal',
+    label='sub-internal',
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
-@fixtures.extension(context='main-internal', exten=gen_conference_exten())
-@fixtures.extension(context='sub-internal', exten=gen_conference_exten())
-def test_dissociate_multi_tenant(main, sub, _, __, main_exten, sub_exten):
-    response = (
-        confd.conferences(sub['id'])
-        .extensions(main_exten['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_dissociate_multi_tenant(main, sub, main_ctx, sub_ctx):
 
-    response = (
-        confd.conferences(main['id'])
-        .extensions(sub_exten['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Conference'))
+    @fixtures.extension(context=main_ctx['name'], exten=gen_conference_exten())
+    @fixtures.extension(context=sub_ctx['name'], exten=gen_conference_exten())
+    def aux(main_exten, sub_exten):
+        response = (
+            confd.conferences(sub['id'])
+            .extensions(main_exten['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
+
+        response = (
+            confd.conferences(main['id'])
+            .extensions(sub_exten['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Conference'))
+
+    aux()
 
 
 @fixtures.conference()
