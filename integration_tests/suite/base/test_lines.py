@@ -110,16 +110,16 @@ def test_get(line):
     )
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.line(context='main_ctx')
-@fixtures.line(context='sub_ctx')
-def test_get_multi_tenant(_, __, main, sub):
-    response = confd.lines(main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Line'))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.line(context=main_ctx['name']) as main:
+        with fixtures.line(context=sub_ctx['name']) as sub:
+            response = confd.lines(main['id']).get(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found(resource='Line'))
 
-    response = confd.lines(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+            response = confd.lines(sub['id']).get(wazo_tenant=MAIN_TENANT)
+            assert_that(response.item, has_entries(**sub))
 
 
 @fixtures.line()
@@ -135,19 +135,19 @@ def test_search(line1, line2):
     assert_that(response.items, contains(has_entry('id', line1['id'])))
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.line(context='main_ctx')
-@fixtures.line(context='sub_ctx')
-def test_list_multi_tenant(_, __, main, sub):
-    response = confd.lines.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_list_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.line(context=main_ctx['name']) as main:
+        with fixtures.line(context=sub_ctx['name']) as sub:
+            response = confd.lines.get(wazo_tenant=MAIN_TENANT)
+            assert_that(response.items, all_of(has_item(main), not_(has_item(sub))))
 
-    response = confd.lines.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
+            response = confd.lines.get(wazo_tenant=SUB_TENANT)
+            assert_that(response.items, all_of(has_item(sub), not_(has_item(main))))
 
-    response = confd.lines.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(main, sub))
+            response = confd.lines.get(wazo_tenant=MAIN_TENANT, recurse=True)
+            assert_that(response.items, has_items(main, sub))
 
 
 @fixtures.user()
@@ -299,21 +299,21 @@ def test_when_line_has_no_endpoint_then_caller_id_can_be_set_to_null(line):
     response.assert_updated()
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.line(context='main_ctx')
-@fixtures.line(context='sub_ctx')
-def test_edit_multi_tenant(main_ctx, _, main, sub):
-    response = confd.lines(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Line'))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main_ctx, sub_ctx):
+    with fixtures.line(context=main_ctx['name']) as main:
+        with fixtures.line(context=sub_ctx['name']) as sub:
+            response = confd.lines(main['id']).put(wazo_tenant=SUB_TENANT)
+            response.assert_match(404, e.not_found(resource='Line'))
 
-    response = confd.lines(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+            response = confd.lines(sub['id']).put(wazo_tenant=MAIN_TENANT)
+            response.assert_updated()
 
-    response = confd.lines(sub['id']).put(
-        context=main_ctx['name'], wazo_tenant=SUB_TENANT
-    )
-    response.assert_status(400)
+            response = confd.lines(sub['id']).put(
+                context=main_ctx['name'], wazo_tenant=SUB_TENANT
+            )
+            response.assert_status(400)
 
 
 @fixtures.line()
