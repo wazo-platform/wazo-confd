@@ -44,7 +44,7 @@ class IncallRangeSchema(RangeSchema):
 class ContextSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     name = fields.String(dump_only=True)
-    label = fields.String(validate=Length(max=128), required=True)
+    label = fields.String(validate=Length(min=1, max=128), required=True)
     type = fields.String(
         validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others'])
     )
