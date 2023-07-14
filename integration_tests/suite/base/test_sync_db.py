@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -17,22 +17,22 @@ from ..helpers import (
 from ..helpers.config import DELETED_TENANT, CREATED_TENANT
 
 
-@fixtures.context(name='DELETED', wazo_tenant=DELETED_TENANT)
+@fixtures.context(wazo_tenant=DELETED_TENANT)
 @fixtures.user(wazo_tenant=DELETED_TENANT)
-@fixtures.voicemail(context='DELETED')
-def test_remove_user_with_voicemail(_, user, voicemail):
-    with a.user_voicemail(user, voicemail, check=False):
-        with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
-            BaseIntegrationTest.sync_db()
+def test_remove_user_with_voicemail(deleted_ctx, user):
+    with fixtures.voicemail(context=deleted_ctx['name']) as voicemail:
+        with a.user_voicemail(user, voicemail, check=False):
+            with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+                BaseIntegrationTest.sync_db()
 
-        response = confd.users(user['uuid']).get()
-        response.assert_status(404)
+            response = confd.users(user['uuid']).get()
+            response.assert_status(404)
 
-        response = confd.voicemails(voicemail['id']).get()
-        assert_that(response.item, has_entries(users=empty()))
+            response = confd.voicemails(voicemail['id']).get()
+            assert_that(response.item, has_entries(users=empty()))
 
 
-@fixtures.context(name='DELETED', wazo_tenant=DELETED_TENANT)
+@fixtures.context(wazo_tenant=DELETED_TENANT)
 @fixtures.user(wazo_tenant=DELETED_TENANT)
 def test_remove_user_with_line(context, user):
     with fixtures.line_sip(context=context, wazo_tenant=DELETED_TENANT) as line:
