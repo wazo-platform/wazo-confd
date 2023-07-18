@@ -43,6 +43,13 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'label', True)
     s.check_bogus_field_returns_error(url, 'label', {})
     s.check_bogus_field_returns_error(url, 'label', [])
+    s.check_bogus_field_returns_error(url, 'label', 'a' * 129)
+    s.check_bogus_field_returns_error(url, 'name', 123, None, 'label')
+    s.check_bogus_field_returns_error(url, 'name', None, None, 'label')
+    s.check_bogus_field_returns_error(url, 'name', True, None, 'label')
+    s.check_bogus_field_returns_error(url, 'name', {}, None, 'label')
+    s.check_bogus_field_returns_error(url, 'name', [], None, 'label')
+    s.check_bogus_field_returns_error(url, 'name', 'a' * 129, None, 'label')
     s.check_bogus_field_returns_error(url, 'source', 123)
     s.check_bogus_field_returns_error(url, 'source', True)
     s.check_bogus_field_returns_error(url, 'source', 'invalid')
@@ -213,6 +220,21 @@ def test_create_with_every_enum(self, *call_filters):
 def test_create_without_label():
     response = confd.callfilters.post()
     response.assert_status(400)
+
+
+def test_create_with_name_copied_into_label():
+    response = confd.callfilters.post(
+        name='test-to-label', source='all', strategy='all'
+    )
+    response.assert_created('callfilters')
+    assert_that(
+        response.item,
+        has_entries(
+            name=is_not('test-to-label'),
+            label='test-to-label',
+        ),
+    )
+    confd.callfilters(response.item['id']).delete().assert_deleted()
 
 
 @fixtures.call_filter()
