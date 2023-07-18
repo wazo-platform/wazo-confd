@@ -116,6 +116,10 @@ definitions:
           type: integer
           readOnly: true
           description: The id of the call filter
+        uuid:
+          type: string
+          description: Call filter UUID. This ID is globally unique across multiple Wazo instances
+          readOnly: true
         tenant_uuid:
           type: string
           description: The UUID of the tenant

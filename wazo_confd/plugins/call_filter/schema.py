@@ -49,6 +49,7 @@ class CallFilterSurrogatesSchema(BaseSchema):
 
 class CallFilterSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
+    uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(dump_only=True)
     label = fields.String(validate=Length(max=128), required=True)

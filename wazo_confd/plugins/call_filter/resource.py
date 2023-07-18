@@ -30,11 +30,10 @@ class CallFilterList(ListResource):
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])
-        # NOTE(afournier): we use a UUID as if it was the callfilter UUID but it's not
-        # Call filters do not use UUIDs yet
+        form['uuid'] = uuid4()
         form['name'] = self.call_filter_name_fmt.format(
             tenant_slug=tenant.slug,
-            callfilter_uuid=uuid4(),
+            callfilter_uuid=form['uuid'],
         )
         model = self.model(**form)
         model = self.service.create(model)
