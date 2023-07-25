@@ -42,6 +42,14 @@ def test_post_errors():
     yield s.check_bogus_field_returns_error, url, 'label', []
     yield s.check_bogus_field_returns_error, url, 'label', {}
 
+    yield s.check_bogus_field_returns_error, url, 'name', 123, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', True, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', None, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', '', None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129), None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', [], None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', {}, None, 'label'
+
 
 @fixtures.context()
 def test_put_errors(context):
@@ -56,6 +64,11 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'label', []
     yield s.check_bogus_field_returns_error, url, 'label', {}
+    yield s.check_bogus_field_returns_error, url, 'name', 123, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', True, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129), None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', [], None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', {}, None, 'label'
     yield s.check_bogus_field_returns_error, url, 'type', 123
     yield s.check_bogus_field_returns_error, url, 'type', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'type', True
