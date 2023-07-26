@@ -11,7 +11,7 @@ class ConferenceSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(allow_none=True, validate=Length(max=128))
-    preprocess_subroutine = fields.String(validate=Length(max=79),  allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     max_users = fields.Integer(validate=Range(min=0))
     record = fields.Boolean()
     pin = fields.String(

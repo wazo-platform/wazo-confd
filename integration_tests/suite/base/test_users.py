@@ -191,7 +191,9 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(80)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        80
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'userfield', 123

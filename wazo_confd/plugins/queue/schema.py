@@ -31,7 +31,7 @@ class QueueSchema(BaseSchema):
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     announce_hold_time_on_entry = StrictBoolean()
     ignore_forward = StrictBoolean(attribute='ignore_forward_bool')
-    preprocess_subroutine = fields.String(validate=Length(max=79),  allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
     wait_time_threshold = fields.Integer(validate=Range(min=0), allow_none=True)
     wait_time_destination = DestinationField(allow_none=True)

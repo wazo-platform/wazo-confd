@@ -19,7 +19,7 @@ class AgentSchema(BaseSchema):
         validate=Length(max=128), allow_none=True, attribute='passwd'
     )
     language = fields.String(validate=Length(max=20), allow_none=True)
-    preprocess_subroutine = fields.String(validate=Length(max=79),  allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     description = fields.String(allow_none=True)
     links = ListLink(Link('agents'))
 

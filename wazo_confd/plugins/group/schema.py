@@ -23,7 +23,7 @@ class GroupSchema(BaseSchema):
     label = fields.String(
         validate=[Length(max=128), Regexp(LABEL_REGEX)], required=True
     )
-    preprocess_subroutine = fields.String(validate=Length(max=79),  allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     ring_strategy = fields.String(
         validate=OneOf(
             [
