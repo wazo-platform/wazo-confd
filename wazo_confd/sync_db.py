@@ -81,6 +81,7 @@ def main():
             if not tenant.slug:
                 confd_tenant_without_slugs.add(tenant.uuid)
         logger.debug('wazo-confd tenants: %s', confd_tenants)
+        logger.debug('wazo-auth tenants: %s', auth_tenants)
 
         removed_tenants = confd_tenants - auth_tenants
         for tenant_uuid in removed_tenants:
@@ -101,7 +102,7 @@ def main():
 
 
 def remove_tenant(tenant_uuid):
-    logger.debug('Removing tenant : %s', tenant_uuid)
+    logger.debug('Removing tenant: %s', tenant_uuid)
     with session_scope():
         tenant = tenant_resources_dao.get(tenant_uuid)
         tenant_resources_dao.delete(tenant)
