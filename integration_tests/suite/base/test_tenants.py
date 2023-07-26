@@ -23,7 +23,8 @@ from ..helpers.config import (
     gen_group_exten,
     gen_line_exten,
     ALL_TENANTS,
-    DEFAULT_TENANTS)
+    DEFAULT_TENANTS,
+)
 
 
 def test_get():
@@ -77,7 +78,6 @@ def test_list_multi_tenant(_):
 
 
 class BaseTestTenants(TestCase):
-
     def count_tables_rows(self):
         tables_counts = {}
         with self.db.queries() as queries:
@@ -109,6 +109,7 @@ class BaseTestTenants(TestCase):
         }
         return diff
 
+
 class BaseTestDeleteByEvent(BaseTestTenants):
     def setUp(self):
         self.db = db
@@ -124,7 +125,6 @@ class BaseTestDeleteByEvent(BaseTestTenants):
             'func_key_dest_custom',
         ]
         self.before_tables_rows_counts = self.count_tables_rows()
-
 
     @fixtures.user(wazo_tenant=DELETED_TENANT)
     @fixtures.group(wazo_tenant=DELETED_TENANT)
@@ -217,6 +217,7 @@ class BaseTestDeleteByEvent(BaseTestTenants):
 
             until.assert_(resources_deleted, tries=5, interval=5)
 
+
 class BaseTestDeleteBySyncDb(BaseTestTenants):
     def setUp(self):
         self.db = db
@@ -247,7 +248,6 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         # add the tenant DELETED_TENANT in wazo-auth for the authorization,
         # to be able to create the tenant in wazo-confd
         BaseIntegrationTest.mock_auth.set_tenants(*ALL_TENANTS)
-
 
     @fixtures.user(wazo_tenant=DELETED_TENANT)
     @fixtures.group(wazo_tenant=DELETED_TENANT)
@@ -338,4 +338,5 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
                     assert (
                         len(diff) == 0
                     ), "Some tables are not properly cleaned after tenant deletion"
+
                 until.assert_(resources_deleted, tries=5, interval=5)
