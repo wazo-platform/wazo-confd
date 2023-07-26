@@ -82,12 +82,10 @@ class BaseTestTenants(TestCase):
         tables_counts = {}
         with self.db.queries() as queries:
             query = text(
-                """
-                SELECT * 
-                FROM pg_catalog.pg_tables
-                WHERE schemaname != 'pg_catalog' AND
-                      schemaname != 'information_schema';
-                """
+                """SELECT * 
+                FROM pg_catalog.pg_tables 
+                WHERE schemaname != 'pg_catalog' AND 
+                schemaname != 'information_schema';"""
             )
             result = queries.connection.execute(query)
             for row in result:
