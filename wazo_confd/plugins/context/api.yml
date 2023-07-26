@@ -155,6 +155,10 @@ definitions:
         type: integer
         readOnly: true
         description: The id of the context
+      uuid:
+        type: string
+        readOnly: true
+        description: The UUID of the context
       name:
         type: string
         description: The name used by Asterisk

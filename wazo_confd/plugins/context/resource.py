@@ -30,11 +30,10 @@ class ContextList(ListResource):
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])
-        # NOTE(afournier): we use a UUID as if it was the context UUID but it's not
-        # Contexts do not use UUIDs yet
+        form['uuid'] = uuid4()
         form['name'] = self.context_name_fmt.format(
             tenant_slug=tenant.slug,
-            context_uuid=uuid4(),
+            context_uuid=form['uuid'],
         )
         model = self.model(**form)
         model = self.service.create(model)
