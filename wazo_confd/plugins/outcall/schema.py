@@ -13,7 +13,7 @@ class OutcallSchema(BaseSchema):
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     internal_caller_id = StrictBoolean()
-    preprocess_subroutine = fields.String(validate=Length(max=79),  allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     ring_time = fields.Integer(validate=Range(min=0), allow_none=True)
     description = fields.String(allow_none=True)
     enabled = StrictBoolean()

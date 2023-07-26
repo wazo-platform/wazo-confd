@@ -166,7 +166,9 @@ def error_checks(url, user):
     yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', {}
     yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(80)
+    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
+        80
+    )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
