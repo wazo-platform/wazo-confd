@@ -10,6 +10,11 @@
       jobs:
         - confd-tox-integration
 
+    experimental:
+      jobs:
+        - wazo-acceptance-bullseye:
+            nodeset: vm-debian-11-m1s
+
 - job:
     name: confd-tox-integration
     description: Run confd integration tests
