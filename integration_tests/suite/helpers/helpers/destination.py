@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .. import scenarios as s
@@ -22,7 +22,7 @@ def invalid_destinations():
         {
             'type': 'application',
             'application': 'callback_disa',
-            'context': s.random_string(40),
+            'context': s.random_string(80),
         },
         {
             'type': 'application',
@@ -68,12 +68,12 @@ def invalid_destinations():
         {
             'type': 'application',
             'application': 'directory',
-            'context': s.random_string(40),
+            'context': s.random_string(80),
         },
         {'type': 'application', 'application': 'disa', 'context': True},
         {'type': 'application', 'application': 'disa', 'context': None},
         {'type': 'application', 'application': 'disa', 'context': 'invalid_char_@'},
-        {'type': 'application', 'application': 'disa', 'context': s.random_string(40)},
+        {'type': 'application', 'application': 'disa', 'context': s.random_string(80)},
         {
             'type': 'application',
             'application': 'disa',
@@ -123,7 +123,7 @@ def invalid_destinations():
         {
             'type': 'application',
             'application': 'voicemail',
-            'context': s.random_string(40),
+            'context': s.random_string(80),
         },
         {'type': 'conference'},
         {'type': 'conference', 'missing_required_field': 123},
@@ -143,7 +143,7 @@ def invalid_destinations():
         {'type': 'extension', 'context': True},
         {'type': 'extension', 'context': None},
         {'type': 'extension', 'context': 'invalid_char_@'},
-        {'type': 'extension', 'context': s.random_string(40)},
+        {'type': 'extension', 'context': s.random_string(80)},
         {'type': 'extension', 'context': 'default', 'exten': 1234},
         {'type': 'extension', 'context': 'default', 'exten': True},
         {'type': 'extension', 'context': 'default', 'exten': None},
