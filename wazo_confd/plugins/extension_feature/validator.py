@@ -14,10 +14,10 @@ class ExtenAvailableOnUpdateValidator(Validator):
     def validate(self, extension):
         existing = self.dao.find_by(exten=extension.exten)
         if existing and existing.uuid != extension.uuid:
-            raise errors.resource_exists(
-                'FeatureExtension', exten=extension.exten
-            )
+            raise errors.resource_exists('FeatureExtension', exten=extension.exten)
 
 
 def build_validator():
-    return ValidationGroup(edit=[ExtenAvailableOnUpdateValidator(feature_extension_dao)])
+    return ValidationGroup(
+        edit=[ExtenAvailableOnUpdateValidator(feature_extension_dao)]
+    )

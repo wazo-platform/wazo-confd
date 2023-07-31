@@ -25,4 +25,6 @@ class FeatureExtensionService(CRUDService):
 
 
 def build_service():
-    return FeatureExtensionService(feature_extension_dao, build_validator(), build_notifier())
+    return FeatureExtensionService(
+        feature_extension_dao, build_validator(), build_notifier()
+    )
