@@ -13,7 +13,7 @@ class Plugin:
 
         api.add_resource(
             ExtensionFeatureItem,
-            '/extensions/features/<int:id>',
+            '/extensions/features/<uuid:uuid>',
             endpoint='extensions_features',
             resource_class_args=(service,),
         )

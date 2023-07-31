@@ -1,8 +1,8 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.feature_extension import dao as feature_extension_dao
 
 from wazo_confd.helpers.validator import Validator, ValidationGroup
 
@@ -12,12 +12,12 @@ class ExtenAvailableOnUpdateValidator(Validator):
         self.dao = dao
 
     def validate(self, extension):
-        existing = self.dao.find_by(exten=extension.exten, context=extension.context)
-        if existing and existing.id != extension.id:
+        existing = self.dao.find_by(exten=extension.exten)
+        if existing and existing.uuid != extension.uuid:
             raise errors.resource_exists(
-                'Extension', exten=extension.exten, context=extension.context
+                'FeatureExtension', exten=extension.exten
             )
 
 
 def build_validator():
-    return ValidationGroup(edit=[ExtenAvailableOnUpdateValidator(extension_dao)])
+    return ValidationGroup(edit=[ExtenAvailableOnUpdateValidator(feature_extension_dao)])

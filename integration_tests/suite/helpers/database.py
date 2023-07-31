@@ -174,30 +174,28 @@ class DatabaseQueries:
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
         query = text(
             """
-        INSERT INTO extensions
-        (exten, context, type, typeval, commented)
+        INSERT INTO feature_extension
+        (exten, feature, enabled)
         VALUES (
             :exten,
-            'xivo-features',
-            'extenfeatures',
             :feature,
-            :commented
+            :enabled
         )
-        RETURNING id
+        RETURNING uuid
         """
         )
 
-        agent_id = self.connection.execute(
-            query, exten=exten, feature=feature, commented=1 if not enabled else 0
+        feature_extension_uuid = self.connection.execute(
+            query, exten=exten, feature=feature, enabled=enabled
         ).scalar()
 
-        return agent_id
+        return feature_extension_uuid
 
-    def delete_extension_feature(self, extension_id):
+    def delete_extension_feature(self, extension_feature_uuid):
         query = text(
-            "DELETE FROM extensions WHERE id = :extension_id AND context = 'xivo-features'"
+            "DELETE FROM feature_extension WHERE uuid = :extension_feature_uuid"
         )
-        self.connection.execute(query, extension_id=extension_id)
+        self.connection.execute(query, extension_feature_uuid=extension_feature_uuid)
 
     def insert_func_key(self, func_key_type, destination_type):
         func_key_query = text(
