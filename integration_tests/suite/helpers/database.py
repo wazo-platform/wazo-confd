@@ -307,11 +307,11 @@ class DatabaseQueries:
 
         func_key_query = text(
             """
-        INSERT INTO func_key_dest_agent (func_key_id, agent_id, extension_id)
+        INSERT INTO func_key_dest_agent (func_key_id, agent_id, feature_extension_uuid)
         VALUES (
         :func_key_id,
         :agent_id,
-        (SELECT id FROM extensions WHERE type = 'extenfeatures' AND typeval = :typeval)
+        (SELECT uuid FROM feature_extension WHERE feature = :feature)
         )
         """
         )
@@ -325,7 +325,7 @@ class DatabaseQueries:
 
         func_key_id = self.insert_func_key('speeddial', 'agent')
 
-        for typeval in (
+        for feature in (
             'agentstaticlogin',
             'agentstaticlogoff',
             'agentstaticlogtoggle',
@@ -335,7 +335,7 @@ class DatabaseQueries:
                 func_key_query,
                 func_key_id=func_key_id,
                 agent_id=agent_id,
-                typeval=typeval,
+                feature=feature,
             )
 
         return agent_id

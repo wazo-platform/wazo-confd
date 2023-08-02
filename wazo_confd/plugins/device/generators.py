@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -48,8 +48,8 @@ class UserGenerator:
 
 
 class ExtensionGenerator:
-    def __init__(self, extension_dao):
-        self.extension_dao = extension_dao
+    def __init__(self, feature_extension_dao):
+        self.feature_extension_dao = feature_extension_dao
 
     def generate(self, device):
         return {
@@ -64,8 +64,8 @@ class ExtensionGenerator:
             'exten_voicemail': self.find_exten('vmusermsg'),
         }
 
-    def find_exten(self, typeval):
-        extension = self.extension_dao.find_by(type='extenfeatures', typeval=typeval)
+    def find_exten(self, feature):
+        extension = self.feature_extension_dao.find_by(feature=feature)
         if extension:
             return extension.clean_exten()
 

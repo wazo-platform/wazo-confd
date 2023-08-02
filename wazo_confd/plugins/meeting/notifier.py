@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo.xivo_helpers import clean_extension
@@ -101,7 +101,7 @@ class Notifier:
             {'feature': 'meetingjoin'}
         ).items
         for exten in extens:
-            if exten.typeval == 'meetingjoin' and exten.commented == 0:
+            if exten.feature == 'meetingjoin' and exten.enabled:
                 exten_pattern = exten.exten
                 break
         if exten_pattern:
