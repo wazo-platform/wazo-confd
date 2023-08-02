@@ -123,10 +123,10 @@ class GroupMemberConverter(FuncKeyConverter):
         self.feature_extension_dao = feature_extension_dao
 
     def build(self, user, line, position, funckey):
-        prog_exten = self.feature_extension_dao.get_by(
-            feature='phoneprogfunckey'
+        prog_exten = self.feature_extension_dao.get_by(feature='phoneprogfunckey')
+        action_exten = self.feature_extension_dao.get(
+            funckey.destination.feature_extension_uuid
         )
-        action_exten = self.feature_extension_dao.get(funckey.destination.feature_extension_uuid)
 
         value = self.progfunckey(
             prog_exten.exten, user.id, action_exten.exten, funckey.destination.group_id
@@ -182,12 +182,12 @@ class ServiceConverter(FuncKeyConverter):
         self.feature_extension_dao = feature_extension_dao
 
     def build(self, user, line, position, funckey):
-        extension = self.feature_extension_dao.get(funckey.destination.feature_extension_uuid)
+        extension = self.feature_extension_dao.get(
+            funckey.destination.feature_extension_uuid
+        )
 
         if funckey.destination.service in self.PROGFUNCKEYS:
-            prog_exten = self.feature_extension_dao.get_by(
-                feature='phoneprogfunckey'
-            )
+            prog_exten = self.feature_extension_dao.get_by(feature='phoneprogfunckey')
             value = self.progfunckey(
                 prog_exten.exten, user.id, extension.clean_exten(), None
             )
@@ -212,10 +212,10 @@ class ForwardConverter(FuncKeyConverter):
         self.feature_extension_dao = feature_extension_dao
 
     def build(self, user, line, position, funckey):
-        prog_exten = self.feature_extension_dao.get_by(
-            feature='phoneprogfunckey'
+        prog_exten = self.feature_extension_dao.get_by(feature='phoneprogfunckey')
+        fwd_exten = self.feature_extension_dao.get(
+            funckey.destination.feature_extension_uuid
         )
-        fwd_exten = self.feature_extension_dao.get(funckey.destination.feature_extension_uuid)
 
         value = self.progfunckey(
             prog_exten.exten, user.id, fwd_exten.exten, funckey.destination.exten
@@ -271,10 +271,10 @@ class AgentConverter(FuncKeyConverter):
         self.feature_extension_dao = extension_dao
 
     def build(self, user, line, position, funckey):
-        prog_exten = self.feature_extension_dao.get_by(
-            feature='phoneprogfunckey'
+        prog_exten = self.feature_extension_dao.get_by(feature='phoneprogfunckey')
+        action_exten = self.feature_extension_dao.get(
+            funckey.destination.feature_extension_uuid
         )
-        action_exten = self.feature_extension_dao.get(funckey.destination.feature_extension_uuid)
 
         value = self.progfunckey(
             prog_exten.exten,
