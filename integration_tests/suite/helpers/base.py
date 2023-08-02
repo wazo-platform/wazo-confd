@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -32,9 +32,9 @@ from .config import (
     TOKEN_SUB_TENANT,
     MAIN_TENANT,
     SUB_TENANT,
-    DELETED_TENANT,
-    CREATED_TENANT,
     USER_UUID,
+    DEFAULT_TENANTS,
+    ALL_TENANTS,
 )
 
 
@@ -82,60 +82,15 @@ class IntegrationTest(AssetLaunchingTestCase):
 
     @classmethod
     def _create_auth_tenant(cls):
-        cls.mock_auth.set_tenants(
-            {
-                'uuid': MAIN_TENANT,
-                'name': 'name1',
-                'slug': 'slug1',
-                'parent_uuid': MAIN_TENANT,
-            },
-            {
-                'uuid': CREATED_TENANT,
-                'name': 'name4',
-                'slug': 'slug2',
-                'parent_uuid': MAIN_TENANT,
-            },
-        )
+        cls.mock_auth.set_tenants(*DEFAULT_TENANTS)
 
     @classmethod
     def _delete_auth_tenant(cls):
-        cls.mock_auth.set_tenants(
-            {
-                'uuid': MAIN_TENANT,
-                'name': 'name1',
-                'slug': 'slug1',
-                'parent_uuid': MAIN_TENANT,
-            },
-        )
+        cls.mock_auth.set_tenants(*DEFAULT_TENANTS)
 
     @classmethod
     def _reset_auth_tenants(cls):
-        cls.mock_auth.set_tenants(
-            {
-                'uuid': MAIN_TENANT,
-                'name': 'name1',
-                'slug': 'slug1',
-                'parent_uuid': MAIN_TENANT,
-            },
-            {
-                'uuid': SUB_TENANT,
-                'name': 'name2',
-                'slug': 'slug2',
-                'parent_uuid': MAIN_TENANT,
-            },
-            {
-                'uuid': DELETED_TENANT,
-                'name': 'name3',
-                'slug': 'slug3',
-                'parent_uuid': MAIN_TENANT,
-            },
-            {
-                'uuid': CREATED_TENANT,
-                'name': 'name4',
-                'slug': 'slug4',
-                'parent_uuid': MAIN_TENANT,
-            },
-        )
+        cls.mock_auth.set_tenants(*ALL_TENANTS)
 
     @classmethod
     @contextmanager
