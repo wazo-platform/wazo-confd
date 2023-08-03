@@ -29,7 +29,7 @@ def test_remove_user_with_voicemail(deleted_ctx, user):
             response.assert_status(404)
 
             response = confd.voicemails(voicemail['id']).get()
-            assert_that(response.item, has_entries(users=empty()))
+            response.assert_status(404)
 
 
 @fixtures.context(wazo_tenant=DELETED_TENANT)
