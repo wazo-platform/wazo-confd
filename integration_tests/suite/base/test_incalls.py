@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -14,7 +14,7 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
+from . import confd, BaseIntegrationTest
 from ..helpers import (
     associations as a,
     errors as e,
@@ -511,4 +511,14 @@ def test_get_incalls_relation_when_switchboard_destination(switchboard):
                 has_entries(id=incall2['id'], extensions=incall2['extensions']),
             )
         ),
+    )
+
+
+# Note: Until we have a better way to mesure query performance,
+# this test makes sure we are using joinedload instead of lazyloading
+@fixtures.incall()
+def test_list_db_requests(*_):
+    expected_request_count = 1 + 1  # 1 list (w/ joinedload) + 1 count
+    s.check_db_requests(
+        BaseIntegrationTest, confd.incalls.get, nb_requests=expected_request_count
     )
