@@ -4,4 +4,4 @@ ENV PYTHONDONTWRITEBYTECODE='true'
 
 COPY . /usr/src/wazo-confd
 WORKDIR /usr/src/wazo-confd
-RUN python setup.py develop
+RUN python3 -m pip install -e .
