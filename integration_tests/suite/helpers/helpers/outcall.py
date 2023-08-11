@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -9,7 +9,7 @@ from ..config import CONTEXT
 
 
 def generate_outcall(**parameters):
-    parameters.setdefault('name', generate_name())
+    parameters.setdefault('label', generate_label())
     parameters.setdefault('context', CONTEXT)
     return add_outcall(**parameters)
 
@@ -25,14 +25,14 @@ def delete_outcall(outcall_id, check=False, **params):
         response.assert_ok()
 
 
-def generate_name():
+def generate_label():
     response = confd.outcalls.get()
-    names = set(d['name'] for d in response.items)
-    return _random_name(names)
+    labels = set(d['label'] for d in response.items)
+    return _random_label(labels)
 
 
-def _random_name(names):
-    name = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-    if name in names:
-        return _random_name(names)
-    return name
+def _random_label(labels):
+    label = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    while label in labels:
+        label = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    return label
