@@ -26,7 +26,9 @@ build-provd:
 	docker build -t wazoplatform/wazo-provd $(PROVD_DIR)
 
 test:
-	nosetests -x
+	# Explicit match to avoid to include AssetLaunchingTestCase helper methods
+	# This constraint must be removed when tests will be migrated to pytest
+	nosetests --match '^[Tt]est' -x
 
 egg-info:
 	cd .. && python setup.py egg_info
