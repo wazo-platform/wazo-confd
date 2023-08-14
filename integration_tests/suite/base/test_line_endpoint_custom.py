@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -82,33 +82,36 @@ def test_associate_when_trunk_already_associated(line, trunk, custom):
         response.assert_match(400, e.resource_associated('Trunk', 'Endpoint'))
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line(context='main-internal')
-@fixtures.line(context='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.custom(wazo_tenant=MAIN_TENANT)
 @fixtures.custom(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(_, __, main_line, sub_line, main_custom, sub_custom):
-    response = (
-        confd.lines(main_line['id'])
-        .endpoints.custom(sub_custom['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+def test_associate_multi_tenant(main_ctx, sub_ctx, main_custom, sub_custom):
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(main_line['id'])
+            .endpoints.custom(sub_custom['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
 
-    response = (
-        confd.lines(sub_line['id'])
-        .endpoints.custom(main_custom['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('CustomEndpoint'))
+        response = (
+            confd.lines(sub_line['id'])
+            .endpoints.custom(main_custom['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('CustomEndpoint'))
 
-    response = (
-        confd.lines(main_line['id'])
-        .endpoints.custom(sub_custom['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.lines(main_line['id'])
+            .endpoints.custom(sub_custom['id'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.line()
@@ -144,26 +147,29 @@ def test_dissociate_when_associated_to_extension(line, custom, extension):
         response.assert_match(400, e.resource_associated('Line', 'Extension'))
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line(context='main-internal')
-@fixtures.line(context='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.custom(wazo_tenant=MAIN_TENANT)
 @fixtures.custom(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_custom, sub_custom):
-    response = (
-        confd.lines(main_line['id'])
-        .endpoints.custom(sub_custom['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_custom, sub_custom):
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(main_line['id'])
+            .endpoints.custom(sub_custom['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
 
-    response = (
-        confd.lines(sub_line['id'])
-        .endpoints.custom(main_custom['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('CustomEndpoint'))
+        response = (
+            confd.lines(sub_line['id'])
+            .endpoints.custom(main_custom['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('CustomEndpoint'))
+
+    aux()
 
 
 @fixtures.line()

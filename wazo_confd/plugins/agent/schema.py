@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_dump
@@ -19,7 +19,7 @@ class AgentSchema(BaseSchema):
         validate=Length(max=128), allow_none=True, attribute='passwd'
     )
     language = fields.String(validate=Length(max=20), allow_none=True)
-    preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     description = fields.String(allow_none=True)
     links = ListLink(Link('agents'))
 

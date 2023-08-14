@@ -192,7 +192,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
-        40
+        80
     )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
@@ -1810,47 +1810,44 @@ def test_post_incalls_existing_extension_no_error(incall, extension):
 
 @fixtures.incall()
 @fixtures.context(
-    name='test-context',
     label='test-context',
     type='incall',
     description='test-context',
     incall_ranges=[],
 )
-@fixtures.extension(context='test-context')
-def test_post_incalls_existing_extension_missing_range_no_error(
-    incall, context, extension
-):
-    with a.incall_extension(incall, extension):
-        user = FULL_USER
-        user_body = {
-            'incalls': [
-                {
-                    'extensions': [{'id': extension['id']}],
-                }
-            ],
-            **user,
-        }
-        response = confd.users.post(user_body)
+def test_post_incalls_existing_extension_missing_range_no_error(incall, context):
+    with fixtures.extension(context=context['name']) as extension:
+        with a.incall_extension(incall, extension):
+            user = FULL_USER
+            user_body = {
+                'incalls': [
+                    {
+                        'extensions': [{'id': extension['id']}],
+                    }
+                ],
+                **user,
+            }
+            response = confd.users.post(user_body)
 
-        response.assert_created('users')
-        payload = response.item
+            response.assert_created('users')
+            payload = response.item
 
-        # retrieve the context and check if the incall range has been added
-        assert_that(
-            confd.contexts(context['id']).get().item,
-            has_entries(
-                incall_ranges=contains(
-                    has_entries(
-                        start=extension['exten'],
-                        end=extension['exten'],
-                        did_length=len(extension['exten']),
+            # retrieve the context and check if the incall range has been added
+            assert_that(
+                confd.contexts(context['id']).get().item,
+                has_entries(
+                    incall_ranges=contains(
+                        has_entries(
+                            start=extension['exten'],
+                            end=extension['exten'],
+                            did_length=len(extension['exten']),
+                        )
                     )
-                )
-            ),
-        )
-    # user deletion
-    url = confd.users(payload['uuid'])
-    url.delete(recursive=True)
+                ),
+            )
+        # user deletion
+        url = confd.users(payload['uuid'])
+        url.delete(recursive=True)
 
 
 @fixtures.outcall()

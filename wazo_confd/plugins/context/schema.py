@@ -1,15 +1,18 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_load, validates_schema
+import logging
+
+from marshmallow import fields, post_load, pre_load, validates_schema
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import Length, NoneOf, OneOf, Predicate, Range, Regexp
+from marshmallow.validate import Length, OneOf, Predicate, Range
 
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 CONTEXT_REGEX = r"^[a-zA-Z0-9-_]*$"
+logger = logging.getLogger(__name__)
 
 
 class RangeSchema(BaseSchema):
@@ -40,27 +43,12 @@ class IncallRangeSchema(RangeSchema):
 
 class ContextSchema(BaseSchema):
     id = fields.Integer(dump_only=True)
-    name = fields.String(
-        validate=(
-            Regexp(CONTEXT_REGEX),
-            Length(min=1, max=39),
-            NoneOf(
-                [
-                    'authentication',
-                    'general',
-                    'global',
-                    'globals',
-                    'parkedcalls',
-                    'xivo-features',
-                    'zonemessages',
-                ]
-            ),
-        ),
-        required=True,
-    )
-    label = fields.String(validate=Length(max=128), allow_none=True)
+    uuid = fields.UUID(dump_only=True)
+    name = fields.String(dump_only=True)
+    label = fields.String(validate=Length(min=1, max=128), required=True)
     type = fields.String(
-        validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others'])
+        validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others']),
+        missing='internal',
     )
     user_ranges = Nested(RangeSchema, many=True)
     group_ranges = Nested(RangeSchema, many=True)
@@ -90,6 +78,18 @@ class ContextSchema(BaseSchema):
         ]:
             if data.get(key):
                 data[key] = [ContextNumbers(**d) for d in data[key]]
+        return data
+
+    # DEPRECATED 23.12
+    @pre_load
+    def copy_name_to_label(self, data, **kwargs):
+        if 'label' in data:
+            return data
+        if 'name' in data:
+            logger.warning(
+                'The "name" field of context is deprecated. Use "label" instead'
+            )
+            data['label'] = data['name']
         return data
 
 

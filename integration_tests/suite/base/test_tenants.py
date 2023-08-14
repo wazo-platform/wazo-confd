@@ -126,10 +126,7 @@ class BaseTestDeleteByEvent(BaseTestTenants):
     @fixtures.incall(wazo_tenant=DELETED_TENANT)
     @fixtures.outcall(wazo_tenant=DELETED_TENANT)
     @fixtures.conference(wazo_tenant=DELETED_TENANT)
-    @fixtures.context(name='mycontext', wazo_tenant=DELETED_TENANT)
-    @fixtures.voicemail(context='mycontext', wazo_tenant=DELETED_TENANT)
-    @fixtures.line_sip(context={'name': 'mycontext'}, wazo_tenant=DELETED_TENANT)
-    @fixtures.extension(exten=gen_group_exten(), context='mycontext')
+    @fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
     @fixtures.funckey_template(
         keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
         wazo_tenant=DELETED_TENANT,
@@ -145,8 +142,6 @@ class BaseTestDeleteByEvent(BaseTestTenants):
     @fixtures.iax(name='name_search', wazo_tenant=DELETED_TENANT)
     @fixtures.custom(interface='name_search', wazo_tenant=DELETED_TENANT)
     @fixtures.agent(number='1234', wazo_tenant=DELETED_TENANT)
-    @fixtures.extension(exten=gen_line_exten(), context='mycontext')
-    @fixtures.extension(exten=gen_line_exten(), context='mycontext')
     @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
@@ -160,9 +155,6 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         outcall,
         conference,
         context,
-        voicemail,
-        line,
-        group_extension,
         funckey_template,
         switchboard,
         device,
@@ -175,42 +167,50 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         iax,
         custom,
         agent,
-        incall_extension,
-        outcall_extension,
         skill,
         call_pickup,
         user2,
         call_permission,
         call_filter,
     ):
-        with (
-            a.user_line(user, line, check=False),
-            a.line_endpoint_sip(line, user_sip, check=False),
-            a.user_voicemail(user, voicemail, check=False),
-            a.switchboard_member_user(switchboard, [user], check=False),
-            a.group_extension(group, group_extension, check=False),
-            a.user_agent(user, agent, check=False),
-            a.queue_member_agent(queue, agent, check=False),
-            a.agent_skill(agent, skill, check=False),
-            a.incall_extension(incall, incall_extension, check=False),
-            a.outcall_extension(outcall, outcall_extension, check=False),
-            a.group_member_user(group, user, check=False),
-            a.trunk_endpoint_sip(trunk_sip, sip, check=False),
-            a.trunk_endpoint_iax(trunk_iax, iax, check=False),
-            a.trunk_endpoint_custom(trunk_custom, custom, check=False),
-            a.call_pickup_interceptor_user(call_pickup, user, check=False),
-            a.call_pickup_target_user(call_pickup, user2, check=False),
-        ):
-            BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
+        @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
+        @fixtures.line_sip(
+            context={'name': context['name']}, wazo_tenant=DELETED_TENANT
+        )
+        @fixtures.extension(exten=gen_group_exten(), context=context['name'])
+        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
+        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
+        def aux(voicemail, line, group_extension, incall_extension, outcall_extension):
+            with (
+                a.user_line(user, line, check=False),
+                a.line_endpoint_sip(line, user_sip, check=False),
+                a.user_voicemail(user, voicemail, check=False),
+                a.switchboard_member_user(switchboard, [user], check=False),
+                a.group_extension(group, group_extension, check=False),
+                a.user_agent(user, agent, check=False),
+                a.queue_member_agent(queue, agent, check=False),
+                a.agent_skill(agent, skill, check=False),
+                a.incall_extension(incall, incall_extension, check=False),
+                a.outcall_extension(outcall, outcall_extension, check=False),
+                a.group_member_user(group, user, check=False),
+                a.trunk_endpoint_sip(trunk_sip, sip, check=False),
+                a.trunk_endpoint_iax(trunk_iax, iax, check=False),
+                a.trunk_endpoint_custom(trunk_custom, custom, check=False),
+                a.call_pickup_interceptor_user(call_pickup, user, check=False),
+                a.call_pickup_target_user(call_pickup, user2, check=False),
+            ):
+                BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
 
-            def resources_deleted():
-                after_deletion_tables_rows_counts = self.count_tables_rows()
-                diff = self.diff(after_deletion_tables_rows_counts)
-                assert (
-                    len(diff) == 0
-                ), "Some tables are not properly cleaned after the tenant deletion"
+                def resources_deleted():
+                    after_deletion_tables_rows_counts = self.count_tables_rows()
+                    diff = self.diff(after_deletion_tables_rows_counts)
+                    assert (
+                        len(diff) == 0
+                    ), "Some tables are not properly cleaned after the tenant deletion"
 
-            until.assert_(resources_deleted, tries=5, interval=5)
+                until.assert_(resources_deleted, tries=5, interval=5)
+
+        aux()
 
 
 class BaseTestDeleteBySyncDb(BaseTestTenants):
@@ -249,10 +249,7 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
     @fixtures.incall(wazo_tenant=DELETED_TENANT)
     @fixtures.outcall(wazo_tenant=DELETED_TENANT)
     @fixtures.conference(wazo_tenant=DELETED_TENANT)
-    @fixtures.context(name='mycontext', wazo_tenant=DELETED_TENANT)
-    @fixtures.voicemail(context='mycontext', wazo_tenant=DELETED_TENANT)
-    @fixtures.line_sip(context={'name': 'mycontext'}, wazo_tenant=DELETED_TENANT)
-    @fixtures.extension(exten=gen_group_exten(), context='mycontext')
+    @fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
     @fixtures.funckey_template(
         keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
         wazo_tenant=DELETED_TENANT,
@@ -268,8 +265,6 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
     @fixtures.iax(name='name_search', wazo_tenant=DELETED_TENANT)
     @fixtures.custom(interface='name_search', wazo_tenant=DELETED_TENANT)
     @fixtures.agent(number='1234', wazo_tenant=DELETED_TENANT)
-    @fixtures.extension(exten=gen_line_exten(), context='mycontext')
-    @fixtures.extension(exten=gen_line_exten(), context='mycontext')
     @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
@@ -283,9 +278,6 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         outcall,
         conference,
         context,
-        voicemail,
-        line,
-        group_extension,
         funckey_template,
         switchboard,
         device,
@@ -298,40 +290,48 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         iax,
         custom,
         agent,
-        incall_extension,
-        outcall_extension,
         skill,
         call_pickup,
         user2,
         call_permission,
         call_filter,
     ):
-        with (
-            a.user_line(user, line, check=False),
-            a.line_endpoint_sip(line, user_sip, check=False),
-            a.user_voicemail(user, voicemail, check=False),
-            a.switchboard_member_user(switchboard, [user], check=False),
-            a.group_extension(group, group_extension, check=False),
-            a.user_agent(user, agent, check=False),
-            a.queue_member_agent(queue, agent, check=False),
-            a.agent_skill(agent, skill, check=False),
-            a.incall_extension(incall, incall_extension, check=False),
-            a.outcall_extension(outcall, outcall_extension, check=False),
-            a.group_member_user(group, user, check=False),
-            a.trunk_endpoint_sip(trunk_sip, sip, check=False),
-            a.trunk_endpoint_iax(trunk_iax, iax, check=False),
-            a.trunk_endpoint_custom(trunk_custom, custom, check=False),
-            a.call_pickup_interceptor_user(call_pickup, user, check=False),
-            a.call_pickup_target_user(call_pickup, user2, check=False),
-        ):
-            with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
-                BaseIntegrationTest.sync_db()
+        @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
+        @fixtures.line_sip(
+            context={'name': context['name']}, wazo_tenant=DELETED_TENANT
+        )
+        @fixtures.extension(exten=gen_group_exten(), context=context['name'])
+        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
+        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
+        def aux(voicemail, line, group_extension, incall_extension, outcall_extension):
+            with (
+                a.user_line(user, line, check=False),
+                a.line_endpoint_sip(line, user_sip, check=False),
+                a.user_voicemail(user, voicemail, check=False),
+                a.switchboard_member_user(switchboard, [user], check=False),
+                a.group_extension(group, group_extension, check=False),
+                a.user_agent(user, agent, check=False),
+                a.queue_member_agent(queue, agent, check=False),
+                a.agent_skill(agent, skill, check=False),
+                a.incall_extension(incall, incall_extension, check=False),
+                a.outcall_extension(outcall, outcall_extension, check=False),
+                a.group_member_user(group, user, check=False),
+                a.trunk_endpoint_sip(trunk_sip, sip, check=False),
+                a.trunk_endpoint_iax(trunk_iax, iax, check=False),
+                a.trunk_endpoint_custom(trunk_custom, custom, check=False),
+                a.call_pickup_interceptor_user(call_pickup, user, check=False),
+                a.call_pickup_target_user(call_pickup, user2, check=False),
+            ):
+                with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+                    BaseIntegrationTest.sync_db()
 
-                def resources_deleted():
-                    after_deletion_tables_rows_counts = self.count_tables_rows()
-                    diff = self.diff(after_deletion_tables_rows_counts)
-                    assert (
-                        len(diff) == 0
-                    ), "Some tables are not properly cleaned after tenant deletion"
+                    def resources_deleted():
+                        after_deletion_tables_rows_counts = self.count_tables_rows()
+                        diff = self.diff(after_deletion_tables_rows_counts)
+                        assert (
+                            len(diff) == 0
+                        ), "Some tables are not properly cleaned after tenant deletion"
 
-                until.assert_(resources_deleted, tries=5, interval=5)
+                    until.assert_(resources_deleted, tries=5, interval=5)
+
+        aux()

@@ -1,5 +1,11 @@
 # Changelog
 
+## 23.12
+
+* A context now has a read-only auto-generated `name` and a required `label` instead
+  of a user-provided `name` and optional `label`. For compatibility purposes, if a context is
+  created using only a `name`, it will be used as the `label` and auto-generated.
+
 ## 23.04
 
 * PUT on `/users?recursive=true` updated, to provide a way to update lines, switchboards, agent, voicemail and incalls for a specific user.

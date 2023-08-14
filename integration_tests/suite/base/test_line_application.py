@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -64,33 +64,36 @@ def test_associate_multiple_lines_to_application(line1, line2, application):
         response.assert_updated()
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line(context='main-internal')
-@fixtures.line(context='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(_, __, main_line, sub_line, main_app, sub_app):
-    response = (
-        confd.lines(main_line['id'])
-        .applications(sub_app['uuid'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+def test_associate_multi_tenant(main_ctx, sub_ctx, main_app, sub_app):
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(main_line['id'])
+            .applications(sub_app['uuid'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
 
-    response = (
-        confd.lines(sub_line['id'])
-        .applications(main_app['uuid'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Application'))
+        response = (
+            confd.lines(sub_line['id'])
+            .applications(main_app['uuid'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Application'))
 
-    response = (
-        confd.lines(main_line['id'])
-        .applications(sub_app['uuid'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.lines(main_line['id'])
+            .applications(sub_app['uuid'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.line()
@@ -108,26 +111,29 @@ def test_dissociate_not_associated(line, application):
     response.assert_deleted()
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.line(context='main-internal')
-@fixtures.line(context='sub-internal')
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
 @fixtures.application(wazo_tenant=MAIN_TENANT)
 @fixtures.application(wazo_tenant=SUB_TENANT)
-def test_dissociate_multi_tenant(_, __, main_line, sub_line, main_app, sub_app):
-    response = (
-        confd.lines(main_line['id'])
-        .applications(sub_app['uuid'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Line'))
+def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_app, sub_app):
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        response = (
+            confd.lines(main_line['id'])
+            .applications(sub_app['uuid'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Line'))
 
-    response = (
-        confd.lines(sub_line['id'])
-        .applications(main_app['uuid'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Application'))
+        response = (
+            confd.lines(sub_line['id'])
+            .applications(main_app['uuid'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Application'))
+
+    aux()
 
 
 @fixtures.line()

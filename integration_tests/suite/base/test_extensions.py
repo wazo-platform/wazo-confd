@@ -97,16 +97,19 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'context', []
 
 
-@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
-@fixtures.extension(exten='1001', context='main')
-@fixtures.extension(exten='1001', context='sub')
-def test_get_multi_tenant(_, __, in_main, in_sub):
-    response = confd.extensions(in_main['id']).get(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Extension'))
+@fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
+def test_get_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(exten='1001', context=main_ctx['name'])
+    @fixtures.extension(exten='1001', context=sub_ctx['name'])
+    def aux(in_main, in_sub):
+        response = confd.extensions(in_main['id']).get(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.extensions(in_sub['id']).get(wazo_tenant=SUB_TENANT)
-    assert_that(response.item, equal_to(in_sub))
+        response = confd.extensions(in_sub['id']).get(wazo_tenant=SUB_TENANT)
+        assert_that(response.item, equal_to(in_sub))
+
+    aux()
 
 
 @fixtures.extension()
@@ -296,21 +299,24 @@ def test_edit_outcall_pattern(extension):
     response.assert_updated()
 
 
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.extension(context='main_ctx')
-@fixtures.extension(context='sub_ctx')
-def test_edit_multi_tenant(main_ctx, _, main, sub):
-    response = confd.extensions(main['id']).put(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found(resource='Extension'))
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_edit_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(context=main_ctx['name'])
+    @fixtures.extension(context=sub_ctx['name'])
+    def aux(main, sub):
+        response = confd.extensions(main['id']).put(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found(resource='Extension'))
 
-    response = confd.extensions(sub['id']).put(wazo_tenant=MAIN_TENANT)
-    response.assert_updated()
+        response = confd.extensions(sub['id']).put(wazo_tenant=MAIN_TENANT)
+        response.assert_updated()
 
-    response = confd.extensions(sub['id']).put(
-        context=main_ctx['name'], wazo_tenant=SUB_TENANT
-    )
-    response.assert_status(400)
+        response = confd.extensions(sub['id']).put(
+            context=main_ctx['name'], wazo_tenant=SUB_TENANT
+        )
+        response.assert_status(400)
+
+    aux()
 
 
 @fixtures.extension()
@@ -336,36 +342,44 @@ def test_update_additional_parameters(extension1):
     assert_that(response.item, has_entries(enabled=False))
 
 
-@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
-@fixtures.extension(exten='1001', context='main')
-@fixtures.extension(exten='1001', context='sub')
-def test_update_and_multi_tenant(_, __, in_main, in_sub):
-    response = confd.extensions(in_main['id']).put(
-        wazo_tenant=SUB_TENANT, enabled=False
-    )
-    response.assert_match(404, e.not_found('Extension'))
+@fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
+def test_update_and_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(exten='1001', context=main_ctx['name'])
+    @fixtures.extension(exten='1001', context=sub_ctx['name'])
+    def aux(in_main, in_sub):
+        response = confd.extensions(in_main['id']).put(
+            wazo_tenant=SUB_TENANT, enabled=False
+        )
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.extensions(in_sub['id']).put(wazo_tenant=SUB_TENANT, enabled=False)
-    response.assert_updated()
+        response = confd.extensions(in_sub['id']).put(
+            wazo_tenant=SUB_TENANT, enabled=False
+        )
+        response.assert_updated()
 
-    response = confd.extensions(in_sub['id']).get()
-    assert_that(response.item, has_entries(id=in_sub['id'], enabled=False))
+        response = confd.extensions(in_sub['id']).get()
+        assert_that(response.item, has_entries(id=in_sub['id'], enabled=False))
 
-    response = confd.extensions(in_sub['id']).put(
-        context='main', wazo_tenant=SUB_TENANT
-    )
-    response.assert_match(400, e.not_found('Context'))
+        response = confd.extensions(in_sub['id']).put(
+            context=main_ctx['name'], wazo_tenant=SUB_TENANT
+        )
+        response.assert_match(400, e.not_found('Context'))
+
+    aux()
 
 
-@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
-@fixtures.extension(exten='1001', context='main')
-@fixtures.extension(exten='1001', context='sub')
-def test_that_changing_tenant_is_not_possible(_, __, in_main, in_sub):
-    body = {'exten': '1002', 'context': 'sub'}
-    response = confd.extensions(in_main['id']).put(wazo_tenant=MAIN_TENANT, **body)
-    response.assert_match(400, e.different_tenant())
+@fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
+def test_that_changing_tenant_is_not_possible(main_ctx, sub_ctx):
+    @fixtures.extension(exten='1001', context=main_ctx['name'])
+    @fixtures.extension(exten='1001', context=sub_ctx['name'])
+    def aux(in_main, in_sub):
+        body = {'exten': '1002', 'context': sub_ctx['name']}
+        response = confd.extensions(in_main['id']).put(wazo_tenant=MAIN_TENANT, **body)
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.user()
@@ -481,31 +495,40 @@ def check_search(url, extension, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
-@fixtures.extension(exten='1001', context='main')
-@fixtures.extension(exten='1001', context='sub')
-def test_search_multi_tenant(*_):
-    response = confd.extensions.get(wazo_tenant=SUB_TENANT)
-    assert_that(
-        response.items,
-        all_of(
-            not_(has_item(has_entries(context='main'))),
-            has_item(has_entries(context='sub')),
-        ),
-    )
+@fixtures.context(label='main', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub', wazo_tenant=SUB_TENANT)
+def test_search_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(exten='1001', context=main_ctx['name'])
+    @fixtures.extension(exten='1001', context=sub_ctx['name'])
+    def aux(*_):
+        response = confd.extensions.get(wazo_tenant=SUB_TENANT)
+        assert_that(
+            response.items,
+            all_of(
+                not_(has_item(has_entries(context=main_ctx['name']))),
+                has_item(has_entries(context=sub_ctx['name'])),
+            ),
+        )
 
-    response = confd.extensions.get(wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        has_items(has_entries(context='main'), not_(has_entries(context='sub'))),
-    )
+        response = confd.extensions.get(wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(context=main_ctx['name']),
+                not_(has_entries(context=sub_ctx['name'])),
+            ),
+        )
 
-    response = confd.extensions.get(recurse=True, wazo_tenant=MAIN_TENANT)
-    assert_that(
-        response.items,
-        has_items(has_entries(context='main'), has_entries(context='sub')),
-    )
+        response = confd.extensions.get(recurse=True, wazo_tenant=MAIN_TENANT)
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(context=main_ctx['name']),
+                has_entries(context=sub_ctx['name']),
+            ),
+        )
+
+    aux()
 
 
 @fixtures.extension(exten='9998', context='from-extern')
@@ -586,11 +609,14 @@ def test_delete(extension):
 
 @fixtures.context(name='main', wazo_tenant=MAIN_TENANT)
 @fixtures.context(name='sub', wazo_tenant=SUB_TENANT)
-@fixtures.extension(exten='1001', context='main')
-@fixtures.extension(exten='1001', context='sub')
-def test_delete_multi_tenant(_, __, in_main, in_sub):
-    response = confd.extensions(in_main['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_match(404, e.not_found('Extension'))
+def test_delete_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(exten='1001', context=main_ctx['name'])
+    @fixtures.extension(exten='1001', context=sub_ctx['name'])
+    def aux(in_main, in_sub):
+        response = confd.extensions(in_main['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = confd.extensions(in_sub['id']).delete(wazo_tenant=SUB_TENANT)
-    response.assert_deleted()
+        response = confd.extensions(in_sub['id']).delete(wazo_tenant=SUB_TENANT)
+        response.assert_deleted()
+
+    aux()

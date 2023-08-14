@@ -53,7 +53,7 @@ def test_put_errors(incall, user):
 def error_checks(url, user):
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
-        40
+        80
     )
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
     yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}

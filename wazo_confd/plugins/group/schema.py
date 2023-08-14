@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -23,7 +23,7 @@ class GroupSchema(BaseSchema):
     label = fields.String(
         validate=[Length(max=128), Regexp(LABEL_REGEX)], required=True
     )
-    preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     ring_strategy = fields.String(
         validate=OneOf(
             [

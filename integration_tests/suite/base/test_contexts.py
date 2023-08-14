@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -34,24 +34,23 @@ def test_post_errors():
     for check in error_checks(url):
         yield check
 
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', 'with space'
-    yield s.check_bogus_field_returns_error, url, 'name', ''
-    yield s.check_bogus_field_returns_error, url, 'name', 'authentication'
-    yield s.check_bogus_field_returns_error, url, 'name', 'general'
-    yield s.check_bogus_field_returns_error, url, 'name', 'global'
-    yield s.check_bogus_field_returns_error, url, 'name', 'globals'
-    yield s.check_bogus_field_returns_error, url, 'name', 'parkedcalls'
-    yield s.check_bogus_field_returns_error, url, 'name', 'xivo-features'
-    yield s.check_bogus_field_returns_error, url, 'name', 'zonemessages'
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(40)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    yield s.check_bogus_field_returns_error, url, 'label', 123
+    yield s.check_bogus_field_returns_error, url, 'label', True
+    yield s.check_bogus_field_returns_error, url, 'label', None
+    yield s.check_bogus_field_returns_error, url, 'label', ''
+    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
+    yield s.check_bogus_field_returns_error, url, 'label', []
+    yield s.check_bogus_field_returns_error, url, 'label', {}
 
-    for check in unique_error_checks(url):
-        yield check
+    yield s.check_bogus_field_returns_error, url, 'name', 123, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', True, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', None, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', '', None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
+        129
+    ), None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', [], None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', {}, None, 'label'
 
 
 @fixtures.context()
@@ -67,6 +66,13 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
     yield s.check_bogus_field_returns_error, url, 'label', []
     yield s.check_bogus_field_returns_error, url, 'label', {}
+    yield s.check_bogus_field_returns_error, url, 'name', 123, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', True, None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
+        129
+    ), None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', [], None, 'label'
+    yield s.check_bogus_field_returns_error, url, 'name', {}, None, 'label'
     yield s.check_bogus_field_returns_error, url, 'type', 123
     yield s.check_bogus_field_returns_error, url, 'type', 'invalid'
     yield s.check_bogus_field_returns_error, url, 'type', True
@@ -168,19 +174,12 @@ def error_checks(url):
     ]
 
 
-@fixtures.context(name='unique')
-def unique_error_checks(url, context):
-    yield s.check_bogus_field_returns_error, url, 'name', context['name']
-
-
 @fixtures.context(
-    name='name_search',
     label='label_search',
     type='internal',
     description='desc_search',
 )
 @fixtures.context(
-    name='hidden',
     label='hidden',
     type='incall',
     description='hidden',
@@ -188,7 +187,6 @@ def unique_error_checks(url, context):
 def test_search(context, hidden):
     url = confd.contexts
     searches = {
-        'name': 'name_search',
         'label': 'label_search',
         'type': 'internal',
         'description': 'desc_search',
@@ -221,15 +219,15 @@ def test_list_multi_tenant(main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
-@fixtures.context(name='sort1', description='sort1')
-@fixtures.context(name='sort2', description='sort2')
+@fixtures.context(label='sort1', description='sort1')
+@fixtures.context(label='sort2', description='sort2')
 def test_sorting_offset_limit(context1, context2):
     url = confd.contexts.get
-    yield s.check_sorting, url, context1, context2, 'name', 'sort'
+    yield s.check_sorting, url, context1, context2, 'label', 'sort'
     yield s.check_sorting, url, context1, context2, 'description', 'sort'
 
-    yield s.check_offset, url, context1, context2, 'name', 'sort'
-    yield s.check_limit, url, context1, context2, 'name', 'sort'
+    yield s.check_offset, url, context1, context2, 'label', 'sort'
+    yield s.check_limit, url, context1, context2, 'label', 'sort'
 
 
 @fixtures.context()
@@ -256,7 +254,7 @@ def test_get(context):
 
 
 def test_create_minimal_parameters():
-    response = confd.contexts.post(name='MyContext')
+    response = confd.contexts.post(label='MyContext')
     response.assert_created('contexts')
 
     assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
@@ -266,13 +264,13 @@ def test_create_minimal_parameters():
 
 def test_create_out_of_tree_tenant():
     response = confd.contexts.post(
-        name='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000'
+        label='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000'
     )
     response.assert_status(401)
 
 
 def test_create_in_authorized_tenant():
-    response = confd.contexts.post(name='ZContext', wazo_tenant=SUB_TENANT)
+    response = confd.contexts.post(label='Context', wazo_tenant=SUB_TENANT)
     response.assert_created('context')
 
     assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
@@ -280,7 +278,6 @@ def test_create_in_authorized_tenant():
 
 def test_create_all_parameters():
     parameters = {
-        'name': 'MyContext',
         'label': 'Context Power',
         'type': 'outcall',
         'user_ranges': [{'start': '1000', 'end': '1999'}],
@@ -327,15 +324,6 @@ def test_edit_all_parameters(context):
     assert_that(response.item, has_entries(parameters))
 
 
-@fixtures.context(name='OriginalName')
-def test_edit_name_unavailable(context):
-    response = confd.contexts(context['id']).put(name='ModifiedName')
-    response.assert_updated()
-
-    response = confd.contexts(context['id']).get()
-    assert_that(response.item, has_entries(name=context['name']))
-
-
 @fixtures.context()
 def test_delete(context):
     response = confd.contexts(context['id']).delete()
@@ -344,32 +332,32 @@ def test_delete(context):
     response.assert_match(404, e.not_found(resource='Context'))
 
 
-@fixtures.context(name='error')
-@fixtures.extension(context='error')
-def test_delete_when_extension_associated(context, extension):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Extension'))
+@fixtures.context(label='error')
+def test_delete_when_extension_associated(context):
+    with fixtures.extension(context=context['name']):
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'Extension'))
 
 
-@fixtures.context(name='error')
-@fixtures.trunk(context='error')
-def test_delete_when_trunk_associated(context, trunk):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Trunk'))
+@fixtures.context(label='error')
+def test_delete_when_trunk_associated(context):
+    with fixtures.trunk(context=context['name']):
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'Trunk'))
 
 
-@fixtures.context(name='error')
-@fixtures.voicemail(context='error')
-def test_delete_when_voicemail_associated(context, voicemail):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'Voicemail'))
+@fixtures.context(label='error')
+def test_delete_when_voicemail_associated(context):
+    with fixtures.voicemail(context=context['name']):
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'Voicemail'))
 
 
-@fixtures.context(name='error')
-@fixtures.agent_login_status(context='error')
-def test_delete_when_agent_is_logged(context, agent_login_status):
-    response = confd.contexts(context['id']).delete()
-    response.assert_match(400, e.resource_associated('Context', 'AgentLoginStatus'))
+@fixtures.context(label='error')
+def test_delete_when_agent_is_logged(context):
+    with fixtures.agent_login_status(context=context['name']):
+        response = confd.contexts(context['id']).delete()
+        response.assert_match(400, e.resource_associated('Context', 'AgentLoginStatus'))
 
 
 @fixtures.context()

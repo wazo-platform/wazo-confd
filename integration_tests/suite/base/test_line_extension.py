@@ -42,14 +42,14 @@ def test_associate_errors(line, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.extension(context='main-internal')
-@fixtures.extension(context='sub-internal')
-def test_associate_multi_tenant(main_ctx, sub_ctx, main_exten, sub_exten):
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
+def test_associate_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(context=main_ctx['name'])
+    @fixtures.extension(context=sub_ctx['name'])
     @fixtures.line_sip(context=main_ctx, wazo_tenant=MAIN_TENANT)
     @fixtures.line_sip(context=sub_ctx, wazo_tenant=SUB_TENANT)
-    def aux(main_line, sub_line):
+    def aux(main_exten, sub_exten, main_line, sub_line):
         response = (
             confd.lines(sub_line['id'])
             .extensions(main_exten['id'])
@@ -84,14 +84,14 @@ def test_dissociate_errors(line, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
 
-@fixtures.context(wazo_tenant=MAIN_TENANT, name='main-internal')
-@fixtures.context(wazo_tenant=SUB_TENANT, name='sub-internal')
-@fixtures.extension(context='main-internal')
-@fixtures.extension(context='sub-internal')
-def test_dissociate_multi_tenant(main_ctx, sub_ctx, main_exten, sub_exten):
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
+def test_dissociate_multi_tenant(main_ctx, sub_ctx):
+    @fixtures.extension(context=main_ctx['name'])
+    @fixtures.extension(context=sub_ctx['name'])
     @fixtures.line_sip(context=main_ctx, wazo_tenant=MAIN_TENANT)
     @fixtures.line_sip(context=sub_ctx, wazo_tenant=SUB_TENANT)
-    def aux(main_line, sub_line):
+    def aux(main_exten, sub_exten, main_line, sub_line):
         url = confd.lines(sub_line['id']).extensions(main_exten['id'])
         response = url.delete(wazo_tenant=SUB_TENANT)
         response.assert_match(404, e.not_found('Extension'))
@@ -147,36 +147,39 @@ def test_extension_creation_error(line):
         yield check
 
 
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
-@fixtures.line_sip(context={'name': 'sub_ctx'}, wazo_tenant=SUB_TENANT)
-@fixtures.line_sip(context={'name': 'sub_ctx'}, wazo_tenant=SUB_TENANT)
-@fixtures.line_sip()
-def test_extension_create_multi_tenant(context, line_one, line_two, line_three):
-    response = confd.lines(line_one['id']).extensions.post(
-        exten='1000',
-        context=context['name'],
-        wazo_tenant=SUB_TENANT,
-    )
-    response.assert_created()
-    extension = response.item
-    try:
-        assert_that(extension['tenant_uuid'], equal_to(SUB_TENANT))
-    finally:
-        confd.lines(line_one['id']).extensions(extension['id']).delete()
-        confd.extensions(extension['id']).delete().assert_deleted()
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
+def test_extension_create_multi_tenant(context):
+    @fixtures.line_sip(context={'name': context['name']}, wazo_tenant=SUB_TENANT)
+    @fixtures.line_sip(context={'name': context['name']}, wazo_tenant=SUB_TENANT)
+    @fixtures.line_sip()
+    def aux(line_one, line_two, line_three):
+        response = confd.lines(line_one['id']).extensions.post(
+            exten='1000',
+            context=context['name'],
+            wazo_tenant=SUB_TENANT,
+        )
+        response.assert_created()
+        extension = response.item
+        try:
+            assert_that(extension['tenant_uuid'], equal_to(SUB_TENANT))
+        finally:
+            confd.lines(line_one['id']).extensions(extension['id']).delete()
+            confd.extensions(extension['id']).delete().assert_deleted()
 
-    response = confd.lines(line_two['id']).extensions.post(
-        exten=h.extension.find_available_exten(CONTEXT),
-        context=CONTEXT,
-    )
-    response.assert_match(400, e.different_tenant())
+        response = confd.lines(line_two['id']).extensions.post(
+            exten=h.extension.find_available_exten(CONTEXT),
+            context=CONTEXT,
+        )
+        response.assert_match(400, e.different_tenant())
 
-    response = confd.lines(line_three['id']).extensions.post(
-        exten='1001',
-        context=context['name'],
-        wazo_tenant=SUB_TENANT,
-    )
-    response.assert_match(404, e.not_found('Line'))
+        response = confd.lines(line_three['id']).extensions.post(
+            exten='1001',
+            context=context['name'],
+            wazo_tenant=SUB_TENANT,
+        )
+        response.assert_match(404, e.not_found('Line'))
+
+    aux()
 
 
 @fixtures.extension(context=INCALL_CONTEXT)

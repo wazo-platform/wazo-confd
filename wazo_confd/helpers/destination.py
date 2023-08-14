@@ -34,7 +34,7 @@ from wazo_confd.helpers.mallow import StrictBoolean, Nested
 from wazo_confd.helpers.validator import GetResource, Validator
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'
-CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,39}$'
+CONTEXT_REGEX = r'^[a-zA-Z0-9_-]{1,79}$'
 EXTEN_REGEX = r'^[0-9*#]{1,255}$'
 SKILL_RULE_VARIABLE_REGEX = r'^[^[;\|]+$'
 

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -13,7 +13,7 @@ class OutcallSchema(BaseSchema):
     tenant_uuid = fields.String(dump_only=True)
     name = fields.String(validate=Length(max=128), required=True)
     internal_caller_id = StrictBoolean()
-    preprocess_subroutine = fields.String(validate=Length(max=39), allow_none=True)
+    preprocess_subroutine = fields.String(validate=Length(max=79), allow_none=True)
     ring_time = fields.Integer(validate=Range(min=0), allow_none=True)
     description = fields.String(allow_none=True)
     enabled = StrictBoolean()

@@ -1,13 +1,12 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.resources.voicemail import dao as voicemail_dao_module
 
-from wazo_confd.helpers.validator import UniqueField, Validator, ValidationGroup
+from wazo_confd.helpers.validator import Validator, ValidationGroup
 from wazo_confd.database import agent_status_login as agent_login_status_dao_module
 
 
@@ -64,9 +63,6 @@ class ContextDeleteValidator(Validator):
 
 def build_validator():
     return ValidationGroup(
-        create=[
-            UniqueField('name', lambda name: context_dao.find_by(name=name), 'Context')
-        ],
         delete=[
             ContextDeleteValidator(
                 agent_login_status_dao_module,

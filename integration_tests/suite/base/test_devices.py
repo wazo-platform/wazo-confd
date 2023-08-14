@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -518,33 +518,40 @@ def test_reset_to_autoprov_device_associated_to_line(provd, device, line):
 
 
 @mocks.provd()
-@fixtures.context(name='main_ctx', wazo_tenant=MAIN_TENANT)
-@fixtures.context(name='sub_ctx', wazo_tenant=SUB_TENANT)
+@fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
+@fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 @fixtures.device(wazo_tenant=MAIN_TENANT)
 @fixtures.device(wazo_tenant=SUB_TENANT)
-@fixtures.line(context='main_ctx')
-@fixtures.line(context='sub_ctx')
 def test_reset_to_autoprov_multi_tenant(
-    provd, _, __, main_device, sub_device, main_line, sub_line
+    provd, main_ctx, sub_ctx, main_device, sub_device
 ):
-    with a.line_device(main_line, main_device, check=False) and a.line_device(
-        sub_line, sub_device, check=False
-    ):
-        response = confd.devices(main_device['id']).autoprov.get(wazo_tenant=SUB_TENANT)
-        response.assert_match(404, e.not_found('Device'))
+    @fixtures.line(context=main_ctx['name'])
+    @fixtures.line(context=sub_ctx['name'])
+    def aux(main_line, sub_line):
+        with a.line_device(main_line, main_device, check=False) and a.line_device(
+            sub_line, sub_device, check=False
+        ):
+            response = confd.devices(main_device['id']).autoprov.get(
+                wazo_tenant=SUB_TENANT
+            )
+            response.assert_match(404, e.not_found('Device'))
 
-        response = confd.devices(sub_device['id']).autoprov.get(wazo_tenant=MAIN_TENANT)
-        response.assert_ok()
+            response = confd.devices(sub_device['id']).autoprov.get(
+                wazo_tenant=MAIN_TENANT
+            )
+            response.assert_ok()
 
-        device_cfg = provd.devices.get(sub_device['id'])
-        assert_that(device_cfg, has_entries(config=starts_with('autoprov')))
-        assert_that(device_cfg, is_not(has_key('options')))
+            device_cfg = provd.devices.get(sub_device['id'])
+            assert_that(device_cfg, has_entries(config=starts_with('autoprov')))
+            assert_that(device_cfg, is_not(has_key('options')))
 
-        config_cfg = provd.configs.get(device_cfg['config'])
-        assert_that(config_cfg, not_none())
+            config_cfg = provd.configs.get(device_cfg['config'])
+            assert_that(config_cfg, not_none())
 
-        response = confd.lines(sub_line['id']).get(wazo_tenant=MAIN_TENANT)
-        assert_that(response.item, has_entries(device_id=none()))
+            response = confd.lines(sub_line['id']).get(wazo_tenant=MAIN_TENANT)
+            assert_that(response.item, has_entries(device_id=none()))
+
+    aux()
 
 
 @mocks.provd()

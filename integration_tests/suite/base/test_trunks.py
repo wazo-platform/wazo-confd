@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -57,34 +57,37 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'twilio_incoming', {}
 
 
-@fixtures.context(name='search')
-@fixtures.context(name='hidden')
+@fixtures.context(label='search')
+@fixtures.context(label='hidden')
 @fixtures.sip(name='name_search', label='label_search')
 @fixtures.iax(name='name_search')
 @fixtures.custom(interface='name_search')
-@fixtures.trunk(context='search')
-@fixtures.trunk(context='hidden')
-def test_search(_, __, sip, iax, custom, trunk, hidden):
-    url = confd.trunks
-    searches = {'context': 'search'}
+def test_search(search_ctx, hidden_ctx, sip, iax, custom):
+    @fixtures.trunk(context=search_ctx['name'])
+    @fixtures.trunk(context=hidden_ctx['name'])
+    def aux(trunk, hidden):
+        url = confd.trunks
+        searches = {'context': 'search'}
 
-    for field, term in searches.items():
-        yield check_search, url, trunk, hidden, field, term
-
-    searches = {'name': 'name_search', 'label': 'label_search'}
-    with a.trunk_endpoint_sip(trunk, sip):
         for field, term in searches.items():
-            yield check_relation_search, url, trunk, hidden, field, term
+            yield check_search, url, trunk, hidden, field, term
 
-    searches = {'name': 'name_search'}
-    with a.trunk_endpoint_iax(trunk, iax):
-        for field, term in searches.items():
-            yield check_relation_search, url, trunk, hidden, field, term
+        searches = {'name': 'name_search', 'label': 'label_search'}
+        with a.trunk_endpoint_sip(trunk, sip):
+            for field, term in searches.items():
+                yield check_relation_search, url, trunk, hidden, field, term
 
-    searches = {'name': 'name_search'}
-    with a.trunk_endpoint_custom(trunk, custom):
-        for field, term in searches.items():
-            yield check_relation_search, url, trunk, hidden, field, term
+        searches = {'name': 'name_search'}
+        with a.trunk_endpoint_iax(trunk, iax):
+            for field, term in searches.items():
+                yield check_relation_search, url, trunk, hidden, field, term
+
+        searches = {'name': 'name_search'}
+        with a.trunk_endpoint_custom(trunk, custom):
+            for field, term in searches.items():
+                yield check_relation_search, url, trunk, hidden, field, term
+
+    aux()
 
 
 def check_search(url, trunk, hidden, field, term):
@@ -107,15 +110,18 @@ def check_relation_search(url, trunk, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.context(name='sort1')
-@fixtures.context(name='sort2')
-@fixtures.trunk(context='sort1')
-@fixtures.trunk(context='sort2')
-def test_sorting_offset_limit(_, __, trunk1, trunk2):
-    url = confd.trunks.get
-    yield s.check_sorting, url, trunk1, trunk2, 'context', 'sort'
-    yield s.check_offset, url, trunk1, trunk2, 'context', 'sort'
-    yield s.check_limit, url, trunk1, trunk2, 'context', 'sort'
+@fixtures.context(label='sort1')
+@fixtures.context(label='sort2')
+def test_sorting_offset_limit(ctx1, ctx2):
+    @fixtures.trunk(context=ctx1['name'])
+    @fixtures.trunk(context=ctx2['name'])
+    def aux(trunk1, trunk2):
+        url = confd.trunks.get
+        yield s.check_sorting, url, trunk1, trunk2, 'context', 'sort'
+        yield s.check_offset, url, trunk1, trunk2, 'context', 'sort'
+        yield s.check_limit, url, trunk1, trunk2, 'context', 'sort'
+
+    aux()
 
 
 @fixtures.trunk(wazo_tenant=MAIN_TENANT)
@@ -189,7 +195,7 @@ def test_edit_minimal_parameters(trunk):
     response.assert_updated()
 
 
-@fixtures.context(name='not_default')
+@fixtures.context(label='not_default')
 @fixtures.trunk()
 def test_edit_all_parameters(context, trunk):
     parameters = {'context': context['name'], 'twilio_incoming': True}

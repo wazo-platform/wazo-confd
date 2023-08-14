@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -82,32 +82,33 @@ def test_associate_when_not_incall_context(incall, extension):
 
 @fixtures.incall(wazo_tenant=MAIN_TENANT)
 @fixtures.incall(wazo_tenant=SUB_TENANT)
-@fixtures.context(wazo_tenant=SUB_TENANT, type='incall', name='sub-incall')
-@fixtures.extension(context='sub-incall')
+@fixtures.context(wazo_tenant=SUB_TENANT, type='incall', label='sub-incall')
 @fixtures.extension(context=INCALL_CONTEXT)
-def test_associate_multi_tenant(
-    main_incall, sub_incall, sub_ctx, sub_exten, main_exten
-):
-    response = (
-        confd.incalls(sub_incall['id'])
-        .extensions(main_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_associate_multi_tenant(main_incall, sub_incall, sub_ctx, main_exten):
+    @fixtures.extension(context=sub_ctx['name'])
+    def aux(sub_exten):
+        response = (
+            confd.incalls(sub_incall['id'])
+            .extensions(main_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.incalls(main_incall['id'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Incall'))
+        response = (
+            confd.incalls(main_incall['id'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Incall'))
 
-    response = (
-        confd.incalls(main_incall['id'])
-        .extensions(sub_exten['id'])
-        .put(wazo_tenant=MAIN_TENANT)
-    )
-    response.assert_match(400, e.different_tenant())
+        response = (
+            confd.incalls(main_incall['id'])
+            .extensions(sub_exten['id'])
+            .put(wazo_tenant=MAIN_TENANT)
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
 
 
 @fixtures.incall()
@@ -120,25 +121,26 @@ def test_dissociate(incall, extension):
 
 @fixtures.incall(wazo_tenant=MAIN_TENANT)
 @fixtures.incall(wazo_tenant=SUB_TENANT)
-@fixtures.context(wazo_tenant=SUB_TENANT, type='incall', name='sub-incall')
-@fixtures.extension(context='sub-incall')
+@fixtures.context(wazo_tenant=SUB_TENANT, type='incall', label='sub-incall')
 @fixtures.extension(context=INCALL_CONTEXT)
-def test_dissociate_multi_tenant(
-    main_incall, sub_incall, sub_ctx, sub_exten, main_exten
-):
-    response = (
-        confd.incalls(sub_incall['id'])
-        .extensions(main_exten['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Extension'))
+def test_dissociate_multi_tenant(main_incall, sub_incall, sub_ctx, main_exten):
+    @fixtures.extension(context=sub_ctx['name'])
+    def aux(sub_exten):
+        response = (
+            confd.incalls(sub_incall['id'])
+            .extensions(main_exten['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Extension'))
 
-    response = (
-        confd.incalls(main_incall['id'])
-        .extensions(sub_exten['id'])
-        .delete(wazo_tenant=SUB_TENANT)
-    )
-    response.assert_match(404, e.not_found('Incall'))
+        response = (
+            confd.incalls(main_incall['id'])
+            .extensions(sub_exten['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Incall'))
+
+    aux()
 
 
 @fixtures.incall()
