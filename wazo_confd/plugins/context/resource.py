@@ -15,7 +15,7 @@ from .schema import ContextSchema, ContextSchemaPUT
 class ContextList(ListResource):
     model = Context
     schema = ContextSchema
-    context_name_fmt = 'ctx-{tenant_slug}-{context_uuid}'
+    context_name_fmt = 'ctx-{tenant_slug}-{context_type}-{context_uuid}'
 
     def __init__(self, tenant_dao, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -33,6 +33,7 @@ class ContextList(ListResource):
         form['uuid'] = uuid4()
         form['name'] = self.context_name_fmt.format(
             tenant_slug=tenant.slug,
+            context_type=form['type'],
             context_uuid=form['uuid'],
         )
         model = self.model(**form)
