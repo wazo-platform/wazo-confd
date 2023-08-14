@@ -1,6 +1,6 @@
 # Changelog
 
-## 23.10
+## 23.12
 
 * A context now has a read-only auto-generated `name` and a required `label` instead
   of a user-provided `name` and optional `label`. For compatibility purposes, if a context is

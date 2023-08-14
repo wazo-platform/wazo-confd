@@ -80,7 +80,7 @@ class ContextSchema(BaseSchema):
                 data[key] = [ContextNumbers(**d) for d in data[key]]
         return data
 
-    # DEPRECATED 23.11
+    # DEPRECATED 23.12
     @pre_load
     def copy_name_to_label(self, data, **kwargs):
         if 'label' in data:
