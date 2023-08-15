@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -27,11 +27,10 @@ class ExtensionService(CRUDService):
         return created_extension
 
     def search(self, parameters, tenant_uuids=None):
-        parameters['is_feature'] = False
         return self.dao.search(tenant_uuids=tenant_uuids, **parameters)
 
     def get(self, resource_id, **kwargs):
-        return self.dao.get_by(id=resource_id, is_feature=False, **kwargs)
+        return self.dao.get_by(id=resource_id, **kwargs)
 
     def edit(self, extension, updated_fields=None, tenant_uuids=None):
         with Session.no_autoflush:

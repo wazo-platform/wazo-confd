@@ -1,5 +1,6 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from uuid import uuid4
 
 from hamcrest import assert_that, has_entries, has_entry, has_item, is_not
 
@@ -7,7 +8,7 @@ from . import confd
 from ..helpers import errors as e, fixtures, scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
 
-FAKE_ID = 999999999
+FAKE_UUID = uuid4()
 
 
 def test_search_errors():
@@ -17,16 +18,16 @@ def test_search_errors():
 
 
 def test_get_errors():
-    url = confd.extensions.features(FAKE_ID).get
-    yield s.check_resource_not_found, url, 'Extension'
+    url = confd.extensions.features(FAKE_UUID).get
+    yield s.check_resource_not_found, url, 'FeatureExtension'
 
 
 @fixtures.extension_feature()
 def test_put_errors(extension):
-    url = confd.extensions.features(FAKE_ID).put
-    yield s.check_resource_not_found, url, 'Extension'
+    url = confd.extensions.features(FAKE_UUID).put
+    yield s.check_resource_not_found, url, 'FeatureExtension'
 
-    url = confd.extensions.features(extension['id']).put
+    url = confd.extensions.features(extension['uuid']).put
     for check in error_checks(url):
         yield check
 
@@ -51,7 +52,7 @@ def test_create_unimplemented():
 
 @fixtures.extension_feature()
 def test_delete_unimplemented(extension):
-    response = confd.extensions.features(extension['id']).delete()
+    response = confd.extensions.features(extension['uuid']).delete()
     response.assert_status(405)
 
 
@@ -71,28 +72,28 @@ def check_search(url, extension, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
     response = url.get(**{field: extension[field]})
-    assert_that(response.items, has_item(has_entry('id', extension['id'])))
-    assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
+    assert_that(response.items, has_item(has_entry('uuid', extension['uuid'])))
+    assert_that(response.items, is_not(has_item(has_entry('uuid', hidden['uuid']))))
 
 
 @fixtures.extension_feature(exten='9998')
 @fixtures.extension_feature(exten='9999')
 def test_sorting_offset_limit(extension1, extension2):
     url = confd.extensions.features.get
-    yield s.check_sorting, url, extension1, extension2, 'exten', '999'
+    id_field = 'uuid'
+    yield s.check_sorting, url, extension1, extension2, 'exten', '999', id_field
 
-    yield s.check_offset, url, extension1, extension2, 'exten', '999'
-    yield s.check_limit, url, extension1, extension2, 'exten', '999'
+    yield s.check_offset, url, extension1, extension2, 'exten', '999', id_field
+    yield s.check_limit, url, extension1, extension2, 'exten', '999', id_field
 
 
 @fixtures.extension_feature()
 def test_get(extension):
-    response = confd.extensions.features(extension['id']).get()
+    response = confd.extensions.features(extension['uuid']).get()
     assert_that(
         response.item,
         has_entries(
             exten=extension['exten'],
-            context=extension['context'],
             feature=extension['feature'],
             enabled=True,
         ),
@@ -101,7 +102,7 @@ def test_get(extension):
 
 @fixtures.extension_feature()
 def test_edit_minimal_parameters(extension):
-    response = confd.extensions.features(extension['id']).put()
+    response = confd.extensions.features(extension['uuid']).put()
     response.assert_updated()
 
 
@@ -109,20 +110,20 @@ def test_edit_minimal_parameters(extension):
 def test_edit_all_parameters(extension):
     parameters = {'exten': '*911', 'enabled': False}
 
-    response = confd.extensions.features(extension['id']).put(**parameters)
+    response = confd.extensions.features(extension['uuid']).put(**parameters)
     response.assert_updated()
 
-    response = confd.extensions.features(extension['id']).get()
+    response = confd.extensions.features(extension['uuid']).get()
     assert_that(response.item, has_entries(parameters))
 
 
 @fixtures.extension_feature(exten='1234')
 @fixtures.extension_feature()
 def test_edit_with_same_extension(extension1, extension2):
-    response = confd.extensions.features(extension2['id']).put(
+    response = confd.extensions.features(extension2['uuid']).put(
         exten=extension1['exten']
     )
-    response.assert_match(400, e.resource_exists('Extension'))
+    response.assert_match(400, e.resource_exists('FeatureExtension'))
 
 
 @fixtures.extension_feature()
@@ -130,17 +131,16 @@ def test_restrict_only_master_tenant(extension):
     response = confd.extensions.features.get(token=TOKEN_SUB_TENANT)
     response.assert_status(401)
 
-    response = confd.extensions.features(extension['id']).put(token=TOKEN_SUB_TENANT)
+    response = confd.extensions.features(extension['uuid']).put(token=TOKEN_SUB_TENANT)
     response.assert_status(401)
 
-    response = confd.extensions.features(extension['id']).get(token=TOKEN_SUB_TENANT)
+    response = confd.extensions.features(extension['uuid']).get(token=TOKEN_SUB_TENANT)
     response.assert_status(401)
 
 
 @fixtures.extension_feature()
 def test_bus_events(extension):
     headers = {}
-
     yield s.check_event, 'extension_feature_edited', headers, confd.extensions.features(
-        extension['id']
+        extension['uuid']
     ).put

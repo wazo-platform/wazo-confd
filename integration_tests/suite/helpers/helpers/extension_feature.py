@@ -14,18 +14,18 @@ def generate_extension_feature(**parameters):
 
 def add_extension_feature(**parameters):
     with db.queries() as queries:
-        id = queries.insert_extension_feature(**parameters)
+        uuid = queries.insert_extension_feature(**parameters)
     return {
-        'id': id,
+        'uuid': str(uuid),
         'exten': parameters.get('exten'),
         'context': 'xivo-features',
         'feature': parameters.get('feature'),
     }
 
 
-def delete_extension_feature(extension_feature_id, check=False, **params):
+def delete_extension_feature(extension_feature_uuid, check=False, **params):
     with db.queries() as queries:
-        queries.delete_extension_feature(extension_feature_id)
+        queries.delete_extension_feature(extension_feature_uuid)
 
 
 def generate_exten():

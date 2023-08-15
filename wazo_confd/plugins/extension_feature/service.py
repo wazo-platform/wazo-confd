@@ -1,8 +1,8 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.feature_extension import dao as feature_extension_dao
 
 from wazo_confd.helpers.resource import CRUDService
 
@@ -10,13 +10,12 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class ExtensionService(CRUDService):
+class FeatureExtensionService(CRUDService):
     def search(self, parameters):
-        parameters['is_feature'] = True
         return self.dao.search(**parameters)
 
-    def get(self, resource_id):
-        return self.dao.get_by(id=resource_id, is_feature=True)
+    def get(self, resource_uuid):
+        return self.dao.get_by(uuid=resource_uuid)
 
     def edit(self, resource, updated_fields=None):
         with Session.no_autoflush:
@@ -26,4 +25,6 @@ class ExtensionService(CRUDService):
 
 
 def build_service():
-    return ExtensionService(extension_dao, build_validator(), build_notifier())
+    return FeatureExtensionService(
+        feature_extension_dao, build_validator(), build_notifier()
+    )

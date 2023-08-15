@@ -17,15 +17,15 @@ paths:
           description: Extension feature list
           schema:
             $ref: '#/definitions/ExtensionFeatureItems'
-  /extensions/features/{extension_id}:
+  /extensions/features/{extension_uuid}:
     get:
       operationId: get_extension_feature
       summary: Get extension feature
-      description: '**Required ACL:** `confd.extensions.features.{extension_id}.read`'
+      description: '**Required ACL:** `confd.extensions.features.{extension_uuid}.read`'
       tags:
       - extensions
       parameters:
-      - $ref: '#/parameters/extensionid'
+      - $ref: '#/parameters/extensionuuid'
       responses:
         '200':
           description: Extension feature
@@ -36,11 +36,11 @@ paths:
     put:
       operationId: update_extension_feature
       summary: Update extension
-      description: '**Required ACL:** `confd.extensions.features.{extension_id}.update`'
+      description: '**Required ACL:** `confd.extensions.features.{extension_uuid}.update`'
       tags:
       - extensions
       parameters:
-      - $ref: '#/parameters/extensionid'
+      - $ref: '#/parameters/extensionuuid'
       - name: body
         in: body
         required: true
@@ -53,6 +53,14 @@ paths:
           $ref: '#/responses/UpdateError'
         '404':
           $ref: '#/responses/NotFoundError'
+
+
+parameters:
+  extensionuuid:
+    required: true
+    type: string
+    name: extension_uuid
+    in: path
 
 definitions:
   ExtensionFeatureItems:
@@ -69,9 +77,9 @@ definitions:
   ExtensionFeature:
     title: ExtensionFeature
     properties:
-      id:
-        type: integer
-        description: Extension ID
+      uuid:
+        type: string
+        description: Extension UUID
         readOnly: true
       context:
         type: string

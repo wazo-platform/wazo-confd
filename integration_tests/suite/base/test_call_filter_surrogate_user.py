@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries, is_not, none
@@ -215,7 +215,7 @@ def test_get_surrogates_callfilter_exten(call_filter, user):
 def test_get_surrogates_callfilter_exten_when_disabled(call_filter, user):
     response = confd.extensions.features.get(search="bsfilter")
     feature = response.items[0]
-    confd.extensions.features(feature['id']).put({'enabled': False}).assert_updated()
+    confd.extensions.features(feature['uuid']).put({'enabled': False}).assert_updated()
 
     with a.call_filter_surrogate_user(call_filter, user):
         response = confd.callfilters(call_filter['id']).get()
@@ -229,6 +229,6 @@ def test_get_surrogates_callfilter_exten_when_disabled(call_filter, user):
             ),
         )
 
-    confd.extensions.features(feature['id']).put(
+    confd.extensions.features(feature['uuid']).put(
         {'enabled': feature['enabled']}
     ).assert_updated()

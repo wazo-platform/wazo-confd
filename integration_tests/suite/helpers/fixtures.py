@@ -220,6 +220,7 @@ class sound(IsolatedAction):
 
 
 class extension_feature(IsolatedAction):
+    id_field = 'uuid'
     actions = {
         'generate': h.extension_feature.generate_extension_feature,
         'delete': h.extension_feature.delete_extension_feature,

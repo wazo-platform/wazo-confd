@@ -38,7 +38,7 @@ class _SchemaMixin:
             {'feature': 'meetingjoin'}
         ).items
         for exten in extens:
-            if exten.feature == 'meetingjoin' and exten.commented == 0:
+            if exten.feature == 'meetingjoin' and exten.enabled:
                 exten_pattern = exten.exten
                 break
         if exten_pattern:

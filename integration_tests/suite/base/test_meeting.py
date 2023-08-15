@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -251,7 +251,7 @@ def test_create_no_ingress_http_configured():
 def test_create_no_meetingjoin_extension_feature(_):
     extension = confd.extensions.features.get(feature='meetingjoin').items[0]
     extension['enabled'] = False
-    response = confd.extensions.features(extension['id']).put(**extension)
+    response = confd.extensions.features(extension['uuid']).put(**extension)
 
     response = confd.meetings.post(name='no exten')
     try:

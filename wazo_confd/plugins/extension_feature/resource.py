@@ -23,14 +23,14 @@ class ExtensionFeatureItem(ItemResource):
     schema = ExtensionFeatureSchema
 
     @required_master_tenant()
-    @required_acl('confd.extensions.features.{id}.read')
-    def get(self, id):
-        return super().get(id)
+    @required_acl('confd.extensions.features.{uuid}.read')
+    def get(self, uuid):
+        return super().get(uuid)
 
     @required_master_tenant()
-    @required_acl('confd.extensions.features.{id}.update')
-    def put(self, id):
-        return super().put(id)
+    @required_acl('confd.extensions.features.{uuid}.update')
+    def put(self, uuid):
+        return super().put(uuid)
 
-    def delete(self, id):
+    def delete(self, uuid):
         return '', 405
