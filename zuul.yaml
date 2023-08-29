@@ -9,6 +9,9 @@
     wazo-gate:
       jobs:
         - confd-tox-integration
+    experimental:
+      jobs:
+        - wazo-acceptance-bullseye
 
 - job:
     name: confd-tox-integration
