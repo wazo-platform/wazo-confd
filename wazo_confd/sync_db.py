@@ -105,10 +105,12 @@ def main():
 def remove_tenant(tenant_uuid, config=None):
     logger.debug('Removing tenant: %s', tenant_uuid)
     from wazo_confd.http_server import app
+
     with app.app_context():
         if config:
-            app.config=config
+            app.config = config
         from wazo_confd import sysconfd
+
         with session_scope():
             contexts = context_dao.search(tenant_uuids=[tenant_uuid])
             for context in contexts.items:
