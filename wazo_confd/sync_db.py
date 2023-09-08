@@ -13,6 +13,7 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.tenant import dao as tenant_resources_dao
+from xivo_dao.resources.context import dao as context_dao
 from xivo_dao import tenant_dao
 from wazo_auth_client import Client as AuthClient
 
@@ -85,7 +86,7 @@ def main():
 
         removed_tenants = confd_tenants - auth_tenants
         for tenant_uuid in removed_tenants:
-            remove_tenant(tenant_uuid)
+            remove_tenant(tenant_uuid, config=config)
 
     with session_scope() as session:
         for tenant_uuid in auth_tenants:
@@ -101,11 +102,19 @@ def main():
             session.flush()
 
 
-def remove_tenant(tenant_uuid):
+def remove_tenant(tenant_uuid, config=None):
     logger.debug('Removing tenant: %s', tenant_uuid)
-    with session_scope():
-        tenant = tenant_resources_dao.get(tenant_uuid)
-        tenant_resources_dao.delete(tenant)
+    from wazo_confd.http_server import app
+    with app.app_context():
+        if config:
+            app.config=config
+        from wazo_confd import sysconfd
+        with session_scope():
+            contexts = context_dao.search(tenant_uuids=[tenant_uuid])
+            for context in contexts.items:
+                sysconfd.delete_voicemails(context.name)
+            tenant = tenant_resources_dao.get(tenant_uuid)
+            tenant_resources_dao.delete(tenant)
 
 
 if __name__ == '__main__':

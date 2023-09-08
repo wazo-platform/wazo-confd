@@ -190,3 +190,14 @@ class TestSysconfdClient(TestCase):
 
         self.client.get_available_network_interfaces()
         self.session.get.assert_called_with(expected_url)
+
+    def test_delete_voicemails_context(self):
+        self.session.request.return_value = Mock(status_code=200)
+
+        self.client.delete_voicemails("default")
+        self.client.flush()
+
+        url = "http://localhost:8668/voicemails_context"
+        self.session.request.assert_called_once_with(
+            'DELETE', url, params={'context': 'default'}
+        )
