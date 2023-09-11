@@ -112,11 +112,18 @@ def remove_tenant(tenant_uuid, config=None):
         from wazo_confd import sysconfd
 
         with session_scope():
+            logger.debug('Retrieving contexts for tenant: %s', tenant_uuid)
             contexts = context_dao.search(tenant_uuids=[tenant_uuid])
             for context in contexts.items:
+                logger.debug(
+                    'Deleting voicemails for tenant: %s, context: %s',
+                    tenant_uuid,
+                    context.name,
+                )
                 sysconfd.delete_voicemails(context.name)
             tenant = tenant_resources_dao.get(tenant_uuid)
             tenant_resources_dao.delete(tenant)
+        sysconfd.flush()
 
 
 if __name__ == '__main__':
