@@ -18,6 +18,7 @@ from xivo_dao import tenant_dao
 from wazo_auth_client import Client as AuthClient
 
 from wazo_confd.config import DEFAULT_CONFIG, _load_key_file
+from wazo_confd.http_server import app
 from wazo_confd.plugins.event_handlers.service import DefaultSIPTemplateService
 
 logger = logging.getLogger('wazo-confd-sync-db')
@@ -104,7 +105,6 @@ def main():
 
 def remove_tenant(tenant_uuid, config=None):
     logger.debug('Removing tenant: %s', tenant_uuid)
-    from wazo_confd.http_server import app
 
     with app.app_context():
         if config:
