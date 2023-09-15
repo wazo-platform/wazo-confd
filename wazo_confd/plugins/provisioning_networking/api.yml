@@ -37,3 +37,6 @@ definitions:
       provision_http_port:
         type: integer
         description: The port used by the HTTP provisioning server.
+      provision_http_base_url:
+        type: string
+        description: The base URL on which the provisioning server will be accessible from outside the network.
