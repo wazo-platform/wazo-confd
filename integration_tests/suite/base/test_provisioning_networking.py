@@ -33,6 +33,13 @@ def test_put_errors():
         256
     )
 
+    yield s.check_bogus_field_returns_error, url, 'provision_host', 123
+    yield s.check_bogus_field_returns_error, url, 'provision_host', True
+    yield s.check_bogus_field_returns_error, url, 'provision_host', {}
+    yield s.check_bogus_field_returns_error, url, 'provision_host', []
+    yield s.check_bogus_field_returns_error, url, 'provision_host', s.random_string(40)
+
+
 def test_put_minimal_parameters():
     body = {}
     result = confd.provisioning.networking.put(body)
