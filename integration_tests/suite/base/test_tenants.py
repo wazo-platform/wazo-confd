@@ -150,13 +150,15 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         mode='allow',
         enabled=True,
         extensions=[gen_group_exten()],
-        wazo_tenant=DELETED_TENANT)
+        wazo_tenant=DELETED_TENANT,
+    )
     @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
     @fixtures.schedule(wazo_tenant=DELETED_TENANT)
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
     @fixtures.ivr(
         choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
-        wazo_tenant=DELETED_TENANT)
+        wazo_tenant=DELETED_TENANT,
+    )
     def test_delete_tenant_with_many_resources_by_event(
         self,
         user,
@@ -287,11 +289,15 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         mode='allow',
         enabled=True,
         extensions=[gen_group_exten()],
-        wazo_tenant=DELETED_TENANT)
+        wazo_tenant=DELETED_TENANT,
+    )
     @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
     @fixtures.schedule(wazo_tenant=DELETED_TENANT)
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.ivr(choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}], wazo_tenant=DELETED_TENANT)
+    @fixtures.ivr(
+        choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
+        wazo_tenant=DELETED_TENANT,
+    )
     def test_delete_tenant_with_many_resources_by_syncdb(
         self,
         user,
