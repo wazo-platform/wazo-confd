@@ -1,5 +1,6 @@
 # Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from time import sleep
 
 from hamcrest import (
     all_of,
@@ -145,8 +146,17 @@ class BaseTestDeleteByEvent(BaseTestTenants):
     @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_permission(wazo_tenant=DELETED_TENANT)
+    @fixtures.call_permission(
+        mode='allow',
+        enabled=True,
+        extensions=[gen_group_exten()],
+        wazo_tenant=DELETED_TENANT)
     @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
+    @fixtures.schedule(wazo_tenant=DELETED_TENANT)
+    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
+    @fixtures.ivr(
+        choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
+        wazo_tenant=DELETED_TENANT)
     def test_delete_tenant_with_many_resources_by_event(
         self,
         user,
@@ -172,6 +182,9 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         user2,
         call_permission,
         call_filter,
+        schedule,
+        trunk,
+        ivr,
     ):
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
@@ -198,6 +211,8 @@ class BaseTestDeleteByEvent(BaseTestTenants):
                 a.trunk_endpoint_custom(trunk_custom, custom, check=False),
                 a.call_pickup_interceptor_user(call_pickup, user, check=False),
                 a.call_pickup_target_user(call_pickup, user2, check=False),
+                a.incall_schedule(incall, schedule, check=False),
+                a.outcall_trunk(outcall, trunk, check=False),
             ):
                 BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
 
@@ -268,8 +283,15 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
     @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_permission(wazo_tenant=DELETED_TENANT)
+    @fixtures.call_permission(
+        mode='allow',
+        enabled=True,
+        extensions=[gen_group_exten()],
+        wazo_tenant=DELETED_TENANT)
     @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
+    @fixtures.schedule(wazo_tenant=DELETED_TENANT)
+    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
+    @fixtures.ivr(choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}], wazo_tenant=DELETED_TENANT)
     def test_delete_tenant_with_many_resources_by_syncdb(
         self,
         user,
@@ -295,6 +317,9 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         user2,
         call_permission,
         call_filter,
+        schedule,
+        trunk,
+        ivr,
     ):
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
@@ -321,6 +346,8 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
                 a.trunk_endpoint_custom(trunk_custom, custom, check=False),
                 a.call_pickup_interceptor_user(call_pickup, user, check=False),
                 a.call_pickup_target_user(call_pickup, user2, check=False),
+                a.incall_schedule(incall, schedule, check=False),
+                a.outcall_trunk(outcall, trunk, check=False),
             ):
                 with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
                     BaseIntegrationTest.sync_db()
