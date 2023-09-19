@@ -222,7 +222,7 @@ class BaseTestDeleteByEvent(BaseTestTenants):
                     diff = self.diff(after_deletion_tables_rows_counts)
                     assert (
                         len(diff) == 0
-                    ), "Some tables are not properly cleaned after the tenant deletion"
+                    ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
 
                 until.assert_(resources_deleted, tries=5, interval=5)
 
@@ -362,7 +362,7 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
                         diff = self.diff(after_deletion_tables_rows_counts)
                         assert (
                             len(diff) == 0
-                        ), "Some tables are not properly cleaned after tenant deletion"
+                        ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
 
                     until.assert_(resources_deleted, tries=5, interval=5)
 
