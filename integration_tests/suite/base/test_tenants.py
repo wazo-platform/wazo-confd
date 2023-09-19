@@ -138,15 +138,26 @@ class BaseTestDeleteByEvent(BaseTestTenants):
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
     @fixtures.sip(name='endpoint_sip', wazo_tenant=DELETED_TENANT)
-    @fixtures.sip(name='name_search', wazo_tenant=DELETED_TENANT)
-    @fixtures.iax(name='name_search', wazo_tenant=DELETED_TENANT)
-    @fixtures.custom(interface='name_search', wazo_tenant=DELETED_TENANT)
+    @fixtures.sip(name='endpoint_sip2', wazo_tenant=DELETED_TENANT)
+    @fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
+    @fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
     @fixtures.agent(number='1234', wazo_tenant=DELETED_TENANT)
     @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_permission(wazo_tenant=DELETED_TENANT)
+    @fixtures.call_permission(
+        mode='allow',
+        enabled=True,
+        extensions=[gen_group_exten()],
+        wazo_tenant=DELETED_TENANT,
+    )
     @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
+    @fixtures.schedule(wazo_tenant=DELETED_TENANT)
+    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
+    @fixtures.ivr(
+        choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
+        wazo_tenant=DELETED_TENANT,
+    )
     def test_delete_tenant_with_many_resources_by_event(
         self,
         user,
@@ -172,6 +183,9 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         user2,
         call_permission,
         call_filter,
+        schedule,
+        trunk,
+        ivr,
     ):
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
@@ -198,6 +212,8 @@ class BaseTestDeleteByEvent(BaseTestTenants):
                 a.trunk_endpoint_custom(trunk_custom, custom, check=False),
                 a.call_pickup_interceptor_user(call_pickup, user, check=False),
                 a.call_pickup_target_user(call_pickup, user2, check=False),
+                a.incall_schedule(incall, schedule, check=False),
+                a.outcall_trunk(outcall, trunk, check=False),
             ):
                 BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
 
@@ -206,7 +222,7 @@ class BaseTestDeleteByEvent(BaseTestTenants):
                     diff = self.diff(after_deletion_tables_rows_counts)
                     assert (
                         len(diff) == 0
-                    ), "Some tables are not properly cleaned after the tenant deletion"
+                    ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
 
                 until.assert_(resources_deleted, tries=5, interval=5)
 
@@ -260,16 +276,27 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
     @fixtures.trunk(wazo_tenant=DELETED_TENANT)
+    @fixtures.sip(name='endpoint_sip', wazo_tenant=DELETED_TENANT)
     @fixtures.sip(name='endpoint_sip2', wazo_tenant=DELETED_TENANT)
-    @fixtures.sip(name='name_search2', wazo_tenant=DELETED_TENANT)
-    @fixtures.iax(name='name_search', wazo_tenant=DELETED_TENANT)
-    @fixtures.custom(interface='name_search', wazo_tenant=DELETED_TENANT)
-    @fixtures.agent(number='1234', wazo_tenant=DELETED_TENANT)
+    @fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
+    @fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
+    @fixtures.agent(number='5678', wazo_tenant=DELETED_TENANT)
     @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_permission(wazo_tenant=DELETED_TENANT)
+    @fixtures.call_permission(
+        mode='allow',
+        enabled=True,
+        extensions=[gen_group_exten()],
+        wazo_tenant=DELETED_TENANT,
+    )
     @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
+    @fixtures.schedule(wazo_tenant=DELETED_TENANT)
+    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
+    @fixtures.ivr(
+        choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
+        wazo_tenant=DELETED_TENANT,
+    )
     def test_delete_tenant_with_many_resources_by_syncdb(
         self,
         user,
@@ -295,6 +322,9 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         user2,
         call_permission,
         call_filter,
+        schedule,
+        trunk,
+        ivr,
     ):
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
@@ -321,6 +351,8 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
                 a.trunk_endpoint_custom(trunk_custom, custom, check=False),
                 a.call_pickup_interceptor_user(call_pickup, user, check=False),
                 a.call_pickup_target_user(call_pickup, user2, check=False),
+                a.incall_schedule(incall, schedule, check=False),
+                a.outcall_trunk(outcall, trunk, check=False),
             ):
                 with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
                     BaseIntegrationTest.sync_db()
@@ -330,7 +362,7 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
                         diff = self.diff(after_deletion_tables_rows_counts)
                         assert (
                             len(diff) == 0
-                        ), "Some tables are not properly cleaned after tenant deletion"
+                        ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
 
                     until.assert_(resources_deleted, tries=5, interval=5)
 
