@@ -124,7 +124,7 @@ def remove_tenant(tenant_uuid, config=None):
             moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
             for moh in moh_list.items:
                 logger.debug(
-                    'Deleting moh for tenant: %s, moh: %s',
+                    'Deleting moh directory for tenant: %s, moh: %s',
                     tenant_uuid,
                     moh.name,
                 )
