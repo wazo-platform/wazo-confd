@@ -120,9 +120,15 @@ def remove_tenant(tenant_uuid, config=None):
                     context.name,
                 )
                 sysconfd.delete_voicemails(context.name)
-                moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
-                for moh in moh_list.items:
-                    sysconfd.delete_moh(moh.name)
+            logger.debug('Retrieving all moh for tenant: %s', tenant_uuid)
+            moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
+            for moh in moh_list.items:
+                logger.debug(
+                    'Deleting moh for tenant: %s, moh: %s',
+                    tenant_uuid,
+                    moh.name,
+                )
+                sysconfd.delete_moh(moh.name)
             tenant = tenant_resources_dao.get(tenant_uuid)
             tenant_resources_dao.delete(tenant)
         sysconfd.flush()
