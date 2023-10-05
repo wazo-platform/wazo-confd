@@ -1,4 +1,4 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -200,4 +200,16 @@ class TestSysconfdClient(TestCase):
         url = "http://localhost:8668/voicemails_context"
         self.session.request.assert_called_once_with(
             'DELETE', url, params={'context': 'default'}
+        )
+
+    def test_delete_moh(self):
+        self.session.request.return_value = Mock(status_code=200)
+
+        moh_name = 'moh-mycompany-58432565-9dca-4863-b1ac-a62f731dcd01'
+        self.client.delete_moh(moh_name)
+        self.client.flush()
+
+        url = "http://localhost:8668/moh"
+        self.session.request.assert_called_once_with(
+            'DELETE', url, params={'name': moh_name}
         )

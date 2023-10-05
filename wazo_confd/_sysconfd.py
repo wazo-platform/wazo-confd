@@ -58,6 +58,11 @@ class SysconfdPublisher:
         url = "{}/voicemails_context".format(self.base_url)
         self.add_request('DELETE', url, params=params)
 
+    def delete_moh(self, moh_name):
+        params = {'name': moh_name}
+        url = "{}/moh".format(self.base_url)
+        self.add_request('DELETE', url, params=params)
+
     def commonconf_apply(self):
         url = "{}/commonconf_apply".format(self.base_url)
         self.add_request('GET', url)
