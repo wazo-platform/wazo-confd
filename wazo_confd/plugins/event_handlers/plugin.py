@@ -8,7 +8,10 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
+from wazo_confd import sysconfd
+
 from .service import DefaultSIPTemplateService
+from ...http_server import app
 from ...sync_db import remove_tenant
 
 logger = logging.getLogger(__name__)
@@ -32,7 +35,8 @@ class TenantEventHandler:
             self.service.copy_slug(tenant, slug)
 
     def _auth_tenant_deleted(self, event):
-        remove_tenant(event['uuid'])
+        with app.app_context():
+            remove_tenant(event['uuid'], sysconfd)
 
 
 class Plugin:
