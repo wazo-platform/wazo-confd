@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 
 
 class TenantEventHandler:
-    def __init__(self, tenant_dao, service, config):
+    def __init__(self, tenant_dao, service, sysconfd):
         self.tenant_dao = tenant_dao
         self.service = service
-        self.sysconfd = SysconfdPublisher.from_config(config)
+        self.sysconfd = sysconfd
 
     def subscribe(self, bus_consumer):
         bus_consumer.subscribe('auth_tenant_added', self._auth_tenant_added)
@@ -43,9 +43,10 @@ class Plugin:
         config = dependencies['config']
 
         service = DefaultSIPTemplateService(sip_dao, transport_dao)
+        sysconfd = SysconfdPublisher.from_config(config)
         tenant_event_handler = TenantEventHandler(
             tenant_dao,
             service,
-            config,
+            sysconfd,
         )
         tenant_event_handler.subscribe(bus_consumer)
