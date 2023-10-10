@@ -12,8 +12,9 @@ from xivo_dao.alchemy.tenant import Tenant
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
-from xivo_dao.resources.tenant import dao as tenant_resources_dao
 from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.moh import dao as moh_dao
+from xivo_dao.resources.tenant import dao as tenant_resources_dao
 from xivo_dao import tenant_dao
 from wazo_auth_client import Client as AuthClient
 
@@ -119,6 +120,15 @@ def remove_tenant(tenant_uuid, config=None):
                     context.name,
                 )
                 sysconfd.delete_voicemails(context.name)
+            logger.debug('Retrieving all moh for tenant: %s', tenant_uuid)
+            moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
+            for moh in moh_list.items:
+                logger.debug(
+                    'Deleting moh directory for tenant: %s, moh: %s',
+                    tenant_uuid,
+                    moh.name,
+                )
+                sysconfd.delete_moh(moh.name)
             tenant = tenant_resources_dao.get(tenant_uuid)
             tenant_resources_dao.delete(tenant)
         sysconfd.flush()
