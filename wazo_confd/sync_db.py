@@ -18,9 +18,8 @@ from xivo_dao.resources.tenant import dao as tenant_resources_dao
 from xivo_dao import tenant_dao
 from wazo_auth_client import Client as AuthClient
 
+from wazo_confd._sysconfd import SysconfdPublisher
 from wazo_confd.config import DEFAULT_CONFIG, _load_key_file
-from wazo_confd.http_server import app
-from wazo_confd import sysconfd
 from wazo_confd.plugins.event_handlers.service import DefaultSIPTemplateService
 
 logger = logging.getLogger('wazo-confd-sync-db')
@@ -71,6 +70,8 @@ def main():
     auth_tenant_slugs = {tenant['uuid']: tenant['slug'] for tenant in tenants}
     logger.debug('wazo-auth tenants: %s', auth_tenants)
 
+    sysconfd = SysconfdPublisher.from_config(config)
+
     init_db_from_config(config)
     default_sip_template_service = DefaultSIPTemplateService(
         sip_dao,
@@ -89,7 +90,7 @@ def main():
 
         removed_tenants = confd_tenants - auth_tenants
         for tenant_uuid in removed_tenants:
-            remove_tenant(tenant_uuid, config=config)
+            remove_tenant(tenant_uuid, sysconfd)
 
     with session_scope() as session:
         for tenant_uuid in auth_tenants:
@@ -105,33 +106,30 @@ def main():
             session.flush()
 
 
-def remove_tenant(tenant_uuid, config=None):
+def remove_tenant(tenant_uuid, sysconfd):
     logger.debug('Removing tenant: %s', tenant_uuid)
-    with app.app_context():
-        if config:
-            app.config = config
-        with session_scope():
-            logger.debug('Retrieving contexts for tenant: %s', tenant_uuid)
-            contexts = context_dao.search(tenant_uuids=[tenant_uuid])
-            for context in contexts.items:
-                logger.debug(
-                    'Deleting voicemails for tenant: %s, context: %s',
-                    tenant_uuid,
-                    context.name,
-                )
-                sysconfd.delete_voicemails(context.name)
-            logger.debug('Retrieving all moh for tenant: %s', tenant_uuid)
-            moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
-            for moh in moh_list.items:
-                logger.debug(
-                    'Deleting moh directory for tenant: %s, moh: %s',
-                    tenant_uuid,
-                    moh.name,
-                )
-                sysconfd.delete_moh(moh.name)
-            tenant = tenant_resources_dao.get(tenant_uuid)
-            tenant_resources_dao.delete(tenant)
-        sysconfd.flush()
+    with session_scope():
+        logger.debug('Retrieving contexts for tenant: %s', tenant_uuid)
+        contexts = context_dao.search(tenant_uuids=[tenant_uuid])
+        for context in contexts.items:
+            logger.debug(
+                'Deleting voicemails for tenant: %s, context: %s',
+                tenant_uuid,
+                context.name,
+            )
+            sysconfd.delete_voicemails(context.name)
+        logger.debug('Retrieving all moh for tenant: %s', tenant_uuid)
+        moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
+        for moh in moh_list.items:
+            logger.debug(
+                'Deleting moh directory for tenant: %s, moh: %s',
+                tenant_uuid,
+                moh.name,
+            )
+            sysconfd.delete_moh(moh.name)
+        tenant = tenant_resources_dao.get(tenant_uuid)
+        tenant_resources_dao.delete(tenant)
+    sysconfd.flush()
 
 
 if __name__ == '__main__':
