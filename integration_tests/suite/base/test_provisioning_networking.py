@@ -15,7 +15,7 @@ def test_get():
         has_entries(
             {
                 'provision_host': '',
-                'provision_http_port': 18667,
+                'provision_http_port': 8667,
                 'provision_http_base_url': '',
             }
         ),
@@ -50,7 +50,7 @@ def test_put_minimal_parameters():
         has_entries(
             {
                 'provision_host': '',
-                'provision_http_port': 18667,
+                'provision_http_port': 8667,
                 'provision_http_base_url': '',
             }
         ),
@@ -68,7 +68,7 @@ def test_put_minimal_parameters():
         has_entries(
             {
                 'provision_host': '127.0.0.1',
-                'provision_http_port': 18667,
+                'provision_http_port': 8667,
                 'provision_http_base_url': 'http://example.com',
             }
         ),
@@ -83,7 +83,7 @@ def test_put_minimal_parameters():
         has_entries(
             {
                 'provision_host': None,
-                'provision_http_port': 18667,
+                'provision_http_port': 8667,
                 'provision_http_base_url': None,
             }
         ),
