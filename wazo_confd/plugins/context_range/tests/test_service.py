@@ -5,7 +5,7 @@ from collections import namedtuple
 from unittest import TestCase
 from hamcrest import assert_that, contains_exactly
 
-from ..service import _list_exten_from_ranges, _ranges_from_extens
+from ..service import RangeFilter
 
 
 Range = namedtuple('Range', ['start', 'end'])
@@ -18,7 +18,7 @@ class TestListExtenFromRanges(TestCase):
             Range('1005', '1007'),
         ]
 
-        result = list(_list_exten_from_ranges(ranges))
+        result = list(RangeFilter._list_exten_from_ranges(ranges))
 
         assert_that(
             result,
@@ -37,7 +37,7 @@ class TestListExtenFromRanges(TestCase):
             Range('0001', '0003'),
         ]
 
-        result = list(_list_exten_from_ranges(ranges))
+        result = list(RangeFilter._list_exten_from_ranges(ranges))
 
         assert_that(
             result,
@@ -55,7 +55,7 @@ class TestListExtenFromRanges(TestCase):
             Range('00001', '00003'),
         ]
 
-        result = list(_list_exten_from_ranges(ranges))
+        result = list(RangeFilter._list_exten_from_ranges(ranges))
 
         assert_that(
             result,
@@ -84,7 +84,7 @@ class TestRangesFromExtens(TestCase):
             '1007',
         ]
 
-        result = list(_ranges_from_extens(extens))
+        result = list(RangeFilter._ranges_from_extens(extens))
 
         assert_that(
             result,
@@ -101,7 +101,7 @@ class TestRangesFromExtens(TestCase):
             '0003',
         ]
 
-        result = list(_ranges_from_extens(extens))
+        result = list(RangeFilter._ranges_from_extens(extens))
 
         assert_that(
             result,
@@ -123,7 +123,7 @@ class TestRangesFromExtens(TestCase):
             '00003',
         ]
 
-        result = list(_ranges_from_extens(extens))
+        result = list(RangeFilter._ranges_from_extens(extens))
 
         assert_that(
             result,

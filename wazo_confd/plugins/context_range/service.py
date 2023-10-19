@@ -9,6 +9,76 @@ from xivo_dao.resources.extension import dao as extension_dao
 logger = logging.getLogger(__name__)
 
 
+class RangeFilter:
+    def __init__(self, context, extension_dao, available=None, search=None, **kwargs):
+        self._context = context
+        self._extension_dao = extension_dao
+        self._available = available
+        self._search = search
+        self._used_extensions = set()
+
+        if self._available:
+            configured_extens = self._extension_dao.find_all_by(context=context.name)
+            self._used_extensions = set(e.exten for e in configured_extens)
+
+    def get_ranges(self, range_type):
+        ranges = self._extract_ranges(self._context, range_type)
+        unfiltered_extens = self._list_exten_from_ranges(ranges)
+        filtered_extens = (
+            exten for exten in unfiltered_extens if self._include_exten(exten)
+        )
+        filtered_ranges = list(self._ranges_from_extens(filtered_extens))
+        count = len(filtered_ranges)
+        return filtered_ranges, count
+
+    def _include_exten(self, exten):
+        if self._available:
+            if exten in self._used_extensions:
+                return False
+        if self._search:
+            if self._search not in exten:
+                return False
+        return True
+
+    def _extract_ranges(self, context, range_type):
+        if range_type == 'user':
+            return context.user_ranges
+        elif range_type == 'group':
+            return context.group_ranges
+        elif range_type == 'queue':
+            return context.queue_ranges
+        elif range_type == 'conference':
+            return context.conference_room_ranges
+        elif range_type == 'incall':
+            return context.incall_ranges
+        else:
+            assert False, f'{range_type} is not supported'
+
+    @staticmethod
+    def _list_exten_from_ranges(ranges):
+        for r in ranges:
+            start = r.start
+            end = r.end
+            length = len(start)
+            for exten in range(int(start), int(end) + 1):
+                yield str(exten).rjust(length, '0')
+
+    @staticmethod
+    def _ranges_from_extens(extensions):
+        start, previous = None, None
+        for exten in extensions:
+            if not start:
+                start = exten
+            if previous:
+                increment = int(exten) - int(previous)
+                len_diff = len(exten) - len(previous) > 0
+                if increment > 1 or len_diff:
+                    yield {'start': start, 'end': previous}
+                    start, previous = exten, None
+            previous = exten
+        yield {'start': start, 'end': previous}
+
+
 class ContextRangeService:
     def __init__(self, context_dao, extension_dao):
         self._context_dao = context_dao
@@ -21,66 +91,10 @@ class ContextRangeService:
         )
 
         context = self._context_dao.get(context_id)
-        if range_type == 'user':
-            range = context.user_ranges
-        elif range_type == 'group':
-            range = context.group_ranges
-        elif range_type == 'queue':
-            range = context.queue_ranges
-        elif range_type == 'conference':
-            range = context.conference_room_ranges
-        elif range_type == 'incall':
-            range = context.incall_ranges
-        else:
-            assert False, f'{range_type} is not supported'
-
-        if parameters['available']:
-            extensions = self._extension_dao.find_all_by(context=context.name)
-            used_extensions = set(e.exten for e in extensions)
-        else:
-            used_extensions = set()
-
-        def exten_filter(exten):
-            term = parameters.get('search')
-            if term:
-                if term not in exten:
-                    return False
-            return exten not in used_extensions
-
-        filtered_extensions = (
-            exten for exten in _list_exten_from_ranges(range)
-            if exten_filter(exten)
-        )
-        ranges = _ranges_from_extens(filtered_extensions)
-
-        response = list(ranges)
-
-        return len(response), response
+        filter = RangeFilter(context, self._extension_dao, **parameters)
+        ranges, count = filter.get_ranges(range_type)
+        return count, ranges
 
 
 def build_service():
     return ContextRangeService(context_dao, extension_dao)
-
-
-def _list_exten_from_ranges(ranges):
-    for r in ranges:
-        start = r.start
-        end = r.end
-        length = len(start)
-        for exten in range(int(start), int(end) + 1):
-            yield str(exten).rjust(length, '0')
-
-
-def _ranges_from_extens(extensions):
-    start, previous = None, None
-    for exten in extensions:
-        if not start:
-            start = exten
-        if previous:
-            increment = int(exten) - int(previous)
-            len_diff = len(exten) - len(previous) > 0
-            if increment > 1 or len_diff:
-                yield {'start': start, 'end': previous}
-                start, previous = exten, None
-        previous = exten
-    yield {'start': start, 'end': previous}
