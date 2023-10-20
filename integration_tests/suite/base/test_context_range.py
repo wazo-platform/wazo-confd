@@ -149,6 +149,64 @@ def test_search_partial_exten(context):
     )
 
 
+@fixtures.context(
+    user_ranges=[
+        {'start': '00', 'end': '99'},
+        {'start': '0001', 'end': '0499'},
+    ],
+)
+def test_search_pagination(context):
+    response = confd.contexts(context['id']).ranges('user').get(search='11', limit=2)
+    assert_that(
+        response.json,
+        has_entries(
+            total=6,
+            items=contains_inanyorder(
+                {'start': '11', 'end': '11'},
+                {'start': '0011', 'end': '0011'},
+                # {'start': '0110', 'end': '0119'},
+                # {'start': '0211', 'end': '0211'},
+                # {'start': '0311', 'end': '0311'},
+                # {'start': '0411', 'end': '0411'},
+            ),
+        ),
+    )
+
+    response = (
+        confd.contexts(context['id']).ranges('user').get(search='11', offset=4, limit=3)
+    )
+    assert_that(
+        response.json,
+        has_entries(
+            total=6,
+            items=contains_inanyorder(
+                # {'start': '11', 'end': '11'},
+                # {'start': '0011', 'end': '0011'},
+                # {'start': '0110', 'end': '0119'},
+                # {'start': '0211', 'end': '0211'},
+                {'start': '0311', 'end': '0311'},
+                {'start': '0411', 'end': '0411'},
+            ),
+        ),
+    )
+
+    response = confd.contexts(context['id']).ranges('user').get(search='11', offset=2)
+    assert_that(
+        response.json,
+        has_entries(
+            total=6,
+            items=contains_inanyorder(
+                # {'start': '11', 'end': '11'},
+                # {'start': '0011', 'end': '0011'},
+                {'start': '0110', 'end': '0119'},
+                {'start': '0211', 'end': '0211'},
+                {'start': '0311', 'end': '0311'},
+                {'start': '0411', 'end': '0411'},
+            ),
+        ),
+    )
+
+
 @fixtures.context()
 def test_search_errors(context):
     fake_context_range = confd.contexts(999999).ranges('user').get

@@ -79,6 +79,18 @@ class RangeFilter:
         yield {'start': start, 'end': previous}
 
 
+class RangePaginator:
+    def __init__(self, limit=None, offset=0, **kwargs):
+        self._limit = limit
+        self._offset = offset
+
+    def paginate(self, ranges):
+        if self._limit is None:
+            return ranges[self._offset :]
+        else:
+            return ranges[self._offset : self._offset + self._limit]
+
+
 class ContextRangeService:
     def __init__(self, context_dao, extension_dao):
         self._context_dao = context_dao
@@ -92,8 +104,10 @@ class ContextRangeService:
 
         context = self._context_dao.get(context_id)
         filter = RangeFilter(context, self._extension_dao, **parameters)
+        paginator = RangePaginator(**parameters)
         ranges, count = filter.get_ranges(range_type)
-        return count, ranges
+        paginated_ranges = paginator.paginate(ranges)
+        return count, paginated_ranges
 
 
 def build_service():
