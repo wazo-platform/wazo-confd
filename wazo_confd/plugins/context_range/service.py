@@ -1,14 +1,10 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
-
 from operator import itemgetter
 
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
-
-logger = logging.getLogger(__name__)
 
 
 class RangeFilter:
@@ -111,8 +107,8 @@ class ContextRangeService:
         self._context_dao = context_dao
         self._extension_dao = extension_dao
 
-    def search(self, context_id, range_type, parameters, tenant_uuids=None):
-        context = self._context_dao.get(context_id)
+    def search(self, context_id, range_type, tenant_uuids=None, **parameters):
+        context = self._context_dao.get(context_id, tenant_uuids=tenant_uuids)
 
         filter = RangeFilter(context, self._extension_dao, **parameters)
         paginator = RangePaginator(**parameters)

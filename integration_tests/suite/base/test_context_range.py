@@ -10,6 +10,7 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import associations as a, fixtures, scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
 @fixtures.context(
@@ -269,6 +270,21 @@ def test_search_errors(context):
     fake_context_range = confd.contexts(999999).ranges('user').get
     yield s.check_resource_not_found, fake_context_range, 'Context'
 
-    request = confd.contexts(context['id']).ranges('unknown').get
-    response = request()
+    response = confd.contexts(context['id']).ranges('unknown').get()
     response.assert_status(404)
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+def test_search_multi_tenant(main, sub):
+    response = confd.contexts(main['id']).ranges('user').get(wazo_tenant=MAIN_TENANT)
+    response.assert_status(200)
+
+    response = confd.contexts(main['id']).ranges('user').get(wazo_tenant=SUB_TENANT)
+    response.assert_status(404)
+
+    response = confd.contexts(sub['id']).ranges('user').get(wazo_tenant=MAIN_TENANT)
+    response.assert_status(200)
+
+    response = confd.contexts(sub['id']).ranges('user').get(wazo_tenant=SUB_TENANT)
+    response.assert_status(200)
