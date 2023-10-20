@@ -110,9 +110,6 @@ definitions:
     allOf:
     - $ref: '#/definitions/SkillRelationBase'
     - properties:
-        category:
-          type: string
-          description: The category of the skill
         description:
           type: string
     - $ref: '#/definitions/SkillRelationAgents'

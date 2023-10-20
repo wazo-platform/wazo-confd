@@ -49,11 +49,6 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(65)
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'category', True
-    yield s.check_bogus_field_returns_error, url, 'category', 1234
-    yield s.check_bogus_field_returns_error, url, 'category', s.random_string(65)
-    yield s.check_bogus_field_returns_error, url, 'category', []
-    yield s.check_bogus_field_returns_error, url, 'category', {}
     yield s.check_bogus_field_returns_error, url, 'description', True
     yield s.check_bogus_field_returns_error, url, 'description', 1234
     yield s.check_bogus_field_returns_error, url, 'description', []
@@ -68,11 +63,11 @@ def unique_error_checks(url, skill):
     yield s.check_bogus_field_returns_error, url, 'name', skill['name']
 
 
-@fixtures.skill(name='search', category='search', description='search')
-@fixtures.skill(name='hidden', category='hidden', description='hidden')
+@fixtures.skill(name='search', description='search')
+@fixtures.skill(name='hidden', description='hidden')
 def test_search(skill, hidden):
     url = confd.agents.skills
-    searches = {'name': 'search', 'category': 'search', 'description': 'search'}
+    searches = {'name': 'search', 'description': 'search'}
 
     for field, term in searches.items():
         yield check_search, url, skill, hidden, field, term
@@ -133,7 +128,6 @@ def test_get(skill):
         has_entries(
             id=skill['id'],
             name=skill['name'],
-            category=skill['category'],
             description=skill['description'],
             agents=empty(),
         ),
@@ -162,7 +156,6 @@ def test_create_minimal_parameters():
 def test_create_all_parameters():
     parameters = {
         'name': 'MySkill',
-        'category': 'banana',
         'description': 'MyDescription',
     }
 
@@ -192,7 +185,6 @@ def test_edit_minimal_parameters(skill):
 def test_edit_all_parameters(skill):
     parameters = {
         'name': 'UpdatedSkill',
-        'category': 'UpdatedCategory',
         'description': 'UpdatedDescription',
     }
 
