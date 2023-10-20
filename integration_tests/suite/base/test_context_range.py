@@ -1,7 +1,12 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_entries, contains_inanyorder
+from hamcrest import (
+    assert_that,
+    has_entries,
+    contains_exactly,
+    contains_inanyorder,
+)
 
 from . import confd
 from ..helpers import associations as a, fixtures, scenarios as s
@@ -202,6 +207,58 @@ def test_search_pagination(context):
                 {'start': '0211', 'end': '0211'},
                 {'start': '0311', 'end': '0311'},
                 {'start': '0411', 'end': '0411'},
+            ),
+        ),
+    )
+
+
+@fixtures.context(
+    user_ranges=[
+        {'start': '100', 'end': '999'},
+        {'start': '5999', 'end': '6000'},
+    ],
+)
+def test_search_order(context):
+    response = (
+        confd.contexts(context['id']).ranges('user').get(order='start', direction='asc')
+    )
+    assert_that(
+        response.json,
+        has_entries(
+            total=2,
+            items=contains_exactly(
+                {'start': '100', 'end': '999'},
+                {'start': '5999', 'end': '6000'},
+            ),
+        ),
+    )
+
+    response = (
+        confd.contexts(context['id'])
+        .ranges('user')
+        .get(order='start', direction='desc')
+    )
+    assert_that(
+        response.json,
+        has_entries(
+            total=2,
+            items=contains_exactly(
+                {'start': '5999', 'end': '6000'},
+                {'start': '100', 'end': '999'},
+            ),
+        ),
+    )
+
+    response = (
+        confd.contexts(context['id']).ranges('user').get(order='end', direction='asc')
+    )
+    assert_that(
+        response.json,
+        has_entries(
+            total=2,
+            items=contains_exactly(
+                {'start': '5999', 'end': '6000'},
+                {'start': '100', 'end': '999'},
             ),
         ),
     )

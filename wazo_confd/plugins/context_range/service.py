@@ -3,6 +3,8 @@
 
 import logging
 
+from operator import itemgetter
+
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
 
@@ -91,22 +93,35 @@ class RangePaginator:
             return ranges[self._offset : self._offset + self._limit]
 
 
+class RangeSorter:
+    def __init__(self, order=None, direction='asc', **kwargs):
+        self._should_sort = order is not None
+        if self._should_sort:
+            self._key = itemgetter(order)
+            self._reverse = direction == 'desc'
+
+    def sort(self, ranges):
+        if not self._should_sort:
+            return ranges
+        return sorted(ranges, key=self._key, reverse=self._reverse)
+
+
 class ContextRangeService:
     def __init__(self, context_dao, extension_dao):
         self._context_dao = context_dao
         self._extension_dao = extension_dao
 
     def search(self, context_id, range_type, parameters, tenant_uuids=None):
-        logger.info(
-            'search %s %s %s %s',
-            context_id, range_type, parameters, tenant_uuids,
-        )
-
         context = self._context_dao.get(context_id)
+
         filter = RangeFilter(context, self._extension_dao, **parameters)
         paginator = RangePaginator(**parameters)
+        sorter = RangeSorter(**parameters)
+
         ranges, count = filter.get_ranges(range_type)
-        paginated_ranges = paginator.paginate(ranges)
+        sorted_ranges = sorter.sort(ranges)
+        paginated_ranges = paginator.paginate(sorted_ranges)
+
         return count, paginated_ranges
 
 
