@@ -115,7 +115,6 @@ class BaseTestDeleteByEvent(BaseTestTenants):
             'queue',
             'queuemember',
             'pickupmember',
-            'queueskillcat',
             'func_key',
             'func_key_dest_custom',
         ]
@@ -239,7 +238,6 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
             'queue',
             'queuemember',
             'pickupmember',
-            'queueskillcat',
             'func_key',
             'func_key_dest_custom',
         ]
