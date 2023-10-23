@@ -6,6 +6,7 @@ from hamcrest import (
     has_entries,
     contains_exactly,
     contains_inanyorder,
+    empty,
 )
 
 from . import confd
@@ -162,6 +163,26 @@ def test_search_partial_exten(context):
                 {'start': '0311', 'end': '0311'},
                 {'start': '0411', 'end': '0411'},
             ),
+        ),
+    )
+
+    response = confd.contexts(context['id']).ranges('user').get(search='0011')
+    assert_that(
+        response.json,
+        has_entries(
+            total=1,
+            items=contains_inanyorder(
+                {'start': '0011', 'end': '0011'},
+            ),
+        ),
+    )
+
+    response = confd.contexts(context['id']).ranges('user').get(search='10000')
+    assert_that(
+        response.json,
+        has_entries(
+            total=0,
+            items=empty(),
         ),
     )
 

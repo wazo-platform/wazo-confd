@@ -92,7 +92,8 @@ class RangeFilter:
                     yield {'start': start, 'end': previous}
                     start, previous = exten, None
             previous = exten
-        yield {'start': start, 'end': previous}
+        if start:
+            yield {'start': start, 'end': previous}
 
 
 class RangePaginator:
