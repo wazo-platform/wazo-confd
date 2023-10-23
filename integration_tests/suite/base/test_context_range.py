@@ -101,11 +101,15 @@ def test_search_all_types(internal_context, incoming_context):
 )
 @fixtures.user()
 @fixtures.line_sip()
-def test_search_available(context, user, line):
+def test_search_availability(context, user, line):
     @fixtures.extension(context=context['name'], exten='1005')
     def aux(extension):
         with a.user_line(user, line), a.line_extension(line, extension):
-            response = confd.contexts(context['id']).ranges('user').get(available=True)
+            response = (
+                confd.contexts(context['id'])
+                .ranges('user')
+                .get(availability='available')
+            )
             assert_that(
                 response.json,
                 has_entries(
@@ -117,7 +121,9 @@ def test_search_available(context, user, line):
                 ),
             )
 
-            response = confd.contexts(context['id']).ranges('user').get(available=False)
+            response = (
+                confd.contexts(context['id']).ranges('user').get(availability='all')
+            )
             assert_that(
                 response.json,
                 has_entries(

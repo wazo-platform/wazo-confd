@@ -9,14 +9,16 @@ from xivo_dao.resources.extension import dao as extension_dao
 
 
 class RangeFilter:
-    def __init__(self, context, extension_dao, available=None, search=None, **kwargs):
+    def __init__(
+        self, context, extension_dao, availability=None, search=None, **kwargs
+    ):
         self._context = context
         self._extension_dao = extension_dao
-        self._available = available
+        self._availability = availability
         self._search = search
         self._used_extensions = set()
 
-        if self._available:
+        if self._availability == 'available':
             configured_extens = self._extension_dao.find_all_by(context=context.name)
             self._used_extensions = set(e.exten for e in configured_extens)
 
@@ -31,7 +33,7 @@ class RangeFilter:
         return filtered_ranges, count
 
     def _include_exten(self, exten):
-        if self._available:
+        if self._availability == 'available':
             if exten in self._used_extensions:
                 return False
         if self._search:

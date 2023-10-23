@@ -7,7 +7,7 @@ paths:
         **Required ACL:** `confd.contexts.{context_id}.ranges.{range_type}.read`
 
         List the extension range for a given context and resource type. When filtering
-        using the `available` query string the range will be split into multiple
+        using the `availability=available` query string the range will be split into multiple
         sub-ranges to only contain extension numbers that are available.
 
         If a given extension exists but is not assigned to any resource it will still
@@ -23,7 +23,7 @@ paths:
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
       - $ref: '#/parameters/rangetype'
-      - $ref: '#/parameters/available'
+      - $ref: '#/parameters/availability'
       - $ref: '#/parameters/contextid'
       responses:
         '200':
@@ -33,13 +33,16 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
 parameters:
-  available:
+  availability:
     required: false
-    name: available
+    name: availability
     in: query
-    type: boolean
-    default: true
-    description: Make sub ranges based on available extensions only
+    type: string
+    default: available
+    enum:
+      - available
+      - all
+    description: Determines if the ranges are going to be split to display only ranges with available extensions.
   rangetype:
     required: true
     type: string

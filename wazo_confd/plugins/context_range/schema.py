@@ -2,13 +2,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import Predicate, Length
+from marshmallow.validate import Predicate, Length, OneOf
 from wazo_confd.helpers.mallow import BaseSchema
 from wazo_confd.helpers.restful import ListSchema as BaseListSchema
 
 
 class ListSchema(BaseListSchema):
-    available = fields.Boolean(missing=True, default=True)
+    availability = fields.String(
+        missing='available', validate=OneOf(['available', 'all'])
+    )
 
 
 class ContextRangeSchema(BaseSchema):
