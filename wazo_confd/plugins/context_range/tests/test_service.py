@@ -50,9 +50,11 @@ class TestListExtenFromRanges(TestCase):
 
     def test_range_mixed_length(self):
         ranges = [
-            Range('001', '003'),
-            Range('0001', '0003'),
             Range('00001', '00003'),
+            Range('002', '005'),
+            Range('0001', '0003'),
+            Range('001', '003'),
+            Range('0000', '0001'),
         ]
 
         result = list(RangeFilter._list_exten_from_ranges(ranges))
@@ -63,6 +65,9 @@ class TestListExtenFromRanges(TestCase):
                 '001',
                 '002',
                 '003',
+                '004',
+                '005',
+                '0000',
                 '0001',
                 '0002',
                 '0003',

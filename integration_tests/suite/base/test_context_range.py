@@ -157,6 +157,27 @@ def test_search_partial_exten(context):
 
 @fixtures.context(
     user_ranges=[
+        {'start': '100', 'end': '119'},
+        {'start': '000', 'end': '099'},
+        {'start': '070', 'end': '199'},
+    ],
+)
+def test_search_overlapping_ranges(context):
+    response = confd.contexts(context['id']).ranges('user').get()
+    print(response)
+    assert_that(
+        response.json,
+        has_entries(
+            total=1,
+            items=contains_inanyorder(
+                {'start': '000', 'end': '199'},
+            ),
+        ),
+    )
+
+
+@fixtures.context(
+    user_ranges=[
         {'start': '00', 'end': '99'},
         {'start': '0001', 'end': '0499'},
     ],

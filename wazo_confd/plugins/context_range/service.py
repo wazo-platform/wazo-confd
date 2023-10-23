@@ -1,7 +1,8 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from operator import itemgetter
+from collections import defaultdict
+from operator import attrgetter, itemgetter
 
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
@@ -52,14 +53,29 @@ class RangeFilter:
         else:
             assert False, f'{range_type} is not supported'
 
-    @staticmethod
-    def _list_exten_from_ranges(ranges):
-        for r in ranges:
+    @classmethod
+    def _list_exten_from_ranges(cls, ranges):
+        listed_extens = set()
+        for r in cls._sort_ranges(ranges):
             start = r.start
             end = r.end
             length = len(start)
             for exten in range(int(start), int(end) + 1):
-                yield str(exten).rjust(length, '0')
+                formatted_exten = str(exten).rjust(length, '0')
+                if formatted_exten in listed_extens:
+                    continue
+                listed_extens.add(formatted_exten)
+                yield formatted_exten
+
+    @staticmethod
+    def _sort_ranges(ranges):
+        ranges_by_len = defaultdict(list)
+        for range in ranges:
+            ranges_by_len[len(range.start)].append(range)
+
+        for length in sorted(ranges_by_len.keys()):
+            for range in sorted(ranges_by_len[length], key=attrgetter('start')):
+                yield range
 
     @staticmethod
     def _ranges_from_extens(extensions):
