@@ -134,6 +134,11 @@ def test_search_availability(context, user, line):
                 ),
             )
 
+            response = (
+                confd.contexts(context['id']).ranges('user').get(availability='unknown')
+            )
+            response.assert_status(400)
+
     aux()
 
 
