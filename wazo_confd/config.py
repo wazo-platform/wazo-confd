@@ -72,6 +72,7 @@ DEFAULT_CONFIG = {
         'configuration': True,
         'context': True,
         'context_context': True,
+        'context_range': True,
         'device': True,
         'dhcp': True,
         'email': True,

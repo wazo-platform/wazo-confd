@@ -168,9 +168,10 @@ definitions:
     properties:
       start:
         type: string
+        default: <start>
       end:
         type: string
-        default: <start>
+        default: <end>
     required:
     - start
   ContextIncallRange:

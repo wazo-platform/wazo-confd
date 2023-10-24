@@ -1,0 +1,73 @@
+paths:
+  /contexts/{context_id}/ranges/{range_type}:
+    get:
+      operationId: list_contexts_range
+      summary: List contexts range
+      description: |
+        **Required ACL:** `confd.contexts.{context_id}.ranges.{range_type}.read`
+
+        List the extension range for a given context and resource type. When filtering
+        using the `availability=available` query string the range will be split into multiple
+        sub-ranges to only contain extension numbers that are available.
+
+        If a given extension exists but is not assigned to any resource it will still
+        be considered to be unavailable and therefore will not be included in the list
+        of available extension
+      tags:
+      - contexts
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      - $ref: '#/parameters/rangetype'
+      - $ref: '#/parameters/availability'
+      - $ref: '#/parameters/contextid'
+      responses:
+        '200':
+          description: Contexts list of ranges for that destination type in that context
+          schema:
+            $ref: '#/definitions/ContextRangeItems'
+        '404':
+          $ref: '#/responses/NotFoundError'
+parameters:
+  availability:
+    required: false
+    name: availability
+    in: query
+    type: string
+    default: available
+    enum:
+      - available
+      - all
+    description: Determines if the ranges are going to be split to display only ranges with available extensions.
+  rangetype:
+    required: true
+    type: string
+    enum: [user, group, queue, conference, incall]
+    name: range_type
+    in: path
+    description: The extension range destination type
+definitions:
+  ContextRangeItems:
+    title: ContextRangeItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/ContextRange'
+      total:
+        type: integer
+    required:
+    - total
+    example:
+      total: 3
+      items:
+        - start: 1006
+          end: 1006
+        - start: 1010
+          end: 1014
+        - start: 1025
+          end: 1999

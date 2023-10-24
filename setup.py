@@ -41,6 +41,7 @@ setup(
             'configuration = wazo_confd.plugins.configuration.plugin:Plugin',
             'context = wazo_confd.plugins.context.plugin:Plugin',
             'context_context = wazo_confd.plugins.context_context.plugin:Plugin',
+            'context_range = wazo_confd.plugins.context_range.plugin:Plugin',
             'device = wazo_confd.plugins.device.plugin:Plugin',
             'dhcp = wazo_confd.plugins.dhcp.plugin:Plugin',
             'email = wazo_confd.plugins.email.plugin:Plugin',

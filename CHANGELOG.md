@@ -1,5 +1,12 @@
 # Changelog
 
+## 23.15
+
+* The following resource has been added:
+
+  * POST `/1.1/contexts/<context_id>/ranges/<range type>`. It can be used to list available extensions in a given context.
+
+
 ## 23.12
 
 * A context now has a read-only auto-generated `name` and a required `label` instead
