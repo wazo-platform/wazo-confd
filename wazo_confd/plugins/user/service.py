@@ -1,7 +1,8 @@
-# Copyright 2013-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.user import strategy
 from xivo_dao.resources.func_key import dao as func_key_dao
 
 from wazo_confd.helpers.resource import CRUDService
@@ -36,7 +37,14 @@ class UserService(UserBaseService):
             self.device_updater.update_for_user(user_with_fk)
 
     def search_collated(self, parameters, tenant_uuids=None):
-        return self.dao.search_collated(tenant_uuids=tenant_uuids, **parameters)
+        limit = parameters.get('limit')
+        if limit is None or limit > 101:
+            selected_strategy = strategy.user_unpaginated_strategy
+        else:
+            selected_strategy = strategy.no_strategy
+
+        with self.dao.query_options(*selected_strategy):
+            return self.dao.search_collated(tenant_uuids=tenant_uuids, **parameters)
 
 
 def build_service(provd_client):
