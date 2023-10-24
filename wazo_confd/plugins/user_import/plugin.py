@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import OrderedDict
@@ -96,7 +96,12 @@ class Plugin:
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
-        user_service = build_user_service(provd_client)
+        user_service = build_user_service(
+            provd_client,
+            paginated_user_strategy_threshold=config[
+                'paginated_user_strategy_threshold'
+            ],
+        )
         wazo_user_service = build_wazo_user_service()
         user_voicemail_service = build_uv_service()
         voicemail_service = build_voicemail_service()

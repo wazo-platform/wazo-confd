@@ -19,10 +19,19 @@ class UserBaseService(CRUDService):
 
 
 class UserService(UserBaseService):
-    def __init__(self, dao, validator, notifier, device_updater, func_key_dao):
+    def __init__(
+        self,
+        dao,
+        validator,
+        notifier,
+        device_updater,
+        func_key_dao,
+        paginated_user_strategy_threshold,
+    ):
         super().__init__(dao, validator, notifier)
         self.device_updater = device_updater
         self.func_key_dao = func_key_dao
+        self._paginated_user_strategy_threshold = paginated_user_strategy_threshold
 
     def edit(self, user, updated_fields=None):
         super().edit(user, updated_fields)
@@ -38,7 +47,7 @@ class UserService(UserBaseService):
 
     def search_collated(self, parameters, tenant_uuids=None):
         limit = parameters.get('limit')
-        if limit is None or limit > 101:
+        if limit is None or limit > self._paginated_user_strategy_threshold:
             selected_strategy = strategy.user_unpaginated_strategy
         else:
             selected_strategy = strategy.no_strategy
@@ -47,10 +56,15 @@ class UserService(UserBaseService):
             return self.dao.search_collated(tenant_uuids=tenant_uuids, **parameters)
 
 
-def build_service(provd_client):
+def build_service(provd_client, paginated_user_strategy_threshold):
     updater = build_device_updater(provd_client)
     return UserService(
-        user_dao, build_validator(), build_notifier(), updater, func_key_dao
+        user_dao,
+        build_validator(),
+        build_notifier(),
+        updater,
+        func_key_dao,
+        paginated_user_strategy_threshold,
     )
 
 

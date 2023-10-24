@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
@@ -29,7 +29,9 @@ class Plugin:
         provd_client = ProvdClient(**config['provd'])
         token_changed_subscribe(provd_client.set_token)
 
-        service = build_service(provd_client)
+        service = build_service(
+            provd_client, config['paginated_user_strategy_threshold']
+        )
         service_callservice = build_service_callservice()
         service_forward = build_service_forward()
         wazo_user_service = build_wazo_user_service()
