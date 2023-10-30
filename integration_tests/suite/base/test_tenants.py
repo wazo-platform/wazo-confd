@@ -115,7 +115,6 @@ class BaseTestDeleteByEvent(BaseTestTenants):
             'queue',
             'queuemember',
             'pickupmember',
-            'queueskillcat',
             'func_key',
             'func_key_dest_custom',
         ]
@@ -142,7 +141,7 @@ class BaseTestDeleteByEvent(BaseTestTenants):
     @fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
     @fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
     @fixtures.agent(number='1234', wazo_tenant=DELETED_TENANT)
-    @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
+    @fixtures.skill(wazo_tenant=DELETED_TENANT)
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
     @fixtures.call_permission(
@@ -239,7 +238,6 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
             'queue',
             'queuemember',
             'pickupmember',
-            'queueskillcat',
             'func_key',
             'func_key_dest_custom',
         ]
@@ -281,7 +279,7 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
     @fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
     @fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
     @fixtures.agent(number='5678', wazo_tenant=DELETED_TENANT)
-    @fixtures.skill(wazo_tenant=DELETED_TENANT, category='mycategory')
+    @fixtures.skill(wazo_tenant=DELETED_TENANT)
     @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
     @fixtures.user(wazo_tenant=DELETED_TENANT)
     @fixtures.call_permission(

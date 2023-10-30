@@ -6,6 +6,7 @@
 
   * POST `/1.1/contexts/<context_id>/ranges/<range type>`. It can be used to list available extensions in a given context.
 
+* the `agent skill` resource no longer has a `category` field.
 
 ## 23.12
 
