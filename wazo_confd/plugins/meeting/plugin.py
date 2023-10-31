@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .resource import (
@@ -36,6 +36,7 @@ class Plugin:
         bus_consumer = dependencies['bus_consumer']
         bus_publisher = dependencies['bus_publisher']
         pjsip_doc = dependencies['pjsip_doc']
+        config = dependencies['config']
 
         ingress_http_service = build_ingress_http_service()
         extension_features_service = build_extension_features_service()
@@ -58,7 +59,12 @@ class Plugin:
         endpoint_sip_template_service = build_endpoint_sip_template_service(
             None, pjsip_doc
         )
-        user_service = build_user_service(provd_client=None)
+        user_service = build_user_service(
+            provd_client=None,
+            paginated_user_strategy_threshold=config[
+                'paginated_user_strategy_threshold'
+            ],
+        )
         tenant_service = build_tenant_service()
         args = [service, user_service, ingress_http_service, extension_features_service]
 

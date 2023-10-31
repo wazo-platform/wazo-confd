@@ -179,6 +179,7 @@ DEFAULT_CONFIG = {
     'wizard': {'service_id': None, 'service_key': None},
     'pjsip_config_doc_filename': '/usr/share/doc/asterisk-doc/json/pjsip.json.gz',
     'sync_db': {'quiet': False},
+    'paginated_user_strategy_threshold': 101,
 }
 
 
