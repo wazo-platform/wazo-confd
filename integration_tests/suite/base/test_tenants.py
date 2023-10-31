@@ -110,10 +110,7 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         self.db = db
         self.excluded_tables = [
             'agentqueueskill',
-            'extensions',
             'dialaction',
-            'queue',
-            'queuemember',
             'pickupmember',
             'func_key',
             'func_key_dest_custom',
@@ -233,10 +230,7 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         self.db = db
         self.excluded_tables = [
             'agentqueueskill',
-            'extensions',
             'dialaction',
-            'queue',
-            'queuemember',
             'pickupmember',
             'func_key',
             'func_key_dest_custom',
