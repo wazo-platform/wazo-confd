@@ -13,7 +13,9 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.moh import dao as moh_dao
+from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.tenant import dao as tenant_resources_dao
 from xivo_dao import tenant_dao
 from wazo_auth_client import Client as AuthClient
@@ -118,6 +120,7 @@ def remove_tenant(tenant_uuid, sysconfd):
                 context.name,
             )
             sysconfd.delete_voicemails(context.name)
+
         logger.debug('Retrieving all moh for tenant: %s', tenant_uuid)
         moh_list = moh_dao.search(tenant_uuids=[tenant_uuid])
         for moh in moh_list.items:
@@ -127,6 +130,17 @@ def remove_tenant(tenant_uuid, sysconfd):
                 moh.name,
             )
             sysconfd.delete_moh(moh.name)
+
+        logger.debug('Deleting all queues for tenant: %s', tenant_uuid)
+        queues_list = queue_dao.search(tenant_uuids=[tenant_uuid])
+        for queue in queues_list.items:
+            queue_dao.delete(queue)
+
+        logger.debug('Deleting all groups for tenant: %s', tenant_uuid)
+        groups_list = group_dao.search(tenant_uuids=[tenant_uuid])
+        for group in groups_list.items:
+            group_dao.delete(group)
+
         tenant = tenant_resources_dao.get(tenant_uuid)
         tenant_resources_dao.delete(tenant)
     sysconfd.flush()
