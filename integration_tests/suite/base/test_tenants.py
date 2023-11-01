@@ -183,6 +183,15 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         trunk,
         ivr,
     ):
+        confd.users(user['uuid']).funckeys('1').put(
+            {
+                'destination': {
+                    'type': 'conference',
+                    'conference_id': conference['id'],
+                }
+            }
+        )
+
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
             context={'name': context['name']}, wazo_tenant=DELETED_TENANT
@@ -318,6 +327,15 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         trunk,
         ivr,
     ):
+        confd.users(user['uuid']).funckeys('1').put(
+            {
+                'destination': {
+                    'type': 'conference',
+                    'conference_id': conference['id'],
+                }
+            }
+        )
+
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
             context={'name': context['name']}, wazo_tenant=DELETED_TENANT
