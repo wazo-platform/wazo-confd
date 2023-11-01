@@ -131,7 +131,7 @@ def remove_tenant(tenant_uuid, sysconfd):
             )
             sysconfd.delete_moh(moh.name)
 
-        logger.debug('Retrieving all queues for tenant: %s', tenant_uuid)
+        logger.debug('Deleting all queues for tenant: %s', tenant_uuid)
         queues_list = queue_dao.search(tenant_uuids=[tenant_uuid])
         for queue in queues_list.items:
             queue_dao.delete(queue)
