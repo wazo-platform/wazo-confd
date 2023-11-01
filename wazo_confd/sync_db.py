@@ -136,7 +136,7 @@ def remove_tenant(tenant_uuid, sysconfd):
         for queue in queues_list.items:
             queue_dao.delete(queue)
 
-        logger.debug('Retrieving all groups for tenant: %s', tenant_uuid)
+        logger.debug('Deleting all groups for tenant: %s', tenant_uuid)
         groups_list = group_dao.search(tenant_uuids=[tenant_uuid])
         for group in groups_list.items:
             group_dao.delete(group)
