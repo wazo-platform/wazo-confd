@@ -1,0 +1,17 @@
+[tool.black]
+skip-string-normalization = true
+
+[tool.flake8]
+show-source = true
+max-line-length = 99
+application-import-names = "wazo_confd"
+ignore = [
+  "E203", # whitespace before ':'
+  "E501", # line too long
+  "W503", # line break before binary operator
+]
+exclude = [
+    ".tox",
+    ".eggs",
+    "alembic",
+]
