@@ -16,7 +16,7 @@ from hamcrest import (
 
 from . import confd
 from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 
 
 def test_get_errors():
@@ -289,3 +289,17 @@ def test_bus_events(agent):
     yield s.check_event, 'agent_deleted', expected_headers, confd.agents(
         agent['id']
     ).delete
+
+
+def test_create_multi_tenant_same_number():
+    number = '5678'
+    response = confd.agents.post(number=number, wazo_tenant=SUB_TENANT)
+    response.assert_created('agents')
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
+
+    response = confd.agents.post(number=number, wazo_tenant=SUB_TENANT2)
+    response.assert_created('agents')
+    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT2))
+
+    response = confd.agents.post(number=number, wazo_tenant=SUB_TENANT2)
+    response.assert_match(400, e.resource_exists(resource='Agent'))
