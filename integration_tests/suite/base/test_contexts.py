@@ -20,11 +20,7 @@ from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
 from . import confd, BaseIntegrationTest
 from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-    ALL_TENANTS,
-    DELETED_TENANT)
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, ALL_TENANTS, DELETED_TENANT
 
 
 def test_get_errors():
@@ -412,19 +408,17 @@ def test_create_contexts_parallel():
         responses,
         not_(
             has_item(
-            has_property(
-                "response",
-                has_property(
-                    "status_code",
-                    500)
+                has_property("response", has_property("status_code", 500))
+                and has_property(
+                    "response",
+                    has_property(
+                        "text",
+                        matches_regexp(
+                            "Unexpected error: \(psycopg2.errors.UniqueViolation\)"
+                            + " duplicate key value violates unique constraint .*tenant_pkey.*"
+                        ),
+                    ),
+                )
             )
-            and has_property(
-                "response",
-                has_property(
-                    "text",
-                    matches_regexp(
-                     "Unexpected error: \(psycopg2.errors.UniqueViolation\)"
-                     +" duplicate key value violates unique constraint .*tenant_pkey.*")))
-            )
-        )
+        ),
     )
