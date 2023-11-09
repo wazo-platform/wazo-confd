@@ -379,7 +379,7 @@ def test_bus_events(context):
 
 def test_create_contexts_parallel():
     def create_context(responses, index):
-        responses = confd.contexts.post(label='MyContext', wazo_tenant=DELETED_TENANT)
+        response = confd.contexts.post(label='MyContext', wazo_tenant=DELETED_TENANT)
         responses[index] = response
 
     # create tenants (including DELETED_TENANT) in wazo-auth
@@ -414,8 +414,8 @@ def test_create_contexts_parallel():
                     has_property(
                         "text",
                         matches_regexp(
-                            "Unexpected error: \(psycopg2.errors.UniqueViolation\)"
-                            + " duplicate key value violates unique constraint .*tenant_pkey.*"
+                            r"""Unexpected error: \(psycopg2.errors.UniqueViolation\) """
+                            + r"""duplicate key value violates unique constraint .*tenant_pkey.*"""
                         ),
                     ),
                 )
