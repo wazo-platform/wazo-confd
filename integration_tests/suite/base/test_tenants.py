@@ -183,6 +183,15 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         trunk,
         ivr,
     ):
+        confd.users(user['uuid']).funckeys('1').put(
+            {
+                'destination': {
+                    'type': 'conference',
+                    'conference_id': conference['id'],
+                }
+            }
+        )
+
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
             context={'name': context['name']}, wazo_tenant=DELETED_TENANT
@@ -190,7 +199,25 @@ class BaseTestDeleteByEvent(BaseTestTenants):
         @fixtures.extension(exten=gen_group_exten(), context=context['name'])
         @fixtures.extension(exten=gen_line_exten(), context=context['name'])
         @fixtures.extension(exten=gen_line_exten(), context=context['name'])
-        def aux(voicemail, line, group_extension, incall_extension, outcall_extension):
+        @fixtures.funckey_template(
+            keys={
+                '1': {
+                    'destination': {
+                        'type': 'conference',
+                        'conference_id': conference['id'],
+                    }
+                }
+            },
+            wazo_tenant=DELETED_TENANT,
+        )
+        def aux(
+            voicemail,
+            line,
+            group_extension,
+            incall_extension,
+            outcall_extension,
+            funckey_template_conference,
+        ):
             with (
                 a.user_line(user, line, check=False),
                 a.line_endpoint_sip(line, user_sip, check=False),
@@ -318,6 +345,15 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         trunk,
         ivr,
     ):
+        confd.users(user['uuid']).funckeys('1').put(
+            {
+                'destination': {
+                    'type': 'conference',
+                    'conference_id': conference['id'],
+                }
+            }
+        )
+
         @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         @fixtures.line_sip(
             context={'name': context['name']}, wazo_tenant=DELETED_TENANT
@@ -325,7 +361,25 @@ class BaseTestDeleteBySyncDb(BaseTestTenants):
         @fixtures.extension(exten=gen_group_exten(), context=context['name'])
         @fixtures.extension(exten=gen_line_exten(), context=context['name'])
         @fixtures.extension(exten=gen_line_exten(), context=context['name'])
-        def aux(voicemail, line, group_extension, incall_extension, outcall_extension):
+        @fixtures.funckey_template(
+            keys={
+                '1': {
+                    'destination': {
+                        'type': 'conference',
+                        'conference_id': conference['id'],
+                    }
+                }
+            },
+            wazo_tenant=DELETED_TENANT,
+        )
+        def aux(
+            voicemail,
+            line,
+            group_extension,
+            incall_extension,
+            outcall_extension,
+            funckey_template_conference,
+        ):
             with (
                 a.user_line(user, line, check=False),
                 a.line_endpoint_sip(line, user_sip, check=False),
