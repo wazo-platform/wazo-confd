@@ -1,7 +1,7 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from threading import Thread
+import concurrent.futures
 
 from hamcrest import (
     all_of,
@@ -13,8 +13,6 @@ from hamcrest import (
     has_items,
     is_not,
     not_,
-    has_property,
-    matches_regexp,
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
@@ -378,9 +376,8 @@ def test_bus_events(context):
 
 
 def test_create_contexts_parallel():
-    def create_context(responses, index):
-        response = confd.contexts.post(label='MyContext', wazo_tenant=DELETED_TENANT)
-        responses[index] = response
+    def create_context():
+        return confd.contexts.post(label='MyContext', wazo_tenant=DELETED_TENANT)
 
     # create tenants (including DELETED_TENANT) in wazo-auth
     BaseIntegrationTest.mock_auth.set_tenants(*ALL_TENANTS)
@@ -389,36 +386,15 @@ def test_create_contexts_parallel():
     response = confd.tenants(DELETED_TENANT).get(wazo_tenant=MAIN_TENANT)
     response.assert_status(404)
 
-    threads = [None] * 5
-    responses = [None] * 5
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for i in range(5):
+            futures.append(executor.submit(create_context))
 
-    for i in range(len(threads)):
-        threads[i] = Thread(target=create_context, args=(responses, i))
-        threads[i].start()
-
-    for i in range(len(threads)):
-        threads[i].join()
+        for future in concurrent.futures.as_completed(futures):
+            response = future.result()
+            response.assert_status(201)
 
     # check if tenant is created now (it has been created during the context creation)
     response = confd.tenants(DELETED_TENANT).get(wazo_tenant=MAIN_TENANT)
     response.assert_status(200)
-
-    # check there is no 500 error due to tenant creation conflict
-    assert_that(
-        responses,
-        not_(
-            has_item(
-                has_property("response", has_property("status_code", 500))
-                and has_property(
-                    "response",
-                    has_property(
-                        "text",
-                        matches_regexp(
-                            r"""Unexpected error: \(psycopg2.errors.UniqueViolation\) """
-                            + r"""duplicate key value violates unique constraint .*tenant_pkey.*"""
-                        ),
-                    ),
-                )
-            )
-        ),
-    )
