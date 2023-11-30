@@ -124,7 +124,7 @@ definitions:
         description: Backup registrar port
       proxy_main_host:
         type: string
-        description: Proxy host
+        description: 'Proxy host. Using IPv4 is recommended to have a better integration with some provisioning plugins. (ex: Yealink DND integration)'
       proxy_main_port:
         type: integer
         description: Proxy port
