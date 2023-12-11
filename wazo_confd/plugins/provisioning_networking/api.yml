@@ -33,7 +33,7 @@ definitions:
     properties:
       provision_host:
         type: string
-        description: The hostname or IP address used for HTTP and TFTP provisioning requests.
+        description: The hostname or IP address used for HTTP and TFTP provisioning requests for DHCP integration.
       provision_http_port:
         type: integer
         description: The port used by the HTTP provisioning server.
