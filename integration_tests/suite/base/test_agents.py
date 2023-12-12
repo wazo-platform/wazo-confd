@@ -211,10 +211,17 @@ def test_create_all_parameters():
 
 
 def test_create_multi_tenant():
-    response = confd.agents.post(number='1234', wazo_tenant=SUB_TENANT)
-    response.assert_created('agents')
+    number = '1234'
 
-    assert_that(response.item, has_entries(tenant_uuid=SUB_TENANT))
+    response_sub = confd.agents.post(number=number, wazo_tenant=SUB_TENANT)
+    response_sub.assert_created('agents')
+
+    assert_that(response_sub.item, has_entries(tenant_uuid=SUB_TENANT))
+
+    response_main = confd.agents.post(number=number, wazo_tenant=MAIN_TENANT)
+    response_main.assert_created('agents')
+
+    assert_that(response_main.item, has_entries(tenant_uuid=MAIN_TENANT))
 
 
 @fixtures.agent()
@@ -249,13 +256,13 @@ def test_edit_number_unavailable(agent):
     assert_that(response.item, has_entries(number=agent['number']))
 
 
-@fixtures.agent(wazo_tenant=MAIN_TENANT)
-@fixtures.agent(wazo_tenant=SUB_TENANT)
+@fixtures.agent(number='1234', wazo_tenant=MAIN_TENANT)
+@fixtures.agent(number='1234', wazo_tenant=SUB_TENANT)
 def test_edit_multi_tenant(main, sub):
-    response = confd.agents(main['id']).put(wazo_tenant=SUB_TENANT)
+    response = confd.agents(main['id']).put(number='1234', wazo_tenant=SUB_TENANT)
     response.assert_match(404, e.not_found(resource='Agent'))
 
-    response = confd.agents(sub['id']).put(wazo_tenant=MAIN_TENANT)
+    response = confd.agents(sub['id']).put(number='1234', wazo_tenant=MAIN_TENANT)
     response.assert_updated()
 
 
