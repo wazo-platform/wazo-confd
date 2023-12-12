@@ -4,11 +4,15 @@
 from xivo_dao.resources.agent import dao as agent_dao
 
 from wazo_confd.helpers.validator import (
-    Optional,
     UniqueField,
-    UniqueFieldChanged,
     ValidationGroup,
+    Validator,
 )
+
+
+class NumberChanged(Validator):
+    def validate(self, model):
+        agent_dao.find_by(number=model.number, tenant_uuids=[model.tenant_uuid])
 
 
 def build_validator():
@@ -22,7 +26,5 @@ def build_validator():
                 'Agent',
             )
         ],
-        edit=[
-            Optional('number', UniqueFieldChanged('number', agent_dao.find_by, 'Agent'))
-        ],
+        edit=[NumberChanged()],
     )
