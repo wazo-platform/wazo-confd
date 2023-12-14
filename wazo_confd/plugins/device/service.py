@@ -58,6 +58,7 @@ class SearchEngine:
         'model',
         'version',
         'description',
+        'config',
     ]
 
     DIRECTION = ['asc', 'desc']
