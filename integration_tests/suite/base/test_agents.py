@@ -223,6 +223,9 @@ def test_create_multi_tenant():
 
     assert_that(response_main.item, has_entries(tenant_uuid=MAIN_TENANT))
 
+    confd.agents(response_sub.item['id']).delete().assert_deleted()
+    confd.agents(response_main.item['id']).delete().assert_deleted()
+
 
 @fixtures.agent()
 def test_edit_minimal_parameters(agent):
