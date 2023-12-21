@@ -1,21 +1,21 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.resources.user import dao as user_dao
-from xivo_dao.resources.func_key_template import dao as template_dao
 from wazo_provd_client import Client as ProvdClient
+from xivo_dao.resources.func_key_template import dao as template_dao
+from xivo_dao.resources.user import dao as user_dao
 
 from .middleware import UserFuncKeyTemplateAssociationMiddleWare
 from .resource import (
-    FuncKeyTemplateList,
+    FuncKeyDestination,
     FuncKeyTemplateItem,
     FuncKeyTemplateItemPosition,
-    FuncKeyDestination,
-    UserFuncKeyList,
+    FuncKeyTemplateList,
+    FuncKeyTemplateUserGet,
     UserFuncKeyItemPosition,
+    UserFuncKeyList,
     UserFuncKeyTemplateAssociation,
     UserFuncKeyTemplateGet,
-    FuncKeyTemplateUserGet,
 )
 from .service import build_service, build_user_funckey_template_service
 

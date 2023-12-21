@@ -1,13 +1,14 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_bus.resources.agent.event import AgentEditedEvent
 from xivo_bus.resources.queue_member.event import (
     QueueMemberAgentAssociatedEvent,
     QueueMemberAgentDissociatedEvent,
     QueueMemberUserAssociatedEvent,
     QueueMemberUserDissociatedEvent,
 )
-from xivo_bus.resources.agent.event import AgentEditedEvent
+
 from wazo_confd import bus, sysconfd
 
 

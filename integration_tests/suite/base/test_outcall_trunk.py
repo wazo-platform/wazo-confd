@@ -1,11 +1,14 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries, none
 
-from . import confd
-from ..helpers import associations as a, errors as e, fixtures, scenarios as s
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import confd
 
 FAKE_ID = 999999999
 
@@ -17,8 +20,7 @@ def test_associate_errors(outcall, trunk):
     response.assert_status(404)
 
     url = confd.outcalls(outcall['id']).trunks().put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

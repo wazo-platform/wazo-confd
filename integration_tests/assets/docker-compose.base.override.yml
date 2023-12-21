@@ -22,4 +22,3 @@ services:
     volumes:
       - "./mocks/ari.py:/tmp/ari.py"
     command: "python /tmp/ari.py 5039"
-

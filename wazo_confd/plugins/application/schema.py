@@ -3,7 +3,6 @@
 
 from marshmallow import fields, post_load, pre_dump
 from marshmallow.validate import Length, OneOf
-
 from xivo_dao.alchemy.application_dest_node import ApplicationDestNode
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested

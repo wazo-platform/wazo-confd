@@ -4,8 +4,8 @@
 import logging
 
 from marshmallow import fields, post_dump
-from marshmallow.validate import Length, OneOf
 from marshmallow.utils import get_value
+from marshmallow.validate import Length, OneOf
 
 from wazo_confd.helpers.mallow import (
     BaseSchema,
@@ -109,11 +109,11 @@ class MergedEndpointSIPSchema(EndpointSIPSchema):
             'outbound_auth',
         ]
         for section in sections:
-            combined_options = data.pop('{}_section_options'.format(section), [])
+            combined_options = data.pop(f'{section}_section_options', [])
             accumulator = {}
             for key, value in combined_options:
                 accumulator[key] = value
-            data['{}_section_options'.format(section)] = list(accumulator.items())
+            data[f'{section}_section_options'] = list(accumulator.items())
         return data
 
 

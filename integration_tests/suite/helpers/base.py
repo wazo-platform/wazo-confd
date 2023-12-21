@@ -2,21 +2,26 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
-
 from contextlib import contextmanager
 
 from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from wazo_test_helpers.auth import AuthClient as MockAuthClient
+from wazo_test_helpers.auth import MockCredentials, MockUserToken
 from wazo_test_helpers.bus import BusClient
-from wazo_test_helpers.auth import (
-    MockUserToken,
-    MockCredentials,
-    AuthClient as MockAuthClient,
-)
 
 from .ari import ARIClient
 from .auth import AuthClient
 from .bus import setup_bus as setup_bus_helpers
 from .client import ConfdClient
+from .config import (
+    ALL_TENANTS,
+    DEFAULT_TENANTS,
+    MAIN_TENANT,
+    SUB_TENANT,
+    TOKEN,
+    TOKEN_SUB_TENANT,
+    USER_UUID,
+)
 from .database import create_helper as db_create_helper
 from .filesystem import FileSystemClient, TenantFileSystemClient
 from .helpers import setup_confd as setup_confd_helpers
@@ -26,16 +31,6 @@ from .helpers import setup_provd as setup_provd_helpers
 from .provd import create_helper as provd_create_helper
 from .sysconfd import SysconfdMock
 from .wait_strategy import EverythingOkWaitStrategy
-
-from .config import (
-    TOKEN,
-    TOKEN_SUB_TENANT,
-    MAIN_TENANT,
-    SUB_TENANT,
-    USER_UUID,
-    DEFAULT_TENANTS,
-    ALL_TENANTS,
-)
 
 
 class IntegrationTest(AssetLaunchingTestCase):

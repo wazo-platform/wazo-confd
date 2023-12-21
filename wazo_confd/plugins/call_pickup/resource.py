@@ -2,11 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
-
 from xivo_dao.alchemy.pickup import Pickup as CallPickup
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ItemResource, ListResource
 
 from .schema import CallPickupSchema
 

@@ -1,10 +1,10 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 
 from wazo_confd.helpers.destination import DestinationValidator
-from wazo_confd.helpers.validator import Validator, ValidationGroup
+from wazo_confd.helpers.validator import ValidationGroup, Validator
 
 
 class IvrModelValidator(Validator):

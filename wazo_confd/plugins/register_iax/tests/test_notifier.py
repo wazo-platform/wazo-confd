@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -11,7 +11,6 @@ from xivo_bus.resources.register.event import (
 )
 
 from ..notifier import RegisterIAXNotifier
-
 
 EXPECTED_SYSCONFD_HANDLERS = {'ipbx': ['iax2 reload']}
 

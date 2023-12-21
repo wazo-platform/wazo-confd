@@ -3,8 +3,9 @@
 
 from flask import url_for
 from xivo_dao.alchemy.tenant import Tenant
+
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ItemResource, ListResource
 
 from .schema import TenantSchema
 

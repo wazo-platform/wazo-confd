@@ -2,10 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from .resource import (
-    ContextGroupRangeList,
-    ContextQueueRangeList,
     ContextConferenceRangeList,
+    ContextGroupRangeList,
     ContextIncallRangeList,
+    ContextQueueRangeList,
     ContextUserRangeList,
 )
 from .service import build_service

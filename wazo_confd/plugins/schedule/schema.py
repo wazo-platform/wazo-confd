@@ -1,14 +1,13 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, validates, validates_schema
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import Length, Regexp, Range
-
+from marshmallow.validate import Length, Range, Regexp
 from xivo_dao.alchemy.schedule_time import ScheduleTime
+
 from wazo_confd.helpers.destination import DestinationField
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
-
 
 HOUR_REGEX = r"^([0,1][0-9]|2[0-3]):[0-5][0-9]$"
 

@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -15,7 +15,6 @@ from xivo_bus.resources.endpoint_sip.event import (
 )
 
 from ..notifier import SipEndpointNotifier, SipTemplateNotifier
-
 
 SYSCONFD_HANDLERS = {'ipbx': ['module reload res_pjsip.so', 'dialplan reload']}
 

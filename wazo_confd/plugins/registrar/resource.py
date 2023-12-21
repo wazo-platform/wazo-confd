@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
+
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ItemResource, ListResource
 
 from .model import Registrar
 from .schema import RegistrarSchema

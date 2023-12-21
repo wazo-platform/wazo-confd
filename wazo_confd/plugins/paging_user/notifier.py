@@ -1,9 +1,9 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.paging_user.event import (
-    PagingMemberUsersAssociatedEvent,
     PagingCallerUsersAssociatedEvent,
+    PagingMemberUsersAssociatedEvent,
 )
 
 from wazo_confd import bus

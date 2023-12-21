@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
-import yaml
 
+import yaml
 from xivo.chain_map import ChainMap
 from xivo.config_helper import parse_config_file, read_config_file_hierarchy
 from xivo.xivo_logging import get_log_level_by_name
@@ -185,9 +185,9 @@ DEFAULT_CONFIG = {
 
 def load(argv):
     try:
-        with open(WIZARD_KEY_FILE, 'r') as f:
+        with open(WIZARD_KEY_FILE) as f:
             key_config = {'wizard': yaml.safe_load(f)}
-    except IOError:
+    except OSError:
         key_config = {}
 
     cli_config = _parse_cli_args(argv)

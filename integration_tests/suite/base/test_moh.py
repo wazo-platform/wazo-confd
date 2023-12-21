@@ -18,9 +18,11 @@ from hamcrest import (
     not_,
 )
 
-from . import BaseIntegrationTest, confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT, TOKEN
+from . import BaseIntegrationTest, confd
 
 NOT_FOUND_UUID = 'uuid-not-found'
 VALID_WAV_FILE = io.BytesIO()
@@ -76,8 +78,7 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.moh.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
         129
@@ -87,8 +88,7 @@ def test_post_errors():
 @fixtures.moh()
 def test_put_errors(moh):
     url = confd.moh(moh['uuid']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):
@@ -427,7 +427,7 @@ def test_add_filename_errors(moh):
         assert_that(
             response.status,
             equal_to(404),
-            'unexpected status for MOH filename {}'.format(filename),
+            f'unexpected status for MOH filename {filename}',
         )
 
 

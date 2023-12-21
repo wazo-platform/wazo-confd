@@ -1,8 +1,8 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import string
 import random
+import string
 
 from . import confd
 
@@ -26,7 +26,7 @@ def delete_call_permission(call_permission_id, check=False, **params):
 
 def generate_name():
     response = confd.callpermissions.get()
-    names = set(d['name'] for d in response.items)
+    names = {d['name'] for d in response.items}
     return _random_name(names)
 
 

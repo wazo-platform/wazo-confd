@@ -1,20 +1,18 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 
 from ..helpers import scenarios as s
-from . import confd
 from ..helpers.config import TOKEN_SUB_TENANT
-
+from . import confd
 
 REQUIRED_OPTIONS = {'atxfer': '*0', 'blindxfer': '9'}
 
 
 def test_put_errors():
     url = confd.asterisk.features.featuremap.put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

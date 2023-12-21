@@ -3,10 +3,11 @@
 
 from flask import request
 from marshmallow import fields
-from marshmallow.validate import Equal, Regexp, Length, OneOf
+from marshmallow.validate import Equal, Length, OneOf, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Nested, StrictBoolean
 from wazo_confd.helpers.restful import ErrorCatchingResource
+
 from .access_restriction import wazo_unconfigured
 
 ADMIN_PASSWORD_REGEX = (
@@ -14,8 +15,8 @@ ADMIN_PASSWORD_REGEX = (
 )
 IP_ADDRESS_REGEX = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
 BASE_HOSTNAME_REGEX = r'[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?'
-HOSTNAME_REGEX = r'^{}$'.format(BASE_HOSTNAME_REGEX)
-DOMAIN_REGEX = r'^(?:{}\.)*({})$'.format(BASE_HOSTNAME_REGEX, BASE_HOSTNAME_REGEX)
+HOSTNAME_REGEX = fr'^{BASE_HOSTNAME_REGEX}$'
+DOMAIN_REGEX = fr'^(?:{BASE_HOSTNAME_REGEX}\.)*({BASE_HOSTNAME_REGEX})$'
 INTERFACE_REGEX = r'^[\w\-\:\.]{1,64}$'
 
 

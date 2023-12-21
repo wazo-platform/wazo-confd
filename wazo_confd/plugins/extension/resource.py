@@ -4,7 +4,7 @@
 from flask import request, url_for
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ItemResource, ListResource
 
 from .schema import ExtensionSchema
 

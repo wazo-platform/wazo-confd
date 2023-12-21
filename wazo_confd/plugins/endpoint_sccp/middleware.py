@@ -3,8 +3,8 @@
 
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCPEndpoint
 
-from .schema import SccpSchema
 from ...middleware import ResourceMiddleware
+from .schema import SccpSchema
 
 
 class EndpointSCCPMiddleWare(ResourceMiddleware):

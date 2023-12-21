@@ -4,8 +4,8 @@
 import socket
 import sys
 import time
-
 from contextlib import closing
+
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
 

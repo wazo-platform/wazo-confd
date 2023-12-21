@@ -3,16 +3,15 @@
 
 import re
 
-from flask import url_for, request
+from flask import request, url_for
 from marshmallow import fields, post_load, pre_dump, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Range, Regexp
-
 from xivo_dao.alchemy.staticiax import StaticIAX
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
+from wazo_confd.helpers.restful import ItemResource, ListResource
 
 REGISTER_REGEX = re.compile(
     r'''^

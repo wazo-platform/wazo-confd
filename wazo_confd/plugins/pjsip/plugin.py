@@ -1,9 +1,9 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 
-from .service import build_service, build_pjsip_transport_service
+from . import schema
 from .resource import (
     PJSIPDocList,
     PJSIPGlobalList,
@@ -11,7 +11,7 @@ from .resource import (
     PJSIPTransportItem,
     PJSIPTransportList,
 )
-from . import schema
+from .service import build_pjsip_transport_service, build_service
 
 logger = logging.getLogger(__name__)
 

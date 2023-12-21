@@ -1,9 +1,8 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import string
 import hashlib
-
+import string
 from random import choice, randint, random, randrange
 
 from . import confd, provd
@@ -33,19 +32,19 @@ def generate_mac_and_ip():
 
 def generate_ip():
     response = confd.devices.get()
-    ips = set(d['ip'] for d in response.items)
+    ips = {d['ip'] for d in response.items}
     return _random_ip(ips)
 
 
 def generate_mac():
     response = confd.devices.get()
-    macs = set(d['mac'] for d in response.items)
+    macs = {d['mac'] for d in response.items}
     return _random_mac(macs)
 
 
 def generate_autoprov():
     mac, ip = generate_mac_and_ip()
-    autoprov_id = 'autoprov{}'.format(randint(100000000, 9999999999))
+    autoprov_id = f'autoprov{randint(100000000, 9999999999)}'
     sip_username = "".join(choice(string.ascii_letters) for _ in range(20))
     random_id = hashlib.md5(str(random()).encode('utf-8')).hexdigest()
 
@@ -77,9 +76,9 @@ def generate_autoprov():
 
 
 def _random_mac(macs):
-    mac = ':'.join('{:02x}'.format(randrange(256)) for i in range(6))
+    mac = ':'.join(f'{randrange(256):02x}' for i in range(6))
     while mac in macs:
-        mac = ':'.join('{:02x}'.format(randrange(256)) for i in range(6))
+        mac = ':'.join(f'{randrange(256):02x}' for i in range(6))
     return mac
 
 

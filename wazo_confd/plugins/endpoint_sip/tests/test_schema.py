@@ -1,32 +1,19 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
 from unittest import TestCase
 
-from hamcrest import (
-    assert_that,
-    calling,
-    contains,
-    empty,
-    equal_to,
-    has_entries,
-    not_,
-)
-
+from hamcrest import assert_that, calling, contains, empty, equal_to, has_entries, not_
 from wazo_test_helpers.hamcrest.raises import raises
 from werkzeug.exceptions import BadRequest
 
+from wazo_confd.plugins.line.resource import LineListSchema  # noqa
 
 # Adding schemas to the marshmallow registry
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
-from wazo_confd.plugins.line.resource import LineListSchema  # noqa
 
-from ..schema import (
-    EndpointSIPSchema,
-    GETQueryStringSchema,
-    MergedEndpointSIPSchema,
-)
+from ..schema import EndpointSIPSchema, GETQueryStringSchema, MergedEndpointSIPSchema
 
 
 class TestGETQueryStringSchema(TestCase):
@@ -106,16 +93,12 @@ class TestEndpointSIPSchema(TestCase):
 
     def test_option_length(self):
         body = {
-            'aor_section_options': [
-                ['key_{}'.format(i), '{}'.format(i)] for i in range(513)
-            ],
+            'aor_section_options': [[f'key_{i}', f'{i}'] for i in range(513)],
         }
         assert_that(calling(self.schema.load).with_args(body), raises(BadRequest))
 
         body = {
-            'aor_section_options': [
-                ['key_{}'.format(i), '{}'.format(i)] for i in range(512)
-            ],
+            'aor_section_options': [[f'key_{i}', f'{i}'] for i in range(512)],
         }
         assert_that(calling(self.schema.load).with_args(body), not_(raises(BadRequest)))
 

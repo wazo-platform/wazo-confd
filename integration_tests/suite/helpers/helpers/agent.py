@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -24,7 +24,7 @@ def delete_agent(agent_id, check=False, **kwargs):
 
 def generate_number():
     response = confd.agents.get()
-    numbers = set(d['number'] for d in response.items)
+    numbers = {d['number'] for d in response.items}
     return _random_number(numbers)
 
 

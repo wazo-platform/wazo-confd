@@ -1,7 +1,8 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
 from hamcrest import (
     assert_that,
     contains,
@@ -13,18 +14,12 @@ from hamcrest import (
     not_,
 )
 
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures, helpers
+from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd, db, provd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    helpers,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
 
 FAKE_ID = 999999999
 
@@ -305,13 +300,13 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*11{paging}'.format(paging=paging_number),
+                'value': f'*11{paging_number}',
             },
             '29': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*37{member_id}'.format(member_id=filter_member_id),
+                'value': f'*37{filter_member_id}',
             },
             '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
             '31': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
@@ -1269,7 +1264,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*37{member_id}'.format(member_id=filter_member_id),
+                'value': f'*37{filter_member_id}',
             },
             '32': {
                 'label': '',

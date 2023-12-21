@@ -3,7 +3,6 @@
 
 import unittest
 import uuid
-
 from unittest.mock import Mock
 
 from xivo_bus.resources.line_application.event import (

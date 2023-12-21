@@ -9,10 +9,8 @@ from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user_line import dao as user_line_dao
 
 from wazo_confd import bus, sysconfd
-from wazo_confd.database import (
-    device as device_db,
-    func_key_template as func_key_template_db,
-)
+from wazo_confd.database import device as device_db
+from wazo_confd.database import func_key_template as func_key_template_db
 from wazo_confd.plugins.device.funckey import build_converters
 from wazo_confd.plugins.device.generators import (
     ConfigGenerator,
@@ -25,13 +23,11 @@ from wazo_confd.plugins.device.generators import (
 )
 from wazo_confd.plugins.device.service import DeviceService, SearchEngine
 from wazo_confd.plugins.device.update import DeviceUpdater, ProvdUpdater
-
+from wazo_confd.plugins.line_device.notifier import LineDeviceNotifier
 from wazo_confd.plugins.line_device.service import LineDeviceService
 from wazo_confd.plugins.line_device.validator import (
     build_validator as build_line_device_validator,
 )
-from wazo_confd.plugins.line_device.notifier import LineDeviceNotifier
-
 from wazo_confd.plugins.registrar.dao import RegistrarDao
 
 from .dao import DeviceDao

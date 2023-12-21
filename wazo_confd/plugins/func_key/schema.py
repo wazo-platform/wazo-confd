@@ -2,11 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
-from marshmallow import EXCLUDE, Schema, fields, validates, post_dump, pre_load
-from marshmallow.validate import OneOf, Regexp, Range, Length
+from marshmallow import EXCLUDE, Schema, fields, post_dump, pre_load, validates
 from marshmallow.exceptions import ValidationError
+from marshmallow.validate import Length, OneOf, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 EXTEN_REGEX = r'^[A-Z0-9+*]+$'
 
@@ -41,7 +41,7 @@ class BaseDestinationSchema(Schema):
     def exclude_destination(self, data):
         if data in self.context.get('exclude_destination', []):
             raise ValidationError(
-                'The "{}" funckey are excluded'.format(data),
+                f'The "{data}" funckey are excluded',
                 field_name='type',
             )
 

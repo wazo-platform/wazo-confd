@@ -3,8 +3,8 @@
 
 from xivo_dao.alchemy.extension import Extension
 
-from .schema import ExtensionSchema
 from ...middleware import ResourceMiddleware
+from .schema import ExtensionSchema
 
 
 class ExtensionMiddleWare(ResourceMiddleware):

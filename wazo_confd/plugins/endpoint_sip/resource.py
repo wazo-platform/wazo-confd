@@ -1,20 +1,19 @@
 # Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
-
+from flask import request, url_for
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource, build_tenant
+from wazo_confd.helpers.restful import ItemResource, ListResource, build_tenant
 
 from .schema import (
     EndpointSIPSchema,
+    GETQueryStringSchema,
     MergedEndpointSIPSchema,
     TemplateSIPSchema,
-    GETQueryStringSchema,
 )
 
 

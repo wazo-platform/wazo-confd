@@ -1,11 +1,12 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries, has_item
 
-from ..helpers import associations as a, config, database, fixtures
+from ..helpers import associations as a
+from ..helpers import config, database, fixtures
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
-from . import confd_csv, auth, db
+from . import auth, confd_csv, db
 
 UNKNOWN_TENANT = '00000000-0000-0000-0000-000000000000'
 

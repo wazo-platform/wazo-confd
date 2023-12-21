@@ -5,10 +5,7 @@ from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
 from .middleware import QueueMemberMiddleWare
-from .resource import (
-    QueueMemberAgentItem,
-    QueueMemberUserItem,
-)
+from .resource import QueueMemberAgentItem, QueueMemberUserItem
 from .service import build_service
 
 

@@ -4,12 +4,11 @@
 from flask import request
 from marshmallow import fields
 from marshmallow.validate import Range
-
 from xivo_dao.alchemy.queuemember import QueueMember
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class QueueMemberAgentSchema(BaseSchema):

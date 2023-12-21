@@ -6,11 +6,12 @@ from xivo_dao.resources.func_key_template import dao as template_dao_module
 from xivo_dao.resources.user import dao as user_dao_module
 
 from wazo_confd.plugins.device import builder as device_builder
+
 from .notifier import build_notifier
 from .validator import (
+    build_user_template_validator,
     build_validator,
     build_validator_bsfilter,
-    build_user_template_validator,
 )
 
 

@@ -1,23 +1,16 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import re
 import random
+import re
 import string
-
 from datetime import datetime
-from hamcrest import (
-    assert_that,
-    contains,
-    has_entries,
-    all_of,
-    has_items,
-)
+
+from hamcrest import all_of, assert_that, contains, has_entries, has_items
 from wazo_test_helpers import until
 
-from .bus import BusClient
-
 from . import errors as e
+from .bus import BusClient
 
 OVERHEAD_DB_REQUESTS = 3  # BEGIN, SELECT 1, COMMIT
 

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import OneOf, Length
+from marshmallow.validate import Length, OneOf
 
 from wazo_confd.helpers.destination import DestinationField
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested

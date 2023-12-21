@@ -6,12 +6,12 @@ from wazo_provd_client import Client as ProvdClient
 from .builder import build_dao, build_service
 from .middleware import DeviceMiddleWare
 from .resource import (
+    DeviceAutoprov,
     DeviceItem,
     DeviceList,
-    UnallocatedDeviceList,
-    UnallocatedDeviceItem,
-    DeviceAutoprov,
     DeviceSynchronize,
+    UnallocatedDeviceItem,
+    UnallocatedDeviceList,
 )
 
 

@@ -4,6 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
+    calling,
     contains,
     contains_inanyorder,
     empty,
@@ -17,28 +18,27 @@ from hamcrest import (
     none,
     not_,
     raises,
-    calling,
     starts_with,
 )
+from requests.exceptions import HTTPError
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd, provd, auth as authentication, BaseIntegrationTest
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-    helpers as h,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-    gen_group_exten,
     CONTEXT,
     INCALL_CONTEXT,
+    MAIN_TENANT,
     OUTCALL_CONTEXT,
+    SUB_TENANT,
+    gen_group_exten,
 )
-from requests.exceptions import HTTPError
+from . import BaseIntegrationTest
+from . import auth as authentication
+from . import confd, provd
 
 FULL_USER = {
     "firstname": "Jôhn",
@@ -106,8 +106,7 @@ AUTH_USER = {
 
 def test_search_errors():
     url = confd.users.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_head_errors():
@@ -125,8 +124,7 @@ def test_post_errors():
     user_post = confd.users(firstname="Jôhn").post
 
     yield s.check_missing_required_field_returns_error, empty_post, 'firstname'
-    for check in error_checks(user_post):
-        yield check
+    yield from error_checks(user_post)
 
 
 def error_checks(url):
@@ -293,23 +291,19 @@ def put_error_checks(url):
 def test_put_errors(user):
     user_put = confd.users(user['id']).put
 
-    for check in error_checks(user_put):
-        yield check
-    for check in put_error_checks(user_put):
-        yield check
+    yield from error_checks(user_put)
+    yield from put_error_checks(user_put)
 
 
 @fixtures.user(firstname='user1', username='unique_username', email='unique@email.com')
 @fixtures.user()
 def test_unique_errors(user1, user2):
     url = confd.users(user2['id']).put
-    for check in unique_error_checks(url, user1):
-        yield check
+    yield from unique_error_checks(url, user1)
 
     required_body = {'firstname': 'user2'}
     url = confd.users.post
-    for check in unique_error_checks(url, user1, required_body):
-        yield check
+    yield from unique_error_checks(url, user1, required_body)
 
 
 def unique_error_checks(url, existing_resource, required_body=None):

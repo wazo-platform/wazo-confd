@@ -14,7 +14,6 @@ from wazo_confd import auth
 
 from .schema import MeetingSchema
 
-
 MEETING_FIELDS = [
     'uuid',
     'name',

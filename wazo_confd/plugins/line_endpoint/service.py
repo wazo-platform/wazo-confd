@@ -1,19 +1,12 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.line import dao as line_dao_module
+
 from wazo_confd.plugins.line.service import build_service as build_line_service
 
-from .notifier import (
-    build_notifier_sip,
-    build_notifier_sccp,
-    build_notifier_custom,
-)
-from .validator import (
-    build_validator_sip,
-    build_validator_sccp,
-    build_validator_custom,
-)
+from .notifier import build_notifier_custom, build_notifier_sccp, build_notifier_sip
+from .validator import build_validator_custom, build_validator_sccp, build_validator_sip
 
 
 class LineEndpointSIPService:

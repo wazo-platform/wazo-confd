@@ -2,14 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-
 from marshmallow import fields
 from marshmallow.validate import Length, Range, Regexp
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.helpers.mallow import BaseSchema
-
+from wazo_confd.helpers.restful import ConfdResource
 
 EXTERNAL_PREFIX_REGEX = r'^\+|\+?[0-9#*]+$'
 PREFIX_REGEX = r'^\+|\+?[0-9#*]+$'

@@ -3,9 +3,9 @@
 
 from hamcrest import assert_that, has_entries
 
-from . import confd
 from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
+from . import confd
 
 
 def test_get():

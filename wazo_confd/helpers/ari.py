@@ -1,9 +1,10 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
+
 import requests
-from requests import RequestException, HTTPError
+from requests import HTTPError, RequestException
 
 LANGUAGE_REGEX = r'^[a-zA-Z]{2,3}_[a-zA-Z]{2,3}$'
 
@@ -28,21 +29,19 @@ class Client:
         self._base_url = '{scheme}://{host}{port}/ari'.format(
             scheme='https' if self._https else 'http',
             host=self._host,
-            port=':{}'.format(self._port) if self._port else '',
+            port=f':{self._port}' if self._port else '',
         )
-        self._params = {'api_key': '{}:{}'.format(username, password)}
+        self._params = {'api_key': f'{username}:{password}'}
 
     def get_sounds(self):
-        url = '{base_url}/sounds'.format(base_url=self._base_url)
+        url = f'{self._base_url}/sounds'
         try:
             response = requests.get(url, params=self._params)
         except RequestException as e:
             raise AsteriskUnreachable(e)
 
         if response.status_code == 401:
-            raise AsteriskUnauthorized(
-                'Asterisk unauthorized error {}'.format(self._params)
-            )
+            raise AsteriskUnauthorized(f'Asterisk unauthorized error {self._params}')
 
         response.raise_for_status()
         results = []
@@ -76,9 +75,7 @@ class Client:
             raise AsteriskUnreachable(e)
 
         if response.status_code == 401:
-            raise AsteriskUnauthorized(
-                'Asterisk unauthorized error {}'.format(self._params)
-            )
+            raise AsteriskUnauthorized(f'Asterisk unauthorized error {self._params}')
 
         response.raise_for_status()
         result = self._filter_sound(response.json(), params)
@@ -106,9 +103,7 @@ class Client:
         return sound_languages
 
     def _extract_sounds_languages(self, sounds):
-        return set(
-            format_['language'] for sound in sounds for format_ in sound['formats']
-        )
+        return {format_['language'] for sound in sounds for format_ in sound['formats']}
 
     def _remove_non_standard_tag(self, languages):
         return [

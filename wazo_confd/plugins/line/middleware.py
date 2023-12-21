@@ -5,8 +5,8 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import InputError, ResourceError
 
-from .schema import LineSchemaNullable, LinePutSchema, LineListSchema
 from ...middleware import ResourceMiddleware
+from .schema import LineListSchema, LinePutSchema, LineSchemaNullable
 
 
 class LineMiddleWare(ResourceMiddleware):

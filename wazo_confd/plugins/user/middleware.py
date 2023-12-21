@@ -3,13 +3,13 @@
 from http import HTTPStatus
 
 from requests import HTTPError
-from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.helpers.exception import NotFoundError, ResourceError, InputError
+from xivo_dao.helpers.db_manager import Session
+from xivo_dao.helpers.exception import InputError, NotFoundError, ResourceError
 from xivo_dao.resources.switchboard import dao as switchboard_dao
 
-from .schema import UserListItemSchema, UserSchema, UserListItemSchemaPut
 from ...middleware import ResourceMiddleware
+from .schema import UserListItemSchema, UserListItemSchemaPut, UserSchema
 
 
 class UserMiddleWare(ResourceMiddleware):

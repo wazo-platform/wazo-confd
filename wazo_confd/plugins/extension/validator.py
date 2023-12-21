@@ -10,10 +10,9 @@ from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.parking_lot import dao as parking_lot_dao_module
 
-
 from wazo_confd.helpers.validator import (
-    EXTEN_REGEX,
     EXTEN_OUTCALL_REGEX,
+    EXTEN_REGEX,
     BaseExtensionRangeMixin,
     GetResource,
     ValidationGroup,

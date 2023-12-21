@@ -14,11 +14,11 @@ from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
 from wazo_confd.helpers.validator import (
-    Validator,
     GetResource,
     ResourceExists,
     ValidationAssociation,
     ValidationGroup,
+    Validator,
 )
 
 

@@ -3,9 +3,12 @@
 
 from hamcrest import assert_that, contains, has_entries
 
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
+from ..helpers.config import CONTEXT, INCALL_CONTEXT, MAIN_TENANT, SUB_TENANT
 from . import confd
-from ..helpers import associations as a, errors as e, fixtures, scenarios as s
-from ..helpers.config import INCALL_CONTEXT, CONTEXT, MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 

@@ -3,8 +3,9 @@
 
 from hamcrest import assert_that, has_entries
 
+from ..helpers import associations as a
+from ..helpers import fixtures
 from . import confd
-from ..helpers import associations as a, fixtures
 
 
 @fixtures.user()

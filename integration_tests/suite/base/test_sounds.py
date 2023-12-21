@@ -1,10 +1,10 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
 from hamcrest import (
-    assert_that,
     any_of,
+    assert_that,
     contains,
     contains_inanyorder,
     empty,
@@ -17,8 +17,7 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT, TOKEN
-from . import BaseIntegrationTest
-from . import confd, ari, wazo_sound, asterisk_sound
+from . import BaseIntegrationTest, ari, asterisk_sound, confd, wazo_sound
 
 DEFAULT_INTERNAL_DIRECTORY = ('monitor', 'recordings-meetme')
 DEFAULT_CATEGORY = ('acd', 'features', 'playback', 'recordings')
@@ -45,11 +44,9 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.sounds.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
@@ -58,8 +55,7 @@ def test_search_errors(sound):
         confd.sounds.get,
     ]
     for url in searchable_endpoints:
-        for check in s.search_error_checks(url):
-            yield check
+        yield from s.search_error_checks(url)
 
 
 def error_checks(url):

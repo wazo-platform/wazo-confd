@@ -1,25 +1,25 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+
 from hamcrest import (
     assert_that,
     calling,
     contains_inanyorder,
+    empty,
     has_entries,
     has_properties,
-    empty,
     raises,
     starts_with,
 )
-
 from wazo_provd_client.exceptions import ProvdError
 from wazo_test_helpers import until
 
-from . import BaseIntegrationTest, confd, provd
 from ..helpers import associations, fixtures
-from ..helpers.config import CREATED_TENANT, DELETED_TENANT
 from ..helpers.bus import BusClient
+from ..helpers.config import CREATED_TENANT, DELETED_TENANT
+from . import BaseIntegrationTest, confd, provd
 
 
 def test_create_default_templates_when_not_exist():

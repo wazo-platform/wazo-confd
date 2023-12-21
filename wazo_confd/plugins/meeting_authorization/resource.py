@@ -1,17 +1,15 @@
 # Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
-from wazo_confd.auth import no_auth, required_acl
-from wazo_confd.helpers.restful import ItemResource, ListResource
+from flask import request, url_for
 from xivo_dao.alchemy.meeting_authorization import MeetingAuthorization
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 
-from .schema import (
-    MeetingAuthorizationSchema,
-    MeetingAuthorizationIDSchema,
-)
+from wazo_confd.auth import no_auth, required_acl
+from wazo_confd.helpers.restful import ItemResource, ListResource
+
+from .schema import MeetingAuthorizationIDSchema, MeetingAuthorizationSchema
 
 
 class GuestMeetingAuthorizationList(ListResource):

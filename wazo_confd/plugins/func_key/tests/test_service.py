@@ -1,13 +1,12 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+from unittest.mock import Mock, patch, sentinel
 
-from unittest.mock import Mock, sentinel, patch
 from hamcrest import assert_that, equal_to
-
-from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
 from wazo_confd.plugins.device.update import DeviceUpdater
 

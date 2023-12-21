@@ -1,11 +1,12 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from wazo_test_helpers import until
 from requests.exceptions import ConnectionError
+from wazo_test_helpers import until
 
-from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
-from . import BaseIntegrationTest, confd, confd_csv, auth
+from ..helpers.helpers import confd as helper_confd
+from ..helpers.helpers import new_client as helper_new_client
+from . import BaseIntegrationTest, auth, confd, confd_csv
 
 
 def test_restrict_on_with_slow_wazo_auth():

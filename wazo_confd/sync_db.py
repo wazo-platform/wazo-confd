@@ -4,21 +4,20 @@
 import argparse
 import logging
 
+from wazo_auth_client import Client as AuthClient
 from xivo import xivo_logging
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
-from xivo_dao import init_db_from_config
+from xivo_dao import init_db_from_config, tenant_dao
 from xivo_dao.alchemy.tenant import Tenant
 from xivo_dao.helpers.db_utils import session_scope
-from xivo_dao.resources.pjsip_transport import dao as transport_dao
-from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.context import dao as context_dao
+from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.moh import dao as moh_dao
+from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.tenant import dao as tenant_resources_dao
-from xivo_dao import tenant_dao
-from wazo_auth_client import Client as AuthClient
 
 from wazo_confd._sysconfd import SysconfdPublisher
 from wazo_confd.config import DEFAULT_CONFIG, _load_key_file
@@ -68,7 +67,7 @@ def main():
     del config['auth']['username']
     del config['auth']['password']
     tenants = AuthClient(token=token, **config['auth']).tenants.list()['items']
-    auth_tenants = set(tenant['uuid'] for tenant in tenants)
+    auth_tenants = {tenant['uuid'] for tenant in tenants}
     auth_tenant_slugs = {tenant['uuid']: tenant['slug'] for tenant in tenants}
     logger.debug('wazo-auth tenants: %s', auth_tenants)
 

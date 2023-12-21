@@ -36,7 +36,7 @@ xivo-restapi (13.04~20130220.155733.2ed00b6-5) squeeze-xivo-skaro-dev; urgency=l
 
 xivo-restapi (13.04~20130220.155733.2ed00b6-4) squeeze-xivo-skaro-dev; urgency=low
 
-  * revert init script 
+  * revert init script
 
  -- Nicolas HICHER <nhicher@avencall.com>  Sat, 23 Feb 2013 08:53:32 -0500
 
@@ -48,7 +48,7 @@ xivo-restapi (13.04~20130220.155733.2ed00b6-2) squeeze-xivo-skaro-dev; urgency=l
 
 xivo-restapi (13.03~20130204.112202.b7f7d37-2ubuntu1) UNRELEASED; urgency=low
 
-  * fix cron.d file 
+  * fix cron.d file
 
  -- Jirka HLAVACEK <jhlavacek@avencall.com>  Wed, 13 Feb 2013 09:39:15 +0100
 
@@ -78,19 +78,19 @@ xivo-restapi (13.02~20130130.161117.8a7232b-2) squeeze-xivo-skaro-dev; urgency=l
 
 xivo-restapi (13.02~20130128.162503.9ad8f8e-2) squeeze-xivo-skaro-dev; urgency=low
 
-  * add depends on python-flup 
+  * add depends on python-flup
 
  -- Nicolas HICHER (atarakt) <nhicher@proformatique.com>  Mon, 28 Jan 2013 12:47:02 -0500
 
 xivo-restapi (13.02~20130128.114517.8175ed1-2) squeeze-xivo-skaro-dev; urgency=low
 
-  * add cron and logrotate files 
+  * add cron and logrotate files
 
  -- Jirka <jhlavacek@avencall.com>  Mon, 28 Jan 2013 16:16:30 +0100
 
 xivo-restapi (13.02~20130125.154646.aee3db8-1) squeeze-xivo-skaro-dev; urgency=low
 
-  * 
+  *
 
  -- Jirka HLAVACEK <jhlavacek@avencall.com>  Fri, 25 Jan 2013 16:55:03 +0100
 

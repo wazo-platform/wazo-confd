@@ -3,10 +3,10 @@
 
 from collections import namedtuple
 from unittest import TestCase
+
 from hamcrest import assert_that, contains_exactly
 
 from ..service import RangeFilter
-
 
 Range = namedtuple('Range', ['start', 'end'])
 

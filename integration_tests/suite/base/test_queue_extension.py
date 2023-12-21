@@ -3,7 +3,10 @@
 
 from hamcrest import assert_that, contains, has_entries
 
-from ..helpers import scenarios as s, errors as e, fixtures, associations as a
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import (
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,

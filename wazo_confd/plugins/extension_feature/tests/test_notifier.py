@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
-from uuid import uuid4
 from unittest.mock import Mock
+from uuid import uuid4
 
 from xivo_bus.resources.extension_feature.event import ExtensionFeatureEditedEvent
 from xivo_dao.alchemy.feature_extension import FeatureExtension

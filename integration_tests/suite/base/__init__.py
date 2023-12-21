@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from typing import cast
-from ..helpers.sysconfd import SysconfdMock
+
 from ..helpers.base import IntegrationTest
 from ..helpers.config import TOKEN
+from ..helpers.sysconfd import SysconfdMock
 from ..helpers.wrappers import IsolatedAction
 
 

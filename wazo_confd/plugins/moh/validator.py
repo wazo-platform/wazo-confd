@@ -4,7 +4,7 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.moh import dao as moh_dao
 
-from wazo_confd.helpers.validator import UniqueField, Validator, ValidationGroup
+from wazo_confd.helpers.validator import UniqueField, ValidationGroup, Validator
 
 
 class MohModelValidator(Validator):

@@ -4,7 +4,7 @@
 from xivo.tenant_flask_helpers import Tenant
 from xivo_dao.helpers.db_manager import Session
 
-from wazo_confd import sysconfd, bus
+from wazo_confd import bus, sysconfd
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.representations.csv_ import output_csv

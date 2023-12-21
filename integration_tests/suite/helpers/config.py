@@ -6,7 +6,7 @@ import random
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
 OUTCALL_CONTEXT = 'to-extern'
-EXTEN_OUTSIDE_RANGE = str('99999')
+EXTEN_OUTSIDE_RANGE = '99999'
 USER_EXTENSION_RANGE = list(range(1000, 2000))
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'

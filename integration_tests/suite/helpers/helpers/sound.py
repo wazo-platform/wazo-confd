@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -30,7 +30,7 @@ def delete_sound(sound_name, check=False, wazo_tenant=None, **kwargs):
 
 def generate_name():
     response = confd.sounds.get()
-    forbidden_names = set(d['name'] for d in response.items)
+    forbidden_names = {d['name'] for d in response.items}
     return _random_name(forbidden_names)
 
 

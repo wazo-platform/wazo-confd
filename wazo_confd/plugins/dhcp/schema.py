@@ -27,13 +27,13 @@ class DHCPSchema(BaseSchema):
 
         try:
             ip_start = socket.inet_aton(data['pool_start'])
-        except socket.error:
+        except OSError:
             raise ValidationError(
                 'pool_start: invalid IP address: {}'.format(data['pool_start'])
             )
         try:
             ip_end = socket.inet_aton(data['pool_end'])
-        except socket.error:
+        except OSError:
             raise ValidationError(
                 'pool_end: invalid IP address: {}'.format(data['pool_end'])
             )

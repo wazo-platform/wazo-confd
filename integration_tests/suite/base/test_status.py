@@ -1,16 +1,14 @@
 # Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from hamcrest import assert_that, has_entries
+from wazo_test_helpers import until
+
 from ..helpers.bus import BusClient as bus_client
 from ..helpers.bus import setup_bus
-from wazo_test_helpers import until
-from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
-from . import auth, BaseIntegrationTest, confd, confd_csv, rabbitmq
-
-from hamcrest import (
-    assert_that,
-    has_entries,
-)
+from ..helpers.helpers import confd as helper_confd
+from ..helpers.helpers import new_client as helper_new_client
+from . import BaseIntegrationTest, auth, confd, confd_csv, rabbitmq
 
 expected_status_ok_entries = {
     'bus_consumer': {

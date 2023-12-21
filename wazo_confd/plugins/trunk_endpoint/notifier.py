@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -13,10 +13,10 @@ from xivo_bus.resources.trunk_endpoint.event import (
 )
 
 from wazo_confd import bus, sysconfd
-from wazo_confd.plugins.trunk.schema import TrunkSchema
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
 from wazo_confd.plugins.endpoint_iax.schema import IAXSchema
 from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+from wazo_confd.plugins.trunk.schema import TrunkSchema
 
 logger = logging.getLogger(__name__)
 

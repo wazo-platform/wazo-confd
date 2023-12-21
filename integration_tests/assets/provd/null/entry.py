@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Plugin that offers no configuration service and rejects TFTP/HTTP requests
 by returning file not found errors.
 
@@ -7,7 +5,7 @@ by returning file not found errors.
 
 __version__ = "$Revision: 10355 $ $Date: 2011-03-08 14:38:11 -0500 (Tue, 08 Mar 2011) $"
 __license__ = """
-    Copyright 2010-2019 The Wazo Authors  (see the AUTHORS file)
+    Copyright 2010-2023 The Wazo Authors  (see the AUTHORS file)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +24,6 @@ __license__ = """
 from provd.plugins import Plugin
 from provd.servers.tftp.service import TFTPNullService
 from twisted.web.resource import NoResource
-
 
 _MSG = 'Null plugin always reject requests'
 

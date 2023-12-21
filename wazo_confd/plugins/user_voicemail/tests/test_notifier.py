@@ -1,10 +1,10 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
-from uuid import uuid4
 from unittest.mock import Mock
+from uuid import uuid4
+
 from xivo_bus.resources.user_voicemail.event import (
     UserVoicemailAssociatedEvent,
     UserVoicemailDissociatedEvent,

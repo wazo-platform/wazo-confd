@@ -7,8 +7,8 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.plugins.endpoint_sip.schema import (
     EndpointSIPSchema,
-    MergedEndpointSIPSchema,
     GETQueryStringSchema,
+    MergedEndpointSIPSchema,
 )
 
 

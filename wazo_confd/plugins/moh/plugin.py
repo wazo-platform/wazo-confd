@@ -1,9 +1,9 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.tenant import dao as tenant_dao
 
-from .resource import MohItem, MohList, MohFileItem
+from .resource import MohFileItem, MohItem, MohList
 from .service import build_service
 
 

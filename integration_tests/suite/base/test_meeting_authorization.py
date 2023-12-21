@@ -1,27 +1,24 @@
 # Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from datetime import datetime, timedelta, timezone
+
 from hamcrest import (
     assert_that,
     has_entries,
     has_entry,
-    has_items,
     has_item,
+    has_items,
     is_not,
     none,
     not_none,
 )
-from datetime import datetime, timedelta, timezone
 from wazo_test_helpers import until
 
-from . import (
-    BaseIntegrationTest,
-    confd,
-    create_confd,
-    db,
-)
-from ..helpers import fixtures, scenarios as s
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.bus import BusClient
+from . import BaseIntegrationTest, confd, create_confd, db
 
 
 def until_event(accumulator, headers_matchers, message_matcher, timeout=5):

@@ -1,14 +1,13 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 
 from wazo_auth_client import Client as AuthClient
 from wazo_provd_client import Client as ProvdClient
-
 from xivo_dao.resources.infos import dao as infos_dao
 
-from .resource import WizardResource, WizardDiscoverResource
+from .resource import WizardDiscoverResource, WizardResource
 from .service import build_service
 
 logger = logging.getLogger(__name__)

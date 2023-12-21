@@ -4,17 +4,18 @@ from uuid import uuid4
 
 from hamcrest import assert_that, has_entries, has_entry, has_item, is_not
 
-from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
+from . import confd
 
 FAKE_UUID = uuid4()
 
 
 def test_search_errors():
     url = confd.extensions.features.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -28,8 +29,7 @@ def test_put_errors(extension):
     yield s.check_resource_not_found, url, 'FeatureExtension'
 
     url = confd.extensions.features(extension['uuid']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

@@ -4,13 +4,13 @@
 import abc
 
 from xivo.xivo_helpers import fkey_extension
-from xivo_dao.resources.line import dao as line_dao_module
-from xivo_dao.resources.user_line import dao as user_line_dao_module
-from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.feature_extension import dao as feature_extension_dao_module
 from xivo_dao.resources.features import dao as features_dao_module
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.paging import dao as paging_dao_module
+from xivo_dao.resources.user_line import dao as user_line_dao_module
 
 
 def build_converters():
@@ -168,7 +168,7 @@ class PagingConverter(FuncKeyConverter):
     def build(self, user, line, position, funckey):
         prefix_exten = self.feature_extension_dao.get_by(feature='paging')
         extension = self.paging_dao.get(funckey.destination.paging_id).number
-        value = '{}{}'.format(prefix_exten.clean_exten(), extension)
+        value = f'{prefix_exten.clean_exten()}{extension}'
         return self.provd_funckey(line, position, funckey, value)
 
     def determine_type(self, funckey):
@@ -280,7 +280,7 @@ class AgentConverter(FuncKeyConverter):
             prog_exten.exten,
             user.id,
             action_exten.exten,
-            '*{}'.format(funckey.destination.agent_id),
+            f'*{funckey.destination.agent_id}',
         )
 
         return self.provd_funckey(line, position, funckey, value)

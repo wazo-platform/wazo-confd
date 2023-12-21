@@ -1,19 +1,19 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from functools import partial
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.pjsip_transport import dao as transport_dao_module
 from xivo_dao.resources.endpoint_sip import dao as sip_dao_module
+from xivo_dao.resources.pjsip_transport import dao as transport_dao_module
 
+from wazo_confd.helpers.asterisk import PJSIPDocValidator
 from wazo_confd.helpers.validator import (
     UniqueField,
     UniqueFieldChanged,
-    Validator,
     ValidationGroup,
+    Validator,
 )
-from wazo_confd.helpers.asterisk import PJSIPDocValidator
 
 
 class TransportDeleteValidator(Validator):

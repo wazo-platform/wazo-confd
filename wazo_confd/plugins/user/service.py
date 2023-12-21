@@ -1,16 +1,16 @@
 # Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_dao.resources.func_key import dao as func_key_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.user import strategy
-from xivo_dao.resources.func_key import dao as func_key_dao
 
 from wazo_confd.helpers.resource import CRUDService
 from wazo_confd.helpers.validator import ValidationGroup
 from wazo_confd.plugins.device.builder import build_device_updater
 
+from .notifier import build_notifier, build_notifier_forward, build_notifier_service
 from .validator import build_validator, build_validator_forward
-from .notifier import build_notifier, build_notifier_service, build_notifier_forward
 
 
 class UserBaseService(CRUDService):

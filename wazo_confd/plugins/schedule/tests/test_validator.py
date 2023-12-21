@@ -1,7 +1,8 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
+
 from hamcrest import assert_that, has_entries
 
 from ..validator import UserDestinationSchema
@@ -16,9 +17,9 @@ class TestUserDestinationSchema(TestCase):
         base_body = {'type': 'user', 'user_id': 42}
         samples = [
             ({}, ''),
-            ({'moh_uuid': moh_uuid}, ';{}'.format(moh_uuid)),
+            ({'moh_uuid': moh_uuid}, f';{moh_uuid}'),
             ({'ring_time': 0}, '0.0'),
-            ({'ring_time': 42, 'moh_uuid': moh_uuid}, '42.0;{}'.format(moh_uuid)),
+            ({'ring_time': 42, 'moh_uuid': moh_uuid}, f'42.0;{moh_uuid}'),
         ]
         for extra_args, expected in samples:
             body = dict(**base_body, **extra_args)

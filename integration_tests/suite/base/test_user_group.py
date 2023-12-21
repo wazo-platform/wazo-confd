@@ -1,14 +1,13 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
 
+from ..helpers import associations as a
 from ..helpers import errors as e
+from ..helpers import fixtures
 from ..helpers import scenarios as s
 from . import confd
-from ..helpers import fixtures
-from ..helpers import associations as a
-
 
 FAKE_ID = 999999999
 FAKE_UUID = '99999999-9999-9999-9999-999999999999'
@@ -21,8 +20,7 @@ def test_associate_errors(group, user):
     response.assert_status(404)
 
     url = confd.users(user['uuid']).groups.put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

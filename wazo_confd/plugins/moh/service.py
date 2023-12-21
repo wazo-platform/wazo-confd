@@ -4,6 +4,7 @@
 from xivo_dao.resources.moh import dao as moh_dao
 
 from wazo_confd.helpers.resource import CRUDService
+
 from .notifier import build_notifier
 from .storage import build_storage
 from .validator import build_validator

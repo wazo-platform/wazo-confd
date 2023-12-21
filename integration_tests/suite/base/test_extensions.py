@@ -3,7 +3,6 @@
 
 import datetime
 import re
-
 from contextlib import ExitStack
 
 from hamcrest import (
@@ -22,23 +21,22 @@ from hamcrest import (
     not_,
 )
 
-from . import confd, provd, BaseIntegrationTest
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    helpers as h,
-    scenarios as s,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import (
     CONTEXT,
     EXTEN_OUTSIDE_RANGE,
+    MAIN_TENANT,
+    SUB_TENANT,
     gen_conference_exten,
     gen_group_exten,
-    gen_queue_exten,
     gen_line_exten,
+    gen_queue_exten,
 )
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import BaseIntegrationTest, confd, provd
 
 outside_range_regex = re.compile(
     r"Extension '(\d+)' is outside of range for context '([\w_-]+)'"
@@ -49,8 +47,7 @@ FAKE_ID = 999999999
 
 def test_search_errors():
     url = confd.extensions.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -61,15 +58,13 @@ def test_get_errors():
 @fixtures.extension()
 def test_post_errors(extension):
     url = confd.extensions.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.extension()
 def test_put_errors(extension):
     url = confd.extensions(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def test_delete_errors():

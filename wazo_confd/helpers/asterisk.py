@@ -1,15 +1,13 @@
 # Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import logging
 import gzip
 import json
+import logging
 
 from flask import request
-
-from marshmallow import fields, pre_dump, post_load, pre_load, post_dump
+from marshmallow import fields, post_dump, post_load, pre_dump, pre_load
 from marshmallow.validate import Length
-
 from xivo.rest_api_helpers import APIException
 from xivo_dao.alchemy.asterisk_file_variable import AsteriskFileVariable
 from xivo_dao.helpers import errors
@@ -111,7 +109,7 @@ class PJSIPDocError(APIException):
 
 
 class PJSIPDoc:
-    _internal_fields = set(['type'])
+    _internal_fields = {'type'}
 
     def __init__(self, filename):
         logger.debug('%s initialized with file %s', self.__class__.__name__, filename)
@@ -191,6 +189,6 @@ class PJSIPDocValidator(Validator):
         for option_name in option_names:
             if not self.pjsip_doc.is_valid_in_section(self.section, option_name):
                 raise errors.invalid_choice(
-                    field='{}: invalid variable ({})'.format(self.field, option_name),
+                    field=f'{self.field}: invalid variable ({option_name})',
                     choices=self.pjsip_doc.get_section_variables(self.section),
                 )

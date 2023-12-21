@@ -1,24 +1,22 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from sqlalchemy.sql import cast, func, and_, case
-from sqlalchemy import String, Integer
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import aliased
-
-from xivo_dao.helpers.db_manager import Session
+from sqlalchemy.sql import and_, case, cast, func
+from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
-from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.alchemy.voicemail import Voicemail
-from xivo_dao.alchemy.linefeatures import LineFeatures as Line
-from xivo_dao.alchemy.user_line import UserLine
-from xivo_dao.alchemy.line_extension import LineExtension
 from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.incall import Incall
-from xivo_dao.alchemy.dialaction import Dialaction
+from xivo_dao.alchemy.line_extension import LineExtension
+from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.rightcall import RightCall
 from xivo_dao.alchemy.rightcallmember import RightCallMember
-
+from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.userfeatures import UserFeatures as User
+from xivo_dao.alchemy.voicemail import Voicemail
+from xivo_dao.helpers.db_manager import Session
 
 COLUMNS = (
     'uuid',

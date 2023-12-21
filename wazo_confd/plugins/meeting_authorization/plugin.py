@@ -1,19 +1,20 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from wazo_confd import bus
 from xivo_dao.resources.meeting import dao as meeting_dao
 from xivo_dao.resources.meeting_authorization import dao as meeting_authorization_dao
 
+from wazo_confd import bus
+
+from .notifier import Notifier
 from .resource import (
-    GuestMeetingAuthorizationList,
     GuestMeetingAuthorizationItem,
-    UserMeetingAuthorizationList,
-    UserMeetingAuthorizationItem,
+    GuestMeetingAuthorizationList,
     UserMeetingAuthorizationAccept,
+    UserMeetingAuthorizationItem,
+    UserMeetingAuthorizationList,
     UserMeetingAuthorizationReject,
 )
-from .notifier import Notifier
 from .service import build_service
 
 

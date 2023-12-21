@@ -23,7 +23,7 @@ class RegistrarDao:
         'outbound_proxy_port': 'proxy_outbound_port',
     }
 
-    DIRECTION = set(('asc', 'desc'))
+    DIRECTION = {'asc', 'desc'}
 
     DEFAULT_ORDER = 'name'
     DEFAULT_DIRECTION = 'asc'

@@ -1,14 +1,14 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import netifaces
 import random
 import re
 import socket
 import string
-
 from os import urandom
+
+import netifaces
 from xivo_dao.helpers.db_utils import session_scope
 
 from wazo_confd import sysconfd
@@ -130,7 +130,7 @@ class WizardService:
         try:
             with open(ASTERISK_AUTOPROV_CONFIG_FILENAME, 'w') as fobj:
                 fobj.write(content)
-        except IOError as e:
+        except OSError as e:
             logger.info('%s', e)
             logger.warning('failed to create the Asterisk autoprov configuration file')
 
@@ -233,7 +233,7 @@ class WizardService:
 
     def _generate_autoprov_username(self):
         suffix = ''.join(random.choice(USERNAME_VALUES) for _ in range(8))
-        return 'ap{}'.format(suffix)
+        return f'ap{suffix}'
 
     def _generate_phone_password(self, length):
         chars = string.ascii_letters + string.digits
@@ -268,21 +268,21 @@ class WizardService:
         nameserver_regex = re.compile(NAMESERVER_REGEX)
         nameservers = []
         try:
-            with open('/etc/resolv.conf', 'r') as f:
+            with open('/etc/resolv.conf') as f:
                 for line in f.readlines():
                     nameserver = re.match(nameserver_regex, line)
                     if nameserver:
                         nameservers.append(nameserver.group(1))
-        except IOError:
+        except OSError:
             pass
 
         return nameservers
 
     def get_timezone(self):
         try:
-            with open('/etc/timezone', 'r') as f:
+            with open('/etc/timezone') as f:
                 return f.readline().strip()
-        except IOError:
+        except OSError:
             return None
 
     def get_hostname(self):

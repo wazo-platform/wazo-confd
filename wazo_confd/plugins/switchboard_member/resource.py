@@ -3,7 +3,6 @@
 
 from flask import request
 
-
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 

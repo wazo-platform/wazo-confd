@@ -3,9 +3,12 @@
 
 from hamcrest import assert_that, contains, has_entries
 
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
+from ..helpers.config import CONTEXT, MAIN_TENANT, OUTCALL_CONTEXT, SUB_TENANT
 from . import confd
-from ..helpers import associations as a, errors as e, fixtures, scenarios as s
-from ..helpers.config import OUTCALL_CONTEXT, CONTEXT, MAIN_TENANT, SUB_TENANT
 
 FAKE_ID = 999999999
 
@@ -20,8 +23,7 @@ def test_associate_errors(outcall, extension):
     yield s.check_resource_not_found, fake_extension, 'Extension'
 
     url = confd.outcalls(outcall['id']).extensions(extension['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

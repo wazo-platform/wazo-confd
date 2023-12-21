@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
-
 from contextlib import contextmanager
 
 from hamcrest import (
@@ -15,10 +14,13 @@ from hamcrest import (
     none,
 )
 
-from . import confd, provd
-from ..helpers import associations as a, fixtures, helpers as h, scenarios as s
+from ..helpers import associations as a
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
 from ..helpers.helpers.line_fellowship import line_fellowship
+from . import confd, provd
 
 
 @contextmanager
@@ -35,8 +37,7 @@ def line_device(endpoint_type='sip', registrar=None):
 
 def test_search_errors():
     url = confd.registrars.get
-    for check in s.search_error_checks(url):
-        yield check
+    yield from s.search_error_checks(url)
 
 
 def test_get_errors():
@@ -46,15 +47,13 @@ def test_get_errors():
 
 def test_post_errors():
     url = confd.registrars.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.registrar()
 def test_put_errors(registrar):
     url = confd.registrars(registrar['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

@@ -1,17 +1,16 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 
-from . import confd
 from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
+from . import confd
 
 
 def test_put_errors():
     url = confd.asterisk.rtp.ice_host_candidates.put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

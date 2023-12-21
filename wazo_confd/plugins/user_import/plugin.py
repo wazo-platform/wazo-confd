@@ -3,6 +3,7 @@
 
 from collections import OrderedDict
 
+from wazo_provd_client import Client as ProvdClient
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.endpoint_sccp import dao as sccp_dao
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
@@ -15,7 +16,6 @@ from xivo_dao.resources.user_call_permission import dao as user_call_permission_
 from xivo_dao.resources.user_line import dao as user_line_dao
 from xivo_dao.resources.user_voicemail import dao as user_voicemail_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
-from wazo_provd_client import Client as ProvdClient
 
 from wazo_confd.database import user_export as user_export_dao
 from wazo_confd.plugins.call_permission.service import (
@@ -35,12 +35,15 @@ from wazo_confd.plugins.incall_extension.service import (
 )
 from wazo_confd.plugins.line.service import build_service as build_line_service
 from wazo_confd.plugins.line_endpoint.service import (
-    build_service_sip as build_le_sip_service,
     build_service_sccp as build_le_sccp_service,
+)
+from wazo_confd.plugins.line_endpoint.service import (
+    build_service_sip as build_le_sip_service,
 )
 from wazo_confd.plugins.line_extension.service import (
     build_service as build_line_extension_service,
 )
+from wazo_confd.plugins.tenant.service import build_service as build_tenant_service
 from wazo_confd.plugins.user.service import build_service as build_user_service
 from wazo_confd.plugins.user_call_permission.service import (
     build_service as build_user_call_permission_service,
@@ -49,10 +52,6 @@ from wazo_confd.plugins.user_line.service import build_service as build_ul_servi
 from wazo_confd.plugins.user_voicemail.service import build_service as build_uv_service
 from wazo_confd.plugins.voicemail.service import (
     build_service as build_voicemail_service,
-)
-
-from wazo_confd.plugins.tenant.service import (
-    build_service as build_tenant_service,
 )
 
 from .associators import (
@@ -65,6 +64,7 @@ from .associators import (
     VoicemailAssociator,
     WazoUserAssociator,
 )
+from .auth_client import auth_client, set_auth_client_config
 from .creators import (
     CallPermissionCreator,
     ContextCreator,
@@ -78,11 +78,10 @@ from .creators import (
     WazoUserCreator,
     WebRTCCreator,
 )
-from .entry import EntryCreator, EntryAssociator, EntryFinder, EntryUpdater
-from .resource import UserImportResource, UserExportResource
-from .service import ImportService, ExportService
+from .entry import EntryAssociator, EntryCreator, EntryFinder, EntryUpdater
+from .resource import UserExportResource, UserImportResource
+from .service import ExportService, ImportService
 from .wazo_user_service import build_service as build_wazo_user_service
-from .auth_client import set_auth_client_config, auth_client
 
 
 class Plugin:

@@ -3,11 +3,7 @@
 
 from xivo_dao.resources.agent import dao as agent_dao
 
-from wazo_confd.helpers.validator import (
-    UniqueField,
-    ValidationGroup,
-    Validator,
-)
+from wazo_confd.helpers.validator import UniqueField, ValidationGroup, Validator
 
 
 class NumberChanged(Validator):

@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.agentfeatures import AgentFeatures as Agent
-from .schema import AgentSchema, AgentSchemaPUT
+
 from ...middleware import ResourceMiddleware
+from .schema import AgentSchema, AgentSchemaPUT
 
 
 class AgentMiddleWare(ResourceMiddleware):

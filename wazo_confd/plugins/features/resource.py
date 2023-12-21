@@ -1,24 +1,22 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-
 from marshmallow import (
     fields,
-    pre_dump,
-    post_load,
-    pre_load,
     post_dump,
+    post_load,
+    pre_dump,
+    pre_load,
     validates_schema,
 )
-from marshmallow.validate import Length, NoneOf
 from marshmallow.exceptions import ValidationError
-
+from marshmallow.validate import Length, NoneOf
 from xivo_dao.alchemy.features import Features
 from xivo_dao.resources.features.search import (
-    PARKING_OPTIONS,
-    FUNC_KEY_FEATUREMAP_FOREIGN_KEY,
     FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY,
+    FUNC_KEY_FEATUREMAP_FOREIGN_KEY,
+    PARKING_OPTIONS,
 )
 
 from wazo_confd.auth import required_acl, required_master_tenant
@@ -83,7 +81,7 @@ class FeaturesFeaturemapSchema(FeaturesConfigurationSchema):
         for required in FUNC_KEY_FEATUREMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required),
+                    f'The following option are required: {required}',
                     field_name='options',
                 )
 
@@ -98,7 +96,7 @@ class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
         for required in FUNC_KEY_APPLICATIONMAP_FOREIGN_KEY:
             if required not in keys:
                 raise ValidationError(
-                    'The following option are required: {}'.format(required),
+                    f'The following option are required: {required}',
                     field_name='options',
                 )
 

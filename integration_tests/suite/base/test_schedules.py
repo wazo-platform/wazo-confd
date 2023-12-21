@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -14,10 +14,12 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from . import confd
 
 
 def test_get_errors():
@@ -33,16 +35,14 @@ def test_delete_errors():
 @fixtures.user()
 def test_post_errors(user):
     url = confd.schedules.post
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 @fixtures.schedule()
 @fixtures.user()
 def test_put_errors(schedule, user):
     url = confd.schedules(schedule['id']).put
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 def error_checks(url, user):
@@ -71,7 +71,7 @@ def error_checks(url, user):
     yield s.check_bogus_field_returns_error, url, 'exceptional_periods', {}
 
     for key in ('open_periods', 'exceptional_periods'):
-        regex = r'{}.*0.*hours_start'.format(key)
+        regex = fr'{key}.*0.*hours_start'
         yield s.check_bogus_field_returns_error_matching_regex, url, key, [
             {'hours_start': 7}
         ], regex
@@ -91,7 +91,7 @@ def error_checks(url, user):
             {'hours_start': '10:60'}
         ], regex
 
-        regex = r'{}.*0.*hours_end'.format(key)
+        regex = fr'{key}.*0.*hours_end'
         yield s.check_bogus_field_returns_error_matching_regex, url, key, [
             {'hours_end': 8}
         ], regex
@@ -111,7 +111,7 @@ def error_checks(url, user):
             {'hours_end': '10:60'}
         ], regex
 
-        regex = r'{}.*0.*week_days'.format(key)
+        regex = fr'{key}.*0.*week_days'
         yield s.check_bogus_field_returns_error_matching_regex, url, key, [
             {'week_days': None}
         ], regex
@@ -134,7 +134,7 @@ def error_checks(url, user):
             {'week_days': [8]}
         ], regex
 
-        regex = r'{}.*0.*month_days'.format(key)
+        regex = fr'{key}.*0.*month_days'
         yield s.check_bogus_field_returns_error_matching_regex, url, key, [
             {'month_days': None}
         ], regex
@@ -157,7 +157,7 @@ def error_checks(url, user):
             {'month_days': [32]}
         ], regex
 
-        regex = r'{}.*0.*months'.format(key)
+        regex = fr'{key}.*0.*months'
         yield s.check_bogus_field_returns_error_matching_regex, url, key, [
             {'months': None}
         ], regex

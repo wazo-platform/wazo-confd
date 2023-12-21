@@ -1,9 +1,10 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from xivo_bus.resources.dhcp.event import DHCPEditedEvent
 
 from wazo_confd._bus import BusPublisher
 from wazo_confd._sysconfd import SysconfdPublisher
-from xivo_bus.resources.dhcp.event import DHCPEditedEvent
 
 
 class DHCPNotifier:

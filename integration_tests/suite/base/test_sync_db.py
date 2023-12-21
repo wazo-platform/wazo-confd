@@ -1,20 +1,12 @@
 # Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    has_entries,
-    has_length,
-    empty,
-)
+from hamcrest import assert_that, contains_inanyorder, empty, has_entries, has_length
 
+from ..helpers import associations as a
+from ..helpers import fixtures
+from ..helpers.config import CREATED_TENANT, DELETED_TENANT
 from . import BaseIntegrationTest, confd, db
-from ..helpers import (
-    associations as a,
-    fixtures,
-)
-from ..helpers.config import DELETED_TENANT, CREATED_TENANT
 
 
 @fixtures.context(wazo_tenant=DELETED_TENANT)

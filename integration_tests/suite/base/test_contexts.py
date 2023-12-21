@@ -16,9 +16,11 @@ from hamcrest import (
 )
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd, BaseIntegrationTest
-from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT, ALL_TENANTS, DELETED_TENANT
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
+from ..helpers.config import ALL_TENANTS, DELETED_TENANT, MAIN_TENANT, SUB_TENANT
+from . import BaseIntegrationTest, confd
 
 
 def test_get_errors():
@@ -33,8 +35,7 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.contexts.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     yield s.check_bogus_field_returns_error, url, 'label', 123
     yield s.check_bogus_field_returns_error, url, 'label', True
@@ -58,8 +59,7 @@ def test_post_errors():
 @fixtures.context()
 def test_put_errors(context):
     url = confd.contexts(context['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

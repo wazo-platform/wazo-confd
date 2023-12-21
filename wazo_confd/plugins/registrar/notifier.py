@@ -6,6 +6,7 @@ from xivo_bus.resources.registrar.event import (
     RegistrarDeletedEvent,
     RegistrarEditedEvent,
 )
+
 from .schema import RegistrarSchema
 
 

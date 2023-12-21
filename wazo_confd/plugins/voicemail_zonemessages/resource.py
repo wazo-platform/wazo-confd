@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-
-from marshmallow import fields, pre_dump, post_load
+from marshmallow import fields, post_load, pre_dump
 from marshmallow.validate import Length
-
 from xivo_dao.alchemy.staticvoicemail import StaticVoicemail
 
 from wazo_confd.auth import required_acl, required_master_tenant

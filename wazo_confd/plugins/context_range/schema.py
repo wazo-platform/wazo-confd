@@ -2,7 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import Predicate, Length, OneOf
+from marshmallow.validate import Length, OneOf, Predicate
+
 from wazo_confd.helpers.mallow import BaseSchema
 from wazo_confd.helpers.restful import ListSchema as BaseListSchema
 

@@ -1,10 +1,9 @@
 # Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import docker
-
 from datetime import datetime
 
+import docker
 from hamcrest import assert_that, equal_to, has_item, starts_with
 from wazo_provd_client import Client as ProvdClient
 from wazo_provd_client.exceptions import ProvdError
@@ -132,7 +131,7 @@ class ProvdHelper:
         except ProvdError:
             return
         else:
-            raise AssertionError('config "{}" exists in wazo-provd'.format(config_id))
+            raise AssertionError(f'config "{config_id}" exists in wazo-provd')
 
     def assert_device_has_autoprov_config(self, device):
         assert_that(device['config'], starts_with('autoprov'))
@@ -143,7 +142,7 @@ class ProvdHelper:
 
     def has_synchronized(self, device_id, timestamp=None):
         timestamp = timestamp or datetime.utcnow()
-        line = "Synchronizing device {}".format(device_id)
+        line = f"Synchronizing device {device_id}"
         output = self.find_provd_logs(timestamp)
         for log in output.split("\n"):
             if line in log:
@@ -152,7 +151,7 @@ class ProvdHelper:
 
     def updated_count(self, device_id, timestamp=None):
         timestamp = timestamp or datetime.utcnow()
-        expected_line = "Updating config {}".format(device_id)
+        expected_line = f"Updating config {device_id}"
         output = self.find_provd_logs(timestamp)
         count = len([line for line in output.split("\n") if expected_line in line])
         return count

@@ -1,13 +1,11 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
 import string
 
-from . import (
-    confd,
-    user as user_helper,
-)
+from . import confd
+from . import user as user_helper
 
 
 def generate_user_external_app(**parameters):
@@ -39,7 +37,7 @@ def delete_user_external_app(user_uuid, name, check=False, **parameters):
 
 def generate_name(user_uuid):
     response = confd.users(user_uuid).external.apps.get()
-    names = set(d['name'] for d in response.items)
+    names = {d['name'] for d in response.items}
     return _random_name(names)
 
 

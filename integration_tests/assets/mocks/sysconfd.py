@@ -4,7 +4,7 @@
 
 import logging
 
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify, request
 
 logging.basicConfig(level=logging.DEBUG)
 

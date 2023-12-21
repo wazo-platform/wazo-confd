@@ -14,15 +14,13 @@ from hamcrest import (
     not_,
 )
 
-from . import confd, BaseIntegrationTest
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import INCALL_CONTEXT, MAIN_TENANT, SUB_TENANT
+from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from . import BaseIntegrationTest, confd
 
 
 def test_get_errors():
@@ -38,16 +36,14 @@ def test_delete_errors():
 @fixtures.user()
 def test_post_errors(user):
     url = confd.incalls.post
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 @fixtures.incall()
 @fixtures.user()
 def test_put_errors(incall, user):
     url = confd.incalls(incall['id']).put
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 def error_checks(url, user):

@@ -1,15 +1,14 @@
 # Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
+from flask import request, url_for
 from xivo_dao.alchemy.pjsip_transport import PJSIPTransport
+
 from wazo_confd.auth import required_acl, required_master_tenant
-from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 from wazo_confd.helpers.asterisk import AsteriskConfigurationList
-from .schema import (
-    PJSIPTransportSchema,
-    PJSIPTransportDeleteRequestSchema,
-)
+from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
+
+from .schema import PJSIPTransportDeleteRequestSchema, PJSIPTransportSchema
 
 
 class PJSIPDocList(ConfdResource):

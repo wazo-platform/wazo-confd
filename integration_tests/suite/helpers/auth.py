@@ -1,12 +1,10 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import requests
 import re
-
-from wazo_auth_client import Client as AuthClient
-
 from pprint import pformat
+
+import requests
 from hamcrest import (
     all_of,
     anything,
@@ -16,6 +14,7 @@ from hamcrest import (
     has_entry,
     has_item,
 )
+from wazo_auth_client import Client as AuthClient
 
 
 class AuthClient(AuthClient):
@@ -95,5 +94,5 @@ class AuthClient(AuthClient):
         ]
 
         if not results:
-            raise AssertionError("Request not found: {} {}".format(method, path))
+            raise AssertionError(f"Request not found: {method} {path}")
         return results

@@ -1,18 +1,17 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 
 from requests import HTTPError
-
 from xivo_dao.helpers import errors
 
+from .converter import convert_ari_sounds_to_model
 from .model import SoundCategory
 from .notifier import build_notifier
 from .schema import ASTERISK_CATEGORY
 from .storage import build_storage
 from .validator import build_validator, build_validator_file
-from .converter import convert_ari_sounds_to_model
 
 logger = logging.getLogger(__name__)
 

@@ -4,6 +4,7 @@
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.call_permission import dao as call_permission_dao
 from xivo_dao.resources.call_permission import strategy
+
 from wazo_confd.helpers.resource import CRUDService
 
 from .notifier import build_notifier

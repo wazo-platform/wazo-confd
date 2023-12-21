@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import errno
@@ -6,12 +6,12 @@ import glob
 import logging
 import os
 import shutil
-
 from contextlib import contextmanager
+
 from flask import send_file
 from xivo_dao.helpers import errors
 
-from .model import SoundCategory, SoundFormat, SoundFile
+from .model import SoundCategory, SoundFile, SoundFormat
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class _SoundFilesystemStorage:
         ]
         if dangerous_fragments:
             raise errors.not_permitted(
-                'Dangerous path fragment: "{}"'.format(dangerous_fragments)
+                f'Dangerous path fragment: "{dangerous_fragments}"'
             )
 
         return os.path.join(self._base_path, *fragments)
@@ -162,7 +162,7 @@ class _SoundFilesystemStorage:
         )
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
-        filename_extension = '{}.*'.format(filename_filter)
+        filename_extension = f'{filename_filter}.*'
         path = self._build_path(
             'tenants',
             sound.tenant_uuid,
@@ -202,7 +202,7 @@ class _SoundFilesystemStorage:
         )
         sound = self._find_and_populate_sound(sound, path, extract_language=True)
 
-        filename_extension = '{}.*'.format(filename_filter)
+        filename_extension = f'{filename_filter}.*'
         path = self._build_path(
             'tenants', sound.tenant_uuid, sound.name, filename_extension
         )
@@ -216,7 +216,7 @@ class _SoundFilesystemStorage:
         return sound
 
     def _filter_language_format(self, sound, language_filter, format_filter):
-        filename_extension = '*.{}'.format(SoundFormat(format_=format_filter).extension)
+        filename_extension = f'*.{SoundFormat(format_=format_filter).extension}'
         path = self._build_path(
             'tenants',
             sound.tenant_uuid,
@@ -235,7 +235,7 @@ class _SoundFilesystemStorage:
         return sound
 
     def _filter_format(self, sound, format_filter):
-        filename_extension = '*.{}'.format(SoundFormat(format_=format_filter).extension)
+        filename_extension = f'*.{SoundFormat(format_=format_filter).extension}'
 
         path = self._build_path(
             'tenants', sound.tenant_uuid, sound.name, filename_extension
@@ -347,7 +347,7 @@ class _SoundFilesystemStorage:
                             format_.language,
                             file_.name,
                         ),
-                        '.{}'.format(format_.extension) if format_.extension else '',
+                        f'.{format_.extension}' if format_.extension else '',
                     )
                     for format_ in file_.formats
                 ]
@@ -355,7 +355,7 @@ class _SoundFilesystemStorage:
                 return [
                     '{}{}'.format(
                         self._build_path(sound.name, format_.language, file_.name),
-                        '.{}'.format(format_.extension) if format_.extension else '',
+                        f'.{format_.extension}' if format_.extension else '',
                     )
                     for format_ in file_.formats
                 ]

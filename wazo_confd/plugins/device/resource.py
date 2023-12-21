@@ -6,9 +6,9 @@ from xivo.tenant_flask_helpers import Tenant
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import (
-    ListResource,
-    ItemResource,
     ConfdResource,
+    ItemResource,
+    ListResource,
     build_tenant,
 )
 from wazo_confd.plugins.device.model import Device

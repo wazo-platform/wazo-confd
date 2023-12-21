@@ -4,7 +4,7 @@
 from xivo_dao.helpers import errors
 from xivo_dao.resources.feature_extension import dao as feature_extension_dao
 
-from wazo_confd.helpers.validator import Validator, ValidationGroup
+from wazo_confd.helpers.validator import ValidationGroup, Validator
 
 
 class ExtenAvailableOnUpdateValidator(Validator):

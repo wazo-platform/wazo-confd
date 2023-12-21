@@ -3,10 +3,10 @@
 
 from collections import deque
 
+from xivo.status import Status
+from xivo_bus.base import Base
 from xivo_bus.consumer import BusConsumer as Consumer
 from xivo_bus.mixins import PublisherMixin, WazoEventMixin
-from xivo_bus.base import Base
-from xivo.status import Status
 
 
 class FlushMixin:

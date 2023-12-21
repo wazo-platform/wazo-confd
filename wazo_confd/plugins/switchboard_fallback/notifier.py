@@ -1,7 +1,8 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.switchboard.event import SwitchboardFallbackEditedEvent
+
 from wazo_confd import bus
 
 from .schema import SwitchboardFallbackSchema

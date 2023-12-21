@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -13,7 +13,6 @@ from xivo_bus.resources.call_filter.event import (
 from xivo_dao.alchemy.callfilter import Callfilter as CallFilter
 
 from ..notifier import CallFilterNotifier
-
 
 TENANT_UUID = str(uuid.uuid4())
 

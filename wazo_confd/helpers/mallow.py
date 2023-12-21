@@ -141,9 +141,7 @@ class AsteriskSection:
         if not value:
             raise ValidationError('Shorter than minimum length 1')
         if len(value) > self._max_length:
-            raise ValidationError(
-                'Longer than maximum length {}'.format(self._max_length)
-            )
+            raise ValidationError(f'Longer than maximum length {self._max_length}')
         if value in self._reserved_names:
             raise ValidationError('Reserved Asterisk section name')
         if self._regex.match(value) is None:

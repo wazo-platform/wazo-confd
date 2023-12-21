@@ -1,13 +1,11 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
 from flask import Flask
-from werkzeug.exceptions import HTTPException, BadRequest
-
-from xivo_dao.helpers.exception import NotFoundError
-from xivo_dao.helpers.exception import ServiceError
+from werkzeug.exceptions import BadRequest, HTTPException
+from xivo_dao.helpers.exception import NotFoundError, ServiceError
 
 from ..common import handle_api_exception
 

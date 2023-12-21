@@ -21,10 +21,11 @@ from hamcrest import (
     not_none,
 )
 
-from . import confd, BaseIntegrationTest
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
-
+from . import BaseIntegrationTest, confd
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
@@ -43,15 +44,13 @@ def test_delete_errors(sip):
 
 def test_post_errors():
     url = confd.endpoints.sip.templates.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.sip_template()
 def test_put_errors(sip):
     url = confd.endpoints.sip.templates(sip['uuid']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
     yield s.check_bogus_field_returns_error, url, 'name', None
 
@@ -88,8 +87,7 @@ def error_checks(url):
     for section, values in sections:
         yield s.check_bogus_field_returns_error, url, section, values
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.transport(name='transport_unique')

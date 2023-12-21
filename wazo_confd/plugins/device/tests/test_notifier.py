@@ -1,10 +1,9 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
-from uuid import uuid4
 from unittest.mock import Mock
+from uuid import uuid4
 
 from xivo_bus.resources.device.event import (
     DeviceCreatedEvent,
@@ -12,8 +11,8 @@ from xivo_bus.resources.device.event import (
     DeviceEditedEvent,
 )
 
-from ..notifier import DeviceNotifier
 from ..model import Device
+from ..notifier import DeviceNotifier
 
 
 class TestDeviceNotifier(unittest.TestCase):

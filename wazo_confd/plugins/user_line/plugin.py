@@ -1,11 +1,11 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.line import dao as line_dao
+from xivo_dao.resources.user import dao as user_dao
 
 from .middleware import UserLineAssociationMiddleWare
-from .resource import UserLineList, UserLineItem
+from .resource import UserLineItem, UserLineList
 from .service import build_service
 
 

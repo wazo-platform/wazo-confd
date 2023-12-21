@@ -30,7 +30,7 @@ def delete_context(context_id, check=False, **parameters):
 
 def generate_label():
     response = confd.contexts.get()
-    labels = set(d['label'] for d in response.items)
+    labels = {d['label'] for d in response.items}
     return _random_label(labels)
 
 

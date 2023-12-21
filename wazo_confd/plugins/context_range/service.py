@@ -20,7 +20,7 @@ class RangeFilter:
 
         if self._availability == 'available':
             configured_extens = self._extension_dao.find_all_by(context=context.name)
-            self._used_extensions = set(e.exten for e in configured_extens)
+            self._used_extensions = {e.exten for e in configured_extens}
 
     def get_ranges(self, range_type):
         ranges = self._extract_ranges(self._context, range_type)

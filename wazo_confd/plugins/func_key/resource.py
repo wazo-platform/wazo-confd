@@ -1,16 +1,15 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
-
+from flask import request, url_for
 from xivo_dao.alchemy.func_key_dest_agent import FuncKeyDestAgent
 from xivo_dao.alchemy.func_key_dest_bsfilter import FuncKeyDestBSFilter
-from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
 from xivo_dao.alchemy.func_key_dest_conference import FuncKeyDestConference
+from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
 from xivo_dao.alchemy.func_key_dest_features import (
-    FuncKeyDestTransfer,
     FuncKeyDestOnlineRecording,
     FuncKeyDestParking,
+    FuncKeyDestTransfer,
 )
 from xivo_dao.alchemy.func_key_dest_forward import FuncKeyDestForward
 from xivo_dao.alchemy.func_key_dest_group import FuncKeyDestGroup
@@ -24,7 +23,7 @@ from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping
 from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ItemResource, ListResource, ConfdResource
+from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
 from .schema import (
     FuncKeyDestinationField,

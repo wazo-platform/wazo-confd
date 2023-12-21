@@ -1,22 +1,20 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 import uuid
+from unittest.mock import Mock, patch
 
-from unittest.mock import Mock
-from unittest.mock import patch
 from xivo_bus.resources.user_line.event import (
     UserLineAssociatedEvent,
     UserLineDissociatedEvent,
 )
 
-from ..notifier import UserLineNotifier
-
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema  # noqa
 from wazo_confd.plugins.endpoint_sccp.resource import SccpSchema  # noqa
 from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema  # noqa
 
+from ..notifier import UserLineNotifier
 
 EXPECTED_SYSCONFD_HANDLERS = {'ipbx': ['dialplan reload', 'module reload res_pjsip.so']}
 

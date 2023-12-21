@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_bus.resources.line_endpoint.event import (
@@ -11,10 +11,10 @@ from xivo_bus.resources.line_endpoint.event import (
 )
 
 from wazo_confd import bus
-from wazo_confd.plugins.line.schema import LineSchema
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
 from wazo_confd.plugins.endpoint_sccp.schema import SccpSchema
 from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
+from wazo_confd.plugins.line.schema import LineSchema
 
 LINE_FIELDS = [
     'id',

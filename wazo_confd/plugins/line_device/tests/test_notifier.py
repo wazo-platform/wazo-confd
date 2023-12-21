@@ -3,11 +3,9 @@
 
 import unittest
 import uuid
-
 from unittest.mock import Mock
 
 from hamcrest import assert_that, equal_to
-
 from xivo_bus.resources.line_device.event import (
     LineDeviceAssociatedEvent,
     LineDeviceDissociatedEvent,

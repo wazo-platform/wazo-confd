@@ -6,13 +6,13 @@ from flask import request
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.plugins.user.sub_resources.schema import (
+    ForwardBusySchema,
+    ForwardNoAnswerSchema,
+    ForwardsSchema,
+    ForwardUnconditionalSchema,
     ServiceDNDSchema,
     ServiceIncallFilterSchema,
     ServicesSchema,
-    ForwardBusySchema,
-    ForwardNoAnswerSchema,
-    ForwardUnconditionalSchema,
-    ForwardsSchema,
 )
 
 

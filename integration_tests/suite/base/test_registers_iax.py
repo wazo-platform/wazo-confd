@@ -1,11 +1,11 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, empty, has_entries, none, not_
 
-from . import confd
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from . import confd
 
 
 def test_get_errors():
@@ -20,15 +20,13 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.registers.iax.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.register_iax()
 def test_put_errors(register_iax):
     url = confd.registers.iax(register_iax['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):

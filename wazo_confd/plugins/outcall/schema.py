@@ -5,7 +5,7 @@
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Range
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 
 class OutcallSchema(BaseSchema):

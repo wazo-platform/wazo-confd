@@ -3,15 +3,17 @@
 
 from hamcrest import (
     assert_that,
-    has_entries,
     contains_exactly,
     contains_inanyorder,
     empty,
+    has_entries,
 )
 
-from . import confd
-from ..helpers import associations as a, fixtures, scenarios as s
+from ..helpers import associations as a
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import confd
 
 
 @fixtures.context(

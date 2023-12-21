@@ -1,10 +1,9 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
-from uuid import uuid4
 from unittest.mock import Mock
+from uuid import uuid4
 
 from xivo_bus.resources.call_pickup_member.event import (
     CallPickupInterceptorGroupsAssociatedEvent,
@@ -12,9 +11,9 @@ from xivo_bus.resources.call_pickup_member.event import (
     CallPickupTargetGroupsAssociatedEvent,
     CallPickupTargetUsersAssociatedEvent,
 )
+from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 from xivo_dao.alchemy.pickup import Pickup as CallPickup
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
-from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 
 from ..notifier import CallPickupMemberNotifier
 

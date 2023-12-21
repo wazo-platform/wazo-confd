@@ -4,18 +4,15 @@
 import logging
 import secrets
 import string
-
 from uuid import uuid4
 
-from flask import url_for, request
-
+from flask import request, url_for
 from xivo.xivo_helpers import clean_extension
-
-from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
+from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.helpers import errors
 
-from wazo_confd.auth import required_acl, no_auth, master_tenant_uuid
+from wazo_confd.auth import master_tenant_uuid, no_auth, required_acl
 from wazo_confd.helpers.restful import ItemResource, ListResource, ListSchema
 
 from .exceptions import MeetingGuestSIPTemplateNotFound

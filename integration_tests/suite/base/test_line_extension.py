@@ -12,13 +12,11 @@ from hamcrest import (
     none,
 )
 
-from ..helpers import (
-    scenarios as s,
-    errors as e,
-    associations as a,
-    fixtures,
-    helpers as h,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import (
     CONTEXT,
     EXTEN_OUTSIDE_RANGE,
@@ -143,8 +141,7 @@ def test_associate_line_and_create_extension_unknown_line():
 @fixtures.line_sip()
 def test_extension_creation_error(line):
     url = confd.lines(line['id']).extensions.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)

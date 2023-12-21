@@ -1,8 +1,8 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from xivo_dao.helpers.exception import ResourceError
-from xivo_dao.resources.line import dao as line_dao
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.line import dao as line_dao
 
 
 class LineExtensionMiddleware:

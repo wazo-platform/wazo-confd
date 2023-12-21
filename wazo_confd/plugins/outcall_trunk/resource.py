@@ -3,7 +3,6 @@
 
 from flask import request
 from marshmallow import fields
-
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 

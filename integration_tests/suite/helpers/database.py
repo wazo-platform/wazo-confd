@@ -5,7 +5,6 @@ from contextlib import contextmanager
 from functools import wraps
 
 import sqlalchemy as sa
-
 from sqlalchemy.sql import text
 
 
@@ -36,7 +35,7 @@ class DbHelper:
 
     def create_engine(self, db=None, isolate=False):
         db = db or self.db
-        uri = "{}/{}".format(self.uri, db)
+        uri = f"{self.uri}/{db}"
         if isolate:
             return sa.create_engine(uri, isolation_level='AUTOCOMMIT')
         return sa.create_engine(uri)
@@ -58,7 +57,7 @@ class DbHelper:
                 db=self.db
             )
         )
-        connection.execute("DROP DATABASE IF EXISTS {db}".format(db=self.db))
+        connection.execute(f"DROP DATABASE IF EXISTS {self.db}")
         connection.execute(
             "CREATE DATABASE {db} TEMPLATE {template}".format(
                 db=self.db, template=self.TEMPLATE

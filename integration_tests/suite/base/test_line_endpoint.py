@@ -1,17 +1,12 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
 
-from hamcrest import (
-    assert_that,
-    contains_inanyorder,
-    has_entries,
-    has_items,
-)
+from hamcrest import assert_that, contains_inanyorder, has_entries, has_items
 
-from . import confd
 from ..helpers.config import CONTEXT
+from . import confd
 
 
 def test_create_line_with_multiple_endpoints_error():

@@ -1,10 +1,11 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd._sysconfd import SysconfdPublisher
 from wazo_confd.database import dhcp as dhcp_dao
-from .notifier import DHCPNotifier
+
 from .exceptions import InvalidInterfaces
+from .notifier import DHCPNotifier
 
 
 class DHCPService:

@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -20,10 +20,11 @@ from hamcrest import (
     not_none,
 )
 
-from ..helpers import associations as a, config, fixtures, helpers as h
+from ..helpers import associations as a
+from ..helpers import config, fixtures
+from ..helpers import helpers as h
 from ..helpers.config import MAIN_TENANT
-from . import confd, auth
-
+from . import auth, confd
 
 client = h.user_import.csv_client()
 

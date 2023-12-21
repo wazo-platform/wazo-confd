@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
@@ -30,7 +30,7 @@ def delete_extension_feature(extension_feature_uuid, check=False, **params):
 
 def generate_exten():
     response = confd.extensions.features.get()
-    extens = set(d['exten'] for d in response.items)
+    extens = {d['exten'] for d in response.items}
     return _random_exten(extens)
 
 

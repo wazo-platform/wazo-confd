@@ -13,9 +13,11 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import confd
 
 
 def test_get_errors():
@@ -30,15 +32,13 @@ def test_delete_errors():
 
 def test_post_errors():
     url = confd.pagings.post
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 @fixtures.paging(number='724464')
 def test_put_errors(paging):
     url = confd.pagings(paging['id']).put
-    for check in error_checks(url):
-        yield check
+    yield from error_checks(url)
 
 
 def error_checks(url):
@@ -77,8 +77,7 @@ def error_checks(url):
     yield s.check_bogus_field_returns_error, url, 'enabled', []
     yield s.check_bogus_field_returns_error, url, 'enabled', {}
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.paging(number='123')

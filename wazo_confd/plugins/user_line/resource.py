@@ -3,9 +3,8 @@
 
 from flask import request
 from marshmallow import fields
-
-from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.mallow import BaseSchema, Nested

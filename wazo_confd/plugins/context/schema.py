@@ -6,10 +6,9 @@ import logging
 from marshmallow import fields, post_load, pre_load, validates_schema
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, OneOf, Predicate, Range
-
 from xivo_dao.alchemy.contextnumbers import ContextNumbers
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 CONTEXT_REGEX = r"^[a-zA-Z0-9-_]*$"
 logger = logging.getLogger(__name__)

@@ -6,8 +6,8 @@ from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 from xivo_dao.resources.voicemail import dao as voicemail_dao_module
 
-from wazo_confd.helpers.validator import Validator, ValidationGroup
 from wazo_confd.database import agent_status_login as agent_login_status_dao_module
+from wazo_confd.helpers.validator import ValidationGroup, Validator
 
 
 class ContextDeleteValidator(Validator):

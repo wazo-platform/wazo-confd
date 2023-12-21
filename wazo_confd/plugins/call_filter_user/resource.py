@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-
 from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMember
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError

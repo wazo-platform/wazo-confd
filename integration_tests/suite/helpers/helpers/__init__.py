@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..client import ConfdClient
@@ -136,16 +136,16 @@ from . import line_sip  # noqa
 from . import meeting  # noqa
 from . import meeting_authorization  # noqa
 from . import moh  # noqa
-from . import paging  # noqa
-from . import paging_caller_user  # noqa
-from . import paging_member_user  # noqa
-from . import parking_lot  # noqa
-from . import parking_lot_extension  # noqa
 from . import outcall  # noqa
 from . import outcall_call_permission  # noqa
 from . import outcall_extension  # noqa
 from . import outcall_schedule  # noqa
 from . import outcall_trunk  # noqa
+from . import paging  # noqa
+from . import paging_caller_user  # noqa
+from . import paging_member_user  # noqa
+from . import parking_lot  # noqa
+from . import parking_lot_extension  # noqa
 from . import queue  # noqa
 from . import queue_extension  # noqa
 from . import queue_member_agent  # noqa
@@ -153,10 +153,10 @@ from . import queue_member_user  # noqa
 from . import queue_schedule  # noqa
 from . import register_iax  # noqa
 from . import registrar  # noqa
-from . import sound  # noqa
 from . import schedule  # noqa
 from . import skill  # noqa
 from . import skill_rule  # noqa
+from . import sound  # noqa
 from . import switchboard  # noqa
 from . import switchboard_member_user  # noqa
 from . import transport  # noqa
@@ -168,8 +168,8 @@ from . import trunk_endpoint_sip  # noqa
 from . import trunk_register_iax  # noqa
 from . import user  # noqa
 from . import user_agent  # noqa
-from . import user_external_app  # noqa
 from . import user_call_permission  # noqa
+from . import user_external_app  # noqa
 from . import user_funckey_template  # noqa
 from . import user_import  # noqa
 from . import user_line  # noqa
@@ -178,7 +178,6 @@ from . import user_schedule  # noqa
 from . import user_voicemail  # noqa
 from . import voicemail  # noqa
 from . import voicemail_zonemessages  # noqa
-
 
 __all__ = [
     'access_feature',

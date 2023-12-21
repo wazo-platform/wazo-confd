@@ -1,12 +1,10 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
 from unittest.mock import Mock, sentinel
 
 from hamcrest import assert_that, calling, raises
-
 from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMember
 from xivo_dao.alchemy.func_key_dest_bsfilter import FuncKeyDestBSFilter
 from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
@@ -19,11 +17,11 @@ from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.helpers.exception import InputError, ResourceError
 
 from wazo_confd.helpers.validator import Validator
-from wazo_confd.plugins.func_key.validator import FuncKeyMappingValidator
 from wazo_confd.plugins.func_key.validator import (
     BSFilterValidator,
     CustomValidator,
     ForwardValidator,
+    FuncKeyMappingValidator,
     FuncKeyModelValidator,
     ParkPositionValidator,
     PrivateTemplateValidator,

@@ -1,8 +1,7 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import inspect
-
 from functools import wraps
 
 
@@ -66,8 +65,7 @@ class IsolatedAction:
                 resource = self.__enter__()
                 # Pass the resource as an argument to the test function
                 new_args = list(args) + [resource]
-                for result in func(*new_args, **kwargs):
-                    yield result
+                yield from func(*new_args, **kwargs)
                 self.__exit__()
 
             return generator_decorated

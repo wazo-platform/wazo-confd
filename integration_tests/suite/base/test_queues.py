@@ -14,19 +14,13 @@ from hamcrest import (
     not_,
 )
 
-from . import confd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-    gen_queue_exten,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, gen_queue_exten
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from . import confd
 
 ALL_OPTIONS = [
     ['context', 'Default'],
@@ -87,8 +81,7 @@ def test_delete_errors():
 @fixtures.user()
 def test_post_errors(user):
     url = confd.queues.post
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
     yield s.check_bogus_field_returns_error, url, 'name', 123
     yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
@@ -99,16 +92,14 @@ def test_post_errors(user):
     yield s.check_bogus_field_returns_error, url, 'name', []
     yield s.check_bogus_field_returns_error, url, 'name', {}
 
-    for check in unique_error_checks(url):
-        yield check
+    yield from unique_error_checks(url)
 
 
 @fixtures.queue()
 @fixtures.user()
 def test_put_errors(queue, user):
     url = confd.queues(queue['id']).put
-    for check in error_checks(url, user):
-        yield check
+    yield from error_checks(url, user)
 
 
 def error_checks(url, user):

@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
-
 from marshmallow import fields, post_dump, pre_load
 from marshmallow.validate import Length
-
 from xivo_dao.alchemy.sccpgeneralsettings import SCCPGeneralSettings
 
 from wazo_confd.auth import required_acl, required_master_tenant

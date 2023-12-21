@@ -8,9 +8,9 @@ from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
-from .service import DefaultSIPTemplateService
 from ..._sysconfd import SysconfdPublisher
 from ...sync_db import remove_tenant
+from .service import DefaultSIPTemplateService
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,9 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from .middleware import LineExtensionMiddleware
 from .resource import LineExtensionItem, LineExtensionList
 from .service import build_service
-from .middleware import LineExtensionMiddleware
 
 
 class Plugin:

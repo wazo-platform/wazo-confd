@@ -1,18 +1,10 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.trunk import dao as trunk_dao_module
 
-from .notifier import (
-    build_notifier_sip,
-    build_notifier_iax,
-    build_notifier_custom,
-)
-from .validator import (
-    build_validator_sip,
-    build_validator_iax,
-    build_validator_custom,
-)
+from .notifier import build_notifier_custom, build_notifier_iax, build_notifier_sip
+from .validator import build_validator_custom, build_validator_iax, build_validator_sip
 
 
 class TrunkEndpointService:

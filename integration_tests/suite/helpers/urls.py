@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -20,7 +20,7 @@ class UrlFragment:
         return '/'.join(self.fragments)
 
     def __repr__(self):
-        return "<{} '{}' {}>".format(self.__class__.__name__, str(self), self.fragments)
+        return f"<{self.__class__.__name__} '{str(self)}' {self.fragments}>"
 
     def __enter__(self):
         return self._copy()
