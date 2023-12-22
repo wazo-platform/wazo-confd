@@ -35,43 +35,40 @@ def line_device(endpoint_type='sip', registrar=None):
 
 def test_search_errors():
     url = confd.registrars.get
-    for check in s.search_error_checks(url):
-        yield check
+    s.search_error_checks(url)
 
 
 def test_get_errors():
     fake_get = confd.registrars(999999).get
-    yield s.check_resource_not_found, fake_get, 'Registrar'
+    s.check_resource_not_found(fake_get, 'Registrar')
 
 
 def test_post_errors():
     url = confd.registrars.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.registrar()
 def test_put_errors(registrar):
     url = confd.registrars(registrar['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'main_host', None
-    yield s.check_bogus_field_returns_error, url, 'deletable', 123
-    yield s.check_bogus_field_returns_error, url, 'deletable', 'wrong'
-    yield s.check_bogus_field_returns_error, url, 'main_host', 123
-    yield s.check_bogus_field_returns_error, url, 'main_port', 'wrong'
-    yield s.check_bogus_field_returns_error, url, 'backup_host', 123
-    yield s.check_bogus_field_returns_error, url, 'backup_port', 'wrong'
-    yield s.check_bogus_field_returns_error, url, 'proxy_main_host', None
-    yield s.check_bogus_field_returns_error, url, 'proxy_main_host', 123
-    yield s.check_bogus_field_returns_error, url, 'proxy_main_port', 'wrong'
-    yield s.check_bogus_field_returns_error, url, 'proxy_backup_host', 123
-    yield s.check_bogus_field_returns_error, url, 'proxy_backup_port', 'wrong'
-    yield s.check_bogus_field_returns_error, url, 'outbound_proxy_host', 123
-    yield s.check_bogus_field_returns_error, url, 'outbound_proxy_port', 'wrong'
+    s.check_bogus_field_returns_error(url, 'main_host', None)
+    s.check_bogus_field_returns_error(url, 'deletable', 123)
+    s.check_bogus_field_returns_error(url, 'deletable', 'wrong')
+    s.check_bogus_field_returns_error(url, 'main_host', 123)
+    s.check_bogus_field_returns_error(url, 'main_port', 'wrong')
+    s.check_bogus_field_returns_error(url, 'backup_host', 123)
+    s.check_bogus_field_returns_error(url, 'backup_port', 'wrong')
+    s.check_bogus_field_returns_error(url, 'proxy_main_host', None)
+    s.check_bogus_field_returns_error(url, 'proxy_main_host', 123)
+    s.check_bogus_field_returns_error(url, 'proxy_main_port', 'wrong')
+    s.check_bogus_field_returns_error(url, 'proxy_backup_host', 123)
+    s.check_bogus_field_returns_error(url, 'proxy_backup_port', 'wrong')
+    s.check_bogus_field_returns_error(url, 'outbound_proxy_host', 123)
+    s.check_bogus_field_returns_error(url, 'outbound_proxy_port', 'wrong')
 
 
 @fixtures.registrar(
@@ -96,7 +93,7 @@ def test_search(registrar, hidden):
     }
 
     for field, term in searches.items():
-        yield check_search, url, registrar, hidden, field, term
+        check_search(url, registrar, hidden, field, term)
 
 
 def check_search(url, registrar, hidden, field, term):
@@ -117,12 +114,12 @@ def check_search(url, registrar, hidden, field, term):
 )
 def test_sorting_offset_limit(registrar1, registrar2):
     url = confd.registrars.get
-    yield s.check_sorting, url, registrar1, registrar2, 'proxy_main_host', '99.20.30.'
-    yield s.check_sorting, url, registrar1, registrar2, 'name', 'SortRegistrar'
-    yield s.check_sorting, url, registrar1, registrar2, 'main_port', 'SortRegistrar'
+    s.check_sorting(url, registrar1, registrar2, 'proxy_main_host', '99.20.30.')
+    s.check_sorting(url, registrar1, registrar2, 'name', 'SortRegistrar')
+    s.check_sorting(url, registrar1, registrar2, 'main_port', 'SortRegistrar')
 
-    yield s.check_offset, url, registrar1, registrar2, 'name', 'Sort'
-    yield s.check_limit, url, registrar1, registrar2, 'name', 'Sort'
+    s.check_offset(url, registrar1, registrar2, 'name', 'Sort')
+    s.check_limit(url, registrar1, registrar2, 'name', 'Sort')
 
 
 @fixtures.registrar()
@@ -489,6 +486,6 @@ def test_bus_events(registrar):
     body = {'name': 'a', 'main_host': '1.2.3.4', 'proxy_main_host': '1.2.3.4'}
     headers = {}
 
-    yield s.check_event, 'registrar_created', headers, confd.registrars.post, body
-    yield s.check_event, 'registrar_edited', headers, url.put
-    yield s.check_event, 'registrar_deleted', headers, url.delete
+    s.check_event('registrar_created', headers, confd.registrars.post, body)
+    s.check_event('registrar_edited', headers, url.put)
+    s.check_event('registrar_deleted', headers, url.delete)

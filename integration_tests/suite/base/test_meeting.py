@@ -42,31 +42,28 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 @fixtures.user()
 def test_get_errors(me):
     fake_get = confd.meetings(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_get, 'Meeting'
+    s.check_resource_not_found(fake_get, 'Meeting')
 
     user_confd = create_confd(user_uuid=me['uuid'])
     fake_get = user_confd.users.me.meetings(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_get, 'Meeting'
+    s.check_resource_not_found(fake_get, 'Meeting')
 
 
 @fixtures.user()
 def test_post_errors(me):
     url = confd.meetings.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
     user_confd = create_confd(user_uuid=me['uuid'])
     url = user_confd.users.me.meetings.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.ingress_http()
 @fixtures.meeting()
 def test_put_errors(_, meeting):
     url = confd.meetings(meeting['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.ingress_http()
@@ -75,22 +72,21 @@ def test_put_errors_users_me(_, me):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as meeting:
         url = user_confd.users.me.meetings(meeting['uuid']).put
-        for check in error_checks(url):
-            yield check
+        error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', 'a' * 513
-    yield s.check_bogus_field_returns_error, url, 'persistent', None
-    yield s.check_bogus_field_returns_error, url, 'persistent', 42
-    yield s.check_bogus_field_returns_error, url, 'persistent', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'persistent', []
-    yield s.check_bogus_field_returns_error, url, 'persistent', {}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', 'a' * 513)
+    s.check_bogus_field_returns_error(url, 'persistent', None)
+    s.check_bogus_field_returns_error(url, 'persistent', 42)
+    s.check_bogus_field_returns_error(url, 'persistent', 'invalid')
+    s.check_bogus_field_returns_error(url, 'persistent', [])
+    s.check_bogus_field_returns_error(url, 'persistent', {})
 
 
 @fixtures.ingress_http(wazo_tenant=MAIN_TENANT, uri='http://main')
@@ -168,7 +164,7 @@ def test_search(_, meeting, hidden):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, meeting, hidden, field, term
+        check_search(url, meeting, hidden, field, term)
 
     response = url.get(persistent=True)
     assert_that(response.items, has_item(meeting))
@@ -199,10 +195,10 @@ def check_search(url, meeting, hidden, field, term):
 @fixtures.meeting(name="sort2")
 def test_sorting_offset_limit(_, meeting1, meeting2):
     url = confd.meetings.get
-    yield s.check_sorting, url, meeting1, meeting2, 'name', 'sort', 'uuid'
+    s.check_sorting(url, meeting1, meeting2, 'name', 'sort', 'uuid')
 
-    yield s.check_offset, url, meeting1, meeting2, 'name', 'sort', 'uuid'
-    yield s.check_limit, url, meeting1, meeting2, 'name', 'sort', 'uuid'
+    s.check_offset(url, meeting1, meeting2, 'name', 'sort', 'uuid')
+    s.check_limit(url, meeting1, meeting2, 'name', 'sort', 'uuid')
 
 
 @fixtures.ingress_http()
@@ -549,13 +545,11 @@ def test_bus_events(_, meeting):
     url = confd.meetings(meeting['uuid'])
     headers = {'tenant_uuid': meeting['tenant_uuid']}
 
-    yield s.check_event, 'meeting_created', headers, confd.meetings.post, {
-        'name': 'meeting'
-    }
+    s.check_event('meeting_created', headers, confd.meetings.post, {'name': 'meeting'})
 
     headers['meeting_uuid'] = meeting['uuid']
-    yield s.check_event, 'meeting_updated', headers, url.put
-    yield s.check_event, 'meeting_deleted', headers, url.delete
+    s.check_event('meeting_updated', headers, url.put)
+    s.check_event('meeting_deleted', headers, url.delete)
 
 
 @fixtures.ingress_http()
@@ -563,13 +557,23 @@ def test_bus_events(_, meeting):
 @fixtures.meeting()
 def test_bus_events_progress(_, me, meeting):
     headers = {'tenant_uuid': meeting['tenant_uuid']}
-    yield s.check_event, 'meeting_progress', headers, bus.BusClient.send_meeting_reload_complete_event, meeting
+    s.check_event(
+        'meeting_progress',
+        headers,
+        bus.BusClient.send_meeting_reload_complete_event,
+        meeting,
+    )
 
     my_uuid = me['uuid']
     user_confd = create_confd(user_uuid=my_uuid)
     with fixtures.user_me_meeting(user_confd) as mine:
         headers = {'tenant_uuid': meeting['tenant_uuid'], f'user_uuid:{my_uuid}': True}
-        yield s.check_event, 'meeting_user_progress', headers, bus.BusClient.send_meeting_reload_complete_event, mine
+        s.check_event(
+            'meeting_user_progress',
+            headers,
+            bus.BusClient.send_meeting_reload_complete_event,
+            mine,
+        )
 
 
 @fixtures.ingress_http()

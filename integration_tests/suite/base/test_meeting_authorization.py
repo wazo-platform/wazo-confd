@@ -170,7 +170,9 @@ def test_list_search_authorizations_by_user(_, me, another_meeting):
         # Test search
         url = user_confd.users.me.meetings(meeting['uuid']).authorizations
         for field, term in searches.items():
-            yield check_authorization_search, url, authorization_found, authorization_hidden, field, term
+            check_authorization_search(
+                url, authorization_found, authorization_hidden, field, term
+            )
 
 
 def check_authorization_search(url, meeting, hidden, field, term):
@@ -201,10 +203,14 @@ def test_sorting_offset_limit_authorizations_by_user(_, me):
     ) as authorization2:
         url = user_confd.users.me.meetings(meeting['uuid']).authorizations.get
 
-        yield s.check_sorting, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+        s.check_sorting(
+            url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+        )
 
-        yield s.check_offset, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
-        yield s.check_limit, url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+        s.check_offset(
+            url, authorization1, authorization2, 'guest_name', 'sort', 'uuid'
+        )
+        s.check_limit(url, authorization1, authorization2, 'guest_name', 'sort', 'uuid')
 
 
 @fixtures.ingress_http()

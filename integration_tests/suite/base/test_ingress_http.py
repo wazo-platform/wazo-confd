@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -22,17 +22,16 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 def test_post_errors():
     url = confd.ingresses.http.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'uri', 123
-    yield s.check_bogus_field_returns_error, url, 'uri', None
-    yield s.check_bogus_field_returns_error, url, 'uri', True
-    yield s.check_bogus_field_returns_error, url, 'uri', {}
-    yield s.check_bogus_field_returns_error, url, 'uri', []
-    yield s.check_bogus_field_returns_error, url, 'uri', 'a' * 1025
+    s.check_bogus_field_returns_error(url, 'uri', 123)
+    s.check_bogus_field_returns_error(url, 'uri', None)
+    s.check_bogus_field_returns_error(url, 'uri', True)
+    s.check_bogus_field_returns_error(url, 'uri', {})
+    s.check_bogus_field_returns_error(url, 'uri', [])
+    s.check_bogus_field_returns_error(url, 'uri', 'a' * 1025)
 
 
 def test_create_all_parameters():
@@ -77,7 +76,7 @@ def test_search(ingress_http, hidden):
     searches = {'uri': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, ingress_http, hidden, field, term
+        check_search(url, ingress_http, hidden, field, term)
 
 
 @fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
@@ -114,7 +113,7 @@ def test_sorting_offset_limit(ingress_http1, ingress_http2):
 
 def test_get_errors():
     fake_ingress_http = confd.ingresses.http(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_ingress_http, 'IngressHTTP'
+    s.check_resource_not_found(fake_ingress_http, 'IngressHTTP')
 
 
 @fixtures.ingress_http()
@@ -146,8 +145,7 @@ def test_put_errors(ingress_http):
     response.assert_match(404, e.not_found(resource='IngressHTTP'))
 
     url = confd.ingresses.http(ingress_http['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.ingress_http()
@@ -182,7 +180,7 @@ def test_edit_multi_tenant(main, sub):
 
 def test_delete_errors():
     fake_ingress_http = confd.ingresses.http(FAKE_UUID).delete
-    yield s.check_resource_not_found, fake_ingress_http, 'IngressHTTP'
+    s.check_resource_not_found(fake_ingress_http, 'IngressHTTP')
 
 
 @fixtures.ingress_http()
@@ -211,8 +209,8 @@ def test_bus_events():
         nonlocal res
         res = confd.ingresses.http.post(uri='post')
 
-    yield s.check_event, 'ingress_http_created', headers, post
+    s.check_event('ingress_http_created', headers, post)
 
     url = confd.ingresses.http(res.item['uuid'])
-    yield s.check_event, 'ingress_http_edited', headers, url.put, {'uri': 'put'}
-    yield s.check_event, 'ingress_http_deleted', headers, url.delete
+    s.check_event('ingress_http_edited', headers, url.put, {'uri': 'put'})
+    s.check_event('ingress_http_deleted', headers, url.delete)

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_key, has_entries, equal_to
@@ -21,15 +21,15 @@ def test_get_users_forwards(user):
 def test_get_for_each_user_forward(user):
     for forward in VALID_FORWARDS:
         forward_url = confd.users(user['uuid']).forwards(forward)
-        yield _read_forward, forward_url, False
+        _read_forward(forward_url, False)
 
 
 @fixtures.user()
 def test_put_for_each_user_forward(user):
     for forward in VALID_FORWARDS:
         forward_url = confd.users(user['uuid']).forwards(forward)
-        yield _update_forward, forward_url, False
-        yield _update_forward, forward_url, True, '123'
+        _update_forward(forward_url, False)
+        _update_forward(forward_url, True, '123')
 
 
 def _update_forward(forward_url, enabled, destination=None):
@@ -48,10 +48,15 @@ def _read_forward(forward_url, enabled, destination=None):
 @fixtures.user()
 def test_put_forwards(user):
     forwards_url = confd.users(user['uuid']).forwards
-    yield _update_forwards, forwards_url, {'enabled': True, 'destination': '123'}, {
-        'enabled': False,
-        'destination': '456',
-    }, {'enabled': False, 'destination': None}
+    _update_forwards(
+        forwards_url,
+        {'enabled': True, 'destination': '123'},
+        {
+            'enabled': False,
+            'destination': '456',
+        },
+        {'enabled': False, 'destination': None},
+    )
 
 
 def _update_forwards(forwards_url, busy={}, noanswer={}, unconditional={}):
@@ -81,18 +86,16 @@ def test_error_on_null_destination_when_enabled(user):
 @fixtures.user()
 def test_put_error(user):
     forward_url = confd.users(user['uuid']).forwards('busy').put
-    yield s.check_bogus_field_returns_error, forward_url, 'enabled', 'string'
-    yield s.check_bogus_field_returns_error, forward_url, 'enabled', None
-    yield s.check_bogus_field_returns_error, forward_url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, forward_url, 'enabled', 1
-    yield s.check_bogus_field_returns_error, forward_url, 'enabled', 0
-    yield s.check_bogus_field_returns_error, forward_url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, forward_url, 'destination', True
-    yield s.check_bogus_field_returns_error, forward_url, 'destination', 123
-    yield s.check_bogus_field_returns_error, forward_url, 'destination', s.random_string(
-        129
-    )
-    yield s.check_bogus_field_returns_error, forward_url, 'destination', {}
+    s.check_bogus_field_returns_error(forward_url, 'enabled', 'string')
+    s.check_bogus_field_returns_error(forward_url, 'enabled', None)
+    s.check_bogus_field_returns_error(forward_url, 'enabled', 123)
+    s.check_bogus_field_returns_error(forward_url, 'enabled', 1)
+    s.check_bogus_field_returns_error(forward_url, 'enabled', 0)
+    s.check_bogus_field_returns_error(forward_url, 'enabled', {})
+    s.check_bogus_field_returns_error(forward_url, 'destination', True)
+    s.check_bogus_field_returns_error(forward_url, 'destination', 123)
+    s.check_bogus_field_returns_error(forward_url, 'destination', s.random_string(129))
+    s.check_bogus_field_returns_error(forward_url, 'destination', {})
 
 
 @fixtures.user(

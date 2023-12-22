@@ -23,12 +23,12 @@ def test_associate_errors(extension, group):
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_group, 'Group'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_group, 'Group')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
     fake_extension = confd.groups(group['uuid']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -37,12 +37,12 @@ def test_dissociate_errors(extension, group):
     fake_group = confd.groups(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.groups(group['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_group, 'Group'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_group, 'Group')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
     fake_extension = confd.groups(group['uuid']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -259,5 +259,5 @@ def test_bus_events(extension, group):
     url = confd.groups(group['uuid']).extensions(extension['id'])
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'group_extension_associated', headers, url.put
-    yield s.check_event, 'group_extension_dissociated', headers, url.delete
+    s.check_event('group_extension_associated', headers, url.put)
+    s.check_event('group_extension_dissociated', headers, url.delete)

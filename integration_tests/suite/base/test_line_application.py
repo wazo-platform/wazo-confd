@@ -17,8 +17,8 @@ def test_associate_errors(line, application):
     fake_line = confd.lines(FAKE_ID).applications(application['uuid']).put
     fake_application = confd.lines(line['id']).applications(FAKE_UUID).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_application, 'Application'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_application, 'Application')
 
 
 @fixtures.line()
@@ -27,8 +27,8 @@ def test_dissociate_errors(line, application):
     fake_line = confd.lines(FAKE_ID).applications(application['uuid']).delete
     fake_application = confd.lines(line['id']).applications(FAKE_UUID).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_application, 'Application'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_application, 'Application')
 
 
 @fixtures.line()
@@ -184,5 +184,5 @@ def test_bus_events(line, application):
     url = confd.lines(line['id']).applications(application['uuid'])
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'line_application_associated', headers, url.put
-    yield s.check_event, 'line_application_dissociated', headers, url.delete
+    s.check_event('line_application_associated', headers, url.put)
+    s.check_event('line_application_dissociated', headers, url.delete)

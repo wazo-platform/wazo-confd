@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -16,20 +16,19 @@ def test_associate_errors(agent, skill):
     fake_agent = confd.agents(FAKE_ID).skills(skill['id']).put
     fake_skill = confd.agents(agent['id']).skills(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_agent, 'Agent'
-    yield s.check_resource_not_found, fake_skill, 'Skill'
+    s.check_resource_not_found(fake_agent, 'Agent')
+    s.check_resource_not_found(fake_skill, 'Skill')
 
     url = confd.agents(agent['id']).skills(skill['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', -1
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', None
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', 'string'
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', []
-    yield s.check_bogus_field_returns_error, url, 'skill_weight', {}
+    s.check_bogus_field_returns_error(url, 'skill_weight', -1)
+    s.check_bogus_field_returns_error(url, 'skill_weight', None)
+    s.check_bogus_field_returns_error(url, 'skill_weight', 'string')
+    s.check_bogus_field_returns_error(url, 'skill_weight', [])
+    s.check_bogus_field_returns_error(url, 'skill_weight', {})
 
 
 @fixtures.agent()
@@ -38,8 +37,8 @@ def test_dissociate_errors(agent, skill):
     fake_agent = confd.agents(FAKE_ID).skills(skill['id']).delete
     fake_skill = confd.agents(agent['id']).skills(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_agent, 'Agent'
-    yield s.check_resource_not_found, fake_skill, 'Skill'
+    s.check_resource_not_found(fake_agent, 'Agent')
+    s.check_resource_not_found(fake_skill, 'Skill')
 
 
 @fixtures.agent()
@@ -237,5 +236,5 @@ def test_bus_events(agent, skill):
     url = confd.agents(agent['id']).skills(skill['id'])
     expected_headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'agent_skill_associated', expected_headers, url.put
-    yield s.check_event, 'agent_skill_dissociated', expected_headers, url.delete
+    s.check_event('agent_skill_associated', expected_headers, url.put)
+    s.check_event('agent_skill_dissociated', expected_headers, url.delete)

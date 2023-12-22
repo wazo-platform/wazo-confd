@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers import scenarios as s
@@ -10,45 +10,42 @@ from ..helpers.config import TOKEN_SUB_TENANT
 
 def test_put_errors():
     url = confd.asterisk.iax.general.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', 123
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', None
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', {}
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', 'string'
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [
-        'string',
-        'string',
-    ]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [123, 123]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', ['string', 123]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [[]]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [{'key': 'value'}]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [['missing_value']]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [
-        ['too', 'much', 'value']
-    ]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [
-        ['wrong_value', 1234]
-    ]
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [
-        ['none_value', None]
-    ]
+    s.check_bogus_field_returns_error(url, 'ordered_options', 123)
+    s.check_bogus_field_returns_error(url, 'ordered_options', None)
+    s.check_bogus_field_returns_error(url, 'ordered_options', {})
+    s.check_bogus_field_returns_error(url, 'ordered_options', 'string')
+    s.check_bogus_field_returns_error(
+        url,
+        'ordered_options',
+        [
+            'string',
+            'string',
+        ],
+    )
+    s.check_bogus_field_returns_error(url, 'ordered_options', [123, 123])
+    s.check_bogus_field_returns_error(url, 'ordered_options', ['string', 123])
+    s.check_bogus_field_returns_error(url, 'ordered_options', [[]])
+    s.check_bogus_field_returns_error(url, 'ordered_options', [{'key': 'value'}])
+    s.check_bogus_field_returns_error(url, 'ordered_options', [['missing_value']])
+    s.check_bogus_field_returns_error(
+        url, 'ordered_options', [['too', 'much', 'value']]
+    )
+    s.check_bogus_field_returns_error(url, 'ordered_options', [['wrong_value', 1234]])
+    s.check_bogus_field_returns_error(url, 'ordered_options', [['none_value', None]])
 
-    yield s.check_bogus_field_returns_error, url, 'options', 123
-    yield s.check_bogus_field_returns_error, url, 'options', None
-    yield s.check_bogus_field_returns_error, url, 'options', 'string'
-    yield s.check_bogus_field_returns_error, url, 'options', [['ordered', 'option']]
-    yield s.check_bogus_field_returns_error, url, 'options', {'wrong_value': 23}
-    yield s.check_bogus_field_returns_error, url, 'options', {'none_value': None}
+    s.check_bogus_field_returns_error(url, 'options', 123)
+    s.check_bogus_field_returns_error(url, 'options', None)
+    s.check_bogus_field_returns_error(url, 'options', 'string')
+    s.check_bogus_field_returns_error(url, 'options', [['ordered', 'option']])
+    s.check_bogus_field_returns_error(url, 'options', {'wrong_value': 23})
+    s.check_bogus_field_returns_error(url, 'options', {'none_value': None})
 
-    yield s.check_bogus_field_returns_error, url, 'options', {'register': 'value'}
-    yield s.check_bogus_field_returns_error, url, 'ordered_options', [
-        ['register', 'value']
-    ]
+    s.check_bogus_field_returns_error(url, 'options', {'register': 'value'})
+    s.check_bogus_field_returns_error(url, 'ordered_options', [['register', 'value']])
 
 
 def test_get():
@@ -105,7 +102,12 @@ def test_bus_event_when_edited():
     url = confd.asterisk.iax.general
     headers = {}
 
-    yield s.check_event, 'iax_general_edited', headers, url.put, {
-        'ordered_options': [],
-        'options': {},
-    }
+    s.check_event(
+        'iax_general_edited',
+        headers,
+        url.put,
+        {
+            'ordered_options': [],
+            'options': {},
+        },
+    )

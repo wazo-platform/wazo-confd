@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries
@@ -18,37 +18,36 @@ def test_associate_errors(call_filter, user):
     response.assert_status(404)
 
     url = confd.callfilters(call_filter['id']).recipients.users.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'users', 123
-    yield s.check_bogus_field_returns_error, url, 'users', None
-    yield s.check_bogus_field_returns_error, url, 'users', True
-    yield s.check_bogus_field_returns_error, url, 'users', 'string'
-    yield s.check_bogus_field_returns_error, url, 'users', [123]
-    yield s.check_bogus_field_returns_error, url, 'users', [None]
-    yield s.check_bogus_field_returns_error, url, 'users', ['string']
-    yield s.check_bogus_field_returns_error, url, 'users', [{}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
+    s.check_bogus_field_returns_error(url, 'users', 123)
+    s.check_bogus_field_returns_error(url, 'users', None)
+    s.check_bogus_field_returns_error(url, 'users', True)
+    s.check_bogus_field_returns_error(url, 'users', 'string')
+    s.check_bogus_field_returns_error(url, 'users', [123])
+    s.check_bogus_field_returns_error(url, 'users', [None])
+    s.check_bogus_field_returns_error(url, 'users', ['string'])
+    s.check_bogus_field_returns_error(url, 'users', [{}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': 1}, {'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'not_uuid': 123}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': FAKE_UUID}])
 
     regex = r'users.*timeout'
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [
-        {'timeout': 'ten'}
-    ], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [
-        {'timeout': -1}
-    ], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [
-        {'timeout': {}}
-    ], regex
-    yield s.check_bogus_field_returns_error_matching_regex, url, 'users', [
-        {'timeout': []}
-    ], regex
+    s.check_bogus_field_returns_error_matching_regex(
+        url, 'users', [{'timeout': 'ten'}], regex
+    )
+    s.check_bogus_field_returns_error_matching_regex(
+        url, 'users', [{'timeout': -1}], regex
+    )
+    s.check_bogus_field_returns_error_matching_regex(
+        url, 'users', [{'timeout': {}}], regex
+    )
+    s.check_bogus_field_returns_error_matching_regex(
+        url, 'users', [{'timeout': []}], regex
+    )
 
 
 @fixtures.call_filter()
@@ -139,7 +138,7 @@ def test_delete_call_filter_when_call_filter_and_user_associated(
         confd.callfilters(call_filter['id']).delete().assert_deleted()
 
         deleted_call_filter = confd.callfilters(call_filter['id']).get
-        yield s.check_resource_not_found, deleted_call_filter, 'CallFilter'
+        s.check_resource_not_found(deleted_call_filter, 'CallFilter')
 
         # When the relation will be added,
         # we should check if users have the key.callfilters to empty
@@ -157,10 +156,10 @@ def test_delete_user_when_call_filter_and_user_associated(
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.callfilters(call_filter1['id']).get()
-        yield assert_that, response.item['recipients']['users'], empty()
+        assert_that(response.item['recipients']['users'], empty())
 
         response = confd.callfilters(call_filter2['id']).get()
-        yield assert_that, response.item['recipients']['users'], empty()
+        assert_that(response.item['recipients']['users'], empty())
 
 
 @fixtures.call_filter()
@@ -170,4 +169,4 @@ def test_bus_events(call_filter, user):
     body = {'users': [user]}
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'call_filter_recipient_users_associated', headers, url, body
+    s.check_event('call_filter_recipient_users_associated', headers, url, body)

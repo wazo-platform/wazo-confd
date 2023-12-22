@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, contains
@@ -17,8 +17,8 @@ def test_associate_errors(trunk, sip):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['uuid']).put
     fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_UUID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.trunk()
@@ -27,8 +27,8 @@ def test_dissociate_errors(trunk, sip):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.sip(sip['uuid']).delete
     fake_sip = confd.trunks(trunk['id']).endpoints.sip(FAKE_UUID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.trunk()
@@ -188,8 +188,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, sip):
 
         deleted_trunk = confd.trunks(trunk['id']).get
         deleted_sip = confd.endpoints.sip(sip['uuid']).get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_sip, 'SIPEndpoint'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_sip, 'SIPEndpoint')
 
 
 @fixtures.trunk()
@@ -208,5 +208,5 @@ def test_bus_events(trunk, sip):
     url = confd.trunks(trunk['id']).endpoints.sip(sip['uuid'])
     headers = {'tenant_uuid': trunk['tenant_uuid']}
 
-    yield s.check_event, 'trunk_endpoint_sip_associated', headers, url.put
-    yield s.check_event, 'trunk_endpoint_sip_dissociated', headers, url.delete
+    s.check_event('trunk_endpoint_sip_associated', headers, url.put)
+    s.check_event('trunk_endpoint_sip_dissociated', headers, url.delete)

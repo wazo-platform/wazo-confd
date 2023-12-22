@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -23,68 +23,68 @@ NOT_FOUND_SWITCHBOARD_UUID = 'uuid-not-found'
 
 def test_get_errors():
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).get
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
 
 def test_delete_errors():
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).delete
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
 
 @fixtures.moh(label='othertenant', wazo_tenant=SUB_TENANT)
 def test_post_errors(_):
     switchboard_post = confd.switchboards(name='TheSwitchboard').post
-    for check in error_checks(switchboard_post):
-        yield check
+    error_checks(switchboard_post)
 
-    yield s.check_bogus_field_returns_error, switchboard_post, 'queue_music_on_hold', 'othertenant'
-    yield s.check_bogus_field_returns_error, switchboard_post, 'waiting_room_music_on_hold', 'othertenant'
+    s.check_bogus_field_returns_error(
+        switchboard_post, 'queue_music_on_hold', 'othertenant'
+    )
+    s.check_bogus_field_returns_error(
+        switchboard_post, 'waiting_room_music_on_hold', 'othertenant'
+    )
 
 
 @fixtures.switchboard()
 @fixtures.moh(label='othertenant', wazo_tenant=SUB_TENANT)
 def test_put_errors(switchboard, _):
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
     url = confd.switchboards(switchboard['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 'othertenant'
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 'othertenant'
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', 'othertenant')
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', 'othertenant')
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 'unknown'
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', True
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', False
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', s.random_string(
-        129
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', 'unknown')
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', 123)
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', True)
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', False)
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', {})
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', 'unknown')
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', 123)
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', True)
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', False)
+    s.check_bogus_field_returns_error(
+        url, 'waiting_room_music_on_hold', s.random_string(129)
     )
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'queue_music_on_hold', {}
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 'unknown'
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', True
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', False
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', s.random_string(
-        129
-    )
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'waiting_room_music_on_hold', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', 'unknown'
-    yield s.check_bogus_field_returns_error, url, 'timeout', True
-    yield s.check_bogus_field_returns_error, url, 'timeout', False
-    yield s.check_bogus_field_returns_error, url, 'timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'timeout', 0
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', {})
+    s.check_bogus_field_returns_error(url, 'timeout', 'unknown')
+    s.check_bogus_field_returns_error(url, 'timeout', True)
+    s.check_bogus_field_returns_error(url, 'timeout', False)
+    s.check_bogus_field_returns_error(url, 'timeout', -1)
+    s.check_bogus_field_returns_error(url, 'timeout', 0)
 
 
 @fixtures.switchboard(wazo_tenant=MAIN_TENANT)
@@ -107,7 +107,7 @@ def test_search(hidden, switchboard):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, switchboard, hidden, field, term
+        check_search(url, switchboard, hidden, field, term)
 
 
 def check_search(url, switchboard, hidden, field, term):
@@ -123,7 +123,7 @@ def check_search(url, switchboard, hidden, field, term):
 @fixtures.switchboard(name='sort1')
 @fixtures.switchboard(name='sort2')
 def test_sorting(switchboard1, switchboard2):
-    yield check_sorting, switchboard1, switchboard2, 'name', 'sort'
+    check_sorting(switchboard1, switchboard2, 'name', 'sort')
 
 
 def check_sorting(switchboard1, switchboard2, field, search):
@@ -322,9 +322,9 @@ def test_bus_events(switchboard):
         'tenant_uuid': switchboard['tenant_uuid'],
     }
 
-    yield s.check_event, 'switchboard_created', headers, confd.switchboards.post, {
-        'name': 'bus_event'
-    }
+    s.check_event(
+        'switchboard_created', headers, confd.switchboards.post, {'name': 'bus_event'}
+    )
     headers['switchboard_uuid'] = switchboard['uuid']
-    yield s.check_event, 'switchboard_edited', headers, url.put
-    yield s.check_event, 'switchboard_deleted', headers, url.delete
+    s.check_event('switchboard_edited', headers, url.put)
+    s.check_event('switchboard_deleted', headers, url.delete)

@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -15,8 +15,8 @@ def test_associate_errors(outcall, schedule):
     fake_outcall = confd.outcalls(FAKE_ID).schedules(schedule['id']).put
     fake_schedule = confd.outcalls(outcall['id']).schedules(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.outcall()
@@ -25,8 +25,8 @@ def test_dissociate_errors(outcall, schedule):
     fake_outcall = confd.outcalls(FAKE_ID).schedules(schedule['id']).delete
     fake_schedule = confd.outcalls(outcall['id']).schedules(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_schedule, 'Schedule'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_schedule, 'Schedule')
 
 
 @fixtures.outcall()

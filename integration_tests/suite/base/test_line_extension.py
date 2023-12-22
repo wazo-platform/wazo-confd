@@ -38,8 +38,8 @@ def test_associate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.lines(line['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
@@ -80,8 +80,8 @@ def test_dissociate_errors(line, extension):
     fake_line = confd.lines(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.lines(line['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
@@ -143,8 +143,7 @@ def test_associate_line_and_create_extension_unknown_line():
 @fixtures.line_sip()
 def test_extension_creation_error(line):
     url = confd.lines(line['id']).extensions.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)

@@ -19,63 +19,58 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 def test_get_errors():
     fake_outcall = confd.outcalls(999999).get
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
 
 
 def test_delete_errors():
     fake_outcall = confd.outcalls(999999).delete
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
 
 
 def test_post_errors():
     url = confd.outcalls.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.outcall()
 def test_put_errors(outcall):
     url = confd.outcalls(outcall['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
-        80
-    )
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', None
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'internal_caller_id', 1234
-    yield s.check_bogus_field_returns_error, url, 'internal_caller_id', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'internal_caller_id', None
-    yield s.check_bogus_field_returns_error, url, 'internal_caller_id', []
-    yield s.check_bogus_field_returns_error, url, 'internal_caller_id', {}
-    yield s.check_bogus_field_returns_error, url, 'ring_time', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'ring_time', []
-    yield s.check_bogus_field_returns_error, url, 'ring_time', {}
-    yield s.check_bogus_field_returns_error, url, 'description', 1234
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', 123)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', s.random_string(80))
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'internal_caller_id', 1234)
+    s.check_bogus_field_returns_error(url, 'internal_caller_id', 'invalid')
+    s.check_bogus_field_returns_error(url, 'internal_caller_id', None)
+    s.check_bogus_field_returns_error(url, 'internal_caller_id', [])
+    s.check_bogus_field_returns_error(url, 'internal_caller_id', {})
+    s.check_bogus_field_returns_error(url, 'ring_time', 'invalid')
+    s.check_bogus_field_returns_error(url, 'ring_time', [])
+    s.check_bogus_field_returns_error(url, 'ring_time', {})
+    s.check_bogus_field_returns_error(url, 'description', 1234)
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'enabled', {})
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.outcall(name='unique')
 def unique_error_checks(url, outcall):
-    yield s.check_bogus_field_returns_error, url, 'name', outcall['name']
+    s.check_bogus_field_returns_error(url, 'name', outcall['name'])
 
 
 @fixtures.outcall(description='search')
@@ -85,7 +80,7 @@ def test_search(outcall, hidden):
     searches = {'description': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, outcall, hidden, field, term
+        check_search(url, outcall, hidden, field, term)
 
 
 def check_search(url, outcall, hidden, field, term):
@@ -115,10 +110,10 @@ def test_list_multi_tenant(main, sub):
 @fixtures.outcall(description='sort2')
 def test_sorting_offset_limit(outcall1, outcall2):
     url = confd.outcalls.get
-    yield s.check_sorting, url, outcall1, outcall2, 'description', 'sort'
+    s.check_sorting(url, outcall1, outcall2, 'description', 'sort')
 
-    yield s.check_offset, url, outcall1, outcall2, 'description', 'sort'
-    yield s.check_limit, url, outcall1, outcall2, 'description', 'sort'
+    s.check_offset(url, outcall1, outcall2, 'description', 'sort')
+    s.check_limit(url, outcall1, outcall2, 'description', 'sort')
 
 
 @fixtures.outcall()
@@ -233,6 +228,6 @@ def test_bus_events(outcall):
     url = confd.outcalls(outcall['id'])
     headers = {'tenant_uuid': outcall['tenant_uuid']}
 
-    yield s.check_event, 'outcall_created', headers, confd.outcalls.post, {'name': 'a'}
-    yield s.check_event, 'outcall_edited', headers, url.put
-    yield s.check_event, 'outcall_deleted', headers, url.delete
+    s.check_event('outcall_created', headers, confd.outcalls.post, {'name': 'a'})
+    s.check_event('outcall_edited', headers, url.put)
+    s.check_event('outcall_deleted', headers, url.delete)

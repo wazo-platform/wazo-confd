@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -26,25 +26,24 @@ def test_associate_errors(queue, agent):
     fake_queue = confd.queues(FAKE_ID).members.agents(agent['id']).put
     fake_agent = confd.queues(queue['id']).members.agents(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_agent, 'Agent'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_agent, 'Agent')
 
     url = confd.queues(queue['id']).members.agents(agent['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'penalty', -1
-    yield s.check_bogus_field_returns_error, url, 'penalty', None
-    yield s.check_bogus_field_returns_error, url, 'penalty', 'string'
-    yield s.check_bogus_field_returns_error, url, 'penalty', []
-    yield s.check_bogus_field_returns_error, url, 'penalty', {}
-    yield s.check_bogus_field_returns_error, url, 'priority', -1
-    yield s.check_bogus_field_returns_error, url, 'priority', None
-    yield s.check_bogus_field_returns_error, url, 'priority', 'string'
-    yield s.check_bogus_field_returns_error, url, 'priority', []
-    yield s.check_bogus_field_returns_error, url, 'priority', {}
+    s.check_bogus_field_returns_error(url, 'penalty', -1)
+    s.check_bogus_field_returns_error(url, 'penalty', None)
+    s.check_bogus_field_returns_error(url, 'penalty', 'string')
+    s.check_bogus_field_returns_error(url, 'penalty', [])
+    s.check_bogus_field_returns_error(url, 'penalty', {})
+    s.check_bogus_field_returns_error(url, 'priority', -1)
+    s.check_bogus_field_returns_error(url, 'priority', None)
+    s.check_bogus_field_returns_error(url, 'priority', 'string')
+    s.check_bogus_field_returns_error(url, 'priority', [])
+    s.check_bogus_field_returns_error(url, 'priority', {})
 
 
 @fixtures.queue()
@@ -53,8 +52,8 @@ def test_dissociate_errors(queue, agent):
     fake_queue = confd.queues(FAKE_ID).members.agents(agent['id']).delete
     fake_agent = confd.queues(queue['id']).members.agents(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_queue, 'Queue'
-    yield s.check_resource_not_found, fake_agent, 'Agent'
+    s.check_resource_not_found(fake_queue, 'Queue')
+    s.check_resource_not_found(fake_agent, 'Agent')
 
 
 @fixtures.queue()
@@ -247,5 +246,5 @@ def test_bus_events(queue, agent):
     url = confd.queues(queue['id']).members.agents(agent['id'])
     headers = {'tenant_uuid': queue['tenant_uuid']}
 
-    yield s.check_event, 'queue_member_agent_associated', headers, url.put
-    yield s.check_event, 'queue_member_agent_dissociated', headers, url.delete
+    s.check_event('queue_member_agent_associated', headers, url.put)
+    s.check_event('queue_member_agent_dissociated', headers, url.delete)

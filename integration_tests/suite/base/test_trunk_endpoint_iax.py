@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, none
@@ -17,8 +17,8 @@ def test_associate_errors(trunk, iax):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.iax(iax['id']).put
     fake_iax = confd.trunks(trunk['id']).endpoints.iax(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_iax, 'IAXEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_iax, 'IAXEndpoint')
 
 
 @fixtures.trunk()
@@ -27,8 +27,8 @@ def test_dissociate_errors(trunk, iax):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.iax(iax['id']).delete
     fake_iax = confd.trunks(trunk['id']).endpoints.iax(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_iax, 'IAXEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_iax, 'IAXEndpoint')
 
 
 @fixtures.trunk()
@@ -153,8 +153,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, iax):
 
         deleted_trunk = confd.trunks(trunk['id']).get
         deleted_iax = confd.endpoints.iax(iax['id']).get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_iax, 'IAXEndpoint'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_iax, 'IAXEndpoint')
 
 
 @fixtures.trunk()
@@ -173,5 +173,5 @@ def test_bus_events(trunk, iax):
     url = confd.trunks(trunk['id']).endpoints.iax(iax['id'])
     headers = {'tenant_uuid': trunk['tenant_uuid']}
 
-    yield s.check_event, 'trunk_endpoint_iax_associated', headers, url.put
-    yield s.check_event, 'trunk_endpoint_iax_dissociated', headers, url.delete
+    s.check_event('trunk_endpoint_iax_associated', headers, url.put)
+    s.check_event('trunk_endpoint_iax_dissociated', headers, url.delete)

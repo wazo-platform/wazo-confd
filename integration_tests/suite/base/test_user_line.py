@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -31,8 +31,8 @@ def test_associate_errors(user, line):
     fake_user = confd.users(FAKE_ID).lines(line['id']).put
     fake_line = confd.users(user['id']).lines(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 @fixtures.user()
@@ -41,8 +41,8 @@ def test_dissociate_errors(user, line):
     fake_user = confd.users(FAKE_ID).lines(line['id']).delete
     fake_line = confd.users(user['id']).lines(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_line, 'Line'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_line, 'Line')
 
 
 @fixtures.user()
@@ -449,5 +449,5 @@ def test_bus_events(user, line):
         f'user_uuid:{user["uuid"]}': True,
     }
 
-    yield (s.check_event, 'user_line_associated', headers, url.put)
-    yield (s.check_event, 'user_line_dissociated', headers, url.delete)
+    (s.check_event('user_line_associated', headers, url.put))
+    (s.check_event('user_line_dissociated', headers, url.delete))

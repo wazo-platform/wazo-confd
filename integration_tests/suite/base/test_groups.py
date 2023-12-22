@@ -30,89 +30,84 @@ from ..helpers.config import (
 
 def test_get_errors():
     fake_group = confd.groups(999999).get
-    yield s.check_resource_not_found, fake_group, 'Group'
+    s.check_resource_not_found(fake_group, 'Group')
 
 
 def test_delete_errors():
     fake_group = confd.groups(999999).delete
-    yield s.check_resource_not_found, fake_group, 'Group'
+    s.check_resource_not_found(fake_group, 'Group')
 
 
 def test_post_errors():
     url = confd.groups.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.group()
 def test_put_errors(group):
     url = confd.groups(group['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
     url = confd.groups(group['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'label', 123
-    yield s.check_bogus_field_returns_error, url, 'label', True
-    yield s.check_bogus_field_returns_error, url, 'label', None
-    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'label', 'legitimate name\nconfig injection'
-    yield s.check_bogus_field_returns_error, url, 'label', []
-    yield s.check_bogus_field_returns_error, url, 'label', {}
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
-        80
-    )
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-    yield s.check_bogus_field_returns_error, url, 'ring_strategy', 123
-    yield s.check_bogus_field_returns_error, url, 'ring_strategy', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'ring_strategy', True
-    yield s.check_bogus_field_returns_error, url, 'ring_strategy', None
-    yield s.check_bogus_field_returns_error, url, 'ring_strategy', []
-    yield s.check_bogus_field_returns_error, url, 'ring_strategy', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', {}
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', 123
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', []
-    yield s.check_bogus_field_returns_error, url, 'music_on_hold', {}
-    yield s.check_bogus_field_returns_error, url, 'user_timeout', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'user_timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'user_timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'user_timeout', []
-    yield s.check_bogus_field_returns_error, url, 'retry_delay', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'retry_delay', -1
-    yield s.check_bogus_field_returns_error, url, 'retry_delay', {}
-    yield s.check_bogus_field_returns_error, url, 'retry_delay', []
-    yield s.check_bogus_field_returns_error, url, 'timeout', 'ten'
-    yield s.check_bogus_field_returns_error, url, 'timeout', -1
-    yield s.check_bogus_field_returns_error, url, 'timeout', {}
-    yield s.check_bogus_field_returns_error, url, 'timeout', []
-    yield s.check_bogus_field_returns_error, url, 'ring_in_use', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'ring_in_use', 123
-    yield s.check_bogus_field_returns_error, url, 'ring_in_use', {}
-    yield s.check_bogus_field_returns_error, url, 'ring_in_use', []
-    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', 123
-    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', {}
-    yield s.check_bogus_field_returns_error, url, 'mark_answered_elsewhere', []
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'yeah'
-    yield s.check_bogus_field_returns_error, url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, url, 'enabled', {}
-    yield s.check_bogus_field_returns_error, url, 'enabled', []
+    s.check_bogus_field_returns_error(url, 'label', 123)
+    s.check_bogus_field_returns_error(url, 'label', True)
+    s.check_bogus_field_returns_error(url, 'label', None)
+    s.check_bogus_field_returns_error(url, 'label', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'label', 'legitimate name\nconfig injection')
+    s.check_bogus_field_returns_error(url, 'label', [])
+    s.check_bogus_field_returns_error(url, 'label', {})
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', 123)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', s.random_string(80))
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
+    s.check_bogus_field_returns_error(url, 'ring_strategy', 123)
+    s.check_bogus_field_returns_error(url, 'ring_strategy', 'invalid')
+    s.check_bogus_field_returns_error(url, 'ring_strategy', True)
+    s.check_bogus_field_returns_error(url, 'ring_strategy', None)
+    s.check_bogus_field_returns_error(url, 'ring_strategy', [])
+    s.check_bogus_field_returns_error(url, 'ring_strategy', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 'invalid')
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_name', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'caller_id_name', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_name', {})
+    s.check_bogus_field_returns_error(url, 'music_on_hold', 123)
+    s.check_bogus_field_returns_error(url, 'music_on_hold', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'music_on_hold', [])
+    s.check_bogus_field_returns_error(url, 'music_on_hold', {})
+    s.check_bogus_field_returns_error(url, 'user_timeout', 'ten')
+    s.check_bogus_field_returns_error(url, 'user_timeout', -1)
+    s.check_bogus_field_returns_error(url, 'user_timeout', {})
+    s.check_bogus_field_returns_error(url, 'user_timeout', [])
+    s.check_bogus_field_returns_error(url, 'retry_delay', 'ten')
+    s.check_bogus_field_returns_error(url, 'retry_delay', -1)
+    s.check_bogus_field_returns_error(url, 'retry_delay', {})
+    s.check_bogus_field_returns_error(url, 'retry_delay', [])
+    s.check_bogus_field_returns_error(url, 'timeout', 'ten')
+    s.check_bogus_field_returns_error(url, 'timeout', -1)
+    s.check_bogus_field_returns_error(url, 'timeout', {})
+    s.check_bogus_field_returns_error(url, 'timeout', [])
+    s.check_bogus_field_returns_error(url, 'ring_in_use', 'yeah')
+    s.check_bogus_field_returns_error(url, 'ring_in_use', 123)
+    s.check_bogus_field_returns_error(url, 'ring_in_use', {})
+    s.check_bogus_field_returns_error(url, 'ring_in_use', [])
+    s.check_bogus_field_returns_error(url, 'mark_answered_elsewhere', 'yeah')
+    s.check_bogus_field_returns_error(url, 'mark_answered_elsewhere', 123)
+    s.check_bogus_field_returns_error(url, 'mark_answered_elsewhere', {})
+    s.check_bogus_field_returns_error(url, 'mark_answered_elsewhere', [])
+    s.check_bogus_field_returns_error(url, 'enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'enabled', 123)
+    s.check_bogus_field_returns_error(url, 'enabled', {})
+    s.check_bogus_field_returns_error(url, 'enabled', [])
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -123,12 +118,12 @@ def test_search(extension, hidden, group):
     searches = {'label': 'search', 'preprocess_subroutine': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, group, hidden, field, term
+        check_search(url, group, hidden, field, term)
 
     searches = {'exten': extension['exten']}
     with a.group_extension(group, extension):
         for field, term in searches.items():
-            yield check_relation_search, url, group, hidden, field, term
+            check_relation_search(url, group, hidden, field, term)
 
 
 def check_search(url, group, hidden, field, term):
@@ -168,11 +163,11 @@ def test_list_multi_tenant(main, sub):
 @fixtures.group(label='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(group1, group2):
     url = confd.groups.get
-    yield s.check_sorting, url, group1, group2, 'label', 'sort'
-    yield s.check_sorting, url, group1, group2, 'preprocess_subroutine', 'sort'
+    s.check_sorting(url, group1, group2, 'label', 'sort')
+    s.check_sorting(url, group1, group2, 'preprocess_subroutine', 'sort')
 
-    yield s.check_offset, url, group1, group2, 'label', 'sort'
-    yield s.check_limit, url, group1, group2, 'label', 'sort'
+    s.check_offset(url, group1, group2, 'label', 'sort')
+    s.check_limit(url, group1, group2, 'label', 'sort')
 
 
 @fixtures.group()
@@ -477,19 +472,22 @@ def test_delete_multi_tenant_by_uuid(main, sub):
 def test_bus_events(group):
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'group_created', headers, confd.groups.post, {
-        'label': 'group_bus_event'
-    }
-    yield s.check_event, 'group_edited', headers, confd.groups(group['id']).put
-    yield s.check_event, 'group_deleted', headers, confd.groups(group['id']).delete
+    s.check_event(
+        'group_created', headers, confd.groups.post, {'label': 'group_bus_event'}
+    )
+    s.check_event('group_edited', headers, confd.groups(group['id']).put)
+    s.check_event('group_deleted', headers, confd.groups(group['id']).delete)
 
 
 @fixtures.group()
 def test_bus_events_by_uuid(group):
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'group_created', headers, confd.groups.post, {
-        'label': 'group_bus_event_with_uuid'
-    }
-    yield s.check_event, 'group_edited', headers, confd.groups(group['uuid']).put
-    yield s.check_event, 'group_deleted', headers, confd.groups(group['uuid']).delete
+    s.check_event(
+        'group_created',
+        headers,
+        confd.groups.post,
+        {'label': 'group_bus_event_with_uuid'},
+    )
+    s.check_event('group_edited', headers, confd.groups(group['uuid']).put)
+    s.check_event('group_deleted', headers, confd.groups(group['uuid']).delete)

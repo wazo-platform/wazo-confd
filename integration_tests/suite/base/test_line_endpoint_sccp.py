@@ -26,8 +26,8 @@ def test_associate_errors(line, sccp):
     fake_line = confd.lines(999999999).endpoints.sccp(sccp['id']).put
     fake_sccp = confd.lines(line['id']).endpoints.sccp(999999999).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sccp, 'SCCPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sccp, 'SCCPEndpoint')
 
 
 @fixtures.line()
@@ -36,8 +36,8 @@ def test_dissociate_errors(line, sccp):
     fake_line = confd.lines(999999999).endpoints.sccp(sccp['id']).delete
     fake_sccp = confd.lines(line['id']).endpoints.sccp(999999999).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sccp, 'SCCPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sccp, 'SCCPEndpoint')
 
 
 @fixtures.line()
@@ -198,8 +198,8 @@ def test_bus_events(line, sccp):
     url = confd.lines(line['id']).endpoints.sccp(sccp['id'])
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'line_endpoint_sccp_associated', headers, url.put
-    yield s.check_event, 'line_endpoint_sccp_dissociated', headers, url.delete
+    s.check_event('line_endpoint_sccp_associated', headers, url.put)
+    s.check_event('line_endpoint_sccp_dissociated', headers, url.delete)
 
 
 @fixtures.registrar()

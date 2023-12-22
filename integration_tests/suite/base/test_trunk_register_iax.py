@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, none
@@ -15,8 +15,8 @@ def test_associate_errors(trunk, register):
     fake_trunk = confd.trunks(FAKE_ID).registers.iax(register['id']).put
     fake_register = confd.trunks(trunk['id']).registers.iax(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_register, 'IAXRegister'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_register, 'IAXRegister')
 
 
 @fixtures.trunk()
@@ -25,8 +25,8 @@ def test_dissociate_errors(trunk, register):
     fake_trunk = confd.trunks(FAKE_ID).registers.iax(register['id']).delete
     fake_register = confd.trunks(trunk['id']).registers.iax(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_register, 'IAXRegister'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_register, 'IAXRegister')
 
 
 @fixtures.trunk()
@@ -121,8 +121,8 @@ def test_delete_trunk_when_trunk_and_register_associated(trunk, register):
 
         deleted_trunk = confd.trunks(trunk['id']).get
         deleted_register = confd.registers.iax(register['id']).get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_register, 'IAXRegister'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_register, 'IAXRegister')
 
 
 @fixtures.trunk()
@@ -141,5 +141,5 @@ def test_bus_events(trunk, register):
     url = confd.trunks(trunk['id']).registers.iax(register['id'])
     headers = {'tenant_uuid': trunk['tenant_uuid']}
 
-    yield s.check_event, 'trunk_register_iax_associated', headers, url.put
-    yield s.check_event, 'trunk_register_iax_dissociated', headers, url.delete
+    s.check_event('trunk_register_iax_associated', headers, url.put)
+    s.check_event('trunk_register_iax_dissociated', headers, url.delete)

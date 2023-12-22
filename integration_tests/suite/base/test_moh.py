@@ -66,52 +66,48 @@ with wave.open(INVALID_WAV_FILE_FRAMERATE, 'wb') as wav_file:
 
 def test_get_errors():
     fake_moh = confd.moh(NOT_FOUND_UUID).get
-    yield s.check_resource_not_found, fake_moh, 'MOH'
+    s.check_resource_not_found(fake_moh, 'MOH')
 
 
 def test_delete_errors():
     fake_moh = confd.moh(NOT_FOUND_UUID).delete
-    yield s.check_resource_not_found, fake_moh, 'MOH'
+    s.check_resource_not_found(fake_moh, 'MOH')
 
 
 def test_post_errors():
     url = confd.moh.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(
-        129
-    ), None, 'label'
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129), None, 'label')
 
 
 @fixtures.moh()
 def test_put_errors(moh):
     url = confd.moh(moh['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'label', True
-    yield s.check_bogus_field_returns_error, url, 'label', 1234
-    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'label', []
-    yield s.check_bogus_field_returns_error, url, 'label', {}
-    yield s.check_bogus_field_returns_error, url, 'mode', True
-    yield s.check_bogus_field_returns_error, url, 'mode', 1234
-    yield s.check_bogus_field_returns_error, url, 'mode', 'hello'
-    yield s.check_bogus_field_returns_error, url, 'mode', []
-    yield s.check_bogus_field_returns_error, url, 'mode', {}
-    yield s.check_bogus_field_returns_error, url, 'application', True
-    yield s.check_bogus_field_returns_error, url, 'application', 1234
-    yield s.check_bogus_field_returns_error, url, 'application', s.random_string(257)
-    yield s.check_bogus_field_returns_error, url, 'application', []
-    yield s.check_bogus_field_returns_error, url, 'application', {}
-    yield s.check_bogus_field_returns_error, url, 'sort', True
-    yield s.check_bogus_field_returns_error, url, 'sort', 1234
-    yield s.check_bogus_field_returns_error, url, 'sort', 'hello'
-    yield s.check_bogus_field_returns_error, url, 'sort', []
-    yield s.check_bogus_field_returns_error, url, 'sort', {}
+    s.check_bogus_field_returns_error(url, 'label', True)
+    s.check_bogus_field_returns_error(url, 'label', 1234)
+    s.check_bogus_field_returns_error(url, 'label', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'label', [])
+    s.check_bogus_field_returns_error(url, 'label', {})
+    s.check_bogus_field_returns_error(url, 'mode', True)
+    s.check_bogus_field_returns_error(url, 'mode', 1234)
+    s.check_bogus_field_returns_error(url, 'mode', 'hello')
+    s.check_bogus_field_returns_error(url, 'mode', [])
+    s.check_bogus_field_returns_error(url, 'mode', {})
+    s.check_bogus_field_returns_error(url, 'application', True)
+    s.check_bogus_field_returns_error(url, 'application', 1234)
+    s.check_bogus_field_returns_error(url, 'application', s.random_string(257))
+    s.check_bogus_field_returns_error(url, 'application', [])
+    s.check_bogus_field_returns_error(url, 'application', {})
+    s.check_bogus_field_returns_error(url, 'sort', True)
+    s.check_bogus_field_returns_error(url, 'sort', 1234)
+    s.check_bogus_field_returns_error(url, 'sort', 'hello')
+    s.check_bogus_field_returns_error(url, 'sort', [])
+    s.check_bogus_field_returns_error(url, 'sort', {})
 
 
 @fixtures.moh(label='visible')
@@ -121,7 +117,7 @@ def test_search(visible, hidden):
     searches = {'label': 'visible'}
 
     for field, term in searches.items():
-        yield check_search, url, visible, hidden, field, term
+        check_search(url, visible, hidden, field, term)
 
 
 def check_search(url, visible, hidden, field, term):
@@ -138,10 +134,10 @@ def check_search(url, visible, hidden, field, term):
 @fixtures.moh(label='sort2')
 def test_sorting_offset_limit(moh1, moh2):
     url = confd.moh.get
-    yield s.check_sorting, url, moh1, moh2, 'label', 'sort', 'uuid'
+    s.check_sorting(url, moh1, moh2, 'label', 'sort', 'uuid')
 
-    yield s.check_offset, url, moh1, moh2, 'label', 'sort', 'uuid'
-    yield s.check_limit, url, moh1, moh2, 'label', 'sort', 'uuid'
+    s.check_offset(url, moh1, moh2, 'label', 'sort', 'uuid')
+    s.check_limit(url, moh1, moh2, 'label', 'sort', 'uuid')
 
 
 @fixtures.moh(wazo_tenant=MAIN_TENANT)
@@ -448,9 +444,14 @@ def test_bus_events(moh):
     url = confd.moh(moh['uuid'])
     headers = {'tenant_uuid': moh['tenant_uuid']}
 
-    yield s.check_event, 'moh_created', headers, confd.moh.post, {
-        'name': 'bus_event',
-        'mode': 'files',
-    }
-    yield s.check_event, 'moh_edited', headers, url.put
-    yield s.check_event, 'moh_deleted', headers, url.delete
+    s.check_event(
+        'moh_created',
+        headers,
+        confd.moh.post,
+        {
+            'name': 'bus_event',
+            'mode': 'files',
+        },
+    )
+    s.check_event('moh_edited', headers, url.put)
+    s.check_event('moh_deleted', headers, url.delete)

@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -21,46 +21,43 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 def test_get_errors():
     fake_skill = confd.agents.skills(999999).get
-    yield s.check_resource_not_found, fake_skill, 'Skill'
+    s.check_resource_not_found(fake_skill, 'Skill')
 
 
 def test_delete_errors():
     fake_skill = confd.agents.skills(999999).delete
-    yield s.check_resource_not_found, fake_skill, 'Skill'
+    s.check_resource_not_found(fake_skill, 'Skill')
 
 
 def test_post_errors():
     url = confd.agents.skills.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.skill()
 def test_put_errors(skill):
     url = confd.agents.skills(skill['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', 'invalid regex'
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(65)
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'description', True
-    yield s.check_bogus_field_returns_error, url, 'description', 1234
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'description', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', 'invalid regex')
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(65))
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'description', True)
+    s.check_bogus_field_returns_error(url, 'description', 1234)
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'description', {})
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.skill(name='unique')
 def unique_error_checks(url, skill):
-    yield s.check_bogus_field_returns_error, url, 'name', skill['name']
+    s.check_bogus_field_returns_error(url, 'name', skill['name'])
 
 
 @fixtures.skill(name='search', description='search')
@@ -70,7 +67,7 @@ def test_search(skill, hidden):
     searches = {'name': 'search', 'description': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, skill, hidden, field, term
+        check_search(url, skill, hidden, field, term)
 
 
 def check_search(url, skill, hidden, field, term):
@@ -115,9 +112,9 @@ def test_list_multi_tenant(main, sub):
 @fixtures.skill(name='sort2')
 def test_sort_offset_limit(skill1, skill2):
     url = confd.agents.skills.get
-    yield s.check_sorting, url, skill1, skill2, 'name', 'sort'
-    yield s.check_offset, url, skill1, skill2, 'name', 'sort'
-    yield s.check_limit, url, skill1, skill2, 'name', 'sort'
+    s.check_sorting(url, skill1, skill2, 'name', 'sort')
+    s.check_offset(url, skill1, skill2, 'name', 'sort')
+    s.check_limit(url, skill1, skill2, 'name', 'sort')
 
 
 @fixtures.skill()
@@ -229,6 +226,6 @@ def test_bus_events(skill):
     body = {'name': 'Skill'}
     headers = {'tenant_uuid': skill['tenant_uuid']}
 
-    yield s.check_event, 'skill_created', headers, confd.agents.skills.post, body
-    yield s.check_event, 'skill_edited', headers, url.put
-    yield s.check_event, 'skill_deleted', headers, url.delete
+    s.check_event('skill_created', headers, confd.agents.skills.post, body)
+    s.check_event('skill_edited', headers, url.put)
+    s.check_event('skill_deleted', headers, url.delete)

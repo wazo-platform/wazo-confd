@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -21,23 +21,22 @@ def test_associate_errors(group, user):
     response.assert_status(404)
 
     url = confd.users(user['uuid']).groups.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'groups', 123
-    yield s.check_bogus_field_returns_error, url, 'groups', None
-    yield s.check_bogus_field_returns_error, url, 'groups', True
-    yield s.check_bogus_field_returns_error, url, 'groups', 'string'
-    yield s.check_bogus_field_returns_error, url, 'groups', [123]
-    yield s.check_bogus_field_returns_error, url, 'groups', [None]
-    yield s.check_bogus_field_returns_error, url, 'groups', ['string']
-    yield s.check_bogus_field_returns_error, url, 'groups', [{}]
-    yield s.check_bogus_field_returns_error, url, 'groups', [{'id': None}]
-    yield s.check_bogus_field_returns_error, url, 'groups', [{'id': 1}, {'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'groups', [{'not_id': 123}]
-    yield s.check_bogus_field_returns_error, url, 'groups', [{'id': FAKE_UUID}]
+    s.check_bogus_field_returns_error(url, 'groups', 123)
+    s.check_bogus_field_returns_error(url, 'groups', None)
+    s.check_bogus_field_returns_error(url, 'groups', True)
+    s.check_bogus_field_returns_error(url, 'groups', 'string')
+    s.check_bogus_field_returns_error(url, 'groups', [123])
+    s.check_bogus_field_returns_error(url, 'groups', [None])
+    s.check_bogus_field_returns_error(url, 'groups', ['string'])
+    s.check_bogus_field_returns_error(url, 'groups', [{}])
+    s.check_bogus_field_returns_error(url, 'groups', [{'id': None}])
+    s.check_bogus_field_returns_error(url, 'groups', [{'id': 1}, {'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'groups', [{'not_id': 123}])
+    s.check_bogus_field_returns_error(url, 'groups', [{'id': FAKE_UUID}])
 
 
 @fixtures.group()
@@ -136,4 +135,4 @@ def test_bus_events(group, user, line):
             f'user_uuid:{user["uuid"]}': True,
         }
 
-        yield s.check_event, 'user_groups_associated', headers, url, body
+        s.check_event('user_groups_associated', headers, url, body)

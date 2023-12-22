@@ -27,63 +27,65 @@ from ..helpers.config import INCALL_CONTEXT, MAIN_TENANT, SUB_TENANT
 
 def test_get_errors():
     fake_incall = confd.incalls(999999).get
-    yield s.check_resource_not_found, fake_incall, 'Incall'
+    s.check_resource_not_found(fake_incall, 'Incall')
 
 
 def test_delete_errors():
     fake_incall = confd.incalls(999999).delete
-    yield s.check_resource_not_found, fake_incall, 'Incall'
+    s.check_resource_not_found(fake_incall, 'Incall')
 
 
 @fixtures.user()
 def test_post_errors(user):
     url = confd.incalls.post
-    for check in error_checks(url, user):
-        yield check
+    error_checks(url, user)
 
 
 @fixtures.incall()
 @fixtures.user()
 def test_put_errors(incall, user):
     url = confd.incalls(incall['id']).put
-    for check in error_checks(url, user):
-        yield check
+    error_checks(url, user)
 
 
 def error_checks(url, user):
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
-        80
-    )
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', 123
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', s.random_string(256)
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', []
-    yield s.check_bogus_field_returns_error, url, 'greeting_sound', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_mode', {}
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', 1234
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', True
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', s.random_string(81)
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', []
-    yield s.check_bogus_field_returns_error, url, 'caller_id_name', {}
-    yield s.check_bogus_field_returns_error, url, 'description', 1234
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'destination', {}
-    yield s.check_bogus_field_returns_error, url, 'destination', None
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', 123)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', s.random_string(80))
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
+    s.check_bogus_field_returns_error(url, 'greeting_sound', 123)
+    s.check_bogus_field_returns_error(url, 'greeting_sound', s.random_string(256))
+    s.check_bogus_field_returns_error(url, 'greeting_sound', [])
+    s.check_bogus_field_returns_error(url, 'greeting_sound', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 'invalid')
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_mode', {})
+    s.check_bogus_field_returns_error(url, 'caller_id_name', 1234)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', True)
+    s.check_bogus_field_returns_error(url, 'caller_id_name', s.random_string(81))
+    s.check_bogus_field_returns_error(url, 'caller_id_name', [])
+    s.check_bogus_field_returns_error(url, 'caller_id_name', {})
+    s.check_bogus_field_returns_error(url, 'description', 1234)
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'destination', {})
+    s.check_bogus_field_returns_error(url, 'destination', None)
 
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'destination', destination
+        s.check_bogus_field_returns_error(url, 'destination', destination)
 
-    yield s.check_bogus_field_returns_error, url, 'destination', {
-        'type': 'user',
-        'user_id': user['id'],
-        'moh_uuid': '00000000-0000-0000-0000-000000000000',
-    }, {}, 'MOH was not found'
+    s.check_bogus_field_returns_error(
+        url,
+        'destination',
+        {
+            'type': 'user',
+            'user_id': user['id'],
+            'moh_uuid': '00000000-0000-0000-0000-000000000000',
+        },
+        {},
+        'MOH was not found',
+    )
 
 
 @fixtures.extension(context=INCALL_CONTEXT)
@@ -94,12 +96,12 @@ def test_search(extension, incall, hidden):
     searches = {'description': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, incall, hidden, field, term
+        check_search(url, incall, hidden, field, term)
 
     searches = {'exten': extension['exten']}
     with a.incall_extension(incall, extension):
         for field, term in searches.items():
-            yield check_relation_search, url, incall, hidden, field, term
+            check_relation_search(url, incall, hidden, field, term)
 
 
 def check_search(url, incall, hidden, field, term):
@@ -139,10 +141,10 @@ def test_search_multi_tenant(main, sub):
 @fixtures.incall(description='sort2')
 def test_sorting_offset_limit(incall1, incall2):
     url = confd.incalls.get
-    yield s.check_sorting, url, incall1, incall2, 'description', 'sort'
+    s.check_sorting(url, incall1, incall2, 'description', 'sort')
 
-    yield s.check_offset, url, incall1, incall2, 'description', 'sort'
-    yield s.check_limit, url, incall1, incall2, 'description', 'sort'
+    s.check_offset(url, incall1, incall2, 'description', 'sort')
+    s.check_limit(url, incall1, incall2, 'description', 'sort')
 
 
 @fixtures.incall()
@@ -262,8 +264,8 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.moh()
 def test_valid_destinations(incall, *destinations):
     for destination in valid_destinations(*destinations):
-        yield create_incall_with_destination, destination
-        yield update_incall_with_destination, incall['id'], destination
+        create_incall_with_destination(destination)
+        update_incall_with_destination(incall['id'], destination)
 
 
 def create_incall_with_destination(destination):
