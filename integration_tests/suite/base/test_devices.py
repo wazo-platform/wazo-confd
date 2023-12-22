@@ -193,15 +193,15 @@ def test_list_device_no_config(dev1, dev2):
 )
 def test_sorting_offset_limit(device1, device2):
     url = confd.devices.get
-    s.check_sorting(url, device1, device2, 'ip', '99.')
-    s.check_sorting(url, device1, device2, 'model', 'SortModel')
-    s.check_sorting(url, device1, device2, 'sn', 'SortSn')
-    s.check_sorting(url, device1, device2, 'vendor', 'SortVendor')
-    s.check_sorting(url, device1, device2, 'version', '1.')
-    s.check_sorting(url, device1, device2, 'description', 'SortDesc')
+    s.check_sorting(url, device1, device2, 'ip', 'Sort')
+    s.check_sorting(url, device1, device2, 'model', 'Sort')
+    s.check_sorting(url, device1, device2, 'sn', 'Sort')
+    s.check_sorting(url, device1, device2, 'vendor', 'Sort')
+    s.check_sorting(url, device1, device2, 'version', 'Sort')
+    s.check_sorting(url, device1, device2, 'description', 'Sort')
 
-    s.check_offset(url, device1, device2, 'mac', 'aa:bb')
-    s.check_limit(url, device1, device2, 'mac', 'aa:bb')
+    s.check_offset(url, device1, device2, 'mac', 'Sort')
+    s.check_limit(url, device1, device2, 'mac', 'Sort')
 
 
 @fixtures.device()
