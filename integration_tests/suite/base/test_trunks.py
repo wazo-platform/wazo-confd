@@ -63,11 +63,12 @@ def error_checks(url):
 @fixtures.iax(name='name_search')
 @fixtures.custom(interface='name_search')
 def test_search(search_ctx, hidden_ctx, sip, iax, custom):
-    @fixtures.trunk(context=search_ctx['name'])
-    @fixtures.trunk(context=hidden_ctx['name'])
-    def aux(trunk, hidden):
+    with (
+        fixtures.trunk(context=search_ctx['name']) as trunk,
+        fixtures.trunk(context=hidden_ctx['name']) as hidden,
+    ):
         url = confd.trunks
-        searches = {'context': 'search'}
+        searches = {'context': search_ctx['name']}
 
         for field, term in searches.items():
             yield check_search, url, trunk, hidden, field, term
@@ -86,8 +87,6 @@ def test_search(search_ctx, hidden_ctx, sip, iax, custom):
         with a.trunk_endpoint_custom(trunk, custom):
             for field, term in searches.items():
                 yield check_relation_search, url, trunk, hidden, field, term
-
-    aux()
 
 
 def check_search(url, trunk, hidden, field, term):
@@ -113,15 +112,18 @@ def check_relation_search(url, trunk, hidden, field, term):
 @fixtures.context(label='sort1')
 @fixtures.context(label='sort2')
 def test_sorting_offset_limit(ctx1, ctx2):
-    @fixtures.trunk(context=ctx1['name'])
-    @fixtures.trunk(context=ctx2['name'])
-    def aux(trunk1, trunk2):
+    with (
+        fixtures.trunk(context=ctx1['name']) as trunk1,
+        fixtures.trunk(context=ctx2['name']) as trunk2,
+    ):
         url = confd.trunks.get
-        yield s.check_sorting, url, trunk1, trunk2, 'context', 'sort'
-        yield s.check_offset, url, trunk1, trunk2, 'context', 'sort'
-        yield s.check_limit, url, trunk1, trunk2, 'context', 'sort'
-
-    aux()
+        if ctx1['name'] < ctx2['name']:
+            first, second = trunk1, trunk2
+        else:
+            first, second = trunk2, trunk1
+        s.check_sorting(url, first, second, 'context', None)
+        s.check_offset(url, first, second, 'context', None)
+        s.check_limit(url, first, second, 'context', None)
 
 
 @fixtures.trunk(wazo_tenant=MAIN_TENANT)
