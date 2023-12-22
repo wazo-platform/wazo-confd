@@ -35,12 +35,6 @@ DEFAULT_TENANTS = [
         'slug': 'slug3',
         'parent_uuid': MAIN_TENANT,
     },
-    {
-        'uuid': CREATED_TENANT,
-        'name': 'name4',
-        'slug': 'slug4',
-        'parent_uuid': MAIN_TENANT,
-    },
 ]
 ALL_TENANTS = DEFAULT_TENANTS + [
     {
@@ -48,7 +42,13 @@ ALL_TENANTS = DEFAULT_TENANTS + [
         'name': 'name3',
         'slug': 'slug3',
         'parent_uuid': MAIN_TENANT,
-    }
+    },
+    {
+        'uuid': CREATED_TENANT,
+        'name': 'name4',
+        'slug': 'slug4',
+        'parent_uuid': MAIN_TENANT,
+    },
 ]
 
 
