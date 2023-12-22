@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_test_helpers import bus
@@ -14,6 +14,8 @@ class BusClientWrapper:
 
     def __getattr__(self, attr):
         if self._bus is None:
+            if self.host is None:
+                raise AttributeError('BusClientWrapper is not initialized yet')
             self._bus = self._create_client()
         return getattr(self._bus, attr)
 
