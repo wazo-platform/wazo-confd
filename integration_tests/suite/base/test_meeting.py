@@ -248,10 +248,16 @@ def test_create_no_ingress_http_configured():
 
 
 @fixtures.ingress_http()
-def test_create_no_meetingjoin_extension_feature(_):
+def test_create_no_meetingjoin_extension_feature(_, request):
     extension = confd.extensions.features.get(feature='meetingjoin').items[0]
     extension['enabled'] = False
     response = confd.extensions.features(extension['uuid']).put(**extension)
+
+    def enable_meetingjoin():
+        extension['enabled'] = True
+        confd.extensions.features(extension['uuid']).put(**extension)
+
+    request.addfinalizer(enable_meetingjoin)
 
     response = confd.meetings.post(name='no exten')
     try:
