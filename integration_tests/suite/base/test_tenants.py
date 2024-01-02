@@ -1,4 +1,4 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -115,7 +115,21 @@ class BaseTestDeleteByEvent(BaseTestTenants):
             'func_key',
             'func_key_dest_custom',
         ]
+        BaseIntegrationTest.mock_auth.set_tenants(*DEFAULT_TENANTS)
+
+        for t in DEFAULT_TENANTS:
+            BusClient.send_tenant_created(t['uuid'], t['slug'])
+
+        # xivo-manage-db creates a tenant (with a random uuid)
+        # sync_db is called now to remove this tenant
+        BaseIntegrationTest.sync_db()
+
+        # count before the creation of the DELETED_TENANT
         self.before_tables_rows_counts = self.count_tables_rows()
+
+        # add the tenant DELETED_TENANT in wazo-auth for the authorization,
+        # to be able to create the tenant in wazo-confd
+        BaseIntegrationTest.mock_auth.set_tenants(*ALL_TENANTS)
 
     @fixtures.user(wazo_tenant=DELETED_TENANT)
     @fixtures.group(wazo_tenant=DELETED_TENANT)
