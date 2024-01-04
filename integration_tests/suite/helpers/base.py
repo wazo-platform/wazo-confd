@@ -81,8 +81,14 @@ class IntegrationTest(AssetLaunchingTestCase):
         )
 
     @classmethod
-    def _create_auth_tenant(cls):
-        cls.mock_auth.set_tenants(*DEFAULT_TENANTS)
+    def _create_auth_tenant(cls, tenant_uuid):
+        new_tenant_candidates = [
+            tenant for tenant in ALL_TENANTS if tenant['uuid'] == tenant_uuid
+        ]
+        if not new_tenant_candidates:
+            raise Exception('Cannot create tenant {tenant_uuid}: tenant unknown')
+        new_tenant = new_tenant_candidates[0]
+        cls.mock_auth.set_tenants(new_tenant, *DEFAULT_TENANTS)
 
     @classmethod
     def _delete_auth_tenant(cls):
@@ -91,6 +97,10 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def _reset_auth_tenants(cls):
         cls.mock_auth.set_tenants(*ALL_TENANTS)
+
+    @classmethod
+    def _reset_confd_tenants(cls):
+        cls.sync_db()
 
     @classmethod
     @contextmanager
@@ -104,9 +114,10 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     @contextmanager
     def create_auth_tenant(cls, tenant_uuid):  # tenant_uuid improve readability
-        cls._create_auth_tenant()  # FIXME pass tenant_uuid
+        cls._create_auth_tenant(tenant_uuid)
         yield
         cls._reset_auth_tenants()
+        cls._reset_confd_tenants()
 
     @classmethod
     def setup_provd(cls, *args, **kwargs):  # args seems needed for IsolatedAction

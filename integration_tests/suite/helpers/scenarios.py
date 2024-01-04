@@ -84,12 +84,12 @@ def check_event(event_name, expected_headers, url, body=None):
 
 
 def search_error_checks(url):
-    yield check_bogus_query_string_returns_error, url, 'order', 'invalid_column'
-    yield check_bogus_query_string_returns_error, url, 'direction', 'invalid'
-    yield check_bogus_query_string_returns_error, url, 'limit', -42
-    yield check_bogus_query_string_returns_error, url, 'limit', 'invalid'
-    yield check_bogus_query_string_returns_error, url, 'offset', -42
-    yield check_bogus_query_string_returns_error, url, 'offset', 'invalid'
+    check_bogus_query_string_returns_error(url, 'order', 'invalid_column')
+    check_bogus_query_string_returns_error(url, 'direction', 'invalid')
+    check_bogus_query_string_returns_error(url, 'limit', -42)
+    check_bogus_query_string_returns_error(url, 'limit', 'invalid')
+    check_bogus_query_string_returns_error(url, 'offset', -42)
+    check_bogus_query_string_returns_error(url, 'offset', 'invalid')
 
 
 def check_bogus_query_string_returns_error(request, query_string, bogus):

@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries, empty
@@ -16,8 +16,8 @@ def test_associate_errors(outcall, call_permission):
     fake_outcall = confd.outcalls(FAKE_ID).callpermissions(call_permission['id']).put
     fake_call_permission = confd.outcalls(outcall['id']).callpermissions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.outcall()
@@ -26,8 +26,8 @@ def test_dissociate_errors(outcall, call_permission):
     fake_outcall = confd.outcalls(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.outcalls(outcall['id']).callpermissions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_outcall, 'Outcall'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_outcall, 'Outcall')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.outcall()
@@ -199,5 +199,5 @@ def test_bus_events(outcall, call_permission):
     url = confd.outcalls(outcall['id']).callpermissions(call_permission['id'])
     headers = {'tenant_uuid': outcall['tenant_uuid']}
 
-    yield (s.check_event, 'outcall_call_permission_associated', headers, url.put)
-    yield (s.check_event, 'outcall_call_permission_dissociated', headers, url.delete)
+    s.check_event('outcall_call_permission_associated', headers, url.put)
+    s.check_event('outcall_call_permission_dissociated', headers, url.delete)

@@ -1,7 +1,7 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import inspect
+import _pytest
 
 from functools import wraps
 
@@ -54,35 +54,31 @@ class IsolatedAction:
     def __call__(self, func):
         # This function is called when using the IsolatedAction as a decorator
 
-        if inspect.isgeneratorfunction(func):
-            # This is a hack in order to make sure
-            # that test generators still work with nosetest.
-            # A function must have a "yield" inside the function body
-            # so that nose can see the test function as a generator.
-            # Therefore, we decorate by using a function that
-            # will also appear as a generator
-            @wraps(func)
-            def generator_decorated(*args, **kwargs):
-                resource = self.__enter__()
-                # Pass the resource as an argument to the test function
-                new_args = list(args) + [resource]
-                for result in func(*new_args, **kwargs):
-                    yield result
-                self.__exit__()
+        self._disable_pytest_fixture_detection(func)
 
-            return generator_decorated
+        @wraps(func)
+        def decorated(*args, **kwargs):
+            resource = self.__enter__()
+            # Pass the resource as an argument to the test function
+            new_args = list(args) + [resource]
+            result = func(*new_args, **kwargs)
+            self.__exit__()
+            return result
+
+        return decorated
+
+    def _disable_pytest_fixture_detection(self, function):
+        def get_custom_fixtures_count(function):
+            patchings = getattr(function, "confd_fixtures", None)
+            if not patchings:
+                return 0
+            return patchings
+
+        _pytest.compat.num_mock_patch_args = get_custom_fixtures_count
+        if hasattr(function, 'confd_fixtures'):
+            function.confd_fixtures += 1
         else:
-
-            @wraps(func)
-            def decorated(*args, **kwargs):
-                resource = self.__enter__()
-                # Pass the resource as an argument to the test function
-                new_args = list(args) + [resource]
-                result = func(*new_args, **kwargs)
-                self.__exit__()
-                return result
-
-            return decorated
+            function.confd_fixtures = 1
 
     def __enter__(self):
         # This function is called when using the IsolatedAction as a

@@ -16,8 +16,8 @@ def test_associate_errors(parking_lot, extension):
     fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_parking_lot, 'ParkingLot')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.parking_lot()
@@ -26,8 +26,8 @@ def test_dissociate_errors(parking_lot, extension):
     fake_parking_lot = confd.parkinglots(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.parkinglots(parking_lot['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_parking_lot, 'ParkingLot'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_parking_lot, 'ParkingLot')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.parking_lot()

@@ -31,19 +31,19 @@ def test_associate_errors(switchboard, user):
 
     url = confd.switchboards(switchboard['uuid']).members.users.put
 
-    yield s.check_missing_required_field_returns_error, url, 'users'
-    yield s.check_bogus_field_returns_error, url, 'users', 123
-    yield s.check_bogus_field_returns_error, url, 'users', None
-    yield s.check_bogus_field_returns_error, url, 'users', True
-    yield s.check_bogus_field_returns_error, url, 'users', 'string'
-    yield s.check_bogus_field_returns_error, url, 'users', [123]
-    yield s.check_bogus_field_returns_error, url, 'users', [None]
-    yield s.check_bogus_field_returns_error, url, 'users', ['string']
-    yield s.check_bogus_field_returns_error, url, 'users', [{}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': 1}, {'uuid': None}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'not_uuid': 123}]
-    yield s.check_bogus_field_returns_error, url, 'users', [{'uuid': FAKE_UUID}]
+    s.check_missing_required_field_returns_error(url, 'users')
+    s.check_bogus_field_returns_error(url, 'users', 123)
+    s.check_bogus_field_returns_error(url, 'users', None)
+    s.check_bogus_field_returns_error(url, 'users', True)
+    s.check_bogus_field_returns_error(url, 'users', 'string')
+    s.check_bogus_field_returns_error(url, 'users', [123])
+    s.check_bogus_field_returns_error(url, 'users', [None])
+    s.check_bogus_field_returns_error(url, 'users', ['string'])
+    s.check_bogus_field_returns_error(url, 'users', [{}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': 1}, {'uuid': None}])
+    s.check_bogus_field_returns_error(url, 'users', [{'not_uuid': 123}])
+    s.check_bogus_field_returns_error(url, 'users', [{'uuid': FAKE_UUID}])
 
 
 @fixtures.switchboard()
@@ -174,10 +174,10 @@ def test_delete_user_when_switchboard_and_user_associated(
         confd.users(user['uuid']).delete().assert_deleted()
 
         response = confd.switchboards(switchboard1['uuid']).get()
-        yield assert_that, response.item['members']['users'], empty()
+        assert_that(response.item['members']['users'], empty())
 
         response = confd.switchboards(switchboard2['uuid']).get()
-        yield assert_that, response.item['members']['users'], empty()
+        assert_that(response.item['members']['users'], empty())
 
 
 @fixtures.switchboard()
@@ -191,4 +191,4 @@ def test_bus_events(switchboard, user):
         f'user_uuid:{user["uuid"]}': True,
     }
 
-    yield s.check_event, 'switchboard_member_user_associated', headers, url, body
+    s.check_event('switchboard_member_user_associated', headers, url, body)

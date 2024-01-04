@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, empty, has_entries, has_entry, has_item, is_not, not_
@@ -14,33 +14,31 @@ from ..helpers.config import TOKEN_SUB_TENANT
 
 def test_get_errors():
     fake_access_feature = confd.access_features(999999).get
-    yield s.check_resource_not_found, fake_access_feature, 'AccessFeatures'
+    s.check_resource_not_found(fake_access_feature, 'AccessFeatures')
 
 
 def test_delete_errors():
     fake_access_feature = confd.access_features(999999).delete
-    yield s.check_resource_not_found, fake_access_feature, 'AccessFeatures'
+    s.check_resource_not_found(fake_access_feature, 'AccessFeatures')
 
 
 def test_post_errors():
     url = confd.access_features.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.access_feature()
 def test_put_errors(access_feature):
     url = confd.access_features(access_feature['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'host', None
-    yield s.check_bogus_field_returns_error, url, 'enabled', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'enabled', None
-    yield s.check_bogus_field_returns_error, url, 'feature', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'feature', None
+    s.check_bogus_field_returns_error(url, 'host', None)
+    s.check_bogus_field_returns_error(url, 'enabled', 'invalid')
+    s.check_bogus_field_returns_error(url, 'enabled', None)
+    s.check_bogus_field_returns_error(url, 'feature', 'invalid')
+    s.check_bogus_field_returns_error(url, 'feature', None)
 
 
 @fixtures.access_feature(host='1.2.3.0/24', enabled=False)
@@ -50,7 +48,7 @@ def test_search(access_feature, hidden):
     searches = {'host': '1.2.3', 'enabled': False}
 
     for field, term in searches.items():
-        yield check_search, url, access_feature, hidden, field, term
+        check_search(url, access_feature, hidden, field, term)
 
 
 def check_search(url, context, hidden, field, term):
@@ -67,9 +65,9 @@ def check_search(url, context, hidden, field, term):
 @fixtures.access_feature(host='1.2.4.0/24')
 def test_sorting_offset_limit(access_feature1, access_feature2):
     url = confd.access_features.get
-    yield s.check_sorting, url, access_feature1, access_feature2, 'host', '1.2.'
-    yield s.check_offset, url, access_feature1, access_feature2, 'host', '1.2.'
-    yield s.check_limit, url, access_feature1, access_feature2, 'host', '1.2.'
+    s.check_sorting(url, access_feature1, access_feature2, 'host', '1.2.')
+    s.check_offset(url, access_feature1, access_feature2, 'host', '1.2.')
+    s.check_limit(url, access_feature1, access_feature2, 'host', '1.2.')
 
 
 @fixtures.access_feature(host='1.2.3.0/24')
@@ -168,13 +166,22 @@ def test_restrict_only_master_tenant(access):
 def test_bus_events(access_feature):
     expected_headers = {}
 
-    yield s.check_event, 'access_feature_created', expected_headers, confd.access_features.post, {
-        'host': '9.2.4.0/24',
-        'feature': 'phonebook',
-    }
-    yield s.check_event, 'access_feature_edited', expected_headers, confd.access_features(
-        access_feature['id']
-    ).put
-    yield s.check_event, 'access_feature_deleted', expected_headers, confd.access_features(
-        access_feature['id']
-    ).delete
+    s.check_event(
+        'access_feature_created',
+        expected_headers,
+        confd.access_features.post,
+        {
+            'host': '9.2.4.0/24',
+            'feature': 'phonebook',
+        },
+    )
+    s.check_event(
+        'access_feature_edited',
+        expected_headers,
+        confd.access_features(access_feature['id']).put,
+    )
+    s.check_event(
+        'access_feature_deleted',
+        expected_headers,
+        confd.access_features(access_feature['id']).delete,
+    )

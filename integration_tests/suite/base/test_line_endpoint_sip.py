@@ -30,8 +30,8 @@ def test_associate_errors(line, sip):
     fake_line = confd.lines(FAKE_ID).endpoints.sip(sip['uuid']).put
     fake_sip = confd.lines(line['id']).endpoints.sip(FAKE_UUID).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.line()
@@ -40,8 +40,8 @@ def test_dissociate_errors(line, sip):
     fake_line = confd.lines(FAKE_ID).endpoints.sip(sip['uuid']).delete
     fake_sip = confd.lines(line['id']).endpoints.sip(FAKE_UUID).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_sip, 'SIPEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_sip, 'SIPEndpoint')
 
 
 @fixtures.line()
@@ -232,8 +232,8 @@ def test_bus_events(line, sip):
     url = confd.lines(line['id']).endpoints.sip(sip['uuid'])
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'line_endpoint_sip_associated', headers, url.put
-    yield s.check_event, 'line_endpoint_sip_dissociated', headers, url.delete
+    s.check_event('line_endpoint_sip_associated', headers, url.put)
+    s.check_event('line_endpoint_sip_dissociated', headers, url.delete)
 
 
 @fixtures.transport()

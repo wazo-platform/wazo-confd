@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -16,8 +16,8 @@ def test_associate_errors(trunk, custom):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom(custom['id']).put
     fake_custom = confd.trunks(trunk['id']).endpoints.custom(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.trunk()
@@ -26,8 +26,8 @@ def test_dissociate_errors(trunk, custom):
     fake_trunk = confd.trunks(FAKE_ID).endpoints.custom(custom['id']).delete
     fake_custom = confd.trunks(trunk['id']).endpoints.custom(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.trunk()
@@ -174,8 +174,8 @@ def test_delete_trunk_when_trunk_and_endpoint_associated(trunk, custom):
 
         deleted_trunk = confd.trunks(trunk['id']).get
         deleted_custom = confd.endpoints.custom(custom['id']).get
-        yield s.check_resource_not_found, deleted_trunk, 'Trunk'
-        yield s.check_resource_not_found, deleted_custom, 'CustomEndpoint'
+        s.check_resource_not_found(deleted_trunk, 'Trunk')
+        s.check_resource_not_found(deleted_custom, 'CustomEndpoint')
 
 
 @fixtures.trunk()
@@ -194,5 +194,5 @@ def test_bus_events(trunk, custom):
     url = confd.trunks(trunk['id']).endpoints.custom(custom['id'])
     headers = {'tenant_uuid': trunk['tenant_uuid']}
 
-    yield s.check_event, 'trunk_endpoint_custom_associated', headers, url.put
-    yield s.check_event, 'trunk_endpoint_custom_dissociated', headers, url.delete
+    s.check_event('trunk_endpoint_custom_associated', headers, url.put)
+    s.check_event('trunk_endpoint_custom_dissociated', headers, url.delete)

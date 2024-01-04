@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, empty, has_entries, not_
@@ -16,15 +16,15 @@ def test_associate_errors(agent, user):
     fake_user = confd.users(FAKE_ID).agents(agent['id']).put
     fake_agent = confd.users(user['id']).agents(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_agent, 'Agent'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_agent, 'Agent')
 
 
 @fixtures.user()
 def test_dissociate_errors(user):
     fake_user = confd.users(FAKE_ID).agents().delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.agent()
@@ -168,7 +168,7 @@ def test_bus_events(agent, user):
     }
 
     url = confd.users(user['id']).agents(agent['id']).put
-    yield s.check_event, 'user_agent_associated', headers, url
+    s.check_event('user_agent_associated', headers, url)
 
     url = confd.users(user['id']).agents.delete
-    yield s.check_event, 'user_agent_dissociated', headers, url
+    s.check_event('user_agent_dissociated', headers, url)

@@ -321,7 +321,7 @@ def test_search_order(context):
 @fixtures.context()
 def test_search_errors(context):
     fake_context_range = confd.contexts(999999).ranges('user').get
-    yield s.check_resource_not_found, fake_context_range, 'Context'
+    s.check_resource_not_found(fake_context_range, 'Context')
 
     response = confd.contexts(context['id']).ranges('unknown').get()
     response.assert_status(404)

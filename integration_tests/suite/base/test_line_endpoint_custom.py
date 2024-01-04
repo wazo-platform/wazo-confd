@@ -24,8 +24,8 @@ def test_associate_errors(line, custom):
     fake_line = confd.lines(999999999).endpoints.custom(custom['id']).put
     fake_custom = confd.lines(line['id']).endpoints.custom(999999999).put
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.line()
@@ -34,8 +34,8 @@ def test_dissociate_errors(line, custom):
     fake_line = confd.lines(999999999).endpoints.custom(custom['id']).delete
     fake_custom = confd.lines(line['id']).endpoints.custom(999999999).delete
 
-    yield s.check_resource_not_found, fake_line, 'Line'
-    yield s.check_resource_not_found, fake_custom, 'CustomEndpoint'
+    s.check_resource_not_found(fake_line, 'Line')
+    s.check_resource_not_found(fake_custom, 'CustomEndpoint')
 
 
 @fixtures.line()
@@ -212,8 +212,8 @@ def test_bus_events(line, custom):
     url = confd.lines(line['id']).endpoints.custom(custom['id'])
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'line_endpoint_custom_associated', headers, url.put
-    yield s.check_event, 'line_endpoint_custom_dissociated', headers, url.delete
+    s.check_event('line_endpoint_custom_associated', headers, url.put)
+    s.check_event('line_endpoint_custom_dissociated', headers, url.delete)
 
 
 @fixtures.registrar()

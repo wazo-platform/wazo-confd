@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -13,28 +13,33 @@ FAKE_ID = 999999999
 
 def test_get_errors():
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.get
-    yield s.check_resource_not_found, fake_call_filter, 'CallFilter'
+    s.check_resource_not_found(fake_call_filter, 'CallFilter')
 
 
 @fixtures.call_filter()
 @fixtures.user()
 def test_put_errors(call_filter, user):
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.put
-    yield s.check_resource_not_found, fake_call_filter, 'CallFilter'
+    s.check_resource_not_found(fake_call_filter, 'CallFilter')
 
     url = confd.callfilters(call_filter['id']).fallbacks.put
-    for check in error_checks(url, user):
-        yield check
+    error_checks(url, user)
 
 
 def error_checks(url, user):
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'noanswer_destination', {
-        'type': 'user',
-        'user_id': user['id'],
-        'moh_uuid': '00000000-0000-0000-0000-000000000000',
-    }, {}, 'MOH was not found'
+        s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
+    s.check_bogus_field_returns_error(
+        url,
+        'noanswer_destination',
+        {
+            'type': 'user',
+            'user_id': user['id'],
+            'moh_uuid': '00000000-0000-0000-0000-000000000000',
+        },
+        {},
+        'MOH was not found',
+    )
 
 
 @fixtures.call_filter()
@@ -112,9 +117,7 @@ def test_edit_multi_tenant(main, sub):
 @fixtures.moh()
 def test_valid_destinations(call_filter, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_call_filter_fallbacks_with_destination, call_filter[
-            'id'
-        ], destination
+        _update_call_filter_fallbacks_with_destination(call_filter['id'], destination)
 
 
 def _update_call_filter_fallbacks_with_destination(call_filter_id, destination):
@@ -158,17 +161,17 @@ def test_nonexistent_destinations(call_filter, moh):
             'voicemail',
             'conference',
         ):
-            yield _update_user_fallbacks_with_nonexistent_destination, call_filter[
-                'id'
-            ], destination
+            _update_user_fallbacks_with_nonexistent_destination(
+                call_filter['id'], destination
+            )
 
         if (
             destination['type'] == 'application'
             and destination['application'] == 'custom'
         ):
-            yield _update_user_fallbacks_with_nonexistent_destination, call_filter[
-                'id'
-            ], destination
+            _update_user_fallbacks_with_nonexistent_destination(
+                call_filter['id'], destination
+            )
 
 
 def _update_user_fallbacks_with_nonexistent_destination(call_filter_id, destination):
@@ -183,7 +186,7 @@ def test_bus_events(call_filter):
     url = confd.callfilters(call_filter['id']).fallbacks.put
     expected_headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'call_filter_fallback_edited', expected_headers, url
+    s.check_event('call_filter_fallback_edited', expected_headers, url)
 
 
 @fixtures.call_filter()

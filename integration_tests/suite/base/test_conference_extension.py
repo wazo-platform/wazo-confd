@@ -22,8 +22,8 @@ def test_associate_errors(conference, extension):
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_conference, 'Conference'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_conference, 'Conference')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.conference()
@@ -32,8 +32,8 @@ def test_dissociate_errors(conference, extension):
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_conference, 'Conference'
-    yield s.check_resource_not_found, fake_extension, 'Extension'
+    s.check_resource_not_found(fake_conference, 'Conference')
+    s.check_resource_not_found(fake_extension, 'Extension')
 
 
 @fixtures.extension(exten=gen_conference_exten())

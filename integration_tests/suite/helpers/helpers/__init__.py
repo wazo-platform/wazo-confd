@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..client import ConfdClient
@@ -15,6 +15,8 @@ class NewClientWrapper:
 
     def __getattr__(self, attr):
         if self._client is None:
+            if self.host is None:
+                raise AttributeError('BusClientWrapper is not initialized yet')
             self._client = self._create_client()
 
         # This trick is needed because the self._client.url cannot be "confd.users.import.post()"
@@ -40,6 +42,8 @@ class DatabaseWrapper:
 
     def __getattr__(self, attr):
         if self._db is None:
+            if self.host is None:
+                raise AttributeError('BusClientWrapper is not initialized yet')
             self._db = db_create_helper(host=self.host, port=self.port)
         return getattr(self._db, attr)
 
@@ -52,6 +56,8 @@ class ProvdWrapper:
 
     def __getattr__(self, attr):
         if self._provd is None:
+            if self.host is None:
+                raise AttributeError('BusClientWrapper is not initialized yet')
             from ..provd import create_helper as provd_create_helper
 
             self._provd = provd_create_helper(host=self.host, port=self.port)

@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -31,7 +31,7 @@ def setup_module():
 
 def test_get_errors():
     fake_sound = confd.sounds('invalid').get
-    yield s.check_resource_not_found, fake_sound, 'Sound'
+    s.check_resource_not_found(fake_sound, 'Sound')
 
     for invalid_name in ['.foo', 'foo/bar', '../bar']:
         response = confd.sounds(invalid_name).get()
@@ -40,16 +40,14 @@ def test_get_errors():
 
 def test_delete_errors():
     fake_sound = confd.sounds('invalid').delete
-    yield s.check_resource_not_found, fake_sound, 'Sound'
+    s.check_resource_not_found(fake_sound, 'Sound')
 
 
 def test_post_errors():
     url = confd.sounds.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
@@ -58,25 +56,24 @@ def test_search_errors(sound):
         confd.sounds.get,
     ]
     for url in searchable_endpoints:
-        for check in s.search_error_checks(url):
-            yield check
+        s.search_error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', 1234
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(150)
-    yield s.check_bogus_field_returns_error, url, 'name', '.foo'
-    yield s.check_bogus_field_returns_error, url, 'name', 'foo\nbar'
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', 1234)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(150))
+    s.check_bogus_field_returns_error(url, 'name', '.foo')
+    s.check_bogus_field_returns_error(url, 'name', 'foo\nbar')
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
 
-    yield s.check_bogus_field_returns_error, url, 'name', 'system'
+    s.check_bogus_field_returns_error(url, 'name', 'system')
 
 
 @fixtures.sound(name='unique')
 def unique_error_checks(url, sound):
-    yield s.check_bogus_field_returns_error, url, 'name', sound['name']
+    s.check_bogus_field_returns_error(url, 'name', sound['name'])
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)
@@ -160,7 +157,7 @@ def test_get_with_files(sound):
 @fixtures.sound(name='test_category_1')
 @fixtures.sound(name='test_category_2')
 def test_search_sound(sound1, sound2):
-    yield s.check_sorting, confd.sounds.get, sound1, sound2, 'name', 'test_category', 'name'
+    s.check_sorting(confd.sounds.get, sound1, sound2, 'name', 'test_category', 'name')
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT, name='test_category_1')
@@ -190,14 +187,14 @@ def test_search_sound_multi_tenant(sound1, sound2):
 @fixtures.sound(name='test_offset_2')
 def test_search_sound_offset(sound1, sound2):
     url = confd.sounds.get
-    yield s.check_offset, url, sound1, sound2, 'name', 'test_offset', 'name'
+    s.check_offset(url, sound1, sound2, 'name', 'test_offset', 'name')
 
 
 @fixtures.sound(name='test_limit_1')
 @fixtures.sound(name='test_limit_2')
 def test_search_sound_limit(sound1, sound2):
     url = confd.sounds.get
-    yield s.check_limit, url, sound1, sound2, 'name', 'test_limit', 'name'
+    s.check_limit(url, sound1, sound2, 'name', 'test_limit', 'name')
 
 
 def test_get_system_sound():
@@ -677,7 +674,5 @@ def _new_sound_file_client():
 def test_bus_events():
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'sound_created', headers, confd.sounds.post, {
-        'name': 'bus_event'
-    }
-    yield s.check_event, 'sound_deleted', headers, confd.sounds('bus_event').delete
+    s.check_event('sound_created', headers, confd.sounds.post, {'name': 'bus_event'})
+    s.check_event('sound_deleted', headers, confd.sounds('bus_event').delete)

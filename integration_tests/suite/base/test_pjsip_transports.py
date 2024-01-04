@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -24,42 +24,44 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 def test_post_errors():
     url = confd.sip.transports.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 123
-    yield s.check_bogus_field_returns_error, url, 'name', True
-    yield s.check_bogus_field_returns_error, url, 'name', []
-    yield s.check_bogus_field_returns_error, url, 'name', {}
-    yield s.check_bogus_field_returns_error, url, 'options', 123, {'name': 'transport'}
-    yield s.check_bogus_field_returns_error, url, 'options', None, {'name': 'transport'}
-    yield s.check_bogus_field_returns_error, url, 'options', True, {'name': 'transport'}
-    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'transport'}
-    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'system'}
-    yield s.check_bogus_field_returns_error, url, 'options', {}, {'name': 'global'}
-    yield s.check_bogus_field_returns_error, url, 'options', [
-        ['not-a-transport-option', '42'],
-    ], {'name': 'transport'}
-    yield s.check_bogus_field_returns_error, url, 'options', [
-        ['one', 'two', 'three']
-    ], {'name': 'transport'}
+    s.check_bogus_field_returns_error(url, 'name', 123)
+    s.check_bogus_field_returns_error(url, 'name', True)
+    s.check_bogus_field_returns_error(url, 'name', [])
+    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url, 'options', 123, {'name': 'transport'})
+    s.check_bogus_field_returns_error(url, 'options', None, {'name': 'transport'})
+    s.check_bogus_field_returns_error(url, 'options', True, {'name': 'transport'})
+    s.check_bogus_field_returns_error(url, 'options', {}, {'name': 'transport'})
+    s.check_bogus_field_returns_error(url, 'options', {}, {'name': 'system'})
+    s.check_bogus_field_returns_error(url, 'options', {}, {'name': 'global'})
+    s.check_bogus_field_returns_error(
+        url,
+        'options',
+        [
+            ['not-a-transport-option', '42'],
+        ],
+        {'name': 'transport'},
+    )
+    s.check_bogus_field_returns_error(
+        url, 'options', [['one', 'two', 'three']], {'name': 'transport'}
+    )
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.transport(name='transport_unique')
 @fixtures.sip(name='endpoint_unique')
 @fixtures.sip_template(name='template_unique')
 def unique_error_checks(url, transport, sip, template):
-    yield s.check_bogus_field_returns_error, url, 'name', transport['name']
-    yield s.check_bogus_field_returns_error, url, 'name', template['name']
-    yield s.check_bogus_field_returns_error, url, 'name', sip['name']
+    s.check_bogus_field_returns_error(url, 'name', transport['name'])
+    s.check_bogus_field_returns_error(url, 'name', template['name'])
+    s.check_bogus_field_returns_error(url, 'name', sip['name'])
 
 
 def test_create_minimal_parameters():
@@ -98,11 +100,9 @@ def test_create_all_parameters():
 @fixtures.transport()
 def test_put_errors(transport):
     url = confd.sip.transports(transport['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.transport()
@@ -124,7 +124,7 @@ def test_edit_options_with_commas(transport):
 
 def test_get_errors():
     fake_transport = confd.sip.transports(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_transport, 'Transport'
+    s.check_resource_not_found(fake_transport, 'Transport')
 
 
 @fixtures.transport()
@@ -142,7 +142,7 @@ def test_get(transport):
 
 def test_delete_errors():
     fake_transport = confd.sip.transports(FAKE_UUID).delete
-    yield s.check_resource_not_found, fake_transport, 'Transport'
+    s.check_resource_not_found(fake_transport, 'Transport')
 
 
 @fixtures.transport()
@@ -178,7 +178,7 @@ def test_search(hidden, transport):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, transport, hidden, field, term
+        check_search(url, transport, hidden, field, term)
 
 
 def check_search(url, transport, hidden, field, term):
@@ -195,11 +195,11 @@ def check_search(url, transport, hidden, field, term):
 @fixtures.transport(name='sort2')
 def test_sorting_offset_limit(transport1, transport2):
     url = confd.sip.transports.get
-    yield s.check_sorting, url, transport1, transport2, 'name', 'sort', 'uuid'
+    s.check_sorting(url, transport1, transport2, 'name', 'sort', 'uuid')
 
-    yield s.check_offset, url, transport1, transport2, 'name', 'sort', 'uuid'
+    s.check_offset(url, transport1, transport2, 'name', 'sort', 'uuid')
 
-    yield s.check_limit, url, transport1, transport2, 'name', 'sort', 'uuid'
+    s.check_limit(url, transport1, transport2, 'name', 'sort', 'uuid')
 
 
 @fixtures.transport()
@@ -219,8 +219,13 @@ def test_bus_events(transport):
     url = confd.sip.transports(transport['uuid'])
     headers = {}
 
-    yield s.check_event, 'sip_transport_created', headers, confd.sip.transports.post, {
-        'name': 'a-leaked-transport',
-    }
-    yield s.check_event, 'sip_transport_edited', headers, url.put, {'name': 'new'}
-    yield s.check_event, 'sip_transport_deleted', headers, url.delete
+    s.check_event(
+        'sip_transport_created',
+        headers,
+        confd.sip.transports.post,
+        {
+            'name': 'a-leaked-transport',
+        },
+    )
+    s.check_event('sip_transport_edited', headers, url.put, {'name': 'new'})
+    s.check_event('sip_transport_deleted', headers, url.delete)

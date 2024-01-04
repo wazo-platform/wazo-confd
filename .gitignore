@@ -4,4 +4,3 @@
 .tox
 coverage.xml
 unit-tests.xml
-nosetests.xml

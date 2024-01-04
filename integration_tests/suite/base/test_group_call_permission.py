@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries
@@ -16,11 +16,11 @@ def test_associate_errors(group, call_permission):
     fake_group = confd.groups(FAKE_ID).callpermissions(call_permission['id']).put
     fake_call_permission = confd.groups(group['id']).callpermissions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_group, 'Group'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_group, 'Group')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
     fake_call_permission = confd.groups(group['uuid']).callpermissions(FAKE_ID).put
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.group()
@@ -29,11 +29,11 @@ def test_dissociate_errors(group, call_permission):
     fake_group = confd.groups(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.groups(group['id']).callpermissions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_group, 'Group'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_group, 'Group')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
     fake_call_permission = confd.groups(group['uuid']).callpermissions(FAKE_ID).delete
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.group()
@@ -217,14 +217,12 @@ def test_delete_call_permission_when_group_and_call_permission_associated_by_uui
 def test_bus_events(group, call_permission):
     headers = {'tenant_uuid': group['tenant_uuid']}
 
-    yield (
-        s.check_event,
+    s.check_event(
         'group_call_permission_associated',
         headers,
         confd.groups(group['uuid']).callpermissions(call_permission['id']).put,
     )
-    yield (
-        s.check_event,
+    s.check_event(
         'group_call_permission_dissociated',
         headers,
         confd.groups(group['uuid']).callpermissions(call_permission['id']).delete,

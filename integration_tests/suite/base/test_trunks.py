@@ -26,35 +26,33 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 def test_get_errors():
     fake_trunk = confd.trunks(999999).get
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
 
 
 def test_delete_errors():
     fake_trunk = confd.trunks(999999).delete
-    yield s.check_resource_not_found, fake_trunk, 'Trunk'
+    s.check_resource_not_found(fake_trunk, 'Trunk')
 
 
 def test_post_errors():
     url = confd.trunks.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.trunk()
 def test_put_errors(trunk):
     url = confd.trunks(trunk['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'context', 123
-    yield s.check_bogus_field_returns_error, url, 'context', []
-    yield s.check_bogus_field_returns_error, url, 'context', {}
-    yield s.check_bogus_field_returns_error, url, 'context', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'twilio_incoming', 123
-    yield s.check_bogus_field_returns_error, url, 'twilio_incoming', []
-    yield s.check_bogus_field_returns_error, url, 'twilio_incoming', {}
+    s.check_bogus_field_returns_error(url, 'context', 123)
+    s.check_bogus_field_returns_error(url, 'context', [])
+    s.check_bogus_field_returns_error(url, 'context', {})
+    s.check_bogus_field_returns_error(url, 'context', 'invalid')
+    s.check_bogus_field_returns_error(url, 'twilio_incoming', 123)
+    s.check_bogus_field_returns_error(url, 'twilio_incoming', [])
+    s.check_bogus_field_returns_error(url, 'twilio_incoming', {})
 
 
 @fixtures.context(label='search')
@@ -63,31 +61,30 @@ def error_checks(url):
 @fixtures.iax(name='name_search')
 @fixtures.custom(interface='name_search')
 def test_search(search_ctx, hidden_ctx, sip, iax, custom):
-    @fixtures.trunk(context=search_ctx['name'])
-    @fixtures.trunk(context=hidden_ctx['name'])
-    def aux(trunk, hidden):
+    with (
+        fixtures.trunk(context=search_ctx['name']) as trunk,
+        fixtures.trunk(context=hidden_ctx['name']) as hidden,
+    ):
         url = confd.trunks
-        searches = {'context': 'search'}
+        searches = {'context': search_ctx['name']}
 
         for field, term in searches.items():
-            yield check_search, url, trunk, hidden, field, term
+            check_search(url, trunk, hidden, field, term)
 
         searches = {'name': 'name_search', 'label': 'label_search'}
         with a.trunk_endpoint_sip(trunk, sip):
             for field, term in searches.items():
-                yield check_relation_search, url, trunk, hidden, field, term
+                check_relation_search(url, trunk, hidden, field, term)
 
         searches = {'name': 'name_search'}
         with a.trunk_endpoint_iax(trunk, iax):
             for field, term in searches.items():
-                yield check_relation_search, url, trunk, hidden, field, term
+                check_relation_search(url, trunk, hidden, field, term)
 
         searches = {'name': 'name_search'}
         with a.trunk_endpoint_custom(trunk, custom):
             for field, term in searches.items():
-                yield check_relation_search, url, trunk, hidden, field, term
-
-    aux()
+                check_relation_search(url, trunk, hidden, field, term)
 
 
 def check_search(url, trunk, hidden, field, term):
@@ -113,15 +110,18 @@ def check_relation_search(url, trunk, hidden, field, term):
 @fixtures.context(label='sort1')
 @fixtures.context(label='sort2')
 def test_sorting_offset_limit(ctx1, ctx2):
-    @fixtures.trunk(context=ctx1['name'])
-    @fixtures.trunk(context=ctx2['name'])
-    def aux(trunk1, trunk2):
+    with (
+        fixtures.trunk(context=ctx1['name']) as trunk1,
+        fixtures.trunk(context=ctx2['name']) as trunk2,
+    ):
         url = confd.trunks.get
-        yield s.check_sorting, url, trunk1, trunk2, 'context', 'sort'
-        yield s.check_offset, url, trunk1, trunk2, 'context', 'sort'
-        yield s.check_limit, url, trunk1, trunk2, 'context', 'sort'
-
-    aux()
+        if ctx1['name'] < ctx2['name']:
+            first, second = trunk1, trunk2
+        else:
+            first, second = trunk2, trunk1
+        s.check_sorting(url, first, second, 'context', None)
+        s.check_offset(url, first, second, 'context', None)
+        s.check_limit(url, first, second, 'context', None)
 
 
 @fixtures.trunk(wazo_tenant=MAIN_TENANT)

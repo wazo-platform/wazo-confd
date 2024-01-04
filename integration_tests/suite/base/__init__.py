@@ -23,11 +23,11 @@ class BaseIntegrationTest(IntegrationTest):
         cls.setup_helpers()
 
 
-def setUpModule():
+def setup_module(module):
     BaseIntegrationTest.setUpClass()
 
 
-def tearDownModule():
+def teardown_module(module):
     BaseIntegrationTest.tearDownClass()
 
 

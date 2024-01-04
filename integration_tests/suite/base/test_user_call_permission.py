@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, empty, has_entries, not_
@@ -21,8 +21,8 @@ def test_associate_errors(user, call_permission):
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).put
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.user()
@@ -31,8 +31,8 @@ def test_dissociate_errors(user, call_permission):
     fake_user = confd.users(FAKE_ID).callpermissions(call_permission['id']).delete
     fake_call_permission = confd.users(user['id']).callpermissions(FAKE_ID).delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_call_permission, 'CallPermission'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_call_permission, 'CallPermission')
 
 
 @fixtures.user()

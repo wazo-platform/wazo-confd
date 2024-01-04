@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -21,44 +21,42 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 def test_get_errors():
     fake_external_app = confd.external.apps('invalid').get
-    yield s.check_resource_not_found, fake_external_app, 'ExternalApp'
+    s.check_resource_not_found(fake_external_app, 'ExternalApp')
 
 
 def test_delete_errors():
     fake_external_app = confd.external.apps('invalid').delete
-    yield s.check_resource_not_found, fake_external_app, 'ExternalApp'
+    s.check_resource_not_found(fake_external_app, 'ExternalApp')
 
 
 @fixtures.external_app(name='unique')
 def test_post_errors(external_app):
     url = confd.external.apps.myapp.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
     url = confd.external.apps(s.random_string(129)).post
-    yield s.check_bogus_field_returns_error, url, 'name', s.random_string(129)
+    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
 
     url = confd.external.apps('unique').post
-    yield s.check_bogus_field_returns_error, url, 'name', 'unique'
+    s.check_bogus_field_returns_error(url, 'name', 'unique')
 
 
 @fixtures.external_app()
 def test_put_errors(external_app):
     url = confd.external.apps(external_app['name']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'label', True
-    yield s.check_bogus_field_returns_error, url, 'label', 1234
-    yield s.check_bogus_field_returns_error, url, 'label', s.random_string(257)
-    yield s.check_bogus_field_returns_error, url, 'label', []
-    yield s.check_bogus_field_returns_error, url, 'label', {}
-    yield s.check_bogus_field_returns_error, url, 'configuration', True
-    yield s.check_bogus_field_returns_error, url, 'configuration', json.dumps('invalid')
-    yield s.check_bogus_field_returns_error, url, 'configuration', json.dumps(1234)
-    yield s.check_bogus_field_returns_error, url, 'configuration', []
+    s.check_bogus_field_returns_error(url, 'label', True)
+    s.check_bogus_field_returns_error(url, 'label', 1234)
+    s.check_bogus_field_returns_error(url, 'label', s.random_string(257))
+    s.check_bogus_field_returns_error(url, 'label', [])
+    s.check_bogus_field_returns_error(url, 'label', {})
+    s.check_bogus_field_returns_error(url, 'configuration', True)
+    s.check_bogus_field_returns_error(url, 'configuration', json.dumps('invalid'))
+    s.check_bogus_field_returns_error(url, 'configuration', json.dumps(1234))
+    s.check_bogus_field_returns_error(url, 'configuration', [])
 
 
 @fixtures.external_app(wazo_tenant=MAIN_TENANT)
@@ -81,7 +79,7 @@ def test_search(external_app, hidden):
     searches = {'name': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, external_app, hidden, field, term
+        check_search(url, external_app, hidden, field, term)
 
 
 def check_search(url, external_app, hidden, field, term):
@@ -98,10 +96,10 @@ def check_search(url, external_app, hidden, field, term):
 @fixtures.external_app(name='sort2')
 def test_sort_offset_limit(external_app1, external_app2):
     url = confd.external.apps.get
-    yield s.check_sorting, url, external_app1, external_app2, 'name', 'sort', 'name'
+    s.check_sorting(url, external_app1, external_app2, 'name', 'sort', 'name')
 
-    yield s.check_offset, url, external_app1, external_app2, 'name', 'sort', 'name'
-    yield s.check_limit, url, external_app1, external_app2, 'name', 'sort', 'name'
+    s.check_offset(url, external_app1, external_app2, 'name', 'sort', 'name')
+    s.check_limit(url, external_app1, external_app2, 'name', 'sort', 'name')
 
 
 @fixtures.external_app()
@@ -213,6 +211,6 @@ def test_bus_events():
     url = confd.external.apps.myname
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'external_app_created', headers, url.post
-    yield s.check_event, 'external_app_edited', headers, url.put
-    yield s.check_event, 'external_app_deleted', headers, url.delete
+    s.check_event('external_app_created', headers, url.post)
+    s.check_event('external_app_edited', headers, url.put)
+    s.check_event('external_app_deleted', headers, url.delete)

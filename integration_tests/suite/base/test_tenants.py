@@ -1,6 +1,7 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from contextlib import contextmanager, ExitStack
 from hamcrest import (
     all_of,
     assert_that,
@@ -9,9 +10,10 @@ from hamcrest import (
     has_key,
     not_,
 )
-from unittest import TestCase
 from sqlalchemy.sql import text
 from wazo_test_helpers import until
+
+from typing import Dict
 
 from . import confd, db, BaseIntegrationTest
 from ..helpers import errors as e, fixtures, associations as a
@@ -25,6 +27,7 @@ from ..helpers.config import (
     ALL_TENANTS,
     DEFAULT_TENANTS,
 )
+from ..helpers.database import DatabaseQueries
 
 
 def test_get():
@@ -77,112 +80,164 @@ def test_list_multi_tenant(_):
     )
 
 
-class BaseTestTenants(TestCase):
-    def count_tables_rows(self):
-        tables_counts = {}
-        with self.db.queries() as queries:
-            query = text(
-                "SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';"
-            )
-            result = queries.connection.execute(query)
-            for row in result:
-                if row.tablename not in self.excluded_tables:
-                    query = text(f"SELECT COUNT(*) FROM {row.tablename};")
-                    count = queries.connection.execute(query).scalar()
-                    tables_counts[row.tablename] = count
-        return tables_counts
+def test_tenant_deletion_with_event():
+    _reset_tenants()
+    tables_rows_count_before_deletion = _count_tables_rows()
+    with _create_tenant_ready_for_deletion() as tenant_uuid:
+        with BaseIntegrationTest.delete_auth_tenant(tenant_uuid):
+            BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
 
-    def diff(self, after_tables_rows_counts):
-        diff = {
-            k: {
-                'before': self.before_tables_rows_counts[k],
-                'after': after_tables_rows_counts[k],
-            }
-            for k in self.before_tables_rows_counts
-            if k in after_tables_rows_counts
-            and self.before_tables_rows_counts[k] != after_tables_rows_counts[k]
+            def resources_deleted():
+                tables_rows_count_after_deletion = _count_tables_rows()
+                diff = _diff_tables_rows(
+                    tables_rows_count_before_deletion, tables_rows_count_after_deletion
+                )
+                assert (
+                    len(diff) == 0
+                ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
+
+            until.assert_(resources_deleted, tries=5, interval=5)
+
+
+def test_tenant_deletion_with_sync_db():
+    _reset_tenants()
+    tables_rows_count_before_deletion = _count_tables_rows()
+    with _create_tenant_ready_for_deletion() as tenant_uuid:
+        with BaseIntegrationTest.delete_auth_tenant(tenant_uuid):
+            BaseIntegrationTest.sync_db()
+
+            def resources_deleted():
+                tables_rows_count_after_deletion = _count_tables_rows()
+                diff = _diff_tables_rows(
+                    tables_rows_count_before_deletion, tables_rows_count_after_deletion
+                )
+                assert (
+                    len(diff) == 0
+                ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
+
+            until.assert_(resources_deleted, tries=5, interval=5)
+
+
+def _reset_tenants():
+    BaseIntegrationTest.mock_auth.set_tenants(*DEFAULT_TENANTS)
+
+    for t in DEFAULT_TENANTS:
+        BusClient.send_tenant_created(t['uuid'], t['slug'])
+
+    # xivo-manage-db creates a tenant (with a random uuid)
+    # sync_db is called now to remove this tenant
+    BaseIntegrationTest.sync_db()
+
+
+def _count_table_rows(queries: DatabaseQueries, table_name: str) -> int:
+    query = text(f"SELECT COUNT(*) FROM {table_name};")
+    count = queries.connection.execute(query).scalar()
+    return count
+
+
+def _count_tables_rows() -> Dict[str, int]:
+    excluded_tables = [
+        'agentqueueskill',
+        'dialaction',
+        'pickupmember',
+        'func_key',
+        'func_key_dest_custom',
+    ]
+    with db.queries() as queries:
+        query = text(
+            "SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';"
+        )
+        result = queries.connection.execute(query)
+        table_names = set(row.tablename for row in result)
+        tables_counts = {
+            table_name: _count_table_rows(queries, table_name)
+            for table_name in table_names
+            if table_name not in excluded_tables
         }
-        return diff
+    return tables_counts
 
 
-class BaseTestDeleteByEvent(BaseTestTenants):
-    def setUp(self):
-        self.db = db
-        self.excluded_tables = [
-            'agentqueueskill',
-            'dialaction',
-            'pickupmember',
-            'func_key',
-            'func_key_dest_custom',
-        ]
-        self.before_tables_rows_counts = self.count_tables_rows()
+def _diff_tables_rows(before: Dict[str, int], after: Dict[str, int]):
+    diff = {
+        table_name: {
+            'before': before[table_name],
+            'after': after[table_name],
+        }
+        for table_name in set(before) | set(after)
+        if before.get(table_name) != after.get(table_name)
+    }
+    return diff
 
-    @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.group(wazo_tenant=DELETED_TENANT)
-    @fixtures.incall(wazo_tenant=DELETED_TENANT)
-    @fixtures.outcall(wazo_tenant=DELETED_TENANT)
-    @fixtures.conference(wazo_tenant=DELETED_TENANT)
-    @fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
-    @fixtures.funckey_template(
-        keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
-        wazo_tenant=DELETED_TENANT,
-    )
-    @fixtures.switchboard(wazo_tenant=DELETED_TENANT)
-    @fixtures.device(wazo_tenant=DELETED_TENANT)
-    @fixtures.queue(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.sip(name='endpoint_sip', wazo_tenant=DELETED_TENANT)
-    @fixtures.sip(name='endpoint_sip2', wazo_tenant=DELETED_TENANT)
-    @fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
-    @fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
-    @fixtures.agent(number='1234', wazo_tenant=DELETED_TENANT)
-    @fixtures.skill(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
-    @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_permission(
-        mode='allow',
-        enabled=True,
-        extensions=[gen_group_exten()],
-        wazo_tenant=DELETED_TENANT,
-    )
-    @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
-    @fixtures.schedule(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.ivr(
-        choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
-        wazo_tenant=DELETED_TENANT,
-    )
-    def test_delete_tenant_with_many_resources_by_event(
-        self,
-        user,
-        group,
-        incall,
-        outcall,
-        conference,
-        context,
-        funckey_template,
-        switchboard,
-        device,
-        queue,
-        trunk_sip,
-        trunk_iax,
-        trunk_custom,
-        user_sip,
-        sip,
-        iax,
-        custom,
-        agent,
-        skill,
-        call_pickup,
-        user2,
-        call_permission,
-        call_filter,
-        schedule,
-        trunk,
-        ivr,
-    ):
+
+@contextmanager
+def _create_tenant_ready_for_deletion():
+    # add the tenant DELETED_TENANT in wazo-auth for the authorization,
+    # to be able to create the tenant in wazo-confd
+    BaseIntegrationTest.mock_auth.set_tenants(*ALL_TENANTS)
+
+    with ExitStack() as stack:
+        user = stack.enter_context(fixtures.user(wazo_tenant=DELETED_TENANT))
+        group = stack.enter_context(fixtures.group(wazo_tenant=DELETED_TENANT))
+        incall = stack.enter_context(fixtures.incall(wazo_tenant=DELETED_TENANT))
+        outcall = stack.enter_context(fixtures.outcall(wazo_tenant=DELETED_TENANT))
+        conference = stack.enter_context(
+            fixtures.conference(wazo_tenant=DELETED_TENANT)
+        )
+        context = stack.enter_context(
+            fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
+        )
+        stack.enter_context(
+            fixtures.funckey_template(
+                keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
+                wazo_tenant=DELETED_TENANT,
+            )
+        )
+        switchboard = stack.enter_context(
+            fixtures.switchboard(wazo_tenant=DELETED_TENANT)
+        )
+        stack.enter_context(fixtures.device(wazo_tenant=DELETED_TENANT))
+        queue = stack.enter_context(fixtures.queue(wazo_tenant=DELETED_TENANT))
+        trunk_sip = stack.enter_context(fixtures.trunk(wazo_tenant=DELETED_TENANT))
+        trunk_iax = stack.enter_context(fixtures.trunk(wazo_tenant=DELETED_TENANT))
+        trunk_custom = stack.enter_context(fixtures.trunk(wazo_tenant=DELETED_TENANT))
+        user_sip = stack.enter_context(
+            fixtures.sip(name='endpoint_sip', wazo_tenant=DELETED_TENANT)
+        )
+        sip = stack.enter_context(
+            fixtures.sip(name='endpoint_sip2', wazo_tenant=DELETED_TENANT)
+        )
+        iax = stack.enter_context(
+            fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
+        )
+        custom = stack.enter_context(
+            fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
+        )
+        agent = stack.enter_context(
+            fixtures.agent(number='5678', wazo_tenant=DELETED_TENANT)
+        )
+        skill = stack.enter_context(fixtures.skill(wazo_tenant=DELETED_TENANT))
+        call_pickup = stack.enter_context(
+            fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
+        )
+        user2 = stack.enter_context(fixtures.user(wazo_tenant=DELETED_TENANT))
+        stack.enter_context(
+            fixtures.call_permission(
+                mode='allow',
+                enabled=True,
+                extensions=[gen_group_exten()],
+                wazo_tenant=DELETED_TENANT,
+            )
+        )
+        stack.enter_context(fixtures.call_filter(wazo_tenant=DELETED_TENANT))
+        schedule = stack.enter_context(fixtures.schedule(wazo_tenant=DELETED_TENANT))
+        trunk = stack.enter_context(fixtures.trunk(wazo_tenant=DELETED_TENANT))
+        stack.enter_context(
+            fixtures.ivr(
+                choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
+                wazo_tenant=DELETED_TENANT,
+            )
+        )
+
         confd.users(user['uuid']).funckeys('1').put(
             {
                 'destination': {
@@ -192,224 +247,57 @@ class BaseTestDeleteByEvent(BaseTestTenants):
             }
         )
 
-        @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
-        @fixtures.line_sip(
-            context={'name': context['name']}, wazo_tenant=DELETED_TENANT
+        voicemail = stack.enter_context(
+            fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
         )
-        @fixtures.extension(exten=gen_group_exten(), context=context['name'])
-        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
-        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
-        @fixtures.funckey_template(
-            keys={
-                '1': {
-                    'destination': {
-                        'type': 'conference',
-                        'conference_id': conference['id'],
+        line = stack.enter_context(
+            fixtures.line_sip(
+                context={'name': context['name']}, wazo_tenant=DELETED_TENANT
+            )
+        )
+        group_extension = stack.enter_context(
+            fixtures.extension(exten=gen_group_exten(), context=context['name'])
+        )
+        incall_extension = stack.enter_context(
+            fixtures.extension(exten=gen_line_exten(), context=context['name'])
+        )
+        outcall_extension = stack.enter_context(
+            fixtures.extension(exten=gen_line_exten(), context=context['name'])
+        )
+        stack.enter_context(
+            fixtures.funckey_template(
+                keys={
+                    '1': {
+                        'destination': {
+                            'type': 'conference',
+                            'conference_id': conference['id'],
+                        }
                     }
-                }
-            },
-            wazo_tenant=DELETED_TENANT,
+                },
+                wazo_tenant=DELETED_TENANT,
+            )
         )
-        def aux(
-            voicemail,
-            line,
-            group_extension,
-            incall_extension,
-            outcall_extension,
-            funckey_template_conference,
-        ):
-            with (
-                a.user_line(user, line, check=False),
-                a.line_endpoint_sip(line, user_sip, check=False),
-                a.user_voicemail(user, voicemail, check=False),
-                a.switchboard_member_user(switchboard, [user], check=False),
-                a.group_extension(group, group_extension, check=False),
-                a.user_agent(user, agent, check=False),
-                a.queue_member_agent(queue, agent, check=False),
-                a.agent_skill(agent, skill, check=False),
-                a.incall_extension(incall, incall_extension, check=False),
-                a.outcall_extension(outcall, outcall_extension, check=False),
-                a.group_member_user(group, user, check=False),
-                a.trunk_endpoint_sip(trunk_sip, sip, check=False),
-                a.trunk_endpoint_iax(trunk_iax, iax, check=False),
-                a.trunk_endpoint_custom(trunk_custom, custom, check=False),
-                a.call_pickup_interceptor_user(call_pickup, user, check=False),
-                a.call_pickup_target_user(call_pickup, user2, check=False),
-                a.incall_schedule(incall, schedule, check=False),
-                a.outcall_trunk(outcall, trunk, check=False),
-            ):
-                BusClient.send_tenant_deleted(DELETED_TENANT, 'slug2')
-
-                def resources_deleted():
-                    after_deletion_tables_rows_counts = self.count_tables_rows()
-                    diff = self.diff(after_deletion_tables_rows_counts)
-                    assert (
-                        len(diff) == 0
-                    ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
-
-                until.assert_(resources_deleted, tries=5, interval=5)
-
-        aux()
-
-
-class BaseTestDeleteBySyncDb(BaseTestTenants):
-    def setUp(self):
-        self.db = db
-        self.excluded_tables = [
-            'agentqueueskill',
-            'dialaction',
-            'pickupmember',
-            'func_key',
-            'func_key_dest_custom',
-        ]
-
-        BaseIntegrationTest.mock_auth.set_tenants(*DEFAULT_TENANTS)
-
-        for t in DEFAULT_TENANTS:
-            BusClient.send_tenant_created(t['uuid'], t['slug'])
-
-        # xivo-manage-db creates a tenant (with a random uuid)
-        # sync_db is called now to remove this tenant
-        BaseIntegrationTest.sync_db()
-
-        # count before the creation of the DELETED_TENANT
-        self.before_tables_rows_counts = self.count_tables_rows()
-
-        # add the tenant DELETED_TENANT in wazo-auth for the authorization,
-        # to be able to create the tenant in wazo-confd
-        BaseIntegrationTest.mock_auth.set_tenants(*ALL_TENANTS)
-
-    @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.group(wazo_tenant=DELETED_TENANT)
-    @fixtures.incall(wazo_tenant=DELETED_TENANT)
-    @fixtures.outcall(wazo_tenant=DELETED_TENANT)
-    @fixtures.conference(wazo_tenant=DELETED_TENANT)
-    @fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
-    @fixtures.funckey_template(
-        keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}},
-        wazo_tenant=DELETED_TENANT,
-    )
-    @fixtures.switchboard(wazo_tenant=DELETED_TENANT)
-    @fixtures.device(wazo_tenant=DELETED_TENANT)
-    @fixtures.queue(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.sip(name='endpoint_sip', wazo_tenant=DELETED_TENANT)
-    @fixtures.sip(name='endpoint_sip2', wazo_tenant=DELETED_TENANT)
-    @fixtures.iax(name='endpoint_iax', wazo_tenant=DELETED_TENANT)
-    @fixtures.custom(interface='endpoint_custom', wazo_tenant=DELETED_TENANT)
-    @fixtures.agent(number='5678', wazo_tenant=DELETED_TENANT)
-    @fixtures.skill(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_pickup(wazo_tenant=DELETED_TENANT)
-    @fixtures.user(wazo_tenant=DELETED_TENANT)
-    @fixtures.call_permission(
-        mode='allow',
-        enabled=True,
-        extensions=[gen_group_exten()],
-        wazo_tenant=DELETED_TENANT,
-    )
-    @fixtures.call_filter(wazo_tenant=DELETED_TENANT)
-    @fixtures.schedule(wazo_tenant=DELETED_TENANT)
-    @fixtures.trunk(wazo_tenant=DELETED_TENANT)
-    @fixtures.ivr(
-        choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
-        wazo_tenant=DELETED_TENANT,
-    )
-    def test_delete_tenant_with_many_resources_by_syncdb(
-        self,
-        user,
-        group,
-        incall,
-        outcall,
-        conference,
-        context,
-        funckey_template,
-        switchboard,
-        device,
-        queue,
-        trunk_sip,
-        trunk_iax,
-        trunk_custom,
-        user_sip,
-        sip,
-        iax,
-        custom,
-        agent,
-        skill,
-        call_pickup,
-        user2,
-        call_permission,
-        call_filter,
-        schedule,
-        trunk,
-        ivr,
-    ):
-        confd.users(user['uuid']).funckeys('1').put(
-            {
-                'destination': {
-                    'type': 'conference',
-                    'conference_id': conference['id'],
-                }
-            }
+        stack.enter_context(a.user_line(user, line, check=False))
+        stack.enter_context(a.line_endpoint_sip(line, user_sip, check=False))
+        stack.enter_context(a.user_voicemail(user, voicemail, check=False))
+        stack.enter_context(a.switchboard_member_user(switchboard, [user], check=False))
+        stack.enter_context(a.group_extension(group, group_extension, check=False))
+        stack.enter_context(a.user_agent(user, agent, check=False))
+        stack.enter_context(a.queue_member_agent(queue, agent, check=False))
+        stack.enter_context(a.agent_skill(agent, skill, check=False))
+        stack.enter_context(a.incall_extension(incall, incall_extension, check=False))
+        stack.enter_context(
+            a.outcall_extension(outcall, outcall_extension, check=False)
         )
-
-        @fixtures.voicemail(context=context['name'], wazo_tenant=DELETED_TENANT)
-        @fixtures.line_sip(
-            context={'name': context['name']}, wazo_tenant=DELETED_TENANT
+        stack.enter_context(a.group_member_user(group, user, check=False))
+        stack.enter_context(a.trunk_endpoint_sip(trunk_sip, sip, check=False))
+        stack.enter_context(a.trunk_endpoint_iax(trunk_iax, iax, check=False))
+        stack.enter_context(a.trunk_endpoint_custom(trunk_custom, custom, check=False))
+        stack.enter_context(
+            a.call_pickup_interceptor_user(call_pickup, user, check=False)
         )
-        @fixtures.extension(exten=gen_group_exten(), context=context['name'])
-        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
-        @fixtures.extension(exten=gen_line_exten(), context=context['name'])
-        @fixtures.funckey_template(
-            keys={
-                '1': {
-                    'destination': {
-                        'type': 'conference',
-                        'conference_id': conference['id'],
-                    }
-                }
-            },
-            wazo_tenant=DELETED_TENANT,
-        )
-        def aux(
-            voicemail,
-            line,
-            group_extension,
-            incall_extension,
-            outcall_extension,
-            funckey_template_conference,
-        ):
-            with (
-                a.user_line(user, line, check=False),
-                a.line_endpoint_sip(line, user_sip, check=False),
-                a.user_voicemail(user, voicemail, check=False),
-                a.switchboard_member_user(switchboard, [user], check=False),
-                a.group_extension(group, group_extension, check=False),
-                a.user_agent(user, agent, check=False),
-                a.queue_member_agent(queue, agent, check=False),
-                a.agent_skill(agent, skill, check=False),
-                a.incall_extension(incall, incall_extension, check=False),
-                a.outcall_extension(outcall, outcall_extension, check=False),
-                a.group_member_user(group, user, check=False),
-                a.trunk_endpoint_sip(trunk_sip, sip, check=False),
-                a.trunk_endpoint_iax(trunk_iax, iax, check=False),
-                a.trunk_endpoint_custom(trunk_custom, custom, check=False),
-                a.call_pickup_interceptor_user(call_pickup, user, check=False),
-                a.call_pickup_target_user(call_pickup, user2, check=False),
-                a.incall_schedule(incall, schedule, check=False),
-                a.outcall_trunk(outcall, trunk, check=False),
-            ):
-                with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
-                    BaseIntegrationTest.sync_db()
+        stack.enter_context(a.call_pickup_target_user(call_pickup, user2, check=False))
+        stack.enter_context(a.incall_schedule(incall, schedule, check=False))
+        stack.enter_context(a.outcall_trunk(outcall, trunk, check=False))
 
-                    def resources_deleted():
-                        after_deletion_tables_rows_counts = self.count_tables_rows()
-                        diff = self.diff(after_deletion_tables_rows_counts)
-                        assert (
-                            len(diff) == 0
-                        ), f'Some tables are not properly cleaned after tenant deletion: {diff}'
-
-                    until.assert_(resources_deleted, tries=5, interval=5)
-
-        aux()
+        yield DELETED_TENANT

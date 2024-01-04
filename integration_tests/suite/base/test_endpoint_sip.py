@@ -35,40 +35,38 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 def test_get_errors():
     fake_sip_get = confd.endpoints.sip(FAKE_UUID).get
-    yield s.check_resource_not_found, fake_sip_get, 'SIPEndpoint'
+    s.check_resource_not_found(fake_sip_get, 'SIPEndpoint')
 
 
 @fixtures.sip()
 def test_delete_errors(sip):
     url = confd.endpoints.sip(sip['uuid'])
     url.delete()
-    yield s.check_resource_not_found, url.get, 'SIPEndpoint'
+    s.check_resource_not_found(url.get, 'SIPEndpoint')
 
 
 def test_post_errors():
     url = confd.endpoints.sip.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 @fixtures.sip()
 def test_put_errors(sip):
     url = confd.endpoints.sip(sip['uuid']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'name', None
+    s.check_bogus_field_returns_error(url, 'name', None)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'name', 42
-    yield s.check_bogus_field_returns_error, url, 'name', 'a' * 80
-    yield s.check_bogus_field_returns_error, url, 'name', 'global'
-    yield s.check_bogus_field_returns_error, url, 'name', 'system'
-    yield s.check_bogus_field_returns_error, url, 'transport', {'uuid': FAKE_UUID}
-    yield s.check_bogus_field_returns_error, url, 'aor_section_options', [
-        ['one', 'two', 'three']
-    ]
+    s.check_bogus_field_returns_error(url, 'name', 42)
+    s.check_bogus_field_returns_error(url, 'name', 'a' * 80)
+    s.check_bogus_field_returns_error(url, 'name', 'global')
+    s.check_bogus_field_returns_error(url, 'name', 'system')
+    s.check_bogus_field_returns_error(url, 'transport', {'uuid': FAKE_UUID})
+    s.check_bogus_field_returns_error(
+        url, 'aor_section_options', [['one', 'two', 'three']]
+    )
     sections = [
         ('aor_section_options', [['auth_type', 'invalid-key']]),
         ('auth_section_options', [['max_contacts', 'invalid-key']]),
@@ -90,19 +88,18 @@ def error_checks(url):
         ('outbound_auth_section_options', [['@custom_variable', 'invalid-key']]),
     ]
     for section, values in sections:
-        yield s.check_bogus_field_returns_error, url, section, values
+        s.check_bogus_field_returns_error(url, section, values)
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.transport(name='transport_unique')
 @fixtures.sip(name='endpoint_unique')
 @fixtures.sip_template(name='template_unique')
 def unique_error_checks(url, transport, sip, template):
-    yield s.check_bogus_field_returns_error, url, 'name', transport['name']
-    yield s.check_bogus_field_returns_error, url, 'name', template['name']
-    yield s.check_bogus_field_returns_error, url, 'name', sip['name']
+    s.check_bogus_field_returns_error(url, 'name', transport['name'])
+    s.check_bogus_field_returns_error(url, 'name', template['name'])
+    s.check_bogus_field_returns_error(url, 'name', sip['name'])
 
 
 @fixtures.sip(name='hidden', label='hidden', asterisk_id='hidden')
@@ -112,7 +109,7 @@ def test_search(hidden, sip):
     searches = {'name': 'search', 'label': 'search', 'asterisk_id': 'search'}
 
     for field, term in searches.items():
-        yield check_search, url, sip, hidden, field, term
+        check_search(url, sip, hidden, field, term)
 
 
 def check_search(url, sip, hidden, field, term):
@@ -166,11 +163,11 @@ def test_list_multi_tenant(main, sub):
 @fixtures.sip(name='sort2', label='sort2')
 def test_sorting_offset_limit(sip1, sip2):
     url = confd.endpoints.sip.get
-    yield s.check_sorting, url, sip1, sip2, 'name', 'sort', 'uuid'
-    yield s.check_sorting, url, sip1, sip2, 'label', 'sort', 'uuid'
+    s.check_sorting(url, sip1, sip2, 'name', 'sort', 'uuid')
+    s.check_sorting(url, sip1, sip2, 'label', 'sort', 'uuid')
 
-    yield s.check_offset, url, sip1, sip2, 'name', 'sort', 'uuid'
-    yield s.check_limit, url, sip1, sip2, 'name', 'sort', 'uuid'
+    s.check_offset(url, sip1, sip2, 'name', 'sort', 'uuid')
+    s.check_limit(url, sip1, sip2, 'name', 'sort', 'uuid')
 
 
 @fixtures.sip()
@@ -500,10 +497,8 @@ def test_delete_multi_tenant(main, sub):
 def test_bus_events(sip):
     headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'sip_endpoint_created', headers, confd.endpoints.sip.post
-    yield s.check_event, 'sip_endpoint_edited', headers, confd.endpoints.sip(
-        sip['uuid']
-    ).put
-    yield s.check_event, 'sip_endpoint_deleted', headers, confd.endpoints.sip(
-        sip['uuid']
-    ).delete
+    s.check_event('sip_endpoint_created', headers, confd.endpoints.sip.post)
+    s.check_event('sip_endpoint_edited', headers, confd.endpoints.sip(sip['uuid']).put)
+    s.check_event(
+        'sip_endpoint_deleted', headers, confd.endpoints.sip(sip['uuid']).delete
+    )

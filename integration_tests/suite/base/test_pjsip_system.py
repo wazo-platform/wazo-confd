@@ -1,4 +1,4 @@
-# Copyright 2020-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
@@ -10,21 +10,20 @@ from ..helpers.config import TOKEN_SUB_TENANT
 
 def test_put_errors():
     url = confd.asterisk.pjsip.system.put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'options', 123
-    yield s.check_bogus_field_returns_error, url, 'options', None
-    yield s.check_bogus_field_returns_error, url, 'options', 'string'
-    yield s.check_bogus_field_returns_error, url, 'options', [['ordered', 'option']]
-    yield s.check_bogus_field_returns_error, url, 'options', {'wrong_value': 23}
-    yield s.check_bogus_field_returns_error, url, 'options', {'none_value': None}
+    s.check_bogus_field_returns_error(url, 'options', 123)
+    s.check_bogus_field_returns_error(url, 'options', None)
+    s.check_bogus_field_returns_error(url, 'options', 'string')
+    s.check_bogus_field_returns_error(url, 'options', [['ordered', 'option']])
+    s.check_bogus_field_returns_error(url, 'options', {'wrong_value': 23})
+    s.check_bogus_field_returns_error(url, 'options', {'none_value': None})
     # Not a system option
-    yield s.check_bogus_field_returns_error, url, 'options', {'user_agent': 'yes'}
+    s.check_bogus_field_returns_error(url, 'options', {'user_agent': 'yes'})
     # Should not be modified
-    yield s.check_bogus_field_returns_error, url, 'options', {'type': 'endpoint'}
+    s.check_bogus_field_returns_error(url, 'options', {'type': 'endpoint'})
 
 
 def test_get():
@@ -63,4 +62,4 @@ def test_bus_event_when_edited():
     url = confd.asterisk.pjsip.system
     headers = {}
 
-    yield s.check_event, 'pjsip_system_updated', headers, url.put, {'options': {}}
+    s.check_event('pjsip_system_updated', headers, url.put, {'options': {}})

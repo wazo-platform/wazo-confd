@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_key, has_entry, has_entries
@@ -21,15 +21,15 @@ def test_get_users_services(user):
 def test_get_value_for_each_user_service(user):
     for service in VALID_SERVICES:
         service_url = confd.users(user['uuid']).services(service)
-        yield _read_service, service_url, False
+        _read_service(service_url, False)
 
 
 @fixtures.user()
 def test_put_value_for_each_user_service(user):
     for service in VALID_SERVICES:
         service_url = confd.users(user['uuid']).services(service)
-        yield _update_service, service_url, False
-        yield _update_service, service_url, True
+        _update_service(service_url, False)
+        _update_service(service_url, True)
 
 
 def _update_service(service_url, value):
@@ -46,7 +46,7 @@ def _read_service(service_url, value):
 @fixtures.user()
 def test_put_services(user):
     services_url = confd.users(user['uuid']).services
-    yield _update_services, services_url, {'enabled': True}, {'enabled': False}
+    _update_services(services_url, {'enabled': True}, {'enabled': False})
 
 
 def _update_services(services_url, dnd={}, incallfilter={}):
@@ -60,11 +60,11 @@ def _update_services(services_url, dnd={}, incallfilter={}):
 @fixtures.user()
 def test_put_error(user):
     service_url = confd.users(user['uuid']).services('dnd').put
-    yield s.check_bogus_field_returns_error, service_url, 'enabled', 'string'
-    yield s.check_bogus_field_returns_error, service_url, 'enabled', None
-    yield s.check_bogus_field_returns_error, service_url, 'enabled', 123
-    yield s.check_bogus_field_returns_error, service_url, 'enabled', []
-    yield s.check_bogus_field_returns_error, service_url, 'enabled', {}
+    s.check_bogus_field_returns_error(service_url, 'enabled', 'string')
+    s.check_bogus_field_returns_error(service_url, 'enabled', None)
+    s.check_bogus_field_returns_error(service_url, 'enabled', 123)
+    s.check_bogus_field_returns_error(service_url, 'enabled', [])
+    s.check_bogus_field_returns_error(service_url, 'enabled', {})
 
 
 @fixtures.user(services={'dnd': {'enabled': True}, 'incallfilter': {'enabled': True}})

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -14,32 +14,36 @@ FAKE_UUID = '99999999-9999-9999-9999-999999999999'
 
 def test_get_errors():
     fake_switchboard = confd.switchboards(FAKE_UUID).fallbacks.get
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
 
 @fixtures.switchboard()
 @fixtures.user()
 def test_put_errors(switchboard, user):
     fake_switchboard = confd.switchboards(FAKE_UUID).fallbacks.put
-    yield s.check_resource_not_found, fake_switchboard, 'Switchboard'
+    s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
     url = confd.switchboards(switchboard['uuid']).fallbacks.put
-    for check in error_checks(url, user):
-        yield check
+    error_checks(url, user)
 
     url = confd.switchboards(switchboard['uuid']).fallbacks.put
-    for check in error_checks(url, user):
-        yield check
+    error_checks(url, user)
 
 
 def error_checks(url, user):
     for destination in invalid_destinations():
-        yield s.check_bogus_field_returns_error, url, 'noanswer_destination', destination
-    yield s.check_bogus_field_returns_error, url, 'noanswer_destination', {
-        'type': 'user',
-        'user_id': user['id'],
-        'moh_uuid': '00000000-0000-0000-0000-000000000000',
-    }, {}, 'MOH was not found'
+        s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
+    s.check_bogus_field_returns_error(
+        url,
+        'noanswer_destination',
+        {
+            'type': 'user',
+            'user_id': user['id'],
+            'moh_uuid': '00000000-0000-0000-0000-000000000000',
+        },
+        {},
+        'MOH was not found',
+    )
 
 
 @fixtures.switchboard()
@@ -103,9 +107,7 @@ def test_edit_to_none(switchboard):
 @fixtures.moh()
 def test_valid_destinations(switchboard, *destinations):
     for destination in valid_destinations(*destinations):
-        yield _update_switchboard_fallbacks_with_destination, switchboard[
-            'uuid'
-        ], destination
+        _update_switchboard_fallbacks_with_destination(switchboard['uuid'], destination)
 
 
 def _update_switchboard_fallbacks_with_destination(switchboard_uuid, destination):
@@ -152,9 +154,9 @@ def test_nonexistent_destinations(switchboard, moh):
             destination['type'] == 'application'
             and destination['application'] == 'custom'
         ):
-            yield _update_user_fallbacks_with_nonexistent_destination, switchboard[
-                'uuid'
-            ], destination
+            _update_user_fallbacks_with_nonexistent_destination(
+                switchboard['uuid'], destination
+            )
 
 
 def _update_user_fallbacks_with_nonexistent_destination(switchboard_uuid, destination):
@@ -172,7 +174,7 @@ def test_bus_events(switchboard):
         'switchboard_uuid': switchboard['uuid'],
     }
 
-    yield s.check_event, 'switchboard_fallback_edited', headers, url
+    s.check_event('switchboard_fallback_edited', headers, url)
 
 
 @fixtures.switchboard()

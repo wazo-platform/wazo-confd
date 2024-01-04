@@ -27,8 +27,8 @@ def test_associate_errors(user, voicemail):
     fake_user = confd.users(FAKE_ID).voicemails(voicemail['id']).put
     fake_voicemail = confd.users(user['id']).voicemails(FAKE_ID).put
 
-    yield s.check_resource_not_found, fake_user, 'User'
-    yield s.check_resource_not_found, fake_voicemail, 'Voicemail'
+    s.check_resource_not_found(fake_user, 'User')
+    s.check_resource_not_found(fake_voicemail, 'Voicemail')
 
 
 @fixtures.user()
@@ -36,7 +36,7 @@ def test_associate_errors(user, voicemail):
 def test_dissociate_errors(user, voicemail):
     fake_user = confd.users(FAKE_ID).voicemails.delete
 
-    yield s.check_resource_not_found, fake_user, 'User'
+    s.check_resource_not_found(fake_user, 'User')
 
 
 @fixtures.user()
@@ -196,10 +196,10 @@ def test_bus_events(user, voicemail):
     }
 
     url = confd.users(user['id']).voicemails(voicemail['id']).put
-    yield s.check_event, 'user_voicemail_associated', headers, url
+    s.check_event('user_voicemail_associated', headers, url)
 
     url = confd.users(user['id']).voicemails.delete
-    yield s.check_event, 'user_voicemail_dissociated', headers, url
+    s.check_event('user_voicemail_dissociated', headers, url)
 
 
 @fixtures.user()

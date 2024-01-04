@@ -21,75 +21,70 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 
 def test_get_errors():
     fake_agent = confd.agents(999999).get
-    yield s.check_resource_not_found, fake_agent, 'Agent'
+    s.check_resource_not_found(fake_agent, 'Agent')
 
 
 def test_delete_errors():
     fake_agent = confd.agents(999999).delete
-    yield s.check_resource_not_found, fake_agent, 'Agent'
+    s.check_resource_not_found(fake_agent, 'Agent')
 
 
 def test_post_errors():
     url = confd.agents.post
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
-    yield s.check_bogus_field_returns_error, url, 'number', 123
-    yield s.check_bogus_field_returns_error, url, 'number', True
-    yield s.check_bogus_field_returns_error, url, 'number', 'invalid'
-    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(0)
-    yield s.check_bogus_field_returns_error, url, 'number', s.random_string(41)
-    yield s.check_bogus_field_returns_error, url, 'number', []
-    yield s.check_bogus_field_returns_error, url, 'number', {}
+    s.check_bogus_field_returns_error(url, 'number', 123)
+    s.check_bogus_field_returns_error(url, 'number', True)
+    s.check_bogus_field_returns_error(url, 'number', 'invalid')
+    s.check_bogus_field_returns_error(url, 'number', s.random_string(0))
+    s.check_bogus_field_returns_error(url, 'number', s.random_string(41))
+    s.check_bogus_field_returns_error(url, 'number', [])
+    s.check_bogus_field_returns_error(url, 'number', {})
 
-    for check in unique_error_checks(url):
-        yield check
+    unique_error_checks(url)
 
 
 @fixtures.agent()
 def test_put_errors(agent):
     url = confd.agents(agent['id']).put
-    for check in error_checks(url):
-        yield check
+    error_checks(url)
 
 
 def error_checks(url):
-    yield s.check_bogus_field_returns_error, url, 'firstname', 123
-    yield s.check_bogus_field_returns_error, url, 'firstname', True
-    yield s.check_bogus_field_returns_error, url, 'firstname', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'firstname', []
-    yield s.check_bogus_field_returns_error, url, 'firstname', {}
-    yield s.check_bogus_field_returns_error, url, 'lastname', 123
-    yield s.check_bogus_field_returns_error, url, 'lastname', True
-    yield s.check_bogus_field_returns_error, url, 'lastname', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'lastname', []
-    yield s.check_bogus_field_returns_error, url, 'lastname', {}
-    yield s.check_bogus_field_returns_error, url, 'password', 123
-    yield s.check_bogus_field_returns_error, url, 'password', True
-    yield s.check_bogus_field_returns_error, url, 'password', s.random_string(129)
-    yield s.check_bogus_field_returns_error, url, 'password', []
-    yield s.check_bogus_field_returns_error, url, 'password', {}
-    yield s.check_bogus_field_returns_error, url, 'language', 123
-    yield s.check_bogus_field_returns_error, url, 'language', True
-    yield s.check_bogus_field_returns_error, url, 'language', s.random_string(21)
-    yield s.check_bogus_field_returns_error, url, 'language', []
-    yield s.check_bogus_field_returns_error, url, 'language', {}
-    yield s.check_bogus_field_returns_error, url, 'description', 123
-    yield s.check_bogus_field_returns_error, url, 'description', True
-    yield s.check_bogus_field_returns_error, url, 'description', []
-    yield s.check_bogus_field_returns_error, url, 'description', {}
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', 123
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', True
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', s.random_string(
-        80
-    )
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', []
-    yield s.check_bogus_field_returns_error, url, 'preprocess_subroutine', {}
+    s.check_bogus_field_returns_error(url, 'firstname', 123)
+    s.check_bogus_field_returns_error(url, 'firstname', True)
+    s.check_bogus_field_returns_error(url, 'firstname', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'firstname', [])
+    s.check_bogus_field_returns_error(url, 'firstname', {})
+    s.check_bogus_field_returns_error(url, 'lastname', 123)
+    s.check_bogus_field_returns_error(url, 'lastname', True)
+    s.check_bogus_field_returns_error(url, 'lastname', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'lastname', [])
+    s.check_bogus_field_returns_error(url, 'lastname', {})
+    s.check_bogus_field_returns_error(url, 'password', 123)
+    s.check_bogus_field_returns_error(url, 'password', True)
+    s.check_bogus_field_returns_error(url, 'password', s.random_string(129))
+    s.check_bogus_field_returns_error(url, 'password', [])
+    s.check_bogus_field_returns_error(url, 'password', {})
+    s.check_bogus_field_returns_error(url, 'language', 123)
+    s.check_bogus_field_returns_error(url, 'language', True)
+    s.check_bogus_field_returns_error(url, 'language', s.random_string(21))
+    s.check_bogus_field_returns_error(url, 'language', [])
+    s.check_bogus_field_returns_error(url, 'language', {})
+    s.check_bogus_field_returns_error(url, 'description', 123)
+    s.check_bogus_field_returns_error(url, 'description', True)
+    s.check_bogus_field_returns_error(url, 'description', [])
+    s.check_bogus_field_returns_error(url, 'description', {})
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', 123)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', True)
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', s.random_string(80))
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', [])
+    s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
 
 
 @fixtures.agent(number='1234')
 def unique_error_checks(url, agent):
-    yield s.check_bogus_field_returns_error, url, 'number', agent['number']
+    s.check_bogus_field_returns_error(url, 'number', agent['number'])
 
 
 @fixtures.agent(firstname='hidden', lastname='hidden', preprocess_subroutine='hidden')
@@ -103,7 +98,7 @@ def test_search(hidden, agent):
     }
 
     for field, term in searches.items():
-        yield check_search, url, agent, hidden, field, term
+        check_search(url, agent, hidden, field, term)
 
 
 def check_search(url, agent, hidden, field, term):
@@ -133,13 +128,13 @@ def test_list_multi_tenant(main, sub):
 @fixtures.agent(firstname='sort2', lastname='sort2', preprocess_subroutine='sort2')
 def test_sorting_offset_limit(agent1, agent2):
     url = confd.agents.get
-    yield s.check_sorting, url, agent1, agent2, 'firstname', 'sort'
-    yield s.check_sorting, url, agent1, agent2, 'lastname', 'sort'
-    yield s.check_sorting, url, agent1, agent2, 'preprocess_subroutine', 'sort'
+    s.check_sorting(url, agent1, agent2, 'firstname', 'sort')
+    s.check_sorting(url, agent1, agent2, 'lastname', 'sort')
+    s.check_sorting(url, agent1, agent2, 'preprocess_subroutine', 'sort')
 
-    yield s.check_offset, url, agent1, agent2, 'firstname', 'sort'
+    s.check_offset(url, agent1, agent2, 'firstname', 'sort')
 
-    yield s.check_limit, url, agent1, agent2, 'firstname', 'sort'
+    s.check_limit(url, agent1, agent2, 'firstname', 'sort')
 
 
 @fixtures.agent()
@@ -223,6 +218,9 @@ def test_create_multi_tenant():
 
     assert_that(response_main.item, has_entries(tenant_uuid=MAIN_TENANT))
 
+    confd.agents(response_sub.item['id']).delete().assert_deleted()
+    confd.agents(response_main.item['id']).delete().assert_deleted()
+
 
 @fixtures.agent()
 def test_edit_minimal_parameters(agent):
@@ -289,13 +287,14 @@ def test_delete_multi_tenant(main, sub):
 def test_bus_events(agent):
     expected_headers = {'tenant_uuid': MAIN_TENANT}
 
-    yield s.check_event, 'agent_created', expected_headers, confd.agents.post, {
-        'number': '123456789123456789'
-    }
-    yield s.check_event, 'agent_edited', expected_headers, confd.agents(agent['id']).put
-    yield s.check_event, 'agent_deleted', expected_headers, confd.agents(
-        agent['id']
-    ).delete
+    s.check_event(
+        'agent_created',
+        expected_headers,
+        confd.agents.post,
+        {'number': '123456789123456789'},
+    )
+    s.check_event('agent_edited', expected_headers, confd.agents(agent['id']).put)
+    s.check_event('agent_deleted', expected_headers, confd.agents(agent['id']).delete)
 
 
 def test_create_multi_tenant_same_number():
