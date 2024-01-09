@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -126,7 +126,7 @@ def test_list_multi_tenant(main, sub):
 # this test makes sure we are using joinedload instead of lazyloading
 @fixtures.call_permission(wazo_tenant=MAIN_TENANT)
 def test_list_db_requests(*_):
-    expected_request_count = 1 + 1  # 1 list (w/ joinedload) + 1 count
+    expected_request_count = 1 + 4 + 1  # 1 list with 4 selectin + 1 count
     s.check_db_requests(
         BaseIntegrationTest,
         confd.callpermissions.get,
