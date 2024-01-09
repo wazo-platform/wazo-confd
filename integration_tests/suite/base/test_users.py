@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -656,6 +656,7 @@ def test_sorting_offset_limit(user1, user2):
     s.check_sorting(url, user1, user2, 'mobile_phone_number', '+555')
     s.check_sorting(url, user1, user2, 'userfield', 'sort userfield')
     s.check_sorting(url, user1, user2, 'description', 'description')
+    s.check_sorting(url, user1, user2, 'id', 'firstname')
 
     s.check_offset(url, user1, user2, 'firstname', 'firstname')
     s.check_limit(url, user1, user2, 'firstname', 'firstname')
