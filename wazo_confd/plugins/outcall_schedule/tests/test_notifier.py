@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.outcall_schedule.event import (
+from wazo_bus.resources.outcall_schedule.event import (
     OutcallScheduleAssociatedEvent,
     OutcallScheduleDissociatedEvent,
 )

@@ -1,11 +1,11 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd import bus, sysconfd
 from wazo_confd.plugins.line.schema import LineSchema
 from wazo_confd.plugins.device.schema import DeviceSchema
 
-from xivo_bus.resources.line_device.event import (
+from wazo_bus.resources.line_device.event import (
     LineDeviceAssociatedEvent,
     LineDeviceDissociatedEvent,
 )

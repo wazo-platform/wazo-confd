@@ -1,11 +1,11 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 import uuid
 from unittest.mock import Mock
 
-from xivo_bus.resources.endpoint_sip.event import (
+from wazo_bus.resources.endpoint_sip.event import (
     SIPEndpointCreatedEvent,
     SIPEndpointDeletedEvent,
     SIPEndpointEditedEvent,

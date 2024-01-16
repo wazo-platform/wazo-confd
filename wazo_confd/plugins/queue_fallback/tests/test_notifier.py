@@ -1,4 +1,4 @@
-# Copyright 2018-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.queue.event import QueueFallbackEditedEvent
+from wazo_bus.resources.queue.event import QueueFallbackEditedEvent
 from xivo_dao.alchemy.queuefeatures import QueueFeatures as Queue
 
 from ..notifier import QueueFallbackNotifier

@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.user_group.event import UserGroupsAssociatedEvent
+from wazo_bus.resources.user_group.event import UserGroupsAssociatedEvent
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.groupfeatures import GroupFeatures as Group
 

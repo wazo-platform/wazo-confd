@@ -1,4 +1,4 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,13 +6,13 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock, call
 
-from xivo_bus.resources.queue_member.event import (
+from wazo_bus.resources.queue_member.event import (
     QueueMemberAgentAssociatedEvent,
     QueueMemberAgentDissociatedEvent,
     QueueMemberUserAssociatedEvent,
     QueueMemberUserDissociatedEvent,
 )
-from xivo_bus.resources.agent.event import AgentEditedEvent
+from wazo_bus.resources.agent.event import AgentEditedEvent
 from ..notifier import QueueMemberNotifier
 
 
