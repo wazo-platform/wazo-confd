@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -7,7 +7,7 @@ import uuid
 from unittest.mock import Mock, call
 from hamcrest import assert_that, has_entries
 
-from xivo_bus.resources.user.event import (
+from wazo_bus.resources.user.event import (
     UserCreatedEvent,
     UserDeletedEvent,
     UserEditedEvent,

@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -9,7 +9,7 @@ from unittest.mock import call, Mock
 
 from xivo_dao.alchemy.voicemail import Voicemail
 
-from xivo_bus.resources.voicemail.event import (
+from wazo_bus.resources.voicemail.event import (
     VoicemailCreatedEvent,
     VoicemailDeletedEvent,
     VoicemailEditedEvent,

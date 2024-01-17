@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.outcall_trunk.event import OutcallTrunksAssociatedEvent
+from wazo_bus.resources.outcall_trunk.event import OutcallTrunksAssociatedEvent
 from xivo_dao.alchemy.outcall import Outcall
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 

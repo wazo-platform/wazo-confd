@@ -74,7 +74,7 @@ You need the repos wazo-provd up-to-date.
 
 ### Mounting libraries
 
-In case you need to mount libraries (xivo-dao, xivo-bus, lib-python) inside the wazo-confd container:
+In case you need to mount libraries (xivo-dao, wazo-bus, lib-python) inside the wazo-confd container:
 
 1. Uncomment the confd volumes in ```integration_tests/assets/docker-compose.yml```
 2. Set the environment variable: ```export LOCAL_GIT_REPOS=/parent/directory/to/all/git/repos```

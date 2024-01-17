@@ -1,4 +1,4 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -6,7 +6,7 @@ import unittest
 from uuid import uuid4
 from unittest.mock import Mock
 
-from xivo_bus.resources.extension_feature.event import ExtensionFeatureEditedEvent
+from wazo_bus.resources.extension_feature.event import ExtensionFeatureEditedEvent
 from xivo_dao.alchemy.feature_extension import FeatureExtension
 
 from ..notifier import ExtensionFeatureNotifier
