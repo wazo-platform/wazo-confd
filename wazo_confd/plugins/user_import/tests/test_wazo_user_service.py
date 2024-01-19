@@ -1,9 +1,9 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 
-from hamcrest import assert_that, contains, has_entries, has_items
+from hamcrest import assert_that, contains_exactly, has_entries, has_items
 from unittest.mock import Mock, sentinel as s
 
 from ..wazo_user_service import WazoUserService
@@ -21,7 +21,7 @@ class TestWazoUserService(unittest.TestCase):
 
         assert_that(
             self.auth_client.new_user.call_args_list,
-            contains(has_items(has_entries(tenant_uuid=s.tenant_uuid))),
+            contains_exactly(has_items(has_entries(tenant_uuid=s.tenant_uuid))),
         )
 
     def test_that_a_missing_tenant_uuid_does_not_raise(self):
@@ -31,5 +31,5 @@ class TestWazoUserService(unittest.TestCase):
 
         assert_that(
             self.auth_client.new_user.call_args_list,
-            contains(has_items(has_entries(tenant_uuid=None))),
+            contains_exactly(has_items(has_entries(tenant_uuid=None))),
         )

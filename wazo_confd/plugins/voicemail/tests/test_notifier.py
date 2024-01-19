@@ -3,7 +3,7 @@
 
 import unittest
 
-from hamcrest import assert_that, contains
+from hamcrest import assert_that, contains_exactly
 from uuid import uuid4
 from unittest.mock import call, Mock
 
@@ -56,7 +56,7 @@ class TestVoicemailNotifier(unittest.TestCase):
 
         assert_that(
             self.bus.queue_event.call_args_list,
-            contains(
+            contains_exactly(
                 call(expected_event1),
                 call(expected_event2),
             ),
