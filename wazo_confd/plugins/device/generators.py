@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -58,7 +58,7 @@ class ExtensionGenerator:
             'exten_fwd_no_answer': self.find_exten('fwdrna'),
             'exten_fwd_busy': self.find_exten('fwdbusy'),
             'exten_fwd_disable_all': self.find_exten('fwdundoall'),
-            'exten_park': self.find_exten('parkext'),
+            'exten_park': None,
             'exten_pickup_group': self.find_exten('pickupexten'),
             'exten_pickup_call': self.find_exten('pickup'),
             'exten_voicemail': self.find_exten('vmusermsg'),
