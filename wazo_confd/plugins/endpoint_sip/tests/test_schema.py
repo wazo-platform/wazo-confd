@@ -1,4 +1,4 @@
-# Copyright 2019-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -7,7 +7,7 @@ from unittest import TestCase
 from hamcrest import (
     assert_that,
     calling,
-    contains,
+    contains_exactly,
     empty,
     equal_to,
     has_entries,
@@ -81,7 +81,7 @@ class TestEndpointSIPSchema(TestCase):
         loaded = self.schema.load(body)
         assert_that(
             loaded,
-            has_entries(templates=contains({'uuid': template_uuid})),
+            has_entries(templates=contains_exactly({'uuid': template_uuid})),
         )
 
         body = {'templates': [{'name': 'no uuid'}]}
@@ -127,7 +127,9 @@ class TestEndpointSIPSchema(TestCase):
         loaded = self.schema.dump(body)
         assert_that(
             loaded,
-            has_entries(auth_section_options=contains(['username', 'username'])),
+            has_entries(
+                auth_section_options=contains_exactly(['username', 'username'])
+            ),
         )
 
         body = {'auth_section_options': [['password', 'password']]}
@@ -145,7 +147,7 @@ class TestEndpointSIPSchema(TestCase):
         assert_that(
             loaded,
             has_entries(
-                auth_section_options=contains(
+                auth_section_options=contains_exactly(
                     ['username', 'username1'],
                     ['username', 'username2'],
                 )
@@ -160,7 +162,9 @@ class TestMergedEndpointSIPSchema(TestCase):
         loaded = self.schema.dump(body)
         assert_that(
             loaded,
-            has_entries(auth_section_options=contains(('username', 'username'))),
+            has_entries(
+                auth_section_options=contains_exactly(('username', 'username'))
+            ),
         )
 
     def test_get_attribute_with_attribute_and_only(self):
@@ -174,5 +178,7 @@ class TestMergedEndpointSIPSchema(TestCase):
         loaded = self.schema.dump(body)
         assert_that(
             loaded,
-            has_entries(auth_section_options=contains(('username', 'username'))),
+            has_entries(
+                auth_section_options=contains_exactly(('username', 'username'))
+            ),
         )

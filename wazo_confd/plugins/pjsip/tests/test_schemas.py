@@ -1,9 +1,9 @@
-# Copyright 2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
 
-from hamcrest import assert_that, calling, empty, has_entries, contains, raises
+from hamcrest import assert_that, calling, empty, has_entries, contains_exactly, raises
 from werkzeug.exceptions import BadRequest
 
 from ..schema import PJSIPTransportSchema
@@ -25,10 +25,10 @@ class TestTransportSchema(TestCase):
             result,
             has_entries(
                 name='my-transport',
-                options=contains(
-                    contains('bind', '0.0.0.0:5060'),
-                    contains('local_net', '192.168.1.0/24'),
-                    contains('protocol', 'udp'),
+                options=contains_exactly(
+                    contains_exactly('bind', '0.0.0.0:5060'),
+                    contains_exactly('local_net', '192.168.1.0/24'),
+                    contains_exactly('protocol', 'udp'),
                 ),
             ),
         )
