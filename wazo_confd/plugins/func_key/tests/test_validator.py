@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -11,7 +11,6 @@ from xivo_dao.alchemy.callfiltermember import Callfiltermember as CallFilterMemb
 from xivo_dao.alchemy.func_key_dest_bsfilter import FuncKeyDestBSFilter
 from xivo_dao.alchemy.func_key_dest_custom import FuncKeyDestCustom
 from xivo_dao.alchemy.func_key_dest_forward import FuncKeyDestForward
-from xivo_dao.alchemy.func_key_dest_park_position import FuncKeyDestParkPosition
 from xivo_dao.alchemy.func_key_dest_service import FuncKeyDestService
 from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping as FuncKey
 from xivo_dao.alchemy.func_key_template import FuncKeyTemplate
@@ -25,7 +24,6 @@ from wazo_confd.plugins.func_key.validator import (
     CustomValidator,
     ForwardValidator,
     FuncKeyModelValidator,
-    ParkPositionValidator,
     PrivateTemplateValidator,
     SimilarFuncKeyValidator,
 )
@@ -195,48 +193,6 @@ class TestForwardValidator(unittest.TestCase):
         destination = FuncKeyDestForward(forward='noanswer', exten='hello')
 
         self.validator.validate(destination)
-
-
-class TestParkPositionValidator(unittest.TestCase):
-    def setUp(self):
-        self.dao = Mock()
-        self.dao.find_park_position_range.return_value = (701, 750)
-        self.validator = ParkPositionValidator(self.dao)
-
-    def test_given_position_under_minimum_then_raises_error(self):
-        destination = FuncKeyDestParkPosition(position=600)
-
-        assert_that(
-            calling(self.validator.validate).with_args(destination), raises(InputError)
-        )
-
-    def test_given_position_over_maximum_then_raises_error(self):
-        destination = FuncKeyDestParkPosition(position=800)
-
-        assert_that(
-            calling(self.validator.validate).with_args(destination), raises(InputError)
-        )
-
-    def test_given_position_on_minimum_position_then_validation_passes(self):
-        destination = FuncKeyDestParkPosition(position=701)
-
-        self.validator.validate(destination)
-
-        self.dao.find_park_position_range.assert_called_once_with()
-
-    def test_given_position_on_maximum_position_then_validation_passes(self):
-        destination = FuncKeyDestParkPosition(position=750)
-
-        self.validator.validate(destination)
-
-        self.dao.find_park_position_range.assert_called_once_with()
-
-    def test_given_position_inside_range_then_validation_passes(self):
-        destination = FuncKeyDestParkPosition(position=710)
-
-        self.validator.validate(destination)
-
-        self.dao.find_park_position_range.assert_called_once_with()
 
 
 class TestCustomValidator(unittest.TestCase):

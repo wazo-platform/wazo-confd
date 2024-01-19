@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -7,7 +7,6 @@ from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
 from xivo_dao.resources.call_filter import dao as call_filter_dao
 from xivo_dao.resources.conference import dao as conference_dao
-from xivo_dao.resources.features import dao as feature_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.paging import dao as paging_dao
 from xivo_dao.resources.queue import dao as queue_dao
@@ -109,18 +108,6 @@ class ForwardValidator(FuncKeyValidator):
         self.validate_text(destination.exten, 'exten')
 
 
-class ParkPositionValidator(FuncKeyValidator):
-    def __init__(self, dao):
-        self.dao = dao
-
-    def validate(self, destination):
-        min_pos, max_pos = self.dao.find_park_position_range()
-        position = destination.position
-
-        if not min_pos <= position <= max_pos:
-            raise errors.outside_park_range(position, min=min_pos, max=max_pos)
-
-
 class CustomValidator(FuncKeyValidator):
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
@@ -150,8 +137,8 @@ def build_validator():
         'groupmember': [GetResource('group_id', group_dao.get, 'Group')],
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
-        'park_position': [ParkPositionValidator(feature_dao)],
-        'parking': [],
+        # 'park_position': [],
+        # 'parking': [],
         'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
         'service': [],
         'transfer': [],
