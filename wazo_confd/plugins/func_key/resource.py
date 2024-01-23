@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -10,13 +10,11 @@ from xivo_dao.alchemy.func_key_dest_conference import FuncKeyDestConference
 from xivo_dao.alchemy.func_key_dest_features import (
     FuncKeyDestTransfer,
     FuncKeyDestOnlineRecording,
-    FuncKeyDestParking,
 )
 from xivo_dao.alchemy.func_key_dest_forward import FuncKeyDestForward
 from xivo_dao.alchemy.func_key_dest_group import FuncKeyDestGroup
 from xivo_dao.alchemy.func_key_dest_group_member import FuncKeyDestGroupMember
 from xivo_dao.alchemy.func_key_dest_paging import FuncKeyDestPaging
-from xivo_dao.alchemy.func_key_dest_park_position import FuncKeyDestParkPosition
 from xivo_dao.alchemy.func_key_dest_queue import FuncKeyDestQueue
 from xivo_dao.alchemy.func_key_dest_service import FuncKeyDestService
 from xivo_dao.alchemy.func_key_dest_user import FuncKeyDestUser
@@ -44,8 +42,8 @@ models_destination = {
     'groupmember': FuncKeyDestGroupMember,
     'onlinerec': FuncKeyDestOnlineRecording,
     'paging': FuncKeyDestPaging,
-    'park_position': FuncKeyDestParkPosition,
-    'parking': FuncKeyDestParking,
+    # 'park_position': FuncKeyDestParkPosition,
+    # 'parking': FuncKeyDestParking,
     'queue': FuncKeyDestQueue,
     'service': FuncKeyDestService,
     'transfer': FuncKeyDestTransfer,
