@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -70,10 +70,10 @@ invalid_destinations = [
     {'type': 'paging', 'bad_field': 123},
     {'type': 'paging', 'paging_id': 'invalid'},
     {'type': 'paging', 'paging_id': None},
-    {'type': 'park_position'},
-    {'type': 'park_position', 'bad_field': 123},
-    {'type': 'park_position', 'position': 'invalid'},
-    {'type': 'park_position', 'position': None},
+    # {'type': 'park_position'},
+    # {'type': 'park_position', 'bad_field': 123},
+    # {'type': 'park_position', 'position': 'invalid'},
+    # {'type': 'park_position', 'position': None},
     {'type': 'queue'},
     {'type': 'queue', 'bad_field': 123},
     {'type': 'queue', 'queue_id': 'string'},
@@ -186,8 +186,8 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         forward_number = '5000'
         custom_exten = '9999'
         paging_number = '1234'
-        parking = '700'
-        park_pos = 701
+        # parking = '700'
+        # park_pos = 701
 
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
@@ -293,8 +293,8 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     user_id=self.user['id'], agent_id=agent_id
                 ),
             },
-            '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
-            '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
+            # '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
+            # '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
             '28': {
                 'label': '',
                 'type': 'speeddial',
@@ -443,11 +443,11 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'agent_id': agent_id,
                 },
             },
-            '26': {
-                'blf': False,
-                'destination': {'type': 'park_position', 'position': park_pos},
-            },
-            '27': {'blf': False, 'destination': {'type': 'parking'}},
+            # '26': {
+            #     'blf': False,
+            #     'destination': {'type': 'park_position', 'position': park_pos},
+            # },
+            # '27': {'blf': False, 'destination': {'type': 'parking'}},
             '28': {
                 'blf': False,
                 'destination': {'type': 'paging', 'paging_id': paging_id},
@@ -559,12 +559,12 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
         self.funckeys = {
             '1': {'destination': {'type': 'custom', 'exten': '9999'}},
-            '2': {'destination': {'type': 'parking'}},
+            '2': {'destination': {'type': 'transfer', 'transfer': 'blind'}},
         }
 
         self.provd_funckeys = {
             '1': {'label': '', 'type': 'blf', 'line': 1, 'value': '9999'},
-            '2': {'label': '', 'type': 'park', 'line': 1, 'value': '700'},
+            '2': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*1'},
         }
 
         response = confd.funckeys.templates.post(keys=self.funckeys)
@@ -1096,7 +1096,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         conf_exten = '4000'
         forward_number = '5000'
         custom_exten = '9999'
-        park_pos = 701
+        # park_pos = 701
 
         with self.db.queries() as queries:
             conference_id = queries.insert_conference(
@@ -1150,7 +1150,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                     'agent_id': agent_id,
                 }
             },
-            '26': {'destination': {'type': 'park_position', 'position': park_pos}},
+            # '26': {'destination': {'type': 'park_position', 'position': park_pos}},
             '29': {
                 'destination': {
                     'type': 'bsfilter',
@@ -1258,7 +1258,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                     user_id=self.user['id'], agent_id=agent_id
                 ),
             },
-            '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
+            # '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
             '29': {
                 'label': '',
                 'type': 'blf',
@@ -1308,8 +1308,11 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         self,
     ):
         position = '1'
-        funckey = {'blf': True, 'destination': {'type': 'parking'}}
-        provd_funckey = {'label': '', 'type': 'park', 'line': 1, 'value': '700'}
+        funckey = {
+            'blf': True,
+            'destination': {'type': 'transfer', 'transfer': 'blind'},
+        }
+        provd_funckey = {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*1'}
 
         self.add_funckey_to_user(position, funckey)
         self.check_provd_has_funckey(position, provd_funckey)

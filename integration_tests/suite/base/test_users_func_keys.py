@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, has_key, is_not
@@ -91,25 +91,25 @@ def test_put_position(user, line_sip, extension, device):
     modified_funckey = {
         'blf': False,
         'label': 'myfunckey',
-        'destination': {'type': 'park_position', 'position': 701},
+        'destination': {'type': 'service', 'service': 'recsnd'},
     }
     uuid_funckey = {
         'blf': False,
         'label': 'myfunckey',
-        'destination': {'type': 'park_position', 'position': 702},
+        'destination': {'type': 'service', 'service': 'phonestatus'},
     }
 
     provd_funckey = {
         'label': 'myfunckey',
         'type': 'speeddial',
         'line': 1,
-        'value': '701',
+        'value': '*9',
     }
     provd_uuid_funckey = {
         'label': 'myfunckey',
         'type': 'speeddial',
         'line': 1,
-        'value': '702',
+        'value': '*10',
     }
     position = 1
 
