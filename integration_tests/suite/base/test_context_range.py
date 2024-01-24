@@ -1,4 +1,4 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -196,7 +196,6 @@ def test_search_partial_exten(context):
 )
 def test_search_overlapping_ranges(context):
     response = confd.contexts(context['id']).ranges('user').get()
-    print(response)
     assert_that(
         response.json,
         has_entries(
