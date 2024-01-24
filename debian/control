@@ -8,9 +8,6 @@ X-Python3-Version: >= 3.9
 
 Package: wazo-confd
 Architecture: all
-Provides: xivo-confd
-Conflicts: xivo-confd
-Replaces: xivo-confd
 Depends:
   ${python3:Depends},
   ${misc:Depends},
@@ -26,7 +23,6 @@ Depends:
   python3-requests,
   python3-werkzeug,
   python3-tz,
-  rename,
   wazo-auth-client-python3,
   wazo-provd-client-python3,
   wazo-bus-python3,
