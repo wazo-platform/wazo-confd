@@ -1,4 +1,4 @@
-PROVD_DIR ?= ../../provd/
+PROVD_DIR ?= ${LOCAL_GIT_REPOS}/wazo-provd/
 
 ifeq ($(MANAGE_DB_DIR),)
 	UPDATE_DB_TARGET=update-db-pull
