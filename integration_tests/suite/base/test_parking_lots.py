@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -315,7 +315,7 @@ def test_bus_events(parking_lot):
     url = confd.parkinglots(parking_lot['id'])
     headers = {'tenant_uuid': parking_lot['tenant_uuid']}
 
-    s.check_event(
+    response = s.check_event(
         'parking_lot_created',
         headers,
         confd.parkinglots.post,
@@ -324,5 +324,7 @@ def test_bus_events(parking_lot):
             'slots_end': '999',
         },
     )
+    confd.parkinglots(response.item['id']).delete().assert_deleted()
+
     s.check_event('parking_lot_edited', headers, url.put)
     s.check_event('parking_lot_deleted', headers, url.delete)
