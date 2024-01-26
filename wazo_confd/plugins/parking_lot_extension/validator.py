@@ -1,9 +1,10 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 
 from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
 
@@ -17,6 +18,9 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
         self.validate_extension_is_in_internal_context(extension)
         self.validate_extension_is_not_pattern(extension)
         self.validate_slots_do_not_conflict_with_extension_context(
+            parking_lot, extension
+        )
+        self.validate_slots_do_not_conflict_with_other_parking_slots(
             parking_lot, extension
         )
 
@@ -81,6 +85,40 @@ class ParkingLotExtensionAssociationValidator(ValidatorAssociation):
                     id=extension.id,
                     exten=extension.exten,
                     context=extension.context,
+                )
+
+    def validate_slots_do_not_conflict_with_other_parking_slots(
+        self, parking_lot, extension
+    ):
+        sibling_parking_lots = parking_lot_dao.find_all_by(context=extension.context)
+        for sibling_parking_lot in sibling_parking_lots:
+            if sibling_parking_lot.in_slots_range(parking_lot.slots_start):
+                raise errors.extension_conflict(
+                    'Extension',
+                    exten=parking_lot.slots_start,
+                    context=extension.context,
+                    parking_lot_id=sibling_parking_lot.id,
+                )
+            if sibling_parking_lot.in_slots_range(parking_lot.slots_end):
+                raise errors.extension_conflict(
+                    'Extension',
+                    exten=parking_lot.slots_end,
+                    context=extension.context,
+                    parking_lot_id=sibling_parking_lot.id,
+                )
+            if parking_lot.in_slots_range(sibling_parking_lot.slots_start):
+                raise errors.extension_conflict(
+                    'Extension',
+                    exten=sibling_parking_lot.slots_start,
+                    context=extension.context,
+                    parking_lot_id=sibling_parking_lot.id,
+                )
+            if parking_lot.in_slots_range(sibling_parking_lot.slots_end):
+                raise errors.extension_conflict(
+                    'Extension',
+                    exten=sibling_parking_lot.slots_end,
+                    context=extension.context,
+                    parking_lot_id=sibling_parking_lot.id,
                 )
 
 
