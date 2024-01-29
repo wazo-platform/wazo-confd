@@ -9,69 +9,69 @@ from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 from wazo_confd.helpers.validator import MOHExists, ValidationGroup, Validator
 
 
+def validate_parking_lot_slots_do_not_conflict(parking_lot, context):
+    validate_parking_lot_slots_do_not_conflict_with_extension(parking_lot, context)
+    validate_parking_lot_slots_do_not_conflict_with_parking_lots(parking_lot, context)
+
+
+def validate_parking_lot_slots_do_not_conflict_with_extension(parking_lot, context):
+    extensions = extension_dao.find_all_by(context=context)
+    for extension in extensions:
+        if extension.is_pattern():
+            continue
+        if parking_lot.in_slots_range(extension.exten):
+            raise errors.resource_exists(
+                'Extension',
+                id=extension.id,
+                exten=extension.exten,
+                context=extension.context,
+            )
+
+
+def validate_parking_lot_slots_do_not_conflict_with_parking_lots(parking_lot, context):
+    sibling_parking_lots = (
+        sibling_parking_lot
+        for sibling_parking_lot in parking_lot_dao.find_all_by(context=context)
+        if sibling_parking_lot.id != parking_lot.id
+    )
+    for sibling_parking_lot in sibling_parking_lots:
+        if sibling_parking_lot.in_slots_range(parking_lot.slots_start):
+            raise errors.extension_conflict(
+                'Extension',
+                exten=parking_lot.slots_start,
+                context=context,
+                parking_lot_id=sibling_parking_lot.id,
+            )
+        if sibling_parking_lot.in_slots_range(parking_lot.slots_end):
+            raise errors.extension_conflict(
+                'Extension',
+                exten=parking_lot.slots_end,
+                context=context,
+                parking_lot_id=sibling_parking_lot.id,
+            )
+        if parking_lot.in_slots_range(sibling_parking_lot.slots_start):
+            raise errors.extension_conflict(
+                'Extension',
+                exten=sibling_parking_lot.slots_start,
+                context=context,
+                parking_lot_id=sibling_parking_lot.id,
+            )
+        if parking_lot.in_slots_range(sibling_parking_lot.slots_end):
+            raise errors.extension_conflict(
+                'Extension',
+                exten=sibling_parking_lot.slots_end,
+                context=context,
+                parking_lot_id=sibling_parking_lot.id,
+            )
+
+
 class SlotsAvailableValidator(Validator):
     def validate(self, parking_lot):
-        self.validate_slots_do_not_conflict_with_extension_context(parking_lot)
-        self.validate_slots_do_not_conflict_with_other_parking_slots(parking_lot)
-
-    def validate_slots_do_not_conflict_with_extension_context(self, parking_lot):
         if not parking_lot.extensions:
             return
 
-        parking_lot_context = parking_lot.extensions[0].context
-        extensions = extension_dao.find_all_by(context=parking_lot_context)
-        for extension in extensions:
-            if extension.is_pattern():
-                continue
-            if parking_lot.in_slots_range(extension.exten):
-                raise errors.resource_exists(
-                    'Extension',
-                    id=extension.id,
-                    exten=extension.exten,
-                    context=extension.context,
-                )
-
-    def validate_slots_do_not_conflict_with_other_parking_slots(self, parking_lot):
-        if not parking_lot.extensions:
-            return
-
-        parking_lot_context = parking_lot.extensions[0].context
-        sibling_parking_lots = (
-            sibling_parking_lot
-            for sibling_parking_lot in parking_lot_dao.find_all_by(
-                context=parking_lot_context
-            )
-            if sibling_parking_lot.id != parking_lot.id
-        )
-        for sibling_parking_lot in sibling_parking_lots:
-            if sibling_parking_lot.in_slots_range(parking_lot.slots_start):
-                raise errors.extension_conflict(
-                    'Extension',
-                    exten=parking_lot.slots_start,
-                    context=parking_lot_context,
-                    parking_lot_id=sibling_parking_lot.id,
-                )
-            if sibling_parking_lot.in_slots_range(parking_lot.slots_end):
-                raise errors.extension_conflict(
-                    'Extension',
-                    exten=parking_lot.slots_end,
-                    context=parking_lot_context,
-                    parking_lot_id=sibling_parking_lot.id,
-                )
-            if parking_lot.in_slots_range(sibling_parking_lot.slots_start):
-                raise errors.extension_conflict(
-                    'Extension',
-                    exten=sibling_parking_lot.slots_start,
-                    context=parking_lot_context,
-                    parking_lot_id=sibling_parking_lot.id,
-                )
-            if parking_lot.in_slots_range(sibling_parking_lot.slots_end):
-                raise errors.extension_conflict(
-                    'Extension',
-                    exten=sibling_parking_lot.slots_end,
-                    context=parking_lot_context,
-                    parking_lot_id=sibling_parking_lot.id,
-                )
+        context = parking_lot.extensions[0].context
+        validate_parking_lot_slots_do_not_conflict(parking_lot, context)
 
 
 def build_validator():
