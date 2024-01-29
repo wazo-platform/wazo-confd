@@ -20,7 +20,7 @@ from ..helpers import (
     fixtures,
     scenarios as s,
 )
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import CONTEXT, MAIN_TENANT, SUB_TENANT
 
 
 def test_get_errors():
@@ -290,6 +290,58 @@ def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
 
     response = confd.parkinglots(sub['id']).put(music_on_hold=sub_moh['name'])
     response.assert_updated()
+
+
+@fixtures.extension(exten='600', context=CONTEXT)
+@fixtures.parking_lot(slots_start='601', slots_end='650')
+@fixtures.extension(exten='400', context=CONTEXT)
+@fixtures.parking_lot(slots_start='701', slots_end='750')
+@fixtures.parking_lot(slots_start='801', slots_end='850', wazo_tenant=SUB_TENANT)
+def test_edit_when_overlapping_slots(
+    exten_edited_parking_lot,
+    edited_parking_lot,
+    exten_existing_parking_lot,
+    existing_parking_lot,
+    _,
+):
+    def assert_edition_fails(start, end):
+        parking_lot = dict(edited_parking_lot)
+        parking_lot['slots_start'] = start
+        parking_lot['slots_end'] = end
+        response = confd.parkinglots(parking_lot['id']).put(parking_lot)
+        response.assert_match(400, e.extension_conflict())
+
+    with (
+        a.parking_lot_extension(existing_parking_lot, exten_existing_parking_lot),
+        a.parking_lot_extension(edited_parking_lot, exten_edited_parking_lot),
+    ):
+        # same range
+        assert_edition_fails('701', '750')
+        # overlap end
+        assert_edition_fails('750', '850')
+        # overlap end -1
+        assert_edition_fails('749', '850')
+        # overlap start
+        assert_edition_fails('601', '701')
+        # overlap start +1
+        assert_edition_fails('601', '702')
+        # overlap inner
+        assert_edition_fails('710', '711')
+        # overlap outer
+        assert_edition_fails('601', '850')
+
+        # check there is no conflict with itself
+        parking_lot = dict(edited_parking_lot)
+        response = confd.parkinglots(edited_parking_lot['id']).put(parking_lot)
+        response.assert_updated()
+
+        # check there is no conflict with parking_lot from other tenant
+        parking_lot = dict(edited_parking_lot)
+        parking_lot['slots_start'] = '801'
+        parking_lot['slots_end'] = '850'
+
+        response = confd.parkinglots(edited_parking_lot['id']).put(parking_lot)
+        response.assert_updated()
 
 
 @fixtures.parking_lot()
