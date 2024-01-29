@@ -292,6 +292,20 @@ def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
     response.assert_updated()
 
 
+@fixtures.parking_lot(slots_start='1701', slots_end='1750')
+@fixtures.extension(exten='1700')
+@fixtures.extension(exten='1825')
+def test_edit_range_when_other_extension_exists(
+    parking_lot, parking_lot_extension, blocking_extension
+):
+    with a.parking_lot_extension(parking_lot, parking_lot_extension):
+        parking_lot = dict(parking_lot)
+        parking_lot['slots_start'] = '1801'
+        parking_lot['slots_end'] = '1850'
+        response = confd.parkinglots(parking_lot['id']).put(parking_lot)
+        response.assert_status(400)
+
+
 @fixtures.extension(exten='600', context=CONTEXT)
 @fixtures.parking_lot(slots_start='601', slots_end='650')
 @fixtures.extension(exten='400', context=CONTEXT)
