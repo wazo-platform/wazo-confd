@@ -117,9 +117,8 @@ def test_associate_when_exten_is_pattern(parking_lot, extension):
 @fixtures.extension(exten='600', context=CONTEXT)
 @fixtures.extension(exten='400', context=CONTEXT)
 @fixtures.parking_lot(slots_start='701', slots_end='750')
-@fixtures.parking_lot(slots_start='801', slots_end='850', wazo_tenant=SUB_TENANT)
 def test_associate_when_overlapping_slots(
-    exten_new_parking, exten_existing_parking, existing_parking, _
+    exten_new_parking, exten_existing_parking, existing_parking
 ):
     def assert_association_fails(start, end):
         with fixtures.parking_lot(slots_start=start, slots_end=end) as parking_lot:
@@ -146,15 +145,31 @@ def test_associate_when_overlapping_slots(
         # overlap outer
         assert_association_fails('601', '850')
 
-        # check there is no conflict with parking_lot from other tenant
-        parameters = {
-            'slots_start': '801',
-            'slots_end': '850',
-        }
 
-        response = confd.parkinglots.post(**parameters)
-        response.assert_created('parkinglots')
-        confd.parkinglots(response.item['id']).delete().assert_deleted()
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
+@fixtures.parking_lot(slots_start='801', slots_end='850', wazo_tenant=SUB_TENANT)
+def test_associate_when_overlapping_slots_multi_tenant(main_ctx, sub_ctx, sub_pl):
+    with fixtures.extension(exten='600', context=main_ctx['name']) as main_extension:
+        with fixtures.extension(exten='600', context=sub_ctx['name']) as sub_extension:
+            response = (
+                confd.parkinglots(sub_pl['id'])
+                .extensions(sub_extension['id'])
+                .put(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_updated()
+            parameters = {
+                'slots_starts': '801',
+                'slots_end': '850',
+                'wazo_tenant': MAIN_TENANT,
+            }
+            with fixtures.parking_lot(**parameters) as parking_lot:
+                response = (
+                    confd.parkinglots(parking_lot['id'])
+                    .extensions(main_extension['id'])
+                    .put(wazo_tenant=MAIN_TENANT)
+                )
+                response.assert_updated()
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
