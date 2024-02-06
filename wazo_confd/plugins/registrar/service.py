@@ -78,4 +78,7 @@ class RegistrarService(CRUDService):
         if main:
             main['ip'] = registrar.proxy_main_host
         if backup:
-            backup['ip'] = registrar.proxy_backup_host
+            if registrar.proxy_backup_host:
+                backup['ip'] = registrar.proxy_backup_host
+            else:
+                del config['2']
