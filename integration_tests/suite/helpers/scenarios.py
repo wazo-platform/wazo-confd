@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -65,7 +65,7 @@ def check_event(event_name, expected_headers, url, body=None):
     accumulator = BusClient.accumulator(
         headers={'name': event_name},
     )
-    url(body) if body else url()
+    result = url(body) if body else url()
 
     assertions = all_of(
         has_items(
@@ -81,6 +81,8 @@ def check_event(event_name, expected_headers, url, body=None):
         assert_that(accumulator.accumulate(with_headers=True), assertions)
 
     until.assert_(check_bus, tries=5)
+
+    return result
 
 
 def search_error_checks(url):

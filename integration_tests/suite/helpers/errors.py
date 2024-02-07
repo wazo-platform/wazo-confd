@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from functools import partial
@@ -83,3 +83,4 @@ missing_parameters = build_error(
     r"missing parameters: ((\w+)(, (\w+))*)", SequenceError
 )
 different_tenant = build_error(r"different tenants")
+extension_conflict = build_error(r"[Ee]xtension is already used")

@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains, has_entries
@@ -112,6 +112,64 @@ def test_associate_when_other_extension_exists(parking_lot, extension1, extensio
 def test_associate_when_exten_is_pattern(parking_lot, extension):
     response = confd.parkinglots(parking_lot['id']).extensions(extension['id']).put()
     response.assert_status(400)
+
+
+@fixtures.extension(exten='600', context=CONTEXT)
+@fixtures.extension(exten='400', context=CONTEXT)
+@fixtures.parking_lot(slots_start='701', slots_end='750')
+def test_associate_when_overlapping_slots(
+    exten_new_parking, exten_existing_parking, existing_parking
+):
+    def assert_association_fails(start, end):
+        with fixtures.parking_lot(slots_start=start, slots_end=end) as parking_lot:
+            response = (
+                confd.parkinglots(parking_lot['id'])
+                .extensions(exten_new_parking['id'])
+                .put()
+            )
+            response.assert_match(400, e.extension_conflict())
+
+    with a.parking_lot_extension(existing_parking, exten_existing_parking):
+        # same range
+        assert_association_fails('701', '750')
+        # overlap end
+        assert_association_fails('750', '850')
+        # overlap end -1
+        assert_association_fails('749', '850')
+        # overlap start
+        assert_association_fails('601', '701')
+        # overlap start +1
+        assert_association_fails('601', '702')
+        # overlap inner
+        assert_association_fails('710', '711')
+        # overlap outer
+        assert_association_fails('601', '850')
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')
+@fixtures.context(wazo_tenant=SUB_TENANT, label='sub-internal')
+@fixtures.parking_lot(slots_start='801', slots_end='850', wazo_tenant=SUB_TENANT)
+def test_associate_when_overlapping_slots_multi_tenant(main_ctx, sub_ctx, sub_pl):
+    with fixtures.extension(exten='600', context=main_ctx['name']) as main_extension:
+        with fixtures.extension(exten='600', context=sub_ctx['name']) as sub_extension:
+            response = (
+                confd.parkinglots(sub_pl['id'])
+                .extensions(sub_extension['id'])
+                .put(wazo_tenant=SUB_TENANT)
+            )
+            response.assert_updated()
+            parameters = {
+                'slots_starts': '801',
+                'slots_end': '850',
+                'wazo_tenant': MAIN_TENANT,
+            }
+            with fixtures.parking_lot(**parameters) as parking_lot:
+                response = (
+                    confd.parkinglots(parking_lot['id'])
+                    .extensions(main_extension['id'])
+                    .put(wazo_tenant=MAIN_TENANT)
+                )
+                response.assert_updated()
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT, label='main-internal')

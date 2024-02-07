@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -30,19 +30,15 @@ class ExtenAvailableValidator(Validator):
         if extension.is_pattern():
             return
 
-        parking_lots = self.parking_lot_dao.find_all_by()
+        parking_lots = self.parking_lot_dao.find_all_by(context=extension.context)
         for parking_lot in parking_lots:
-            if (
-                parking_lot.extensions
-                and parking_lot.extensions[0].context == extension.context
-            ):
-                if parking_lot.in_slots_range(extension.exten):
-                    raise errors.resource_exists(
-                        'ParkingLot',
-                        id=parking_lot.id,
-                        slots_start=parking_lot.slots_start,
-                        slots_end=parking_lot.slots_end,
-                    )
+            if parking_lot.in_slots_range(extension.exten):
+                raise errors.resource_exists(
+                    'ParkingLot',
+                    id=parking_lot.id,
+                    slots_start=parking_lot.slots_start,
+                    slots_end=parking_lot.slots_end,
+                )
 
 
 class ExtenAvailableOnCreateValidator(ExtenAvailableValidator):
