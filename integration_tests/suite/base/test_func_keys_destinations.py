@@ -1,4 +1,4 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -54,7 +54,13 @@ def test_get_destinations():
             has_entries({'type': 'onlinerec', 'parameters': []}),
             has_entries({'type': 'paging', 'parameters': [{'name': 'paging_id'}]}),
             has_entries(
-                {'type': 'park_position', 'parameters': [{'name': 'position'}]}
+                {
+                    'type': 'park_position',
+                    'parameters': contains_inanyorder(
+                        {'name': 'parking_lot_id'},
+                        {'name': 'position'},
+                    ),
+                }
             ),
             has_entries({'type': 'parking', 'parameters': []}),
             has_entries({'type': 'queue', 'parameters': [{'name': 'queue_id'}]}),

@@ -24,7 +24,7 @@ class BaseDestinationSchema(Schema):
                 'groupmember',
                 'onlinerec',
                 'paging',
-                # 'park_position',
+                'park_position',
                 # 'parking',
                 'queue',
                 'service',
@@ -181,6 +181,7 @@ class TransferDestinationSchema(BaseDestinationSchema):
 
 
 class ParkPositionDestinationSchema(BaseDestinationSchema):
+    parking_lot_id = fields.Integer(required=True)
     position = fields.Integer(required=True)
 
 

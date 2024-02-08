@@ -70,10 +70,12 @@ invalid_destinations = [
     {'type': 'paging', 'bad_field': 123},
     {'type': 'paging', 'paging_id': 'invalid'},
     {'type': 'paging', 'paging_id': None},
-    # {'type': 'park_position'},
-    # {'type': 'park_position', 'bad_field': 123},
-    # {'type': 'park_position', 'position': 'invalid'},
-    # {'type': 'park_position', 'position': None},
+    {'type': 'park_position'},
+    {'type': 'park_position', 'bad_field': 123},
+    {'type': 'park_position', 'parking_lot_id': None, 'position': '801'},
+    {'type': 'park_position', 'parking_lot_id': 'invalid', 'position': '801'},
+    {'type': 'park_position', 'parking_lot_id': 123, 'position': 'invalid'},
+    {'type': 'park_position', 'parking_lot_id': 123, 'position': None},
     {'type': 'queue'},
     {'type': 'queue', 'bad_field': 123},
     {'type': 'queue', 'queue_id': 'string'},
@@ -187,10 +189,13 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         custom_exten = '9999'
         paging_number = '1234'
         # parking = '700'
-        # park_pos = 701
+        park_pos = 701
 
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
+            parking_lot_id = queries.insert_parking_lot(
+                slots_start=park_pos, slots_end=park_pos, tenant_uuid=MAIN_TENANT
+            )
             queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
             conference_id = queries.insert_conference(
                 number=conf_exten, tenant_uuid=MAIN_TENANT
@@ -293,7 +298,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     user_id=self.user['id'], agent_id=agent_id
                 ),
             },
-            # '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
+            '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
             # '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
             '28': {
                 'label': '',
@@ -443,10 +448,14 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'agent_id': agent_id,
                 },
             },
-            # '26': {
-            #     'blf': False,
-            #     'destination': {'type': 'park_position', 'position': park_pos},
-            # },
+            '26': {
+                'blf': False,
+                'destination': {
+                    'type': 'park_position',
+                    'parking_lot_id': parking_lot_id,
+                    'position': park_pos,
+                },
+            },
             # '27': {'blf': False, 'destination': {'type': 'parking'}},
             '28': {
                 'blf': False,
@@ -1032,8 +1041,11 @@ def test_func_key_destinations_multi_tenant(
         '6': {'type': 'agent', 'action': 'login', 'agent_id': agent['id']},
         '7': {'type': 'agent', 'action': 'logout', 'agent_id': agent['id']},
         '8': {'type': 'agent', 'action': 'toggle', 'agent_id': agent['id']},
-        # FIXME: park_position use old hardcoded system and not multi-tenant
-        # '9': {'type': 'park_position', 'position': parking['slots_start']},
+        '9': {
+            'type': 'park_position',
+            'parking_lot_id': parking['id'],
+            'position': parking['slots_start'],
+        },
         '10': {'type': 'paging', 'paging_id': paging['id']},
         '11': {'type': 'bsfilter', 'filter_member_id': filter_member_id},
         '12': {'type': 'groupmember', 'action': 'join', 'group_id': group['id']},
@@ -1096,11 +1108,14 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         conf_exten = '4000'
         forward_number = '5000'
         custom_exten = '9999'
-        # park_pos = 701
+        park_pos = 701
 
         with self.db.queries() as queries:
             conference_id = queries.insert_conference(
                 number=conf_exten, tenant_uuid=MAIN_TENANT
+            )
+            parking_lot_id = queries.insert_parking_lot(
+                slots_start=park_pos, slots_end=park_pos, tenant_uuid=MAIN_TENANT
             )
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
@@ -1150,7 +1165,13 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                     'agent_id': agent_id,
                 }
             },
-            # '26': {'destination': {'type': 'park_position', 'position': park_pos}},
+            '26': {
+                'destination': {
+                    'type': 'park_position',
+                    'parking_lot_id': parking_lot_id,
+                    'position': park_pos,
+                }
+            },
             '29': {
                 'destination': {
                     'type': 'bsfilter',
@@ -1258,7 +1279,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                     user_id=self.user['id'], agent_id=agent_id
                 ),
             },
-            # '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
+            '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
             '29': {
                 'label': '',
                 'type': 'blf',

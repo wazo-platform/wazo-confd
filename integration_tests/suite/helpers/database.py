@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -430,6 +430,31 @@ class DatabaseQueries:
         )
 
         return filter_member_id
+
+    def insert_parking_lot(
+        self,
+        number='700',
+        context='default',
+        slots_start='701',
+        slots_end='750',
+        tenant_uuid=None,
+    ):
+        query = text(
+            """
+        INSERT INTO parking_lot (slots_start, slots_end, tenant_uuid)
+        VALUES (:slots_start, :slots_end, :tenant_uuid)
+        RETURNING id
+        """
+        )
+
+        parking_lot_id = self.connection.execute(
+            query,
+            slots_start=slots_start,
+            slots_end=slots_end,
+            tenant_uuid=tenant_uuid,
+        ).scalar()
+        self.insert_extension(number, context, 'parking', parking_lot_id)
+        return parking_lot_id
 
     def delete_context(self, name):
         query = text("DELETE FROM context WHERE name = :name")

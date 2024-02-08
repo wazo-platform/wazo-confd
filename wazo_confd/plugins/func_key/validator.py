@@ -9,6 +9,7 @@ from xivo_dao.resources.call_filter import dao as call_filter_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.paging import dao as paging_dao
+from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
@@ -137,7 +138,9 @@ def build_validator():
         'groupmember': [GetResource('group_id', group_dao.get, 'Group')],
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
-        # 'park_position': [],
+        'park_position': [
+            GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot')
+        ],
         # 'parking': [],
         'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
         'service': [],
