@@ -1,19 +1,15 @@
-Xivo-confd integration tests
-============================
+# wazo-confd integration tests
 
 This README attempts to document various bits of information pertaining to the integration tests for
 this project.
 
-Running tests
-=============
+# Running tests
 
 Please read the README at the project's root
 
-Writing tests
-=============
+# Writing tests
 
-URLs, Requests, Responses
--------------------------
+## URLs, Requests, Responses
 
 The test framework offers a helper for building and sending requests to URLs without having to concatenate various
 strings and variables haphazardly. URL building works by chaining together calls to the helper.
@@ -30,10 +26,10 @@ url = confd.users(user_id).lines
 print url # http://confd:9486/1.1/users/10/lines
 ```
 
-A request can be sent by calling one of the HTTP methods on a url (```get()```,
-```post()```, ```put()``` or ```delete()```). These methods accept optional arguments. When passed to
-```get```, the arguments will be converted to query parameters. When passed to ```put``` or
-```post```, they will be JSON encoded and embedded in the request's body.
+A request can be sent by calling one of the HTTP methods on a url (`get()`,
+`post()`, `put()` or `delete()`). These methods accept optional arguments. When passed to
+`get`, the arguments will be converted to query parameters. When passed to `put` or
+`post`, they will be JSON encoded and embedded in the request's body.
 
 ```python
 # GET http://confd:9486/users?search=John&limit=10
@@ -43,7 +39,7 @@ response = confd.users.get(search="John", limit=10)
 response = confd.users.post(firstname="John", lastname="Smith")
 ```
 
-Every request returns a ```Response``` object. The response offers the following attributes
+Every request returns a `Response` object. The response offers the following attributes
 
 ```python
 #Returns the HTTP status code (200, 400, etc)
@@ -107,8 +103,7 @@ expected_error_message = re.compile(r"Input Error - User already exists")
 response.assert_match(expected_status_code, expected_error_message)
 ```
 
-Test fixtures
--------------
+## Test fixtures
 
 Fixtures are a mechanism for creating resources that are needed for performing a test. They often
 represent the preconditions of a test. Fixtures can be used as decorators or context managers.  When
@@ -139,8 +134,7 @@ def test_user_has_a_firstname(user):
     assert user['firstname'] == "John"
 ```
 
-Test associators
-----------------
+## Test associators
 
 Associators are helpers that associate 2 resources together. They are used in tests where 2
 resources are assumed to have been previously associated. Associators are used as context
