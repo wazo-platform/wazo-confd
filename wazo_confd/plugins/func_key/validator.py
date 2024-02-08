@@ -109,6 +109,17 @@ class ForwardValidator(FuncKeyValidator):
         self.validate_text(destination.exten, 'exten')
 
 
+class ParkPositionValidator(FuncKeyValidator):
+    def validate(self, destination):
+        parking_lot = parking_lot_dao.get(destination.parking_lot_id)
+        if not parking_lot.in_slots_range(destination.position):
+            raise errors.outside_park_range(
+                destination.position,
+                min=parking_lot.slots_start,
+                max=parking_lot.slots_end,
+            )
+
+
 class CustomValidator(FuncKeyValidator):
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
@@ -139,7 +150,8 @@ def build_validator():
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
         'park_position': [
-            GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot')
+            GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot'),
+            ParkPositionValidator(),
         ],
         # 'parking': [],
         'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],

@@ -875,7 +875,7 @@ def test_get_group_destination_relation(user, group):
 
 
 @fixtures.user()
-@fixtures.parking_lot()
+@fixtures.parking_lot(slots_start='801', slots_end='850')
 def test_get_park_position_destination_relation(user, parking_lot):
     destination = {
         'type': 'park_position',
@@ -895,6 +895,18 @@ def test_get_park_position_destination_relation(user, parking_lot):
             )
         ),
     )
+
+
+@fixtures.user()
+@fixtures.parking_lot(slots_start='801', slots_end='850')
+def test_create_park_position_wrong_position(user, parking_lot):
+    destination = {
+        'type': 'park_position',
+        'parking_lot_id': parking_lot['id'],
+        'position': 900,
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_match(400, e.outside_range())
 
 
 @fixtures.user(wazo_tenant=MAIN_TENANT)
