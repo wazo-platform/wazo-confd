@@ -874,6 +874,29 @@ def test_get_group_destination_relation(user, group):
     )
 
 
+@fixtures.user()
+@fixtures.parking_lot()
+def test_get_park_position_destination_relation(user, parking_lot):
+    destination = {
+        'type': 'park_position',
+        'parking_lot_id': parking_lot['id'],
+        'position': 801,
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_updated()
+
+    response = confd.users(user['id']).funckeys(1).get()
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                parking_lot_id=parking_lot['id'],
+                parking_lot_name=parking_lot['name'],
+            )
+        ),
+    )
+
+
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_get_user_funckeys_multi_tenant(main, sub):
