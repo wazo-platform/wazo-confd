@@ -2,8 +2,8 @@
 
 ## 24.03
 
-* Undeprecate `park_position` function key, now working with `parkinglots`
-  resource
+* Undeprecate `parking` and `park_position` function keys, now working with
+  `parkinglots` resource
 
 ## 23.15
 
