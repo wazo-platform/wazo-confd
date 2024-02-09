@@ -76,6 +76,10 @@ invalid_destinations = [
     {'type': 'park_position', 'parking_lot_id': 'invalid', 'position': '801'},
     {'type': 'park_position', 'parking_lot_id': 123, 'position': 'invalid'},
     {'type': 'park_position', 'parking_lot_id': 123, 'position': None},
+    {'type': 'parking'},
+    {'type': 'parking', 'bad_field': 123},
+    {'type': 'parking', 'parking_lot_id': 'string'},
+    {'type': 'parking', 'parking_lot_id': None},
     {'type': 'queue'},
     {'type': 'queue', 'bad_field': 123},
     {'type': 'queue', 'queue_id': 'string'},
@@ -188,13 +192,16 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         forward_number = '5000'
         custom_exten = '9999'
         paging_number = '1234'
-        # parking = '700'
+        parking_exten = '700'
         park_pos = 701
 
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
             parking_lot_id = queries.insert_parking_lot(
-                slots_start=park_pos, slots_end=park_pos, tenant_uuid=MAIN_TENANT
+                number=parking_exten,
+                slots_start=park_pos,
+                slots_end=park_pos,
+                tenant_uuid=MAIN_TENANT,
             )
             queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
             conference_id = queries.insert_conference(
@@ -299,7 +306,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 ),
             },
             '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
-            # '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
+            '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking_exten},
             '28': {
                 'label': '',
                 'type': 'speeddial',
@@ -456,7 +463,13 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'position': park_pos,
                 },
             },
-            # '27': {'blf': False, 'destination': {'type': 'parking'}},
+            '27': {
+                'blf': False,
+                'destination': {
+                    'type': 'parking',
+                    'parking_lot_id': parking_lot_id,
+                },
+            },
             '28': {
                 'blf': False,
                 'destination': {'type': 'paging', 'paging_id': paging_id},
@@ -1086,6 +1099,7 @@ def test_func_key_destinations_multi_tenant(
         '12': {'type': 'groupmember', 'action': 'join', 'group_id': group['id']},
         '13': {'type': 'groupmember', 'action': 'leave', 'group_id': group['id']},
         '14': {'type': 'groupmember', 'action': 'toggle', 'group_id': group['id']},
+        '15': {'type': 'parking', 'parking_lot_id': parking['id']},
     }
     exclude_for_template = ['6', '7', '8', '11']
 

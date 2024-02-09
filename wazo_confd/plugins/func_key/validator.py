@@ -153,7 +153,9 @@ def build_validator():
             GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot'),
             ParkPositionValidator(),
         ],
-        # 'parking': [],
+        'parking': [
+            GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot'),
+        ],
         'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
         'service': [],
         'transfer': [],

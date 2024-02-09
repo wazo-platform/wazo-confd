@@ -25,7 +25,7 @@ class BaseDestinationSchema(Schema):
                 'onlinerec',
                 'paging',
                 'park_position',
-                # 'parking',
+                'parking',
                 'queue',
                 'service',
                 'transfer',
@@ -196,7 +196,7 @@ class ParkPositionDestinationSchema(BaseDestinationSchema):
 
 
 class ParkingDestinationSchema(BaseDestinationSchema):
-    pass
+    parking_lot_id = fields.Integer(required=True)
 
 
 class BSFilterDestinationSchema(BaseDestinationSchema):

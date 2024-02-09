@@ -62,7 +62,12 @@ def test_get_destinations():
                     ),
                 }
             ),
-            has_entries({'type': 'parking', 'parameters': []}),
+            has_entries(
+                {
+                    'type': 'parking',
+                    'parameters': [{'name': 'parking_lot_id'}],
+                }
+            ),
             has_entries({'type': 'queue', 'parameters': [{'name': 'queue_id'}]}),
             has_entries(
                 {
