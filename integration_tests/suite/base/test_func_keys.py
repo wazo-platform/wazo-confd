@@ -912,24 +912,26 @@ def test_get_park_position_destination_relation(user, parking_lot):
 
 @fixtures.user()
 @fixtures.parking_lot()
-def test_get_parking_destination_relation(user, parking_lot):
-    destination = {
-        'type': 'parking',
-        'parking_lot_id': parking_lot['id'],
-    }
-    response = confd.users(user['id']).funckeys(1).put(destination=destination)
-    response.assert_updated()
+@fixtures.extension()
+def test_get_parking_destination_relation(user, parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension):
+        destination = {
+            'type': 'parking',
+            'parking_lot_id': parking_lot['id'],
+        }
+        response = confd.users(user['id']).funckeys(1).put(destination=destination)
+        response.assert_updated()
 
-    response = confd.users(user['id']).funckeys(1).get()
-    assert_that(
-        response.item,
-        has_entries(
-            destination=has_entries(
-                parking_lot_id=parking_lot['id'],
-                parking_lot_name=parking_lot['name'],
-            )
-        ),
-    )
+        response = confd.users(user['id']).funckeys(1).get()
+        assert_that(
+            response.item,
+            has_entries(
+                destination=has_entries(
+                    parking_lot_id=parking_lot['id'],
+                    parking_lot_name=parking_lot['name'],
+                )
+            ),
+        )
 
 
 @fixtures.user()
@@ -942,6 +944,17 @@ def test_create_park_position_wrong_position(user, parking_lot):
     }
     response = confd.users(user['id']).funckeys(1).put(destination=destination)
     response.assert_match(400, e.outside_range())
+
+
+@fixtures.user()
+@fixtures.parking_lot()
+def test_create_parking_without_extension(user, parking_lot):
+    destination = {
+        'type': 'parking',
+        'parking_lot_id': parking_lot['id'],
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_match(400, e.missing_association())
 
 
 @fixtures.user(wazo_tenant=MAIN_TENANT)
@@ -1073,6 +1086,7 @@ def test_dissociate_multi_tenant(main_user, sub_user, main_template, sub_templat
     response.assert_match(404, e.not_found('FuncKeyTemplate'))
 
 
+@fixtures.context(label='sub-tenant', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
@@ -1086,6 +1100,7 @@ def test_dissociate_multi_tenant(main_user, sub_user, main_template, sub_templat
 @fixtures.call_filter(wazo_tenant=SUB_TENANT)
 @fixtures.parking_lot(wazo_tenant=SUB_TENANT)
 def test_func_key_destinations_multi_tenant(
+    context,
     main_user,
     main_template,
     sub_user,
@@ -1102,6 +1117,15 @@ def test_func_key_destinations_multi_tenant(
     confd.callfilters(call_filter['id']).surrogates.users.put(users=[sub_user])
     response = confd.callfilters(call_filter['id']).get()
     filter_member_id = response.item['surrogates']['users'][0]['member_id']
+
+    parking_extension = helpers.extension.generate_extension(
+        context=context['name'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response = (
+        confd.parkinglots(parking['id']).extensions(parking_extension['id']).put()
+    )
+    response.assert_updated()
 
     funckeys = {
         '1': {'type': 'user', 'user_id': user['id']},
@@ -1168,6 +1192,8 @@ def test_func_key_destinations_multi_tenant(
 
             response = confd.funckeys.templates(response.item['id']).delete()
             response.assert_deleted()
+
+    helpers.extension.delete_extension(parking_extension['id'])
 
 
 class TestBlfFuncKeys(BaseTestFuncKey):

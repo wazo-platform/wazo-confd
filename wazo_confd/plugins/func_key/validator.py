@@ -120,6 +120,17 @@ class ParkPositionValidator(FuncKeyValidator):
             )
 
 
+class ParkingValidator(FuncKeyValidator):
+    def validate(self, destination):
+        parking_lot = parking_lot_dao.get(destination.parking_lot_id)
+        if not parking_lot.extensions:
+            raise errors.missing_association(
+                'ParkingLot',
+                'Extension',
+                parking_lot_id=parking_lot.id,
+            )
+
+
 class CustomValidator(FuncKeyValidator):
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
@@ -155,6 +166,7 @@ def build_validator():
         ],
         'parking': [
             GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot'),
+            ParkingValidator(),
         ],
         'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
         'service': [],
