@@ -911,6 +911,28 @@ def test_get_park_position_destination_relation(user, parking_lot):
 
 
 @fixtures.user()
+@fixtures.parking_lot()
+def test_get_parking_destination_relation(user, parking_lot):
+    destination = {
+        'type': 'parking',
+        'parking_lot_id': parking_lot['id'],
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_updated()
+
+    response = confd.users(user['id']).funckeys(1).get()
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                parking_lot_id=parking_lot['id'],
+                parking_lot_name=parking_lot['name'],
+            )
+        ),
+    )
+
+
+@fixtures.user()
 @fixtures.parking_lot(slots_start='801', slots_end='850')
 def test_create_park_position_wrong_position(user, parking_lot):
     destination = {
