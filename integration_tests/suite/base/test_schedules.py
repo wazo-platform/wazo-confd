@@ -5,6 +5,7 @@ from hamcrest import (
     all_of,
     assert_that,
     contains,
+    contains_inanyorder,
     empty,
     has_entries,
     has_entry,
@@ -733,4 +734,96 @@ def test_get_application_destination_relation(schedule, application):
                 application_name=application['name'],
             )
         ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.application(name='my-name')
+@fixtures.conference(name='my-name')
+@fixtures.group()
+@fixtures.ivr()
+@fixtures.queue(label='hello-world')
+@fixtures.switchboard()
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_exceptional_periods_destination_relations(
+    schedule,
+    application,
+    conference,
+    group,
+    ivr,
+    queue,
+    switchboard,
+    user,
+    voicemail,
+):
+    destinations = [
+        {
+            'type': 'application',
+            'application': 'custom',
+            'application_uuid': application['uuid'],
+        },
+        {'type': 'conference', 'conference_id': conference['id']},
+        {'type': 'group', 'group_id': group['id']},
+        {'type': 'ivr', 'ivr_id': ivr['id']},
+        {'type': 'queue', 'queue_id': queue['id']},
+        {'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']},
+        {'type': 'user', 'user_id': user['id']},
+        {'type': 'voicemail', 'voicemail_id': voicemail['id']},
+    ]
+    destinations_expected = [
+        has_entries(
+            application_uuid=application['uuid'],
+            application_name=application['name'],
+        ),
+        has_entries(
+            conference_id=conference['id'],
+            conference_name=conference['name'],
+        ),
+        has_entries(
+            group_id=group['id'],
+            group_name=group['name'],
+            group_label=group['label'],
+        ),
+        has_entries(
+            ivr_id=ivr['id'],
+            ivr_name=ivr['name'],
+        ),
+        has_entries(
+            queue_id=queue['id'],
+            queue_label=queue['label'],
+        ),
+        has_entries(
+            switchboard_uuid=switchboard['uuid'],
+            switchboard_name=switchboard['name'],
+        ),
+        has_entries(
+            user_id=user['id'],
+            user_firstname=user['firstname'],
+            user_lastname=user['lastname'],
+        ),
+        has_entries(
+            voicemail_id=voicemail['id'],
+            voicemail_name=voicemail['name'],
+        ),
+    ]
+
+    periods = []
+    for i, destination in enumerate(destinations):
+        periods.append(
+            {
+                'hours_start': f'{i:02d}:00',
+                'hours_end': f'{i:02d}:59',
+                'destination': destination,
+            }
+        )
+
+    response = confd.schedules(schedule['id']).put(exceptional_periods=periods)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    expected = [has_entries(destination=dst) for dst in destinations_expected]
+    assert_that(
+        response.item,
+        has_entries(exceptional_periods=contains_inanyorder(*expected)),
     )
