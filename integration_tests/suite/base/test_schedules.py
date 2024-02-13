@@ -1,10 +1,11 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
     all_of,
     assert_that,
     contains,
+    contains_inanyorder,
     empty,
     has_entries,
     has_entry,
@@ -576,3 +577,253 @@ def test_bus_events(schedule):
     s.check_event('schedule_created', headers, confd.schedules.post, body)
     s.check_event('schedule_edited', headers, url.put)
     s.check_event('schedule_deleted', headers, url.delete)
+
+
+@fixtures.schedule()
+@fixtures.group()
+def test_get_group_destination_relation(schedule, group):
+    destination = {'type': 'group', 'group_id': group['id']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                group_id=group['id'],
+                group_name=group['name'],
+                group_label=group['label'],
+            ),
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.user()
+def test_get_user_destination_relation(schedule, user):
+    destination = {'type': 'user', 'user_id': user['id']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                user_id=user['id'],
+                user_firstname=user['firstname'],
+                user_lastname=user['lastname'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.ivr()
+def test_get_ivr_destination_relation(schedule, ivr):
+    destination = {'type': 'ivr', 'ivr_id': ivr['id']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                ivr_id=ivr['id'],
+                ivr_name=ivr['name'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.conference(name='my-name')
+def test_get_conference_destination_relation(schedule, conference):
+    destination = {'type': 'conference', 'conference_id': conference['id']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                conference_id=conference['id'],
+                conference_name=conference['name'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.switchboard()
+def test_get_switchboard_destination_relation(schedule, switchboard):
+    destination = {'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                switchboard_uuid=switchboard['uuid'],
+                switchboard_name=switchboard['name'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.voicemail()
+def test_get_voicemail_destination_relation(schedule, voicemail):
+    destination = {'type': 'voicemail', 'voicemail_id': voicemail['id']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                voicemail_id=voicemail['id'],
+                voicemail_name=voicemail['name'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.queue(label='hello-world')
+def test_get_queue_destination_relation(schedule, queue):
+    destination = {'type': 'queue', 'queue_id': queue['id']}
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                queue_id=queue['id'],
+                queue_label=queue['label'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.application(name='my-name')
+def test_get_application_destination_relation(schedule, application):
+    destination = {
+        'type': 'application',
+        'application': 'custom',
+        'application_uuid': application['uuid'],
+    }
+    response = confd.schedules(schedule['id']).put(closed_destination=destination)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            closed_destination=has_entries(
+                application_uuid=application['uuid'],
+                application_name=application['name'],
+            )
+        ),
+    )
+
+
+@fixtures.schedule()
+@fixtures.application(name='my-name')
+@fixtures.conference(name='my-name')
+@fixtures.group()
+@fixtures.ivr()
+@fixtures.queue(label='hello-world')
+@fixtures.switchboard()
+@fixtures.user()
+@fixtures.voicemail()
+def test_get_exceptional_periods_destination_relations(
+    schedule,
+    application,
+    conference,
+    group,
+    ivr,
+    queue,
+    switchboard,
+    user,
+    voicemail,
+):
+    destinations = [
+        {
+            'type': 'application',
+            'application': 'custom',
+            'application_uuid': application['uuid'],
+        },
+        {'type': 'conference', 'conference_id': conference['id']},
+        {'type': 'group', 'group_id': group['id']},
+        {'type': 'ivr', 'ivr_id': ivr['id']},
+        {'type': 'queue', 'queue_id': queue['id']},
+        {'type': 'switchboard', 'switchboard_uuid': switchboard['uuid']},
+        {'type': 'user', 'user_id': user['id']},
+        {'type': 'voicemail', 'voicemail_id': voicemail['id']},
+    ]
+    destinations_expected = [
+        has_entries(
+            application_uuid=application['uuid'],
+            application_name=application['name'],
+        ),
+        has_entries(
+            conference_id=conference['id'],
+            conference_name=conference['name'],
+        ),
+        has_entries(
+            group_id=group['id'],
+            group_name=group['name'],
+            group_label=group['label'],
+        ),
+        has_entries(
+            ivr_id=ivr['id'],
+            ivr_name=ivr['name'],
+        ),
+        has_entries(
+            queue_id=queue['id'],
+            queue_label=queue['label'],
+        ),
+        has_entries(
+            switchboard_uuid=switchboard['uuid'],
+            switchboard_name=switchboard['name'],
+        ),
+        has_entries(
+            user_id=user['id'],
+            user_firstname=user['firstname'],
+            user_lastname=user['lastname'],
+        ),
+        has_entries(
+            voicemail_id=voicemail['id'],
+            voicemail_name=voicemail['name'],
+        ),
+    ]
+
+    periods = []
+    for i, destination in enumerate(destinations):
+        periods.append(
+            {
+                'hours_start': f'{i:02d}:00',
+                'hours_end': f'{i:02d}:59',
+                'destination': destination,
+            }
+        )
+
+    response = confd.schedules(schedule['id']).put(exceptional_periods=periods)
+    response.assert_updated()
+
+    response = confd.schedules(schedule['id']).get()
+    expected = [has_entries(destination=dst) for dst in destinations_expected]
+    assert_that(
+        response.item,
+        has_entries(exceptional_periods=contains_inanyorder(*expected)),
+    )
