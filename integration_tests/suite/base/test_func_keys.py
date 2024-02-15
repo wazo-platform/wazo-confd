@@ -192,13 +192,13 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         forward_number = '5000'
         custom_exten = '9999'
         paging_number = '1234'
-        parking_exten = '700'
+        self.parking_exten = '700'
         park_pos = 701
 
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
-            parking_lot_id = queries.insert_parking_lot(
-                number=parking_exten,
+            self.parking_lot_id = queries.insert_parking_lot(
+                number=self.parking_exten,
                 slots_start=park_pos,
                 slots_end=park_pos,
                 tenant_uuid=MAIN_TENANT,
@@ -306,7 +306,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 ),
             },
             '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
-            '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking_exten},
+            '27': {'label': '', 'type': 'park', 'line': 1, 'value': self.parking_exten},
             '28': {
                 'label': '',
                 'type': 'speeddial',
@@ -459,7 +459,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'blf': False,
                 'destination': {
                     'type': 'park_position',
-                    'parking_lot_id': parking_lot_id,
+                    'parking_lot_id': self.parking_lot_id,
                     'position': park_pos,
                 },
             },
@@ -467,7 +467,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'blf': False,
                 'destination': {
                     'type': 'parking',
-                    'parking_lot_id': parking_lot_id,
+                    'parking_lot_id': self.parking_lot_id,
                 },
             },
             '28': {
@@ -513,6 +513,12 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         }
 
         self.exclude_for_template = ['23', '24', '25', '29']
+
+    def tearDown(self):
+        super().tearDown()
+        with self.db.queries() as queries:
+            queries.delete_parking_lot(self.parking_lot_id)
+            queries.delete_extension(self.parking_exten)
 
     def test_when_creating_template_then_all_func_keys_created(self):
         for position in self.exclude_for_template:
@@ -1205,14 +1211,18 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         conf_exten = '4000'
         forward_number = '5000'
         custom_exten = '9999'
+        self.parking_exten = '700'
         park_pos = 701
 
         with self.db.queries() as queries:
             conference_id = queries.insert_conference(
                 number=conf_exten, tenant_uuid=MAIN_TENANT
             )
-            parking_lot_id = queries.insert_parking_lot(
-                slots_start=park_pos, slots_end=park_pos, tenant_uuid=MAIN_TENANT
+            self.parking_lot_id = queries.insert_parking_lot(
+                number=self.parking_exten,
+                slots_start=park_pos,
+                slots_end=park_pos,
+                tenant_uuid=MAIN_TENANT,
             )
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
@@ -1265,7 +1275,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
             '26': {
                 'destination': {
                     'type': 'park_position',
-                    'parking_lot_id': parking_lot_id,
+                    'parking_lot_id': self.parking_lot_id,
                     'position': park_pos,
                 }
             },
@@ -1408,6 +1418,12 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                 ),
             },
         }
+
+    def tearDown(self):
+        super().tearDown()
+        with self.db.queries() as queries:
+            queries.delete_parking_lot(self.parking_lot_id)
+            queries.delete_extension(self.parking_exten)
 
     def test_when_creating_funckey_then_blf_activated_by_default(self):
         funckey = {'destination': {'type': 'custom', 'exten': '9999'}}

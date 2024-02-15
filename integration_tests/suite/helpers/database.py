@@ -456,6 +456,29 @@ class DatabaseQueries:
         self.insert_extension(number, context, 'parking', parking_lot_id)
         return parking_lot_id
 
+    def delete_parking_lot(self, parking_lot_id, extension_id=None):
+        query = text(
+            "DELETE FROM func_key_dest_parking WHERE parking_lot_id = :parking_lot_id"
+        )
+        self.connection.execute(query, parking_lot_id=parking_lot_id)
+
+        query = text(
+            """
+            DELETE FROM func_key_dest_park_position
+            WHERE parking_lot_id = :parking_lot_id
+            """
+        )
+        self.connection.execute(query, parking_lot_id=parking_lot_id)
+
+        query = text("DELETE FROM parking_lot WHERE id = :parking_lot_id")
+        self.connection.execute(query, parking_lot_id=parking_lot_id)
+        if extension_id:
+            self.delete_extension(extension_id)
+
+    def delete_extension(self, exten):
+        query = text("DELETE FROM extensions WHERE exten = :exten")
+        self.connection.execute(query, exten=exten)
+
     def delete_context(self, name):
         query = text("DELETE FROM context WHERE name = :name")
         self.connection.execute(query, name=name)
