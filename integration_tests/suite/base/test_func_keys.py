@@ -70,10 +70,16 @@ invalid_destinations = [
     {'type': 'paging', 'bad_field': 123},
     {'type': 'paging', 'paging_id': 'invalid'},
     {'type': 'paging', 'paging_id': None},
-    # {'type': 'park_position'},
-    # {'type': 'park_position', 'bad_field': 123},
-    # {'type': 'park_position', 'position': 'invalid'},
-    # {'type': 'park_position', 'position': None},
+    {'type': 'park_position'},
+    {'type': 'park_position', 'bad_field': 123},
+    {'type': 'park_position', 'parking_lot_id': None, 'position': '801'},
+    {'type': 'park_position', 'parking_lot_id': 'invalid', 'position': '801'},
+    {'type': 'park_position', 'parking_lot_id': 123, 'position': 'invalid'},
+    {'type': 'park_position', 'parking_lot_id': 123, 'position': None},
+    {'type': 'parking'},
+    {'type': 'parking', 'bad_field': 123},
+    {'type': 'parking', 'parking_lot_id': 'string'},
+    {'type': 'parking', 'parking_lot_id': None},
     {'type': 'queue'},
     {'type': 'queue', 'bad_field': 123},
     {'type': 'queue', 'queue_id': 'string'},
@@ -186,11 +192,17 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         forward_number = '5000'
         custom_exten = '9999'
         paging_number = '1234'
-        # parking = '700'
-        # park_pos = 701
+        self.parking_exten = '700'
+        park_pos = 701
 
         with self.db.queries() as queries:
             group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
+            self.parking_lot_id = queries.insert_parking_lot(
+                number=self.parking_exten,
+                slots_start=park_pos,
+                slots_end=park_pos,
+                tenant_uuid=MAIN_TENANT,
+            )
             queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
             conference_id = queries.insert_conference(
                 number=conf_exten, tenant_uuid=MAIN_TENANT
@@ -293,8 +305,8 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     user_id=self.user['id'], agent_id=agent_id
                 ),
             },
-            # '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
-            # '27': {'label': '', 'type': 'park', 'line': 1, 'value': parking},
+            '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
+            '27': {'label': '', 'type': 'park', 'line': 1, 'value': self.parking_exten},
             '28': {
                 'label': '',
                 'type': 'speeddial',
@@ -443,11 +455,21 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'agent_id': agent_id,
                 },
             },
-            # '26': {
-            #     'blf': False,
-            #     'destination': {'type': 'park_position', 'position': park_pos},
-            # },
-            # '27': {'blf': False, 'destination': {'type': 'parking'}},
+            '26': {
+                'blf': False,
+                'destination': {
+                    'type': 'park_position',
+                    'parking_lot_id': self.parking_lot_id,
+                    'position': park_pos,
+                },
+            },
+            '27': {
+                'blf': False,
+                'destination': {
+                    'type': 'parking',
+                    'parking_lot_id': self.parking_lot_id,
+                },
+            },
             '28': {
                 'blf': False,
                 'destination': {'type': 'paging', 'paging_id': paging_id},
@@ -491,6 +513,12 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         }
 
         self.exclude_for_template = ['23', '24', '25', '29']
+
+    def tearDown(self):
+        super().tearDown()
+        with self.db.queries() as queries:
+            queries.delete_parking_lot(self.parking_lot_id)
+            queries.delete_extension(self.parking_exten)
 
     def test_when_creating_template_then_all_func_keys_created(self):
         for position in self.exclude_for_template:
@@ -865,6 +893,76 @@ def test_get_group_destination_relation(user, group):
     )
 
 
+@fixtures.user()
+@fixtures.parking_lot(slots_start='801', slots_end='850')
+def test_get_park_position_destination_relation(user, parking_lot):
+    destination = {
+        'type': 'park_position',
+        'parking_lot_id': parking_lot['id'],
+        'position': 801,
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_updated()
+
+    response = confd.users(user['id']).funckeys(1).get()
+    assert_that(
+        response.item,
+        has_entries(
+            destination=has_entries(
+                parking_lot_id=parking_lot['id'],
+                parking_lot_name=parking_lot['name'],
+            )
+        ),
+    )
+
+
+@fixtures.user()
+@fixtures.parking_lot()
+@fixtures.extension()
+def test_get_parking_destination_relation(user, parking_lot, extension):
+    with a.parking_lot_extension(parking_lot, extension):
+        destination = {
+            'type': 'parking',
+            'parking_lot_id': parking_lot['id'],
+        }
+        response = confd.users(user['id']).funckeys(1).put(destination=destination)
+        response.assert_updated()
+
+        response = confd.users(user['id']).funckeys(1).get()
+        assert_that(
+            response.item,
+            has_entries(
+                destination=has_entries(
+                    parking_lot_id=parking_lot['id'],
+                    parking_lot_name=parking_lot['name'],
+                )
+            ),
+        )
+
+
+@fixtures.user()
+@fixtures.parking_lot(slots_start='801', slots_end='850')
+def test_create_park_position_wrong_position(user, parking_lot):
+    destination = {
+        'type': 'park_position',
+        'parking_lot_id': parking_lot['id'],
+        'position': 900,
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_match(400, e.outside_range())
+
+
+@fixtures.user()
+@fixtures.parking_lot()
+def test_create_parking_without_extension(user, parking_lot):
+    destination = {
+        'type': 'parking',
+        'parking_lot_id': parking_lot['id'],
+    }
+    response = confd.users(user['id']).funckeys(1).put(destination=destination)
+    response.assert_match(400, e.missing_association())
+
+
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_get_user_funckeys_multi_tenant(main, sub):
@@ -994,6 +1092,7 @@ def test_dissociate_multi_tenant(main_user, sub_user, main_template, sub_templat
     response.assert_match(404, e.not_found('FuncKeyTemplate'))
 
 
+@fixtures.context(label='sub-tenant', wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.funckey_template(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
@@ -1007,6 +1106,7 @@ def test_dissociate_multi_tenant(main_user, sub_user, main_template, sub_templat
 @fixtures.call_filter(wazo_tenant=SUB_TENANT)
 @fixtures.parking_lot(wazo_tenant=SUB_TENANT)
 def test_func_key_destinations_multi_tenant(
+    context,
     main_user,
     main_template,
     sub_user,
@@ -1024,6 +1124,15 @@ def test_func_key_destinations_multi_tenant(
     response = confd.callfilters(call_filter['id']).get()
     filter_member_id = response.item['surrogates']['users'][0]['member_id']
 
+    parking_extension = helpers.extension.generate_extension(
+        context=context['name'],
+        wazo_tenant=SUB_TENANT,
+    )
+    response = (
+        confd.parkinglots(parking['id']).extensions(parking_extension['id']).put()
+    )
+    response.assert_updated()
+
     funckeys = {
         '1': {'type': 'user', 'user_id': user['id']},
         '2': {'type': 'group', 'group_id': group['id']},
@@ -1032,13 +1141,17 @@ def test_func_key_destinations_multi_tenant(
         '6': {'type': 'agent', 'action': 'login', 'agent_id': agent['id']},
         '7': {'type': 'agent', 'action': 'logout', 'agent_id': agent['id']},
         '8': {'type': 'agent', 'action': 'toggle', 'agent_id': agent['id']},
-        # FIXME: park_position use old hardcoded system and not multi-tenant
-        # '9': {'type': 'park_position', 'position': parking['slots_start']},
+        '9': {
+            'type': 'park_position',
+            'parking_lot_id': parking['id'],
+            'position': parking['slots_start'],
+        },
         '10': {'type': 'paging', 'paging_id': paging['id']},
         '11': {'type': 'bsfilter', 'filter_member_id': filter_member_id},
         '12': {'type': 'groupmember', 'action': 'join', 'group_id': group['id']},
         '13': {'type': 'groupmember', 'action': 'leave', 'group_id': group['id']},
         '14': {'type': 'groupmember', 'action': 'toggle', 'group_id': group['id']},
+        '15': {'type': 'parking', 'parking_lot_id': parking['id']},
     }
     exclude_for_template = ['6', '7', '8', '11']
 
@@ -1086,6 +1199,8 @@ def test_func_key_destinations_multi_tenant(
             response = confd.funckeys.templates(response.item['id']).delete()
             response.assert_deleted()
 
+    helpers.extension.delete_extension(parking_extension['id'])
+
 
 class TestBlfFuncKeys(BaseTestFuncKey):
     def setUp(self):
@@ -1096,11 +1211,18 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         conf_exten = '4000'
         forward_number = '5000'
         custom_exten = '9999'
-        # park_pos = 701
+        self.parking_exten = '700'
+        park_pos = 701
 
         with self.db.queries() as queries:
             conference_id = queries.insert_conference(
                 number=conf_exten, tenant_uuid=MAIN_TENANT
+            )
+            self.parking_lot_id = queries.insert_parking_lot(
+                number=self.parking_exten,
+                slots_start=park_pos,
+                slots_end=park_pos,
+                tenant_uuid=MAIN_TENANT,
             )
             callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
             agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
@@ -1150,7 +1272,13 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                     'agent_id': agent_id,
                 }
             },
-            # '26': {'destination': {'type': 'park_position', 'position': park_pos}},
+            '26': {
+                'destination': {
+                    'type': 'park_position',
+                    'parking_lot_id': self.parking_lot_id,
+                    'position': park_pos,
+                }
+            },
             '29': {
                 'destination': {
                     'type': 'bsfilter',
@@ -1258,7 +1386,7 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                     user_id=self.user['id'], agent_id=agent_id
                 ),
             },
-            # '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
+            '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
             '29': {
                 'label': '',
                 'type': 'blf',
@@ -1290,6 +1418,12 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                 ),
             },
         }
+
+    def tearDown(self):
+        super().tearDown()
+        with self.db.queries() as queries:
+            queries.delete_parking_lot(self.parking_lot_id)
+            queries.delete_extension(self.parking_exten)
 
     def test_when_creating_funckey_then_blf_activated_by_default(self):
         funckey = {'destination': {'type': 'custom', 'exten': '9999'}}

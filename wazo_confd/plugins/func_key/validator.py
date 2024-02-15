@@ -9,6 +9,7 @@ from xivo_dao.resources.call_filter import dao as call_filter_dao
 from xivo_dao.resources.conference import dao as conference_dao
 from xivo_dao.resources.group import dao as group_dao
 from xivo_dao.resources.paging import dao as paging_dao
+from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 
@@ -108,6 +109,28 @@ class ForwardValidator(FuncKeyValidator):
         self.validate_text(destination.exten, 'exten')
 
 
+class ParkPositionValidator(FuncKeyValidator):
+    def validate(self, destination):
+        parking_lot = parking_lot_dao.get(destination.parking_lot_id)
+        if not parking_lot.in_slots_range(destination.position):
+            raise errors.outside_park_range(
+                destination.position,
+                min=parking_lot.slots_start,
+                max=parking_lot.slots_end,
+            )
+
+
+class ParkingValidator(FuncKeyValidator):
+    def validate(self, destination):
+        parking_lot = parking_lot_dao.get(destination.parking_lot_id)
+        if not parking_lot.extensions:
+            raise errors.missing_association(
+                'ParkingLot',
+                'Extension',
+                parking_lot_id=parking_lot.id,
+            )
+
+
 class CustomValidator(FuncKeyValidator):
     def validate(self, destination):
         self.validate_text(destination.exten, 'exten')
@@ -137,8 +160,14 @@ def build_validator():
         'groupmember': [GetResource('group_id', group_dao.get, 'Group')],
         'onlinerec': [],
         'paging': [GetResource('paging_id', paging_dao.get, 'Paging')],
-        # 'park_position': [],
-        # 'parking': [],
+        'park_position': [
+            GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot'),
+            ParkPositionValidator(),
+        ],
+        'parking': [
+            GetResource('parking_lot_id', parking_lot_dao.get, 'ParkingLot'),
+            ParkingValidator(),
+        ],
         'queue': [GetResource('queue_id', queue_dao.get, 'Queue')],
         'service': [],
         'transfer': [],

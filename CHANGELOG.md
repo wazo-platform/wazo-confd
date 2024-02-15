@@ -1,5 +1,10 @@
 # Changelog
 
+## 24.03
+
+* Undeprecate `parking` and `park_position` function keys, now working with
+  `parkinglots` resource
+
 ## 23.15
 
 * The following resource has been added:

@@ -24,8 +24,8 @@ class BaseDestinationSchema(Schema):
                 'groupmember',
                 'onlinerec',
                 'paging',
-                # 'park_position',
-                # 'parking',
+                'park_position',
+                'parking',
                 'queue',
                 'service',
                 'transfer',
@@ -181,11 +181,32 @@ class TransferDestinationSchema(BaseDestinationSchema):
 
 
 class ParkPositionDestinationSchema(BaseDestinationSchema):
+    parking_lot_id = fields.Integer(required=True)
     position = fields.Integer(required=True)
+
+    parking_lot = Nested('ParkingLotSchema', only=['name'], dump_only=True)
+
+    @post_dump
+    def make_parking_lot_fields_flat(self, data, **kwargs):
+        if data.get('parking_lot'):
+            data['parking_lot_name'] = data['parking_lot']['name']
+
+        data.pop('parking_lot', None)
+        return data
 
 
 class ParkingDestinationSchema(BaseDestinationSchema):
-    pass
+    parking_lot_id = fields.Integer(required=True)
+
+    parking_lot = Nested('ParkingLotSchema', only=['name'], dump_only=True)
+
+    @post_dump
+    def make_parking_lot_fields_flat(self, data, **kwargs):
+        if data.get('parking_lot'):
+            data['parking_lot_name'] = data['parking_lot']['name']
+
+        data.pop('parking_lot', None)
+        return data
 
 
 class BSFilterDestinationSchema(BaseDestinationSchema):

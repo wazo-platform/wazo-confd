@@ -1,16 +1,17 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
 
 from xivo.xivo_helpers import fkey_extension
-from xivo_dao.resources.line import dao as line_dao_module
-from xivo_dao.resources.user_line import dao as user_line_dao_module
-from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.feature_extension import dao as feature_extension_dao_module
 from xivo_dao.resources.features import dao as features_dao_module
+from xivo_dao.resources.line import dao as line_dao_module
+from xivo_dao.resources.line_extension import dao as line_extension_dao_module
 from xivo_dao.resources.paging import dao as paging_dao_module
+from xivo_dao.resources.parking_lot import dao as parking_lot_dao_module
+from xivo_dao.resources.user_line import dao as user_line_dao_module
 
 
 def build_converters():
@@ -25,7 +26,7 @@ def build_converters():
         'onlinerec': OnlineRecordingConverter(features_dao_module),
         'paging': PagingConverter(feature_extension_dao_module, paging_dao_module),
         'park_position': ParkPositionConverter(),
-        'parking': ParkingConverter(features_dao_module),
+        'parking': ParkingConverter(parking_lot_dao_module),
         'queue': QueueConverter(extension_dao_module),
         'service': ServiceConverter(feature_extension_dao_module),
         'transfer': TransferConverter(features_dao_module),
@@ -241,12 +242,12 @@ class ParkPositionConverter(FuncKeyConverter):
 
 
 class ParkingConverter(FuncKeyConverter):
-    def __init__(self, features_dao):
-        self.features_dao = features_dao
+    def __init__(self, parking_lot_dao):
+        self.parking_lot_dao = parking_lot_dao
 
     def build(self, user, line, position, funckey):
-        exten = self.features_dao.get_value(funckey.destination.feature_id)
-        return self.provd_funckey(line, position, funckey, exten)
+        parking_lot = self.parking_lot_dao.get(funckey.destination.parking_lot_id)
+        return self.provd_funckey(line, position, funckey, parking_lot.exten)
 
     def determine_type(self, funckey):
         return 'park'
