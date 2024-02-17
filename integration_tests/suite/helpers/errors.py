@@ -84,4 +84,4 @@ missing_parameters = build_error(
 )
 different_tenant = build_error(r"different tenants")
 extension_conflict = build_error(r"[Ee]xtension is already used")
-outside_range = build_error(r"is outside of range")
+outside_range = build_error(r"'constraint_id': 'range'")
