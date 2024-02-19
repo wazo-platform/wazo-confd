@@ -4,6 +4,7 @@
 
 * Undeprecate `parking` and `park_position` function keys, now working with
   `parkinglots` resource
+* voicemails: property `delete_messages` of a voicemail resource can now only be set along with a valid `email` and the `attach_audio` property also set. This means creation (`POST /1.1/voicemails`) and update (`PUT /1.1/voicemails/<int:id>`) will now fail with a `400` status response if `delete_messages` is `true` while `email` is missing or `attach_audio` is not also set to `true`.
 
 ## 23.15
 

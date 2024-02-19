@@ -385,6 +385,56 @@ def test_edit_voicemail(voicemail, _):
 
 
 @fixtures.voicemail()
+def test_edit_voicemail_delete_messages(voicemail):
+    number, context = vm_helper.new_number_and_context('vmctxedit')
+
+    # require email along if delete_messages set to True
+    parameters = {
+        'name': 'edited',
+        'number': number,
+        'context': context,
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': True,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': False,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
+
+    url = confd.voicemails(voicemail['id'])
+
+    response = url.put(parameters)
+    response.assert_status(400)
+
+    # require attach_audio to be true if delete_messages set to true
+    parameters = {
+        'name': 'edited',
+        'number': number,
+        'context': context,
+        'email': 'test@example.com',
+        'pager': 'test@example.com',
+        'language': 'en_US',
+        'timezone': 'eu-fr',
+        'password': '1234',
+        'max_messages': 10,
+        'attach_audio': False,
+        'ask_password': False,
+        'delete_messages': True,
+        'enabled': False,
+        'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
+    }
+
+    url = confd.voicemails(voicemail['id'])
+
+    response = url.put(parameters)
+    response.assert_status(400)
+
+
+@fixtures.voicemail()
 @mocks.sysconfd()
 def test_edit_number_and_context_moves_voicemail(voicemail, sysconfd):
     number, context = vm_helper.new_number_and_context('vmctxmove')

@@ -250,7 +250,7 @@ def test_given_csv_has_all_voicemail_fields_then_voicemail_imported():
             "voicemail_context": context,
             "voicemail_password": "1234",
             "voicemail_email": "email@example.com",
-            "voicemail_attach_audio": "0",
+            "voicemail_attach_audio": "1",
             "voicemail_delete_messages": "1",
             "voicemail_ask_password": "0",
         }
@@ -268,7 +268,7 @@ def test_given_csv_has_all_voicemail_fields_then_voicemail_imported():
             context=context,
             password="1234",
             email='email@example.com',
-            attach_audio=False,
+            attach_audio=True,
             delete_messages=True,
             ask_password=False,
         ),

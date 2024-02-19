@@ -151,7 +151,9 @@ definitions:
           email
       delete_messages:
         type: boolean
-        description: Delete messages once they have been listened to
+        description: | 
+          Delete messages after reception. 
+          This can only be set along with 'email' and 'attach_audio' configured.
         default: false
       ask_password:
         type: boolean

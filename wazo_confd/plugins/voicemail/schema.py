@@ -37,6 +37,13 @@ class VoicemailSchema(BaseSchema):
         dump_only=True,
     )
 
+    @validates_schema
+    def prevent_delete_messages_without_email_and_attach_audio(self, data, **kwargs):
+        if data.get('delete_messages', False) and not data.get('email', None):
+            raise ValidationError('email must be provided if delete_messages is set')
+        if data.get('delete_messages', False) and not data.get('attach_audio', None):
+            raise ValidationError('attach_audio must be set if delete_messages is set')
+
 
 class UserVoicemailSchema(VoicemailSchema):
     id = fields.Integer()
