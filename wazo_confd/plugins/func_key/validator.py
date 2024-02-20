@@ -3,6 +3,7 @@
 
 from collections import Counter
 
+from flask_restful import abort
 from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
 from xivo_dao.resources.call_filter import dao as call_filter_dao
@@ -12,6 +13,8 @@ from xivo_dao.resources.paging import dao as paging_dao
 from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
+from marshmallow.exceptions import ValidationError
+from xivo.mallow import validate as mallow_validate
 
 from wazo_confd.helpers.validator import (
     Validator,
@@ -113,11 +116,13 @@ class ParkPositionValidator(FuncKeyValidator):
     def validate(self, destination):
         parking_lot = parking_lot_dao.get(destination.parking_lot_id)
         if not parking_lot.in_slots_range(destination.position):
-            raise errors.outside_park_range(
-                destination.position,
-                min=parking_lot.slots_start,
-                max=parking_lot.slots_end,
-            )
+            try:
+                mallow_validate.Range(
+                    min=int(parking_lot.slots_start),
+                    max=int(parking_lot.slots_end),
+                )(int(destination.position))
+            except ValidationError as error:
+                abort(400, message={'position': error.messages})
 
 
 class ParkingValidator(FuncKeyValidator):
