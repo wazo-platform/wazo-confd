@@ -1,28 +1,35 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
 
 from collections import defaultdict
 from operator import attrgetter, itemgetter
+from typing import Iterator, Literal
 
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
+from xivo_dao.alchemy.context import Context, ContextNumbers
+
+
+RangeType = Literal['user', 'group', 'queue', 'conference', 'incall']
+Availability = Literal['available']
 
 
 class RangeFilter:
     def __init__(
         self, context, extension_dao, availability=None, search=None, **kwargs
     ):
-        self._context = context
+        self._context: Context = context
         self._extension_dao = extension_dao
-        self._availability = availability
+        self._availability: Availability | None = availability
         self._search = search
-        self._used_extensions = set()
+        self._used_extensions: set[str] = set()
 
         if self._availability == 'available':
             configured_extens = self._extension_dao.find_all_by(context=context.name)
             self._used_extensions = set(e.exten for e in configured_extens)
 
-    def get_ranges(self, range_type):
+    def get_ranges(self, range_type: RangeType):
         ranges = self._extract_ranges(self._context, range_type)
         unfiltered_extens = self._list_exten_from_ranges(ranges)
         filtered_extens = (
@@ -32,7 +39,7 @@ class RangeFilter:
         count = len(filtered_ranges)
         return filtered_ranges, count
 
-    def _include_exten(self, exten):
+    def _include_exten(self, exten: str):
         if self._availability == 'available':
             if exten in self._used_extensions:
                 return False
@@ -41,7 +48,7 @@ class RangeFilter:
                 return False
         return True
 
-    def _extract_ranges(self, context, range_type):
+    def _extract_ranges(self, context: Context, range_type: RangeType):
         if range_type == 'user':
             return context.user_ranges
         elif range_type == 'group':
@@ -56,13 +63,13 @@ class RangeFilter:
             assert False, f'{range_type} is not supported'
 
     @classmethod
-    def _list_exten_from_ranges(cls, ranges):
+    def _list_exten_from_ranges(cls, ranges: list[ContextNumbers]):
         listed_extens = set()
         for r in cls._sort_ranges(ranges):
             start = r.start
             end = r.end
-            length = len(start)
-            for exten in range(int(start), int(end) + 1):
+            length = r.did_length if r.type == 'incall' else len(start)
+            for exten in range(int(start[-length:]), int(end[-length:]) + 1):
                 formatted_exten = str(exten).rjust(length, '0')
                 if formatted_exten in listed_extens:
                     continue
@@ -70,7 +77,7 @@ class RangeFilter:
                 yield formatted_exten
 
     @staticmethod
-    def _sort_ranges(ranges):
+    def _sort_ranges(ranges: list[ContextNumbers]) -> Iterator[ContextNumbers]:
         ranges_by_len = defaultdict(list)
         for range in ranges:
             ranges_by_len[len(range.start)].append(range)

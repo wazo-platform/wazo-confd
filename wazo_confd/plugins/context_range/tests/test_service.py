@@ -1,14 +1,19 @@
 # Copyright 2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
 
-from collections import namedtuple
+from typing import NamedTuple
 from unittest import TestCase
 from hamcrest import assert_that, contains_exactly
 
 from ..service import RangeFilter
 
 
-Range = namedtuple('Range', ['start', 'end'])
+class Range(NamedTuple):
+    start: str
+    end: str
+    type: str = 'user'
+    did_length: int | None = None
 
 
 class TestListExtenFromRanges(TestCase):
@@ -74,6 +79,33 @@ class TestListExtenFromRanges(TestCase):
                 '00001',
                 '00002',
                 '00003',
+            ),
+        )
+
+    def test_incall_ranges(self):
+        did_length = 4
+        ranges = [
+            Range('12345670000', '12345670010', 'incall', did_length),
+            Range('12345680000', '12345680005', 'incall', did_length),
+            Range('12345680006', '12345680010', 'incall', did_length),
+        ]
+
+        result = list(RangeFilter._list_exten_from_ranges(ranges))
+
+        assert_that(
+            result,
+            contains_exactly(
+                '0000',
+                '0001',
+                '0002',
+                '0003',
+                '0004',
+                '0005',
+                '0006',
+                '0007',
+                '0008',
+                '0009',
+                '0010',
             ),
         )
 
