@@ -226,7 +226,7 @@ class RangeMerger:
                 if previous is None:
                     previous = current
                 else:
-                    if previous['end'] >= current['start']:
+                    if int(previous['end']) + 1 >= int(current['start']):
                         previous = {
                             'start': min(previous['start'], current['start']),
                             'end': max(previous['end'], current['end']),
