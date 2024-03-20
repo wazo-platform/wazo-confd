@@ -60,6 +60,7 @@ class TestListExtenFromRanges(TestCase):
             Range('0001', '0003'),
             Range('001', '003'),
             Range('0000', '0001'),
+            Range('11110000', '11110005', type='incall', did_length=4),
         ]
 
         result = list(RangeFilter._list_exten_from_ranges(ranges))
@@ -76,6 +77,8 @@ class TestListExtenFromRanges(TestCase):
                 '0001',
                 '0002',
                 '0003',
+                '0004',
+                '0005',
                 '00001',
                 '00002',
                 '00003',
@@ -106,6 +109,39 @@ class TestListExtenFromRanges(TestCase):
                 '0008',
                 '0009',
                 '0010',
+            ),
+        )
+
+    def test_overlapping_ranges(self):
+        ranges = [
+            Range('000', '005'),
+            Range('1000', '1005'),
+            Range('1005', '1007'),
+            Range('1000', '1010'),
+        ]
+
+        result = list(RangeFilter._list_exten_from_ranges(ranges))
+
+        assert_that(
+            result,
+            contains_exactly(
+                '000',
+                '001',
+                '002',
+                '003',
+                '004',
+                '005',
+                '1000',
+                '1001',
+                '1002',
+                '1003',
+                '1004',
+                '1005',
+                '1006',
+                '1007',
+                '1008',
+                '1009',
+                '1010',
             ),
         )
 
