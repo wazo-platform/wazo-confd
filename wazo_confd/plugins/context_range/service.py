@@ -73,7 +73,14 @@ class RangeFilter:
             length = r.did_length if r.type == 'incall' else len(start)
             exten_start = int(start[-length:])
             exten_end = int(end[-length:])
+            assert exten_start <= exten_end
 
+            logger.debug(
+                'Generating range for extensions %d-%d of length %d',
+                exten_start,
+                exten_end,
+                length,
+            )
             for exten in range(exten_start, exten_end + 1):
                 if any(
                     visited_start <= exten <= visited_end
