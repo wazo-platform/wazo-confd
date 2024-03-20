@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 import logging
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 from typing import Iterator, Literal
 
 from xivo_dao.resources.context import dao as context_dao
@@ -95,7 +95,9 @@ class RangeFilter:
             ranges_by_len[rlen].append(range)
 
         for length in sorted(ranges_by_len.keys()):
-            early_range_first = sorted(ranges_by_len[length], key=attrgetter('start'))
+            early_range_first = sorted(
+                ranges_by_len[length], key=lambda r: r.start[-length:]
+            )
             for range in early_range_first:
                 yield range
 
@@ -107,7 +109,7 @@ class RangeFilter:
                 start = exten
             if previous:
                 increment = int(exten) - int(previous)
-                len_diff = len(exten) - len(previous) > 0
+                len_diff = len(exten) != len(previous)
                 if increment > 1 or len_diff:
                     yield {'start': start, 'end': previous}
                     start, previous = exten, None
