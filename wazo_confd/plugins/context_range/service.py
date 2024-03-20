@@ -80,10 +80,12 @@ class RangeFilter:
     def _sort_ranges(ranges: list[ContextNumbers]) -> Iterator[ContextNumbers]:
         ranges_by_len = defaultdict(list)
         for range in ranges:
-            ranges_by_len[len(range.start)].append(range)
+            rlen = range.did_length if range.type == 'incall' else len(range.start)
+            ranges_by_len[rlen].append(range)
 
         for length in sorted(ranges_by_len.keys()):
-            for range in sorted(ranges_by_len[length], key=attrgetter('start')):
+            early_range_first = sorted(ranges_by_len[length], key=attrgetter('start'))
+            for range in early_range_first:
                 yield range
 
     @staticmethod
