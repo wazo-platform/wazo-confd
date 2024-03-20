@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+import logging
 from operator import attrgetter, itemgetter
 from typing import Iterator, Literal
 
@@ -10,6 +11,7 @@ from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
 from xivo_dao.alchemy.context import Context, ContextNumbers
 
+logger = logging.getLogger(__name__)
 
 RangeType = Literal['user', 'group', 'queue', 'conference', 'incall']
 Availability = Literal['available']
@@ -64,17 +66,26 @@ class RangeFilter:
 
     @classmethod
     def _list_exten_from_ranges(cls, ranges: list[ContextNumbers]):
-        listed_extens = set()
+        visited_ranges: set[tuple[int, int, int]] = set()
         for r in cls._sort_ranges(ranges):
             start = r.start
             end = r.end
             length = r.did_length if r.type == 'incall' else len(start)
-            for exten in range(int(start[-length:]), int(end[-length:]) + 1):
-                formatted_exten = str(exten).rjust(length, '0')
-                if formatted_exten in listed_extens:
+            exten_start = int(start[-length:])
+            exten_end = int(end[-length:])
+
+            for exten in range(exten_start, exten_end + 1):
+                if any(
+                    visited_start <= exten <= visited_end
+                    for visited_start, visited_end, visited_length in visited_ranges
+                    if length == visited_length
+                ):
+                    # exten already covered by previously visited range of same length
                     continue
-                listed_extens.add(formatted_exten)
+                formatted_exten = str(exten).rjust(length, '0')
                 yield formatted_exten
+
+            visited_ranges.add((exten_start, exten_end, length))
 
     @staticmethod
     def _sort_ranges(ranges: list[ContextNumbers]) -> Iterator[ContextNumbers]:
