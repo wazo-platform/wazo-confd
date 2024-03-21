@@ -329,7 +329,10 @@ class UserMiddleWare(ResourceMiddleware):
                             'Resource Error - Extension is associated'
                         ):
                             raise e
-                self._middleware_handle.get('incall').delete(incall.id, tenant_uuids)
+                # set incall destination to none
+                self._middleware_handle.get('incall').update(
+                    incall.id, {'destination': {'type': 'none'}}, tenant_uuids
+                )
 
             for switchboard in user.switchboards:
                 members = []
