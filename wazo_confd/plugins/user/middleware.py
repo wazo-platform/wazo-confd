@@ -316,20 +316,10 @@ class UserMiddleWare(ResourceMiddleware):
                 Session.expire(user, ['user_lines'])
 
             for incall in user.incalls:
-                for extension in incall.extensions:
-                    self._middleware_handle.get(
-                        'incall_extension_association'
-                    ).dissociate(incall.id, extension.id, tenant_uuids)
-                    try:
-                        self._middleware_handle.get('extension').delete(
-                            extension.id, tenant_uuids
-                        )
-                    except ResourceError as e:
-                        if not str(e).startswith(
-                            'Resource Error - Extension is associated'
-                        ):
-                            raise e
-                self._middleware_handle.get('incall').delete(incall.id, tenant_uuids)
+                # set incall destination to none
+                self._middleware_handle.get('incall').update(
+                    incall.id, {'destination': {'type': 'none'}}, tenant_uuids
+                )
 
             for switchboard in user.switchboards:
                 members = []
