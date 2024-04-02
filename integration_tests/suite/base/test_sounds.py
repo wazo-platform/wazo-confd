@@ -7,10 +7,12 @@ from hamcrest import (
     any_of,
     contains,
     contains_inanyorder,
+    contains_exactly,
     empty,
     equal_to,
     has_entries,
     has_items,
+    has_length,
 )
 
 from ..helpers import errors as e
@@ -87,6 +89,11 @@ def test_list(sound1, sound2):
 
     response = confd.sounds.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(response.items, has_items(sound1, sound2, has_entries(name='system')))
+
+    response = confd.sounds.get(wazo_tenant=SUB_TENANT, limit=1)
+    assert_that(response.items, contains_exactly(sound2))
+    assert_that(response.items, has_length(1))
+    assert_that(response.total, equal_to(2))
 
 
 @fixtures.sound()

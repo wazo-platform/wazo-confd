@@ -33,11 +33,11 @@ class SoundService:
 
     def search(self, parameters, tenant_uuids):
         sound_system = self._get_asterisk_sound(parameters)
-        sounds = self._storage.list_directories(parameters, tenant_uuids)
-        sounds.append(sound_system)
+        all_sounds = self._storage.list_directories(parameters, tenant_uuids)
+        all_sounds.append(sound_system)
 
-        sounds = self._filter_and_sort_categories(sounds, parameters)
-        total = len(sounds)
+        total = len(all_sounds)
+        sounds = self._filter_and_sort_categories(all_sounds, parameters)
         return total, sounds
 
     def _validate_parameters(self, parameters):
