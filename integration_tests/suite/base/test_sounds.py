@@ -78,8 +78,8 @@ def unique_error_checks(url, sound):
     s.check_bogus_field_returns_error(url, 'name', sound['name'])
 
 
-@fixtures.sound(wazo_tenant=MAIN_TENANT)
-@fixtures.sound(wazo_tenant=SUB_TENANT)
+@fixtures.sound(wazo_tenant=MAIN_TENANT, name='category_1')
+@fixtures.sound(wazo_tenant=SUB_TENANT, name='category_2')
 def test_list(sound1, sound2):
     response = confd.sounds.get(wazo_tenant=MAIN_TENANT)
     assert_that(response.items, has_items(sound1, has_entries(name='system')))
