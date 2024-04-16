@@ -1503,10 +1503,10 @@ def test_post_update_delete_full_user_no_error(
             response = url.get()
             response.assert_status(404)
 
-            # verify that incall is deleted
+            # verify that incall is set to none
             url = confd.incalls(payload['incalls'][0]['id'])
             response = url.get()
-            response.assert_status(404)
+            assert response.item['destination']['type'] == 'none'
 
             # verify that extension is deleted
             url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
