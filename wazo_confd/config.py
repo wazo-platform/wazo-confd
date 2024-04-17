@@ -1,4 +1,4 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -148,6 +148,7 @@ DEFAULT_CONFIG = {
         'user_agent': True,
         'user_external_app': True,
         'user_call_permission': True,
+        'user_callerid': True,
         'user_fallback': True,
         'user_group': True,
         'user_import': True,
