@@ -1,6 +1,8 @@
 # Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_dao.resources.user import dao as user_dao
+
 from .resource import UserCallerIDList
 from .service import build_service
 
@@ -15,5 +17,5 @@ class Plugin:
             UserCallerIDList,
             '/users/<uuid:user_id>/callerids/outgoing',
             '/users/<int:user_id>/callerids/outgoing',
-            resource_class_args=(service,),
+            resource_class_args=(service, user_dao),
         )
