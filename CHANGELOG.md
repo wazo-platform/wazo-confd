@@ -1,5 +1,11 @@
 # Changelog
 
+## 24.06
+
+* The following resource has been added:
+
+  * GET `/1.1/users/<user_id>/callerids/outgoing`
+
 ## 24.03
 
 * Undeprecate `parking` and `park_position` function keys, now working with
