@@ -197,6 +197,10 @@ class DatabaseQueries:
         )
         self.connection.execute(query, extension_feature_uuid=extension_feature_uuid)
 
+    def delete_all_incalls(self, tenant_uuid):
+        query = text("DELETE FROM incall WHERE tenant_uuid = :tenant_uuid")
+        self.connection.execute(query, tenant_uuid=tenant_uuid)
+
     def insert_func_key(self, func_key_type, destination_type):
         func_key_query = text(
             """

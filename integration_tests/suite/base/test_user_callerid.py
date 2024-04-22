@@ -8,7 +8,7 @@ from hamcrest import (
     has_entries,
 )
 
-from . import confd
+from . import confd, db
 from ..helpers import (
     associations as a,
     errors as e,
@@ -19,6 +19,8 @@ from ..helpers.config import INCALL_CONTEXT, MAIN_TENANT, SUB_TENANT
 
 @fixtures.user()
 def test_list_when_no_incall(user):
+    with db.queries() as queries:
+        queries.delete_all_incalls(user['tenant_uuid'])
     response = confd.users(user['uuid']).callerids.outgoing.get()
     expected = [{'type': 'anonymous'}]
     assert_that(response.items, contains_inanyorder(*expected))
@@ -26,14 +28,14 @@ def test_list_when_no_incall(user):
 
 
 @fixtures.extension(exten='5555551234', context=INCALL_CONTEXT)
-@fixtures.incall()
 @fixtures.extension(exten='5555556789', context=INCALL_CONTEXT)
-@fixtures.incall()
 @fixtures.user()
-def test_list_with_associated_type(extension1, incall1, extension2, incall2, user):
+def test_list_with_associated_type(extension1, extension2, user):
+    with db.queries() as queries:
+        queries.delete_all_incalls(user['tenant_uuid'])
     destination = {'type': 'user', 'user_id': user['id']}
-    confd.incalls(incall1['id']).put(destination=destination).assert_updated()
-    confd.incalls(incall2['id']).put(destination=destination).assert_updated()
+    incall1 = confd.incalls.post(destination=destination).item
+    incall2 = confd.incalls.post(destination=destination).item
 
     with a.incall_extension(incall1, extension1):
         with a.incall_extension(incall2, extension2):
@@ -48,13 +50,20 @@ def test_list_with_associated_type(extension1, incall1, extension2, incall2, use
     assert_that(response.items, contains_inanyorder(*expected))
     assert_that(response.total, equal_to(4))
 
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
+
 
 @fixtures.extension(exten='5555551234', context=INCALL_CONTEXT)
-@fixtures.incall(destination={'type': 'custom', 'command': 'Playback(Welcome)'})
 @fixtures.extension(exten='5555556789', context=INCALL_CONTEXT)
-@fixtures.incall(destination={'type': 'custom', 'command': 'Playback(IGNORED)'})
 @fixtures.user()
-def test_list_with_main_type(extension1, incall1, extension2, incall2, user):
+def test_list_with_main_type(extension1, extension2, user):
+    with db.queries() as queries:
+        queries.delete_all_incalls(user['tenant_uuid'])
+    destination = {'type': 'custom', 'command': 'Playback(Welcome)'}
+    incall1 = confd.incalls.post(destination=destination).item
+    incall2 = confd.incalls.post(destination=destination).item
+
     with a.incall_extension(incall1, extension1):
         with a.incall_extension(incall2, extension2):
             response = confd.users(user['uuid']).callerids.outgoing.get()
@@ -67,15 +76,20 @@ def test_list_with_main_type(extension1, incall1, extension2, incall2, user):
     assert_that(response.items, contains_inanyorder(*expected))
     assert_that(response.total, equal_to(2))
 
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
+
 
 @fixtures.extension(exten='5555551234', context=INCALL_CONTEXT)
-@fixtures.incall(destination={'type': 'custom', 'command': 'Playback(Welcome)'})
 @fixtures.extension(exten='5555556789', context=INCALL_CONTEXT)
-@fixtures.incall()
 @fixtures.user()
-def test_list_with_all_type(main_extension, main_incall, extension, incall, user):
+def test_list_with_all_type(main_extension, extension, user):
+    with db.queries() as queries:
+        queries.delete_all_incalls(user['tenant_uuid'])
+    destination = {'type': 'custom', 'command': 'Playback(Welcome)'}
+    main_incall = confd.incalls.post(destination=destination).item
     destination = {'type': 'user', 'user_id': user['id']}
-    confd.incalls(incall['id']).put(destination=destination).assert_updated()
+    incall = confd.incalls.post(destination=destination).item
 
     with a.incall_extension(main_incall, main_extension):
         with a.incall_extension(incall, extension):
@@ -88,6 +102,9 @@ def test_list_with_all_type(main_extension, main_incall, extension, incall, user
     ]
     assert_that(response.items, contains_inanyorder(*expected))
     assert_that(response.total, equal_to(3))
+
+    confd.incalls(main_incall['id']).delete().assert_deleted()
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.user(wazo_tenant=MAIN_TENANT)
