@@ -1,0 +1,47 @@
+paths:
+  /users/{user_id}/callerids/outgoing:
+    get:
+      operationId: list_user_callerid_outgoing
+      summary: List user's outgoing callerids
+      description: '**Required ACL:** `confd.users.{user_id}.callerids.outgoing.read`'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: User Outgoing Caller ID list
+          schema:
+            $ref: '#/definitions/UserCallerIDItems'
+
+definitions:
+  UserCallerID:
+    title: UserCallerID
+    properties:
+      number:
+        type: string
+        description: Caller ID number. Only valid for `main` `associated` type
+      type:
+        type: string
+        description: |
+          Caller ID type.
+
+          - `main`: The first incall defined in the tenant, which should correspond to the organisation number.
+          - `associated`: An incall associated to the user
+          - `anonymous`: Anonymous caller ID
+        enum:
+        - main
+        - associated
+        - anonymous
+  UserCallerIDItems:
+    title: UserCallerIDItems
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/UserCallerID'
+      total:
+        type: integer
+    required:
+    - total
