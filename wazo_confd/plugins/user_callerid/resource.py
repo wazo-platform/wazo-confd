@@ -15,7 +15,7 @@ class UserCallerIDList(ListResource):
         self.service = service
         self.user_dao = user_dao
 
-    @required_acl('confd.users.{user_id}.callerids.outgoing')
+    @required_acl('confd.users.{user_id}.callerids.outgoing.read')
     def get(self, user_id):
         params = {}  # NOTE(fblackburn): search is not implemented
         tenant_uuids = self._build_tenant_list({'recurse': True})
