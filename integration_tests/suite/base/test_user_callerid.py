@@ -40,12 +40,13 @@ def test_list_with_associated_type(extension1, incall1, extension2, incall2, use
             response = confd.users(user['uuid']).callerids.outgoing.get()
 
     expected = [
+        {'type': 'main', 'number': '5555551234'},
         {'type': 'associated', 'number': '5555551234'},
         {'type': 'associated', 'number': '5555556789'},
         {'type': 'anonymous'},
     ]
     assert_that(response.items, contains_inanyorder(*expected))
-    assert_that(response.total, equal_to(3))
+    assert_that(response.total, equal_to(4))
 
 
 @fixtures.extension(exten='5555551234', context=INCALL_CONTEXT)
