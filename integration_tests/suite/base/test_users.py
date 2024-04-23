@@ -1029,15 +1029,15 @@ def generate_user_resources_bodies(
 ) -> UserResources:
     exten = h.extension.find_available_exten(context_name)
     vm_number = h.voicemail.find_available_number(context_name)
+
+    source_exten = None
     if incall_context_name:
         source_exten = h.extension.find_available_exten(incall_context_name)
-    else:
-        source_exten = None
+
     user = FULL_USER
     auth = AUTH_USER
     extension = {'context': context_name, 'exten': exten}
-    if not endpoint_name:
-        endpoint_name = s.random_string(5)
+    endpoint_name = s.random_string(5) if not endpoint_name else endpoint_name
 
     line = {
         'context': context_name,
@@ -1046,20 +1046,16 @@ def generate_user_resources_bodies(
     }
     if device:
         line['device_id'] = device['id']
+
+    incall = None
     if incall_context_name:
         incall = {
             'extensions': [{'context': incall_context_name, 'exten': source_exten}],
         }
-    else:
-        incall = None
-    if group:
-        group = {
-            'uuid': group['uuid'],
-        }
-    if switchboard:
-        switchboard = {
-            'uuid': switchboard['uuid'],
-        }
+
+    group = {'uuid': group['uuid']} if group else None
+    switchboard = {'uuid': switchboard['uuid']} if switchboard else None
+
     voicemail = {
         'number': vm_number,
         'context': CONTEXT,
@@ -1075,6 +1071,9 @@ def generate_user_resources_bodies(
         'enabled': True,
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
+
+    forwards = None
+    fallbacks = None
     if user_destination:
         forwards = {
             'busy': {'enabled': True, 'destination': '123'},
@@ -1090,12 +1089,11 @@ def generate_user_resources_bodies(
             },
             'fail_destination': {'type': 'user', 'user_id': user_destination['id']},
         }
-    else:
-        forwards = None
-        fallbacks = None
+
     agent = {}
     if queue:
         agent['queues'] = [{'id': queue['id'], 'penalty': 1, 'priority': 2}]
+
     return UserResources(
         exten,
         source_exten,
@@ -1164,10 +1162,7 @@ def test_post_update_delete_full_user_no_error(
                 'fallbacks': user_resources.fallbacks,
                 **user_resources.user,
             }
-            response = confd.users.post(user_body)
-
-            response.assert_created('users')
-            payload = response.item
+            payload = confd.users.post(user_body).item
 
             # check the data returned when the user is created
             assert_that(
@@ -1332,9 +1327,9 @@ def test_post_update_delete_full_user_no_error(
                 has_entries(func_key_template_id=payload['func_key_template_id']),
             )
             # check if auth user exists
-            wazo_user = authentication.users.get(payload['uuid'])
+            auth_user = authentication.users.get(payload['uuid'])
             assert_that(
-                wazo_user,
+                auth_user,
                 has_entries(
                     uuid=payload['uuid'],
                     username=user_resources.auth['username'],
@@ -1360,15 +1355,12 @@ def test_post_update_delete_full_user_no_error(
             # retrieve the user and try to update the user with the same data
             user = confd.users(payload['uuid']).get().item
             user.pop('call_record_enabled', None)  # Deprecated field
-            user.pop(
-                'voicemail', None
-            )  # The voicemail cannot be updated directly by calling POST /users
+            # The voicemail cannot be updated directly by calling POST /users
+            user.pop('voicemail', None)
             confd.users(payload['uuid']).put(
                 **user,
                 query_string="recursive=True",
             ).assert_updated()
-
-            url = confd.users(payload['uuid'])
 
             # user update
             destination = {
@@ -1397,7 +1389,7 @@ def test_post_update_delete_full_user_no_error(
                 'caller_id_num', None
             )  # cannot set caller id to none
 
-            response = url.put(
+            response = confd.users(payload['uuid']).put(
                 {
                     **payload,
                     'fallbacks': {**new_fallbacks},
@@ -1465,8 +1457,7 @@ def test_post_update_delete_full_user_no_error(
             )
 
             # retrieve the agent for the user and check the data
-            response = url.get()
-            payload = response.item
+            payload = confd.users(payload['uuid']).get().item
             assert_that(
                 confd.agents(payload['agent']['id']).get().item,
                 has_entries(
@@ -1486,50 +1477,44 @@ def test_post_update_delete_full_user_no_error(
             )
 
             # user deletion
-            response = url.delete(recursive=True)
+            response = confd.users(payload['uuid']).delete(recursive=True)
             response.assert_deleted()
 
             # verify that user is deleted
-            response = url.get()
+            response = confd.users(payload['uuid']).get()
             response.assert_status(404)
 
             # verify that voicemail is deleted
-            url = confd.voicemails(payload['voicemail']['id'])
-            response = url.get()
+            response = confd.voicemails(payload['voicemail']['id']).get()
             response.assert_status(404)
 
             # verify that line is deleted
-            url = confd.lines(payload['lines'][0]['id'])
-            response = url.get()
+            response = confd.lines(payload['lines'][0]['id']).get()
             response.assert_status(404)
 
             # verify that incall is set to none
             incall_id = payload['incalls'][0]['id']
-            url = confd.incalls(incall_id)
-            response = url.get()
+            response = confd.incalls(incall_id).get()
             assert response.item['destination']['type'] == 'none'
 
             # Cleanup incall
             confd.incalls(incall_id).delete().assert_deleted()
 
             # verify that extension is deleted
-            url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
-            response = url.get()
+            extension_id = payload['lines'][0]['extensions'][0]['id']
+            response = confd.extensions(extension_id).get()
             response.assert_status(404)
 
             # verify that the switchboard is not deleted
-            url = confd.switchboards(payload['switchboards'][0]['uuid'])
-            response = url.get()
+            response = confd.switchboards(payload['switchboards'][0]['uuid']).get()
             response.assert_ok()
 
             # verify that the switchboard2 is not deleted
-            url = confd.switchboards(switchboard2['uuid'])
-            response = url.get()
+            response = confd.switchboards(switchboard2['uuid']).get()
             response.assert_ok()
 
             # verify that the group is not deleted
-            url = confd.groups(payload['groups'][0]['uuid'])
-            response = url.get()
+            response = confd.groups(payload['groups'][0]['uuid']).get()
             response.assert_ok()
 
             # verify that auth user is deleted
@@ -1539,13 +1524,11 @@ def test_post_update_delete_full_user_no_error(
             )
 
             # verify that the device is not deleted
-            url = confd.devices(device['id'])
-            response = url.get()
+            response = confd.devices(device['id']).get()
             response.assert_ok()
 
             # verify that agent is deleted
-            url = confd.agents(payload['agent']['id'])
-            response = url.get()
+            response = confd.agents(payload['agent']['id']).get()
             response.assert_status(404)
 
 
@@ -1579,12 +1562,10 @@ def test_delete_full_user_no_auth_no_error(
                 **user_resources.user,
             }
         )
-
-        payload = response.json
+        payload = response.item
 
         # user deletion
-        url = confd.users(payload['uuid'])
-        url.delete(recursive=True)
+        confd.users(payload['uuid']).delete(recursive=True)
 
         # verify auth user is deleted
         assert_that(
@@ -1622,8 +1603,6 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
         },
         wazo_tenant=SUB_TENANT,
     )
-
-    response.assert_created('users')
     payload = response.item
 
     # check if the returned data contains the device_id
@@ -1661,7 +1640,8 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
     # and check if its tenant is always the user tenant and if status=autoprov
     device_cfg = provd.devices.get(device['id'])
     assert_that(
-        device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
+        device_cfg,
+        has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT),
     )
 
 
@@ -1720,7 +1700,8 @@ def test_post_delete_minimalistic_user_with_device_on_subtenant_no_error(
     # and check if its tenant is always the user tenant and if status=autoprov
     device_cfg = provd.devices.get(device['id'])
     assert_that(
-        device_cfg, has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT)
+        device_cfg,
+        has_entries(config=starts_with('autoprov'), tenant_uuid=SUB_TENANT),
     )
 
 
@@ -1765,19 +1746,16 @@ def test_delete_voicemail_2_users_not_deleted(
 
         payload = response.item
 
-        url = confd.users(payload['uuid'])
-
         # user deletion
-        response = url.delete(recursive=True)
+        response = confd.users(payload['uuid']).delete(recursive=True)
         response.assert_deleted()
 
         # verify that user is deleted
-        response = url.get()
+        response = confd.users(payload['uuid']).get()
         response.assert_status(404)
 
         # verify that voicemail is not deleted because user2 uses the same voicemail
-        url = confd.voicemails(payload['voicemail']['id'])
-        response = url.get()
+        response = confd.voicemails(payload['voicemail']['id']).get()
         response.assert_ok()
 
 
@@ -1785,11 +1763,7 @@ def test_delete_voicemail_2_users_not_deleted(
 @fixtures.extension(context=INCALL_CONTEXT)
 def test_post_incalls_existing_extension_no_error(incall, extension):
     incalls_list = [
-        [
-            {
-                'extensions': [{'id': extension['id']}],
-            }
-        ],
+        [{'extensions': [{'id': extension['id']}]}],
         [
             {
                 'extensions': [
@@ -1806,10 +1780,7 @@ def test_post_incalls_existing_extension_no_error(incall, extension):
                 'incalls': incalls_elt,
                 **user,
             }
-            response = confd.users.post(user_body)
-
-            response.assert_created('users')
-            payload = response.item
+            payload = confd.users.post(user_body).item
 
             # retrieve the incall (created before) and check its data are correct
             assert_that(
@@ -1818,9 +1789,9 @@ def test_post_incalls_existing_extension_no_error(incall, extension):
                     destination=has_entries(type="user", user_id=payload['id'])
                 ),
             )
+
         # user deletion
-        url = confd.users(payload['uuid'])
-        url.delete()
+        confd.users(payload['uuid']).delete().assert_deleted()
 
 
 @fixtures.incall()
@@ -1835,17 +1806,10 @@ def test_post_incalls_existing_extension_missing_range_no_error(incall, context)
         with a.incall_extension(incall, extension):
             user = FULL_USER
             user_body = {
-                'incalls': [
-                    {
-                        'extensions': [{'id': extension['id']}],
-                    }
-                ],
+                'incalls': [{'extensions': [{'id': extension['id']}]}],
                 **user,
             }
-            response = confd.users.post(user_body)
-
-            response.assert_created('users')
-            payload = response.item
+            payload = confd.users.post(user_body).item
 
             # retrieve the context and check if the incall range has been added
             assert_that(
@@ -1860,9 +1824,9 @@ def test_post_incalls_existing_extension_missing_range_no_error(incall, context)
                     )
                 ),
             )
+
         # user deletion
-        url = confd.users(payload['uuid'])
-        url.delete(recursive=True)
+        confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
 
 
 @fixtures.outcall()
@@ -1871,11 +1835,7 @@ def test_post_incalls_existing_extension_wrong_context_type_error(outcall, exten
     with a.outcall_extension(outcall, extension):
         user = FULL_USER
         user_body = {
-            'incalls': [
-                {
-                    'extensions': [{'id': extension['id']}],
-                }
-            ],
+            'incalls': [{'extensions': [{'id': extension['id']}]}],
             **user,
         }
         response = confd.users.post(user_body)
@@ -1900,21 +1860,16 @@ def test_update_lines_no_error(device, new_device):
         'lines': [user_resources.line],
         **user_resources.user,
     }
-    response = confd.users.post(user_body)
-
-    response.assert_created('users')
-    payload = response.item
+    payload = confd.users.post(user_body).item
 
     first_line_id = confd.users(payload['uuid']).get().item['lines'][0]['id']
-
-    url = confd.users(payload['uuid'])
 
     # user update
     new_user_resources = generate_user_resources_bodies(
         context_name=CONTEXT, device=new_device, endpoint_name='def'
     )
     payload.pop('call_record_enabled', None)  # Deprecated field
-    response = url.put(
+    response = confd.users(payload['uuid']).put(
         {**payload, 'lines': [new_user_resources.line]},
         query_string="recursive=True",
     )
@@ -1938,7 +1893,7 @@ def test_update_lines_no_error(device, new_device):
 
     # update the label of the SIP endpoint
     new_line['endpoint_sip']['label'] = 'new label'
-    response = url.put(
+    response = confd.users(payload['uuid']).put(
         {**payload, 'lines': [new_line]},
         query_string="recursive=True",
     )
@@ -1953,26 +1908,23 @@ def test_update_lines_no_error(device, new_device):
     )
 
     # user deletion
-    response = url.delete(recursive=True)
+    response = confd.users(payload['uuid']).delete(recursive=True)
     response.assert_deleted()
 
     # verify that user is deleted
-    response = url.get()
+    response = confd.users(payload['uuid']).get()
     response.assert_status(404)
 
     # verify that line is deleted
-    url = confd.lines(new_line['id'])
-    response = url.get()
+    response = confd.lines(new_line['id']).get()
     response.assert_status(404)
 
     # verify that extension is deleted
-    url = confd.extensions(new_line['extensions'][0]['id'])
-    response = url.get()
+    response = confd.extensions(new_line['extensions'][0]['id']).get()
     response.assert_status(404)
 
     # verify that the device is not deleted
-    url = confd.devices(device['id'])
-    response = url.get()
+    response = confd.devices(device['id']).get()
     response.assert_ok()
 
 
@@ -2004,15 +1956,13 @@ def test_update_lines_sip_sccp_error(
         query_string="recursive=True",
     ).assert_updated()
 
-    url = confd.users(payload['uuid'])
-
     # user update
     del payload['lines'][0]['endpoint_sip']
     payload['lines'][0]['endpoint_sccp'] = {}
     payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
-    response = url.put(
+    response = confd.users(payload['uuid']).put(
         {**user, 'lines': [payload['lines'][0]]},
         query_string="recursive=True",
     )
@@ -2025,26 +1975,23 @@ def test_update_lines_sip_sccp_error(
     )
 
     # user deletion
-    response = url.delete(recursive=True)
+    response = confd.users(payload['uuid']).delete(recursive=True)
     response.assert_deleted()
 
     # verify that user is deleted
-    response = url.get()
+    response = confd.users(payload['uuid']).get()
     response.assert_status(404)
 
     # verify that line is deleted
-    url = confd.lines(payload['lines'][0]['id'])
-    response = url.get()
+    response = confd.lines(payload['lines'][0]['id']).get()
     response.assert_status(404)
 
     # verify that extension is deleted
-    url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
-    response = url.get()
+    response = confd.extensions(payload['lines'][0]['extensions'][0]['id']).get()
     response.assert_status(404)
 
     # verify that the device is not deleted
-    url = confd.devices(device['id'])
-    response = url.get()
+    response = confd.devices(device['id']).get()
     response.assert_ok()
 
 
@@ -2059,12 +2006,7 @@ def test_update_extension_lines_no_error(device, new_device):
         'lines': [user_resources.line],
         **user_resources.user,
     }
-    response = confd.users.post(user_body)
-
-    response.assert_created('users')
-    payload = response.item
-
-    url = confd.users(payload['uuid'])
+    payload = confd.users.post(user_body).item
 
     # user update
     new_user_resources = generate_user_resources_bodies(
@@ -2077,7 +2019,7 @@ def test_update_extension_lines_no_error(device, new_device):
     payload['lines'][0].pop('caller_id', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_name', None)  # cannot set caller id to none
     payload['lines'][0].pop('caller_id_num', None)  # cannot set caller id to none
-    response = url.put(
+    response = confd.users(payload['uuid']).put(
         {**payload, 'lines': [created_line]},
         query_string="recursive=True",
     )
@@ -2111,7 +2053,7 @@ def test_update_extension_lines_no_error(device, new_device):
     )
 
     created_line['extensions'][0]['id'] = None
-    response = url.put(
+    response = confd.users(payload['uuid']).put(
         {**payload, 'lines': [created_line]},
         query_string="recursive=True",
     )
@@ -2124,21 +2066,19 @@ def test_update_extension_lines_no_error(device, new_device):
     )
 
     # user deletion
-    response = url.delete(recursive=True)
+    response = confd.users(payload['uuid']).delete(recursive=True)
     response.assert_deleted()
 
     # verify that user is deleted
-    response = url.get()
+    response = confd.users(payload['uuid']).get()
     response.assert_status(404)
 
     # verify that line is deleted
-    url = confd.lines(payload['lines'][0]['id'])
-    response = url.get()
+    response = confd.lines(payload['lines'][0]['id']).get()
     response.assert_status(404)
 
     # verify that the device is not deleted
-    url = confd.devices(device['id'])
-    response = url.get()
+    response = confd.devices(device['id']).get()
     response.assert_ok()
 
 
@@ -2163,10 +2103,7 @@ def test_update_agent_no_error(
         'agent': user_resources.agent,
         **user_resources.user,
     }
-    response = confd.users.post(user_body)
-
-    response.assert_created('users')
-    created_user = response.item
+    created_user = confd.users.post(user_body).item
 
     agent_id = created_user['agent']['id']
 
@@ -2296,18 +2233,15 @@ def test_update_agent_no_error(
     response.assert_status(404)
 
     # verify that line is deleted
-    url = confd.lines(retrieved_user['lines'][0]['id'])
-    response = url.get()
+    response = confd.lines(retrieved_user['lines'][0]['id']).get()
     response.assert_status(404)
 
     # verify that extension is deleted
-    url = confd.extensions(retrieved_user['lines'][0]['extensions'][0]['id'])
-    response = url.get()
+    response = confd.extensions(retrieved_user['lines'][0]['extensions'][0]['id']).get()
     response.assert_status(404)
 
     # verify that agent is deleted
-    url = confd.agents(retrieved_user['agent']['id'])
-    response = url.get()
+    response = confd.agents(retrieved_user['agent']['id']).get()
     response.assert_status(404)
 
 
@@ -2324,18 +2258,16 @@ def test_update_voicemail_field():
     response.assert_created('users')
     payload = response.item
 
-    url = confd.users(payload['uuid'])
-
     payload['voicemail']['language'] = 'es_ES'
     payload.pop('call_record_enabled', None)  # Deprecated field
-    url.put({**payload}, query_string="recursive=True")
+    confd.users(payload['uuid']).put({**payload}, query_string="recursive=True")
 
     assert_that(
         confd.voicemails(payload['voicemail']['id']).get().item,
         has_entries(language='es_ES'),
     )
 
-    url.delete(recursive=True)
+    confd.users(payload['uuid']).delete(recursive=True).assert_deleted
 
 
 @fixtures.voicemail()
@@ -2347,22 +2279,17 @@ def test_update_voicemail_new_voicemail(new_voicemail):
         'voicemail': user_resources.voicemail,
         **user_resources.user,
     }
-    response = confd.users.post(user_body)
-
-    response.assert_created('users')
-    payload = response.item
-
-    url = confd.users(payload['uuid'])
-
+    payload = confd.users.post(user_body).item
     payload.pop('call_record_enabled', None)  # Deprecated field
 
-    url.put(
+    response = confd.users(payload['uuid']).put(
         {
             **payload,
             'voicemail': {'id': new_voicemail['id']},
         },
         query_string="recursive=True",
     )
+    response.assert_updated()
 
     assert_that(
         confd.users(payload['uuid']).get().item,
@@ -2373,7 +2300,7 @@ def test_update_voicemail_new_voicemail(new_voicemail):
         ),
     )
 
-    url.delete(recursive=True)
+    confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
 
 
 def test_update_incall_new_extension():
@@ -2387,12 +2314,7 @@ def test_update_incall_new_extension():
         'incalls': [user_resources.incall],
         **user_resources.user,
     }
-    response = confd.users.post(user_body)
-    response.assert_created('users')
-
-    payload = response.item
-    url = confd.users(payload['uuid'])
-
+    payload = confd.users.post(user_body).item
     payload.pop('call_record_enabled', None)  # Deprecated field
 
     # update existing incall with a new extension
@@ -2400,8 +2322,11 @@ def test_update_incall_new_extension():
     new_incall['extensions'][0]['exten'] = new_user_resources.source_exten
     new_incall['id'] = payload['incalls'][0]['id']
 
-    url.put({**payload, "incalls": [new_incall]}, query_string="recursive=True")
-    response.assert_status(201)
+    response = confd.users(payload['uuid']).put(
+        {**payload, "incalls": [new_incall]},
+        query_string="recursive=True",
+    )
+    response.assert_updated()
 
     # check the incall id is always the same
     assert_that(
@@ -2418,7 +2343,7 @@ def test_update_incall_new_extension():
             extensions=contains(has_entries(exten=new_user_resources.source_exten))
         ),
     )
-    url.delete(recursive=True)
+    confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
 
     # Cleanup incall
     confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
@@ -2432,12 +2357,7 @@ def test_update_incall_new_incall():
         'incalls': [user_resources.incall],
         **user_resources.user,
     }
-    response = confd.users.post(user_body)
-    response.assert_created('users')
-
-    payload = response.item
-    url = confd.users(payload['uuid'])
-
+    payload = confd.users.post(user_body).item
     payload.pop('call_record_enabled', None)  # Deprecated field
 
     new_user_resources = generate_user_resources_bodies(
@@ -2446,7 +2366,11 @@ def test_update_incall_new_incall():
 
     # replace existing incall with a new incall
     new_incall = new_user_resources.incall
-    url.put({**payload, "incalls": [new_incall]}, query_string="recursive=True")
+    response = confd.users(payload['uuid']).put(
+        {**payload, "incalls": [new_incall]},
+        query_string="recursive=True",
+    )
+    response.assert_updated()
 
     # check the incall id is a new one
     updated_user = confd.users(payload['uuid']).get().item
@@ -2456,7 +2380,7 @@ def test_update_incall_new_incall():
             incalls=contains(has_entries(id=is_not(payload['incalls'][0]['id']))),
         ),
     )
-    url.delete(recursive=True)
+    confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
 
     # Cleanup incall
     confd.incalls(updated_user['incalls'][0]['id']).delete().assert_deleted()
@@ -2475,11 +2399,10 @@ def test_post_lines_same_extension_no_error(device, device2):
     }
     line2['device_id'] = device2['id']
 
-    response = confd.users.post(
-        lines=[user_resources.line, line2], **user_resources.user
-    )
-
-    payload = response.item
+    payload = confd.users.post(
+        lines=[user_resources.line, line2],
+        **user_resources.user,
+    ).item
 
     exten = user_resources.extension['exten']
 
@@ -2508,5 +2431,4 @@ def test_post_lines_same_extension_no_error(device, device2):
         has_entries(extensions=contains(has_entries(exten=exten))),
     )
 
-    response = confd.users(response.item['uuid']).delete(recursive=True)
-    response.assert_deleted()
+    confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
