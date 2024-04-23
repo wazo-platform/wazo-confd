@@ -80,33 +80,6 @@ class DatabaseQueries:
     def __init__(self, connection):
         self.connection = connection
 
-    def insert_queue(
-        self, name='myqueue', number='3000', context='default', tenant_uuid=None
-    ):
-        queue_query = text(
-            """
-        INSERT INTO queuefeatures (name, displayname, number, context, tenant_uuid)
-        VALUES (:name, :displayname, :number, :context, :tenant_uuid)
-        RETURNING id
-        """
-        )
-
-        queue_id = self.connection.execute(
-            queue_query,
-            name=name,
-            displayname=name,
-            number=number,
-            context=context,
-            tenant_uuid=tenant_uuid,
-        ).scalar()
-
-        self.insert_extension(number, context, 'queue', queue_id)
-
-        func_key_id = self.insert_func_key('speeddial', 'queue')
-        self.insert_destination('queue', 'queue_id', func_key_id, queue_id)
-
-        return queue_id
-
     def associate_queue_extension(self, queue_id, extension_id):
         query = text(
             "UPDATE extensions SET type = 'queue', typeval = :queue_id WHERE id = :extension_id"
@@ -200,51 +173,6 @@ class DatabaseQueries:
     def delete_all_incalls(self, tenant_uuid):
         query = text("DELETE FROM incall WHERE tenant_uuid = :tenant_uuid")
         self.connection.execute(query, tenant_uuid=tenant_uuid)
-
-    def insert_func_key(self, func_key_type, destination_type):
-        func_key_query = text(
-            """
-        INSERT INTO func_key (type_id, destination_type_id)
-        VALUES (
-        (SELECT id FROM func_key_type WHERE name = :func_key_type),
-        (SELECT id FROM func_key_destination_type WHERE name = :destination_type)
-        )
-        RETURNING id
-        """
-        )
-
-        return self.connection.execute(
-            func_key_query,
-            func_key_type=func_key_type,
-            destination_type=destination_type,
-        ).scalar()
-
-    def insert_destination(self, table, column, func_key_id, destination_id):
-        destination_query = text(
-            """
-        INSERT INTO func_key_dest_{table} (func_key_id, {column})
-        VALUES (:func_key_id, :destination_id)
-        """.format(
-                table=table, column=column
-            )
-        )
-
-        self.connection.execute(
-            destination_query, func_key_id=func_key_id, destination_id=destination_id
-        )
-
-    def insert_extension(self, exten, context, type_, typeval):
-        exten_query = text(
-            """
-        INSERT INTO extensions (context, exten, type, typeval)
-        VALUES (:context, :exten, :type, :typeval)
-        RETURNING id
-        """
-        )
-
-        return self.connection.execute(
-            exten_query, context=context, exten=exten, type=type_, typeval=str(typeval)
-        ).scalar()
 
     def get_agent(self):
         query = text("SELECT * FROM agentfeatures")
