@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -25,8 +25,9 @@ from ..helpers.config import (
     INCALL_CONTEXT,
     MAIN_TENANT,
     SUB_TENANT,
+    gen_queue_exten,
 )
-from . import confd, db
+from . import confd
 from .test_extensions import error_checks
 
 FAKE_ID = 999999999
@@ -283,15 +284,15 @@ def test_associate_line_to_extension_already_associated(extension, line):
         response.assert_updated()
 
 
+@fixtures.extension(exten=gen_queue_exten())
+@fixtures.queue()
 @fixtures.line_sip()
-def test_associate_line_to_extension_already_associated_to_other_resource(line):
-    with db.queries() as queries:
-        queries.insert_queue(number='1234', tenant_uuid=MAIN_TENANT)
-
-    extension_id = confd.extensions.get(exten='1234').items[0]['id']
-
-    response = confd.lines(line['id']).extensions(extension_id).put()
-    response.assert_match(400, e.resource_associated('Extension', 'queue'))
+def test_associate_line_to_extension_already_associated_to_other_resource(
+    extension, queue, line
+):
+    with a.queue_extension(queue, extension):
+        response = confd.lines(line['id']).extensions(extension['id']).put()
+        response.assert_match(400, e.resource_associated('Extension', 'queue'))
 
 
 @fixtures.line()

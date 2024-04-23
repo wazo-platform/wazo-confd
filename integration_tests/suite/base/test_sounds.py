@@ -1,4 +1,4 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -7,12 +7,10 @@ from hamcrest import (
     any_of,
     contains,
     contains_inanyorder,
-    contains_exactly,
     empty,
     equal_to,
     has_entries,
     has_items,
-    has_length,
 )
 
 from ..helpers import errors as e
@@ -81,18 +79,18 @@ def unique_error_checks(url, sound):
 @fixtures.sound(wazo_tenant=MAIN_TENANT, name='category_1')
 @fixtures.sound(wazo_tenant=SUB_TENANT, name='category_2')
 def test_list(sound1, sound2):
+    sound_system = has_entries(name='system')
     response = confd.sounds.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, has_items(sound1, has_entries(name='system')))
+    assert_that(response.items, has_items(sound1, sound_system))
 
     response = confd.sounds.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, has_items(sound2, has_entries(name='system')))
+    assert_that(response.items, has_items(sound2, sound_system))
 
     response = confd.sounds.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(sound1, sound2, has_entries(name='system')))
+    assert_that(response.items, has_items(sound1, sound2, sound_system))
 
-    response = confd.sounds.get(wazo_tenant=SUB_TENANT, limit=1)
-    assert_that(response.items, contains_exactly(sound2))
-    assert_that(response.items, has_length(1))
+    response = confd.sounds.get(wazo_tenant=SUB_TENANT, order='name', limit=1)
+    assert_that(response.items, contains(sound2))
     assert_that(response.total, equal_to(2))
 
 

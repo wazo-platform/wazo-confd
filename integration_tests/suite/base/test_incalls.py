@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -185,6 +185,7 @@ def test_create_minimal_parameters():
     response.assert_created('incalls')
 
     assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
+    confd.incalls(response.item['id']).delete().assert_deleted()
 
 
 def test_create_all_parameters():
@@ -211,6 +212,7 @@ def test_create_all_parameters():
             tenant_uuid=SUB_TENANT,
         ),
     )
+    confd.incalls(response.item['id']).delete().assert_deleted()
 
 
 @fixtures.incall()
@@ -272,6 +274,7 @@ def create_incall_with_destination(destination):
     response = confd.incalls.post(destination=destination)
     response.assert_created('incalls')
     assert_that(response.item, has_entries(destination=has_entries(**destination)))
+    confd.incalls(response.item['id']).delete().assert_deleted()
 
 
 def update_incall_with_destination(incall_id, destination):
@@ -316,6 +319,7 @@ def test_get_group_destination_relation(group):
             ),
         ),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.user()
@@ -335,6 +339,7 @@ def test_get_user_destination_relation(user):
             )
         ),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.ivr()
@@ -346,6 +351,7 @@ def test_get_ivr_destination_relation(ivr):
         response.item,
         has_entries(destination=has_entries(ivr_id=ivr['id'], ivr_name=ivr['name'])),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.conference()
@@ -363,6 +369,7 @@ def test_get_conference_destination_relation(conference):
             )
         ),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.switchboard()
@@ -381,6 +388,7 @@ def test_get_switchboard_destination_relation(switchboard):
             )
         ),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.voicemail()
@@ -398,6 +406,7 @@ def test_get_voicemail_destination_relation(voicemail):
             )
         ),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.queue(label='hello-world')
@@ -413,6 +422,7 @@ def test_get_queue_destination_relation(queue):
             destination=has_entries(queue_id=queue['id'], queue_label=queue['label'])
         ),
     )
+    confd.incalls(incall['id']).delete().assert_deleted()
 
 
 @fixtures.group()
@@ -434,6 +444,8 @@ def test_get_incalls_relation_when_group_destination(group):
             )
         ),
     )
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
 
 
 @fixtures.user()
@@ -455,6 +467,8 @@ def test_get_incalls_relation_when_user_destination(user):
             )
         ),
     )
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
 
 
 @fixtures.ivr()
@@ -472,6 +486,8 @@ def test_get_incalls_relation_when_ivr_destination(ivr):
             )
         ),
     )
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
 
 
 @fixtures.conference()
@@ -493,6 +509,8 @@ def test_get_incalls_relation_when_conference_destination(conference):
             )
         ),
     )
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
 
 
 @fixtures.switchboard()
@@ -514,6 +532,8 @@ def test_get_incalls_relation_when_switchboard_destination(switchboard):
             )
         ),
     )
+    confd.incalls(incall1['id']).delete().assert_deleted()
+    confd.incalls(incall2['id']).delete().assert_deleted()
 
 
 # Note: Until we have a better way to mesure query performance,

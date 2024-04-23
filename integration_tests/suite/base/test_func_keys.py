@@ -17,6 +17,7 @@ from . import confd, db, provd
 from ..helpers import (
     associations as a,
     errors as e,
+    helpers as h,
     fixtures,
     helpers,
     scenarios as s,
@@ -195,26 +196,68 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
         self.parking_exten = '700'
         park_pos = 701
 
-        with self.db.queries() as queries:
-            group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
-            self.parking_lot_id = queries.insert_parking_lot(
-                number=self.parking_exten,
-                slots_start=park_pos,
-                slots_end=park_pos,
-                tenant_uuid=MAIN_TENANT,
-            )
-            queue_id = queries.insert_queue(number=queue_exten, tenant_uuid=MAIN_TENANT)
-            conference_id = queries.insert_conference(
-                number=conf_exten, tenant_uuid=MAIN_TENANT
-            )
-            agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
-            paging_id = queries.insert_paging(
-                number=paging_number, tenant_uuid=MAIN_TENANT
-            )
-            callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
-            filter_member_id = queries.insert_filter_member(
-                callfilter_id, self.user['id']
-            )
+        self.group = confd.groups.post(label='mygroup', tenant_uuid=MAIN_TENANT).item
+        self.group_extension = confd.extensions.post(
+            exten=group_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.group_extension.associate(self.group['uuid'], self.group_extension['id'])
+
+        self.parking_lot = confd.parkinglots.post(
+            slots_start=str(park_pos),
+            slots_end=str(park_pos),
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        self.parking_lot_extension = confd.extensions.post(
+            exten=self.parking_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.parking_lot_extension.associate(
+            self.parking_lot['id'],
+            self.parking_lot_extension['id'],
+        )
+
+        self.queue = confd.queues.post(name='myqueue', tenant_uuid=MAIN_TENANT).item
+        self.queue_extension = confd.extensions.post(
+            exten=queue_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.queue_extension.associate(self.queue['id'], self.queue_extension['id'])
+
+        self.conference = confd.conferences.post(tenant_uuid=MAIN_TENANT).item
+        self.conference_extension = confd.extensions.post(
+            exten=conf_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.conference_extension.associate(
+            self.conference['id'],
+            self.conference_extension['id'],
+        )
+
+        self.agent = confd.agents.post(number='1000', tenant_uuid=MAIN_TENANT).item
+        h.user_agent.associate(self.user['id'], self.agent['id'])
+
+        self.paging = confd.pagings.post(
+            number=paging_number,
+            tenant_uuid=MAIN_TENANT,
+        ).item
+
+        self.call_filter = confd.callfilters.post(
+            name='mycallfilter',
+            strategy='all',
+            source='all',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.call_filter_surrogate_user.associate(
+            self.call_filter['id'],
+            [self.user['uuid']],
+        )
+        self.call_filter = confd.callfilters(self.call_filter['id']).get().item
+        self.filter_member_id = self.call_filter['surrogates']['users'][0]['member_id']
 
         self.provd_funckeys = {
             '1': {'label': '', 'type': 'speeddial', 'line': 1, 'value': user_exten},
@@ -285,25 +328,19 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*735{user_id}***231***3{agent_id}'.format(
-                    user_id=self.user['id'], agent_id=agent_id
-                ),
+                'value': f'*735{self.user["id"]}***231***3{self.agent["id"]}',
             },
             '24': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*735{user_id}***232***3{agent_id}'.format(
-                    user_id=self.user['id'], agent_id=agent_id
-                ),
+                'value': f'*735{self.user["id"]}***232***3{self.agent["id"]}',
             },
             '25': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*735{user_id}***230***3{agent_id}'.format(
-                    user_id=self.user['id'], agent_id=agent_id
-                ),
+                'value': f'*735{self.user["id"]}***230***3{self.agent["id"]}',
             },
             '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
             '27': {'label': '', 'type': 'park', 'line': 1, 'value': self.parking_exten},
@@ -317,7 +354,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*37{member_id}'.format(member_id=filter_member_id),
+                'value': '*37{member_id}'.format(member_id=self.filter_member_id),
             },
             '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
             '31': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
@@ -325,25 +362,19 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*735{user_id}***251*{group_id}'.format(
-                    user_id=self.user['id'], group_id=group_id
-                ),
+                'value': f'*735{self.user["id"]}***251*{self.group["id"]}',
             },
             '33': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*735{user_id}***252*{group_id}'.format(
-                    user_id=self.user['id'], group_id=group_id
-                ),
+                'value': f'*735{self.user["id"]}***252*{self.group["id"]}',
             },
             '34': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
-                'value': '*735{user_id}***250*{group_id}'.format(
-                    user_id=self.user['id'], group_id=group_id
-                ),
+                'value': f'*735{self.user["id"]}***250*{self.group["id"]}',
             },
         }
 
@@ -352,11 +383,20 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'blf': False,
                 'destination': {'type': 'user', 'user_id': self.user['id']},
             },
-            '2': {'blf': False, 'destination': {'type': 'group', 'group_id': group_id}},
-            '3': {'blf': False, 'destination': {'type': 'queue', 'queue_id': queue_id}},
+            '2': {
+                'blf': False,
+                'destination': {'type': 'group', 'group_id': self.group['id']},
+            },
+            '3': {
+                'blf': False,
+                'destination': {'type': 'queue', 'queue_id': self.queue['id']},
+            },
             '4': {
                 'blf': False,
-                'destination': {'type': 'conference', 'conference_id': conference_id},
+                'destination': {
+                    'type': 'conference',
+                    'conference_id': self.conference['id'],
+                },
             },
             '5': {
                 'blf': False,
@@ -436,7 +476,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'destination': {
                     'type': 'agent',
                     'action': 'login',
-                    'agent_id': agent_id,
+                    'agent_id': self.agent['id'],
                 },
             },
             '24': {
@@ -444,7 +484,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'destination': {
                     'type': 'agent',
                     'action': 'logout',
-                    'agent_id': agent_id,
+                    'agent_id': self.agent['id'],
                 },
             },
             '25': {
@@ -452,14 +492,14 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'destination': {
                     'type': 'agent',
                     'action': 'toggle',
-                    'agent_id': agent_id,
+                    'agent_id': self.agent['id'],
                 },
             },
             '26': {
                 'blf': False,
                 'destination': {
                     'type': 'park_position',
-                    'parking_lot_id': self.parking_lot_id,
+                    'parking_lot_id': self.parking_lot['id'],
                     'position': park_pos,
                 },
             },
@@ -467,18 +507,18 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'blf': False,
                 'destination': {
                     'type': 'parking',
-                    'parking_lot_id': self.parking_lot_id,
+                    'parking_lot_id': self.parking_lot['id'],
                 },
             },
             '28': {
                 'blf': False,
-                'destination': {'type': 'paging', 'paging_id': paging_id},
+                'destination': {'type': 'paging', 'paging_id': self.paging['id']},
             },
             '29': {
                 'blf': False,
                 'destination': {
                     'type': 'bsfilter',
-                    'filter_member_id': filter_member_id,
+                    'filter_member_id': self.filter_member_id,
                 },
             },
             '30': {'blf': False, 'destination': {'type': 'onlinerec'}},
@@ -491,7 +531,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'destination': {
                     'type': 'groupmember',
                     'action': 'join',
-                    'group_id': group_id,
+                    'group_id': self.group['id'],
                 },
             },
             '33': {
@@ -499,7 +539,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'destination': {
                     'type': 'groupmember',
                     'action': 'leave',
-                    'group_id': group_id,
+                    'group_id': self.group['id'],
                 },
             },
             '34': {
@@ -507,7 +547,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'destination': {
                     'type': 'groupmember',
                     'action': 'toggle',
-                    'group_id': group_id,
+                    'group_id': self.group['id'],
                 },
             },
         }
@@ -516,9 +556,17 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
 
     def tearDown(self):
         super().tearDown()
-        with self.db.queries() as queries:
-            queries.delete_parking_lot(self.parking_lot_id)
-            queries.delete_extension(self.parking_exten)
+        confd.callfilters(self.call_filter['id']).delete().assert_deleted()
+        confd.pagings(self.paging['id']).delete().assert_deleted()
+        confd.agents(self.agent['id']).delete().assert_deleted()
+        confd.conferences(self.conference['id']).delete().assert_deleted()
+        confd.extensions(self.conference_extension['id']).delete().assert_deleted()
+        confd.queues(self.queue['id']).delete().assert_deleted()
+        confd.extensions(self.queue_extension['id']).delete().assert_deleted()
+        confd.parkinglots(self.parking_lot['id']).delete().assert_deleted()
+        confd.extensions(self.parking_lot_extension['id']).delete().assert_deleted()
+        confd.groups(self.group['id']).delete().assert_deleted()
+        confd.extensions(self.group_extension['id']).delete().assert_deleted()
 
     def test_when_creating_template_then_all_func_keys_created(self):
         for position in self.exclude_for_template:
@@ -688,7 +736,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
             ),
         )
 
-    def test_given_template_associated_when_getting_func_key_using_uuid_then_fetches_from_unified_template(
+    def test_given_template_associated_when_getting_func_key_using_uuid_then_fetches_from_unified_template(  # noqa
         self,
     ):
         self.uuid_url.put().assert_updated()
@@ -1214,27 +1262,63 @@ class TestBlfFuncKeys(BaseTestFuncKey):
         self.parking_exten = '700'
         park_pos = 701
 
-        with self.db.queries() as queries:
-            conference_id = queries.insert_conference(
-                number=conf_exten, tenant_uuid=MAIN_TENANT
-            )
-            self.parking_lot_id = queries.insert_parking_lot(
-                number=self.parking_exten,
-                slots_start=park_pos,
-                slots_end=park_pos,
-                tenant_uuid=MAIN_TENANT,
-            )
-            callfilter_id = queries.insert_callfilter(tenant_uuid=MAIN_TENANT)
-            agent_id = queries.insert_agent(self.user['id'], tenant_uuid=MAIN_TENANT)
-            filter_member_id = queries.insert_filter_member(
-                callfilter_id, self.user['id']
-            )
-            group_id = queries.insert_group(number=group_exten, tenant_uuid=MAIN_TENANT)
+        self.group = confd.groups.post(label='mygroup', tenant_uuid=MAIN_TENANT).item
+        self.group_extension = confd.extensions.post(
+            exten=group_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.group_extension.associate(self.group['uuid'], self.group_extension['id'])
+
+        self.parking_lot = confd.parkinglots.post(
+            slots_start=str(park_pos),
+            slots_end=str(park_pos),
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        self.parking_lot_extension = confd.extensions.post(
+            exten=self.parking_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.parking_lot_extension.associate(
+            self.parking_lot['id'],
+            self.parking_lot_extension['id'],
+        )
+
+        self.conference = confd.conferences.post(tenant_uuid=MAIN_TENANT).item
+        self.conference_extension = confd.extensions.post(
+            exten=conf_exten,
+            context='default',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.conference_extension.associate(
+            self.conference['id'],
+            self.conference_extension['id'],
+        )
+
+        self.agent = confd.agents.post(number='1000', tenant_uuid=MAIN_TENANT).item
+        h.user_agent.associate(self.user['id'], self.agent['id'])
+
+        self.call_filter = confd.callfilters.post(
+            name='mycallfilter',
+            strategy='all',
+            source='all',
+            tenant_uuid=MAIN_TENANT,
+        ).item
+        h.call_filter_surrogate_user.associate(
+            self.call_filter['id'],
+            [self.user['uuid']],
+        )
+        self.call_filter = confd.callfilters(self.call_filter['id']).get().item
+        self.filter_member_id = self.call_filter['surrogates']['users'][0]['member_id']
 
         self.confd_funckeys = {
             '1': {'destination': {'type': 'user', 'user_id': self.user['id']}},
             '4': {
-                'destination': {'type': 'conference', 'conference_id': conference_id}
+                'destination': {
+                    'type': 'conference',
+                    'conference_id': self.conference['id'],
+                }
             },
             '5': {'destination': {'type': 'custom', 'exten': custom_exten}},
             '8': {'destination': {'type': 'service', 'service': 'callrecord'}},
@@ -1255,55 +1339,55 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                 'destination': {
                     'type': 'agent',
                     'action': 'login',
-                    'agent_id': agent_id,
+                    'agent_id': self.agent['id'],
                 }
             },
             '24': {
                 'destination': {
                     'type': 'agent',
                     'action': 'logout',
-                    'agent_id': agent_id,
+                    'agent_id': self.agent['id'],
                 }
             },
             '25': {
                 'destination': {
                     'type': 'agent',
                     'action': 'toggle',
-                    'agent_id': agent_id,
+                    'agent_id': self.agent['id'],
                 }
             },
             '26': {
                 'destination': {
                     'type': 'park_position',
-                    'parking_lot_id': self.parking_lot_id,
+                    'parking_lot_id': self.parking_lot['id'],
                     'position': park_pos,
                 }
             },
             '29': {
                 'destination': {
                     'type': 'bsfilter',
-                    'filter_member_id': filter_member_id,
+                    'filter_member_id': self.filter_member_id,
                 }
             },
             '32': {
                 'destination': {
                     'type': 'groupmember',
                     'action': 'join',
-                    'group_id': group_id,
+                    'group_id': self.group['id'],
                 }
             },
             '33': {
                 'destination': {
                     'type': 'groupmember',
                     'action': 'leave',
-                    'group_id': group_id,
+                    'group_id': self.group['id'],
                 }
             },
             '34': {
                 'destination': {
                     'type': 'groupmember',
                     'action': 'toggle',
-                    'group_id': group_id,
+                    'group_id': self.group['id'],
                 }
             },
         }
@@ -1316,114 +1400,105 @@ class TestBlfFuncKeys(BaseTestFuncKey):
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***226'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***226',
             },
             '9': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***227'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***227',
             },
             '10': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***225'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***225',
             },
             '14': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***290'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***290',
             },
             '17': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***222'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***222',
             },
             '18': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***223'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***223',
             },
             '19': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***221'.format(user_id=self.user['id']),
+                'value': f'*735{self.user["id"]}***221',
             },
             '20': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***223*{fwd}'.format(
-                    user_id=self.user['id'], fwd=forward_number
-                ),
+                'value': f'*735{self.user["id"]}***223*{forward_number}',
             },
             '23': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***231***3{agent_id}'.format(
-                    user_id=self.user['id'], agent_id=agent_id
-                ),
+                'value': f'*735{self.user["id"]}***231***3{self.agent["id"]}',
             },
             '24': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***232***3{agent_id}'.format(
-                    user_id=self.user['id'], agent_id=agent_id
-                ),
+                'value': f'*735{self.user["id"]}***232***3{self.agent["id"]}',
             },
             '25': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***230***3{agent_id}'.format(
-                    user_id=self.user['id'], agent_id=agent_id
-                ),
+                'value': f'*735{self.user["id"]}***230***3{self.agent["id"]}',
             },
             '26': {'label': '', 'type': 'blf', 'line': 1, 'value': str(park_pos)},
             '29': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*37{member_id}'.format(member_id=filter_member_id),
+                'value': f'*37{self.filter_member_id}',
             },
             '32': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***251*{group_id}'.format(
-                    user_id=self.user['id'], group_id=group_id
-                ),
+                'value': f'*735{self.user["id"]}***251*{self.group["id"]}',
             },
             '33': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***252*{group_id}'.format(
-                    user_id=self.user['id'], group_id=group_id
-                ),
+                'value': f'*735{self.user["id"]}***252*{self.group["id"]}',
             },
             '34': {
                 'label': '',
                 'type': 'blf',
                 'line': 1,
-                'value': '*735{user_id}***250*{group_id}'.format(
-                    user_id=self.user['id'], group_id=group_id
-                ),
+                'value': f'*735{self.user["id"]}***250*{self.group["id"]}',
             },
         }
 
     def tearDown(self):
         super().tearDown()
-        with self.db.queries() as queries:
-            queries.delete_parking_lot(self.parking_lot_id)
-            queries.delete_extension(self.parking_exten)
+        confd.callfilters(self.call_filter['id']).delete().assert_deleted()
+        confd.agents(self.agent['id']).delete().assert_deleted()
+        confd.conferences(self.conference['id']).delete().assert_deleted()
+        confd.extensions(self.conference_extension['id']).delete().assert_deleted()
+        confd.parkinglots(self.parking_lot['id']).delete().assert_deleted()
+        confd.extensions(self.parking_lot_extension['id']).delete().assert_deleted()
+        confd.groups(self.group['id']).delete().assert_deleted()
+        confd.extensions(self.group_extension['id']).delete().assert_deleted()
 
     def test_when_creating_funckey_then_blf_activated_by_default(self):
         funckey = {'destination': {'type': 'custom', 'exten': '9999'}}
