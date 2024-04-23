@@ -1504,9 +1504,13 @@ def test_post_update_delete_full_user_no_error(
             response.assert_status(404)
 
             # verify that incall is set to none
-            url = confd.incalls(payload['incalls'][0]['id'])
+            incall_id = payload['incalls'][0]['id']
+            url = confd.incalls(incall_id)
             response = url.get()
             assert response.item['destination']['type'] == 'none'
+
+            # Cleanup incall
+            confd.incalls(incall_id).delete().assert_deleted()
 
             # verify that extension is deleted
             url = confd.extensions(payload['lines'][0]['extensions'][0]['id'])
@@ -1587,6 +1591,9 @@ def test_delete_full_user_no_auth_no_error(
             calling(authentication.users.get).with_args(payload['uuid']),
             raises(HTTPError, "404 Client Error: NOT FOUND"),
         )
+
+        # Cleanup incall
+        confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
 
 
 @fixtures.user()
@@ -2413,6 +2420,9 @@ def test_update_incall_new_extension():
     )
     url.delete(recursive=True)
 
+    # Cleanup incall
+    confd.incalls(payload['incalls'][0]['id']).delete().assert_deleted()
+
 
 def test_update_incall_new_incall():
     user_resources = generate_user_resources_bodies(
@@ -2439,13 +2449,17 @@ def test_update_incall_new_incall():
     url.put({**payload, "incalls": [new_incall]}, query_string="recursive=True")
 
     # check the incall id is a new one
+    updated_user = confd.users(payload['uuid']).get().item
     assert_that(
-        confd.users(payload['uuid']).get().item,
+        updated_user,
         has_entries(
             incalls=contains(has_entries(id=is_not(payload['incalls'][0]['id']))),
         ),
     )
     url.delete(recursive=True)
+
+    # Cleanup incall
+    confd.incalls(updated_user['incalls'][0]['id']).delete().assert_deleted()
 
 
 @fixtures.device()
