@@ -2,6 +2,7 @@
 
 ## 24.06
 
+* DELETE `/1.1/users?recursive=true` will no more delete an incall associated.
 * The following resource has been added:
 
   * GET `/1.1/users/<user_id>/callerids/outgoing`
