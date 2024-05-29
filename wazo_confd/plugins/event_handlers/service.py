@@ -80,6 +80,7 @@ class DefaultSIPTemplateService:
                 ['trust_id_inbound', 'no'],
                 ['allow_subscribe', 'yes'],
                 ['allow', '!all,ulaw'],
+                ['set_var', 'TIMEOUT(absolute)=36000'],
                 ['notify_early_inuse_ringing', 'yes'],
             ],
             'registration_section_options': [],
