@@ -26,6 +26,7 @@ paths:
       tags:
       - trunks
       parameters:
+      - $ref: '#/parameters/tenantuuid'
       - name: body
         in: body
         description: Trunk to create
