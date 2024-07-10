@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -10,6 +10,7 @@ from uuid import uuid4
 from flask import url_for, request
 
 from xivo.xivo_helpers import clean_extension
+from xivo.tenant_flask_helpers import user
 
 from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
@@ -53,11 +54,10 @@ class _SchemaMixin:
 
 class _MeResourceMixin:
     def _find_user_uuid(self):
-        user_uuid = request.user_uuid
-        if not user_uuid:
+        if not user.uuid:
             raise errors.param_not_found('user_uuid', 'meetings')
 
-        return user_uuid
+        return user.uuid
 
 
 def find_owners(form, tenant_uuid, user_service):
