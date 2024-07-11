@@ -99,11 +99,14 @@ def test_list_fallback_tenant(main):
     assert_that(response.items, has_items(main))
     assert_that(len(response.items), is_(1))
 
-    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, fallback=True)
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, view='fallback')
     assert_that(response.items, has_items(main))
     assert_that(len(response.items), is_(1))
 
-    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, fallback=False)
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, view='default')
+    assert_that(len(response.items), is_(0))
+
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT)
     assert_that(len(response.items), is_(0))
 
 

@@ -8,7 +8,7 @@ from xivo_dao.alchemy.ingress_http import IngressHTTP
 from wazo_confd.auth import required_acl, master_tenant_uuid
 from wazo_confd.helpers.restful import ItemResource, ListResource
 
-from .schema import ExtraParamsSchema, IngressHTTPSchema
+from .schema import IngressViewSchema, IngressHTTPSchema
 
 
 class IngressHTTPList(ListResource):
@@ -28,16 +28,28 @@ class IngressHTTPList(ListResource):
 
     @required_acl('confd.ingresses.http.read')
     def get(self):
-        result = super().get()
+        params = self.search_params()
+        tenant_uuids = self._build_tenant_list(params)
+        total, items = self._get_for_args(params, self._get_kwargs(tenant_uuids))
 
-        if result.get('total') > 0:
-            return result
-        else:
-            extra_params = ExtraParamsSchema().load(request.args)
-            if extra_params.get('fallback'):
-                return super().unsafe_fallback_get([str(master_tenant_uuid)])
-            else:
-                return result
+        if total == 0:
+            view_params = IngressViewSchema().load(request.args)
+            if view_params.get('view') == 'fallback':
+                total, items = self._get_for_args(
+                    params, self._get_kwargs([str(master_tenant_uuid)])
+                )
+
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
+
+    def _get_kwargs(self, tenant_uuids):
+        kwargs = {}
+        if tenant_uuids is not None:
+            kwargs['tenant_uuids'] = tenant_uuids
+        return kwargs
+
+    def _get_for_args(self, params, kwargs):
+        total, items = self.service.search(params, **kwargs)
+        return total, items
 
 
 class IngressHTTPItem(ItemResource):
