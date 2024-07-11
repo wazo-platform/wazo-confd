@@ -14,6 +14,7 @@ paths:
       - $ref: '#/parameters/limit'
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
+      - $ref: '#/parameters/fallback_to_master'
       responses:
         '200':
           description: HTTP ingress list
@@ -102,6 +103,13 @@ parameters:
     type: string
     name: http_ingress_uuid
     in: path
+  fallback_to_master:
+    default: false
+    required: false
+    type: boolean
+    name: fallback
+    in: query
+    description: Allows to retrieve the Ingress of the master tenant when the tenant's Ingress is not set
 
 definitions:
   HTTPIngressItems:
