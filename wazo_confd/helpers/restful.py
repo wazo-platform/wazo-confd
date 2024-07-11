@@ -75,10 +75,20 @@ class ListResource(ConfdResource):
         super().__init__()
         self.service = service
 
+    def unsafe_fallback_get(self, fallback_tenants=None):
+        params = self.search_params()
+        tenant_uuids = self._build_tenant_list(params)
+        if fallback_tenants:
+            tenant_uuids.extend(fallback_tenants)
+
+        return self._get(params, tenant_uuids)
+
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
+        return self._get(params, tenant_uuids)
 
+    def _get(self, params, tenant_uuids):
         kwargs = {}
         if tenant_uuids is not None:
             kwargs['tenant_uuids'] = tenant_uuids

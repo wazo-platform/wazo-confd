@@ -9,6 +9,7 @@ from hamcrest import (
     has_entries,
     has_entry,
     has_items,
+    is_,
     is_not,
     not_,
 )
@@ -90,6 +91,20 @@ def test_list_multi_tenant(main, sub):
 
     response = confd.ingresses.http.get(wazo_tenant=MAIN_TENANT, recurse=True)
     assert_that(response.items, has_items(main, sub))
+
+
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
+def test_list_fallback_tenant(main):
+    response = confd.ingresses.http.get(wazo_tenant=MAIN_TENANT)
+    assert_that(response.items, has_items(main))
+    assert_that(len(response.items), is_(1))
+
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, fallback=True)
+    assert_that(response.items, has_items(main))
+    assert_that(len(response.items), is_(1))
+
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, fallback=False)
+    assert_that(len(response.items), is_(0))
 
 
 @fixtures.ingress_http(uri='sort1', wazo_tenant=MAIN_TENANT)

@@ -13,3 +13,7 @@ class IngressHTTPSchema(BaseSchema):
     uri = fields.String(validate=Length(min=1, max=1024), required=True)
 
     links = ListLink(Link('ingresses_http', field='uuid'))
+
+
+class ExtraParamsSchema(BaseSchema):
+    fallback = fields.Boolean(required=False)
