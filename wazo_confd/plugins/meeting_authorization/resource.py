@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
@@ -7,6 +7,7 @@ from wazo_confd.helpers.restful import ItemResource, ListResource
 from xivo_dao.alchemy.meeting_authorization import MeetingAuthorization
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
+from xivo.tenant_flask_helpers import user
 
 from .schema import (
     MeetingAuthorizationSchema,
@@ -94,11 +95,10 @@ class GuestMeetingAuthorizationItem(ItemResource):
 
 class _MeResourceMixin:
     def _find_user_uuid(self):
-        user_uuid = request.user_uuid
-        if not user_uuid:
+        if not user.uuid:
             raise errors.param_not_found('user_uuid', 'meeting_authorizations')
 
-        return user_uuid
+        return user.uuid
 
 
 class UserMeetingAuthorizationList(ListResource, _MeResourceMixin):
