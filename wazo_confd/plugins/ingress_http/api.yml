@@ -14,6 +14,7 @@ paths:
       - $ref: '#/parameters/limit'
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
+      - $ref: '#/parameters/ingress_fallback_view'
       responses:
         '200':
           description: HTTP ingress list
@@ -102,7 +103,21 @@ parameters:
     type: string
     name: http_ingress_uuid
     in: path
+  ingress_fallback_view:
+    description: 'Allows to fallback on master tenant config if the current tenant has no ingress set.
 
+      When the `view` is omitted or the `default`value is passed, only the ingress of the current tenant
+      is returned. This is useful for configuration API.
+
+      For `fallback` view the API fallbacks to the master tenant ingress value.
+      '
+    enum:
+    - default
+    - fallback
+    in: query
+    name: view
+    required: false
+    type: string
 definitions:
   HTTPIngressItems:
     type: object

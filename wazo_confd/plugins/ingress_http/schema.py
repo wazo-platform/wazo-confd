@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import Length
+from marshmallow.validate import Length, OneOf
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
@@ -13,3 +13,7 @@ class IngressHTTPSchema(BaseSchema):
     uri = fields.String(validate=Length(min=1, max=1024), required=True)
 
     links = ListLink(Link('ingresses_http', field='uuid'))
+
+
+class IngressViewSchema(BaseSchema):
+    view = fields.String(validate=OneOf(['fallback', 'default']), required=False)

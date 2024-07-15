@@ -78,7 +78,6 @@ class ListResource(ConfdResource):
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
-
         kwargs = {}
         if tenant_uuids is not None:
             kwargs['tenant_uuids'] = tenant_uuids
