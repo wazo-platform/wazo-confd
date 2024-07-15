@@ -5,6 +5,7 @@ from hamcrest import (
     all_of,
     assert_that,
     contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -93,8 +94,23 @@ def test_list_multi_tenant(main, sub):
     assert_that(response.items, has_items(main, sub))
 
 
-@fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
-def test_list_fallback_tenant(main):
+@fixtures.ingress_http(wazo_tenant=MAIN_TENANT, uri='main')
+@fixtures.ingress_http(wazo_tenant=SUB_TENANT, uri='sub')
+def test_list_fallback_tenant(main, sub):
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, view='default')
+    assert_that(
+        response.items,
+        contains_exactly(has_entries(uri='sub')),
+    )
+    response = confd.ingresses.http.get(wazo_tenant=SUB_TENANT, view='fallback')
+    assert_that(
+        response.items,
+        contains_exactly(has_entries(uri='sub')),
+    )
+
+    response = confd.ingresses.http(sub['uuid']).delete()
+    response.assert_deleted()
+
     response = confd.ingresses.http.get(wazo_tenant=MAIN_TENANT)
     assert_that(response.items, has_items(main))
     assert_that(len(response.items), is_(1))
