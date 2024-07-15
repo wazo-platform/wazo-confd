@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -6,7 +6,7 @@ from flask_restful import Resource
 
 import marshmallow
 
-from xivo.auth_verifier import AuthVerifier
+from xivo.flask.auth_verifier import AuthVerifierFlask
 from xivo.mallow import fields, validate
 from xivo.tenant_flask_helpers import Tenant, token
 from xivo_dao import tenant_dao
@@ -14,7 +14,7 @@ from xivo_dao import tenant_dao
 from wazo_confd.helpers.common import handle_api_exception
 from wazo_confd.helpers.mallow import BaseSchema
 
-auth_verifier = AuthVerifier()
+auth_verifier = AuthVerifierFlask()
 
 
 class ErrorCatchingResource(Resource):
