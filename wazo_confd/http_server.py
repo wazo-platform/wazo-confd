@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -21,7 +21,6 @@ from xivo_dao.resources.infos import dao as info_dao
 from ._bus import BusPublisher
 from ._sysconfd import SysconfdPublisher
 from .helpers.converter import FilenameConverter
-from .helpers.restful import auth_verifier
 
 logger = logging.getLogger(__name__)
 app = Flask('wazo_confd')
@@ -96,7 +95,6 @@ class HTTPServer:
         app.config.update(global_config)
         app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
 
-        auth_verifier.set_config(global_config['auth'])
         self._load_cors()
         self.server = None
 
