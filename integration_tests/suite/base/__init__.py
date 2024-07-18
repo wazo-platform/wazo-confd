@@ -103,15 +103,16 @@ asterisk_json_doc = SingletonProxy(
 )
 
 
-@contextmanager
-def confd_with_config(config):
-    with BaseIntegrationTest.confd_with_config(config):
-        helper_confd._reset()
-        helper_new_client._reset()
-        confd._reset()
-        confd_csv._reset()
-        yield
+def reset_confd_clients():
     helper_confd._reset()
     helper_new_client._reset()
     confd._reset()
     confd_csv._reset()
+
+
+@contextmanager
+def confd_with_config(config):
+    with BaseIntegrationTest.confd_with_config(config):
+        reset_confd_clients()
+        yield
+    reset_confd_clients()

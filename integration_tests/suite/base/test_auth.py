@@ -7,7 +7,7 @@ from ..helpers.wait_strategy import RestAPIOkWaitStrategy
 from . import BaseIntegrationTest, confd, confd_with_config
 
 
-def test_restrict_on_with_slow_wazo_auth():
+def test_restrict_when_service_token_not_initialized(self):
     def _returns_503():
         response = confd.extensions.features.get()
         response.assert_status(503)
