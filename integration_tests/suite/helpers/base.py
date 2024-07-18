@@ -1,6 +1,9 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import random
+import string
+import yaml
 import os
 
 from contextlib import contextmanager
@@ -12,6 +15,7 @@ from wazo_test_helpers.auth import (
     MockCredentials,
     AuthClient as MockAuthClient,
 )
+from wazo_test_helpers.filesystem import FileSystemClient as GenericFileSystemClient
 
 from .ari import ARIClient
 from .auth import AuthClient
@@ -223,3 +227,25 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def create_tenant_filesystem(cls, base_path):
         return TenantFileSystemClient(base_path=base_path, execute=cls.docker_exec)
+
+    @classmethod
+    def restart_confd(cls):
+        cls.restart_service('confd')
+
+    @classmethod
+    @contextmanager
+    def confd_with_config(cls, config):
+        filesystem = GenericFileSystemClient(
+            execute=cls.docker_exec,
+            service_name='confd',
+            root=True,
+        )
+        name = ''.join(random.choice(string.ascii_lowercase) for _ in range(6))
+        config_file = f'/etc/wazo-confd/conf.d/10-{name}.yml'
+        content = yaml.dump(config)
+        try:
+            with filesystem.file_(config_file, content=content):
+                cls.restart_confd()
+                yield
+        finally:
+            cls.restart_confd()
