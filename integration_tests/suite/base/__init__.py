@@ -35,6 +35,13 @@ class BaseIntegrationTest(IntegrationTest):
         cls.setup_helpers()
         cls.confd = cls.make_confd()
 
+    @classmethod
+    @contextmanager
+    def confd_with_config(cls, config):
+        with super().confd_with_config(config):
+            yield
+        cls.wait_strategy.wait(cls)
+
 
 def setup_module(module):
     BaseIntegrationTest.setUpClass()
