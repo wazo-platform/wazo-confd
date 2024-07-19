@@ -7,7 +7,7 @@ from ..helpers.wait_strategy import RestAPIOkWaitStrategy
 from . import BaseIntegrationTest, confd, confd_with_config
 
 
-def test_restrict_when_service_token_not_initialized(self):
+def test_restrict_when_service_token_not_initialized():
     def _returns_503():
         response = confd.extensions.features.get()
         response.assert_status(503)
