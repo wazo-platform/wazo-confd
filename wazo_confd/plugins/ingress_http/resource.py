@@ -29,16 +29,13 @@ class IngressHTTPList(ListResource):
     @required_acl('confd.ingresses.http.read')
     def get(self):
         params = self.search_params()
+        view = IngressViewSchema().load(request.args)['view']
         tenant_uuids = self._build_tenant_list(params)
         total, items = self.service.search(params, tenant_uuids=tenant_uuids)
 
-        if not items:
-            view_params = IngressViewSchema().load(request.args)
-            if view_params.get('view') == 'fallback':
-                total, items = self.service.search(
-                    params,
-                    tenant_uuids=[str(master_tenant_uuid)],
-                )
+        if not items and view == 'fallback':
+            tenant_uuids = [str(master_tenant_uuid)]
+            total, items = self.service.search(params, tenant_uuids=tenant_uuids)
 
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 

@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -79,6 +79,11 @@ def test_search(ingress_http, hidden):
 
     for field, term in searches.items():
         check_search(url, ingress_http, hidden, field, term)
+
+
+def test_list_errors():
+    response = confd.ingresses.http.get(view='invalid')
+    response.assert_status(400)
 
 
 @fixtures.ingress_http(wazo_tenant=MAIN_TENANT)
