@@ -1,4 +1,4 @@
-# Copyright 2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
@@ -16,4 +16,4 @@ class IngressHTTPSchema(BaseSchema):
 
 
 class IngressViewSchema(BaseSchema):
-    view = fields.String(validate=OneOf(['fallback', 'default']), required=False)
+    view = fields.String(validate=OneOf(['fallback', 'default']), missing=None)

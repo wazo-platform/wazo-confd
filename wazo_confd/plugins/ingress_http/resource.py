@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -29,27 +29,15 @@ class IngressHTTPList(ListResource):
     @required_acl('confd.ingresses.http.read')
     def get(self):
         params = self.search_params()
+        view = IngressViewSchema().load(request.args)['view']
         tenant_uuids = self._build_tenant_list(params)
-        total, items = self._get_for_args(params, self._get_kwargs(tenant_uuids))
+        total, items = self.service.search(params, tenant_uuids=tenant_uuids)
 
-        if total == 0:
-            view_params = IngressViewSchema().load(request.args)
-            if view_params.get('view') == 'fallback':
-                total, items = self._get_for_args(
-                    params, self._get_kwargs([str(master_tenant_uuid)])
-                )
+        if not items and view == 'fallback':
+            tenant_uuids = [str(master_tenant_uuid)]
+            total, items = self.service.search(params, tenant_uuids=tenant_uuids)
 
         return {'total': total, 'items': self.schema().dump(items, many=True)}
-
-    def _get_kwargs(self, tenant_uuids):
-        kwargs = {}
-        if tenant_uuids is not None:
-            kwargs['tenant_uuids'] = tenant_uuids
-        return kwargs
-
-    def _get_for_args(self, params, kwargs):
-        total, items = self.service.search(params, **kwargs)
-        return total, items
 
 
 class IngressHTTPItem(ItemResource):
