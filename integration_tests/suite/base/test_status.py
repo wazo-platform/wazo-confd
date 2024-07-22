@@ -1,11 +1,10 @@
-# Copyright 2022-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from ..helpers.bus import BusClient as bus_client
 from ..helpers.bus import setup_bus
 from wazo_test_helpers import until
-from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
-from . import auth, BaseIntegrationTest, confd, confd_csv, rabbitmq
+from . import auth, BaseIntegrationTest, confd, rabbitmq, reset_confd_clients
 
 from hamcrest import (
     assert_that,
@@ -85,13 +84,10 @@ def test_confd_status_fails_when_wazo_auth_is_down():
             'status': 'fail',
         },
     }
-    BaseIntegrationTest.restart_service('confd')
+    BaseIntegrationTest.restart_confd()
+    reset_confd_clients()
+
     BaseIntegrationTest.restart_service('auth')
-    BaseIntegrationTest.setup_helpers()
-    helper_confd._reset()
-    helper_new_client._reset()
-    confd._reset()
-    confd_csv._reset()
     auth._reset()
     until.true(auth.is_up, tries=10)
     BaseIntegrationTest.setup_token()

@@ -1,11 +1,14 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from contextlib import contextmanager
 
 from typing import cast
 from ..helpers.sysconfd import SysconfdMock
 from ..helpers.base import IntegrationTest
 from ..helpers.config import TOKEN
 from ..helpers.wrappers import IsolatedAction
+from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
 
 
 class BaseIntegrationTest(IntegrationTest):
@@ -16,11 +19,28 @@ class BaseIntegrationTest(IntegrationTest):
         super().setUpClass()
         cls.setup_token()
         cls.setup_service_token()
-        cls.confd = cls.create_confd({'X-Auth-Token': TOKEN})
+        cls.confd = cls.make_confd()
         cls.wait_strategy.wait(cls)
         cls.setup_provd()
         cls.setup_database()
         cls.setup_helpers()
+
+    @classmethod
+    def make_confd(cls):
+        return cls.create_confd({'X-Auth-Token': TOKEN})
+
+    @classmethod
+    def restart_confd(cls):
+        super().restart_confd()
+        cls.setup_helpers()
+        cls.confd = cls.make_confd()
+
+    @classmethod
+    @contextmanager
+    def confd_with_config(cls, config):
+        with super().confd_with_config(config):
+            yield
+        cls.wait_strategy.wait(cls)
 
 
 def setup_module(module):
@@ -88,3 +108,18 @@ asterisk_json_doc = SingletonProxy(
     BaseIntegrationTest.create_filesystem,
     '/usr/share/doc/asterisk-doc/json',
 )
+
+
+def reset_confd_clients():
+    helper_confd._reset()
+    helper_new_client._reset()
+    confd._reset()
+    confd_csv._reset()
+
+
+@contextmanager
+def confd_with_config(config):
+    with BaseIntegrationTest.confd_with_config(config):
+        reset_confd_clients()
+        yield
+    reset_confd_clients()
