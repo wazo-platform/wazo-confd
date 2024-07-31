@@ -9,6 +9,7 @@ ExecStart=/usr/bin/wazo-confd
 ExecStartPost=/usr/bin/wazo-confd-wait
 Restart=on-failure
 RestartSec=5
+SyslogIdentifier=wazo-confd
 
 [Install]
 WantedBy=multi-user.target
