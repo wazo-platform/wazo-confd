@@ -1,0 +1,39 @@
+paths:
+  /localization:
+    get:
+      operationId: get_localization
+      summary: Get localization configuration
+      description: '**Required ACL:** `confd.localization.read`'
+      tags:
+      - localization
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      responses:
+        '200':
+          description: Localization configuration
+          schema:
+            $ref: '#/definitions/Localization'
+    put:
+      operationId: update_localization
+      summary: Update localization configuration
+      description: '**Required ACL:** `confd.localization.update`'
+      tags:
+      - localization
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/Localization'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+definitions:
+  Localization:
+    title: Localization
+    type: object
+    properties:
+      country:
+        type: string
+        description: The default country for users, in ISO-3166 alpha-2 format, e.g. "CA" for Canada.

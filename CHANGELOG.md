@@ -1,5 +1,12 @@
 # Changelog
 
+## 24.11
+
+* A new API for localization settings has been added:
+
+  * GET `/1.1/localization`
+  * PUT `/1.1/localization`
+
 ## 24.06
 
 * DELETE `/1.1/users?recursive=true` will no more delete an incall associated.
