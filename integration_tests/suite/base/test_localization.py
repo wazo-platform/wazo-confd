@@ -1,6 +1,8 @@
 # Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
+
 from . import confd
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
@@ -52,3 +54,9 @@ def test_tenant_isolation():
 
     assert result_1.item['country'] == 'CA'
     assert result_2.item['country'] == 'FR'
+
+
+def test_put_errors():
+    # invalid country
+    result = confd.localization.put({'country': 'ZX'})
+    result.assert_match(400, re.compile(re.escape('country')))
