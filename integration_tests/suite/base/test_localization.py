@@ -4,6 +4,7 @@
 import re
 
 from . import confd
+from ..helpers import fixtures
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
@@ -12,7 +13,8 @@ def test_get_default():
     assert response.item == {'country': None}
 
 
-def test_put():
+@fixtures.user()
+def test_put(user):
     # Set country
     result = confd.localization.put({'country': 'CA'})
 
@@ -20,8 +22,8 @@ def test_put():
 
     response = confd.localization.get()
     assert response.item == {'country': 'CA'}
-
-    # TODO: get user country
+    response = confd.users(user['uuid']).get()
+    assert response.item['country'] == 'CA'
 
     # Omit country = no changes
     result = confd.localization.put({})
@@ -30,6 +32,8 @@ def test_put():
 
     response = confd.localization.get()
     assert response.item == {'country': 'CA'}
+    response = confd.users(user['uuid']).get()
+    assert response.item['country'] == 'CA'
 
     # Unset country
     result = confd.localization.put({'country': None})
@@ -38,8 +42,8 @@ def test_put():
 
     response = confd.localization.get()
     assert response.item == {'country': None}
-
-    # TODO: get user country
+    response = confd.users(user['uuid']).get()
+    assert response.item['country'] is None
 
 
 def test_tenant_isolation():
