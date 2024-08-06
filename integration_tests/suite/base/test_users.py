@@ -689,6 +689,7 @@ def test_get(user):
             voicemail=none(),
             queues=empty(),
             call_pickup_target_users=empty(),
+            country=none(),
         ),
     )
 

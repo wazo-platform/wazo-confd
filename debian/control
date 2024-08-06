@@ -20,6 +20,7 @@ Depends:
   python3-kombu,
   python3-marshmallow,
   python3-netifaces,
+  python3-pycountry,
   python3-requests,
   python3-werkzeug,
   python3-tz,

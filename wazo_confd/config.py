@@ -106,6 +106,7 @@ DEFAULT_CONFIG = {
         'line_device': True,
         'line_endpoint': True,
         'line_extension': True,
+        'localization': True,
         'meeting': True,
         'meeting_authorization': True,
         'moh': True,

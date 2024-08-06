@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import (
@@ -50,6 +50,7 @@ class UserSchema(BaseSchema):
     lastname = fields.String(validate=Length(max=128), allow_none=True)
     email = fields.Email(validate=Length(max=254), allow_none=True)
     timezone = fields.String(validate=Length(max=128), allow_none=True)
+    country = fields.String(dump_only=True)
     language = fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
     description = fields.String(allow_none=True)
     caller_id = fields.String(validate=(Regexp(CALLER_ID_REGEX), Length(max=160)))

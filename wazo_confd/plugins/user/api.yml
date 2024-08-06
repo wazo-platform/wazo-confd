@@ -350,6 +350,10 @@ definitions:
           - it_IT
           - nl_NL
           description: User language (e.g. "en_US")
+        country:
+          type: string
+          description: User country, for localization purposes
+          readOnly: true
         description:
           type: string
           description: Additional information about the user
