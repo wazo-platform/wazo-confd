@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
+from hamcrest import has_entries
 
 from . import confd
 from ..helpers import fixtures
+from ..helpers.bus import BusClient
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 
 
@@ -15,11 +17,26 @@ def test_get_default():
 
 @fixtures.user()
 def test_put(user):
+    bus_events = BusClient.accumulator(headers={'name': 'localization_edited'})
+
     # Set country
     result = confd.localization.put({'country': 'CA'})
 
     result.assert_status(204)
 
+    bus_events.until_assert_that_accumulate(
+        {
+            'headers': has_entries(
+                {
+                    'name': 'localization_edited',
+                    'tenant_uuid': MAIN_TENANT,
+                }
+            ),
+            'message': {
+                'country': 'CA',
+            },
+        }
+    )
     response = confd.localization.get()
     assert response.item == {'country': 'CA'}
     response = confd.users(user['uuid']).get()
@@ -40,6 +57,19 @@ def test_put(user):
 
     result.assert_status(204)
 
+    bus_events.until_assert_that_accumulate(
+        {
+            'headers': has_entries(
+                {
+                    'name': 'localization_edited',
+                    'tenant_uuid': MAIN_TENANT,
+                }
+            ),
+            'message': {
+                'country': None,
+            },
+        }
+    )
     response = confd.localization.get()
     assert response.item == {'country': None}
     response = confd.users(user['uuid']).get()
