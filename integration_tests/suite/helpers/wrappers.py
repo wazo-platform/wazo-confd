@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import _pytest
@@ -61,8 +61,10 @@ class IsolatedAction:
             resource = self.__enter__()
             # Pass the resource as an argument to the test function
             new_args = list(args) + [resource]
-            result = func(*new_args, **kwargs)
-            self.__exit__()
+            try:
+                result = func(*new_args, **kwargs)
+            finally:
+                self.__exit__()
             return result
 
         return decorated
