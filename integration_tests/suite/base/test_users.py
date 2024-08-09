@@ -624,12 +624,18 @@ def test_list_by_multiple_uuids(_, user2, user3):
     assert_that(response.items, contains_inanyorder(user2, user3))
 
 
-# TODO(pc-m): fails when running all tests
-# @fixtures.user(firstname='Alice')
-# @fixtures.user(firstname='Bob')
-# @fixtures.user(firstname='Charles')
-# def test_list_db_requests(*_):
-#     s.check_db_requests(BaseIntegrationTest, confd.users.get, nb_requests=1)
+@fixtures.user(firstname='Alice', wazo_tenant=SUB_TENANT)
+@fixtures.user(firstname='Bob', wazo_tenant=SUB_TENANT)
+@fixtures.user(firstname='Charles', wazo_tenant=SUB_TENANT)
+def test_list_db_requests(*_):
+    expected_request_count = 1  # SELECT
+    expected_request_count += 1  # SELECT COUNT
+    s.check_db_requests(
+        BaseIntegrationTest,
+        confd.users.get,
+        wazo_tenant=SUB_TENANT,
+        nb_requests=expected_request_count,
+    )
 
 
 @fixtures.user(

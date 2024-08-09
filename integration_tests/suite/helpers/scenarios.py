@@ -133,10 +133,10 @@ def check_limit(url, resource1, resource2, field, search, id_field='id'):
     )
 
 
-def check_db_requests(cls, url, nb_requests):
+def check_db_requests(cls, url, nb_requests, **kwargs):
     time_start = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
     nb_logs_start = cls.count_database_logs(since=time_start)
-    url()
+    url(**kwargs)
     nb_logs_end = cls.count_database_logs(since=time_start)
     actual_count = nb_logs_end - nb_logs_start
     expected_count = OVERHEAD_DB_REQUESTS + nb_requests
