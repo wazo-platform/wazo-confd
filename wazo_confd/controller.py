@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -10,10 +10,10 @@ from functools import partial
 import xivo_dao
 
 from wazo_auth_client import Client as AuthClient
-from xivo import plugin_helpers
-from xivo.consul_helpers import ServiceCatalogRegistration
-from xivo.status import StatusAggregator, TokenStatus
-from xivo.token_renewer import TokenRenewer
+from wazo import plugin_helpers
+from wazo.consul_helpers import ServiceCatalogRegistration
+from wazo.status import StatusAggregator, TokenStatus
+from wazo.token_renewer import TokenRenewer
 
 from wazo_confd.helpers.asterisk import PJSIPDoc
 from wazo_confd.helpers.middleware import MiddleWareHandle
