@@ -1,9 +1,9 @@
-# Copyright 2014-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2014-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo.auth_verifier import required_acl, required_tenant, no_auth
-from xivo.rest_api_helpers import APIException
-from xivo.status import Status
+from wazo.auth_verifier import required_acl, required_tenant, no_auth
+from wazo.rest_api_helpers import APIException
+from wazo.status import Status
 
 from werkzeug.local import LocalProxy as Proxy
 

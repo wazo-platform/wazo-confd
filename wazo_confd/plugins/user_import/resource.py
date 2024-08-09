@@ -1,7 +1,7 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo.tenant_flask_helpers import Tenant
+from wazo.tenant_flask_helpers import Tenant
 from xivo_dao.helpers.db_manager import Session
 
 from wazo_confd import sysconfd, bus

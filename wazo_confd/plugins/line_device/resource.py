@@ -1,9 +1,9 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
 
-from xivo.tenant_flask_helpers import Tenant
+from wazo.tenant_flask_helpers import Tenant
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 from wazo_confd.helpers.restful import ConfdResource, build_tenant

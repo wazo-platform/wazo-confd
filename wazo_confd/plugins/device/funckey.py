@@ -3,7 +3,7 @@
 
 import abc
 
-from xivo.xivo_helpers import fkey_extension
+from wazo.xivo_helpers import fkey_extension
 from xivo_dao.resources.extension import dao as extension_dao_module
 from xivo_dao.resources.feature_extension import dao as feature_extension_dao_module
 from xivo_dao.resources.features import dao as features_dao_module
