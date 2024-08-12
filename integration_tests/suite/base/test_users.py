@@ -708,6 +708,7 @@ def test_get_db_requests(user, perm):
             1  # user + joins
             + 1  # groups
             + 1  # pickups
+            + 1  # tenant
             + 2  # rightcalls
             + 2  # dialactions
             + 1  # lines
