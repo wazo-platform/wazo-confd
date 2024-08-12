@@ -135,12 +135,16 @@ def check_limit(url, resource1, resource2, field, search, id_field='id'):
 
 def check_db_requests(cls, url, nb_requests, **kwargs):
     time_start = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-    nb_logs_start = cls.count_database_logs(since=time_start)
+    # "REFRESH MATERIALIZED VIEW" happens at unpredictable times
+    nb_logs_start = cls.count_database_logs(
+        since=time_start, exclude='REFRESH MATERIALIZED VIEW'
+    )
     url(**kwargs)
-    nb_logs_end = cls.count_database_logs(since=time_start)
+    nb_logs_end = cls.count_database_logs(
+        since=time_start, exclude='REFRESH MATERIALIZED VIEW'
+    )
     actual_count = nb_logs_end - nb_logs_start
     expected_count = OVERHEAD_DB_REQUESTS + nb_requests
-    # Allow margin of one extra request to account for occasional "REFRESH MATERIALIZED VIEW"
     assert (
-        expected_count <= actual_count <= expected_count + 1
+        expected_count == actual_count
     ), f'Expected: {expected_count} Count: {actual_count}\n{cls.database_logs(service_name="postgres", since=time_start)}'
