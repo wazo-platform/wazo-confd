@@ -1,9 +1,9 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for, request
 
-from xivo.tenant_flask_helpers import Tenant
+from wazo.tenant_flask_helpers import Tenant
 from xivo_dao import tenant_dao
 from xivo_dao.alchemy.user_external_app import UserExternalApp
 

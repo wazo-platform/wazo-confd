@@ -12,8 +12,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.middleware.profiler import ProfilerMiddleware
 from werkzeug.middleware.proxy_fix import ProxyFix
 
-from xivo import http_helpers
-from xivo.http_helpers import ReverseProxied
+from wazo import http_helpers
+from wazo.http_helpers import ReverseProxied
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.db_utils import session_scope
 from xivo_dao.resources.infos import dao as info_dao
