@@ -1,5 +1,6 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
 from uuid import uuid4
 
 from hamcrest import assert_that, has_entries, has_entry, has_item, is_not

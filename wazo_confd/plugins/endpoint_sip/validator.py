@@ -1,7 +1,8 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Do not allow to set loop in template
+
 from functools import partial
 
 from xivo_dao.helpers import errors
