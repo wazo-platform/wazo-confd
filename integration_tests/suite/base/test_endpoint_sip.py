@@ -124,6 +124,34 @@ def check_search(url, sip, hidden, field, term):
 
 @fixtures.sip()
 @fixtures.sip()
+@fixtures.sip()
+@fixtures.sip()
+@fixtures.sip()
+def test_filter(sip1, sip2, sip3, sip4, sip5):
+    matches = sip1, sip2, sip5
+    ignored = sip3, sip4
+    uuids = [sip['uuid'] for sip in matches]
+    response = confd.endpoints.sip.get(uuid=','.join(uuids))
+    assert_that(
+        response.items,
+        all_of(
+            contains_inanyorder(*matches),
+            not_(contains_inanyorder(*ignored)),
+        ),
+    )
+
+    response = confd.endpoints.sip.get(uuid=sip1['uuid'])
+    assert_that(response.items, contains_inanyorder(sip1))
+
+    response = confd.endpoints.sip.get(uuid=FAKE_UUID)
+    assert_that(response.items, empty())
+
+    response = confd.endpoints.sip.get(uuid=42)
+    assert_that(response.items, empty())
+
+
+@fixtures.sip()
+@fixtures.sip()
 def test_list(sip1, sip2):
     response = confd.endpoints.sip.get()
     assert_that(

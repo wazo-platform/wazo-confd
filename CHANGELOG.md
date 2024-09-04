@@ -1,5 +1,9 @@
 # Changelog
 
+## 24.13
+
+* GET `/1.1/endpoints/sip` can now filter by endpoint UUID using the `uuid` query parameter
+
 ## 24.11
 
 * A new API for localization settings has been added:

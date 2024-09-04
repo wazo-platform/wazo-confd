@@ -8,6 +8,9 @@ paths:
 
         List all SIP configurations, each individual configuration includes only fields that it
         defines. Inherited fields from the templates or default values are not returned here.
+
+        SIP endpoints can be filtered by uuid using the uuid query parameter.
+        Ex: GET /1.1/endpoints/sip?uuid=<uuid1>,<uuid2>,...,<uuidn>
       tags:
         - endpoints
         - sip
