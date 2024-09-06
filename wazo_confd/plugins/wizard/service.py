@@ -173,7 +173,7 @@ class WizardService:
             'id': 'default',
             'deletable': False,
             'displayname': 'local',
-            'parent_ids': [],
+            'parent_id': 'base',
             'raw_config': {'X_key': 'xivo'},
             'proxy_main': address,
             'registrar_main': address,
@@ -182,7 +182,7 @@ class WizardService:
             'X_type': 'internal',
             'id': 'base',
             'deletable': False,
-            'parent_ids': [],
+            'parent_id': None,
             'raw_config': {
                 'ntp_enabled': True,
                 'ntp_ip': address,
@@ -194,7 +194,7 @@ class WizardService:
             'deletable': False,
             'id': 'defaultconfigdevice',
             'label': 'Default config device',
-            'parent_ids': [],
+            'parent_id': 'base',
             'raw_config': {
                 'ntp_enabled': True,
                 'ntp_ip': address,
@@ -209,7 +209,7 @@ class WizardService:
             'X_type': 'internal',
             'deletable': False,
             'id': 'autoprov',
-            'parent_ids': ['base', 'defaultconfigdevice'],
+            'parent_id': 'defaultconfigdevice',
             'raw_config': {
                 'sccp_call_managers': {'1': {'ip': address}},
                 'sip_lines': {
