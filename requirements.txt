@@ -22,6 +22,6 @@ pyyaml==5.3.1
 requests==2.25.1
 sqlalchemy==1.3.22  # from xivo-dao
 sqlalchemy-utils==0.36.8  # from xivo-dao
-stevedore==3.2.2
+stevedore==4.0.2
 unidecode==1.2.0  # from xivo-dao
 werkzeug==1.0.1
