@@ -19,6 +19,7 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
         - $ref: '#/parameters/search'
+        - $ref: '#/parameters/query_string_uuid_filter'
       responses:
         '200':
           description: SIP endpoint list

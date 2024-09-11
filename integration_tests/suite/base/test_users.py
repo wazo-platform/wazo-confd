@@ -103,6 +103,8 @@ AUTH_USER = {
     "password": "secret",
 }
 
+FAKE_UUID = '99999999-9999-4999-9999-999999999999'
+
 
 def test_search_errors():
     url = confd.users.get
@@ -619,9 +621,18 @@ def test_list_multi_tenant(main, sub):
 @fixtures.user()
 @fixtures.user()
 @fixtures.user()
-def test_list_by_multiple_uuids(_, user2, user3):
+def test_list_by_multiple_uuids(user1, user2, user3):
     response = confd.users.get(uuid=','.join([user2['uuid'], user3['uuid']]))
     assert_that(response.items, contains_inanyorder(user2, user3))
+
+    response = confd.users.get(uuid=user1['uuid'])
+    assert_that(response.items, contains_inanyorder(user1))
+
+    response = confd.users.get(uuid=FAKE_UUID)
+    assert_that(response.items, empty())
+
+    response = confd.users.get(uuid=42)
+    assert_that(response.items, empty())
 
 
 @fixtures.user(firstname='Alice', wazo_tenant=SUB_TENANT)
