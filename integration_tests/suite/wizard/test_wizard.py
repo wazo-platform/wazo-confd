@@ -405,7 +405,6 @@ class TestWizardPost(IntegrationTest):
                     id='default',
                     parent_id='base',
                     proxy_main=ip_address,
-                    raw_config={'X_key': 'xivo'},
                     registrar_main=ip_address,
                 ),
                 has_entries(
