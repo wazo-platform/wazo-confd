@@ -90,7 +90,7 @@ class ProvdHelper:
 
     def reset(self):
         self.clean_devices()
-        self.clean_configs()
+        # self.clean_configs()
         self.add_default_configs()
 
     def clean_devices(self):
@@ -103,7 +103,11 @@ class ProvdHelper:
 
     def add_default_configs(self):
         for config in self.DEFAULT_CONFIGS:
-            self.configs.create(config)
+            try:
+                self.configs.get(config['id'])
+                self.configs.update(config)
+            except ProvdError:
+                self.configs.create(config)
 
     def add_device_template(self):
         config = {

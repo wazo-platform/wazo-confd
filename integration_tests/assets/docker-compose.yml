@@ -10,10 +10,11 @@ services:
       - 9497
 
   provd:
-    image: wazoplatform/wazo-provd
+    image: wazo-provd-tests
     ports:
       - "8666"
     volumes:
+      - "${LOCAL_GIT_REPOS}/wazo-provd:/usr/src/wazo-provd/"
       - "./etc/wazo-provd/config.yml:/etc/wazo-provd/config.yml"
       - "./keys/wazo-provd-key.yml:/var/lib/wazo-auth-keys/wazo-provd-key.yml"
       - "./provd/null:/var/lib/wazo-provd/plugins/null"
