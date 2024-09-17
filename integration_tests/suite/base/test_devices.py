@@ -8,6 +8,7 @@ from datetime import datetime
 from hamcrest import (
     assert_that,
     empty,
+    equal_to,
     has_entries,
     has_entry,
     has_item,
@@ -320,7 +321,7 @@ def test_create_device_all_parameters():
 
     provd_config = provd.configs.get(provd_device['config'])
     assert_that(provd_config['id'], starts_with('autoprov'))
-    assert_that(provd_config['parent_ids'], has_item(template_config['id']))
+    assert_that(provd_config['parent_id'], equal_to(template_config['id']))
 
 
 @fixtures.device()

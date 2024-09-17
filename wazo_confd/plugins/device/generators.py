@@ -11,7 +11,7 @@ class ConfigGenerator:
         config = {
             'id': device.id,
             'configdevice': configdevice,
-            'parent_ids': ['base', configdevice],
+            'parent_id': configdevice,
             'deletable': True,
             'raw_config': self.raw_generator.generate(device),
         }

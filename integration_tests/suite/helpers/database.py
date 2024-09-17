@@ -22,7 +22,7 @@ def reset(db):
 
 
 class DbHelper:
-    TEMPLATE = "xivotemplate"
+    TEMPLATE = "wazo-confd-db-template"
 
     @classmethod
     def build(cls, user, password, host, port, db):
@@ -45,25 +45,29 @@ class DbHelper:
         db = db or self.db
         return self.create_engine(db).connect()
 
+    def _terminate_db_connections(self, connection):
+        connection.execute(
+            f"""
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{self.db}'
+            AND pid <> pg_backend_pid()
+            """
+        )
+
+    def create_template_db(self):
+        engine = self.create_engine("postgres", isolate=True)
+        connection = engine.connect()
+        self._terminate_db_connections(connection)
+        connection.execute(f'CREATE DATABASE "{self.TEMPLATE}" TEMPLATE "{self.db}"')
+        connection.close()
+
     def recreate(self):
         engine = self.create_engine("postgres", isolate=True)
         connection = engine.connect()
-        connection.execute(
-            """
-                           SELECT pg_terminate_backend(pg_stat_activity.pid)
-                           FROM pg_stat_activity
-                           WHERE pg_stat_activity.datname = '{db}'
-                           AND pid <> pg_backend_pid()
-                           """.format(
-                db=self.db
-            )
-        )
-        connection.execute("DROP DATABASE IF EXISTS {db}".format(db=self.db))
-        connection.execute(
-            "CREATE DATABASE {db} TEMPLATE {template}".format(
-                db=self.db, template=self.TEMPLATE
-            )
-        )
+        self._terminate_db_connections(connection)
+        connection.execute(f'DROP DATABASE IF EXISTS "{self.db}"')
+        connection.execute(f'CREATE DATABASE "{self.db}" TEMPLATE "{self.TEMPLATE}"')
         connection.close()
 
     def execute(self, query, **kwargs):
