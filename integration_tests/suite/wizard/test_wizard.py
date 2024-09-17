@@ -403,7 +403,7 @@ class TestWizardPost(IntegrationTest):
                     deletable=False,
                     displayname='local',
                     id='default',
-                    parent_id=None,
+                    parent_id='base',
                     proxy_main=ip_address,
                     raw_config={'X_key': 'xivo'},
                     registrar_main=ip_address,
