@@ -413,7 +413,9 @@ class TestWizardPost(IntegrationTest):
                     id='autoprov',
                     parent_id='defaultconfigdevice',
                     raw_config=has_entries(
-                        sccp_call_managers={'1': {'ip': ip_address}},
+                        sccp_call_managers=has_entries(
+                            {'1': has_entries(ip=ip_address)}
+                        ),
                         sip_lines=has_entries(
                             '1',
                             has_entries(
@@ -433,11 +435,11 @@ class TestWizardPost(IntegrationTest):
                     deletable=False,
                     id='base',
                     parent_id=None,
-                    raw_config={
-                        'X_xivo_phonebook_ip': ip_address,
-                        'ntp_enabled': True,
-                        'ntp_ip': ip_address,
-                    },
+                    raw_config=has_entries(
+                        X_xivo_phonebook_ip=ip_address,
+                        ntp_enabled=True,
+                        ntp_ip=ip_address,
+                    ),
                 ),
                 has_entries(
                     X_type='device',
