@@ -52,6 +52,7 @@ setup(
             'extension = wazo_confd.plugins.extension.plugin:Plugin',
             'extension_feature = wazo_confd.plugins.extension_feature.plugin:Plugin',
             'external_app = wazo_confd.plugins.external_app.plugin:Plugin',
+            'external_number = wazo_confd.plugins.external_number.plugin:Plugin',
             'features = wazo_confd.plugins.features.plugin:Plugin',
             'func_key = wazo_confd.plugins.func_key.plugin:Plugin',
             'group = wazo_confd.plugins.group.plugin:Plugin',

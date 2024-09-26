@@ -83,6 +83,7 @@ DEFAULT_CONFIG = {
         'extension': True,
         'extension_feature': True,
         'external_app': True,
+        'external_number': True,
         'features': True,
         'func_key': True,
         'group': True,
