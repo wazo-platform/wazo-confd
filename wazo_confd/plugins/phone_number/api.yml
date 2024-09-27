@@ -1,11 +1,11 @@
 paths:
-  /external/numbers:
+  /phone-numbers:
     get:
-      operationId: list_external_numbers
-      summary: List external numbers
-      description: '**Required ACL:** `confd.external.numbers.read`'
+      operationId: list_phone_numbers
+      summary: List phone numbers
+      description: '**Required ACL:** `confd.phone-numbers.read`'
       tags:
-      - numbers
+      - phone-numbers
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/recurse'
@@ -18,53 +18,53 @@ paths:
       - $ref: '#/parameters/main'
       responses:
         '200':
-          description: External phone number list
+          description: Phone number list
           schema:
-            $ref: '#/definitions/ExternalNumberItems'
+            $ref: '#/definitions/PhoneNumberItems'
     post:   
-      operationId: create_external_number
-      summary: Add a new extenral number
-      description: '**Required ACL:** `confd.extenral.numbers.create`'
+      operationId: create_phone_number
+      summary: Add a new phone number
+      description: '**Required ACL:** `confd.phone-numbers.create`'
       tags:
-      - numbers
+      - phone-numbers
       responses:
         '201':
-          description: External number created
+          description: Phone number created
           schema:
-            $ref: '#/definitions/ExternalNumber'
+            $ref: '#/definitions/PhoneNumber'
         '400':
           $ref: '#/responses/CreateError'
-  /external/numbers/{number_uuid}:
+  /phone-numbers/{phone_number_uuid}:
     get:
-      operationId: get_external_number
-      summary: Get external number
-      description: '**Required ACL:** `confd.external.numbers.{number_uuid}.read`'
+      operationId: get_phone_number
+      summary: Get phone number
+      description: '**Required ACL:** `confd.phone-numbers.{phone_number_uuid}.read`'
       tags:
-      - numbers
+      - phone-numbers
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/number_uuid'
+      - $ref: '#/parameters/phone_number_uuid'
       responses:
         '200':
-          description: External Number
+          description: Phone Number
           schema:
-            $ref: '#/definitions/ExternalNumber'
+            $ref: '#/definitions/PhoneNumber'
         '404':
           $ref: '#/responses/NotFoundError'
     put:
-      operationId: update_external_numbers
-      summary: Update External Number
-      description: '**Required ACL:** `confd.external.numbers.{number_uuid}.update`'
+      operationId: update_phone_numbers
+      summary: Update Phone Number
+      description: '**Required ACL:** `confd.phone-numbers.{phone_number_uuid}.update`'
       tags:
-      - numbers
+      - phone-numbers
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/number_uuid'
+      - $ref: '#/parameters/phone_number_uuid'
       - name: body
         in: body
         required: true
         schema:
-          $ref: '#/definitions/ExternalNumberItems'
+          $ref: '#/definitions/PhoneNumberItems'
       responses:
         '204':
           $ref: '#/responses/ResourceUpdated'
@@ -73,14 +73,14 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
     delete:
-      operationId: delete_external_number
-      summary: Delete External Number
-      description: '**Required ACL:** `confd.external.numbers.{number_uuid}.delete`'
+      operationId: delete_phone_number
+      summary: Delete Phone Number
+      description: '**Required ACL:** `confd.phone-numbers.{phone_number_uuid}.delete`'
       tags:
-      - numbers
+      - phone-numbers
       parameters:
       - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/number_uuid'
+      - $ref: '#/parameters/phone_number_uuid'
       responses:
         '204':
           $ref: '#/responses/ResourceDeleted'
@@ -88,24 +88,24 @@ paths:
           $ref: '#/responses/NotFoundError'
 
 parameters:
-  number_uuid:
-    name: number_uuid
+  phone_number_uuid:
+    name: phone_number_uuid
     in: path
     type: string
-    description: UUID of the number
+    description: UUID of the phone number
     required: true
   shareable:
     in: query
     name: shareable
     type: boolean
-    description: Only include shareable numbers
+    description: Only include shareable phone numbers
   main:
     in: query
     name: main
     type: boolean
-    description: Only include the main number
+    description: Only include the main phone number of the tenant
 definitions:
-  ExternalNumber:
+  PhoneNumber:
     type: object
     description: a phone number resource, usable for outgoing caller id or incall routing
     properties:
@@ -133,10 +133,10 @@ definitions:
     required:
       - number
       - shareable
-  ExternalNumberItems:
+  PhoneNumberItems:
     type: object
     properties:
       items:
         type: array
         items:
-          $ref: '#/definitions/ExternalNumber'
+          $ref: '#/definitions/PhoneNumber'

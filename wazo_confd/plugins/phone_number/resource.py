@@ -5,34 +5,34 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource
 
 
-class ExternalNumberList(ListResource):
+class PhoneNumberList(ListResource):
     def __init__(self):
         pass
 
     def build_headers(self, resource):
         return {}
 
-    @required_acl('confd.external.numbers.read')
+    @required_acl('confd.phone-numbers.read')
     def get(self):
         return None
 
-    @required_acl('confd.extenral.numbers.create')
+    @required_acl('confd.phone-numbers.create')
     def post(self):
         return None
 
 
-class ExternalNumberItem(ItemResource):
+class PhoneNumberItem(ItemResource):
     def __init__(self):
         pass
 
-    @required_acl('confd.external.numbers.{uuid}.read')
+    @required_acl('confd.phone-numbers.{uuid}.read')
     def get(self, uuid):
         return None
 
-    @required_acl('confd.external.numbers.{uuid}.update')
+    @required_acl('confd.phone-numbers.{uuid}.update')
     def put(self, uuid):
         return None
 
-    @required_acl('confd.external.numbers.{uuid}.delete')
+    @required_acl('confd.phone-numbers.{uuid}.delete')
     def delete(self, uuid):
         return None

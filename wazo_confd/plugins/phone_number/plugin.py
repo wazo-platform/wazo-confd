@@ -1,7 +1,7 @@
 # Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from .resource import ExternalNumberItem, ExternalNumberList
+from .resource import PhoneNumberItem, PhoneNumberList
 
 
 class Plugin:
@@ -9,7 +9,10 @@ class Plugin:
         api = dependencies['api']
 
         api.add_resource(
-            ExternalNumberList,
-            '/external/numbers',
+            PhoneNumberList,
+            '/phone-numbers',
         )
-        api.add_resource(ExternalNumberItem, '/external/numbers/<uuid:uuid>')
+        api.add_resource(
+            PhoneNumberItem,
+            '/phone-numbers/<uuid:uuid>',
+        )
