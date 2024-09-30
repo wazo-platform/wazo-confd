@@ -107,6 +107,12 @@ class ConfdClient:
 
 
 class RestUrlClient(UrlFragment):
+    _hyphenated_resources = set(
+        [
+            'phone_numbers',
+        ]
+    )
+
     def __init__(self, client, fragments, body=None):
         super().__init__(fragments)
         self.client = client
@@ -114,6 +120,12 @@ class RestUrlClient(UrlFragment):
 
     def __repr__(self):
         return "<Client '{}'>".format('/'.join(self.fragments))
+
+    def __getattr__(self, name):
+        if name in self._hyphenated_resources:
+            name = name.replace('_', '-')
+
+        return super().__getattr__(name)
 
     def head(self, **params):
         url = str(self)
