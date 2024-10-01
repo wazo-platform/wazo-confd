@@ -129,6 +129,14 @@ class schedule(IsolatedAction):
     }
 
 
+class phone_number(IsolatedAction):
+    id_field = 'uuid'
+    actions = {
+        'generate': h.phone_number.generate_phone_number,
+        'delete': h.phone_number.delete_phone_number,
+    }
+
+
 class queue(IsolatedAction):
     actions = {'generate': h.queue.generate_queue, 'delete': h.queue.delete_queue}
 

@@ -152,6 +152,7 @@ from . import outcall_call_permission  # noqa
 from . import outcall_extension  # noqa
 from . import outcall_schedule  # noqa
 from . import outcall_trunk  # noqa
+from . import phone_number  # noqa
 from . import queue  # noqa
 from . import queue_extension  # noqa
 from . import queue_member_agent  # noqa
@@ -244,6 +245,7 @@ __all__ = [
     'paging_member_user',
     'parking_lot',
     'parking_lot_extension',
+    'phone_number',
     'outcall',
     'outcall_call_permission',
     'outcall_extension',
