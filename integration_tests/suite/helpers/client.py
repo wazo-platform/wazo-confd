@@ -261,12 +261,13 @@ class Response:
     def assert_created(self, *resources, **kwargs):
         self.assert_status(201)
         for resource in resources:
-            self.assert_location(kwargs.get('location', resource))
+            self.assert_location(kwargs.get('location', resource), **kwargs)
             self.assert_link(resource)
 
-    def assert_location(self, resource):
+    def assert_location(self, resource, **kwargs):
         headers = {key.lower(): value for key, value in self.response.headers.items()}
-        expected = has_entry('location', contains_string(resource))
+        url_segment = kwargs.get('url_segment') or resource
+        expected = has_entry('location', contains_string(url_segment))
         assert_that(headers, expected, 'Location header not found')
 
     def assert_content_disposition(self, filename):
