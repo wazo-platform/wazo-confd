@@ -14,7 +14,7 @@ paths:
       - $ref: '#/parameters/limit'
       - $ref: '#/parameters/offset'
       - $ref: '#/parameters/search'
-      - $ref: '#/parameters/shareable'
+      - $ref: '#/parameters/shared'
       - $ref: '#/parameters/main'
       responses:
         '200':
@@ -94,11 +94,11 @@ parameters:
     type: string
     description: UUID of the phone number
     required: true
-  shareable:
+  shared:
     in: query
-    name: shareable
+    name: shared
     type: boolean
-    description: Only include shareable phone numbers
+    description: Only include shared phone numbers
   main:
     in: query
     name: main
@@ -123,7 +123,7 @@ definitions:
         type: string
         description: uuid of tenant
         readOnly: true
-      shareable:
+      shared:
         type: boolean
         description: If this number is meant to be shared by multiple people
       main:
@@ -132,7 +132,7 @@ definitions:
         default: false
     required:
       - number
-      - shareable
+      - shared
   PhoneNumberItems:
     type: object
     properties:

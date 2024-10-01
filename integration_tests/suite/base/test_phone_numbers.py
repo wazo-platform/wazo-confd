@@ -65,11 +65,11 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'main', None)
     s.check_bogus_field_returns_error(url, 'main', [])
     s.check_bogus_field_returns_error(url, 'main', {})
-    s.check_bogus_field_returns_error(url, 'shareable', 123)
-    s.check_bogus_field_returns_error(url, 'shareable', '42')
-    s.check_bogus_field_returns_error(url, 'shareable', None)
-    s.check_bogus_field_returns_error(url, 'shareable', [])
-    s.check_bogus_field_returns_error(url, 'shareable', {})
+    s.check_bogus_field_returns_error(url, 'shared', 123)
+    s.check_bogus_field_returns_error(url, 'shared', '42')
+    s.check_bogus_field_returns_error(url, 'shared', None)
+    s.check_bogus_field_returns_error(url, 'shared', [])
+    s.check_bogus_field_returns_error(url, 'shared', {})
 
 
 @fixtures.phone_number(number='+18005551234', main=True)
@@ -94,10 +94,10 @@ def unique_error_checks_post(url, existing):
 
 
 @fixtures.phone_number(
-    number='+18001235555', main=True, shareable=True, caller_id_name='search'
+    number='+18001235555', main=True, shared=True, caller_id_name='search'
 )
 @fixtures.phone_number(
-    number='+15551112222', main=False, shareable=False, caller_id_name='hidden'
+    number='+15551112222', main=False, shared=False, caller_id_name='hidden'
 )
 def test_search(phone_number, hidden):
     url = confd.phone_numbers
@@ -107,7 +107,7 @@ def test_search(phone_number, hidden):
     }
     exact_searches = dict(
         main=True,
-        shareable=True,
+        shared=True,
         **fuzzy_searches,
     )
 
@@ -170,7 +170,7 @@ def test_get(phone_number):
             tenant_uuid=MAIN_TENANT,
             caller_id_name=phone_number['caller_id_name'],
             main=phone_number['main'],
-            shareable=phone_number['shareable'],
+            shared=phone_number['shared'],
         ),
     )
 
@@ -199,7 +199,7 @@ def test_create_all_parameters():
         'number': '+18001235567',
         'caller_id_name': 'Here',
         'main': True,
-        'shareable': True,
+        'shared': True,
     }
 
     response = confd.phone_numbers.post(**parameters)
@@ -222,7 +222,7 @@ def test_edit_all_parameters(phone_number):
         'number': '+18001235567',
         'caller_id_name': 'Here',
         'main': True,
-        'shareable': True,
+        'shared': True,
     }
 
     response = confd.phone_numbers(phone_number['uuid']).put(**parameters)
