@@ -24,5 +24,5 @@ def add_phone_number(wazo_tenant=None, **parameters):
 
 
 def _random_number(length):
-    number = number = ''.join(random.choice(string.digits) for _ in range(length))
+    number = ''.join(random.choice(string.digits) for _ in range(length))
     return f'+{number}'
