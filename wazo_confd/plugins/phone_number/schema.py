@@ -15,3 +15,6 @@ class PhoneNumberSchema(BaseSchema):
     main = StrictBoolean(default=False)
     shared = StrictBoolean(default=False)
     links = ListLink(Link('phone_numbers', field='uuid'))
+
+
+phone_number_schema = PhoneNumberSchema()

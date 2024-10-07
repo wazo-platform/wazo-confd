@@ -9,7 +9,7 @@ from wazo_bus.resources.phone_number.event import (
 
 from wazo_confd import bus
 
-from .schema import PhoneNumberSchema
+from .schema import phone_number_schema
 
 
 class PhoneNumberNotifier:
@@ -17,17 +17,17 @@ class PhoneNumberNotifier:
         self.bus = bus
 
     def created(self, resource):
-        phone_number_serialized = PhoneNumberSchema().dump(resource)
+        phone_number_serialized = phone_number_schema.dump(resource)
         event = PhoneNumberCreatedEvent(phone_number_serialized, resource.tenant_uuid)
         self.bus.queue_event(event)
 
     def edited(self, resource):
-        phone_number_serialized = PhoneNumberSchema().dump(resource)
+        phone_number_serialized = phone_number_schema.dump(resource)
         event = PhoneNumberEditedEvent(phone_number_serialized, resource.tenant_uuid)
         self.bus.queue_event(event)
 
     def deleted(self, resource):
-        phone_number_serialized = PhoneNumberSchema().dump(resource)
+        phone_number_serialized = phone_number_schema.dump(resource)
         event = PhoneNumberDeletedEvent(phone_number_serialized, resource.tenant_uuid)
         self.bus.queue_event(event)
 
