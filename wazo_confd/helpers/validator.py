@@ -101,6 +101,29 @@ class UniqueFieldChanged(Validator):
             raise errors.resource_exists(self.resource, **metadata)
 
 
+class UniqueInTenantValidator(Validator):
+    def __init__(self, field, dao, resource, update=False, id_field='uuid'):
+        self.field = field
+        self.dao = dao
+        self.resource = resource
+        self.update = update
+        self.id_field = id_field
+
+    def validate(self, resource):
+        value = getattr(resource, self.field)
+        tenant_uuid = resource.tenant_uuid
+
+        search_params = {self.field: value, 'tenant_uuid': tenant_uuid}
+        existing = self.dao.find_by(**search_params)
+        if not existing:
+            return
+
+        if not self.update or getattr(existing, self.id_field) != getattr(
+            resource, self.id_field
+        ):
+            raise errors.resource_exists(self.resource, **search_params)
+
+
 class ResourceExists(Validator):
     def __init__(self, field, dao_exist, resource='Resource'):
         self.field = field

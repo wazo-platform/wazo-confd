@@ -89,6 +89,7 @@ setup(
             'paging_user = wazo_confd.plugins.paging_user.plugin:Plugin',
             'parking_lot = wazo_confd.plugins.parking_lot.plugin:Plugin',
             'parking_lot_extension = wazo_confd.plugins.parking_lot_extension.plugin:Plugin',
+            'phone_number = wazo_confd.plugins.phone_number.plugin:Plugin',
             'pjsip = wazo_confd.plugins.pjsip.plugin:Plugin',
             'provisioning_networking = wazo_confd.plugins.provisioning_networking.plugin:Plugin',
             'queue = wazo_confd.plugins.queue.plugin:Plugin',

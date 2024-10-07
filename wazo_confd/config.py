@@ -119,6 +119,7 @@ DEFAULT_CONFIG = {
         'paging_user': True,
         'parking_lot': True,
         'parking_lot_extension': True,
+        'phone_number': True,
         'pjsip': True,
         'provisioning_networking': True,
         'queue': True,

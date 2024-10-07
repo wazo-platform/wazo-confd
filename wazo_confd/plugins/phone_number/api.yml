@@ -1,0 +1,142 @@
+paths:
+  /phone-numbers:
+    get:
+      operationId: list_phone_numbers
+      summary: List phone numbers
+      description: '**Required ACL:** `confd.phone-numbers.read`'
+      tags:
+      - phone-numbers
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/recurse'
+      - $ref: '#/parameters/order'
+      - $ref: '#/parameters/direction'
+      - $ref: '#/parameters/limit'
+      - $ref: '#/parameters/offset'
+      - $ref: '#/parameters/search'
+      - $ref: '#/parameters/shared'
+      - $ref: '#/parameters/main'
+      responses:
+        '200':
+          description: Phone number list
+          schema:
+            $ref: '#/definitions/PhoneNumberItems'
+    post:   
+      operationId: create_phone_number
+      summary: Add a new phone number
+      description: '**Required ACL:** `confd.phone-numbers.create`'
+      tags:
+      - phone-numbers
+      responses:
+        '201':
+          description: Phone number created
+          schema:
+            $ref: '#/definitions/PhoneNumber'
+        '400':
+          $ref: '#/responses/CreateError'
+  /phone-numbers/{phone_number_uuid}:
+    get:
+      operationId: get_phone_number
+      summary: Get phone number
+      description: '**Required ACL:** `confd.phone-numbers.{phone_number_uuid}.read`'
+      tags:
+      - phone-numbers
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/phone_number_uuid'
+      responses:
+        '200':
+          description: Phone Number
+          schema:
+            $ref: '#/definitions/PhoneNumber'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: update_phone_numbers
+      summary: Update Phone Number
+      description: '**Required ACL:** `confd.phone-numbers.{phone_number_uuid}.update`'
+      tags:
+      - phone-numbers
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/phone_number_uuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PhoneNumberItems'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+    delete:
+      operationId: delete_phone_number
+      summary: Delete Phone Number
+      description: '**Required ACL:** `confd.phone-numbers.{phone_number_uuid}.delete`'
+      tags:
+      - phone-numbers
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/phone_number_uuid'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceDeleted'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+parameters:
+  phone_number_uuid:
+    name: phone_number_uuid
+    in: path
+    type: string
+    description: UUID of the phone number
+    required: true
+  shared:
+    in: query
+    name: shared
+    type: boolean
+    description: Only include shared phone numbers
+  main:
+    in: query
+    name: main
+    type: boolean
+    description: Only include the main phone number of the tenant
+definitions:
+  PhoneNumber:
+    type: object
+    description: a phone number resource, usable for outgoing caller id or incall routing
+    properties:
+      uuid:
+        type: string
+        description: Number UUID
+        readOnly: true
+      number: 
+        type: string
+        description: The e.164 representation of a phone number if possible
+      caller_id_name:
+        type: string
+        description: The Caller ID name that should be used when calling with this number as a Caller ID
+      tenant_uuid:
+        type: string
+        description: uuid of tenant
+        readOnly: true
+      shared:
+        type: boolean
+        description: If this number is meant to be shared by multiple people
+      main:
+        type: boolean
+        description: If this is the main phone number for this tenant. Only one number can be the default number for a given tenant.
+        default: false
+    required:
+      - number
+      - shared
+  PhoneNumberItems:
+    type: object
+    properties:
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/PhoneNumber'
