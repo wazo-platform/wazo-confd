@@ -4,7 +4,7 @@
 import os
 import logging
 
-from cheroot import wsgi
+from xivo import wsgi
 from flask import Flask, g
 from flask_cors import CORS
 from flask_restful import Api
