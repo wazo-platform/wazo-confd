@@ -1,5 +1,9 @@
 # Changelog
 
+## 24.14
+
+* The `group` feature now has a `max_calls` field.
+
 ## 24.13
 
 * GET `/1.1/endpoints/sip` can now filter by endpoint UUID using the `uuid` query parameter
