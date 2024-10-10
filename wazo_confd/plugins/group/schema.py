@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -48,6 +48,7 @@ class GroupSchema(BaseSchema):
     ring_in_use = StrictBoolean()
     mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
+    max_calls = fields.Integer(validate=Range(min=0), allow_none=True)
     links = ListLink(Link('groups', field='uuid'))
 
     extensions = Nested(
