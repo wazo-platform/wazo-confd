@@ -34,9 +34,21 @@ def test_put_errors(group, user):
 def error_checks(url, user):
     for destination in invalid_destinations():
         s.check_bogus_field_returns_error(url, 'noanswer_destination', destination)
+        s.check_bogus_field_returns_error(url, 'congestion_destination', destination)
     s.check_bogus_field_returns_error(
         url,
         'noanswer_destination',
+        {
+            'type': 'user',
+            'user_id': user['id'],
+            'moh_uuid': '00000000-0000-0000-0000-000000000000',
+        },
+        {},
+        'MOH was not found',
+    )
+    s.check_bogus_field_returns_error(
+        url,
+        'congestion_destination',
         {
             'type': 'user',
             'user_id': user['id'],
@@ -50,15 +62,24 @@ def error_checks(url, user):
 @fixtures.group()
 def test_get(group):
     response = confd.groups(group['id']).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=None))
+    assert_that(
+        response.item,
+        has_entries(noanswer_destination=None, congestion_destination=None),
+    )
 
     response = confd.groups(group['uuid']).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=None))
+    assert_that(
+        response.item,
+        has_entries(noanswer_destination=None, congestion_destination=None),
+    )
 
 
 @fixtures.group()
 def test_get_all_parameters(group):
-    parameters = {'noanswer_destination': {'type': 'none'}}
+    parameters = {
+        'noanswer_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+    }
     confd.groups(group['uuid']).fallbacks.put(parameters).assert_updated()
     response = confd.groups(group['uuid']).fallbacks.get()
     assert_that(response.item, equal_to(parameters))
@@ -75,21 +96,32 @@ def test_edit(group):
 
 @fixtures.group()
 def test_edit_with_all_parameters(group):
-    parameters = {'noanswer_destination': {'type': 'none'}}
+    parameters = {
+        'noanswer_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+    }
     response = confd.groups(group['uuid']).fallbacks.put(parameters)
     response.assert_updated()
 
 
 @fixtures.group()
 def test_edit_to_none(group):
-    parameters = {'noanswer_destination': {'type': 'none'}}
+    parameters = {
+        'noanswer_destination': {'type': 'none'},
+        'congestion_destination': {'type': 'none'},
+    }
     confd.groups(group['uuid']).fallbacks.put(parameters).assert_updated()
 
-    response = confd.groups(group['uuid']).fallbacks.put(noanswer_destination=None)
+    response = confd.groups(group['uuid']).fallbacks.put(
+        noanswer_destination=None, congestion_destination=None
+    )
     response.assert_updated
 
     response = confd.groups(group['uuid']).fallbacks.get()
-    assert_that(response.item, has_entries(noanswer_destination=None))
+    assert_that(
+        response.item,
+        has_entries(noanswer_destination=None, congestion_destination=None),
+    )
 
 
 @fixtures.group()
@@ -110,11 +142,17 @@ def test_valid_destinations(group, *destinations):
 
 
 def _update_group_fallbacks_with_destination(group_uuid, destination):
-    response = confd.groups(group_uuid).fallbacks.put(noanswer_destination=destination)
+    response = confd.groups(group_uuid).fallbacks.put(
+        noanswer_destination=destination, congestion_destination=destination
+    )
     response.assert_updated()
     response = confd.groups(group_uuid).fallbacks.get()
     assert_that(
-        response.item, has_entries(noanswer_destination=has_entries(**destination))
+        response.item,
+        has_entries(
+            noanswer_destination=has_entries(**destination),
+            congestion_destination=has_entries(**destination),
+        ),
     )
 
 
@@ -162,7 +200,9 @@ def test_nonexistent_destinations(group, moh):
 
 
 def _update_user_fallbacks_with_nonexistent_destination(group_uuid, destination):
-    response = confd.groups(group_uuid).fallbacks.put(noanswer_destination=destination)
+    response = confd.groups(group_uuid).fallbacks.put(
+        noanswer_destination=destination, congestion_destination=destination
+    )
     response.assert_status(400)
 
 
@@ -177,12 +217,16 @@ def test_bus_events(group):
 @fixtures.group()
 def test_get_fallbacks_relation(group):
     confd.groups(group['uuid']).fallbacks.put(
-        noanswer_destination={'type': 'none'}
+        noanswer_destination={'type': 'none'},
+        congestion_destination={'type': 'none'},
     ).assert_updated
     response = confd.groups(group['uuid']).get()
     assert_that(
         response.item,
         has_entries(
-            fallbacks=has_entries(noanswer_destination=has_entries(type='none'))
+            fallbacks=has_entries(
+                noanswer_destination=has_entries(type='none'),
+                congestion_destination=has_entries(type='none'),
+            )
         ),
     )

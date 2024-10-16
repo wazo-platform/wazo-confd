@@ -42,7 +42,13 @@ definitions:
       noanswer_destination:
         description: The destination to redirect the caller to when there are no answer
         $ref: '#/definitions/DestinationType'
+      congestion_destination:
+        description: The destination to redirect the caller to when the group has exceeded max_calls
+        $ref: '#/definitions/DestinationType'
     example:
       noanswer_destination:
         type: user
         user_id: 1
+      congestion_destination:
+        type: user
+        user_id: 2
