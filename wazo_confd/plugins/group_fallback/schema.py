@@ -1,4 +1,4 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import post_load
@@ -11,6 +11,9 @@ from wazo_confd.helpers.destination import DestinationField
 class GroupFallbackSchema(BaseSchema):
     noanswer_destination = DestinationField(
         attribute='noanswer', default=None, allow_none=True
+    )
+    congestion_destination = DestinationField(
+        attribute='congestion', default=None, allow_none=True
     )
 
     @post_load

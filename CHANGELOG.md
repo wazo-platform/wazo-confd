@@ -1,5 +1,10 @@
 # Changelog
 
+## 24.15
+
+* The `group` feature now has a `max_calls` field.
+* A new fallback type has been added to `/1.1/groups/<group_uuid>/fallbacks`: `congestion_destination`
+
 ## 24.13
 
 * GET `/1.1/endpoints/sip` can now filter by endpoint UUID using the `uuid` query parameter
