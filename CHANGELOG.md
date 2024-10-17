@@ -1,5 +1,9 @@
 # Changelog
 
+## 24.15
+
+* The `/1.1/trunks` resource now has the `outgoing_caller_id_format` field
+
 ## 24.13
 
 * GET `/1.1/endpoints/sip` can now filter by endpoint UUID using the `uuid` query parameter

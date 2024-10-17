@@ -1,7 +1,8 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
+from marshmallow.validate import OneOf
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
 
 
@@ -10,6 +11,9 @@ class TrunkSchema(BaseSchema):
     tenant_uuid = fields.String(dump_only=True)
     context = fields.String(allow_none=True)
     twilio_incoming = StrictBoolean(allow_none=True)
+    outgoing_caller_id_format = fields.String(
+        missing='+E164', validate=OneOf(['+E164', 'E164', 'national'])
+    )
     links = ListLink(Link('trunks'))
 
     endpoint_sip = Nested(
