@@ -182,6 +182,16 @@ responses:
   ResourceDeleted:
     description: Resource was deleted successfully
 definitions:
+  Link:
+    title: Link
+    description: a pointer to a linked resource related in some way to the current resource
+    properties:
+      href:
+        type: string
+        description: The URL of the link
+      rel:
+        type: string
+        description: The relationship of the link relative to the current resource
   DestinationType:
     title: DestinationType
     properties:
