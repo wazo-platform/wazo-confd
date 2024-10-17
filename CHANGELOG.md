@@ -4,6 +4,7 @@
 
 * The `group` feature now has a `max_calls` field.
 * A new fallback type has been added to `/1.1/groups/<group_uuid>/fallbacks`: `congestion_destination`
+* The `/1.1/trunks` resource now has the `outgoing_caller_id_format` field
 
 ## 24.13
 
