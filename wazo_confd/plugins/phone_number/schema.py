@@ -2,15 +2,25 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields
-from marshmallow.validate import Length
+from marshmallow.validate import Length, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
+
+
+def number_field(**kwargs):
+    return fields.String(
+        validate=[
+            Length(min=1, max=128),
+            Regexp(r'^\+?[0-9]+$', error='not a valid digit-only phone number'),
+        ],
+        **kwargs,
+    )
 
 
 class PhoneNumberSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    number = fields.String(validate=Length(min=1, max=128), required=True)
+    number = number_field(required=True)
     caller_id_name = fields.String(validate=Length(min=1, max=256), allow_none=True)
     main = StrictBoolean(default=False)
     shared = StrictBoolean(default=False)
