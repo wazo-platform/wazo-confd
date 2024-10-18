@@ -4,11 +4,13 @@
 from hamcrest import (
     all_of,
     assert_that,
+    contains_string,
     empty,
     has_item,
     has_items,
     has_entries,
     is_not,
+    none,
     not_,
 )
 from . import confd
@@ -208,6 +210,51 @@ def test_create_all_parameters():
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
 
     confd.phone_numbers(response.item['uuid']).delete().assert_deleted()
+
+
+def test_create_range():
+    parameters = {'start_number': '+18001235560', 'end_number': '+18001235569'}
+
+    response = confd.phone_numbers.ranges.post(**parameters)
+    response.assert_status(201)
+
+    assert_that(
+        response.item,
+        has_entries(
+            created=has_items(has_entries(uuid=not_(none()))),
+            links=has_items(
+                has_entries(
+                    rel=contains_string('phone_numbers'),
+                    href=contains_string('phone-numbers'),
+                )
+            ),
+            total=10,
+        ),
+    )
+
+    for phone_number in response.item['created']:
+        confd.phone_numbers(phone_number['uuid']).delete().assert_deleted()
+
+
+def test_create_range_too_large():
+    parameters = {'start_number': '+18001230000', 'end_number': '+18001249999'}
+
+    response = confd.phone_numbers.ranges.post(**parameters)
+    response.assert_status(400)
+
+    assert_that(response.json, has_item(contains_string('range size')))
+
+
+def test_create_range_bad_order():
+    parameters = {'start_number': '+18001230000', 'end_number': '+18001225000'}
+
+    response = confd.phone_numbers.ranges.post(**parameters)
+    response.assert_status(400)
+
+    assert_that(
+        response.json,
+        has_item(contains_string('start phone number must precede end phone number')),
+    )
 
 
 @fixtures.phone_number()
