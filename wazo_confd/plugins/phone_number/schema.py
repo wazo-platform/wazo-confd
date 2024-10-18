@@ -36,8 +36,12 @@ class PhoneNumberListSchema(BaseSchema):
     """
 
     created = fields.Nested(PhoneNumberSchema, many=True, only=['uuid'])
-    links = ListLink(Link('phone_numbers', field='uuid'))
+    links = fields.Method('build_links', dump_only=True)
     total = fields.Integer()
+
+    def build_links(self, obj, **kwargs):
+        link_factory = Link('phone_numbers', field='uuid')
+        return [link_factory._serialize(None, None, entry) for entry in obj['links']]
 
 
 class PhoneNumberRangeSpecSchema(BaseSchema):
