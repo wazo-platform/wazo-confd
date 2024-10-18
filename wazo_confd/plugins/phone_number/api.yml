@@ -196,4 +196,4 @@ definitions:
           links to related resources
           include URLs of any registered phone number that are part of this range
         items:
-          $ref: '#/definitions/Links'
+          $ref: '#/definitions/Link'
