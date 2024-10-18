@@ -7,6 +7,7 @@ from functools import wraps
 
 from flask import g
 from flask_restful.utils import http_status_message
+from marshmallow import ValidationError
 from werkzeug.exceptions import HTTPException
 
 from xivo import rest_api_helpers
@@ -34,6 +35,9 @@ def handle_api_exception(func):
             rollback()
             message = decode_and_log_error(error)
             return [message], 400
+        except ValidationError as error:
+            message = [error.normalized_messages()]
+            return message, 400
         except rest_api_helpers.APIException as error:
             rollback()
             if error.status_code >= 500:
