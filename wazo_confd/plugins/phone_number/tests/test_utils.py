@@ -11,7 +11,7 @@ class TestGeneratePhoneNumberRange(unittest.TestCase):
 
     def test_normal_range(self):
         start_number = '15550000000'
-        end_number = '15550001000'
+        end_number = '15550000999'
         numbers = list(generate_phone_number_range(start_number, end_number))
 
         # this generates 1000 numbers
