@@ -163,6 +163,10 @@ definitions:
           type: boolean
           default: true
           description: Enable/Disable the group
+        max_calls:
+          type: integer
+          default: 0
+          description: Number of maximum calls waiting in the group. 0 means unlimited.
         tenant_uuid:
           type: string
           description: The UUID of the tenant

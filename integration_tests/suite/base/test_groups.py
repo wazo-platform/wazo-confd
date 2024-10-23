@@ -108,6 +108,10 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'enabled', 123)
     s.check_bogus_field_returns_error(url, 'enabled', {})
     s.check_bogus_field_returns_error(url, 'enabled', [])
+    s.check_bogus_field_returns_error(url, 'max_calls', 'ten')
+    s.check_bogus_field_returns_error(url, 'max_calls', -1)
+    s.check_bogus_field_returns_error(url, 'max_calls', {})
+    s.check_bogus_field_returns_error(url, 'max_calls', [])
 
 
 @fixtures.extension(exten=gen_group_exten())
@@ -191,6 +195,7 @@ def test_get(group):
             retry_delay=group['retry_delay'],
             mark_answered_elsewhere=group['mark_answered_elsewhere'],
             enabled=group['enabled'],
+            max_calls=group['max_calls'],
             extensions=empty(),
             members=has_entries(users=empty(), extensions=empty()),
             incalls=empty(),
@@ -217,6 +222,7 @@ def test_get(group):
             retry_delay=group['retry_delay'],
             mark_answered_elsewhere=group['mark_answered_elsewhere'],
             enabled=group['enabled'],
+            max_calls=group['max_calls'],
             extensions=empty(),
             members=has_entries(users=empty(), extensions=empty()),
             incalls=empty(),
@@ -303,6 +309,7 @@ def test_create_all_parameters():
         'user_timeout': 24,
         'retry_delay': 12,
         'enabled': False,
+        'max_calls': 42,
     }
 
     response = confd.groups.post(**parameters)
@@ -365,6 +372,7 @@ def test_edit_all_parameters(group):
         'user_timeout': 24,
         'retry_delay': 12,
         'enabled': False,
+        'max_calls': 42,
     }
 
     response = confd.groups(group['id']).put(**parameters)
@@ -389,6 +397,7 @@ def test_edit_all_parameters(group):
         'user_timeout': 24,
         'retry_delay': 12,
         'enabled': False,
+        'max_calls': 0,
     }
 
     response = confd.groups(group['uuid']).put(**parameters)
