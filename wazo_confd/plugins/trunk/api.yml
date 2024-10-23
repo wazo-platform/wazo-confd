@@ -121,10 +121,9 @@ definitions:
             - E164
             - national
           description: |
-            This is the format that is going to be used when sending a caller ID to the trunk
-            operator. This formatting is only done for caller ID specified using the
-            `X-Wazo-Selected-Caller-ID` SIP header on an `INVITE`. If the user supplied caller ID
-            cannot be formated the requested caller ID will be ignored
+            The format to use for the caller ID of outgoing calls through this trunk, 
+            when the caller id is provided by an application through the `X-Wazo-Selected-Caller-ID` SIP header on an `INVITE`. 
+            If the caller ID supplied by an application cannot be formatted, the requested caller ID will be ignored.
     - $ref: '#/definitions/TrunkRelationEndpoints'
     - $ref: '#/definitions/TrunkRelationOutcalls'
   TrunkRelationBase:
