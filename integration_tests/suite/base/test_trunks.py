@@ -53,6 +53,12 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'twilio_incoming', 123)
     s.check_bogus_field_returns_error(url, 'twilio_incoming', [])
     s.check_bogus_field_returns_error(url, 'twilio_incoming', {})
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id_format', {})
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id_format', [])
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id_format', None)
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id_format', '00E164')
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id_format', 42)
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id_format', False)
 
 
 @fixtures.context(label='search')
@@ -111,8 +117,12 @@ def check_relation_search(url, trunk, hidden, field, term):
 @fixtures.context(label='sort2')
 def test_sorting_offset_limit(ctx1, ctx2):
     with (
-        fixtures.trunk(context=ctx1['name']) as trunk1,
-        fixtures.trunk(context=ctx2['name']) as trunk2,
+        fixtures.trunk(
+            context=ctx1['name'], outgoing_caller_id_format='E164'
+        ) as trunk1,
+        fixtures.trunk(
+            context=ctx2['name'], outgoing_caller_id_format='national'
+        ) as trunk2,
     ):
         url = confd.trunks.get
         if ctx1['name'] < ctx2['name']:
@@ -120,6 +130,7 @@ def test_sorting_offset_limit(ctx1, ctx2):
         else:
             first, second = trunk2, trunk1
         s.check_sorting(url, first, second, 'context', None)
+        s.check_sorting(url, trunk1, trunk2, 'outgoing_caller_id_format', None)
         s.check_offset(url, first, second, 'context', None)
         s.check_limit(url, first, second, 'context', None)
 
@@ -169,12 +180,23 @@ def test_create_minimal_parameters():
     response = confd.trunks.post()
     response.assert_created('trunks')
 
-    assert_that(response.item, has_entries(id=not_(empty()), tenant_uuid=MAIN_TENANT))
+    assert_that(
+        response.item,
+        has_entries(
+            id=not_(empty()),
+            tenant_uuid=MAIN_TENANT,
+            outgoing_caller_id_format='+E164',
+        ),
+    )
 
 
 @fixtures.context()
 def test_create_all_parameters(context):
-    parameters = {'context': context['name'], 'twilio_incoming': True}
+    parameters = {
+        'context': context['name'],
+        'twilio_incoming': True,
+        'outgoing_caller_id_format': 'national',
+    }
     response = confd.trunks.post(**parameters)
     response.assert_created('trunks')
 
@@ -198,7 +220,11 @@ def test_edit_minimal_parameters(trunk):
 @fixtures.context(label='not_default')
 @fixtures.trunk()
 def test_edit_all_parameters(context, trunk):
-    parameters = {'context': context['name'], 'twilio_incoming': True}
+    parameters = {
+        'context': context['name'],
+        'twilio_incoming': True,
+        'outgoing_caller_id_format': 'national',
+    }
 
     response = confd.trunks(trunk['id']).put(**parameters)
     response.assert_updated()

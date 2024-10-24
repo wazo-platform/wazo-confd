@@ -113,6 +113,17 @@ definitions:
         twilio_incoming:
           type: boolean
           description: Use this trunk's settings to handle incoming calls from Twilio
+        outgoing_caller_id_format:
+          type: string
+          default: +E164
+          enum:
+            - +E164
+            - E164
+            - national
+          description: |
+            The format to use for the caller ID of outgoing calls through this trunk, 
+            when the caller id is provided by an application through the `X-Wazo-Selected-Caller-ID` SIP header on an `INVITE`. 
+            If the caller ID supplied by an application cannot be formatted, the requested caller ID will be ignored.
     - $ref: '#/definitions/TrunkRelationEndpoints'
     - $ref: '#/definitions/TrunkRelationOutcalls'
   TrunkRelationBase:
