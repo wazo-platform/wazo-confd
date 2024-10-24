@@ -25,7 +25,7 @@ class TestPhoneNumberService(unittest.TestCase):
                 start_number='15550000000',
                 end_number='15550000999',
             ),
-            tenant_uuid='1234',
+            tenant_uuids='1234',
         )
 
         assert (
@@ -58,7 +58,7 @@ class TestPhoneNumberService(unittest.TestCase):
                 start_number='15550000000',
                 end_number='15550000999',
             ),
-            tenant_uuid='1234',
+            tenant_uuids='1234',
         )
         assert (
             len(created_numbers) == 500

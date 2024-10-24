@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 class PhoneNumberService(CRUDService):
+    dao: dao
+
     def __init__(self, dao, validator, notifier):
         super().__init__(dao, validator, notifier)
 
@@ -24,7 +26,7 @@ class PhoneNumberService(CRUDService):
         return self.dao.find_all_by(**criteria)
 
     def create_range(
-        self, range_spec: PhoneNumberRangeSpec, tenant_uuid: str
+        self, range_spec: PhoneNumberRangeSpec, tenant_uuids: list[str]
     ) -> tuple[list[PhoneNumber], list[PhoneNumber]]:
         register_phone_numbers = []
         _redundant_phone_numbers = []
@@ -35,11 +37,11 @@ class PhoneNumberService(CRUDService):
                 phone_number = self.create(
                     PhoneNumber(
                         number=number,
-                        tenant_uuid=tenant_uuid,
+                        tenant_uuid=tenant_uuids[0],
                     )
                 )
             except ResourceError as ex:
-                if "number already exists" in str(ex):
+                if "already exists" in str(ex):
                     _redundant_phone_numbers.append(number)
                     continue
                 else:
@@ -49,6 +51,7 @@ class PhoneNumberService(CRUDService):
 
         redundant_phone_numbers = self.find_all_by(
             number_in=_redundant_phone_numbers,
+            tenant_uuids=tenant_uuids,
         )
 
         logger.info(

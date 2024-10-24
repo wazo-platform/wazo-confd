@@ -42,11 +42,12 @@ class PhoneNumberRange(ConfdResource):
         self.service = service
         super().__init__()
 
+    @required_acl('confd.phone-numbers.create')
     def post(self):
         tenant_uuid = Tenant.autodetect().uuid
         range_spec = phone_number_range_spec_schema.load(request.get_json())
         new_phone_numbers, old_phone_numbers = self.service.create_range(
-            range_spec, tenant_uuid
+            range_spec, tenant_uuids=[tenant_uuid]
         )
         return (
             phone_number_list_schema.dump(
