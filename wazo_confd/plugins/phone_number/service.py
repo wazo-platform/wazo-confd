@@ -17,8 +17,6 @@ logger = logging.getLogger(__name__)
 
 
 class PhoneNumberService(CRUDService):
-    dao: dao
-
     def __init__(self, dao, validator, notifier):
         super().__init__(dao, validator, notifier)
 
