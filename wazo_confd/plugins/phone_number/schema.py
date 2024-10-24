@@ -59,8 +59,12 @@ class PhoneNumberRangeSpecSchema(BaseSchema):
     def validate_range(self, data, **kwargs):
         if not (data['start_number'] <= data['end_number']):
             raise ValidationError("start phone number must precede end phone number")
-        range_size = int(data['end_number'].replace('+', '')) - int(
-            data['start_number'].replace('+', '')
+        # NOTE(clanglois): both start_number and end_number are inclusive,
+        # so range(start_number, start_number) -> [start_number]
+        range_size = (
+            int(data['end_number'].replace('+', ''))
+            - int(data['start_number'].replace('+', ''))
+            + 1
         )
         if not (1 <= range_size <= MAX_PHONE_NUMBER_RANGE_SIZE):
             raise ValidationError(
