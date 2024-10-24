@@ -10,9 +10,13 @@ from hamcrest import (
     has_items,
     has_entries,
     is_not,
+    matches_regexp,
     none,
     not_,
+    has_length,
+    starts_with,
 )
+import pytest
 from . import confd
 from ..helpers import (
     errors as e,
@@ -20,6 +24,7 @@ from ..helpers import (
     scenarios as s,
 )
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.fixtures import phone_number_range  # noqa: F401
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
@@ -188,7 +193,7 @@ def test_get_multi_tenant(main, sub):
 
 
 def test_create_minimal_parameters():
-    response = confd.phone_numbers.post(number='112')
+    response = confd.phone_numbers.post({'number': '112'})
     response.assert_created('phone_numbers', url_segment='phone-numbers')
 
     assert_that(response.item, has_entries(uuid=not_(empty()), tenant_uuid=MAIN_TENANT))
@@ -204,7 +209,7 @@ def test_create_all_parameters():
         'shared': True,
     }
 
-    response = confd.phone_numbers.post(**parameters)
+    response = confd.phone_numbers.post(parameters)
     response.assert_created('phone_numbers', url_segment='phone-numbers')
 
     assert_that(response.item, has_entries(tenant_uuid=MAIN_TENANT, **parameters))
@@ -215,7 +220,7 @@ def test_create_all_parameters():
 def test_create_range():
     parameters = {'start_number': '+18001235560', 'end_number': '+18001235569'}
 
-    response = confd.phone_numbers.ranges.post(**parameters)
+    response = confd.phone_numbers.ranges.post(parameters)
     response.assert_status(201)
 
     assert_that(
@@ -230,16 +235,63 @@ def test_create_range():
             ),
             total=10,
         ),
+        str(response.item),
     )
 
     for phone_number in response.item['created']:
+        phone_number_resource = confd.phone_numbers(phone_number['uuid']).get()
+        assert_that(
+            phone_number_resource.item,
+            has_entries(
+                number=all_of(
+                    starts_with('+1800123556'),
+                ),
+            ),
+            str(phone_number_resource),
+        )
+        confd.phone_numbers(phone_number['uuid']).delete().assert_deleted()
+
+
+def test_create_range_singleton():
+    parameters = {'start_number': '+18001235560', 'end_number': '+18001235560'}
+
+    response = confd.phone_numbers.ranges.post(parameters, wazo_tenant=MAIN_TENANT)
+    response.assert_status(201)
+
+    assert_that(
+        response.item,
+        has_entries(
+            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(1)),
+            links=all_of(
+                has_items(
+                    has_entries(
+                        rel=contains_string('phone_numbers'),
+                        href=contains_string('phone-numbers'),
+                    )
+                ),
+                has_length(1),
+            ),
+            total=1,
+        ),
+        str(response.item),
+    )
+
+    for phone_number in response.item['created']:
+        phone_number_resource = confd.phone_numbers(phone_number['uuid']).get()
+        assert_that(
+            phone_number_resource.item,
+            has_entries(
+                number='+18001235560',
+            ),
+            str(phone_number_resource),
+        )
         confd.phone_numbers(phone_number['uuid']).delete().assert_deleted()
 
 
 def test_create_range_too_large():
     parameters = {'start_number': '+18001230000', 'end_number': '+18001249999'}
 
-    response = confd.phone_numbers.ranges.post(**parameters)
+    response = confd.phone_numbers.ranges.post(parameters)
     response.assert_status(400)
 
     assert_that(response.json, has_item(contains_string('range size')))
@@ -248,13 +300,129 @@ def test_create_range_too_large():
 def test_create_range_bad_order():
     parameters = {'start_number': '+18001230000', 'end_number': '+18001225000'}
 
-    response = confd.phone_numbers.ranges.post(**parameters)
+    response = confd.phone_numbers.ranges.post(parameters)
     response.assert_status(400)
 
     assert_that(
         response.json,
         has_item(contains_string('start phone number must precede end phone number')),
     )
+
+
+@pytest.mark.parametrize(
+    'phone_number_range',
+    [
+        dict(
+            start_number='+18001230000',
+            end_number='+18001230999',
+            wazo_tenant=SUB_TENANT,
+        )
+    ],
+    indirect=True,
+)
+def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
+    parameters = {'start_number': '+18001230500', 'end_number': '+18001231499'}
+
+    response = confd.phone_numbers.ranges.post(parameters, wazo_tenant=MAIN_TENANT)
+    response.assert_status(201)
+
+    assert_that(
+        response.item,
+        has_entries(
+            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(1000)),
+            links=all_of(
+                has_items(
+                    has_entries(
+                        rel=contains_string('phone_numbers'),
+                        href=contains_string('phone-numbers'),
+                    )
+                ),
+                has_length(1000),
+            ),
+            total=1000,
+        ),
+        str(response.item),
+    )
+
+    for phone_number in response.item['created']:
+        phone_number_resource = confd.phone_numbers(phone_number['uuid']).get()
+        assert_that(
+            phone_number_resource.item,
+            has_entries(
+                number=starts_with('+1800123'),
+                tenant_uuid=MAIN_TENANT,
+            ),
+            str(phone_number_resource),
+        )
+        confd.phone_numbers(phone_number['uuid']).delete().assert_deleted()
+
+    for number in phone_number_range:
+        phone_number_resource = confd.phone_numbers(number['uuid']).get()
+        assert_that(
+            phone_number_resource.item,
+            has_entries(
+                number=starts_with('+1800123'),
+                tenant_uuid=SUB_TENANT,
+            ),
+            str(phone_number_resource),
+        )
+
+
+@pytest.mark.parametrize(
+    'phone_number_range',
+    [
+        dict(
+            start_number='+18001230000',
+            end_number='+18001230999',
+            wazo_tenant=MAIN_TENANT,
+        )
+    ],
+    indirect=True,
+)
+def test_create_range_idempotence(phone_number_range):  # noqa: F811
+    parameters = {'start_number': '+18001230500', 'end_number': '+18001231499'}
+
+    response = confd.phone_numbers.ranges.post(parameters, wazo_tenant=MAIN_TENANT)
+    response.assert_status(201)
+
+    assert_that(
+        response.item,
+        has_entries(
+            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(500)),
+            links=all_of(
+                has_items(
+                    has_entries(
+                        rel=contains_string('phone_numbers'),
+                        href=contains_string('phone-numbers'),
+                    )
+                ),
+                has_length(1000),
+            ),
+            total=1000,
+        ),
+        str(response.item),
+    )
+
+    for phone_number in response.item['created']:
+        phone_number_resource = confd.phone_numbers(phone_number['uuid']).get()
+        assert_that(
+            phone_number_resource.item,
+            has_entries(
+                number=matches_regexp(r'^\+1800123[01][0-9]{3}$'),
+            ),
+            str(phone_number_resource),
+        )
+        confd.phone_numbers(phone_number['uuid']).delete().assert_deleted()
+
+    for phone_number in phone_number_range:
+        phone_number_resource = confd.phone_numbers(phone_number['uuid']).get()
+        assert_that(
+            phone_number_resource.item,
+            has_entries(
+                number=matches_regexp(r'^\+18001230[0-9]{3}$'),
+            ),
+            str(phone_number_resource),
+        )
 
 
 @fixtures.phone_number()

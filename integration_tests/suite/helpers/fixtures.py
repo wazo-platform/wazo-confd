@@ -1,6 +1,8 @@
 # Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import pytest
+
 from .wrappers import IsolatedAction
 from . import helpers as h
 
@@ -135,6 +137,17 @@ class phone_number(IsolatedAction):
         'generate': h.phone_number.generate_phone_number,
         'delete': h.phone_number.delete_phone_number,
     }
+
+
+@pytest.fixture
+def phone_number_range(request):
+    parameters = request.param
+    phone_numbers = h.phone_number.generate_phone_number_range(**parameters)
+    try:
+        yield phone_numbers['created']
+    finally:
+        for phone_number in phone_numbers['created']:
+            h.phone_number.delete_phone_number(phone_number['uuid'])
 
 
 class queue(IsolatedAction):
