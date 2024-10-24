@@ -27,6 +27,14 @@ paths:
       description: '**Required ACL:** `confd.phone-numbers.create`'
       tags:
       - phone-numbers
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: specification of the phone number to create
+          required: true
+          schema:
+            $ref: '#/definitions/PhoneNumber'
       responses:
         '201':
           description: Phone number created
@@ -42,6 +50,7 @@ paths:
       tags:
       - phone-numbers
       parameters:
+        - $ref: '#/parameters/tenantuuid'
         - name: body
           in: body
           description: specification of the phone number range to create

@@ -21,5 +21,5 @@ def generate_phone_number_range(start_number: str, end_number: str) -> Iterator[
         )
     for number in range(_start_number, _end_number):
         # assert len(str(number)) == len(start_number)
-        yield str(number)
+        yield f'+{number}' if start_number.startswith('+') else str(number)
     yield end_number
