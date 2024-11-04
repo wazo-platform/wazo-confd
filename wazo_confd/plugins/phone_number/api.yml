@@ -145,7 +145,7 @@ definitions:
         readOnly: true
       number: 
         type: string
-        description: The e.164 representation of a phone number if possible
+        description: The phone number text (in e.164 representation if possible)
       caller_id_name:
         type: string
         description: The Caller ID name that should be used when calling with this number as a Caller ID
@@ -155,11 +155,14 @@ definitions:
         readOnly: true
       shared:
         type: boolean
-        description: If this number is meant to be shared by multiple people
+        description: Whether or not this number is meant to be shared by multiple people
       main:
         type: boolean
-        description: If this is the main phone number for this tenant. Only one number can be the default number for a given tenant.
+        description: |
+          Whether or not this is the main / default phone number for this tenant. 
+          Only one number can be the main number for a given tenant.
         default: false
+        readOnly: true
     required:
       - number
       - shared
