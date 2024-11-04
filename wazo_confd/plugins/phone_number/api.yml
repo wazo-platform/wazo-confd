@@ -116,7 +116,50 @@ paths:
           $ref: '#/responses/ResourceDeleted'
         '404':
           $ref: '#/responses/NotFoundError'
-
+  /phone-numbers/main:
+    get:
+      operationId: get_phone_number_main
+      summary: Get main phone number
+      description: '**Required ACL:** `confd.phone-numbers.main.read`'
+      tags:
+      - phone-numbers
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      responses:
+        '200':
+          description: main phone number
+          schema:
+            $ref: '#/definitions/PhoneNumber'
+        '404':
+          description: main phone number not found
+          $ref: '#/responses/NotFoundError'
+    put:
+      operationId: set_phone_number_main
+      summary: set the 'main' phone number for the tenant
+      description: '**Required ACL:** `confd.phone-numbers.main.update`'
+      tags:
+      - phone-numbers
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          description: specification of the phone number to set as main
+          required: true
+          schema:
+            type: object
+            properties:
+              uuid:
+                type: string
+                description: UUID of the phone number to set as main
+                required: true
+                example: b5bcc98c-10cf-4a68-bf3d-802fb5170911
+      responses:
+        '200':
+          description: main phone number updated successfully
+          schema:
+            $ref: '#/definitions/PhoneNumber'
+        '400':
+          $ref: '#/responses/UpdateError'
 parameters:
   phone_number_uuid:
     name: phone_number_uuid
