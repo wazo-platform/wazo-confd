@@ -467,6 +467,80 @@ def test_delete_multi_tenant(main, sub):
     response.assert_deleted()
 
 
+@fixtures.phone_number(wazo_tenant=MAIN_TENANT)
+@fixtures.phone_number(wazo_tenant=MAIN_TENANT)
+def test_set_main_number(num1, num2):
+    response = confd.phone_numbers.main.get()
+    response.assert_match(404, e.not_found(resource='PhoneNumber'))
+
+    response = confd.phone_numbers.main.put(
+        {
+            'phone_number_uuid': num1['uuid'],
+        },
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_updated()
+
+    response = confd.phone_numbers.main.get()
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=num1['uuid'],
+            main=True,
+        ),
+    )
+
+
+@fixtures.phone_number()
+@fixtures.phone_number()
+def test_replace_main_number(num1, num2):
+    response = confd.phone_numbers.main.get()
+    response.assert_match(404, e.not_found(resource='PhoneNumber'))
+
+    response = confd.phone_numbers.main.put(
+        {
+            'phone_number_uuid': num1['uuid'],
+        },
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_updated()
+
+    response = confd.phone_numbers.main.get()
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=num1['uuid'],
+            main=True,
+        ),
+    )
+
+    response = confd.phone_numbers.main.put(
+        {
+            'phone_number_uuid': num2['uuid'],
+        },
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_updated()
+
+    response = confd.phone_numbers.main.get()
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=num2['uuid'],
+            main=True,
+        ),
+    )
+
+    response = confd.phone_numbers(num1['uuid']).get()
+    assert_that(
+        response.item,
+        has_entries(
+            uuid=num1['uuid'],
+            main=False,
+        ),
+    )
+
+
 @fixtures.phone_number()
 def test_bus_events(phone_number):
     url = confd.phone_numbers(phone_number['uuid'])
