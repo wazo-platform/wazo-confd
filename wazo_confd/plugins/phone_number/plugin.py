@@ -2,7 +2,12 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.helpers.types import PluginDependencies
-from .resource import PhoneNumberItem, PhoneNumberList, PhoneNumberRange
+from .resource import (
+    PhoneNumberItem,
+    PhoneNumberList,
+    PhoneNumberMain,
+    PhoneNumberRange,
+)
 from .service import build_service
 
 
@@ -23,6 +28,11 @@ class Plugin:
         api.add_resource(
             PhoneNumberRange,
             '/phone-numbers/ranges',
+            resource_class_args=(service,),
+        )
+        api.add_resource(
+            PhoneNumberMain,
+            '/phone-numbers/main',
             resource_class_args=(service,),
         )
         api.add_resource(
