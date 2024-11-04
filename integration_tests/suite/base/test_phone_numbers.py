@@ -314,14 +314,14 @@ def test_create_range_bad_order():
     [
         dict(
             start_number='+18001230000',
-            end_number='+18001230999',
+            end_number='+18001230099',
             wazo_tenant=SUB_TENANT,
         )
     ],
     indirect=True,
 )
 def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
-    parameters = {'start_number': '+18001230500', 'end_number': '+18001231499'}
+    parameters = {'start_number': '+18001230050', 'end_number': '+18001230149'}
 
     response = confd.phone_numbers.ranges.post(parameters, wazo_tenant=MAIN_TENANT)
     response.assert_status(201)
@@ -329,7 +329,7 @@ def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
     assert_that(
         response.item,
         has_entries(
-            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(1000)),
+            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(100)),
             links=all_of(
                 has_items(
                     has_entries(
@@ -337,9 +337,9 @@ def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
                         href=contains_string('phone-numbers'),
                     )
                 ),
-                has_length(1000),
+                has_length(100),
             ),
-            total=1000,
+            total=100,
         ),
         str(response.item),
     )
@@ -349,7 +349,7 @@ def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
         assert_that(
             phone_number_resource.item,
             has_entries(
-                number=starts_with('+1800123'),
+                number=starts_with('+18001230'),
                 tenant_uuid=MAIN_TENANT,
             ),
             str(phone_number_resource),
@@ -361,7 +361,7 @@ def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
         assert_that(
             phone_number_resource.item,
             has_entries(
-                number=starts_with('+1800123'),
+                number=starts_with('+18001230'),
                 tenant_uuid=SUB_TENANT,
             ),
             str(phone_number_resource),
@@ -373,14 +373,14 @@ def test_create_range_multi_tenant(phone_number_range):  # noqa: F811
     [
         dict(
             start_number='+18001230000',
-            end_number='+18001230999',
+            end_number='+18001230099',
             wazo_tenant=MAIN_TENANT,
         )
     ],
     indirect=True,
 )
 def test_create_range_idempotence(phone_number_range):  # noqa: F811
-    parameters = {'start_number': '+18001230500', 'end_number': '+18001231499'}
+    parameters = {'start_number': '+18001230050', 'end_number': '+18001230149'}
 
     response = confd.phone_numbers.ranges.post(parameters, wazo_tenant=MAIN_TENANT)
     response.assert_status(201)
@@ -388,7 +388,7 @@ def test_create_range_idempotence(phone_number_range):  # noqa: F811
     assert_that(
         response.item,
         has_entries(
-            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(500)),
+            created=all_of(has_items(has_entries(uuid=not_(none()))), has_length(50)),
             links=all_of(
                 has_items(
                     has_entries(
@@ -396,9 +396,9 @@ def test_create_range_idempotence(phone_number_range):  # noqa: F811
                         href=contains_string('phone-numbers'),
                     )
                 ),
-                has_length(1000),
+                has_length(100),
             ),
-            total=1000,
+            total=100,
         ),
         str(response.item),
     )
@@ -408,7 +408,7 @@ def test_create_range_idempotence(phone_number_range):  # noqa: F811
         assert_that(
             phone_number_resource.item,
             has_entries(
-                number=matches_regexp(r'^\+1800123[01][0-9]{3}$'),
+                number=matches_regexp(r'^\+18001230[01][0-9]{2}$'),
             ),
             str(phone_number_resource),
         )
@@ -419,7 +419,7 @@ def test_create_range_idempotence(phone_number_range):  # noqa: F811
         assert_that(
             phone_number_resource.item,
             has_entries(
-                number=matches_regexp(r'^\+18001230[0-9]{3}$'),
+                number=matches_regexp(r'^\+18001230[01][0-9]{2}$'),
             ),
             str(phone_number_resource),
         )
