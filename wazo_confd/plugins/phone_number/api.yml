@@ -132,7 +132,8 @@ paths:
             $ref: '#/definitions/PhoneNumber'
         '404':
           description: main phone number not found
-          $ref: '#/responses/NotFoundError'
+          schema:
+            $ref: '#/responses/NotFoundError'
     put:
       operationId: set_phone_number_main
       summary: set the 'main' phone number for the tenant
@@ -147,15 +148,15 @@ paths:
           required: true
           schema:
             type: object
+            required:
+              - phone_number_uuid
             properties:
               phone_number_uuid:
                 type: string
                 description: UUID of the phone number to set as main
-                required: true
                 example: b5bcc98c-10cf-4a68-bf3d-802fb5170911
       responses:
         '204':
-          description: main phone number updated successfully
           $ref: '#/responses/ResourceUpdated'
         '400':
           $ref: '#/responses/UpdateError'
