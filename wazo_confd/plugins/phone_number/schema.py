@@ -5,7 +5,7 @@ from marshmallow import ValidationError, fields, validates_schema
 from marshmallow.validate import Length, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink
-from .utils import PhoneNumberRangeSpec
+from .utils import PhoneNumberRangeSpec, PhoneNumberMainSpec
 
 MAX_PHONE_NUMBER_RANGE_SIZE = 10_000
 
@@ -72,6 +72,17 @@ class PhoneNumberRangeSpecSchema(BaseSchema):
             )
 
 
+class PhoneNumberMainSpecSchema(BaseSchema):
+    phone_number_uuid = fields.UUID(required=True)
+
+    def load(self, data, **kwargs) -> PhoneNumberMainSpec:
+        data = super().load(data, **kwargs)
+        return PhoneNumberMainSpec(
+            phone_number_uuid=str(data['phone_number_uuid']),
+        )
+
+
 phone_number_schema = PhoneNumberSchema()
 phone_number_range_spec_schema = PhoneNumberRangeSpecSchema()
 phone_number_list_schema = PhoneNumberListSchema()
+phone_number_main_spec_schema = PhoneNumberMainSpecSchema()

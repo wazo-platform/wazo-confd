@@ -11,6 +11,11 @@ class PhoneNumberRangeSpec:
     end_number: str
 
 
+@dataclass(frozen=True)
+class PhoneNumberMainSpec:
+    phone_number_uuid: str
+
+
 def generate_phone_number_range(start_number: str, end_number: str) -> Iterator[str]:
     _start_number = int(start_number)
     _end_number = int(end_number)
