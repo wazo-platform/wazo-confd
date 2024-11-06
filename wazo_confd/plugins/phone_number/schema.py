@@ -25,7 +25,7 @@ class PhoneNumberSchema(BaseSchema):
     tenant_uuid = fields.String(dump_only=True)
     number = number_field(required=True)
     caller_id_name = fields.String(validate=Length(min=1, max=256), allow_none=True)
-    main = StrictBoolean(default=False)
+    main = StrictBoolean(dump_only=True)
     shared = StrictBoolean(default=False)
     links = ListLink(Link('phone_numbers', field='uuid'))
 
