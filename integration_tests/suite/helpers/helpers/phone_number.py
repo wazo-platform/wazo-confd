@@ -29,7 +29,13 @@ def delete_phone_number(phone_number_uuid, check=False, **parameters):
 
 def add_phone_number(wazo_tenant=None, **parameters):
     response = confd.phone_numbers.post(parameters, wazo_tenant=wazo_tenant)
-    return response.item
+    if parameters.get('main', False):
+        main_response = confd.phone_numbers.main.put(
+            {'phone_number_uuid': response.item['uuid']}, wazo_tenant=wazo_tenant
+        )
+        main_response.assert_updated()
+
+    return confd.phone_numbers(response.item['uuid']).get().item
 
 
 def _random_number(length):
