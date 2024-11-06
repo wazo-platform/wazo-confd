@@ -39,20 +39,36 @@ def test_delete_errors():
     s.check_resource_not_found(fake_phone_number, 'PhoneNumber')
 
 
-@fixtures.phone_number()
-def test_put_errors(phone_number):
+def test_put_not_found():
     fake_phone_number = confd.phone_numbers(FAKE_UUID).put
     s.check_resource_not_found(fake_phone_number, 'PhoneNumber')
 
+
+@fixtures.phone_number()
+def test_put_bogus_fields(phone_number):
     url = confd.phone_numbers(phone_number['uuid']).put
     error_checks(url)
-    unique_error_checks_put(phone_number)
 
 
-def test_post_errors():
+@fixtures.phone_number()
+@fixtures.phone_number(number='+18005551234', main=True)
+def test_put_conflict(phone_number1, phone_number2):
+    phone_number1['number'] = phone_number2['number']
+    response = confd.phone_numbers(phone_number1['uuid']).put(**phone_number1)
+    response.assert_match(400, e.resource_exists(resource='PhoneNumber'))
+
+
+def test_post_bogus_fields():
     url = confd.phone_numbers.post
     error_checks(url)
-    unique_error_checks_post(url)
+
+
+@fixtures.phone_number(number='+18005551234', main=True)
+def test_post_conflict(main_number):
+    url = confd.phone_numbers.post
+
+    response = url(number=main_number['number'])
+    response.assert_match(400, e.resource_exists(resource='PhoneNumber'))
 
 
 def error_checks(url):
@@ -67,37 +83,11 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'caller_id_name', True)
     s.check_bogus_field_returns_error(url, 'caller_id_name', {})
     s.check_bogus_field_returns_error(url, 'caller_id_name', 'a' * 1024)
-    s.check_bogus_field_returns_error(url, 'main', 123)
-    s.check_bogus_field_returns_error(url, 'main', '42')
-    s.check_bogus_field_returns_error(url, 'main', None)
-    s.check_bogus_field_returns_error(url, 'main', [])
-    s.check_bogus_field_returns_error(url, 'main', {})
     s.check_bogus_field_returns_error(url, 'shared', 123)
     s.check_bogus_field_returns_error(url, 'shared', '42')
     s.check_bogus_field_returns_error(url, 'shared', None)
     s.check_bogus_field_returns_error(url, 'shared', [])
     s.check_bogus_field_returns_error(url, 'shared', {})
-
-
-@fixtures.phone_number(number='+18005551234', main=True)
-def unique_error_checks_put(first, second):
-    first['main'] = True
-    response = confd.phone_numbers(first['uuid']).put(**first)
-    response.assert_match(400, e.resource_exists(resource='PhoneNumber'))
-
-    first['main'] = False
-    first['number'] = second['number']
-    response = confd.phone_numbers(first['uuid']).put(**first)
-    response.assert_match(400, e.resource_exists(resource='PhoneNumber'))
-
-
-@fixtures.phone_number(number='+18005551234', main=True)
-def unique_error_checks_post(url, existing):
-    response = url(number='+15551234567', main=True)
-    response.assert_match(400, e.resource_exists(resource='PhoneNumber'))
-
-    response = url(number=existing['number'])
-    response.assert_match(400, e.resource_exists(resource='PhoneNumber'))
 
 
 @fixtures.phone_number(
@@ -205,7 +195,6 @@ def test_create_all_parameters():
     parameters = {
         'number': '+18001235567',
         'caller_id_name': 'Here',
-        'main': True,
         'shared': True,
     }
 
@@ -436,7 +425,6 @@ def test_edit_all_parameters(phone_number):
     parameters = {
         'number': '+18001235567',
         'caller_id_name': 'Here',
-        'main': True,
         'shared': True,
     }
 
