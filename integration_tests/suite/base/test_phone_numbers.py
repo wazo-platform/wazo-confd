@@ -475,6 +475,7 @@ def test_set_main_number(num1, num2):
         has_entries(
             uuid=num1['uuid'],
             main=True,
+            shared=True,
         ),
     )
 
@@ -499,6 +500,7 @@ def test_replace_main_number(num1, num2):
         has_entries(
             uuid=num1['uuid'],
             main=True,
+            shared=True,
         ),
     )
 
@@ -516,6 +518,7 @@ def test_replace_main_number(num1, num2):
         has_entries(
             uuid=num2['uuid'],
             main=True,
+            shared=True,
         ),
     )
 
