@@ -6,7 +6,7 @@ from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.phone_number import dao as phone_number_dao
 from dataclasses import dataclass
 from typing import Literal
-
+import phonenumbers
 
 CallerIDType = Literal['main', 'associated', 'anonymous', 'shared']
 
@@ -19,6 +19,17 @@ class CallerIDAnonymous:
 class CallerID:
     type: CallerIDType
     number: str
+
+
+def same_phone_number(number1: str, number2: str) -> bool:
+    '''
+    compare two strings semantically as phone numbers
+    '''
+    result = phonenumbers.is_number_match(number1, number2)
+    if result == phonenumbers.MatchType.NO_MATCH:
+        return False
+    else:
+        return True
 
 
 class UserCallerIDService:
@@ -40,7 +51,11 @@ class UserCallerIDService:
             CallerID(type='shared', number=callerid.number)
             for callerid in shared_callerids
         )
-        callerids.extend(self.user_dao.list_outgoing_callerid_associated(user_id))
+        callerids.extend(
+            callerid
+            for callerid in self.user_dao.list_outgoing_callerid_associated(user_id)
+            if not any(same_phone_number(callerid.number, c.number) for c in callerids)
+        )
         callerids.append(CallerIDAnonymous)
         return len(callerids), callerids
 
