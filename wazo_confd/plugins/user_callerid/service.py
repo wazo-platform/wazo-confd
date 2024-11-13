@@ -44,16 +44,20 @@ class UserCallerIDService:
             main=True, tenant_uuids=[tenant_uuid]
         ):
             callerids.append(CallerID(type='main', number=main_callerid.number))
+
+        # consider "associated" caller ids from incalls
+        # as having precedence over shared phone numbers
+        callerids.extend(
+            callerid
+            for callerid in self.user_dao.list_outgoing_callerid_associated(user_id)
+            if not any(same_phone_number(callerid.number, c.number) for c in callerids)
+        )
         shared_callerids = self.phone_number_dao.find_all_by(
             shared=True, main=False, tenant_uuids=[tenant_uuid]
         )
         callerids.extend(
             CallerID(type='shared', number=callerid.number)
             for callerid in shared_callerids
-        )
-        callerids.extend(
-            callerid
-            for callerid in self.user_dao.list_outgoing_callerid_associated(user_id)
             if not any(same_phone_number(callerid.number, c.number) for c in callerids)
         )
         callerids.append(CallerIDAnonymous)
