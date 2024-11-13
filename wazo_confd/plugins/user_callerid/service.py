@@ -1,14 +1,14 @@
 # Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import phonenumbers
+from dataclasses import dataclass
+
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.phone_number import dao as phone_number_dao
-from dataclasses import dataclass
-from typing import Literal
-import phonenumbers
 
-CallerIDType = Literal['main', 'associated', 'anonymous', 'shared']
+from .types import CallerIDType
 
 
 class CallerIDAnonymous:
