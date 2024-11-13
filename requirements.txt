@@ -25,3 +25,4 @@ sqlalchemy-utils==0.36.8  # from xivo-dao
 stevedore==4.0.2
 unidecode==1.2.0  # from xivo-dao
 werkzeug==1.0.1
+phonenumbers==8.12.1
