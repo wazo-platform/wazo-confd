@@ -26,10 +26,10 @@ def same_phone_number(number1: str, number2: str) -> bool:
     compare two strings semantically as phone numbers
     '''
     result = phonenumbers.is_number_match(number1, number2)
-    if result == phonenumbers.MatchType.NO_MATCH:
-        return False
-    else:
-        return True
+    return result in (
+        phonenumbers.MatchType.EXACT_MATCH,
+        phonenumbers.MatchType.NSN_MATCH,
+    )
 
 
 class UserCallerIDService:
