@@ -1,5 +1,15 @@
 # Changelog
 
+## 24.16
+
+* A new API endpoint `/1.1/phone-numbers/main` has been added to set & change the 'main' phone number of a tenant:
+
+  * `GET /1.1/phone-numbers/main` to retrieve the current `main` phone number
+  * `PUT /1.1/phone-numbers/main` to set the `main` phone number to another phone number
+
+* `/1.1/users/{uuid}/callerids/outgoing` response schema updated
+  * entries in `items` array may now include objects with `type` value `shared`
+
 ## 24.15
 
 * The `group` feature now has a `max_calls` field.
