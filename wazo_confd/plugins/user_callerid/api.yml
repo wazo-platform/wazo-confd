@@ -27,13 +27,15 @@ definitions:
         description: |
           Caller ID type.
 
-          - `main`: The first incall defined in the tenant, which should correspond to the organisation number.
+          - `main`: The phone number(`/1.1/phone-numbers`) currently flagged as `main`, which should correspond to the organisation number.
           - `associated`: An incall associated to the user
           - `anonymous`: Anonymous caller ID
+          - `shared`: A phone number(`/1.1/phone-numbers`) flagged as `shared`
         enum:
         - main
         - associated
         - anonymous
+        - shared
   UserCallerIDItems:
     title: UserCallerIDItems
     properties:
