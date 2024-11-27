@@ -403,18 +403,19 @@ class TestWizardPost(IntegrationTest):
                     deletable=False,
                     displayname='local',
                     id='default',
-                    parent_ids=[],
+                    parent_id='base',
                     proxy_main=ip_address,
-                    raw_config={'X_key': 'xivo'},
                     registrar_main=ip_address,
                 ),
                 has_entries(
                     X_type='internal',
                     deletable=False,
                     id='autoprov',
-                    parent_ids=['base', 'defaultconfigdevice'],
+                    parent_id='defaultconfigdevice',
                     raw_config=has_entries(
-                        sccp_call_managers={'1': {'ip': ip_address}},
+                        sccp_call_managers=has_entries(
+                            {'1': has_entries(ip=ip_address)}
+                        ),
                         sip_lines=has_entries(
                             '1',
                             has_entries(
@@ -433,19 +434,19 @@ class TestWizardPost(IntegrationTest):
                     X_type='internal',
                     deletable=False,
                     id='base',
-                    parent_ids=[],
-                    raw_config={
-                        'X_xivo_phonebook_ip': ip_address,
-                        'ntp_enabled': True,
-                        'ntp_ip': ip_address,
-                    },
+                    parent_id=None,
+                    raw_config=has_entries(
+                        X_xivo_phonebook_ip=ip_address,
+                        ntp_enabled=True,
+                        ntp_ip=ip_address,
+                    ),
                 ),
                 has_entries(
                     X_type='device',
                     deletable=False,
                     id='defaultconfigdevice',
                     label='Default config device',
-                    parent_ids=[],
+                    parent_id='base',
                     raw_config=has_entries(
                         ntp_enabled=True,
                         ntp_ip=ip_address,

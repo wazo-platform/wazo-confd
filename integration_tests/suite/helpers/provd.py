@@ -21,7 +21,7 @@ class ProvdHelper:
             'deletable': True,
             'displayname': 'local',
             'id': 'default',
-            'parent_ids': [],
+            'parent_id': None,
             'proxy_main': '127.0.0.1',
             'raw_config': {'X_key': 'xivo'},
             'registrar_main': '127.0.0.1',
@@ -29,7 +29,7 @@ class ProvdHelper:
         {
             'X_type': 'internal',
             'id': 'autoprov',
-            'parent_ids': ['base', 'defaultconfigdevice'],
+            'parent_id': 'defaultconfigdevice',
             'raw_config': {
                 'sccp_call_managers': {'1': {'ip': '127.0.0.1'}},
                 'sip_lines': {
@@ -49,7 +49,7 @@ class ProvdHelper:
             'X_type': 'internal',
             'deletable': True,
             'id': 'base',
-            'parent_ids': [],
+            'parent_id': None,
             'raw_config': {
                 'X_xivo_phonebook_ip': '127.0.0.1',
                 'ntp_enabled': True,
@@ -61,14 +61,14 @@ class ProvdHelper:
             'deletable': True,
             'id': 'defaultconfigdevice',
             'label': 'Default config device',
-            'parent_ids': [],
+            'parent_id': 'base',
             'raw_config': {'ntp_enabled': True, 'ntp_ip': '127.0.0.1'},
         },
         {
             'X_type': 'device',
             'deletable': True,
             'id': 'mockdevicetemplate',
-            'parent_ids': ['base'],
+            'parent_id': 'base',
             'raw_config': {},
         },
     ]
@@ -90,7 +90,7 @@ class ProvdHelper:
 
     def reset(self):
         self.clean_devices()
-        self.clean_configs()
+        # self.clean_configs()
         self.add_default_configs()
 
     def clean_devices(self):
@@ -103,14 +103,18 @@ class ProvdHelper:
 
     def add_default_configs(self):
         for config in self.DEFAULT_CONFIGS:
-            self.configs.create(config)
+            try:
+                self.configs.get(config['id'])
+                self.configs.update(config)
+            except ProvdError:
+                self.configs.create(config)
 
     def add_device_template(self):
         config = {
             'X_type': 'device',
             'deletable': True,
             'label': 'black-label',
-            'parent_ids': [],
+            'parent_id': None,
             'raw_config': {},
         }
 
@@ -119,7 +123,7 @@ class ProvdHelper:
     def associate_line_device(self, device_id):
         # line <-> device association is an operation that is currently performed
         # "completely" only by the web-interface -- fake a minimum amount of work here
-        config = {'id': device_id, 'parent_ids': [], 'raw_config': {}}
+        config = {'id': device_id, 'parent_id': None, 'raw_config': {}}
         self.configs.create(config)
 
         device = self.devices.get(device_id)
@@ -139,7 +143,7 @@ class ProvdHelper:
 
     def assert_config_use_device_template(self, config, template_id):
         assert_that(config['configdevice'], equal_to(template_id))
-        assert_that(config['parent_ids'], has_item(template_id))
+        assert_that(config['parent_id'], equal_to(template_id))
 
     def has_synchronized(self, device_id, timestamp=None):
         timestamp = timestamp or datetime.utcnow()

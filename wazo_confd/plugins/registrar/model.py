@@ -7,7 +7,7 @@ class Registrar:
     def from_args(cls, **kwargs):
         baseregistrar = {
             'X_type': 'registrar',
-            'parent_ids': [],
+            'parent_id': 'base',
             'raw_config': {'X_key': 'wazo'},
         }
         registrar = cls(baseregistrar)

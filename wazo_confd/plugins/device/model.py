@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class Device:
     @classmethod
     def from_args(cls, **kwargs):
-        device = cls({}, {'parent_ids': []})
+        device = cls({}, {'parent_id': None})
         for key, value in kwargs.items():
             setattr(device, key, value)
         return device
@@ -134,12 +134,12 @@ class Device:
     @template_id.setter
     def template_id(self, value):
         configdevice = self.config.pop('configdevice', None)
-        if configdevice and configdevice in self.config['parent_ids']:
-            self.config['parent_ids'].remove(configdevice)
+        if configdevice and self.config['parent_id'] == configdevice:
+            self.config['parent_id'] = None
 
         if value:
             self.config['configdevice'] = value
-            self.config['parent_ids'].append(value)
+            self.config['parent_id'] = value
 
     @property
     def tenant_uuid(self):
@@ -154,7 +154,7 @@ class Device:
         return self.device.get('is_new')
 
     def is_autoprov(self):
-        return 'autoprov' in self.config['parent_ids']
+        return 'autoprov' in self.config['parent_id']
 
     def update_config(self, config):
         self.device['config'] = config['id']

@@ -208,7 +208,7 @@ def assert_provd_config(user, line, provd_config):
             id=is_not(starts_with('autoprov')),
             configdevice='defaultconfigdevice',
             deletable=True,
-            parent_ids=has_items('base', 'defaultconfigdevice'),
+            parent_id=equal_to('defaultconfigdevice'),
             raw_config=has_entries(
                 X_key='',
                 config_version=1,
