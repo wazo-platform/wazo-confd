@@ -6,7 +6,7 @@ import pycountry
 from marshmallow import validates
 from marshmallow.validate import Length
 from marshmallow.exceptions import ValidationError
-from xivo.mallow import fields
+from wazo.mallow import fields
 
 from wazo_confd.helpers.mallow import BaseSchema
 

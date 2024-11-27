@@ -9,8 +9,8 @@ from uuid import uuid4
 
 from flask import url_for, request
 
-from xivo.xivo_helpers import clean_extension
-from xivo.tenant_flask_helpers import user
+from wazo.xivo_helpers import clean_extension
+from wazo.tenant_flask_helpers import user
 
 from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP

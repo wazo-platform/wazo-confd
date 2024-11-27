@@ -1,12 +1,12 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
 import logging
 
-from xivo import xivo_logging
-from xivo.chain_map import ChainMap
-from xivo.config_helper import read_config_file_hierarchy
+from wazo import xivo_logging
+from wazo.chain_map import ChainMap
+from wazo.config_helper import read_config_file_hierarchy
 from xivo_dao import init_db_from_config
 from xivo_dao.alchemy.tenant import Tenant
 from xivo_dao.helpers.db_utils import session_scope

@@ -6,9 +6,9 @@ from flask_restful import Resource
 
 import marshmallow
 
-from xivo.flask.auth_verifier import AuthVerifierFlask
-from xivo.mallow import fields, validate
-from xivo.tenant_flask_helpers import Tenant, token
+from wazo.flask.auth_verifier import AuthVerifierFlask
+from wazo.mallow import fields, validate
+from wazo.tenant_flask_helpers import Tenant, token
 from xivo_dao import tenant_dao
 
 from wazo_confd.helpers.common import handle_api_exception

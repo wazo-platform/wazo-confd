@@ -1,4 +1,4 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -7,7 +7,7 @@ from base64 import b64encode
 from marshmallow import fields
 from marshmallow.validate import Length
 
-from xivo.rest_api_helpers import APIException
+from wazo.rest_api_helpers import APIException
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 

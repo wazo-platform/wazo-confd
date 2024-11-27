@@ -4,9 +4,9 @@
 import argparse
 import yaml
 
-from xivo.chain_map import ChainMap
-from xivo.config_helper import parse_config_file, read_config_file_hierarchy
-from xivo.xivo_logging import get_log_level_by_name
+from wazo.chain_map import ChainMap
+from wazo.config_helper import parse_config_file, read_config_file_hierarchy
+from wazo.xivo_logging import get_log_level_by_name
 
 API_VERSION = '1.1'
 WIZARD_KEY_FILE = '/var/lib/wazo-auth-keys/wazo-wizard-key.yml'
