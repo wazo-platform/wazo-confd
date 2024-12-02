@@ -99,11 +99,13 @@ paths:
     put:
       operationId: update_sounds_files
       summary: Add or update audio file
-      description: '**Required ACL:** `confd.sounds.{sound_category}.files.{sound_filename}.update`'
+      description: '**Required ACL:** `confd.sounds.{sound_category}.files.{sound_filename}.update`
+
+      Accepted audio file format: .wav - 8KHz, 16 bits, mono'
       tags:
       - sounds
       consumes:
-      - application/octet-stream
+      - audio/wav
       parameters:
       - $ref: '#/parameters/tenantuuid'
       - $ref: '#/parameters/sound_category'
