@@ -147,6 +147,26 @@ def test_sorting_offset_limit(incall1, incall2):
     s.check_limit(url, incall1, incall2, 'description', 'sort')
 
 
+@fixtures.incall(id=0)
+@fixtures.user(id=0)
+@fixtures.incall(id=1)
+@fixtures.user(id=1)
+def test_list_by_user_id(incall, user1, *_):
+    with a.incall_user(incall, user1):
+        response = confd.incalls().get()
+        assert_that(response.total, 2)
+
+        response = confd.incalls().get(user_id=user1['id'])
+        assert_that(response.total, 1)
+        assert_that(
+            response.items[0],
+            has_entry(
+                'destination',
+                has_entry('user_id', user1['id']),
+            ),
+        )
+
+
 @fixtures.incall()
 def test_get(incall):
     response = confd.incalls(incall['id']).get()
