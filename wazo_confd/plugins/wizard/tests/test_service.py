@@ -117,6 +117,24 @@ class TestWizardService(unittest.TestCase):
         mopen.assert_called_once_with('/etc/resolv.conf', 'r')
         assert_that(result, equal_to(expected_result))
 
+    def test_get_nameservers_with_tabs(self):
+        resolv_conf = dedent(
+            '''
+            search\texample.com
+            nameserver\t192.168.2.0
+            nameserver\t192.168.2.1'''
+        )
+        expected_result = ['192.168.2.0', '192.168.2.1']
+        with patch(
+            'wazo_confd.plugins.wizard.service.open',
+            mock_open(read_data=resolv_conf),
+            create=True,
+        ) as mopen:
+            result = self.service.get_nameservers()
+
+        mopen.assert_called_once_with('/etc/resolv.conf', 'r')
+        assert_that(result, equal_to(expected_result))
+
     @patch('wazo_confd.plugins.wizard.service.open', create=True)
     def test_get_nameservers_return_none_if_no_file(self, mopen):
         mopen.side_effect = IOError()
