@@ -18,7 +18,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 USERNAME_VALUES = '2346789bcdfghjkmnpqrtvwxyzBCDFGHJKLMNPQRTVWXYZ'
-NAMESERVER_REGEX = r'^nameserver (\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+NAMESERVER_REGEX = r'^nameserver\s(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
 DEFAULT_ROOT_POLICY = 'wazo_default_master_user_policy'
 ASTERISK_AUTOPROV_CONFIG_FILENAME = '/etc/asterisk/pjsip.d/05-autoprov-wizard.conf'
 ASTERISK_AUTOPROV_CONFIG_TPL = '''\
