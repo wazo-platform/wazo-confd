@@ -54,6 +54,12 @@ parameters:
     name: agent_id
     in: path
     description: Agent’s ID
+  userid:
+    required: false
+    type: integer
+    name: user_id
+    in: query
+    description: the user's ID
   useruuid:
     required: true
     type: string
