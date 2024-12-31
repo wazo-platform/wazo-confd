@@ -13,7 +13,9 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 
 class AgentSkillSchema(BaseSchema):
-    skill_weight = fields.Integer(validate=Range(min=0), missing=0, attribute='weight')
+    skill_weight = fields.Integer(
+        validate=Range(min=0), load_default=0, attribute='weight'
+    )
 
 
 class AgentSkillItem(ConfdResource):

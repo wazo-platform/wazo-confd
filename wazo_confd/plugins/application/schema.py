@@ -12,9 +12,9 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 class NodeApplicationDestinationOptionsSchema(BaseSchema):
     type = fields.String(attribute='type_', validate=OneOf(['holding']), required=True)
     music_on_hold = fields.String(
-        validate=Length(max=128), allow_none=True, missing=None
+        validate=Length(max=128), allow_none=True, load_default=None
     )
-    answer = fields.Boolean(missing=False)
+    answer = fields.Boolean(load_default=False)
 
 
 class ApplicationDestinationOptionsField(fields.Field):
@@ -44,9 +44,9 @@ class ApplicationSchema(BaseSchema):
     destination = fields.String(
         validate=OneOf(ApplicationDestinationOptionsField._options.keys()),
         allow_none=True,
-        default=None,
+        dump_default=None,
     )
-    destination_options = ApplicationDestinationOptionsField(default={})
+    destination_options = ApplicationDestinationOptionsField(dump_default={})
     links = ListLink(Link('applications', field='uuid', target='application_uuid'))
 
     lines = Nested(

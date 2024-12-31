@@ -10,7 +10,7 @@ from wazo_confd.helpers.destination import DestinationField
 
 class CallFilterFallbackSchema(BaseSchema):
     noanswer_destination = DestinationField(
-        attribute='noanswer', default=None, allow_none=True
+        attribute='noanswer', dump_default=None, allow_none=True
     )
 
     @post_load

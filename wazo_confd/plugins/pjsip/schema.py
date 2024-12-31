@@ -7,7 +7,7 @@ from wazo_confd.helpers.mallow import BaseSchema, PJSIPSection, PJSIPSectionOpti
 
 
 class PJSIPTransportDeleteRequestSchema(BaseSchema):
-    fallback = fields.UUID(missing=None)
+    fallback = fields.UUID(load_default=None)
 
 
 class PJSIPTransportSchema(BaseSchema):
@@ -16,5 +16,5 @@ class PJSIPTransportSchema(BaseSchema):
     options = fields.List(
         PJSIPSectionOption(),
         validate=Length(max=128),
-        missing=[],
+        load_default=[],
     )

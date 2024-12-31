@@ -8,7 +8,7 @@ from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink
 
 class RegistrarSchema(BaseSchema):
     id = fields.String()
-    deletable = fields.Boolean(missing=True, default=True)
+    deletable = fields.Boolean(load_default=True, dump_default=True)
     name = fields.String(allow_none=True)
     main_host = fields.String(required=True)
     main_port = fields.Integer(allow_none=True)

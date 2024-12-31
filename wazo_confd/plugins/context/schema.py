@@ -48,7 +48,7 @@ class ContextSchema(BaseSchema):
     label = fields.String(validate=Length(min=1, max=128), required=True)
     type = fields.String(
         validate=OneOf(['internal', 'incall', 'outcall', 'services', 'others']),
-        missing='internal',
+        load_default='internal',
     )
     user_ranges = Nested(RangeSchema, many=True)
     group_ranges = Nested(RangeSchema, many=True)

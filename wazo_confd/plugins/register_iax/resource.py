@@ -43,7 +43,7 @@ class RegisterIAXSchema(BaseSchema):
         validate=Regexp(INVALID_CALLBACK_EXTENSION), allow_none=True
     )
     callback_context = fields.String(allow_none=True)
-    enabled = StrictBoolean(missing=True)
+    enabled = StrictBoolean(load_default=True)
     links = ListLink(Link('register_iax'))
 
     trunk = Nested('TrunkSchema', only=['id', 'links'], dump_only=True)

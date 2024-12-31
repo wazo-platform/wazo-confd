@@ -16,4 +16,4 @@ class IngressHTTPSchema(BaseSchema):
 
 
 class IngressViewSchema(BaseSchema):
-    view = fields.String(validate=OneOf(['fallback', 'default']), missing=None)
+    view = fields.String(validate=OneOf(['fallback', 'default']), load_default=None)

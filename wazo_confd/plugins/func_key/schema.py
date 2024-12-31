@@ -35,7 +35,7 @@ class BaseDestinationSchema(Schema):
         required=True,
     )
 
-    href = fields.String(default=None, allow_none=True, dump_only=True)
+    href = fields.String(dump_default=None, allow_none=True, dump_only=True)
 
     @validates('type')
     def exclude_destination(self, data):
@@ -216,7 +216,7 @@ class BSFilterDestinationSchema(BaseDestinationSchema):
         '_BSFilterMemberDestinationSchema',
         attribute='filtermember',
         dump_only=True,
-        missing={},
+        load_default={},
     )
 
     @post_dump

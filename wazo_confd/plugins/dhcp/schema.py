@@ -13,7 +13,7 @@ class DHCPSchema(BaseSchema):
     active = fields.Boolean(required=True)
     pool_start = fields.String()
     pool_end = fields.String()
-    network_interfaces = fields.List(fields.String(), missing=list)
+    network_interfaces = fields.List(fields.String(), load_default=list)
 
     @validates_schema
     def check_pool_if_active(self, data, **kwargs):

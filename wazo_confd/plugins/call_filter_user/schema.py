@@ -9,7 +9,7 @@ from wazo_confd.helpers.mallow import BaseSchema, Nested
 
 class CallFilterRecipientUserSchema(BaseSchema):
     uuid = fields.String(required=True)
-    timeout = fields.Integer(validate=Range(min=0), allow_none=True, missing=None)
+    timeout = fields.Integer(validate=Range(min=0), allow_none=True, load_default=None)
 
     @post_load
     def add_envelope(self, data, **kwargs):

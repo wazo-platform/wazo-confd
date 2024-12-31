@@ -13,12 +13,12 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 
 class QueueMemberAgentSchema(BaseSchema):
-    penalty = fields.Integer(validate=Range(min=0), missing=0)
-    priority = fields.Integer(validate=Range(min=0), missing=0)
+    penalty = fields.Integer(validate=Range(min=0), load_default=0)
+    priority = fields.Integer(validate=Range(min=0), load_default=0)
 
 
 class QueueMemberUserSchema(BaseSchema):
-    priority = fields.Integer(validate=Range(min=0), missing=0)
+    priority = fields.Integer(validate=Range(min=0), load_default=0)
 
 
 class QueueMemberAgentItem(ConfdResource):

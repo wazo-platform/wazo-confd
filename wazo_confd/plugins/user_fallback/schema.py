@@ -10,14 +10,16 @@ from wazo_confd.helpers.destination import DestinationField
 
 class UserFallbackSchema(BaseSchema):
     noanswer_destination = DestinationField(
-        attribute='noanswer', default=None, allow_none=True
+        attribute='noanswer', dump_default=None, allow_none=True
     )
-    busy_destination = DestinationField(attribute='busy', default=None, allow_none=True)
+    busy_destination = DestinationField(
+        attribute='busy', dump_default=None, allow_none=True
+    )
     congestion_destination = DestinationField(
-        attribute='congestion', default=None, allow_none=True
+        attribute='congestion', dump_default=None, allow_none=True
     )
     fail_destination = DestinationField(
-        attribute='chanunavail', default=None, allow_none=True
+        attribute='chanunavail', dump_default=None, allow_none=True
     )
 
     @post_load
