@@ -31,15 +31,15 @@ CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
 class WazoAuthUserSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     username = fields.String(
-        validate=Length(min=1, max=256), missing=None, allow_none=True
+        validate=Length(min=1, max=256), load_default=None, allow_none=True
     )
     password = fields.String(validate=Length(min=1), allow_none=True)
-    firstname = fields.String(missing=None, allow_none=True)
-    lastname = fields.String(missing=None, allow_none=True)
+    firstname = fields.String(load_default=None, allow_none=True)
+    lastname = fields.String(load_default=None, allow_none=True)
     purpose = fields.String(
-        missing='user', validate=OneOf(['user', 'internal', 'external_api'])
+        load_default='user', validate=OneOf(['user', 'internal', 'external_api'])
     )
-    enabled = fields.Boolean(missing=True)
+    enabled = fields.Boolean(load_default=True)
     email_address = fields.Email(allow_none=True)
 
 
@@ -208,8 +208,8 @@ class UserSchema(BaseSchema):
 class UserDirectorySchema(BaseSchema):
     id = fields.Integer()
     uuid = fields.String()
-    line_id = fields.Integer(default=None)
-    agent_id = fields.String(default=None)
+    line_id = fields.Integer(dump_default=None)
+    agent_id = fields.String(dump_default=None)
     firstname = fields.String()
     lastname = fields.String()
     email = fields.String()
@@ -336,8 +336,8 @@ class UserSwitchboardSchema(BaseSchema):
 
 class UserAgentQueueSchema(BaseSchema):
     id = fields.Integer()
-    penalty = fields.Integer(validate=Range(min=0), missing=0)
-    priority = fields.Integer(validate=Range(min=0), missing=0)
+    penalty = fields.Integer(validate=Range(min=0), load_default=0)
+    priority = fields.Integer(validate=Range(min=0), load_default=0)
 
 
 class UserAgentSchema(AgentSchema):

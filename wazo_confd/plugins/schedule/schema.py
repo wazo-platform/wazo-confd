@@ -17,11 +17,11 @@ class ScheduleOpenPeriod(BaseSchema):
     hours_start = fields.String(validate=Regexp(HOUR_REGEX), required=True)
     hours_end = fields.String(validate=Regexp(HOUR_REGEX), required=True)
     week_days = fields.List(
-        fields.Integer(validate=Range(min=1, max=7)), missing=[1, 2, 3, 4, 5, 6, 7]
+        fields.Integer(validate=Range(min=1, max=7)), load_default=[1, 2, 3, 4, 5, 6, 7]
     )
     month_days = fields.List(
         fields.Integer(validate=Range(min=1, max=31)),
-        missing=[
+        load_default=[
             1,
             2,
             3,
@@ -58,7 +58,7 @@ class ScheduleOpenPeriod(BaseSchema):
     months = fields.List(
         fields.Integer(validate=Range(min=1, max=12)),
         attribute='months_list',
-        missing=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        load_default=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     )
 
     @validates_schema

@@ -9,7 +9,7 @@ from wazo_confd.helpers.restful import ListSchema as BaseListSchema
 
 class ListSchema(BaseListSchema):
     availability = fields.String(
-        missing='available', validate=OneOf(['available', 'all'])
+        load_default='available', validate=OneOf(['available', 'all'])
     )
 
 

@@ -16,7 +16,7 @@ from wazo_confd.helpers.restful import ConfdResource
 class VoicemailZoneMessagesOption(BaseSchema):
     name = fields.String(required=True, validate=(Length(max=128)))
     timezone = fields.String(required=True)
-    message = fields.String(allow_none=True, missing=None)
+    message = fields.String(allow_none=True, load_default=None)
 
     @post_load
     def convert_to_sqlalchemy(self, data, **kwargs):

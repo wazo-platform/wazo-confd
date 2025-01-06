@@ -23,21 +23,21 @@ class _RewriteRule(BaseSchema):
 
 class EmailConfigSchema(BaseSchema):
     domain_name = fields.String(
-        attribute='mydomain', validate=Length(max=255), missing=''
+        attribute='mydomain', validate=Length(max=255), load_default=''
     )
     from_ = fields.String(
-        attribute='origin', data_key='from', validate=Length(max=255), missing=''
+        attribute='origin', data_key='from', validate=Length(max=255), load_default=''
     )
     address_rewriting_rules = fields.List(
-        Nested(_RewriteRule, missing=None),
+        Nested(_RewriteRule, load_default=None),
         attribute='canonical_lines',
-        missing=[],
+        load_default=[],
     )
     smtp_host = fields.String(
-        attribute='relayhost', validate=Length(max=255), missing=''
+        attribute='relayhost', validate=Length(max=255), load_default=''
     )
     fallback_smtp_host = fields.String(
-        attribute='fallback_relayhost', validate=Length(max=255), missing=''
+        attribute='fallback_relayhost', validate=Length(max=255), load_default=''
     )
 
     @pre_dump

@@ -38,13 +38,13 @@ class WizardNetworkSchema(BaseSchema):
 
 
 class WizardStepsSchema(BaseSchema):
-    database = fields.Boolean(missing=True)
-    manage_services = fields.Boolean(missing=True)
-    manage_hosts_file = fields.Boolean(missing=True)
-    manage_resolv_file = fields.Boolean(missing=True)
-    commonconf = fields.Boolean(missing=True)
-    provisioning = fields.Boolean(missing=True)
-    admin = fields.Boolean(missing=True)
+    database = fields.Boolean(load_default=True)
+    manage_services = fields.Boolean(load_default=True)
+    manage_hosts_file = fields.Boolean(load_default=True)
+    manage_resolv_file = fields.Boolean(load_default=True)
+    commonconf = fields.Boolean(load_default=True)
+    provisioning = fields.Boolean(load_default=True)
+    admin = fields.Boolean(load_default=True)
 
 
 class WizardSchema(BaseSchema):
@@ -52,10 +52,10 @@ class WizardSchema(BaseSchema):
     admin_username = fields.Constant(constant='root', dump_only=True)
     admin_password = fields.String(validate=Regexp(ADMIN_PASSWORD_REGEX), required=True)
     license = StrictBoolean(validate=Equal(True), required=True)
-    language = fields.String(validate=OneOf(['en_US', 'fr_FR']), missing='en_US')
+    language = fields.String(validate=OneOf(['en_US', 'fr_FR']), load_default='en_US')
     timezone = fields.String(validate=Length(max=128), required=True)
     network = Nested(WizardNetworkSchema, required=True)
-    steps = Nested(WizardStepsSchema, missing=WizardStepsSchema().load({}))
+    steps = Nested(WizardStepsSchema, load_default=WizardStepsSchema().load({}))
 
 
 class ConfiguredSchema(BaseSchema):

@@ -28,7 +28,7 @@ class OptionsField(fields.List):
 
 
 class GETQueryStringSchema(BaseSchema):
-    view = fields.String(validate=OneOf(['merged']), missing=None)
+    view = fields.String(validate=OneOf(['merged']), load_default=None)
 
 
 class EndpointSIPRelationSchema(BaseSchema):
@@ -66,7 +66,7 @@ class _BaseSIPSchema(BaseSchema):
     registration_outbound_auth_section_options = OptionsField()
     outbound_auth_section_options = OptionsField()
 
-    templates = fields.List(Nested('EndpointSIPRelationSchema'), missing=[])
+    templates = fields.List(Nested('EndpointSIPRelationSchema'), load_default=[])
     transport = Nested('TransportRelationSchema', allow_none=True)
     asterisk_id = fields.String(validate=Length(max=1024), allow_none=True)
 

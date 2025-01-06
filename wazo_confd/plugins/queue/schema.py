@@ -18,7 +18,7 @@ class QueueSchema(BaseSchema):
         validate=(Regexp(NAME_REGEX), NoneOf(['general']), Length(max=128)),
         required=True,
     )
-    label = fields.String(validate=Length(max=128), missing=None)
+    label = fields.String(validate=Length(max=128), load_default=None)
     data_quality = StrictBoolean(attribute='data_quality_bool')
     dtmf_hangup_callee_enabled = StrictBoolean()
     dtmf_hangup_caller_enabled = StrictBoolean()

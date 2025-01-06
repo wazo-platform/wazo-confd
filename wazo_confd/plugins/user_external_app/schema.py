@@ -8,7 +8,7 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 
 class GETQueryStringSchema(BaseSchema):
-    view = fields.String(validate=OneOf(['fallback']), missing=None)
+    view = fields.String(validate=OneOf(['fallback']), load_default=None)
 
 
 class UserExternalAppSchema(BaseSchema):

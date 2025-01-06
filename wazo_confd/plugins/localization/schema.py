@@ -12,7 +12,9 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 
 class LocalizationSchema(BaseSchema):
-    country = fields.String(allow_none=True, default=None, validate=Length(equal=2))
+    country = fields.String(
+        allow_none=True, dump_default=None, validate=Length(equal=2)
+    )
 
     @validates('country')
     def _validate_country(self, country, **kwargs):

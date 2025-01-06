@@ -12,7 +12,7 @@ class TrunkSchema(BaseSchema):
     context = fields.String(allow_none=True)
     twilio_incoming = StrictBoolean(allow_none=True)
     outgoing_caller_id_format = fields.String(
-        missing='+E164', validate=OneOf(['+E164', 'E164', 'national'])
+        load_default='+E164', validate=OneOf(['+E164', 'E164', 'national'])
     )
     links = ListLink(Link('trunks'))
 
