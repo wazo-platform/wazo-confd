@@ -19,7 +19,7 @@ paths:
     delete:
       operationId: dissociate_group_callpermission
       summary: Dissociate group and call permission
-      description: '**Required ACL:** `confd.groups.{group_id}.callpermissions.{call_permission_id}.delete`'
+      description: '**Required ACL:** `confd.groups.{group_uuid}.callpermissions.{call_permission_id}.delete`'
       tags:
       - groups
       - callpermissions

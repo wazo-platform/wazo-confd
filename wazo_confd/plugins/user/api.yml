@@ -168,7 +168,7 @@ paths:
     get:
       operationId: get_user_forward
       summary: Get forward for a user
-      description: '**Required ACL:** `confd.users.{user_id}.forward.{forward_name}.read`'
+      description: '**Required ACL:** `confd.users.{user_id}.forwards.{forward_name}.read`'
       tags:
       - forwards
       - users
