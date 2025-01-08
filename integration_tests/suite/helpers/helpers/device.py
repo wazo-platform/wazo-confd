@@ -66,7 +66,7 @@ def generate_autoprov():
     config = {
         'id': autoprov_id,
         'transient': True,
-        'parent_ids': ['autoprov'],
+        'parent_id': 'autoprov',
         'raw_config': {'sip_lines': {'1': {'username': sip_username}}},
     }
 

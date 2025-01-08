@@ -136,7 +136,7 @@ class IntegrationTest(AssetLaunchingTestCase):
     @classmethod
     def setup_database(cls):
         helper = cls.create_database()
-        helper.recreate()
+        helper.create_template_db()
         return helper
 
     @classmethod

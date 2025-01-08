@@ -10,14 +10,16 @@ services:
       - 9497
 
   provd:
-    image: wazoplatform/wazo-provd
+    image: wazo-provd-tests
     ports:
       - "8666"
     volumes:
+      - "${LOCAL_GIT_REPOS}/wazo-provd:/usr/src/wazo-provd/"
       - "./etc/wazo-provd/config.yml:/etc/wazo-provd/config.yml"
       - "./keys/wazo-provd-key.yml:/var/lib/wazo-auth-keys/wazo-provd-key.yml"
       - "./provd/null:/var/lib/wazo-provd/plugins/null"
       - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
+    command: "bash -c 'wazo-provd-upgrade-db && twistd --nodaemon --no_save --pidfile= wazo-provd --stderr --verbose'"
 
   postgres:
     image: wazoplatform/wazo-confd-db-test:local
