@@ -25,7 +25,7 @@ paths:
                   $ref: '#/definitions/Switchboard'
     post:
       summary: Create a switchboard
-      description: '**Required ACL:** `confd.switchboard.create`'
+      description: '**Required ACL:** `confd.switchboards.create`'
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - name: body
@@ -81,7 +81,7 @@ paths:
           $ref: '#/responses/NotFoundError'
     delete:
       summary: Delete a switchboard
-      description: '**Required ACL:** `confd.switchboard.{switchboard_uuid}.delete`'
+      description: '**Required ACL:** `confd.switchboards.{switchboard_uuid}.delete`'
       tags:
         - switchboards
       parameters:
