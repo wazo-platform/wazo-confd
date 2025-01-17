@@ -22,7 +22,7 @@ def reset(db):
 
 
 class DbHelper:
-    TEMPLATE = "xivotemplate"
+    TEMPLATE = "wazotemplate"
 
     @classmethod
     def build(cls, user, password, host, port, db):
