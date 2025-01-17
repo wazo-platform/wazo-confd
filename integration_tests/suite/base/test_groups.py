@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -80,6 +80,10 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'caller_id_name', s.random_string(81))
     s.check_bogus_field_returns_error(url, 'caller_id_name', [])
     s.check_bogus_field_returns_error(url, 'caller_id_name', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', [])
     s.check_bogus_field_returns_error(url, 'music_on_hold', 123)
     s.check_bogus_field_returns_error(url, 'music_on_hold', s.random_string(129))
     s.check_bogus_field_returns_error(url, 'music_on_hold', [])
@@ -186,6 +190,7 @@ def test_get(group):
             label=group['label'],
             caller_id_mode=group['caller_id_mode'],
             caller_id_name=group['caller_id_name'],
+            dtmf_record_toggle=group['dtmf_record_toggle'],
             timeout=group['timeout'],
             music_on_hold=group['music_on_hold'],
             preprocess_subroutine=group['preprocess_subroutine'],
@@ -213,6 +218,7 @@ def test_get(group):
             label=group['label'],
             caller_id_mode=group['caller_id_mode'],
             caller_id_name=group['caller_id_name'],
+            dtmf_record_toggle=group['dtmf_record_toggle'],
             timeout=group['timeout'],
             music_on_hold=group['music_on_hold'],
             preprocess_subroutine=group['preprocess_subroutine'],
@@ -300,6 +306,7 @@ def test_create_all_parameters():
         'label': 'MyGroup',
         'caller_id_mode': 'prepend',
         'caller_id_name': 'GROUP-',
+        'dtmf_record_toggle': False,
         'timeout': 42,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutien',
@@ -363,6 +370,7 @@ def test_edit_all_parameters(group):
         'label': 'MyGroup',
         'caller_id_mode': 'prepend',
         'caller_id_name': 'GROUP-',
+        'dtmf_record_toggle': False,
         'timeout': 42,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutien',
@@ -388,6 +396,7 @@ def test_edit_all_parameters(group):
         'label': 'MyGroup2',
         'caller_id_mode': 'prepend',
         'caller_id_name': 'GROUP2-',
+        'dtmf_record_toggle': True,
         'timeout': 43,
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutien2',

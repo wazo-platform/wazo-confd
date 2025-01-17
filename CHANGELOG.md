@@ -1,5 +1,10 @@
 # Changelog
 
+## 25.02
+
+* The `queues` resource now has a `dtmf_record_toggle` field.
+* The `groups` resource now has a `dtmf_record_toggle` field.
+
 ## 24.16
 
 * A new API endpoint `/1.1/phone-numbers/main` has been added to set & change the 'main' phone number of a tenant:

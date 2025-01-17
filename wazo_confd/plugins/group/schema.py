@@ -1,4 +1,4 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -41,6 +41,7 @@ class GroupSchema(BaseSchema):
         validate=OneOf(['prepend', 'overwrite', 'append']), allow_none=True
     )
     caller_id_name = fields.String(validate=Length(max=80), allow_none=True)
+    dtmf_record_toggle = StrictBoolean()
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     user_timeout = fields.Integer(validate=Range(min=0), allow_none=True)
     retry_delay = fields.Integer(validate=Range(min=0), allow_none=True)
