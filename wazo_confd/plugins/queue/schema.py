@@ -1,4 +1,4 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, post_dump
@@ -26,6 +26,7 @@ class QueueSchema(BaseSchema):
     dtmf_transfer_caller_enabled = StrictBoolean()
     dtmf_record_callee_enabled = StrictBoolean()
     dtmf_record_caller_enabled = StrictBoolean()
+    dtmf_record_toggle = StrictBoolean()
     retry_on_timeout = StrictBoolean()
     ring_on_hold = StrictBoolean()
     timeout = fields.Integer(validate=Range(min=0), allow_none=True)

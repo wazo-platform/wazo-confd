@@ -81,6 +81,7 @@ class DefaultSIPTemplateService:
                 ['allow_subscribe', 'yes'],
                 ['allow', '!all,ulaw'],
                 ['set_var', 'TIMEOUT(absolute)=36000'],
+                ['set_var', 'DYNAMIC_FEATURES=togglerecord'],
                 ['notify_early_inuse_ringing', 'yes'],
             ],
             'registration_section_options': [],
