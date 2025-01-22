@@ -142,6 +142,10 @@ def error_checks(url, user):
     s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', 123)
     s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', {})
     s.check_bogus_field_returns_error(url, 'dtmf_record_caller_enabled', [])
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', 'yeah')
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', 123)
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', {})
+    s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', [])
     s.check_bogus_field_returns_error(url, 'retry_on_timeout', 'yeah')
     s.check_bogus_field_returns_error(url, 'retry_on_timeout', 123)
     s.check_bogus_field_returns_error(url, 'retry_on_timeout', {})
@@ -338,6 +342,7 @@ def test_get(queue):
             dtmf_transfer_caller_enabled=queue['dtmf_transfer_caller_enabled'],
             dtmf_record_callee_enabled=queue['dtmf_record_callee_enabled'],
             dtmf_record_caller_enabled=queue['dtmf_record_caller_enabled'],
+            dtmf_record_toggle=queue['dtmf_record_toggle'],
             retry_on_timeout=queue['retry_on_timeout'],
             ring_on_hold=queue['ring_on_hold'],
             announce_hold_time_on_entry=queue['announce_hold_time_on_entry'],
@@ -391,6 +396,7 @@ def test_create_all_parameters():
         'dtmf_transfer_caller_enabled': True,
         'dtmf_record_callee_enabled': True,
         'dtmf_record_caller_enabled': True,
+        'dtmf_record_toggle': True,
         'retry_on_timeout': False,
         'ring_on_hold': True,
         'announce_hold_time_on_entry': True,
@@ -508,6 +514,7 @@ def test_edit_all_parameters(queue):
         'dtmf_transfer_caller_enabled': True,
         'dtmf_record_callee_enabled': True,
         'dtmf_record_caller_enabled': True,
+        'dtmf_record_toggle': True,
         'retry_on_timeout': False,
         'ring_on_hold': True,
         'announce_hold_time_on_entry': True,
