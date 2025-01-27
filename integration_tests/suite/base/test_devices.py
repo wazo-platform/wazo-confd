@@ -120,15 +120,16 @@ def test_search(device, hidden):
     }
 
     for field, term in searches.items():
-        check_search(url, device, hidden, field, term)
+        check_search(url, device, hidden, field, term, '')
+        check_search(url, device, hidden, field, term, 'autoprov')
 
 
-def check_search(url, device, hidden, field, term):
+def check_search(url, device, hidden, field, term, autoprov):
     response = url.get(search=term)
     assert_that(response.items, has_item(has_entry(field, device[field])))
     assert_that(response.items, is_not(has_item(has_entry(field, hidden[field]))))
 
-    response = url.get(**{field: device[field]})
+    response = url.get(search=autoprov, **{field: device[field]})
     assert_that(response.items, has_item(has_entry('id', device['id'])))
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
