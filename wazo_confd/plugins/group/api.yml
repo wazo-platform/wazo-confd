@@ -159,6 +159,10 @@ definitions:
           type: boolean
           default: false
           description: Mark all calls as "answered elsewhere" when cancelled
+        dtmf_record_toggle:
+          type: boolean
+          default: false
+          description: Enable/Disable DTMF recording for members of this group receiving a call from this group
         enabled:
           type: boolean
           default: true
