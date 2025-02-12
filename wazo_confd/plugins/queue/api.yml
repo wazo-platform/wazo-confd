@@ -135,6 +135,10 @@ definitions:
           type: boolean
           default: false
           description: Enable DTMF records by caller
+        dtmf_record_toggle:
+          type: boolean
+          default: false
+          description: Enable/Disable DTMF recording for members of this queue receiving a call from this queue
         retry_on_timeout:
           type: boolean
           default: true
