@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
@@ -412,7 +412,9 @@ def test_edit_extension_then_funckeys_updated(
         es.enter_context(a.line_extension(line_sip3, extension3))
         es.enter_context(a.user_line(user3, line_sip3))
 
-        device2_updated_count = provd.updated_count(device2['id'], timestamp)
+        device2_updated_count = provd.updated_count(
+            BaseIntegrationTest, device2['id'], timestamp
+        )
 
         destination = {'type': 'user', 'user_id': user3['id']}
         confd.users(user1['id']).funckeys(1).put(
@@ -424,7 +426,7 @@ def test_edit_extension_then_funckeys_updated(
         config = provd.configs.get(device1['id'])
         assert_that(config['raw_config']['funckeys']['1']['value'], equal_to('1033'))
         assert_that(
-            provd.updated_count(device2['id'], timestamp),
+            provd.updated_count(BaseIntegrationTest, device2['id'], timestamp),
             equal_to(device2_updated_count),
         )
 
@@ -451,14 +453,17 @@ def test_edit_extension_with_no_change_device_not_updated(
             destination=destination
         ).assert_updated()
 
-        device_updated_count = provd.updated_count(device['id'], timestamp)
+        device_updated_count = provd.updated_count(
+            BaseIntegrationTest, device['id'], timestamp
+        )
 
         confd.extensions(extension2['id']).put(
             exten=extension2['exten']
         ).assert_updated()
 
         assert_that(
-            provd.updated_count(device['id'], timestamp), equal_to(device_updated_count)
+            provd.updated_count(BaseIntegrationTest, device['id'], timestamp),
+            equal_to(device_updated_count),
         )
 
 
