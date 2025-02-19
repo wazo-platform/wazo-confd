@@ -1,7 +1,5 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-import docker
 
 from datetime import datetime
 
@@ -13,8 +11,6 @@ from .config import TOKEN
 
 
 class ProvdHelper:
-    DOCKER_PROVD_IMAGE = "wazoplatform/wazo-provd"
-
     DEFAULT_CONFIGS = [
         {
             'X_type': 'registrar',
@@ -141,28 +137,25 @@ class ProvdHelper:
         assert_that(config['configdevice'], equal_to(template_id))
         assert_that(config['parent_ids'], has_item(template_id))
 
-    def has_synchronized(self, device_id, timestamp=None):
+    def has_synchronized(self, cls, device_id, timestamp=None):
         timestamp = timestamp or datetime.utcnow()
         line = "Synchronizing device {}".format(device_id)
-        output = self.find_provd_logs(timestamp)
+        output = self.find_provd_logs(cls, timestamp)
         for log in output.split("\n"):
             if line in log:
                 return True
         return False
 
-    def updated_count(self, device_id, timestamp=None):
+    def updated_count(self, cls, device_id, timestamp=None):
         timestamp = timestamp or datetime.utcnow()
         expected_line = "Updating config {}".format(device_id)
-        output = self.find_provd_logs(timestamp)
+        output = self.find_provd_logs(cls, timestamp)
         count = len([line for line in output.split("\n") if expected_line in line])
         return count
 
-    def find_provd_logs(self, timestamp):
-        client = docker.from_env().api
-        for container in client.containers(filters={'status': 'running'}):
-            info = client.inspect_container(container['Id'])
-            if info['Config']['Image'] == self.DOCKER_PROVD_IMAGE:
-                return client.logs(container['Id'], since=timestamp).decode('utf-8')
+    def find_provd_logs(self, cls, timestamp):
+        since = timestamp.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        return cls.service_logs(service_name='provd', since=since)
 
 
 def create_helper(host='127.0.0.1', port='8666', token=TOKEN):

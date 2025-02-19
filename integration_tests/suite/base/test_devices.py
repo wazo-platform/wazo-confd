@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -21,7 +21,7 @@ from hamcrest import (
     has_items,
 )
 
-from . import confd, mocks, provd
+from . import BaseIntegrationTest, confd, mocks, provd
 from ..helpers import (
     associations as a,
     errors as e,
@@ -560,7 +560,7 @@ def test_synchronize_device(provd, device):
     response = confd.devices(device['id']).synchronize.get()
     response.assert_ok()
 
-    synchonized = provd.has_synchronized(device['id'], timestamp)
+    synchonized = provd.has_synchronized(BaseIntegrationTest, device['id'], timestamp)
     assert_that(synchonized, "Device was not synchronized")
 
 
@@ -576,5 +576,5 @@ def test_synchronize_device_multi_tenant(provd, main, sub):
     response = confd.devices(sub['id']).synchronize.get(wazo_tenant=MAIN_TENANT)
     response.assert_ok()
 
-    synchonized = provd.has_synchronized(sub['id'], timestamp)
+    synchonized = provd.has_synchronized(BaseIntegrationTest, sub['id'], timestamp)
     assert_that(synchonized, "Device was not synchronized")
