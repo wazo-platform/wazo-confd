@@ -21,6 +21,9 @@ paths:
       parameters:
         - $ref: '#/parameters/tenantuuid'
         - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/search'
       responses:
         '200':
           description: List Func key template
