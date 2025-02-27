@@ -1,0 +1,42 @@
+paths:
+  /recordings/announcements:
+    get:
+      operationId: get_recordings_announcements
+      summary: Get announcements configuration
+      description: '**Required ACL:** `confd.recordings.announcements.read`'
+      tags:
+      - recordings-announcements
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      responses:
+        '200':
+          description: Recordings announcements configuration
+          schema:
+            $ref: '#/definitions/RecordingsAnnouncements'
+    put:
+      operationId: update_recordings_announcements
+      summary: Update recordings announcements configuration
+      description: '**Required ACL:** `confd.recordings.announcements.update`'
+      tags:
+      - recordings-announcements
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - name: body
+        in: body
+        required: true
+        schema:
+          $ref: '#/definitions/RecordingsAnnouncements'
+      responses:
+        '204':
+          $ref: '#/responses/ResourceUpdated'
+definitions:
+  RecordingsAnnouncements:
+    title: Recordings announcements
+    type: object
+    properties:
+      recording_start:
+        type: string
+        description: The filename for the recording start announcement
+      recording_stop:
+        type: string
+        description: The filename for the recording stop announcement
