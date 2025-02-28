@@ -75,7 +75,6 @@ setup(
             'line_device = wazo_confd.plugins.line_device.plugin:Plugin',
             'line_endpoint = wazo_confd.plugins.line_endpoint.plugin:Plugin',
             'line_extension = wazo_confd.plugins.line_extension.plugin:Plugin',
-            'line_sip = wazo_confd.plugins.line_sip.plugin:Plugin',
             'localization = wazo_confd.plugins.localization.plugin:Plugin',
             'meeting = wazo_confd.plugins.meeting.plugin:Plugin',
             'meeting_authorization = wazo_confd.plugins.meeting_authorization.plugin:Plugin',
