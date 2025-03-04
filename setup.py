@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2012-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
@@ -75,7 +75,6 @@ setup(
             'line_device = wazo_confd.plugins.line_device.plugin:Plugin',
             'line_endpoint = wazo_confd.plugins.line_endpoint.plugin:Plugin',
             'line_extension = wazo_confd.plugins.line_extension.plugin:Plugin',
-            'line_sip = wazo_confd.plugins.line_sip.plugin:Plugin',
             'localization = wazo_confd.plugins.localization.plugin:Plugin',
             'meeting = wazo_confd.plugins.meeting.plugin:Plugin',
             'meeting_authorization = wazo_confd.plugins.meeting_authorization.plugin:Plugin',
@@ -98,9 +97,10 @@ setup(
             'queue_general = wazo_confd.plugins.queue_general.plugin:Plugin',
             'queue_member = wazo_confd.plugins.queue_member.plugin:Plugin',
             'queue_schedule = wazo_confd.plugins.queue_schedule.plugin:Plugin',
-            'rtp = wazo_confd.plugins.rtp.plugin:Plugin',
+            'recordings = wazo_confd.plugins.recordings.plugin:Plugin',
             'register_iax = wazo_confd.plugins.register_iax.plugin:Plugin',
             'registrar = wazo_confd.plugins.registrar.plugin:Plugin',
+            'rtp = wazo_confd.plugins.rtp.plugin:Plugin',
             'schedule = wazo_confd.plugins.schedule.plugin:Plugin',
             'sccp_general = wazo_confd.plugins.sccp_general.plugin:Plugin',
             'skill = wazo_confd.plugins.skill.plugin:Plugin',

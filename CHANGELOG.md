@@ -1,5 +1,12 @@
 # Changelog
 
+## 25.04
+
+* A new API endpoint `/1.1/recordings/announcements` has been added to set & change the recording announcements of a tenant:
+
+  * `GET /1.1/recordings/announcements` to retrieve the current recording start and stop announcements
+  * `PUT /1.1/recordings/announcements` to set the recording start and stop announcements to other values
+
 ## 25.02
 
 * The `queues` resource now has a `dtmf_record_toggle` field.
