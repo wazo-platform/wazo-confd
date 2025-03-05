@@ -16,10 +16,10 @@ class CallPickupSchema(BaseSchema):
     links = ListLink(Link('callpickups'))
 
     group_interceptors = Nested(
-        'GroupSchema', only=['id', 'name'], many=True, dump_only=True
+        'GroupSchema', only=['id', 'name', 'label'], many=True, dump_only=True
     )
     group_targets = Nested(
-        'GroupSchema', only=['id', 'name'], many=True, dump_only=True
+        'GroupSchema', only=['id', 'name', 'label'], many=True, dump_only=True
     )
     user_interceptors = Nested(
         'UserSchema', only=['uuid', 'firstname', 'lastname'], many=True, dump_only=True
