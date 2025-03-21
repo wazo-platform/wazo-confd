@@ -12,6 +12,7 @@ from xivo_dao.helpers.exception import ServiceError
 
 logger = logging.getLogger(__name__)
 
+MINUTE = 60
 auth_config = {}
 
 
@@ -47,8 +48,8 @@ class AuthClientProxy:
     @classmethod
     def from_config(cls, *args, **kwargs):
         client = AuthClient(*args, **kwargs)
-        # 30 minutes should be enought to import all users
-        token = client.token.new(expiration=30 * 30)['token']
+        # Set expiration that should be enought to import all users
+        token = client.token.new(expiration=60 * MINUTE)['token']
         client.set_token(token)
         return cls(client)
 
