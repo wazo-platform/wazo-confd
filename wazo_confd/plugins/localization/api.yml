@@ -37,3 +37,6 @@ definitions:
       country:
         type: string
         description: The default country for users, in ISO-3166 alpha-2 format, e.g. "CA" for Canada.
+      tenant_uuid:
+        type: string
+        description: UUID of the tenant
