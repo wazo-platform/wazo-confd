@@ -12,7 +12,7 @@ from wazo_confd.helpers.mallow import BaseSchema
 
 
 class LocalizationSchema(BaseSchema):
-    tenant_uuid = fields.String(dump_only=True, allow_none=False, attribute='uuid')
+    tenant_uuid = fields.String(allow_none=False, attribute='uuid')
     country = fields.String(allow_none=True, default=None, validate=Length(equal=2))
 
     @validates('country')
