@@ -4,13 +4,23 @@ location ^~ /api/confd/1.1/guests {
     include /etc/nginx/wazo-no-auth-shared[.]conf;
 }
 
+location ^~ /api/confd/1.1/users/import {
+    proxy_pass http://127.0.0.1:9486/1.1/users/import;
+    proxy_read_timeout 1800s;  # 30min
+    include /etc/nginx/wazo-confd-shared.conf;
+}
+
 location ^~ /api/confd/1.1/wizard {
     proxy_pass http://127.0.0.1:9486/1.1/wizard;
+    proxy_read_timeout 180s;
     include /etc/nginx/wazo-confd-shared.conf;
     include /etc/nginx/wazo-no-auth-shared[.]conf;
 }
 
 location ^~ /api/confd/ {
     proxy_pass http://127.0.0.1:9486/;
+    # Mostly used for /ha but can be useful for other
+    # endpoints on slow host (e.i. /devices)
+    proxy_read_timeout 180s;
     include /etc/nginx/wazo-confd-shared.conf;
 }
