@@ -10,7 +10,7 @@ from wazo_bus.resources.line_endpoint.event import (
     LineEndpointSIPDissociatedEvent,
 )
 
-from wazo_confd import bus
+from wazo_confd import bus, sysconfd
 from wazo_confd.plugins.line.schema import LineSchema
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema
 from wazo_confd.plugins.endpoint_sccp.schema import SccpSchema
@@ -39,10 +39,16 @@ ENDPOINT_CUSTOM_FIELDS = ['id', 'tenant_uuid', 'interface']
 
 
 class LineEndpointSIPNotifier:
-    def __init__(self, bus):
+    def __init__(self, bus, sysconfd):
         self.bus = bus
+        self.sysconfd = sysconfd
+
+    def send_sysconfd_handlers(self):
+        handlers = {'ipbx': ['module reload res_pjsip.so']}
+        self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, line, endpoint):
+        self.send_sysconfd_handlers()
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = LineEndpointSIPAssociatedEvent(
@@ -51,6 +57,7 @@ class LineEndpointSIPNotifier:
         self.bus.queue_event(event)
 
     def dissociated(self, line, endpoint):
+        self.send_sysconfd_handlers()
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
         sip_serialized = EndpointSIPSchema(only=ENDPOINT_SIP_FIELDS).dump(endpoint)
         event = LineEndpointSIPDissociatedEvent(
@@ -60,10 +67,16 @@ class LineEndpointSIPNotifier:
 
 
 class LineEndpointSCCPNotifier:
-    def __init__(self, bus):
+    def __init__(self, bus, sysconfd):
         self.bus = bus
+        self.sysconfd = sysconfd
+
+    def send_sysconfd_handlers(self):
+        handlers = {'ipbx': ['module reload chan_sccp.so']}
+        self.sysconfd.exec_request_handlers(handlers)
 
     def associated(self, line, endpoint):
+        self.send_sysconfd_handlers()
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(endpoint)
         event = LineEndpointSCCPAssociatedEvent(
@@ -72,6 +85,7 @@ class LineEndpointSCCPNotifier:
         self.bus.queue_event(event)
 
     def dissociated(self, line, endpoint):
+        self.send_sysconfd_handlers()
         line_serialized = LineSchema(only=LINE_FIELDS).dump(line)
         sccp_serialized = SccpSchema(only=ENDPOINT_SCCP_FIELDS).dump(endpoint)
         event = LineEndpointSCCPDissociatedEvent(
@@ -102,11 +116,11 @@ class LineEndpointCustomNotifier:
 
 
 def build_notifier_sip():
-    return LineEndpointSIPNotifier(bus)
+    return LineEndpointSIPNotifier(bus, sysconfd)
 
 
 def build_notifier_sccp():
-    return LineEndpointSCCPNotifier(bus)
+    return LineEndpointSCCPNotifier(bus, sysconfd)
 
 
 def build_notifier_custom():
