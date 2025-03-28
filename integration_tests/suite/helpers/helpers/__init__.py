@@ -95,6 +95,7 @@ from . import agent  # noqa
 from . import agent_login_status  # noqa
 from . import agent_skill  # noqa
 from . import application  # noqa
+from . import blocklist  # noqa
 from . import call_filter  # noqa
 from . import call_filter_recipient_user  # noqa
 from . import call_filter_surrogate_user  # noqa
@@ -193,6 +194,7 @@ __all__ = [
     'agent_login_status',
     'agent_skill',
     'application',
+    'blocklist',
     'call_filter',
     'call_filter_recipient_user',
     'call_filter_surrogate_user',
