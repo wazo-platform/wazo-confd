@@ -117,6 +117,7 @@ setup(
             'trunk_register = wazo_confd.plugins.trunk_register.plugin:Plugin',
             'user = wazo_confd.plugins.user.plugin:Plugin',
             'user_agent = wazo_confd.plugins.user_agent.plugin:Plugin',
+            'user_blocklist = wazo_confd.plugins.user_blocklist.plugin:Plugin',
             'user_call_permission = wazo_confd.plugins.user_call_permission.plugin:Plugin',
             'user_callerid = wazo_confd.plugins.user_callerid.plugin:Plugin',
             'user_external_app = wazo_confd.plugins.user_external_app.plugin:Plugin',
