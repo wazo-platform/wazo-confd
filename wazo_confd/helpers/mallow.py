@@ -153,3 +153,19 @@ class AsteriskSection:
 
 class PJSIPSection(AsteriskSection):
     DEFAULT_RESERVED_NAMES = ['global', 'system']
+
+
+def number_field(**kwargs) -> fields.String:
+    """
+    marshmallow field constructor for phone numbers
+    validates string format to restrict to digits and optional leading +
+    """
+    return fields.String(
+        validate=[
+            validate.Length(min=1, max=128),
+            validate.Regexp(
+                r'^\+?[0-9]+$', error='not a valid digit-only phone number'
+            ),
+        ],
+        **kwargs,
+    )
