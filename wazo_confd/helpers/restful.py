@@ -8,8 +8,9 @@ import marshmallow
 
 from xivo.flask.auth_verifier import AuthVerifierFlask
 from xivo.mallow import fields, validate
-from xivo.tenant_flask_helpers import Tenant, token
+from xivo.tenant_flask_helpers import Tenant, token, user
 from xivo_dao import tenant_dao
+from xivo_dao.helpers import errors
 
 from wazo_confd.helpers.common import handle_api_exception
 from wazo_confd.helpers.mallow import BaseSchema
@@ -167,3 +168,14 @@ def is_recursive():
     return request.args.get(
         'recursive', default=False, type=lambda v: v.lower() == 'true'
     )
+
+
+class MeResourceMixin:
+    # the flask Resource.endpoint
+    endpoint: str
+
+    def _find_user_uuid(self):
+        if not user.uuid:
+            raise errors.param_not_found('user_uuid', self.endpoint)
+
+        return user.uuid
