@@ -44,6 +44,7 @@ def handle_api_exception(func):
                 logger.error("%s: %s", error, error.details, exc_info=True)
             return [str(error)], error.status_code
         except ProvdError as error:
+            logger.exception(str(error))
             rollback()
             return 'Provd client error: {}'.format(error), error.status_code
         except HTTPException as error:

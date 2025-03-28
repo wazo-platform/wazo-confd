@@ -185,7 +185,7 @@ from . import user_schedule  # noqa
 from . import user_voicemail  # noqa
 from . import voicemail  # noqa
 from . import voicemail_zonemessages  # noqa
-
+from . import blocklist  # noqa
 
 __all__ = [
     'access_feature',
@@ -194,6 +194,7 @@ __all__ = [
     'agent_login_status',
     'agent_skill',
     'application',
+    'blocklist',
     'call_filter',
     'call_filter_recipient_user',
     'call_filter_surrogate_user',
