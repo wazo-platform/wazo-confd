@@ -3,6 +3,7 @@
 
 from hamcrest import (
     assert_that,
+    contains_exactly,
     empty,
     has_item,
     has_items,
@@ -144,6 +145,32 @@ def test_search(user):
 
 
 @fixtures.user()
+@fixtures.user()
+def test_search_users_isolated(user1, user2):
+    user1_confd_client = create_confd(user_uuid=user1['uuid'])
+    user2_confd_client = create_confd(user_uuid=user2['uuid'])
+
+    numbers = [
+        fixtures.users_blocklist_number(
+            number='+18001235555', confd_client=user1_confd_client
+        ),
+        fixtures.users_blocklist_number(
+            number='+15551112222', confd_client=user2_confd_client
+        ),
+    ]
+    with numbers[0] as blocklist_number1, numbers[1] as blocklist_number2:
+        print(blocklist_number1)
+        print(blocklist_number2)
+        response1 = user1_confd_client.users.me.blocklist.numbers.get()
+        print(response1.items)
+        assert_that(response1.items, contains_exactly(blocklist_number1))
+
+        response2 = user2_confd_client.users.me.blocklist.numbers.get()
+        print(response2.items)
+        assert_that(response2.items, contains_exactly(blocklist_number2))
+
+
+@fixtures.user()
 def test_list(user):
     user_confd_client = create_confd(user_uuid=user['uuid'])
     numbers = [
@@ -209,7 +236,12 @@ def test_create_minimal_parameters(user):
     )
 
     assert_that(
-        response.item, has_entries(uuid=not_(empty()), number='112', label=None)
+        response.item,
+        has_entries(
+            uuid=not_(empty()),
+            number='112',
+            label=None,
+        ),
     )
 
     user_confd_client.users.me.blocklist.numbers(
