@@ -31,6 +31,11 @@ class UserMeBlocklistNumberList(MeResourceMixin, ListResource):
     def get(self):
         return super().get()
 
+    def search_params(self):
+        search_params = super().search_params()
+        search_params['user_uuid'] = self._find_user_uuid()
+        return search_params
+
     @required_acl('confd.users.me.blocklist.create')
     def post(self):
         form = self.schema().load(request.get_json())
