@@ -227,7 +227,7 @@ def test_create_minimal_parameters(user):
         response.item,
         has_entries(
             uuid=not_(empty()),
-            number='112',
+            number='+112',
             label=None,
         ),
     )
@@ -235,6 +235,13 @@ def test_create_minimal_parameters(user):
     user_confd_client.users.me.blocklist.numbers(
         response.item['uuid']
     ).delete().assert_deleted()
+
+
+@fixtures.user()
+def test_create_bad_number(user):
+    user_confd_client = create_confd(user_uuid=user['uuid'])
+    response = user_confd_client.users.me.blocklist.numbers.post({'number': '112'})
+    response.assert_match(400, e.build_error(r'Input Error - number'))
 
 
 @fixtures.user()
@@ -295,13 +302,16 @@ def test_edit_all_parameters(user):
 def test_bus_events(user):
     user_confd_client = create_confd(user_uuid=user['uuid'])
     url = user_confd_client.users.me.blocklist.numbers
-    headers = {'tenant_uuid': user['tenant_uuid']}
+    headers = {}
 
     blocklist_number = s.check_event(
-        'user_blocklist_number_created', headers, url.post, {'number': '111'}
+        'user_blocklist_number_created', headers, url.post, {'number': '+111'}
     )
     s.check_event(
-        'user_blocklist_number_edited', headers, url(blocklist_number.item['uuid']).put
+        'user_blocklist_number_edited',
+        headers,
+        url(blocklist_number.item['uuid']).put,
+        {'number': '+112'},
     )
     s.check_event(
         'user_blocklist_number_deleted',
