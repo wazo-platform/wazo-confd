@@ -2,13 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
-import string
+
+import phonenumbers
 
 from . import confd
 
 
 def generate_user_blocklist_number(confd_client=confd, **parameters):
-    parameters.setdefault('number', _random_number(10))
+    parameters.setdefault('number', _random_number())
     return add_user_blocklist_number(confd_client=confd_client, **parameters)
 
 
@@ -27,6 +28,12 @@ def add_user_blocklist_number(confd_client=confd, wazo_tenant=None, **parameters
     return confd_client.users.me.blocklist.numbers(response.item['uuid']).get().item
 
 
-def _random_number(length):
-    number = ''.join(random.choice(string.digits) for _ in range(length))
-    return f'+{number}'
+def _random_number():
+    random_country_code = random.choice(
+        list(region for region in phonenumbers.SUPPORTED_REGIONS)
+    )
+    number = phonenumbers.example_number_for_type(
+        random_country_code, phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE
+    )
+    assert number
+    return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
