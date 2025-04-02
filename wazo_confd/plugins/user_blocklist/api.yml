@@ -109,6 +109,7 @@ paths:
       tags:
       - blocklist
       parameters:
+        - $ref: '#/parameters/tenantuuid'
         - name: number_exact
           in: query
           type: string
