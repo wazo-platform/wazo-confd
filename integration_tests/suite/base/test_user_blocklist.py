@@ -27,11 +27,22 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'number', True)
     s.check_bogus_field_returns_error(url, 'number', {})
     s.check_bogus_field_returns_error(url, 'number', 'a' * 1024)
-    s.check_bogus_field_returns_error(url, 'label', 123)
-    s.check_bogus_field_returns_error(url, 'label', [])
-    s.check_bogus_field_returns_error(url, 'label', True)
-    s.check_bogus_field_returns_error(url, 'label', {})
-    s.check_bogus_field_returns_error(url, 'label', 'a' * 1024)
+    s.check_bogus_field_returns_error(
+        url, 'number', '123', message=r'Invalid E.164 phone number'
+    )
+    s.check_bogus_field_returns_error(
+        url, 'label', 123, required_field={'number': '+123'}
+    )
+    s.check_bogus_field_returns_error(
+        url, 'label', [], required_field={'number': '+123'}
+    )
+    s.check_bogus_field_returns_error(
+        url, 'label', True, required_field={'number': '+123'}
+    )
+    s.check_bogus_field_returns_error(
+        url, 'label', {}, required_field={'number': '+123'}
+    )
+    s.check_bogus_field_returns_error(url, 'label', 'a' * 1025, {'number': '+123'})
 
 
 def check_search_fuzzy(url, blocklist_number, hidden, field, term):
@@ -235,13 +246,6 @@ def test_create_minimal_parameters(user):
     user_confd_client.users.me.blocklist.numbers(
         response.item['uuid']
     ).delete().assert_deleted()
-
-
-@fixtures.user()
-def test_create_bad_number(user):
-    user_confd_client = create_confd(user_uuid=user['uuid'])
-    response = user_confd_client.users.me.blocklist.numbers.post({'number': '112'})
-    response.assert_match(400, e.build_error(r'Input Error - number'))
 
 
 @fixtures.user()
