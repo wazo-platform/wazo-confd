@@ -1,5 +1,7 @@
 # Copyright 2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
+import logging
 
 from marshmallow import fields, validates
 from marshmallow.exceptions import ValidationError
@@ -7,6 +9,10 @@ from marshmallow.validate import Length
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, number_field
 import phonenumbers
+
+from wazo_confd.helpers.restful import ListSchema
+
+logger = logging.getLogger(__name__)
 
 
 class UserBlocklistNumberSchema(BaseSchema):
@@ -20,7 +26,41 @@ class UserBlocklistNumberSchema(BaseSchema):
         try:
             return phonenumbers.parse(value)
         except phonenumbers.NumberParseException:
+            logger.exception('Invalid E.164 phone number')
             raise ValidationError('Invalid E.164 phone number', field_name='number')
 
 
+class BlocklistNumberSchema(UserBlocklistNumberSchema):
+    links = ListLink(Link('blocklist_numbers', field='uuid'))
+    user_uuid = fields.String(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
+
+
+class EncodedList(fields.List):
+    def __init__(
+        self, cls_or_instance: fields.Field | type, delimiter: str = ',', **kwargs
+    ):
+        super().__init__(cls_or_instance, **kwargs)
+        self.delimiter = delimiter
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        if isinstance(value, str):
+            values = value.split(self.delimiter)
+            return super()._deserialize(values, attr, data, **kwargs)
+        raise ValidationError('Invalid value type', field_name=attr)
+
+
+class BlocklistNumberListSchema(ListSchema):
+    user_uuids = EncodedList(fields.String())
+    number = number_field()
+    label = fields.String(validate=Length(min=1, max=1024), allow_none=True)
+
+
+class UserBlocklistLookupSchema(BaseSchema):
+    number_exact = number_field()
+
+
 user_blocklist_number_schema = UserBlocklistNumberSchema()
+blocklist_number_schema = BlocklistNumberSchema()
+user_blocklist_lookup_schema = UserBlocklistLookupSchema()
+blocklist_number_list_schema = BlocklistNumberListSchema()

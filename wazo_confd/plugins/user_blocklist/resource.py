@@ -5,12 +5,16 @@ import logging
 from flask import url_for, request
 
 from xivo_dao.alchemy.blocklist import BlocklistNumber
+from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ListResource, ItemResource, MeResourceMixin
 
 from .schema import (
+    BlocklistNumberSchema,
     UserBlocklistNumberSchema,
+    user_blocklist_lookup_schema,
+    blocklist_number_list_schema,
 )
 from .service import UserBlocklistService
 
@@ -74,3 +78,61 @@ class UserMeBlocklistNumberItem(MeResourceMixin, ItemResource):
         model = self.service.get_by(uuid=str(uuid), **kwargs)
         self.service.delete(model)
         return '', 204
+
+
+class UserBlocklistNumberList(ListResource):
+    model = BlocklistNumber
+    schema = BlocklistNumberSchema
+    service: UserBlocklistService
+
+    @required_acl('confd.users.{user_uuid}.blocklist.read')
+    def head(self, user_uuid):
+        params = user_blocklist_lookup_schema.load(request.args)
+        try:
+            match = self.service.get_by(
+                user_uuid=user_uuid, number=params.get('number_exact')
+            )
+        except NotFoundError:
+            return '', 404
+        return (
+            '',
+            200,
+            {
+                'Location': url_for(
+                    'blocklist_numbers', uuid=str(match.uuid), _external=True
+                ),
+            },
+        )
+
+
+class BlocklistNumberList(ListResource):
+    model = BlocklistNumber
+    schema = BlocklistNumberSchema
+    service: UserBlocklistService
+
+    @required_acl('confd.blocklist.read')
+    def get(self):
+        params = self.search_params()
+        tenant_uuids = self._build_tenant_list(params)
+        kwargs = {}
+        if tenant_uuids is not None:
+            kwargs['tenant_uuids'] = tenant_uuids
+
+        total, items = self.service.search(params, **kwargs)
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
+
+    def search_params(self):
+        return blocklist_number_list_schema.load(request.args)
+
+
+class BlocklistNumberItem(ItemResource):
+    has_tenant_uuid = True
+    model = BlocklistNumber
+    schema = BlocklistNumberSchema
+    service: UserBlocklistService
+
+    @required_acl('confd.blocklist.read')
+    def get(self, uuid):
+        kwargs = self._add_tenant_uuid()
+        model = self.service.get_by(uuid=str(uuid), **kwargs)
+        return self.schema().dump(model)
