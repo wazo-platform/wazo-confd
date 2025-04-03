@@ -26,13 +26,13 @@ class DbHelper:
 
     @classmethod
     def build(cls, user, password, host, port, db):
-        tpl = "postgresql://{user}:{password}@{host}:{port}"
-        uri = tpl.format(user=user, password=password, host=host, port=port)
+        uri = f"postgresql://{user}:{password}@{host}:{port}"
         return cls(uri, db)
 
     def __init__(self, uri, db):
         self.uri = uri
         self.db = db
+        self._engine = self.create_engine()
 
     def create_engine(self, db=None, isolate=False):
         db = db or self.db
@@ -41,20 +41,19 @@ class DbHelper:
             return sa.create_engine(uri, isolation_level='AUTOCOMMIT')
         return sa.create_engine(uri)
 
-    def connect(self, db=None):
-        db = db or self.db
-        return self.create_engine(db).connect()
+    def connect(self):
+        return self._engine.connect()
 
     def recreate(self):
         engine = self.create_engine("postgres", isolate=True)
         connection = engine.connect()
         connection.execute(
             """
-                           SELECT pg_terminate_backend(pg_stat_activity.pid)
-                           FROM pg_stat_activity
-                           WHERE pg_stat_activity.datname = '{db}'
-                           AND pid <> pg_backend_pid()
-                           """.format(
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{db}'
+            AND pid <> pg_backend_pid()
+            """.format(
                 db=self.db
             )
         )
@@ -65,6 +64,7 @@ class DbHelper:
             )
         )
         connection.close()
+        self._engine = self.create_engine()
 
     def execute(self, query, **kwargs):
         with self.connect() as connection:
