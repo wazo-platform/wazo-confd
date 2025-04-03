@@ -7,7 +7,7 @@ from wazo_confd.helpers.restful import ItemResource, ListResource
 from xivo_dao.alchemy.meeting_authorization import MeetingAuthorization
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
-from xivo.tenant_flask_helpers import user
+from wazo.tenant_flask_helpers import user
 
 from .schema import (
     MeetingAuthorizationSchema,

@@ -5,7 +5,7 @@ from flask import request
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource, build_tenant
-from xivo.tenant_flask_helpers import Tenant
+from wazo.tenant_flask_helpers import Tenant
 
 from .schema import LocalizationSchema
 

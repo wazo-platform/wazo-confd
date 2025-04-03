@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -6,9 +6,9 @@ import yaml
 
 from flask import make_response
 from flask_restful import Resource
-from xivo.chain_map import ChainMap
-from xivo.rest_api_helpers import load_all_api_specs
-from xivo.http_helpers import reverse_proxy_fix_api_spec
+from wazo.chain_map import ChainMap
+from wazo.rest_api_helpers import load_all_api_specs
+from wazo.http_helpers import reverse_proxy_fix_api_spec
 
 logger = logging.getLogger(__name__)
 

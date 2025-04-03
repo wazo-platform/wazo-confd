@@ -14,7 +14,7 @@ from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
 from marshmallow.exceptions import ValidationError
-from xivo.mallow import validate as mallow_validate
+from wazo.mallow import validate as mallow_validate
 
 from wazo_confd.helpers.validator import (
     Validator,

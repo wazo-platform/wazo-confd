@@ -6,7 +6,7 @@ from collections import deque
 from wazo_bus.consumer import BusConsumer as Consumer
 from wazo_bus.mixins import PublisherMixin, WazoEventMixin
 from wazo_bus.base import Base
-from xivo.status import Status
+from wazo.status import Status
 
 
 class FlushMixin:
