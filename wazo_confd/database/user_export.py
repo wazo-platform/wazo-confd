@@ -2,12 +2,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-from sqlalchemy.sql import cast, func, and_, case
+from sqlalchemy.sql import cast, func, and_, case, select
 from sqlalchemy import String, Integer
 from sqlalchemy.orm import aliased
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
+from xivo_dao.alchemy.endpoint_sip_section import EndpointSIPSection
+from xivo_dao.alchemy.endpoint_sip_section_option import EndpointSIPSectionOption
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
@@ -165,8 +167,28 @@ def export_query(tenant_uuid, separator=";"):
         ),
         Line.provisioning_code,
         func.coalesce(Extension.context, Line.context),
-        EndpointSIP.username,
-        EndpointSIP.password,
+        select([EndpointSIPSectionOption.value])
+        .where(
+            and_(
+                EndpointSIP.uuid == EndpointSIPSection.endpoint_sip_uuid,
+                EndpointSIPSection.type == 'auth',
+                EndpointSIPSectionOption.endpoint_sip_section_uuid
+                == EndpointSIPSection.uuid,
+                EndpointSIPSectionOption.key == 'username',
+            )
+        )
+        .as_scalar(),
+        select([EndpointSIPSectionOption.value])
+        .where(
+            and_(
+                EndpointSIP.uuid == EndpointSIPSection.endpoint_sip_uuid,
+                EndpointSIPSection.type == 'auth',
+                EndpointSIPSectionOption.endpoint_sip_section_uuid
+                == EndpointSIPSection.uuid,
+                EndpointSIPSectionOption.key == 'password',
+            )
+        )
+        .as_scalar(),
         Extension.exten,
         grouped_incalls.c.exten,
         grouped_incalls.c.context,
