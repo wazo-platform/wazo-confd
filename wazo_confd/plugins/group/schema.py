@@ -3,10 +3,10 @@
 
 import logging
 
-from marshmallow import fields, post_load, post_dump, pre_load
+from marshmallow import fields, post_dump, post_load, pre_load
 from marshmallow.validate import Length, OneOf, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 # The label is going to end in queues.conf and used in agi.verbose calls.
 # Try not to be too permissive with it

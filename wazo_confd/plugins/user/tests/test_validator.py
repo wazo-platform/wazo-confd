@@ -1,8 +1,7 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
 from unittest.mock import Mock, sentinel
 
 from xivo_dao.alchemy.userfeatures import UserFeatures as User

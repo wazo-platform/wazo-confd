@@ -1,12 +1,12 @@
 # Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_load, post_dump
+from marshmallow import fields, post_dump, post_load
 from marshmallow.validate import Length, NoneOf, OneOf, Range, Regexp
-
 from xivo_dao.alchemy.dialaction import Dialaction
+
 from wazo_confd.helpers.destination import DestinationField
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 NAME_REGEX = r'^[-_.a-zA-Z0-9]+$'
 

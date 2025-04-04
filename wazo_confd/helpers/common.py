@@ -1,19 +1,17 @@
-# Copyright 2013-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-
 from functools import wraps
 
 from flask import g
 from flask_restful.utils import http_status_message
 from marshmallow import ValidationError
+from wazo_provd_client.exceptions import ProvdError
 from werkzeug.exceptions import HTTPException
-
 from xivo import rest_api_helpers
 from xivo_dao.helpers.db_manager import Session
-from xivo_dao.helpers.exception import ServiceError, NotFoundError
-from wazo_provd_client.exceptions import ProvdError
+from xivo_dao.helpers.exception import NotFoundError, ServiceError
 
 logger = logging.getLogger(__name__)
 

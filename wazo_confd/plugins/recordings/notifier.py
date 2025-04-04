@@ -2,9 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_bus.resources.recordings.event import RecordingsAnnouncementsEditedEvent
-from wazo_confd.plugins.recordings.schema import RecordingAnnouncementSchema
 
 from wazo_confd import bus, sysconfd
+from wazo_confd.plugins.recordings.schema import RecordingAnnouncementSchema
 
 
 class RecordingAnnouncementNotifier:

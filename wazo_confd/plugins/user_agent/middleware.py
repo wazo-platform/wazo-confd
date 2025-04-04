@@ -1,8 +1,8 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.agent import dao as agent_dao
+from xivo_dao.resources.user import dao as user_dao
 
 
 class UserAgentAssociationMiddleWare:

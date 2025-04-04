@@ -1,11 +1,10 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 
-from xivo_dao.helpers import errors
-
 from wazo_provd_client.exceptions import ProvdError
+from xivo_dao.helpers import errors
 
 from wazo_confd.plugins.device.model import Device
 

@@ -1,33 +1,28 @@
-# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from contextlib import contextmanager, ExitStack
-from hamcrest import (
-    all_of,
-    assert_that,
-    has_entries,
-    has_items,
-    has_key,
-    not_,
-)
+from contextlib import ExitStack, contextmanager
+from typing import Dict
+
+from hamcrest import all_of, assert_that, has_entries, has_items, has_key, not_
 from sqlalchemy.sql import text
 from wazo_test_helpers import until
 
-from typing import Dict
-
-from . import confd, db, BaseIntegrationTest
-from ..helpers import errors as e, fixtures, associations as a
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
 from ..helpers.bus import BusClient
 from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-    DELETED_TENANT,
-    gen_group_exten,
-    gen_line_exten,
     ALL_TENANTS,
     DEFAULT_TENANTS,
+    DELETED_TENANT,
+    MAIN_TENANT,
+    SUB_TENANT,
+    gen_group_exten,
+    gen_line_exten,
 )
 from ..helpers.database import DatabaseQueries
+from . import BaseIntegrationTest, confd, db
 
 
 def test_get():

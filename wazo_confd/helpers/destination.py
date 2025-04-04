@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -7,15 +7,14 @@ from marshmallow import (
     EXCLUDE,
     Schema,
     fields,
-    pre_dump,
-    post_load,
     post_dump,
-    validates_schema,
+    post_load,
+    pre_dump,
     validates,
+    validates_schema,
 )
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import Length, OneOf, Regexp, Predicate, Range
-
+from marshmallow.validate import Length, OneOf, Predicate, Range, Regexp
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.application import dao as application_dao
@@ -30,7 +29,7 @@ from xivo_dao.resources.switchboard import dao as switchboard_dao
 from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
-from wazo_confd.helpers.mallow import StrictBoolean, Nested
+from wazo_confd.helpers.mallow import Nested, StrictBoolean
 from wazo_confd.helpers.validator import GetResource, Validator
 
 COMMAND_REGEX = r'^(?!(try)?system\()[a-zA-Z]{3,}\((.*)\)$'

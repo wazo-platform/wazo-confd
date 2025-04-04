@@ -1,17 +1,16 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, post_dump, pre_dump, post_load
+from marshmallow import fields, post_dump, post_load, pre_dump
 from marshmallow.validate import Range
-
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
-from xivo_dao.resources.user import dao as user_dao
 from xivo_dao.resources.moh import dao as moh_dao
+from xivo_dao.resources.user import dao as user_dao
 
-from wazo_confd.helpers.validator import GetResource, Validator, ValidationGroup
 from wazo_confd.helpers.destination import BaseDestinationSchema
 from wazo_confd.helpers.mallow import Nested
+from wazo_confd.helpers.validator import GetResource, ValidationGroup, Validator
 
 
 # This is a copy of the destination helper, only difference being the name of the columns

@@ -1,9 +1,11 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
 
 from flask_restful import abort
+from marshmallow.exceptions import ValidationError
+from xivo.mallow import validate as mallow_validate
 from xivo_dao.helpers import errors
 from xivo_dao.resources.agent import dao as agent_dao
 from xivo_dao.resources.call_filter import dao as call_filter_dao
@@ -13,15 +15,13 @@ from xivo_dao.resources.paging import dao as paging_dao
 from xivo_dao.resources.parking_lot import dao as parking_lot_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.user import dao as user_dao
-from marshmallow.exceptions import ValidationError
-from xivo.mallow import validate as mallow_validate
 
 from wazo_confd.helpers.validator import (
-    Validator,
     GetResource,
     ResourceExists,
     ValidationAssociation,
     ValidationGroup,
+    Validator,
 )
 
 

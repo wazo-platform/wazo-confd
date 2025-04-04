@@ -1,12 +1,12 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import datetime
 import unittest
 import uuid
 from unittest.mock import Mock, call
-from hamcrest import assert_that, has_entries
 
+from hamcrest import assert_that, has_entries
 from wazo_bus.resources.user.event import (
     UserCreatedEvent,
     UserDeletedEvent,
@@ -16,16 +16,15 @@ from wazo_bus.resources.user.event import (
 )
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 
-from ..notifier import UserNotifier, UserServiceNotifier, UserForwardNotifier
+from ..notifier import UserForwardNotifier, UserNotifier, UserServiceNotifier
 from ..sub_resources.schema import (
-    ServiceDNDSchema,
-    ServiceIncallFilterSchema,
     ForwardBusySchema,
     ForwardNoAnswerSchema,
-    ForwardUnconditionalSchema,
     ForwardsSchema,
+    ForwardUnconditionalSchema,
+    ServiceDNDSchema,
+    ServiceIncallFilterSchema,
 )
-
 
 EXPECTED_HANDLERS = {
     'ipbx': [

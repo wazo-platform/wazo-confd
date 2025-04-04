@@ -4,7 +4,6 @@ from hamcrest import assert_that, calling, has_entries, has_key, has_property
 from marshmallow import ValidationError
 from wazo_test_helpers.hamcrest.raises import raises
 
-
 from ..schema import RangeSchema
 
 

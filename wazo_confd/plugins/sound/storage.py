@@ -1,4 +1,4 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import errno
@@ -6,12 +6,12 @@ import glob
 import logging
 import os
 import shutil
-
 from contextlib import contextmanager
+
 from flask import send_file
 from xivo_dao.helpers import errors
 
-from .model import SoundCategory, SoundFormat, SoundFile
+from .model import SoundCategory, SoundFile, SoundFormat
 
 logger = logging.getLogger(__name__)
 
