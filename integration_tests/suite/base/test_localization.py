@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
+
 from hamcrest import has_entries
 
-from . import confd
 from ..helpers import fixtures
 from ..helpers.bus import BusClient
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import confd
 
 
 def test_get_default():

@@ -1,7 +1,8 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask_restful import abort
+
 from wazo_confd.database import wizard as wizard_db
 
 

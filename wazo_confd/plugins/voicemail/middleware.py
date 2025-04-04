@@ -1,10 +1,10 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.voicemail import Voicemail
 
-from .schema import VoicemailSchema
 from ...middleware import ResourceMiddleware
+from .schema import VoicemailSchema
 
 
 class VoicemailMiddleWare(ResourceMiddleware):

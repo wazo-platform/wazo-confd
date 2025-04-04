@@ -1,7 +1,6 @@
-# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo.xivo_helpers import clean_extension
 from wazo_bus.resources.meeting.event import (
     MeetingCreatedEvent,
     MeetingDeletedEvent,
@@ -9,11 +8,11 @@ from wazo_bus.resources.meeting.event import (
     MeetingProgressEvent,
     MeetingUserProgressEvent,
 )
+from xivo.xivo_helpers import clean_extension
 
 from wazo_confd import auth
 
 from .schema import MeetingSchema
-
 
 MEETING_FIELDS = [
     'uuid',

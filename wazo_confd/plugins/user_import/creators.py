@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -13,7 +13,6 @@ from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.alchemy.sccpline import SCCPLine as SCCP
 from xivo_dao.alchemy.userfeatures import UserFeatures as User
 from xivo_dao.alchemy.voicemail import Voicemail
-
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.extension import dao as extension_dao
@@ -23,8 +22,8 @@ from wazo_confd.plugins.extension.schema import ExtensionSchema
 from wazo_confd.plugins.user.schema import UserSchema, UserSchemaNullable
 from wazo_confd.plugins.voicemail.schema import VoicemailSchema
 
-from .wazo_user_schema import WazoUserSchema
 from .constants import VALID_ENDPOINT_TYPES
+from .wazo_user_schema import WazoUserSchema
 
 
 class Creator(metaclass=abc.ABCMeta):

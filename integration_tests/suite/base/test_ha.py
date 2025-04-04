@@ -1,17 +1,12 @@
-# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
 
-from hamcrest import (
-    assert_that,
-    only_contains,
-    has_entry,
-    has_entries,
-)
+from hamcrest import assert_that, has_entries, has_entry, only_contains
 
-from . import confd, sysconfd
 from ..helpers.config import TOKEN_SUB_TENANT
+from . import confd, sysconfd
 
 
 def test_get():

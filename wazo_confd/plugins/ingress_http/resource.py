@@ -1,14 +1,13 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
-
 from xivo_dao.alchemy.ingress_http import IngressHTTP
 
-from wazo_confd.auth import required_acl, master_tenant_uuid
+from wazo_confd.auth import master_tenant_uuid, required_acl
 from wazo_confd.helpers.restful import ItemResource, ListResource
 
-from .schema import IngressViewSchema, IngressHTTPSchema
+from .schema import IngressHTTPSchema, IngressViewSchema
 
 
 class IngressHTTPList(ListResource):

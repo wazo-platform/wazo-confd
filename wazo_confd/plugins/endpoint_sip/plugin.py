@@ -1,14 +1,13 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
-
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
+from .middleware import EndpointSIPMiddleWare, TemplateSIPMiddleWare
 from .resource import SipItem, SipList, SipTemplateItem, SipTemplateList
 from .service import build_endpoint_service, build_template_service
-from .middleware import EndpointSIPMiddleWare, TemplateSIPMiddleWare
 
 
 class Plugin:

@@ -1,12 +1,12 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
-from marshmallow import EXCLUDE, Schema, fields, validates, post_dump, pre_load
-from marshmallow.validate import OneOf, Regexp, Range, Length
+from marshmallow import EXCLUDE, Schema, fields, post_dump, pre_load, validates
 from marshmallow.exceptions import ValidationError
+from marshmallow.validate import Length, OneOf, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 EXTEN_REGEX = r'^[A-Z0-9+*]+$'
 

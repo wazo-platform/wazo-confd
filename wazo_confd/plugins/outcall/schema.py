@@ -1,11 +1,11 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
 from marshmallow import fields, post_dump
 from marshmallow.validate import Length, Range
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 
 
 class OutcallSchema(BaseSchema):

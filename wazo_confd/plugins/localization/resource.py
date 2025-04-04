@@ -1,11 +1,11 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
+from xivo.tenant_flask_helpers import Tenant
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource, build_tenant
-from xivo.tenant_flask_helpers import Tenant
 
 from .schema import LocalizationSchema
 

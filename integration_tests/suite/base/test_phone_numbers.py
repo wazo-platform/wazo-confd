@@ -1,30 +1,29 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import pytest
 from hamcrest import (
     all_of,
     assert_that,
     contains_string,
     empty,
+    has_entries,
     has_item,
     has_items,
-    has_entries,
+    has_length,
     is_not,
     matches_regexp,
     none,
     not_,
-    has_length,
     starts_with,
 )
-import pytest
-from . import confd
-from ..helpers import (
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
+
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from ..helpers.fixtures import phone_number_range  # noqa: F401
+from . import confd
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 

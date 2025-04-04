@@ -1,13 +1,11 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
 from io import StringIO
 
 from .. import config
-from . import words
-from . import voicemail, extension, call_permission
-from . import new_client
+from . import call_permission, extension, new_client, voicemail, words
 
 
 def csv_client():

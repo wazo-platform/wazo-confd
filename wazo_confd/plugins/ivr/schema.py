@@ -1,9 +1,8 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load
 from marshmallow.validate import Length, Range, Regexp
-
 from xivo_dao.alchemy.dialaction import Dialaction
 from xivo_dao.alchemy.ivr_choice import IVRChoice
 

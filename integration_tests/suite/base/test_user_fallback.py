@@ -1,12 +1,12 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 
-from . import confd
-from ..helpers import scenarios as s
 from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
+from . import confd
 
 FAKE_ID = 999999999
 

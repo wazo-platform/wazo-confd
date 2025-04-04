@@ -1,11 +1,11 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_key, has_entries, equal_to
+from hamcrest import assert_that, equal_to, has_entries, has_key
 
-from . import confd
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from . import confd
 
 VALID_FORWARDS = ['busy', 'noanswer', 'unconditional']
 

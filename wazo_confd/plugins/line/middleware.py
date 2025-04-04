@@ -1,12 +1,12 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.exception import InputError, ResourceError
 
-from .schema import LineSchemaNullable, LinePutSchema, LineListSchema
 from ...middleware import ResourceMiddleware
+from .schema import LineListSchema, LinePutSchema, LineSchemaNullable
 
 
 class LineMiddleWare(ResourceMiddleware):

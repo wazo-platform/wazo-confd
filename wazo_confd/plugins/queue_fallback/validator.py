@@ -1,8 +1,8 @@
-# Copyright 2018-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.helpers.destination import DestinationValidator
-from wazo_confd.helpers.validator import Validator, ValidationGroup
+from wazo_confd.helpers.validator import ValidationGroup, Validator
 
 
 class QueueFallbackValidator(Validator):

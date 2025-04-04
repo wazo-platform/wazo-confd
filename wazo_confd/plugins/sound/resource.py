@@ -1,4 +1,4 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -8,7 +8,7 @@ from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
 from .model import SoundCategory, SoundFile, SoundFormat
-from .schema import SoundSchema, SoundQueryParametersSchema
+from .schema import SoundQueryParametersSchema, SoundSchema
 
 
 class SoundList(ListResource):

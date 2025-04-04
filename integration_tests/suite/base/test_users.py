@@ -1,9 +1,10 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
     all_of,
     assert_that,
+    calling,
     contains,
     contains_inanyorder,
     empty,
@@ -17,28 +18,27 @@ from hamcrest import (
     none,
     not_,
     raises,
-    calling,
     starts_with,
 )
+from requests.exceptions import HTTPError
 from wazo_test_helpers.hamcrest.uuid_ import uuid_
 
-from . import confd, provd, auth as authentication, BaseIntegrationTest
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    scenarios as s,
-    helpers as h,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-    gen_group_exten,
     CONTEXT,
     INCALL_CONTEXT,
+    MAIN_TENANT,
     OUTCALL_CONTEXT,
+    SUB_TENANT,
+    gen_group_exten,
 )
-from requests.exceptions import HTTPError
+from . import BaseIntegrationTest
+from . import auth as authentication
+from . import confd, provd
 
 FULL_USER = {
     "firstname": "Jôhn",

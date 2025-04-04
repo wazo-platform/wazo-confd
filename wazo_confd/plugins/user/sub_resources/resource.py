@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -6,13 +6,13 @@ from flask import request
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.plugins.user.sub_resources.schema import (
+    ForwardBusySchema,
+    ForwardNoAnswerSchema,
+    ForwardsSchema,
+    ForwardUnconditionalSchema,
     ServiceDNDSchema,
     ServiceIncallFilterSchema,
     ServicesSchema,
-    ForwardBusySchema,
-    ForwardNoAnswerSchema,
-    ForwardUnconditionalSchema,
-    ForwardsSchema,
 )
 
 

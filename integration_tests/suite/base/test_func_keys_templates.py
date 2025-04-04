@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -11,18 +11,16 @@ from hamcrest import (
     has_item,
     has_items,
     is_not,
-    not_,
     none,
+    not_,
 )
 
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
-from ..helpers import errors as e, fixtures, scenarios as s
-from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-)
-
 
 invalid_template_destinations = [
     {'type': 'agent'},

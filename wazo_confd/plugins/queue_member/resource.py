@@ -1,15 +1,14 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
 from marshmallow import fields
 from marshmallow.validate import Range
-
 from xivo_dao.alchemy.queuemember import QueueMember
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ConfdResource
 from wazo_confd.helpers.mallow import BaseSchema
+from wazo_confd.helpers.restful import ConfdResource
 
 
 class QueueMemberAgentSchema(BaseSchema):

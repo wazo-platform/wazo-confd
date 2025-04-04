@@ -1,15 +1,11 @@
-# Copyright 2016-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
-from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.moh import dao as moh_dao
+from xivo_dao.resources.queue import dao as queue_dao
 
-from wazo_confd.helpers.validator import (
-    MOHExists,
-    Validator,
-    ValidationGroup,
-)
+from wazo_confd.helpers.validator import MOHExists, ValidationGroup, Validator
 
 
 class GroupValidator(Validator):

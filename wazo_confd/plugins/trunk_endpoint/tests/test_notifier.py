@@ -1,9 +1,8 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 import uuid
-
 from unittest.mock import Mock
 
 from wazo_bus.resources.trunk_endpoint.event import (
@@ -14,15 +13,14 @@ from wazo_bus.resources.trunk_endpoint.event import (
     TrunkEndpointSIPAssociatedEvent,
     TrunkEndpointSIPDissociatedEvent,
 )
-
 from xivo_dao.alchemy.trunkfeatures import TrunkFeatures as Trunk
 from xivo_dao.alchemy.usercustom import UserCustom as Custom
 from xivo_dao.alchemy.useriax import UserIAX as IAX
 
 from ..notifier import (
-    TrunkEndpointSIPNotifier,
-    TrunkEndpointIAXNotifier,
     TrunkEndpointCustomNotifier,
+    TrunkEndpointIAXNotifier,
+    TrunkEndpointSIPNotifier,
 )
 
 

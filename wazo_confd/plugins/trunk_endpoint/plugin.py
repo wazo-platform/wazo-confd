@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
@@ -8,14 +8,10 @@ from xivo_dao.resources.trunk import dao as trunk_dao
 
 from .resource import (
     TrunkEndpointAssociationCustom,
-    TrunkEndpointAssociationSip,
     TrunkEndpointAssociationIAX,
+    TrunkEndpointAssociationSip,
 )
-from .service import (
-    build_service_sip,
-    build_service_iax,
-    build_service_custom,
-)
+from .service import build_service_custom, build_service_iax, build_service_sip
 
 
 class Plugin:

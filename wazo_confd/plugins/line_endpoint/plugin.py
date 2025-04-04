@@ -1,23 +1,19 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
 
-from .resource import (
-    LineEndpointAssociationSip,
-    LineEndpointAssociationSccp,
-    LineEndpointAssociationCustom,
-)
-from .service import (
-    build_service_sip,
-    build_service_sccp,
-    build_service_custom,
-)
 from .middleware import (
     LineEndpointCustomMiddleWare,
     LineEndpointSCCPMiddleWare,
     LineEndpointSIPMiddleWare,
 )
+from .resource import (
+    LineEndpointAssociationCustom,
+    LineEndpointAssociationSccp,
+    LineEndpointAssociationSip,
+)
+from .service import build_service_custom, build_service_sccp, build_service_sip
 
 
 class Plugin:

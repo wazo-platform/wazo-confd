@@ -2,34 +2,31 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
 from datetime import datetime
 
 from hamcrest import (
+    all_of,
     assert_that,
     empty,
     has_entries,
     has_entry,
     has_item,
+    has_items,
     has_key,
     is_not,
     none,
+    not_,
     not_none,
     starts_with,
-    all_of,
-    not_,
-    has_items,
 )
 
-from . import BaseIntegrationTest, confd, mocks, provd
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    helpers as h,
-    scenarios as s,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import BaseIntegrationTest, confd, mocks, provd
 
 
 class TestDeviceCreateWithTemplate(unittest.TestCase):

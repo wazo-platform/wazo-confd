@@ -1,12 +1,9 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from . import (
-    confd,
-    endpoint_sip,
-    line as line_helper,
-    line_endpoint_sip,
-)
+from . import confd, endpoint_sip
+from . import line as line_helper
+from . import line_endpoint_sip
 
 
 def delete_line_sip(line_id, check=False, **params):

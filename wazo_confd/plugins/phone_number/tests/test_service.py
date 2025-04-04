@@ -2,9 +2,10 @@ import unittest
 from unittest.mock import Mock
 from uuid import uuid4
 
-from wazo_confd.plugins.phone_number.utils import PhoneNumberRangeSpec
-from wazo_confd.plugins.phone_number.service import PhoneNumberService
 from xivo_dao.helpers.errors import ResourceError
+
+from wazo_confd.plugins.phone_number.service import PhoneNumberService
+from wazo_confd.plugins.phone_number.utils import PhoneNumberRangeSpec
 
 
 class TestPhoneNumberService(unittest.TestCase):

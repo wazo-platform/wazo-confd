@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
@@ -6,12 +6,12 @@ from wazo_provd_client import Client as ProvdClient
 from .builder import build_dao, build_service
 from .middleware import DeviceMiddleWare
 from .resource import (
+    DeviceAutoprov,
     DeviceItem,
     DeviceList,
-    UnallocatedDeviceList,
-    UnallocatedDeviceItem,
-    DeviceAutoprov,
     DeviceSynchronize,
+    UnallocatedDeviceItem,
+    UnallocatedDeviceList,
 )
 
 

@@ -1,13 +1,13 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import request, url_for
 from uuid import uuid4
 
+from flask import request, url_for
 from xivo_dao.alchemy.context import Context
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ListResource, ItemResource
+from wazo_confd.helpers.restful import ItemResource, ListResource
 
 from .schema import ContextSchema, ContextSchemaPUT
 

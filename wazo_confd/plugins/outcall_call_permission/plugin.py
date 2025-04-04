@@ -1,8 +1,8 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.resources.outcall import dao as outcall_dao
 from xivo_dao.resources.call_permission import dao as call_permission_dao
+from xivo_dao.resources.outcall import dao as outcall_dao
 
 from .resource import OutcallCallPermissionAssociation
 from .service import build_service

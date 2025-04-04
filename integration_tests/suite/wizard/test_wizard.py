@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
@@ -9,19 +9,17 @@ from hamcrest import (
     assert_that,
     contains_inanyorder,
     empty,
-    has_entry,
     has_entries,
+    has_entry,
     has_item,
     has_length,
     is_not,
     starts_with,
 )
-
 from wazo_test_helpers import until
 
-from ..helpers.wrappers import IsolatedAction
 from ..helpers.base import IntegrationTest as BaseIntegrationTest
-
+from ..helpers.wrappers import IsolatedAction
 
 RESOLVCONF_NAMESERVERS = ['127.0.0.11']
 TIMEZONE = 'America/Montreal'

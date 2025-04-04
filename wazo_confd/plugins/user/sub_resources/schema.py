@@ -1,10 +1,10 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, pre_dump, post_load
+from marshmallow import fields, post_load, pre_dump
 from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Nested, StrictBoolean
 
 
 class ServiceDNDSchema(BaseSchema):

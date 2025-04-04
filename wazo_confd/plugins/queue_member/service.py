@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -6,7 +6,7 @@ from xivo_dao.resources.agent import dao as agent_dao_module
 from xivo_dao.resources.queue import dao as queue_dao_module
 
 from .notifier import build_notifier
-from .validator import build_validator_member_user, build_validator_member_agent
+from .validator import build_validator_member_agent, build_validator_member_user
 
 
 class QueueMemberService:

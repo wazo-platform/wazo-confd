@@ -1,11 +1,11 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, equal_to, has_key, has_entry, has_entries
+from hamcrest import assert_that, equal_to, has_entries, has_entry, has_key
 
-from . import confd
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from . import confd
 
 VALID_SERVICES = ['dnd', 'incallfilter']
 

@@ -1,17 +1,19 @@
-# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
     assert_that,
-    has_entries,
     contains_exactly,
     contains_inanyorder,
     empty,
+    has_entries,
 )
 
-from . import confd
-from ..helpers import associations as a, fixtures, scenarios as s
+from ..helpers import associations as a
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import confd
 
 
 @fixtures.context(

@@ -1,10 +1,12 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
 
+from ..user_import.wazo_user_service import build_service as build_wazo_user_service
 from .middleware import UserMiddleWare
 from .resource import UserItem, UserList
+from .service import build_service, build_service_callservice, build_service_forward
 from .sub_resources.middleware import UserForwardMiddleWare
 from .sub_resources.resource import (
     UserForwardBusy,
@@ -15,8 +17,6 @@ from .sub_resources.resource import (
     UserServiceIncallFilter,
     UserServiceList,
 )
-from .service import build_service, build_service_callservice, build_service_forward
-from ..user_import.wazo_user_service import build_service as build_wazo_user_service
 
 
 class Plugin:

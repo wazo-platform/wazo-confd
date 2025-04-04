@@ -1,10 +1,10 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_bus.resources.localization.event import LocalizationEditedEvent
-from wazo_confd.plugins.localization.schema import LocalizationSchema
 
 from wazo_confd import bus
+from wazo_confd.plugins.localization.schema import LocalizationSchema
 
 
 class LocalizationNotifier:

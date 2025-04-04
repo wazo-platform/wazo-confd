@@ -1,7 +1,8 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.helpers.types import PluginDependencies
+
 from .resource import (
     PhoneNumberItem,
     PhoneNumberList,

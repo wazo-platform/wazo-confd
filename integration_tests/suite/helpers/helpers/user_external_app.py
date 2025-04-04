@@ -1,13 +1,11 @@
-# Copyright 2020-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import random
 import string
 
-from . import (
-    confd,
-    user as user_helper,
-)
+from . import confd
+from . import user as user_helper
 
 
 def generate_user_external_app(**parameters):

@@ -1,17 +1,11 @@
-# Copyright 2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import (
-    assert_that,
-    all_of,
-    has_entries,
-    has_items,
-    not_,
-)
+from hamcrest import all_of, assert_that, has_entries, has_items, not_
 
-from . import confd
 from ..helpers import fixtures
 from ..helpers.config import SUB_TENANT
+from . import confd
 
 
 @fixtures.user(subscription_type=8)

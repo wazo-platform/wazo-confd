@@ -1,17 +1,15 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from sqlalchemy.orm import Load
 from sqlalchemy.sql import or_
-
-from xivo_dao.alchemy.userfeatures import UserFeatures
-from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
 from xivo_dao.alchemy.extension import Extension
-from xivo_dao.alchemy.user_line import UserLine
 from xivo_dao.alchemy.line_extension import LineExtension
+from xivo_dao.alchemy.linefeatures import LineFeatures
 from xivo_dao.alchemy.sccpdevice import SCCPDevice
-
+from xivo_dao.alchemy.user_line import UserLine
+from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.helpers.db_manager import Session
 
 

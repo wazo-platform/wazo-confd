@@ -3,7 +3,6 @@
 
 import datetime
 import re
-
 from contextlib import ExitStack
 
 from hamcrest import (
@@ -22,23 +21,22 @@ from hamcrest import (
     not_,
 )
 
-from . import confd, provd, BaseIntegrationTest
-from ..helpers import (
-    associations as a,
-    errors as e,
-    fixtures,
-    helpers as h,
-    scenarios as s,
-)
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import (
     CONTEXT,
     EXTEN_OUTSIDE_RANGE,
+    MAIN_TENANT,
+    SUB_TENANT,
     gen_conference_exten,
     gen_group_exten,
-    gen_queue_exten,
     gen_line_exten,
+    gen_queue_exten,
 )
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import BaseIntegrationTest, confd, provd
 
 outside_range_regex = re.compile(
     r"Extension '(\d+)' is outside of range for context '([\w_-]+)'"

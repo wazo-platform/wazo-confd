@@ -1,14 +1,12 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 import signal
 import threading
-
 from functools import partial
 
 import xivo_dao
-
 from wazo_auth_client import Client as AuthClient
 from xivo import plugin_helpers
 from xivo.consul_helpers import ServiceCatalogRegistration
@@ -19,8 +17,8 @@ from wazo_confd.helpers.asterisk import PJSIPDoc
 from wazo_confd.helpers.middleware import MiddleWareHandle
 
 from . import auth
-from ._bus import BusPublisher, BusConsumer
-from .http_server import api, app, HTTPServer
+from ._bus import BusConsumer, BusPublisher
+from .http_server import HTTPServer, api, app
 from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)

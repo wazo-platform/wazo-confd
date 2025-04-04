@@ -1,11 +1,11 @@
-# Copyright 2021-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
 import logging
-
 from datetime import datetime, timedelta, timezone
 
+from wazo_auth_client import Client as AuthClient
 from xivo import xivo_logging
 from xivo.chain_map import ChainMap
 from xivo.config_helper import read_config_file_hierarchy
@@ -15,22 +15,20 @@ from xivo_dao.resources.infos import dao as info_dao
 from xivo_dao.resources.meeting import dao as meeting_dao
 from xivo_dao.resources.meeting_authorization import dao as meeting_authorization_dao
 
-from wazo_auth_client import Client as AuthClient
-
 from wazo_confd._bus import BusPublisher
 from wazo_confd._sysconfd import SysconfdPublisher
 from wazo_confd.config import DEFAULT_CONFIG, _load_key_file
 from wazo_confd.helpers.resource import CRUDService
-from wazo_confd.plugins.meeting.validator import (
-    build_validator as build_meeting_validator,
+from wazo_confd.plugins.extension_feature.service import (
+    build_service as build_extension_features_service,
 )
 from wazo_confd.plugins.ingress_http.service import (
     build_service as build_ingress_http_service,
 )
-from wazo_confd.plugins.extension_feature.service import (
-    build_service as build_extension_features_service,
-)
 from wazo_confd.plugins.meeting.notifier import Notifier as MeetingNotifier
+from wazo_confd.plugins.meeting.validator import (
+    build_validator as build_meeting_validator,
+)
 from wazo_confd.plugins.meeting_authorization.notifier import (
     Notifier as MeetingAuthorizationNotifier,
 )

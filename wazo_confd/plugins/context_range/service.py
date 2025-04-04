@@ -1,16 +1,16 @@
-# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
 
-from collections import defaultdict
 import logging
+from collections import defaultdict
 from operator import itemgetter
 from typing import Iterator, Literal
 
+from xivo_dao.alchemy.context import Context, ContextNumbers
 from xivo_dao.resources.context import dao as context_dao
 from xivo_dao.resources.extension import dao as extension_dao
-from xivo_dao.alchemy.context import Context, ContextNumbers
 
 logger = logging.getLogger(__name__)
 

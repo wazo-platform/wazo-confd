@@ -1,10 +1,10 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from functools import partial
-from hamcrest import assert_that, has_items, has_entries, instance_of, contains_string
-
 import re
+from functools import partial
+
+from hamcrest import assert_that, contains_string, has_entries, has_items, instance_of
 
 
 class RegexError:

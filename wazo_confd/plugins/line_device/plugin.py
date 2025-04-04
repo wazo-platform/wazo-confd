@@ -1,16 +1,14 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from xivo_dao.resources.line import dao as line_dao
 from wazo_provd_client import Client as ProvdClient
+from xivo_dao.resources.line import dao as line_dao
 
-from wazo_confd.plugins.device.builder import (
-    build_dao as build_device_dao,
-    build_device_updater,
-)
+from wazo_confd.plugins.device.builder import build_dao as build_device_dao
+from wazo_confd.plugins.device.builder import build_device_updater
+
 from .middleware import LineDeviceAssociationMiddleWare
-
-from .resource import LineDeviceAssociation, LineDeviceGet, DeviceLineGet
+from .resource import DeviceLineGet, LineDeviceAssociation, LineDeviceGet
 from .service import build_service
 
 
