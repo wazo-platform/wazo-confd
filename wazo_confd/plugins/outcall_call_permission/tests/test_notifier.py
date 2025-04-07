@@ -1,17 +1,16 @@
-# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
-from uuid import uuid4
 from unittest.mock import Mock
+from uuid import uuid4
 
 from wazo_bus.resources.outcall_call_permission.event import (
     OutcallCallPermissionAssociatedEvent,
     OutcallCallPermissionDissociatedEvent,
 )
-from xivo_dao.alchemy.rightcall import RightCall as CallPermission
 from xivo_dao.alchemy.outcall import Outcall
+from xivo_dao.alchemy.rightcall import RightCall as CallPermission
 
 from ..notifier import OutcallCallPermissionNotifier
 

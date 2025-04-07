@@ -1,10 +1,10 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.context import dao as context_dao
 
-from wazo_confd.helpers.validator import ValidatorAssociation, ValidationAssociation
+from wazo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 from wazo_confd.plugins.parking_lot.validator import (
     validate_parking_lot_slots_do_not_conflict,
 )

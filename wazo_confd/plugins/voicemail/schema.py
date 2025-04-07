@@ -1,10 +1,10 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, validates_schema, ValidationError
+from marshmallow import ValidationError, fields, validates_schema
 from marshmallow.validate import Length, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Link, ListLink, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
 
 NUMBER_REGEX = r"^[0-9]{1,40}$"

@@ -1,10 +1,10 @@
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_provd_client import Client as ProvdClient
 
 from .builder import build_dao, build_service
-from .resource import RegistrarList, RegistrarItem
+from .resource import RegistrarItem, RegistrarList
 
 
 class Plugin:

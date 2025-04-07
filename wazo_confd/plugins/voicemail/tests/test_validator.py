@@ -1,11 +1,10 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
 from unittest.mock import Mock, sentinel
-from hamcrest import assert_that, calling, raises
 
+from hamcrest import assert_that, calling, raises
 from xivo_dao.alchemy.voicemail import Voicemail
 from xivo_dao.helpers.exception import ResourceError
 

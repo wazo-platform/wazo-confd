@@ -1,9 +1,9 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from marshmallow import fields, validates_schema, pre_load
-from marshmallow.validate import Length, Predicate, Range
+from marshmallow import fields, pre_load, validates_schema
 from marshmallow.exceptions import ValidationError
+from marshmallow.validate import Length, Predicate, Range
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested
 from wazo_confd.plugins.endpoint_custom.schema import CustomSchema

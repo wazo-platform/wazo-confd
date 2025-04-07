@@ -1,8 +1,10 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
 from base64 import b64encode
+from datetime import datetime, timedelta, timezone
+
 from hamcrest import (
     all_of,
     assert_that,
@@ -20,21 +22,13 @@ from hamcrest import (
     not_,
     not_none,
 )
-from datetime import datetime, timedelta, timezone
 
-from . import (
-    BaseIntegrationTest,
-    confd,
-    create_confd,
-    db,
-)
-from ..helpers import (
-    bus,
-    errors as e,
-    fixtures,
-    scenarios as s,
-)
+from ..helpers import bus
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from . import BaseIntegrationTest, confd, create_confd, db
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 

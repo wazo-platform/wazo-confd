@@ -1,4 +1,4 @@
-# Copyright 2019-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_bus.resources.registrar.event import (
@@ -6,6 +6,7 @@ from wazo_bus.resources.registrar.event import (
     RegistrarDeletedEvent,
     RegistrarEditedEvent,
 )
+
 from .schema import RegistrarSchema
 
 

@@ -1,12 +1,13 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
 import json
 import logging
 import pprint
-import requests
 from io import StringIO
+
+import requests
 from hamcrest import (
     assert_that,
     contains_string,
@@ -21,7 +22,6 @@ from hamcrest import (
 
 from .config import TOKEN
 from .urls import UrlFragment
-
 
 requests.packages.urllib3.disable_warnings()
 

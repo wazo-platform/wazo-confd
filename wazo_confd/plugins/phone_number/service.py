@@ -1,23 +1,23 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import logging
 from typing import Literal
 
-from xivo_dao.resources.phone_number import dao
 from xivo_dao.alchemy.phone_number import PhoneNumber
 from xivo_dao.helpers.errors import ResourceError
+from xivo_dao.resources.phone_number import dao
+
 from wazo_confd.helpers.resource import CRUDService
 
+from .notifier import PhoneNumberNotifier, build_notifier
 from .utils import (
+    PhoneNumberMainSpec,
     PhoneNumberRangeSpec,
     generate_phone_number_range,
-    PhoneNumberMainSpec,
 )
-from .notifier import build_notifier, PhoneNumberNotifier
 from .validator import build_validator
-
 
 logger = logging.getLogger(__name__)
 

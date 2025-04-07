@@ -1,11 +1,10 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
 from unittest.mock import Mock
-from hamcrest import assert_that, has_entries
 
+from hamcrest import assert_that, has_entries
 from xivo_dao.alchemy.func_key_mapping import FuncKeyMapping as FuncKey
 from xivo_dao.alchemy.linefeatures import LineFeatures as Line
 

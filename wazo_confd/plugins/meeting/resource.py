@@ -1,22 +1,19 @@
-# Copyright 2021-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 import secrets
 import string
-
 from uuid import uuid4
 
-from flask import url_for, request
-
-from xivo.xivo_helpers import clean_extension
+from flask import request, url_for
 from xivo.tenant_flask_helpers import user
-
-from xivo_dao.alchemy.meeting import Meeting
+from xivo.xivo_helpers import clean_extension
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
+from xivo_dao.alchemy.meeting import Meeting
 from xivo_dao.helpers import errors
 
-from wazo_confd.auth import required_acl, no_auth, master_tenant_uuid
+from wazo_confd.auth import master_tenant_uuid, no_auth, required_acl
 from wazo_confd.helpers.restful import ItemResource, ListResource, ListSchema
 
 from .exceptions import MeetingGuestSIPTemplateNotFound

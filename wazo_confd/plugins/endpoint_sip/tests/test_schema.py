@@ -1,8 +1,7 @@
-# Copyright 2019-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
-
 from unittest import TestCase
 
 from hamcrest import (
@@ -14,20 +13,15 @@ from hamcrest import (
     has_entries,
     not_,
 )
-
 from wazo_test_helpers.hamcrest.raises import raises
 from werkzeug.exceptions import BadRequest
 
+from wazo_confd.plugins.line.resource import LineListSchema  # noqa
 
 # Adding schemas to the marshmallow registry
 from wazo_confd.plugins.trunk.resource import TrunkSchema  # noqa
-from wazo_confd.plugins.line.resource import LineListSchema  # noqa
 
-from ..schema import (
-    EndpointSIPSchema,
-    GETQueryStringSchema,
-    MergedEndpointSIPSchema,
-)
+from ..schema import EndpointSIPSchema, GETQueryStringSchema, MergedEndpointSIPSchema
 
 
 class TestGETQueryStringSchema(TestCase):

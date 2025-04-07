@@ -1,10 +1,11 @@
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from wazo_confd.helpers.resource import CRUDService
+import logging
+
 from xivo_dao.helpers.exception import NotFoundError
 
-import logging
+from wazo_confd.helpers.resource import CRUDService
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,4 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import io
@@ -18,9 +18,11 @@ from hamcrest import (
     not_,
 )
 
-from . import BaseIntegrationTest, confd
-from ..helpers import errors as e, fixtures, scenarios as s
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.config import MAIN_TENANT, SUB_TENANT, TOKEN
+from . import BaseIntegrationTest, confd
 
 NOT_FOUND_UUID = 'uuid-not-found'
 VALID_WAV_FILE = io.BytesIO()

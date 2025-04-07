@@ -1,12 +1,13 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
 from marshmallow import fields
-from marshmallow.validate import Equal, Regexp, Length, OneOf
+from marshmallow.validate import Equal, Length, OneOf, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Nested, StrictBoolean
 from wazo_confd.helpers.restful import ErrorCatchingResource
+
 from .access_restriction import wazo_unconfigured
 
 ADMIN_PASSWORD_REGEX = (
