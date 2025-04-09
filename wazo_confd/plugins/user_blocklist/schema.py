@@ -15,6 +15,10 @@ from wazo_confd.helpers.restful import ListSchema
 logger = logging.getLogger(__name__)
 
 
+def uuid_str_field(**kwargs):
+    return fields.String(validate=Length(equal=36), **kwargs)
+
+
 class UserBlocklistNumberSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     number = number_field(required=True)
@@ -32,8 +36,8 @@ class UserBlocklistNumberSchema(BaseSchema):
 
 class BlocklistNumberSchema(UserBlocklistNumberSchema):
     links = ListLink(Link('blocklist_numbers', field='uuid'))
-    user_uuid = fields.String(dump_only=True)
-    tenant_uuid = fields.String(dump_only=True)
+    user_uuid = uuid_str_field(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True, attribute='blocklist.tenant_uuid')
 
 
 class EncodedList(fields.List):
@@ -51,7 +55,7 @@ class EncodedList(fields.List):
 
 
 class BlocklistNumberListSchema(ListSchema):
-    user_uuids = EncodedList(fields.String())
+    user_uuid = uuid_str_field()
     number = number_field()
     label = fields.String(validate=Length(min=1, max=1024), allow_none=True)
 
