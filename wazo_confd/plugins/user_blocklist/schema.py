@@ -35,25 +35,11 @@ class UserBlocklistNumberSchema(BaseSchema):
 class BlocklistNumberSchema(UserBlocklistNumberSchema):
     links = ListLink(Link('user_blocklist_numbers', field='uuid'))
     user_uuid = fields.String(dump_only=True)
-    tenant_uuid = fields.String(dump_only=True)
-
-
-class EncodedList(fields.List):
-    def __init__(
-        self, cls_or_instance: fields.Field | type, delimiter: str = ',', **kwargs
-    ):
-        super().__init__(cls_or_instance, **kwargs)
-        self.delimiter = delimiter
-
-    def _deserialize(self, value, attr, data, **kwargs):
-        if isinstance(value, str):
-            values = value.split(self.delimiter)
-            return super()._deserialize(values, attr, data, **kwargs)
-        raise ValidationError('Invalid value type', field_name=attr)
+    tenant_uuid = fields.String(dump_only=True, attribute='blocklist.tenant_uuid')
 
 
 class BlocklistNumberListSchema(ListSchema):
-    user_uuids = EncodedList(fields.String())
+    user_uuid = fields.String()
     number = number_field()
     label = fields.String(validate=Length(min=1, max=1024), allow_none=True)
 

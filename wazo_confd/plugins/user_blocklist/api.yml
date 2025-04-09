@@ -139,10 +139,10 @@ paths:
         - $ref: '#/parameters/limit'
         - $ref: '#/parameters/offset'
         - $ref: '#/parameters/search'
-        - name: user_uuids
+        - name: user_uuid
           in: query
           type: string
-          description: comma-separated list of user UUIDs to filter blocklisted numbers
+          description: filter blocklist numbers by the blocklist owner's uuid
           required: false
         - name: number
           in: query

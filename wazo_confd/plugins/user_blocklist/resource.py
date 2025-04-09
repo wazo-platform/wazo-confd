@@ -120,11 +120,13 @@ class BlocklistNumberList(ListResource):
         if tenant_uuids is not None:
             kwargs['tenant_uuids'] = tenant_uuids
 
+        logger.debug('blocklist search params: %s', params)
         total, items = self.service.search(params, **kwargs)
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     def search_params(self):
-        return blocklist_number_list_schema.load(request.args)
+        params = blocklist_number_list_schema.load(request.args)
+        return params
 
 
 class BlocklistNumberItem(ItemResource):
