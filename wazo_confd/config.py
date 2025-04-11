@@ -149,6 +149,7 @@ DEFAULT_CONFIG = {
         'trunk_register': True,
         'user': True,
         'user_agent': True,
+        'user_blocklist': True,
         'user_external_app': True,
         'user_call_permission': True,
         'user_callerid': True,

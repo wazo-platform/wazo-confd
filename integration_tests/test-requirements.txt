@@ -9,3 +9,4 @@ pyhamcrest
 pytest
 requests
 sqlalchemy<2
+phonenumbers

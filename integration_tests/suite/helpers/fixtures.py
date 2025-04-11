@@ -327,3 +327,11 @@ class meeting_authorization(IsolatedAction):
         'generate': h.meeting_authorization.generate,
         'delete': h.meeting_authorization.delete,
     }
+
+
+class users_blocklist_number(IsolatedAction):
+    id_field = 'uuid'
+    actions = {
+        'generate': h.blocklist.generate_user_blocklist_number,
+        'delete': h.blocklist.delete_user_blocklist_number,
+    }
