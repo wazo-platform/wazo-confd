@@ -7,8 +7,6 @@ paths:
       tags:
       - blocklist
       parameters:
-      - $ref: '#/parameters/tenantuuid'
-      - $ref: '#/parameters/recurse'
       - $ref: '#/parameters/order'
       - $ref: '#/parameters/direction'
       - $ref: '#/parameters/limit'
