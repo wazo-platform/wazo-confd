@@ -25,7 +25,7 @@ class UniqueNumberInBlocklist(Validator):
         raise errors.resource_exists(
             'BlocklistNumber',
             number=model.number,
-            blocklist_uuid=model.blocklist_uuid,
+            user_uuid=existing.user_uuid,
         )
 
 

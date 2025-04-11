@@ -2,8 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
+    all_of,
     assert_that,
     contains_exactly,
+    contains_string,
     empty,
     has_entries,
     has_item,
@@ -104,6 +106,12 @@ def test_put_conflict(user):
                 blocklist_number1['uuid']
             ).put(**blocklist_number1)
             response.assert_match(400, e.resource_exists(resource='BlocklistNumber'))
+            assert_that(
+                response.json,
+                contains_exactly(
+                    all_of(contains_string('number'), contains_string('user_uuid'))
+                ),
+            )
 
 
 @fixtures.user()
@@ -123,6 +131,12 @@ def test_post_conflict(user):
 
         response = url(number=blocklist_number['number'])
         response.assert_match(400, e.resource_exists(resource='BlocklistNumber'))
+        assert_that(
+            response.json,
+            contains_exactly(
+                all_of(contains_string('number'), contains_string('user_uuid'))
+            ),
+        )
 
 
 @fixtures.user()
