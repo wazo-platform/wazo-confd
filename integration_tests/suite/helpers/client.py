@@ -19,6 +19,7 @@ from hamcrest import (
     is_in,
     only_contains,
 )
+from hamcrest.library.collection.isdict_containingentries import has_entries
 
 from .config import TOKEN
 from .urls import UrlFragment
@@ -276,6 +277,16 @@ class Response:
             'content-disposition', ends_with('filename={}'.format(filename))
         )
         assert_that(headers, expected, 'Content-Disposition header not found')
+
+    def assert_headers(self, *expected_headers):
+        response_headers = {key: value for key, value in self.response.headers.items()}
+        expected = has_entries(
+            {
+                header_name: header_value
+                for header_name, header_value in expected_headers
+            }
+        )
+        assert_that(response_headers, expected)
 
     def assert_link(self, resource):
         expected = has_entry(

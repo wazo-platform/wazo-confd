@@ -178,3 +178,7 @@ def test_head_lookup(user):
             'blocklist_numbers',
             url_segment=f'blocklist/numbers/{blocklist_number["uuid"]}',
         )
+        response.assert_headers(
+            ('Wazo-Blocklist-Number-UUID', blocklist_number['uuid']),
+            ('Wazo-Blocklist-Number-Label', ''),
+        )
