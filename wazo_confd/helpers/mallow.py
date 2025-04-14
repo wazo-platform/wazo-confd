@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -155,7 +155,7 @@ class PJSIPSection(AsteriskSection):
     DEFAULT_RESERVED_NAMES = ['global', 'system']
 
 
-def number_field(**kwargs) -> fields.String:
+def PhoneNumber(**kwargs) -> fields.String:
     """
     marshmallow field constructor for phone numbers
     validates string format to restrict to digits and optional leading +

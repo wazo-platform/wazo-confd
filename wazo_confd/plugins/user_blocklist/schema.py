@@ -9,7 +9,7 @@ from marshmallow import fields, validates
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, number_field
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, PhoneNumber
 from wazo_confd.helpers.restful import ListSchema
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class UserBlocklistNumberSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
-    number = number_field(required=True)
+    number = PhoneNumber(required=True)
     label = fields.String(validate=Length(min=1, max=1024), allow_none=True)
     links = ListLink(Link('user_me_blocklist_numbers', field='uuid'))
 
@@ -40,12 +40,12 @@ class BlocklistNumberSchema(UserBlocklistNumberSchema):
 
 class BlocklistNumberListSchema(ListSchema):
     user_uuid = fields.String()
-    number = number_field()
+    number = PhoneNumber()
     label = fields.String(validate=Length(min=1, max=1024), allow_none=True)
 
 
 class UserBlocklistLookupSchema(BaseSchema):
-    number_exact = number_field()
+    number_exact = PhoneNumber()
 
 
 user_blocklist_number_schema = UserBlocklistNumberSchema()
