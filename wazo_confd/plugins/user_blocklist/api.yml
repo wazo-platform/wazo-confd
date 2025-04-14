@@ -120,6 +120,12 @@ paths:
             Wazo-Blocklist-Number-Label:
               type: string
               description: Label of the blocklisted number
+            Wazo-Blocklist-Number-UUID:
+              type: string
+              description: UUID of the blocklisted number
+            Location:
+              type: string
+              description: URL of the matching blocklisted number
         '400':
           $ref: '#/responses/GenericError'
         '404':
