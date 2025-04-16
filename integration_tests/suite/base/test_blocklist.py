@@ -1,11 +1,20 @@
 # Copyright 2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, has_entries, has_item, has_items, is_not
+from hamcrest import (
+    assert_that,
+    contains_exactly,
+    empty,
+    has_entries,
+    has_item,
+    has_items,
+    is_not,
+)
 
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers import utils
+from ..helpers.config import SUB_TENANT, SUB_TENANT2
 from . import confd, create_confd
 
 FAKE_UUID = '99999999-9999-4999-9999-999999999999'
@@ -112,6 +121,78 @@ def test_list(user, other_user):
                     uuid=fourth['uuid'],
                     label=fourth['label'],
                     number=fourth['number'],
+                    tenant_uuid=other_user['tenant_uuid'],
+                    user_uuid=other_user['uuid'],
+                ),
+            ),
+        )
+
+
+@fixtures.user(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT2)
+def test_list_multitenant(user, other_user):
+    user_confd_client = create_confd(user_uuid=user['uuid'])
+    other_user_confd_client = create_confd(user_uuid=other_user['uuid'])
+    numbers = [
+        fixtures.users_blocklist_number(
+            number='+18001235555', confd_client=user_confd_client
+        ),
+        fixtures.users_blocklist_number(
+            number='+15551112222', confd_client=other_user_confd_client
+        ),
+    ]
+    with utils.context_group(*numbers) as (blocklist_number1, blocklist_number2):
+        # master tenant token
+        url = confd.users.blocklist.numbers
+
+        # recurse is false by default
+        response = url.get()
+        assert_that(response.items, empty())
+
+        response = url.get(recurse=True)
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(
+                    uuid=blocklist_number1['uuid'],
+                    label=blocklist_number1['label'],
+                    number=blocklist_number1['number'],
+                    tenant_uuid=user['tenant_uuid'],
+                    user_uuid=user['uuid'],
+                ),
+                has_entries(
+                    uuid=blocklist_number2['uuid'],
+                    label=blocklist_number2['label'],
+                    number=blocklist_number2['number'],
+                    tenant_uuid=other_user['tenant_uuid'],
+                    user_uuid=other_user['uuid'],
+                ),
+            ),
+        )
+
+        # sub tenant only
+        response = url.get(wazo_tenant=user['tenant_uuid'])
+        assert_that(
+            response.items,
+            contains_exactly(
+                has_entries(
+                    uuid=blocklist_number1['uuid'],
+                    label=blocklist_number1['label'],
+                    number=blocklist_number1['number'],
+                    tenant_uuid=user['tenant_uuid'],
+                    user_uuid=user['uuid'],
+                ),
+            ),
+        )
+
+        response = url.get(wazo_tenant=other_user['tenant_uuid'])
+        assert_that(
+            response.items,
+            contains_exactly(
+                has_entries(
+                    uuid=blocklist_number2['uuid'],
+                    label=blocklist_number2['label'],
+                    number=blocklist_number2['number'],
                     tenant_uuid=other_user['tenant_uuid'],
                     user_uuid=other_user['uuid'],
                 ),

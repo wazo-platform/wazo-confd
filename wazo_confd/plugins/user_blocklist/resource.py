@@ -84,6 +84,7 @@ class UserBlocklistNumberList(ListResource):
     model = BlocklistNumber
     schema = BlocklistNumberSchema
     service: UserBlocklistService
+    has_tenant_uuid = True
 
     def build_headers(self, model: BlocklistNumber):
         return {
@@ -98,9 +99,12 @@ class UserBlocklistNumberList(ListResource):
     def head(self, user_uuid):
         params = user_blocklist_lookup_schema.load(request.args)
         logger.debug('lookup params: %s', params)
+        tenant_uuids = self._build_tenant_list(params)
         try:
             match = self.service.get_by(
-                user_uuid=str(user_uuid), number=params.get('number_exact')
+                user_uuid=str(user_uuid),
+                number=params.get('number_exact'),
+                tenant_uuids=tenant_uuids,
             )
         except NotFoundError:
             return '', 404
@@ -111,17 +115,16 @@ class BlocklistNumberList(ListResource):
     model = BlocklistNumber
     schema = BlocklistNumberSchema
     service: UserBlocklistService
+    has_tenant_uuid = True
 
     @required_acl('confd.users.blocklist.read')
     def get(self):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
-        kwargs = {}
-        if tenant_uuids is not None:
-            kwargs['tenant_uuids'] = tenant_uuids
 
         logger.debug('blocklist search params: %s', params)
-        total, items = self.service.search(params, **kwargs)
+        logger.debug('tenant_uuids: %s', tenant_uuids)
+        total, items = self.service.search(params, tenant_uuids=tenant_uuids)
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     def search_params(self):
