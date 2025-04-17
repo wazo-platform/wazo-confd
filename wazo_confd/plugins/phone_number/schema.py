@@ -2,29 +2,25 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import ValidationError, fields, validates_schema
-from marshmallow.validate import Length, Regexp
+from marshmallow.validate import Length
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean
+from wazo_confd.helpers.mallow import (
+    BaseSchema,
+    Link,
+    ListLink,
+    PhoneNumber,
+    StrictBoolean,
+)
 
 from .utils import PhoneNumberMainSpec, PhoneNumberRangeSpec
 
 MAX_PHONE_NUMBER_RANGE_SIZE = 10_000
 
 
-def number_field(**kwargs):
-    return fields.String(
-        validate=[
-            Length(min=1, max=128),
-            Regexp(r'^\+?[0-9]+$', error='not a valid digit-only phone number'),
-        ],
-        **kwargs,
-    )
-
-
 class PhoneNumberSchema(BaseSchema):
     uuid = fields.UUID(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
-    number = number_field(required=True)
+    number = PhoneNumber(required=True)
     caller_id_name = fields.String(validate=Length(min=1, max=256), allow_none=True)
     main = StrictBoolean(dump_only=True)
     shared = StrictBoolean(dump_default=False)
@@ -46,8 +42,8 @@ class PhoneNumberListSchema(BaseSchema):
 
 
 class PhoneNumberRangeSpecSchema(BaseSchema):
-    start_number = number_field(required=True)
-    end_number = number_field(required=True)
+    start_number = PhoneNumber(required=True)
+    end_number = PhoneNumber(required=True)
 
     def load(self, data, **kwargs) -> PhoneNumberRangeSpec:
         data = super().load(data, **kwargs)

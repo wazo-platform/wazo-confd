@@ -1,7 +1,7 @@
 paths:
   /users/me/blocklist/numbers:
     get:
-      operationId: list_blocklist_numbers
+      operationId: list_users_me_blocklist_numbers
       summary: List blocklist numbers of current user
       description: '**Required ACL:** `confd.users.me.blocklist.read`'
       tags:
@@ -28,7 +28,7 @@ paths:
           schema:
             $ref: '#/definitions/UserBlocklistNumbersListResponse'
     post:   
-      operationId: create_blocklist_number
+      operationId: create_users_me_blocklist_number
       summary: Add a new blocklist number
       description: '**Required ACL:** `confd.users.me.blocklist.create`'
       tags:
@@ -49,7 +49,7 @@ paths:
           $ref: '#/responses/CreateError'
   /users/me/blocklist/numbers/{blocklist_number_uuid}:
     get:
-      operationId: get_blocklist_number
+      operationId: get_users_me_blocklist_number
       summary: Get blocklist number by uuid
       description: '**Required ACL:** `confd.users.me.blocklist.read`'
       tags:
@@ -64,7 +64,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
     delete:
-      operationId: delete_blocklist_number
+      operationId: delete_users_me_blocklist_number
       summary: Delete a single blocklisted number by uuid
       description: '**Required ACL:** `confd.users.me.blocklist.delete`'
       tags:
@@ -77,7 +77,7 @@ paths:
         '404':
           $ref: '#/responses/NotFoundError'
     put:
-      operationId: update_blocklist_number
+      operationId: update_users_me_blocklist_number
       summary: Update a single blocklisted number by uuid
       description: '**Required ACL:** `confd.users.me.blocklist.update`'
       tags:
@@ -95,6 +95,94 @@ paths:
           $ref: '#/responses/ResourceUpdated'
         '400':
           $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/{user_uuid}/blocklist/numbers:
+    parameters:
+      - $ref: '#/parameters/useruuid'
+    head:
+      operationId: lookup_user_blocklist_number
+      summary: Check if a number is part of a user's blocklist
+      description: '**Required ACL:** `confd.users.{user_uuid}.blocklist.read`'
+      tags:
+      - blocklist
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: number_exact
+          in: query
+          type: string
+          description: E.164 number string to lookup(exact match) in the user's blocklist
+          required: true
+      responses:
+        '204':
+          description: The requested number is a blocklisted number
+          headers:
+            Wazo-Blocklist-Number-Label:
+              type: string
+              description: Label of the blocklisted number
+            Wazo-Blocklist-Number-UUID:
+              type: string
+              description: UUID of the blocklisted number
+            Location:
+              type: string
+              description: URL of the matching blocklisted number
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+  /users/blocklist/numbers:
+    get:
+      operationId: list_blocklist_numbers
+      summary: List all blocklisted numbers in tenant
+      description: '**Required ACL:** `confd.users.blocklist.read`'
+      tags:
+      - blocklist
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/recurse'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+        - name: user_uuid
+          in: query
+          type: string
+          description: filter blocklist numbers by the blocklist owner's uuid
+          required: false
+        - name: number
+          in: query
+          type: string
+          description: filter blocklisted numbers by a number string
+          required: false
+        - name: label
+          in: query
+          type: string
+          description: filter blocklisted numbers by a label string
+          required: false
+      responses:
+        '200':
+          description: Blocklisted numbers list
+          schema:
+            $ref: '#/definitions/BlocklistNumbersListResponse'
+        '400':
+          $ref: '#/responses/GenericError'
+
+  /users/blocklist/numbers/{blocklist_number_uuid}:
+    get:
+      operationId: get_blocklist_number
+      summary: Get blocklist number by uuid
+      description: '**Required ACL:** `confd.users.blocklist.read`'
+      tags:
+      - blocklist
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/blocklist_number_uuid'
+      responses:
+        '200':
+          description: Blocklisted number
+          schema:
+            $ref: '#/definitions/BlocklistNumber'
         '404':
           $ref: '#/responses/NotFoundError'
 parameters:
@@ -132,3 +220,28 @@ definitions:
       total:
         type: integer
         description: Total number of blocklisted numbers in the user's blocklist
+  BlocklistNumber:
+    allOf:
+      - $ref: '#/definitions/UserBlocklistNumber'
+      - type: object
+        description: a blocklisted number
+        properties:
+          user_uuid:
+            type: string
+            format: uuid
+            description: UUID of the user to whom the blocklisted number belongs
+            readOnly: true
+          tenant_uuid:
+            type: string
+            format: uuid
+            description: UUID of the tenant to which the blocklisted number belongs
+            readOnly: true
+  BlocklistNumbersListResponse:
+    allOf:
+      - $ref: '#/definitions/BlocklistNumbersListResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/definitions/BlocklistNumber'
