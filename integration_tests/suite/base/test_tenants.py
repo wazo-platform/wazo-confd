@@ -178,6 +178,10 @@ def _create_tenant_ready_for_deletion():
         conference = stack.enter_context(
             fixtures.conference(wazo_tenant=DELETED_TENANT)
         )
+        paging = stack.enter_context(fixtures.paging(wazo_tenant=DELETED_TENANT))
+        parking_lot = stack.enter_context(
+            fixtures.parking_lot(wazo_tenant=DELETED_TENANT)
+        )
         context = stack.enter_context(
             fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
         )
@@ -233,11 +237,54 @@ def _create_tenant_ready_for_deletion():
             )
         )
 
+        # dest conference function key
         confd.users(user['uuid']).funckeys('1').put(
             {
                 'destination': {
                     'type': 'conference',
                     'conference_id': conference['id'],
+                }
+            }
+        )
+
+        # dest paging function key
+        confd.users(user['uuid']).funckeys('2').put(
+            {
+                'destination': {
+                    'type': 'paging',
+                    'paging_id': paging['id'],
+                }
+            }
+        )
+
+        # dest park position function key
+        confd.users(user['uuid']).funckeys('3').put(
+            {
+                'destination': {
+                    'type': 'park_position',
+                    'parking_lot_id': parking_lot['id'],
+                    'position': '701',
+                }
+            }
+        )
+
+        # dest forward function key
+        confd.users(user['uuid']).funckeys('4').put(
+            {
+                'destination': {
+                    'type': 'forward',
+                    'exten': '1234',
+                }
+            }
+        )
+
+        # dest agent function key
+        confd.users(user['uuid']).funckeys('6').put(
+            {
+                'destination': {
+                    'type': 'agent',
+                    'agent_id': agent['id'],
+                    'action': 'toggle',
                 }
             }
         )
