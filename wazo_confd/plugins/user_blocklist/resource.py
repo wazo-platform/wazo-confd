@@ -110,6 +110,18 @@ class UserBlocklistNumberList(ListResource):
             return '', 404
         return ('', 204, self.build_headers(match))
 
+    @required_acl('confd.users.{user_uuid}.blocklist.read')
+    def get(self, user_uuid):
+        params = self.search_params()
+        tenant_uuids = self._build_tenant_list(params)
+
+        logger.debug('blocklist search params: %s', params)
+        logger.debug('tenant_uuids: %s', tenant_uuids)
+        params['user_uuid'] = str(user_uuid)
+
+        total, items = self.service.search(params, tenant_uuids=tenant_uuids)
+        return {'total': total, 'items': self.schema().dump(items, many=True)}
+
 
 class BlocklistNumberList(ListResource):
     model = BlocklistNumber

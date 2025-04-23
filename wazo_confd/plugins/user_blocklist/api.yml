@@ -130,6 +130,36 @@ paths:
           $ref: '#/responses/GenericError'
         '404':
           $ref: '#/responses/NotFoundError'
+    get:
+      operationId: list_user_blocklist_numbers
+      summary: List blocklisted numbers of a user
+      description: '**Required ACL:** `confd.users.{user_uuid}.blocklist.read`'
+      tags:
+      - blocklist
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - $ref: '#/parameters/order'
+        - $ref: '#/parameters/direction'
+        - $ref: '#/parameters/limit'
+        - $ref: '#/parameters/offset'
+        - $ref: '#/parameters/search'
+        - name: number
+          in: query
+          type: string
+          description: filter blocklisted numbers by a number string
+          required: false
+        - name: label
+          in: query
+          type: string
+          description: filter blocklisted numbers by a label string
+          required: false
+      responses:
+        '200':
+          description: Blocklisted numbers list
+          schema:
+            $ref: '#/definitions/BlocklistNumbersListResponse'
+        '404':
+          $ref: '#/responses/NotFoundError'
   /users/blocklist/numbers:
     get:
       operationId: list_blocklist_numbers
