@@ -263,3 +263,33 @@ def test_head_lookup(user):
             ('Wazo-Blocklist-Number-UUID', blocklist_number['uuid']),
             ('Wazo-Blocklist-Number-Label', ''),
         )
+
+
+@fixtures.user()
+def test_user_list(user):
+    user_confd_client = create_confd(user_uuid=user['uuid'])
+    numbers = [
+        fixtures.users_blocklist_number(confd_client=user_confd_client),
+        fixtures.users_blocklist_number(confd_client=user_confd_client),
+    ]
+    with utils.context_group(*numbers) as (first, second):
+        response = confd.users(user['uuid']).blocklist.numbers.get()
+        assert_that(
+            response.items,
+            has_items(
+                has_entries(
+                    uuid=first['uuid'],
+                    label=first['label'],
+                    number=first['number'],
+                    tenant_uuid=user['tenant_uuid'],
+                    user_uuid=user['uuid'],
+                ),
+                has_entries(
+                    uuid=second['uuid'],
+                    label=second['label'],
+                    number=second['number'],
+                    tenant_uuid=user['tenant_uuid'],
+                    user_uuid=user['uuid'],
+                ),
+            ),
+        )
