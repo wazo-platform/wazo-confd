@@ -3,6 +3,7 @@
 
 import re
 from pprint import pformat
+from urllib.parse import urlparse
 
 import requests
 from hamcrest import (
@@ -30,13 +31,23 @@ class AuthClient(AuthClient):
     def clear(self):
         self.clear_requests()
 
+    def url_origin(self, *fragments: str) -> str:
+        parsed_url = urlparse(self.url())
+        base = parsed_url.scheme + "://" + parsed_url.netloc
+
+        if fragments:
+            path = '/'.join(str(fragment) for fragment in fragments)
+            base = f"{base}/{path}"
+
+        return base
+
     def clear_requests(self):
-        url = self.url('_reset')
+        url = self.url_origin('_reset')
         response = self.session().post(url)
         response.raise_for_status()
 
     def requests(self):
-        url = self.url('_requests')
+        url = self.url_origin('_requests')
         response = self.session().get(url)
         response.raise_for_status()
         return response.json()['requests']
