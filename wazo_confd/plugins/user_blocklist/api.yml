@@ -27,7 +27,7 @@ paths:
           description: Blocklist numbers list
           schema:
             $ref: '#/definitions/UserBlocklistNumbersListResponse'
-    post:   
+    post:
       operationId: create_users_me_blocklist_number
       summary: Add a new blocklist number
       description: '**Required ACL:** `confd.users.me.blocklist.create`'
@@ -260,6 +260,14 @@ definitions:
             type: string
             format: uuid
             description: UUID of the user to whom the blocklisted number belongs
+            readOnly: true
+          user_firstname:
+            type: string
+            description: First name of the user to whom the blocklisted number belongs
+            readOnly: true
+          user_lastname:
+            type: string
+            description: Last name of the user to whom the blocklisted number belongs
             readOnly: true
           tenant_uuid:
             type: string

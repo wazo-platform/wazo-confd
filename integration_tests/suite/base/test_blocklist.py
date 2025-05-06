@@ -102,6 +102,8 @@ def test_list(user, other_user):
                     number=first['number'],
                     tenant_uuid=user['tenant_uuid'],
                     user_uuid=user['uuid'],
+                    user_firstname=user['firstname'],
+                    user_lastname=user['lastname'],
                 ),
                 has_entries(
                     uuid=second['uuid'],
@@ -109,6 +111,8 @@ def test_list(user, other_user):
                     number=second['number'],
                     tenant_uuid=user['tenant_uuid'],
                     user_uuid=user['uuid'],
+                    user_firstname=user['firstname'],
+                    user_lastname=user['lastname'],
                 ),
                 has_entries(
                     uuid=third['uuid'],
@@ -116,6 +120,8 @@ def test_list(user, other_user):
                     number=third['number'],
                     tenant_uuid=other_user['tenant_uuid'],
                     user_uuid=other_user['uuid'],
+                    user_firstname=other_user['firstname'],
+                    user_lastname=other_user['lastname'],
                 ),
                 has_entries(
                     uuid=fourth['uuid'],
@@ -123,6 +129,8 @@ def test_list(user, other_user):
                     number=fourth['number'],
                     tenant_uuid=other_user['tenant_uuid'],
                     user_uuid=other_user['uuid'],
+                    user_firstname=other_user['firstname'],
+                    user_lastname=other_user['lastname'],
                 ),
             ),
         )
@@ -241,6 +249,8 @@ def test_get(user):
                 number=blocklist_number['number'],
                 tenant_uuid=user['tenant_uuid'],
                 user_uuid=user['uuid'],
+                user_firstname=user['firstname'],
+                user_lastname=user['lastname'],
             ),
         )
 
@@ -283,6 +293,8 @@ def test_user_list(user):
                     number=first['number'],
                     tenant_uuid=user['tenant_uuid'],
                     user_uuid=user['uuid'],
+                    user_firstname=user['firstname'],
+                    user_lastname=user['lastname'],
                 ),
                 has_entries(
                     uuid=second['uuid'],
@@ -290,6 +302,8 @@ def test_user_list(user):
                     number=second['number'],
                     tenant_uuid=user['tenant_uuid'],
                     user_uuid=user['uuid'],
+                    user_firstname=user['firstname'],
+                    user_lastname=user['lastname'],
                 ),
             ),
         )

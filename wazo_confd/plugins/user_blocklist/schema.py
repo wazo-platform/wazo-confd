@@ -35,6 +35,8 @@ class UserBlocklistNumberSchema(BaseSchema):
 class BlocklistNumberSchema(UserBlocklistNumberSchema):
     links = ListLink(Link('user_blocklist_numbers', field='uuid'))
     user_uuid = fields.String(dump_only=True)
+    user_firstname = fields.String(dump_only=True, attribute='blocklist.user.firstname')
+    user_lastname = fields.String(dump_only=True, attribute='blocklist.user.lastname')
     tenant_uuid = fields.String(dump_only=True, attribute='blocklist.tenant_uuid')
 
 
