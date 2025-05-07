@@ -10,7 +10,7 @@ endif
 test-setup: egg-info build-confd update-db
 
 build-confd:
-	docker build -t wazoplatform/wazo-confd ..
+	docker build --no-cache -t wazoplatform/wazo-confd ..
 	docker build --no-cache -t wazo-confd-test -f Dockerfile ..
 
 update-db: $(UPDATE_DB_TARGET)

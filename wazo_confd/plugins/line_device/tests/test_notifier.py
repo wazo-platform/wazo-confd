@@ -1,13 +1,11 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
 import uuid
-
 from unittest.mock import Mock
 
 from hamcrest import assert_that, equal_to
-
 from wazo_bus.resources.line_device.event import (
     LineDeviceAssociatedEvent,
     LineDeviceDissociatedEvent,

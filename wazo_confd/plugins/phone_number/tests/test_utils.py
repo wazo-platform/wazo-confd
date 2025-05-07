@@ -1,7 +1,6 @@
-from wazo_confd.plugins.phone_number.utils import generate_phone_number_range
-
-
 import unittest
+
+from wazo_confd.plugins.phone_number.utils import generate_phone_number_range
 
 
 class TestGeneratePhoneNumberRange(unittest.TestCase):

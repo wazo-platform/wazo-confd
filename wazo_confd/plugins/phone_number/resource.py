@@ -1,19 +1,18 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from flask import url_for, request
-
+from flask import request, url_for
+from xivo.tenant_flask_helpers import Tenant
 from xivo_dao.alchemy.phone_number import PhoneNumber
 
-from xivo.tenant_flask_helpers import Tenant
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ConfdResource, ListResource, ItemResource
+from wazo_confd.helpers.restful import ConfdResource, ItemResource, ListResource
 
 from .schema import (
     PhoneNumberSchema,
-    phone_number_range_spec_schema,
     phone_number_list_schema,
     phone_number_main_spec_schema,
+    phone_number_range_spec_schema,
     phone_number_schema,
 )
 from .service import PhoneNumberService

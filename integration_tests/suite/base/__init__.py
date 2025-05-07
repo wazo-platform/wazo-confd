@@ -1,14 +1,15 @@
-# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
-
 from typing import cast
-from ..helpers.sysconfd import SysconfdMock
+
 from ..helpers.base import IntegrationTest
 from ..helpers.config import TOKEN
+from ..helpers.helpers import confd as helper_confd
+from ..helpers.helpers import new_client as helper_new_client
+from ..helpers.sysconfd import SysconfdMock
 from ..helpers.wrappers import IsolatedAction
-from ..helpers.helpers import confd as helper_confd, new_client as helper_new_client
 
 
 class BaseIntegrationTest(IntegrationTest):

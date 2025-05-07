@@ -1,16 +1,14 @@
-from xivo.token_renewer import Callback
 from collections.abc import Callable
-from wazo_confd._bus import BusConsumer, BusPublisher
-from wazo_confd.helpers.asterisk import PJSIPDoc
-from wazo_confd.helpers.middleware import MiddleWareHandle
-
+from typing import Any, TypedDict
 
 from flask_restful import Api
 from wazo_auth_client import Client as AuthClient
 from xivo.status import StatusAggregator
+from xivo.token_renewer import Callback
 
-
-from typing import Any, TypedDict
+from wazo_confd._bus import BusConsumer, BusPublisher
+from wazo_confd.helpers.asterisk import PJSIPDoc
+from wazo_confd.helpers.middleware import MiddleWareHandle
 
 TokenChangedSubscribeCallback = Callable[[Callback], None]
 

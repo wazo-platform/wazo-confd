@@ -1,23 +1,20 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import (
     fields,
     post_dump,
+    post_load,
     pre_dump,
     pre_load,
-    post_load,
     validates_schema,
 )
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import Length, Range, Regexp, OneOf
+from marshmallow.validate import Length, OneOf, Range, Regexp
 
-from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, StrictBoolean, Nested
+from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
-from wazo_confd.plugins.agent.schema import (
-    AgentSchema,
-    NUMBER_REGEX,
-)
+from wazo_confd.plugins.agent.schema import NUMBER_REGEX, AgentSchema
 from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
 from wazo_confd.plugins.line.schema import LineSchema
 

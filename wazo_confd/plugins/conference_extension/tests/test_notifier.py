@@ -1,17 +1,16 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
-
-from uuid import uuid4
 from unittest.mock import Mock
+from uuid import uuid4
 
 from wazo_bus.resources.conference_extension.event import (
     ConferenceExtensionAssociatedEvent,
     ConferenceExtensionDissociatedEvent,
 )
-from xivo_dao.alchemy.extension import Extension
 from xivo_dao.alchemy.conference import Conference
+from xivo_dao.alchemy.extension import Extension
 
 from ..notifier import ConferenceExtensionNotifier
 

@@ -1,12 +1,13 @@
-# Copyright 2016-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
 
 from hamcrest import assert_that, contains_inanyorder, equal_to, has_entries
 
+from ..helpers import associations as a
+from ..helpers import fixtures
 from . import confd
-from ..helpers import associations as a, fixtures
 
 
 @fixtures.user()

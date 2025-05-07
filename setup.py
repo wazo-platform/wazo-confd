@@ -2,8 +2,7 @@
 # Copyright 2012-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from setuptools import setup
-from setuptools import find_packages
+from setuptools import find_packages, setup
 
 setup(
     name='wazo-confd',
@@ -118,6 +117,7 @@ setup(
             'trunk_register = wazo_confd.plugins.trunk_register.plugin:Plugin',
             'user = wazo_confd.plugins.user.plugin:Plugin',
             'user_agent = wazo_confd.plugins.user_agent.plugin:Plugin',
+            'user_blocklist = wazo_confd.plugins.user_blocklist.plugin:Plugin',
             'user_call_permission = wazo_confd.plugins.user_call_permission.plugin:Plugin',
             'user_callerid = wazo_confd.plugins.user_callerid.plugin:Plugin',
             'user_external_app = wazo_confd.plugins.user_external_app.plugin:Plugin',

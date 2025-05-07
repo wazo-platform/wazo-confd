@@ -1,20 +1,18 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pycountry
-
 from marshmallow import validates
-from marshmallow.validate import Length
 from marshmallow.exceptions import ValidationError
+from marshmallow.validate import Length
 from xivo.mallow import fields
 
 from wazo_confd.helpers.mallow import BaseSchema
 
 
 class LocalizationSchema(BaseSchema):
-    country = fields.String(
-        allow_none=True, dump_default=None, validate=Length(equal=2)
-    )
+    tenant_uuid = fields.String(dump_only=True, allow_none=False, attribute='uuid')
+    country = fields.String(allow_none=True, default=None, validate=Length(equal=2))
 
     @validates('country')
     def _validate_country(self, country, **kwargs):

@@ -1,9 +1,10 @@
-# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
+
 import requests
-from requests import RequestException, HTTPError
+from requests import HTTPError, RequestException
 
 LANGUAGE_REGEX = r'^[a-zA-Z]{2,3}_[a-zA-Z]{2,3}$'
 

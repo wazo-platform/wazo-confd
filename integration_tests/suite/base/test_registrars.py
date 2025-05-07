@@ -1,8 +1,7 @@
-# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
-
 from contextlib import contextmanager
 
 from hamcrest import (
@@ -15,10 +14,13 @@ from hamcrest import (
     none,
 )
 
-from . import confd, provd
-from ..helpers import associations as a, fixtures, helpers as h, scenarios as s
+from ..helpers import associations as a
+from ..helpers import fixtures
+from ..helpers import helpers as h
+from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
 from ..helpers.helpers.line_fellowship import line_fellowship
+from . import confd, provd
 
 
 @contextmanager

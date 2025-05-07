@@ -1,10 +1,10 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
 
-from .wrappers import IsolatedAction
 from . import helpers as h
+from .wrappers import IsolatedAction
 
 
 class user(IsolatedAction):
@@ -326,4 +326,12 @@ class meeting_authorization(IsolatedAction):
     actions = {
         'generate': h.meeting_authorization.generate,
         'delete': h.meeting_authorization.delete,
+    }
+
+
+class users_blocklist_number(IsolatedAction):
+    id_field = 'uuid'
+    actions = {
+        'generate': h.blocklist.generate_user_blocklist_number,
+        'delete': h.blocklist.delete_user_blocklist_number,
     }

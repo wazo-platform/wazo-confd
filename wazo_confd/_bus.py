@@ -1,11 +1,11 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import deque
 
+from wazo_bus.base import Base
 from wazo_bus.consumer import BusConsumer as Consumer
 from wazo_bus.mixins import PublisherMixin, WazoEventMixin
-from wazo_bus.base import Base
 from xivo.status import Status
 
 

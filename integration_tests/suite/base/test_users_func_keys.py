@@ -1,11 +1,14 @@
-# Copyright 2016-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries, has_key, is_not
 
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
+from ..helpers import scenarios as s
 from . import confd, provd
 from .test_func_keys import error_funckey_checks, error_funckeys_checks
-from ..helpers import associations as a, errors as e, fixtures, scenarios as s
 
 FAKE_ID = 999999999
 

@@ -1,33 +1,28 @@
-# Copyright 2020-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from contextlib import contextmanager, ExitStack
-from hamcrest import (
-    all_of,
-    assert_that,
-    has_entries,
-    has_items,
-    has_key,
-    not_,
-)
+from contextlib import ExitStack, contextmanager
+from typing import Dict
+
+from hamcrest import all_of, assert_that, has_entries, has_items, has_key, not_
 from sqlalchemy.sql import text
 from wazo_test_helpers import until
 
-from typing import Dict
-
-from . import confd, db, BaseIntegrationTest
-from ..helpers import errors as e, fixtures, associations as a
+from ..helpers import associations as a
+from ..helpers import errors as e
+from ..helpers import fixtures
 from ..helpers.bus import BusClient
 from ..helpers.config import (
-    MAIN_TENANT,
-    SUB_TENANT,
-    DELETED_TENANT,
-    gen_group_exten,
-    gen_line_exten,
     ALL_TENANTS,
     DEFAULT_TENANTS,
+    DELETED_TENANT,
+    MAIN_TENANT,
+    SUB_TENANT,
+    gen_group_exten,
+    gen_line_exten,
 )
 from ..helpers.database import DatabaseQueries
+from . import BaseIntegrationTest, confd, db
 
 
 def test_get():
@@ -183,6 +178,10 @@ def _create_tenant_ready_for_deletion():
         conference = stack.enter_context(
             fixtures.conference(wazo_tenant=DELETED_TENANT)
         )
+        paging = stack.enter_context(fixtures.paging(wazo_tenant=DELETED_TENANT))
+        parking_lot = stack.enter_context(
+            fixtures.parking_lot(wazo_tenant=DELETED_TENANT)
+        )
         context = stack.enter_context(
             fixtures.context(label='mycontext', wazo_tenant=DELETED_TENANT)
         )
@@ -238,11 +237,54 @@ def _create_tenant_ready_for_deletion():
             )
         )
 
+        # dest conference function key
         confd.users(user['uuid']).funckeys('1').put(
             {
                 'destination': {
                     'type': 'conference',
                     'conference_id': conference['id'],
+                }
+            }
+        )
+
+        # dest paging function key
+        confd.users(user['uuid']).funckeys('2').put(
+            {
+                'destination': {
+                    'type': 'paging',
+                    'paging_id': paging['id'],
+                }
+            }
+        )
+
+        # dest park position function key
+        confd.users(user['uuid']).funckeys('3').put(
+            {
+                'destination': {
+                    'type': 'park_position',
+                    'parking_lot_id': parking_lot['id'],
+                    'position': '701',
+                }
+            }
+        )
+
+        # dest forward function key
+        confd.users(user['uuid']).funckeys('4').put(
+            {
+                'destination': {
+                    'type': 'forward',
+                    'exten': '1234',
+                }
+            }
+        )
+
+        # dest agent function key
+        confd.users(user['uuid']).funckeys('6').put(
+            {
+                'destination': {
+                    'type': 'agent',
+                    'agent_id': agent['id'],
+                    'action': 'toggle',
                 }
             }
         )
