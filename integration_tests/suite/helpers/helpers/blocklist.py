@@ -36,4 +36,9 @@ def _random_number():
         random_country_code, phonenumbers.PhoneNumberType.FIXED_LINE_OR_MOBILE
     )
     assert number
+    offset = random.randint(-9999, 9999)
+    number.national_number += offset
+    while not phonenumbers.is_valid_number(number):
+        offset = random.randint(-9999, 9999)
+        number.national_number += offset
     return phonenumbers.format_number(number, phonenumbers.PhoneNumberFormat.E164)
