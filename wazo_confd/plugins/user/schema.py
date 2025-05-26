@@ -93,7 +93,7 @@ class UserSchema(BaseSchema):
 
     fallbacks = Nested('UserFallbackSchema', dump_only=True)
     groups = Nested(
-        'GroupSchema', only=['uuid', 'id', 'name', 'links'], many=True, dump_only=True
+        'GroupSchema', only=['uuid', 'id', 'name', 'label', 'links'], many=True, dump_only=True
     )
     incalls = Nested(
         'IncallSchema', only=['id', 'extensions', 'links'], many=True, dump_only=True
