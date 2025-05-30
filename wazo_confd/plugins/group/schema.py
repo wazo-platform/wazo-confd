@@ -49,6 +49,7 @@ class GroupSchema(BaseSchema):
     ring_in_use = StrictBoolean()
     mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
+    ignore_forward = StrictBoolean()
     max_calls = fields.Integer(validate=Range(min=0), allow_none=True)
     links = ListLink(Link('groups', field='uuid'))
 
