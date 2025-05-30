@@ -65,8 +65,8 @@ def make_entry(params):
     if params.get('line_protocol') == 'sip':
         if 'sip_username' in params:
             entry['sip_username'] = params['sip_username']
-        if 'sip_password' in params:
-            entry['sip_password'] = params['sip_password']
+        if 'sip_secret' in params:
+            entry['sip_secret'] = params['sip_secret']
 
     if params.get('extension'):
         exten = extension.find_available_exten(config.CONTEXT)
