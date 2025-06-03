@@ -124,6 +124,15 @@ class GroupSchema(BaseSchema):
             data['ring_strategy'] = 'wrandom'
         return data
 
+    @post_load
+    def convert_ignore_forward_to_database(self, data, **kwargs):
+        ignore_forward = data.get('ignore_forward', None)
+        if ignore_forward:
+            data['ignore_forward'] = 1
+        else:
+            data['ignore_forward'] = 0
+        return data
+
 
 class GroupUsersMemberSchema(BaseSchema):
     priority = fields.Integer()
