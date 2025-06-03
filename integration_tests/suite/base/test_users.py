@@ -475,7 +475,7 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
         )
 
 
-@fixtures.user()
+@fixtures.user(subscription_type=1)
 def test_summary_view_on_user_without_line(user):
     response = confd.users.get(view='summary', id=user['id'])
     assert_that(
@@ -492,6 +492,7 @@ def test_summary_view_on_user_without_line(user):
                 context=none(),
                 enabled=True,
                 protocol=none(),
+                subscription_type=user['subscription_type'],
             )
         ),
     )
