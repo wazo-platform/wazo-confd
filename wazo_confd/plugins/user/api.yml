@@ -422,6 +422,11 @@ definitions:
           type: integer
           default: 5
           description: Number of allowed simultaneous calls on a user's phone
+        subscription_type:
+          type: integer
+          description: The subscription type of the user (0-10)
+          minimum: 0
+          maximum: 10
         supervision_enabled:
           type: boolean
           default: true
@@ -701,6 +706,11 @@ definitions:
         type: integer
         default: 5
         description: Number of allowed simultaneous calls on a user's phone
+      subscription_type:
+        type: integer
+        description: The subscription type of the user (0-10)
+        minimum: 0
+        maximum: 10
       supervision_enabled:
         type: boolean
         default: true

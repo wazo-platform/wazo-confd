@@ -229,6 +229,7 @@ class UserSummarySchema(BaseSchema):
     provisioning_code = fields.String()
     protocol = fields.String()
     enabled = StrictBoolean()
+    subscription_type = fields.Integer(validate=Range(min=0, max=10))
 
 
 class UserSchemaNullable(UserSchema):
