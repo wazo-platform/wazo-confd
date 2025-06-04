@@ -78,6 +78,10 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', 123)
     s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', {})
     s.check_bogus_field_returns_error(url, 'dtmf_record_toggle', [])
+    s.check_bogus_field_returns_error(url, 'ignore_forward', 'yeah')
+    s.check_bogus_field_returns_error(url, 'ignore_forward', 123)
+    s.check_bogus_field_returns_error(url, 'ignore_forward', {})
+    s.check_bogus_field_returns_error(url, 'ignore_forward', [])
     s.check_bogus_field_returns_error(url, 'music_on_hold', 123)
     s.check_bogus_field_returns_error(url, 'music_on_hold', s.random_string(129))
     s.check_bogus_field_returns_error(url, 'music_on_hold', [])
@@ -199,6 +203,7 @@ def test_get(group):
             members=has_entries(users=empty(), extensions=empty()),
             incalls=empty(),
             fallbacks=has_entries(noanswer_destination=none()),
+            ignore_forward=group['ignore_forward'],
         ),
     )
 
@@ -227,6 +232,7 @@ def test_get(group):
             members=has_entries(users=empty(), extensions=empty()),
             incalls=empty(),
             fallbacks=has_entries(noanswer_destination=none()),
+            ignore_forward=group['ignore_forward'],
         ),
     )
 
@@ -311,6 +317,7 @@ def test_create_all_parameters():
         'retry_delay': 12,
         'enabled': False,
         'max_calls': 42,
+        'ignore_forward': False,
     }
 
     response = confd.groups.post(**parameters)
@@ -375,6 +382,7 @@ def test_edit_all_parameters(group):
         'retry_delay': 12,
         'enabled': False,
         'max_calls': 42,
+        'ignore_forward': False,
     }
 
     response = confd.groups(group['id']).put(**parameters)
@@ -401,6 +409,7 @@ def test_edit_all_parameters(group):
         'retry_delay': 12,
         'enabled': False,
         'max_calls': 0,
+        'ignore_forward': True,
     }
 
     response = confd.groups(group['uuid']).put(**parameters)
