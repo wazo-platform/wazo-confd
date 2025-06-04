@@ -1,5 +1,9 @@
 # Changelog
 
+## 25.08
+
+* The `groups` resource now has a `ignore_forward` field.
+
 ## 25.04
 
 * A new API endpoint `/1.1/recordings/announcements` has been added to set & change the recording announcements of a tenant:

@@ -49,6 +49,7 @@ class GroupSchema(BaseSchema):
     ring_in_use = StrictBoolean()
     mark_answered_elsewhere = StrictBoolean(attribute='mark_answered_elsewhere_bool')
     enabled = StrictBoolean()
+    ignore_forward = StrictBoolean()
     max_calls = fields.Integer(validate=Range(min=0), allow_none=True)
     links = ListLink(Link('groups', field='uuid'))
 
@@ -121,6 +122,15 @@ class GroupSchema(BaseSchema):
             data['ring_strategy'] = 'rrmemory'
         elif ring_strategy == 'weight_random':
             data['ring_strategy'] = 'wrandom'
+        return data
+
+    @post_load
+    def convert_ignore_forward_to_database(self, data, **kwargs):
+        ignore_forward = data.get('ignore_forward', None)
+        if ignore_forward:
+            data['ignore_forward'] = 1
+        else:
+            data['ignore_forward'] = 0
         return data
 
 
