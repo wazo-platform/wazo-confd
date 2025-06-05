@@ -175,6 +175,10 @@ definitions:
           type: string
           description: The UUID of the tenant
           readOnly: true
+        ignore_forward:
+          type: boolean
+          default: false
+          description: Ignore forward when the group is in use
     - $ref: '#/definitions/GroupRelationExtensions'
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
