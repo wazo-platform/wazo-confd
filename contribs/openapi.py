@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# Copyright 2025 The Wazo Authors  (see the AUTHORS file)
+# SPDX-License-Identifier: GPL-3.0-or-later
+# -
+# this script composes openapi spec fragments from yaml files dispersed across the project
+# into a complete openapi spec, for validation, testing & sharing
+
 import sys
 
 import yaml

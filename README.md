@@ -57,7 +57,7 @@ make test
 ### openapi specification
 
 the openapi specification of the API is constructed, at wazo-confd startup, from the per-plugin yaml files `wazo_confd/plugins/*/api.yml`.
-In order to review the complete specification at once(e.g. run it through an openapi spec validator, share it with others), the python script [`scripts/openapi.py`](./scripts/openapi.py) may be used.
+In order to review the complete specification at once(e.g. run it through an openapi spec validator, share it with others), the python script [`contribs/openapi.py`](./contribs/openapi.py) may be used.
 
 the script takes 2 arguments
 - a hostname for the wazo-confd service
@@ -70,7 +70,7 @@ example:
 # in a virtual env with the wazo-confd package installed
 # debug logs on stderr
 # yaml spec on stdout
-$ ./scripts/openapi.py confd /api >/tmp/confd.yml 2>/dev/null
+$ ./contribs/openapi.py confd /api >/tmp/confd.yml 2>/dev/null
 ```
 
 ## Development
