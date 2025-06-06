@@ -28,13 +28,13 @@ from ..helpers import helpers as h
 from ..helpers import scenarios as s
 from ..helpers.config import (
     CONTEXT,
+    EXTEN_CONFERENCE_RANGE,
+    EXTEN_GROUP_RANGE,
     EXTEN_OUTSIDE_RANGE,
+    EXTEN_QUEUE_RANGE,
+    EXTEN_USER_RANGE,
     MAIN_TENANT,
     SUB_TENANT,
-    gen_conference_exten,
-    gen_group_exten,
-    gen_line_exten,
-    gen_queue_exten,
 )
 from . import BaseIntegrationTest, confd, provd
 
@@ -240,7 +240,7 @@ def test_edit_extension_with_same_exten(extension1, extension2):
     response.assert_status(400)
 
 
-@fixtures.extension(exten=gen_conference_exten(), context=CONTEXT)
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE, context=CONTEXT)
 @fixtures.conference()
 def test_edit_extension_conference_with_exten_outside_range(extension, conference):
     with a.conference_extension(conference, extension):
@@ -248,7 +248,7 @@ def test_edit_extension_conference_with_exten_outside_range(extension, conferenc
         response.assert_match(400, outside_range_regex)
 
 
-@fixtures.extension(exten=gen_group_exten(), context=CONTEXT)
+@fixtures.extension(exten_range=EXTEN_GROUP_RANGE, context=CONTEXT)
 @fixtures.group()
 def test_edit_extension_group_with_exten_outside_range(extension, group):
     with a.group_extension(group, extension):
@@ -256,7 +256,7 @@ def test_edit_extension_group_with_exten_outside_range(extension, group):
         response.assert_match(400, outside_range_regex)
 
 
-@fixtures.extension(exten=gen_queue_exten(), context=CONTEXT)
+@fixtures.extension(exten_range=EXTEN_QUEUE_RANGE, context=CONTEXT)
 @fixtures.queue()
 def test_edit_extension_queue_with_exten_outside_range(extension, queue):
     with a.queue_extension(queue, extension):
@@ -264,7 +264,7 @@ def test_edit_extension_queue_with_exten_outside_range(extension, queue):
         response.assert_match(400, outside_range_regex)
 
 
-@fixtures.extension(exten=gen_line_exten(), context=CONTEXT)
+@fixtures.extension(exten_range=EXTEN_USER_RANGE, context=CONTEXT)
 @fixtures.line_sip()
 def test_edit_extension_line_with_exten_outside_range(extension, line):
     with a.line_extension(line, extension):

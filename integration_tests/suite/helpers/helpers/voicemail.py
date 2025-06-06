@@ -32,7 +32,7 @@ def find_available_number(context=config.CONTEXT, exclude=None):
         if v['context'] == context and v['number'].isdigit()
     ]
 
-    available_numbers = set(config.USER_EXTENSION_RANGE) - set(numbers) - exclude
+    available_numbers = set(config.EXTEN_USER_RANGE) - set(numbers) - exclude
     return str(available_numbers.pop())
 
 

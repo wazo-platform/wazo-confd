@@ -16,10 +16,10 @@ from ..helpers.config import (
     ALL_TENANTS,
     DEFAULT_TENANTS,
     DELETED_TENANT,
+    EXTEN_GROUP_RANGE,
+    EXTEN_USER_RANGE,
     MAIN_TENANT,
     SUB_TENANT,
-    gen_group_exten,
-    gen_line_exten,
 )
 from ..helpers.database import DatabaseQueries
 from . import BaseIntegrationTest, confd, db
@@ -223,7 +223,7 @@ def _create_tenant_ready_for_deletion():
             fixtures.call_permission(
                 mode='allow',
                 enabled=True,
-                extensions=[gen_group_exten()],
+                extensions=['2001'],
                 wazo_tenant=DELETED_TENANT,
             )
         )
@@ -232,7 +232,7 @@ def _create_tenant_ready_for_deletion():
         trunk = stack.enter_context(fixtures.trunk(wazo_tenant=DELETED_TENANT))
         stack.enter_context(
             fixtures.ivr(
-                choices=[{'exten': gen_group_exten(), 'destination': {'type': 'none'}}],
+                choices=[{'exten': '2001', 'destination': {'type': 'none'}}],
                 wazo_tenant=DELETED_TENANT,
             )
         )
@@ -298,13 +298,13 @@ def _create_tenant_ready_for_deletion():
             )
         )
         group_extension = stack.enter_context(
-            fixtures.extension(exten=gen_group_exten(), context=context['name'])
+            fixtures.extension(exten_range=EXTEN_GROUP_RANGE, context=context['name'])
         )
         incall_extension = stack.enter_context(
-            fixtures.extension(exten=gen_line_exten(), context=context['name'])
+            fixtures.extension(exten_range=EXTEN_USER_RANGE, context=context['name'])
         )
         outcall_extension = stack.enter_context(
-            fixtures.extension(exten=gen_line_exten(), context=context['name'])
+            fixtures.extension(exten_range=EXTEN_USER_RANGE, context=context['name'])
         )
         stack.enter_context(
             fixtures.funckey_template(
