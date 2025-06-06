@@ -8,11 +8,11 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers.config import (
+    EXTEN_CONFERENCE_RANGE,
     EXTEN_OUTSIDE_RANGE,
     INCALL_CONTEXT,
     MAIN_TENANT,
     SUB_TENANT,
-    gen_conference_exten,
 )
 from . import confd
 
@@ -20,7 +20,7 @@ FAKE_ID = 999999999
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_associate_errors(conference, extension):
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).put
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).put
@@ -30,7 +30,7 @@ def test_associate_errors(conference, extension):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_dissociate_errors(conference, extension):
     fake_conference = confd.conferences(FAKE_ID).extensions(extension['id']).delete
     fake_extension = confd.conferences(conference['id']).extensions(FAKE_ID).delete
@@ -39,7 +39,7 @@ def test_dissociate_errors(conference, extension):
     s.check_resource_not_found(fake_extension, 'Extension')
 
 
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 @fixtures.conference()
 def test_associate(extension, conference):
     response = confd.conferences(conference['id']).extensions(extension['id']).put()
@@ -59,8 +59,8 @@ def test_associate(extension, conference):
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
 def test_associate_multi_tenant(main, sub, main_ctx, sub_ctx):
-    @fixtures.extension(context=main_ctx['name'], exten=gen_conference_exten())
-    @fixtures.extension(context=sub_ctx['name'], exten=gen_conference_exten())
+    @fixtures.extension(context=main_ctx['name'], exten_range=EXTEN_CONFERENCE_RANGE)
+    @fixtures.extension(context=sub_ctx['name'], exten_range=EXTEN_CONFERENCE_RANGE)
     def aux(main_exten, sub_exten):
         response = (
             confd.conferences(sub['id'])
@@ -87,7 +87,7 @@ def test_associate_multi_tenant(main, sub, main_ctx, sub_ctx):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_associate_already_associated(conference, extension):
     with a.conference_extension(conference, extension):
         response = confd.conferences(conference['id']).extensions(extension['id']).put()
@@ -95,8 +95,8 @@ def test_associate_already_associated(conference, extension):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_associate_multiple_extensions_to_conference(
     conference, extension1, extension2
 ):
@@ -109,7 +109,7 @@ def test_associate_multiple_extensions_to_conference(
 
 @fixtures.conference()
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_associate_multiple_conferences_to_extension(
     conference1, conference2, extension
 ):
@@ -131,14 +131,14 @@ def test_associate_when_user_already_associated(conference, user, line_sip, exte
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten(), context=INCALL_CONTEXT)
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE, context=INCALL_CONTEXT)
 def test_associate_when_not_internal_context(conference, extension):
     response = confd.conferences(conference['id']).extensions(extension['id']).put()
     response.assert_status(400)
 
 
 @fixtures.conference()
-@fixtures.extension(exten=EXTEN_OUTSIDE_RANGE)
+@fixtures.extension(exten_range=EXTEN_OUTSIDE_RANGE)
 def test_associate_when_exten_outside_range(conference, extension):
     response = confd.conferences(conference['id']).extensions(extension['id']).put()
     response.assert_status(400)
@@ -152,7 +152,7 @@ def test_associate_when_exten_pattern(extension, conference):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_dissociate(conference, extension):
     with a.conference_extension(conference, extension, check=False):
         response = (
@@ -174,8 +174,8 @@ def test_dissociate(conference, extension):
     conference_room_ranges=[{'start': '4000', 'end': '4999'}],
 )
 def test_dissociate_multi_tenant(main, sub, main_ctx, sub_ctx):
-    @fixtures.extension(context=main_ctx['name'], exten=gen_conference_exten())
-    @fixtures.extension(context=sub_ctx['name'], exten=gen_conference_exten())
+    @fixtures.extension(context=main_ctx['name'], exten_range=EXTEN_CONFERENCE_RANGE)
+    @fixtures.extension(context=sub_ctx['name'], exten_range=EXTEN_CONFERENCE_RANGE)
     def aux(main_exten, sub_exten):
         response = (
             confd.conferences(sub['id'])
@@ -195,14 +195,14 @@ def test_dissociate_multi_tenant(main, sub, main_ctx, sub_ctx):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_dissociate_not_associated(conference, extension):
     response = confd.conferences(conference['id']).extensions(extension['id']).delete()
     response.assert_deleted()
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_get_conference_relation(conference, extension):
     with a.conference_extension(conference, extension):
         response = confd.conferences(conference['id']).get()
@@ -220,7 +220,7 @@ def test_get_conference_relation(conference, extension):
         )
 
 
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 @fixtures.conference()
 def test_get_extension_relation(extension, conference):
     with a.conference_extension(conference, extension):
@@ -234,7 +234,7 @@ def test_get_extension_relation(extension, conference):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_edit_context_to_incall_when_associated(conference, extension):
     with a.conference_extension(conference, extension):
         response = confd.extensions(extension['id']).put(context=INCALL_CONTEXT)
@@ -242,7 +242,7 @@ def test_edit_context_to_incall_when_associated(conference, extension):
 
 
 @fixtures.conference()
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 def test_delete_conference_when_conference_and_extension_associated(
     conference, extension
 ):

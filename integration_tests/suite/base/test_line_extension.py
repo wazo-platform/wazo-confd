@@ -20,10 +20,10 @@ from ..helpers import scenarios as s
 from ..helpers.config import (
     CONTEXT,
     EXTEN_OUTSIDE_RANGE,
+    EXTEN_QUEUE_RANGE,
     INCALL_CONTEXT,
     MAIN_TENANT,
     SUB_TENANT,
-    gen_queue_exten,
 )
 from . import confd
 from .test_extensions import error_checks
@@ -282,7 +282,7 @@ def test_associate_line_to_extension_already_associated(extension, line):
         response.assert_updated()
 
 
-@fixtures.extension(exten=gen_queue_exten())
+@fixtures.extension(exten_range=EXTEN_QUEUE_RANGE)
 @fixtures.queue()
 @fixtures.line_sip()
 def test_associate_line_to_extension_already_associated_to_other_resource(

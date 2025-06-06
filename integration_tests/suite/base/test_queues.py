@@ -18,7 +18,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT, gen_queue_exten
+from ..helpers.config import EXTEN_QUEUE_RANGE, MAIN_TENANT, SUB_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 from . import confd
 
@@ -245,7 +245,7 @@ def unique_error_checks(url, queue, group):
     s.check_bogus_field_returns_error(url, 'name', group['name'])
 
 
-@fixtures.extension(exten=gen_queue_exten())
+@fixtures.extension(exten_range=EXTEN_QUEUE_RANGE)
 @fixtures.queue(name='hidden', label='hidden', preprocess_subroutine='hidden')
 @fixtures.queue(name='search', label='search', preprocess_subroutine='search')
 def test_search(extension, hidden, queue):
