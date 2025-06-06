@@ -30,11 +30,11 @@ from ..helpers import helpers as h
 from ..helpers import scenarios as s
 from ..helpers.config import (
     CONTEXT,
+    EXTEN_GROUP_RANGE,
     INCALL_CONTEXT,
     MAIN_TENANT,
     OUTCALL_CONTEXT,
     SUB_TENANT,
-    gen_group_exten,
 )
 from . import BaseIntegrationTest
 from . import auth as authentication
@@ -1131,7 +1131,7 @@ def generate_user_resources_bodies(
     )
 
 
-@fixtures.extension(exten=gen_group_exten())
+@fixtures.extension(exten_range=EXTEN_GROUP_RANGE)
 @fixtures.group()
 @fixtures.funckey_template(
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
@@ -1552,7 +1552,7 @@ def test_post_update_delete_full_user_no_error(
             response.assert_status(404)
 
 
-@fixtures.extension(exten=gen_group_exten())
+@fixtures.extension(exten_range=EXTEN_GROUP_RANGE)
 @fixtures.group()
 @fixtures.funckey_template(
     keys={'1': {'destination': {'type': 'custom', 'exten': '123'}}}
@@ -1746,7 +1746,7 @@ def test_post_delete_minimalistic_user_with_non_existing_device_id_error():
     )
 
 
-@fixtures.extension(exten=gen_group_exten())
+@fixtures.extension(exten_range=EXTEN_GROUP_RANGE)
 @fixtures.user()
 @fixtures.voicemail()
 def test_delete_voicemail_2_users_not_deleted(
