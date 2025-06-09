@@ -4,11 +4,11 @@
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
 OUTCALL_CONTEXT = 'to-extern'
-EXTEN_CONFERENCE_RANGE = list(range(4000, 5000))
-EXTEN_GROUP_RANGE = list(range(2000, 3000))
+EXTEN_CONFERENCE_RANGE = range(4000, 5000)
+EXTEN_GROUP_RANGE = range(2000, 3000)
 EXTEN_OUTSIDE_RANGE = str('99999')
-EXTEN_QUEUE_RANGE = list(range(3000, 4000))
-EXTEN_USER_RANGE = list(range(1000, 2000))
+EXTEN_QUEUE_RANGE = range(3000, 4000)
+EXTEN_USER_RANGE = range(1000, 2000)
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
 SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
 SUB_TENANT2 = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3'
