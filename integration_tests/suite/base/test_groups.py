@@ -18,7 +18,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT, gen_group_exten
+from ..helpers.config import EXTEN_GROUP_RANGE, MAIN_TENANT, SUB_TENANT
 from . import confd
 
 
@@ -116,7 +116,7 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'max_calls', [])
 
 
-@fixtures.extension(exten=gen_group_exten())
+@fixtures.extension(exten_range=EXTEN_GROUP_RANGE)
 @fixtures.group(label='hidden', preprocess_subroutine='hidden')
 @fixtures.group(label='search', preprocess_subroutine='search')
 def test_search(extension, hidden, group):

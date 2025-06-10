@@ -17,7 +17,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT, gen_conference_exten
+from ..helpers.config import EXTEN_CONFERENCE_RANGE, MAIN_TENANT, SUB_TENANT
 from . import confd
 
 
@@ -86,7 +86,7 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'admin_pin', {})
 
 
-@fixtures.extension(exten=gen_conference_exten())
+@fixtures.extension(exten_range=EXTEN_CONFERENCE_RANGE)
 @fixtures.conference(name='search', preprocess_subroutine='search')
 @fixtures.conference(name='hidden', preprocess_subroutine='hidden')
 def test_search(extension, conference, hidden):
