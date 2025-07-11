@@ -1,4 +1,4 @@
-# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -112,6 +112,9 @@ class DefaultSIPTemplateService:
                 ['allow', '!all,opus,g722,alaw,ulaw,vp9,vp8,h264'],
                 ['max_video_streams', '25'],
                 ['max_audio_streams', '1'],
+                ['timers', 'always'],
+                ['timers_sess_expires', '300'],
+                ['timers_min_se', '90'],
             ],
             'registration_section_options': [],
             'registration_outbound_auth_section_options': [],
