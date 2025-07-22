@@ -8,8 +8,8 @@ from . import confd
 
 
 def generate_call_filter(**params):
-    name = generate_name()
-    params.setdefault('name', name)
+    label = generate_label()
+    params.setdefault('label', label)
     params.setdefault('source', 'all')
     params.setdefault('strategy', 'all')
     return add_call_filter(**params)
@@ -26,14 +26,14 @@ def delete_call_filter(call_filter_id, check=False, **kwargs):
         response.assert_ok()
 
 
-def generate_name():
+def generate_label():
     response = confd.callfilters.get()
-    names = set(d['name'] for d in response.items)
-    return _random_name(names)
+    labels = set(d['label'] for d in response.items)
+    return _random_label(labels)
 
 
-def _random_name(names):
-    name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
-    while name in names:
-        name = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
-    return name
+def _random_label(labels):
+    label = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    while label in labels:
+        label = ''.join(random.choice(string.ascii_lowercase) for i in range(10))
+    return label
