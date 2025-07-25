@@ -120,6 +120,17 @@ definitions:
         ring_strategy:
           type: string
           default: all
+          description: |
+            The strategy to use when ringing group members.
+            - `all`: ring all members concurrently, first to answer wins
+            - `least_recent`: ring the member which has handled a call the least recently
+            - `linear`: ring each member one after the other based on a the priority ordering of all members
+            - `fewest_calls`: ring the member with the fewest completed calls
+            - `memorized_round_robin`: ring members in a round-robin fashion, starting with the member following
+              the one who answered last
+            - `random`: ring a random member
+            - `weight_random`: ring a random member, weighed by a per-member penalty factor
+                      
           enum:
           - all
           - random
