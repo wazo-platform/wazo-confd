@@ -216,6 +216,7 @@ definitions:
         description: Group UUID. This ID is globally unique across multiple Wazo instances
         readOnly: true
   GroupRelationExtensions:
+    description: extensions configured for this group
     properties:
       extensions:
         type: array
@@ -223,11 +224,13 @@ definitions:
         items:
           $ref: '#/definitions/ExtensionRelationBase'
   GroupRelationFallbacks:
+    description: fallback options for calls to the group
     properties:
       fallbacks:
         readOnly: true
         $ref: '#/definitions/GroupFallbacks'
   GroupRelationIncalls:
+    description: incalls configured for this group
     properties:
       incalls:
         type: array
@@ -235,21 +238,51 @@ definitions:
         items:
           $ref: '#/definitions/GroupRelationIncall'
   GroupRelationIncall:
+    description: an incall configured with this group as destination
     allOf:
       - $ref: '#/definitions/IncallRelationBase'
       - $ref: '#/definitions/IncallRelationExtensions'
   GroupRelationMembers:
+    description: members configured in this group
     properties:
       members:
+        type: object
         readOnly: true
-        $ref: '#/definitions/GroupRelationMemberUsers'
-  GroupRelationMemberUsers:
+        properties:
+          users:
+            description: users configured as members of this group
+            type: array
+            items:
+              $ref: '#/definitions/GroupRelationMemberUser'
+          extensions:
+            description: extensions configured as members of this group
+            type: array
+            items:
+              $ref: '#/definitions/GroupRelationMemberExtension'
+  GroupRelationMemberUser:
+    description: a user configured as a member of this group
+    allOf:
+      - $ref: '#/definitions/UserRelationBase'
+      - properties:
+          priority:
+            type: integer
+            description: |
+              The priority of the user member in the group.
+              Only used for linear ring strategy.
+  GroupRelationMemberExtension:
+    description: an extension configured as a member of this group
     properties:
-      users:
-        type: array
-        readOnly: true
-        items:
-          $ref: '#/definitions/UserRelationBase'
+      priority:
+        type: integer
+        description: |
+          The priority of the extension member in the group.
+          Only used for linear ring strategy.
+      exten:
+        type: string
+        description: The extension number of the member
+      context:
+        type: string
+        description: The context of the member
   GroupRelationSchedules:
     properties:
       schedules:
@@ -258,6 +291,7 @@ definitions:
         items:
           $ref: '#/definitions/ScheduleRelationBase'
   GroupRelationCallPermissions:
+    description: call permissions configured for this group
     properties:
       call_permissions:
         type: array
