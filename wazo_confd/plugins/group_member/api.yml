@@ -5,6 +5,8 @@ paths:
       summary: Update group's user members
       description: '**Required ACL:** `confd.groups.{group_uuid}.members.users.update`
 
+      user members are called by ringing all of the user's configured lines simultaneously;
+      user redirections are not used;
 
       **WARNING**
       This endpoint remove all members which are not defined.'
@@ -32,6 +34,8 @@ paths:
       summary: update group's extension members
       description: '**Required ACL:** `confd.groups.{group_uuid}.members.extensions.update`
 
+      a call to an extension member directly invokes the complete dialplan logic of that extension,
+      as if the extension was called directly;
 
       **WARNING**
       This endpoint remove all members which are not defined.'
