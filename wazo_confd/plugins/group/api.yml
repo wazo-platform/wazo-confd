@@ -114,6 +114,9 @@ definitions:
     allOf:
     - $ref: '#/definitions/GroupRelationBase'
     - properties:
+        label:
+          type: string
+          description: human-readable identifier for the group
         ring_strategy:
           type: string
           default: all
@@ -178,7 +181,7 @@ definitions:
         ignore_forward:
           type: boolean
           default: false
-          description: Ignore forward when the group is in use
+          description: Ignore forwarding from member endpoints
     - $ref: '#/definitions/GroupRelationExtensions'
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
@@ -186,7 +189,7 @@ definitions:
     - $ref: '#/definitions/GroupRelationSchedules'
     - $ref: '#/definitions/GroupRelationCallPermissions'
     - required:
-      - name
+      - label
   GroupRelationBase:
     properties:
       name:
