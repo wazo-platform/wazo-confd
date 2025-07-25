@@ -2,7 +2,7 @@ paths:
   /groups/{group_uuid}/members/users:
     put:
       operationId: update_group_member_users
-      summary: Update group and users
+      summary: Update group's user members
       description: '**Required ACL:** `confd.groups.{group_uuid}.members.users.update`
 
 
@@ -29,7 +29,7 @@ paths:
   /groups/{group_uuid}/members/extensions:
     put:
       operationId: update_group_member_extensions
-      summary: Update group and extensions
+      summary: update group's extension members
       description: '**Required ACL:** `confd.groups.{group_uuid}.members.extensions.update`
 
 
