@@ -143,7 +143,6 @@ definitions:
           type: string
         timeout:
           type: integer
-          default: null
           description: |
             Number of seconds the group will ring before falling back;
             if not set, the group will ring indefinitely.
