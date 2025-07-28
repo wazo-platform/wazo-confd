@@ -40,7 +40,7 @@ definitions:
   GroupFallbacks:
     properties:
       noanswer_destination:
-        description: The destination to redirect the caller to when there are no answer
+        description: The destination to redirect the caller to when there are no answers
         $ref: '#/definitions/DestinationType'
       congestion_destination:
         description: The destination to redirect the caller to when the group has exceeded max_calls

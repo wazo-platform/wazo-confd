@@ -114,9 +114,22 @@ definitions:
     allOf:
     - $ref: '#/definitions/GroupRelationBase'
     - properties:
+        label:
+          type: string
+          description: human-readable identifier for the group
         ring_strategy:
           type: string
           default: all
+          description: |
+            The strategy to use when ringing group members.
+            - `all`: ring all members concurrently, first to answer wins
+            - `least_recent`: ring the member which has handled a call the least recently
+            - `linear`: ring each member one after the other based on a the priority ordering of all members
+            - `fewest_calls`: ring the member with the fewest completed calls
+            - `memorized_round_robin`: ring members in a round-robin fashion, starting with the member following
+              the one who answered last
+            - `random`: ring a random member
+            - `weight_random`: ring a random member, weighed by a per-member penalty factor
           enum:
           - all
           - random
@@ -129,15 +142,17 @@ definitions:
           type: string
         timeout:
           type: integer
-          description: Number of seconds the group will ring before falling back
+          description: |
+            Number of seconds the group will ring before falling back;
+            if not set, the group will ring indefinitely.
         user_timeout:
           type: integer
           default: 15
-          description: Number of seconds the member of group will ring
+          description: Number of seconds each member of the group will ring
         retry_delay:
           type: integer
           default: 5
-          description: Number of seconds before the member of group will ring again
+          description: Number of seconds after each `user_timeout` before the member of the group will ring again
         ring_in_use:
           type: boolean
           default: true
@@ -178,7 +193,17 @@ definitions:
         ignore_forward:
           type: boolean
           default: false
-          description: Ignore forward when the group is in use
+          description: |
+            Ignore forwarding from member endpoints;
+
+            this only affects forwarding configured directly on member endpoint devices;
+            this _does not_ affect the forwardings configured through user profiles,
+            nor the fallback redirections configured on the group itself.
+
+            When set to `true`, redirections from member endpoints are ignored and skipped,
+            and other members are rung according to the ring strategy;
+            when `false`, redirections from members' endpoints are followed,
+            which effectively answers the call to the group.
     - $ref: '#/definitions/GroupRelationExtensions'
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
@@ -186,7 +211,7 @@ definitions:
     - $ref: '#/definitions/GroupRelationSchedules'
     - $ref: '#/definitions/GroupRelationCallPermissions'
     - required:
-      - name
+      - label
   GroupRelationBase:
     properties:
       name:
@@ -202,6 +227,7 @@ definitions:
         description: Group UUID. This ID is globally unique across multiple Wazo instances
         readOnly: true
   GroupRelationExtensions:
+    description: extensions configured for this group
     properties:
       extensions:
         type: array
@@ -209,11 +235,13 @@ definitions:
         items:
           $ref: '#/definitions/ExtensionRelationBase'
   GroupRelationFallbacks:
+    description: fallback options for calls to the group
     properties:
       fallbacks:
         readOnly: true
         $ref: '#/definitions/GroupFallbacks'
   GroupRelationIncalls:
+    description: incalls configured for this group
     properties:
       incalls:
         type: array
@@ -221,21 +249,51 @@ definitions:
         items:
           $ref: '#/definitions/GroupRelationIncall'
   GroupRelationIncall:
+    description: an incall configured with this group as destination
     allOf:
       - $ref: '#/definitions/IncallRelationBase'
       - $ref: '#/definitions/IncallRelationExtensions'
   GroupRelationMembers:
+    description: members configured in this group
     properties:
       members:
+        type: object
         readOnly: true
-        $ref: '#/definitions/GroupRelationMemberUsers'
-  GroupRelationMemberUsers:
+        properties:
+          users:
+            description: users configured as members of this group
+            type: array
+            items:
+              $ref: '#/definitions/GroupRelationMemberUser'
+          extensions:
+            description: extensions configured as members of this group
+            type: array
+            items:
+              $ref: '#/definitions/GroupRelationMemberExtension'
+  GroupRelationMemberUser:
+    description: a user configured as a member of this group
+    allOf:
+      - $ref: '#/definitions/UserRelationBase'
+      - properties:
+          priority:
+            type: integer
+            description: |
+              The priority of the user member in the group.
+              Only used for linear ring strategy.
+  GroupRelationMemberExtension:
+    description: an extension configured as a member of this group
     properties:
-      users:
-        type: array
-        readOnly: true
-        items:
-          $ref: '#/definitions/UserRelationBase'
+      priority:
+        type: integer
+        description: |
+          The priority of the extension member in the group.
+          Only used for linear ring strategy.
+      exten:
+        type: string
+        description: The extension number of the member
+      context:
+        type: string
+        description: The context of the member
   GroupRelationSchedules:
     properties:
       schedules:
@@ -244,6 +302,7 @@ definitions:
         items:
           $ref: '#/definitions/ScheduleRelationBase'
   GroupRelationCallPermissions:
+    description: call permissions configured for this group
     properties:
       call_permissions:
         type: array
