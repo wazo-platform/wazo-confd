@@ -130,7 +130,6 @@ definitions:
               the one who answered last
             - `random`: ring a random member
             - `weight_random`: ring a random member, weighed by a per-member penalty factor
-                      
           enum:
           - all
           - random
@@ -198,14 +197,13 @@ definitions:
             Ignore forwarding from member endpoints;
 
             this only affects forwarding configured directly on member endpoint devices;
-            this _does not_ affect the forwardings configured through user profiles, 
+            this _does not_ affect the forwardings configured through user profiles,
             nor the fallback redirections configured on the group itself.
-            
+
             When set to `true`, redirections from member endpoints are ignored and skipped,
             and other members are rung according to the ring strategy;
             when `false`, redirections from members' endpoints are followed,
             which effectively answers the call to the group.
-            
     - $ref: '#/definitions/GroupRelationExtensions'
     - $ref: '#/definitions/GroupRelationFallbacks'
     - $ref: '#/definitions/GroupRelationIncalls'
