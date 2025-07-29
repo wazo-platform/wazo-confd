@@ -22,7 +22,7 @@ paths:
           $ref: '#/definitions/GroupsID'
       responses:
         '204':
-          description: Call Filter and Groups associated
+          description: Call Pickup and Groups associated
         '400':
           $ref: '#/responses/GenericError'
         '404':
@@ -51,7 +51,7 @@ paths:
           $ref: '#/definitions/UsersUuid'
       responses:
         '204':
-          description: Call Filter and Users associated
+          description: Call Pickup and Users associated
         '400':
           $ref: '#/responses/GenericError'
         '404':
@@ -80,7 +80,7 @@ paths:
           $ref: '#/definitions/GroupsID'
       responses:
         '204':
-          description: Call Filter and Groups associated
+          description: Call Pickup and Groups associated
         '400':
           $ref: '#/responses/GenericError'
         '404':
@@ -109,7 +109,7 @@ paths:
           $ref: '#/definitions/UsersUuid'
       responses:
         '204':
-          description: Call Filter and Users associated
+          description: Call Pickup and Users associated
         '400':
           $ref: '#/responses/GenericError'
         '404':
