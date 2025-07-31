@@ -2,8 +2,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+from typing import Literal
 
 logger = logging.getLogger(__name__)
+
+DeviceStatus = Literal['not_configured', 'autoprov', 'configured']
 
 
 class Device:
@@ -120,7 +123,7 @@ class Device:
         self.set_value('options', value)
 
     @property
-    def status(self):
+    def status(self) -> DeviceStatus:
         if self.device.get('configured', False):
             if self.device.get('config', '').startswith('autoprov'):
                 return 'autoprov'
