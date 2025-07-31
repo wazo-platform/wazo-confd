@@ -225,9 +225,13 @@ definitions:
         - autoprov
         - configured
         - not_configured
-        description: 'Device status. autoprov: Device can be provisionned using a
-          provisioning code, configured: Device is configured and ready to be used,
-          not_configured : Device has not been completely configured'
+        - corrupted
+        description: | 
+          Device status.
+          - autoprov: Device can be provisionned using a provisioning code
+          - configured: Device is configured and ready to be used
+          - not_configured: Device has not been completely configured
+          - corrupted: Device configuration is corrupted and need repair
         readOnly: true
       template_id:
         type: string
