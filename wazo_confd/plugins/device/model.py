@@ -6,7 +6,7 @@ from typing import Literal
 
 logger = logging.getLogger(__name__)
 
-DeviceStatus = Literal['not_configured', 'autoprov', 'configured']
+DeviceStatus = Literal['not_configured', 'autoprov', 'configured', 'corrupted']
 
 
 class Device:
@@ -124,6 +124,8 @@ class Device:
 
     @property
     def status(self) -> DeviceStatus:
+        if not self.config:
+            return 'corrupted'
         if self.device.get('configured', False):
             if self.device.get('config', '').startswith('autoprov'):
                 return 'autoprov'
