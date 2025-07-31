@@ -60,8 +60,8 @@ class SequenceError(RegexError):
             )
 
 
-def build_error(raw_regex, builder=RegexError):
-    regex = re.compile(raw_regex)
+def build_error(raw_regex, builder=RegexError, flags=0):
+    regex = re.compile(raw_regex, flags=flags)
     return partial(builder, regex)
 
 
@@ -85,3 +85,7 @@ missing_parameters = build_error(
 different_tenant = build_error(r"different tenants")
 extension_conflict = build_error(r"[Ee]xtension is already used")
 outside_range = build_error(r"'constraint_id': 'range'")
+device_corrupted = build_error(
+    r"device (?P<device_id>[a-zA-Z0-9_-]+) has a corrupted configuration",
+    flags=re.IGNORECASE,
+)

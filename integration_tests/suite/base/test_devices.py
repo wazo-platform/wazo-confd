@@ -469,6 +469,27 @@ def test_edit_device_with_fake_template(device):
 
 
 @fixtures.device()
+def test_edit_device_no_config_cannot_set_template(device):
+    # a device with no config may be corrupted
+    # this can happen when provd API is used directly,
+    # or provd data is corrupted
+    real_device = provd.devices.get(device['id'])
+    real_device['config'] = None
+    provd.devices.update(real_device)
+
+    confd_device = confd.devices(device['id']).get()
+    assert_that(
+        confd_device.item,
+        has_entries(
+            status='corrupted',
+        ),
+    )
+
+    response = confd.devices(device['id']).put(template_id='mockdevicetemplate')
+    response.assert_match(400, e.device_corrupted(device_id=device['id']))
+
+
+@fixtures.device()
 def test_delete_device(device):
     response = confd.devices(device['id']).delete()
     response.assert_deleted()
