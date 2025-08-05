@@ -11,6 +11,7 @@ from wazo_confd.helpers.restful import (
     ListResource,
     build_tenant,
 )
+from wazo_confd.plugins.device.exceptions import DeviceCorruptedError
 from wazo_confd.plugins.device.model import Device
 
 from .schema import DeviceSchema
@@ -84,6 +85,13 @@ class DeviceItem(SingleTenantMixin, ItemResource):
     def get(self, id):
         tenant_uuid = build_tenant()
         return self._middleware.get(id, tenant_uuid)
+
+    def find_updated_fields(self, model, form):
+        # cannot assign a template to an unconfigured device
+        if model.status == 'corrupted' or not model.config:
+            if 'template_id' in form:
+                raise DeviceCorruptedError(model.id)
+        return super().find_updated_fields(model, form)
 
     @required_acl('confd.devices.{id}.update')
     def put(self, id):

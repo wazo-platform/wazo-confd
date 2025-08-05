@@ -1,9 +1,12 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+from typing import Literal
 
 logger = logging.getLogger(__name__)
+
+DeviceStatus = Literal['not_configured', 'autoprov', 'configured', 'corrupted']
 
 
 class Device:
@@ -120,7 +123,9 @@ class Device:
         self.set_value('options', value)
 
     @property
-    def status(self):
+    def status(self) -> DeviceStatus:
+        if not self.config:
+            return 'corrupted'
         if self.device.get('configured', False):
             if self.device.get('config', '').startswith('autoprov'):
                 return 'autoprov'
@@ -129,10 +134,11 @@ class Device:
 
     @property
     def template_id(self):
-        return self.config.get('configdevice')
+        return self.config and self.config.get('configdevice')
 
     @template_id.setter
     def template_id(self, value):
+        assert self.config, "Device has no config"
         configdevice = self.config.pop('configdevice', None)
         if configdevice and configdevice in self.config['parent_ids']:
             self.config['parent_ids'].remove(configdevice)
@@ -154,7 +160,7 @@ class Device:
         return self.device.get('is_new')
 
     def is_autoprov(self):
-        return 'autoprov' in self.config['parent_ids']
+        return bool(self.config) and 'autoprov' in self.config['parent_ids']
 
     def update_config(self, config):
         self.device['config'] = config['id']
