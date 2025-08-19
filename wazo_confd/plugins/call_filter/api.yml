@@ -116,6 +116,10 @@ definitions:
           type: integer
           readOnly: true
           description: The id of the call filter
+        uuid:
+          type: string
+          description: Call filter UUID. This ID is globally unique across multiple Wazo instances
+          readOnly: true
         tenant_uuid:
           type: string
           description: The UUID of the tenant
@@ -123,6 +127,10 @@ definitions:
         name:
           type: string
           description: The name of the call filter
+          readOnly: true
+        label:
+          type: string
+          description: The label of the call filter
         source:
           type: string
           enum:
@@ -160,7 +168,7 @@ definitions:
           default: true
           description: Disable or enable the call filter
       required:
-      - name
+      - label
       - source
       - strategy
     - $ref: '#/definitions/CallFilterRecipients'
