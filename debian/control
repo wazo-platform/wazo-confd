@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Wazo Maintainers <dev@wazo.community>
 Build-Depends: debhelper (>= 12), dh-python, python3-all, python3-setuptools
 Standards-Version: 3.9.6
-X-Python3-Version: >= 3.9
+X-Python3-Version: >= 3.11
 
 Package: wazo-confd
 Architecture: all
