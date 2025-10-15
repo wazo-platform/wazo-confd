@@ -93,7 +93,7 @@ class MeetingList(ListResource, _SchemaMixin, _MeResourceMixin):
 
     @required_acl('confd.meetings.create')
     def post(self):
-        return self._post(request.get_json())
+        return self._post(request.get_json(force=True))
 
     def _post(self, body):
         form = self.schema().load(body)
@@ -163,7 +163,7 @@ class MeetingItem(ItemResource, _SchemaMixin):
         return super().put(uuid)
 
     def parse_and_update(self, model, **kwargs):
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
         form = find_owners(form, model.tenant_uuid, self._user_service)
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.items():
@@ -219,7 +219,7 @@ class UserMeetingItem(MeetingItem, _MeResourceMixin):
         return '', 204
 
     def parse_and_update(self, model, **kwargs):
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
 
         if not self._current_user_in_owners(kwargs['user_uuid'], form):
             self._add_current_user_owner(kwargs['user_uuid'], form)
@@ -277,7 +277,7 @@ class UserMeetingList(MeetingList):
 
     @required_acl('confd.users.me.meetings.create')
     def post(self):
-        body = self.add_user_to_owner_uuids(request.get_json())
+        body = self.add_user_to_owner_uuids(request.get_json(force=True))
         return self._post(body)
 
     @required_acl('confd.users.me.meetings.read')

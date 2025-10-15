@@ -34,7 +34,7 @@ class GuestMeetingAuthorizationList(ListResource):
 
     @no_auth
     def post(self, guest_uuid, meeting_uuid):
-        body = request.get_json()
+        body = request.get_json(force=True)
         body['guest_uuid'] = guest_uuid
         body['meeting_uuid'] = meeting_uuid
         form = self.schema().load(body)

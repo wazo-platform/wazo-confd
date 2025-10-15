@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -42,7 +42,7 @@ class UserVoicemailList(ConfdResource):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         voicemail = self._middleware.create_voicemail(
             user_id,
-            request.get_json(),
+            request.get_json(force=True),
             tenant_uuids,
         )
         return voicemail, 201, self.build_headers(voicemail)

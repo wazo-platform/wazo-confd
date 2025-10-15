@@ -46,7 +46,7 @@ class PhoneNumberRange(ConfdResource):
     @required_acl('confd.phone-numbers.create')
     def post(self):
         tenant_uuid = Tenant.autodetect().uuid
-        range_spec = phone_number_range_spec_schema.load(request.get_json())
+        range_spec = phone_number_range_spec_schema.load(request.get_json(force=True))
         new_phone_numbers, old_phone_numbers = self.service.create_range(
             range_spec, tenant_uuid=tenant_uuid
         )
@@ -83,7 +83,7 @@ class PhoneNumberMain(ConfdResource):
     @required_acl('confd.phone-numbers.main.update')
     def put(self):
         tenant_uuid = Tenant.autodetect().uuid
-        main_spec = phone_number_main_spec_schema.load(request.get_json())
+        main_spec = phone_number_main_spec_schema.load(request.get_json(force=True))
         new_main_number = self.service.update_main(main_spec, tenant_uuid)
         return (None, 204, self.build_headers(new_main_number))
 

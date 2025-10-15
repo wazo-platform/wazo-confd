@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -28,6 +28,6 @@ class LiveReloadResource(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.configuration.live_reload.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         self.service.edit(form)
         return '', 204

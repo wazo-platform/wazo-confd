@@ -31,7 +31,7 @@ class CallPickupInterceptorGroupList(ConfdResource):
         call_pickup = self.call_pickup_dao.get(
             call_pickup_id, tenant_uuids=tenant_uuids
         )
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             interceptors = [
                 self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
@@ -59,7 +59,7 @@ class CallPickupTargetGroupList(ConfdResource):
         call_pickup = self.call_pickup_dao.get(
             call_pickup_id, tenant_uuids=tenant_uuids
         )
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             targets = [
                 self.group_dao.get_by(id=group['id'], tenant_uuids=tenant_uuids)
@@ -87,7 +87,7 @@ class CallPickupInterceptorUserList(ConfdResource):
         call_pickup = self.call_pickup_dao.get(
             call_pickup_id, tenant_uuids=tenant_uuids
         )
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             interceptors = [
                 self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
@@ -115,7 +115,7 @@ class CallPickupTargetUserList(ConfdResource):
         call_pickup = self.call_pickup_dao.get(
             call_pickup_id, tenant_uuids=tenant_uuids
         )
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             targets = [
                 self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)

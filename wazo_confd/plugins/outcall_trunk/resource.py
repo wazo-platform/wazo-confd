@@ -33,7 +33,7 @@ class OutcallTrunkList(ConfdResource):
     def put(self, outcall_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             trunks = [
                 self.trunk_dao.get(trunk['id'], tenant_uuids=tenant_uuids)

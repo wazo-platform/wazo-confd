@@ -30,7 +30,7 @@ class UserSubResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, self.schema())
@@ -121,5 +121,5 @@ class UserForwardList(UserSubResource):
 
     @required_acl('confd.users.{user_id}.forwards.update')
     def put(self, user_id):
-        self._user_forward_association.associate(user_id, request.get_json())
+        self._user_forward_association.associate(user_id, request.get_json(force=True))
         return '', 204

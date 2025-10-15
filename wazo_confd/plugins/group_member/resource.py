@@ -38,7 +38,7 @@ class GroupMemberUserItem(GroupMemberItem):
         tenant_uuids = self._build_tenant_list({'recurse': True})
 
         group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         members = []
         try:
             for member_form in form['users']:
@@ -67,7 +67,7 @@ class GroupMemberExtensionItem(GroupMemberItem):
     @required_acl('confd.groups.{group_uuid}.members.extensions.update')
     def put(self, group_uuid):
         group = self.group_dao.get(group_uuid)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         members = []
         for member_form in form['extensions']:
             extension = Extension(**member_form['extension'])

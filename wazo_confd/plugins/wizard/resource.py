@@ -78,7 +78,7 @@ class WizardResource(ErrorCatchingResource):
 
     @wazo_unconfigured
     def post(self):
-        wizard = self.wizard_schema().load(request.get_json())
+        wizard = self.wizard_schema().load(request.get_json(force=True))
         wizard_with_uuid = self.service.create(wizard)
         return self.wizard_schema().dump(wizard_with_uuid)
 

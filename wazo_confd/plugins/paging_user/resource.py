@@ -26,7 +26,7 @@ class PagingCallerUserItem(PagingUserItem):
     def put(self, paging_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         paging = self.paging_dao.get(paging_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             users = [
                 self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)
@@ -45,7 +45,7 @@ class PagingMemberUserItem(PagingUserItem):
     def put(self, paging_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         paging = self.paging_dao.get(paging_id, tenant_uuids=tenant_uuids)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             users = [
                 self.user_dao.get_by(uuid=user['uuid'], tenant_uuids=tenant_uuids)

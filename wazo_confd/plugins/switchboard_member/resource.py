@@ -17,5 +17,7 @@ class SwitchboardMemberUserItem(ConfdResource):
     @required_acl('confd.switchboards.{switchboard_uuid}.members.users.update')
     def put(self, switchboard_uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.associate(request.get_json(), switchboard_uuid, tenant_uuids)
+        self._middleware.associate(
+            request.get_json(force=True), switchboard_uuid, tenant_uuids
+        )
         return '', 204

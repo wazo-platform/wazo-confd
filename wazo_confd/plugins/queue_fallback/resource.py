@@ -1,4 +1,4 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -28,6 +28,6 @@ class QueueFallbackList(ConfdResource):
     def put(self, queue_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
-        fallbacks = self.schema().load(request.get_json())
+        fallbacks = self.schema().load(request.get_json(force=True))
         self.service.edit(queue, fallbacks)
         return '', 204

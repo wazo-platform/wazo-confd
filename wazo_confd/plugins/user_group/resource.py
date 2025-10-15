@@ -1,4 +1,4 @@
-# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -40,5 +40,5 @@ class UserGroupItem(ConfdResource):
 
     @required_acl('confd.users.{user_id}.groups.update')
     def put(self, user_id):
-        self._middleware.associate_all_groups(request.get_json(), user_id)
+        self._middleware.associate_all_groups(request.get_json(force=True), user_id)
         return '', 204

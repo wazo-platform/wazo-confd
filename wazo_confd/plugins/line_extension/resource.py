@@ -1,4 +1,4 @@
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -40,7 +40,7 @@ class LineExtensionList(ListResource):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         extension = self._middleware.create_extension(
             line_id,
-            request.get_json(),
+            request.get_json(force=True),
             tenant_uuids,
         )
         return extension, 201, self.build_headers(extension)

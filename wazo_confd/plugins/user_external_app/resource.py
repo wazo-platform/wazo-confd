@@ -70,7 +70,7 @@ class UserExternalAppItem(ItemResource):
     def post(self, user_uuid, name):
         kwargs = self._add_tenant_uuid()
         user = self.user_dao.get_by_id_uuid(user_uuid, **kwargs)
-        body = request.get_json()
+        body = request.get_json(force=True)
         form_part = self.name_schema().load({'name': name})
         form = self.schema().load(body)
         form = self.add_tenant_to_form(form)

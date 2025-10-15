@@ -24,7 +24,7 @@ class IncallList(ListResource):
     @required_acl('confd.incalls.create')
     def post(self):
         tenant_uuid = build_tenant()
-        resource = self._middleware.create(request.get_json(), tenant_uuid)
+        resource = self._middleware.create(request.get_json(force=True), tenant_uuid)
         return resource, 201, self.build_headers(resource)
 
     @required_acl('confd.incalls.read')
@@ -48,7 +48,7 @@ class IncallItem(ItemResource):
     @required_acl('confd.incalls.{id}.update')
     def put(self, id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.update(id, request.get_json(), tenant_uuids)
+        self._middleware.update(id, request.get_json(force=True), tenant_uuids)
         return '', 204
 
     @required_acl('confd.incalls.{id}.delete')

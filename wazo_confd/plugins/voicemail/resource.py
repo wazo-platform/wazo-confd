@@ -23,7 +23,7 @@ class VoicemailList(ListResource):
     @required_acl('confd.voicemails.create')
     def post(self):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        voicemail = self._middleware.create(request.get_json(), tenant_uuids)
+        voicemail = self._middleware.create(request.get_json(force=True), tenant_uuids)
         return voicemail, 201, self.build_headers(voicemail)
 
     @required_acl('confd.voicemails.read')
@@ -47,7 +47,7 @@ class VoicemailItem(ItemResource):
     @required_acl('confd.voicemails.{id}.update')
     def put(self, id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.update(id, request.get_json(), tenant_uuids)
+        self._middleware.update(id, request.get_json(force=True), tenant_uuids)
         return '', 204
 
     @required_acl('confd.voicemails.{id}.delete')

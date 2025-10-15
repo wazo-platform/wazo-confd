@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -32,6 +32,6 @@ class SwitchboardFallbackList(ConfdResource):
         switchboard = self.switchboard_dao.get(
             switchboard_uuid, tenant_uuids=tenant_uuids
         )
-        fallbacks = self.schema().load(request.get_json())
+        fallbacks = self.schema().load(request.get_json(force=True))
         self.service.edit(switchboard, fallbacks)
         return '', 204

@@ -51,7 +51,7 @@ class VoicemailGeneralList(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.asterisk.voicemail.general.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         voicemail_general = [StaticVoicemail(**option) for option in form['options']]
         self.service.edit(voicemail_general)
         return '', 204

@@ -43,7 +43,7 @@ class DeviceList(SingleTenantMixin, ListResource):
 
     @required_acl('confd.devices.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         model = self.model(**form)
         kwargs = self._add_tenant_uuid()
         model = self.service.create(model, **kwargs)

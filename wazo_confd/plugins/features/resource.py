@@ -131,7 +131,7 @@ class FeaturesConfigurationList(ConfdResource):
         return self.schema().dump(options)
 
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         variables = [self.model(**option) for option in form]
         self.service.edit(self.section_name, variables)
         return '', 204

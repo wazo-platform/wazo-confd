@@ -1,4 +1,4 @@
-# Copyright 2021-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -25,7 +25,7 @@ class EmailConfig(ConfdResource):
     @required_acl('confd.emails.update')
     def put(self):
         model = self.service.get()
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model)

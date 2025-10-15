@@ -35,7 +35,7 @@ class _BaseSipList(ListResource):
 
     def post(self):
         tenant_uuid = build_tenant()
-        resource = self._middleware.create(request.get_json(), tenant_uuid)
+        resource = self._middleware.create(request.get_json(force=True), tenant_uuid)
         return resource, 201, self.build_headers(resource)
 
 
@@ -53,7 +53,7 @@ class _BaseSipItem(ItemResource):
     def put(self, uuid):
         kwargs = self._add_tenant_uuid()
         sip = self.service.get(uuid, **kwargs)
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
 
         if form.get('templates'):
             templates = []
@@ -118,7 +118,7 @@ class SipItem(_BaseSipItem):
     @required_acl('confd.endpoints.sip.{uuid}.update')
     def put(self, uuid):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.update(uuid, request.get_json(), tenant_uuids)
+        self._middleware.update(uuid, request.get_json(force=True), tenant_uuids)
         return '', 204
 
     @required_acl('confd.endpoints.sip.{uuid}.delete')
