@@ -1,6 +1,8 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import pytest
+import requests
 from hamcrest import assert_that, contains, has_entries
 
 from ..helpers import associations as a
@@ -8,7 +10,7 @@ from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers.config import CONTEXT, MAIN_TENANT, OUTCALL_CONTEXT, SUB_TENANT
-from . import confd
+from . import BaseIntegrationTest, confd
 
 FAKE_ID = 999999999
 
@@ -47,6 +49,19 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'strip_digits', -1)
     s.check_bogus_field_returns_error(url, 'strip_digits', [])
     s.check_bogus_field_returns_error(url, 'strip_digits', {})
+
+
+@fixtures.outcall()
+@fixtures.extension(context=OUTCALL_CONTEXT)
+def test_associate_error_no_body(outcall, extension):
+    confd = BaseIntegrationTest.new_client()
+    endpoint = confd.url.outcalls(outcall['id']).extensions(extension['id'])
+    response = confd.session.put(
+        confd._build_url(str(endpoint)),
+    )
+    with pytest.raises(requests.exceptions.HTTPError) as ex:
+        response.raise_for_status()
+    assert ex.value.response.status_code == 400
 
 
 @fixtures.outcall()
