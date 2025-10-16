@@ -43,8 +43,9 @@ class AgentSkillItem(ConfdResource):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         agent = self.agent_dao.get(agent_id, tenant_uuids=tenant_uuids)
         skill = self.skill_dao.get(skill_id, tenant_uuids=tenant_uuids)
-        agent_skill = self._find_or_create_agent_skill(agent, skill)
-        self.service.dissociate_agent_skill(agent, agent_skill)
+        agent_skill = self.service.find_agent_skill(agent, skill)
+        if agent_skill:
+            self.service.dissociate_agent_skill(agent, agent_skill)
         return '', 204
 
     def _find_or_create_agent_skill(self, agent, skill):
