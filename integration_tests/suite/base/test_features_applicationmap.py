@@ -11,8 +11,9 @@ REQUIRED_OPTIONS = {'togglerecord': '*3,self,AGI(localhost,...)'}
 
 
 def test_put_errors():
-    url = confd.asterisk.features.applicationmap.put
-    error_checks(url)
+    url = confd.asterisk.features.applicationmap
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

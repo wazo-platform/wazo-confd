@@ -35,10 +35,10 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.voicemails.post
-    error_checks(url)
-
-    error_required_checks(url)
+    url = confd.voicemails
+    error_checks(url.post)
+    error_required_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.voicemail()
@@ -46,8 +46,9 @@ def test_put_errors(voicemail):
     fake_put = confd.voicemails(9999999).put
     s.check_resource_not_found(fake_put, 'Voicemail')
 
-    url = confd.voicemails(voicemail['id']).put
-    error_checks(url)
+    url = confd.voicemails(voicemail['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

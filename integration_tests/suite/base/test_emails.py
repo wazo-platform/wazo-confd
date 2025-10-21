@@ -5,6 +5,7 @@ import re
 
 from hamcrest import assert_that, has_entries
 
+from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
 from . import confd
 
@@ -51,6 +52,8 @@ def test_put_all_parameters():
 
 
 def test_put_errors():
+    s.check_missing_body_returns_error(confd.emails, 'PUT')
+
     fields_too_long = ['domain_name', 'from', 'smtp_host', 'fallback_smtp_host']
     for field in fields_too_long:
         body = {field: 'a' * 256}

@@ -80,26 +80,28 @@ def test_delete_errors():
 
 @fixtures.user()
 def test_post_errors(user):
-    url = confd.queues.post
-    error_checks(url, user)
+    url = confd.queues
+    error_checks(url.post, user)
+    s.check_missing_body_returns_error(url, 'POST')
 
-    s.check_bogus_field_returns_error(url, 'name', 123)
-    s.check_bogus_field_returns_error(url, 'name', 'invalid regex')
-    s.check_bogus_field_returns_error(url, 'name', 'general')
-    s.check_bogus_field_returns_error(url, 'name', True)
-    s.check_bogus_field_returns_error(url, 'name', None)
-    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
-    s.check_bogus_field_returns_error(url, 'name', [])
-    s.check_bogus_field_returns_error(url, 'name', {})
+    s.check_bogus_field_returns_error(url.post, 'name', 123)
+    s.check_bogus_field_returns_error(url.post, 'name', 'invalid regex')
+    s.check_bogus_field_returns_error(url.post, 'name', 'general')
+    s.check_bogus_field_returns_error(url.post, 'name', True)
+    s.check_bogus_field_returns_error(url.post, 'name', None)
+    s.check_bogus_field_returns_error(url.post, 'name', s.random_string(129))
+    s.check_bogus_field_returns_error(url.post, 'name', [])
+    s.check_bogus_field_returns_error(url.post, 'name', {})
 
-    unique_error_checks(url)
+    unique_error_checks(url.post)
 
 
 @fixtures.queue()
 @fixtures.user()
 def test_put_errors(queue, user):
-    url = confd.queues(queue['id']).put
-    error_checks(url, user)
+    url = confd.queues(queue['id'])
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

@@ -9,8 +9,9 @@ from . import confd
 
 
 def test_put_errors():
-    url = confd.asterisk.voicemail.zonemessages.put
-    error_checks(url)
+    url = confd.asterisk.voicemail.zonemessages
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

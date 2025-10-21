@@ -44,16 +44,18 @@ def test_delete_errors(sip):
 
 
 def test_post_errors():
-    url = confd.endpoints.sip.post
-    error_checks(url)
+    url = confd.endpoints.sip
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.sip()
 def test_put_errors(sip):
-    url = confd.endpoints.sip(sip['uuid']).put
-    error_checks(url)
+    url = confd.endpoints.sip(sip['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    s.check_bogus_field_returns_error(url, 'name', None)
+    s.check_bogus_field_returns_error(url.put, 'name', None)
 
 
 def error_checks(url):

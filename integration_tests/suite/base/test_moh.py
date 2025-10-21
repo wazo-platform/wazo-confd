@@ -77,16 +77,20 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.moh.post
-    error_checks(url)
+    url = confd.moh
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
-    s.check_bogus_field_returns_error(url, 'name', s.random_string(129), None, 'label')
+    s.check_bogus_field_returns_error(
+        url.post, 'name', s.random_string(129), None, 'label'
+    )
 
 
 @fixtures.moh()
 def test_put_errors(moh):
-    url = confd.moh(moh['uuid']).put
-    error_checks(url)
+    url = confd.moh(moh['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

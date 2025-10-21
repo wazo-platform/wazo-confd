@@ -18,14 +18,15 @@ def test_put_errors(user):
     fake_user = confd.users(FAKE_ID).funckeys(1).put
     s.check_resource_not_found(fake_user, 'User')
 
-    url = confd.users(user['uuid']).funckeys(1).put
-    error_funckey_checks(url)
+    url = confd.users(user['uuid']).funckeys(1)
+    error_funckey_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
     fake_user = confd.users(FAKE_ID).funckeys.put
     s.check_resource_not_found(fake_user, 'User')
-
-    url = confd.users(user['uuid']).funckeys.put
-    error_funckeys_checks(url)
+    url = confd.users(user['uuid']).funckeys
+    error_funckeys_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def test_delete_errors():

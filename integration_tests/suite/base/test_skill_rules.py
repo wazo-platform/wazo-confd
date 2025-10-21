@@ -32,14 +32,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.queues.skillrules.post
-    error_checks(url)
+    url = confd.queues.skillrules
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.skill_rule()
 def test_put_errors(skill):
-    url = confd.queues.skillrules(skill['id']).put
-    error_checks(url)
+    url = confd.queues.skillrules(skill['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

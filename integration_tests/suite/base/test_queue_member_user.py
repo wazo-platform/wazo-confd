@@ -25,8 +25,9 @@ def test_associate_errors(queue, user):
     s.check_resource_not_found(fake_queue, 'Queue')
     s.check_resource_not_found(fake_user, 'User')
 
-    url = confd.queues(queue['id']).members.users(user['id']).put
-    error_checks(url)
+    url = confd.queues(queue['id']).members.users(user['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

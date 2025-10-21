@@ -19,8 +19,9 @@ def test_associate_errors(outcall, trunk):
     response = confd.outcalls(FAKE_ID).trunks.put(trunks=[trunk])
     response.assert_status(404)
 
-    url = confd.outcalls(outcall['id']).trunks().put
-    error_checks(url)
+    url = confd.outcalls(outcall['id']).trunks()
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

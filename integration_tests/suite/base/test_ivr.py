@@ -33,15 +33,17 @@ def test_delete_errors():
 
 @fixtures.user()
 def test_post_errors(user):
-    url = confd.ivr.post
-    error_checks(url, user)
+    url = confd.ivr
+    error_checks(url.post, user)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.ivr()
 @fixtures.user()
 def test_put_errors(ivr, user):
-    url = confd.ivr(ivr['id']).put
-    error_checks(url, user)
+    url = confd.ivr(ivr['id'])
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

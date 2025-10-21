@@ -22,8 +22,10 @@ def test_associate_errors(agent, skill):
     s.check_resource_not_found(fake_agent, 'Agent')
     s.check_resource_not_found(fake_skill, 'Skill')
 
-    url = confd.agents(agent['id']).skills(skill['id']).put
-    error_checks(url)
+    url = confd.agents(agent['id']).skills(skill['id'])
+    error_checks(url.put)
+
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

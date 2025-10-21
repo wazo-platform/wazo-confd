@@ -33,20 +33,22 @@ def test_delete_errors():
 
 @fixtures.external_app(name='unique')
 def test_post_errors(external_app):
-    url = confd.external.apps.myapp.post
-    error_checks(url)
+    url = confd.external.apps.myapp
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
-    url = confd.external.apps(s.random_string(129)).post
-    s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
+    url = confd.external.apps(s.random_string(129))
+    s.check_bogus_field_returns_error(url.post, 'name', s.random_string(129))
 
-    url = confd.external.apps('unique').post
-    s.check_bogus_field_returns_error(url, 'name', 'unique')
+    url = confd.external.apps('unique')
+    s.check_bogus_field_returns_error(url.post, 'name', 'unique')
 
 
 @fixtures.external_app()
 def test_put_errors(external_app):
-    url = confd.external.apps(external_app['name']).put
-    error_checks(url)
+    url = confd.external.apps(external_app['name'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

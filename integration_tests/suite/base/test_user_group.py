@@ -19,8 +19,9 @@ def test_associate_errors(group, user):
     response = confd.users(FAKE_UUID).groups.put(groups=[group])
     response.assert_status(404)
 
-    url = confd.users(user['uuid']).groups.put
-    error_checks(url)
+    url = confd.users(user['uuid']).groups
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

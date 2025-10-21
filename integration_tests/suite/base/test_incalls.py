@@ -42,8 +42,9 @@ def test_post_errors(user):
 @fixtures.incall()
 @fixtures.user()
 def test_put_errors(incall, user):
-    url = confd.incalls(incall['id']).put
-    error_checks(url, user)
+    url = confd.incalls(incall['id'])
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

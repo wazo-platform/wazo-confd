@@ -36,13 +36,14 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.funckeys.templates.post
-    error_funckeys_checks(url)
+    url = confd.funckeys.templates
+    error_funckeys_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
     regex = r'keys.*1.*destination.*type'
     for destination in invalid_template_destinations:
         s.check_bogus_field_returns_error_matching_regex(
-            url, 'keys', {'1': {'destination': destination}}, regex
+            url.post, 'keys', {'1': {'destination': destination}}, regex
         )
 
 
@@ -53,10 +54,10 @@ def test_get_position_errors(funckey_template):
 
 
 # Should raise an error
-# @fixtures.funckey_template()
-# def test_delete_position_errors(funckey_template):
-#     fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
-#     s.check_resource_not_found(fake_delete, 'FuncKey')
+@fixtures.funckey_template()
+def test_delete_position_errors(funckey_template):
+    fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
+    s.check_resource_not_found(fake_delete, 'FuncKey')
 
 
 @fixtures.funckey_template()

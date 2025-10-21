@@ -36,6 +36,9 @@ def test_delete_errors(user):
 def test_post_errors(app):
     url = confd.users(app['user_uuid']).external.apps('myapp').post
     error_checks(url)
+    s.check_missing_body_returns_error(
+        confd.users(app['user_uuid']).external.apps('myapp'), 'POST'
+    )
 
     url = confd.users(app['user_uuid']).external.apps(s.random_string(129)).post
     s.check_bogus_field_returns_error(url, 'name', s.random_string(129))
@@ -48,6 +51,9 @@ def test_post_errors(app):
 def test_put_errors(app):
     url = confd.users(app['user_uuid']).external.apps(app['name']).put
     error_checks(url)
+    s.check_missing_body_returns_error(
+        confd.users(app['user_uuid']).external.apps(app['name']), 'PUT'
+    )
 
 
 def error_checks(url):

@@ -23,11 +23,13 @@ def test_put_errors(group, user):
     fake_group = confd.groups(FAKE_ID).fallbacks.put
     s.check_resource_not_found(fake_group, 'Group')
 
-    url = confd.groups(group['uuid']).fallbacks.put
-    error_checks(url, user)
+    url = confd.groups(group['uuid']).fallbacks
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    url = confd.groups(group['id']).fallbacks.put
-    error_checks(url, user)
+    url = confd.groups(group['id']).fallbacks
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

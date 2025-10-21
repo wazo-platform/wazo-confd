@@ -45,19 +45,22 @@ def test_get_errors(me):
 
 @fixtures.user()
 def test_post_errors(me):
-    url = confd.meetings.post
-    error_checks(url)
+    url = confd.meetings
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
     user_confd = create_confd(user_uuid=me['uuid'])
-    url = user_confd.users.me.meetings.post
-    error_checks(url)
+    url = user_confd.users.me.meetings
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.ingress_http()
 @fixtures.meeting()
 def test_put_errors(_, meeting):
-    url = confd.meetings(meeting['uuid']).put
-    error_checks(url)
+    url = confd.meetings(meeting['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 @fixtures.ingress_http()
@@ -65,8 +68,9 @@ def test_put_errors(_, meeting):
 def test_put_errors_users_me(_, me):
     user_confd = create_confd(user_uuid=me['uuid'])
     with fixtures.user_me_meeting(user_confd) as meeting:
-        url = user_confd.users.me.meetings(meeting['uuid']).put
-        error_checks(url)
+        url = user_confd.users.me.meetings(meeting['uuid'])
+        error_checks(url.put)
+        s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

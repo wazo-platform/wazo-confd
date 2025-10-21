@@ -37,6 +37,7 @@ def test_delete_errors():
 def test_post_errors(_):
     switchboard_post = confd.switchboards(name='TheSwitchboard').post
     error_checks(switchboard_post)
+    s.check_missing_body_returns_error(confd.switchboards, 'POST')
 
     s.check_bogus_field_returns_error(
         switchboard_post, 'queue_music_on_hold', 'othertenant'
@@ -52,11 +53,14 @@ def test_put_errors(switchboard, _):
     fake_switchboard = confd.switchboards(NOT_FOUND_SWITCHBOARD_UUID).put
     s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
-    url = confd.switchboards(switchboard['uuid']).put
-    error_checks(url)
+    url = confd.switchboards(switchboard['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    s.check_bogus_field_returns_error(url, 'queue_music_on_hold', 'othertenant')
-    s.check_bogus_field_returns_error(url, 'waiting_room_music_on_hold', 'othertenant')
+    s.check_bogus_field_returns_error(url.put, 'queue_music_on_hold', 'othertenant')
+    s.check_bogus_field_returns_error(
+        url.put, 'waiting_room_music_on_hold', 'othertenant'
+    )
 
 
 def error_checks(url):

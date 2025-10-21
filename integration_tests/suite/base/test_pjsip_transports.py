@@ -22,10 +22,11 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
 def test_post_errors():
-    url = confd.sip.transports.post
-    error_checks(url)
+    url = confd.sip.transports
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
-    unique_error_checks(url)
+    unique_error_checks(url.post)
 
 
 def error_checks(url):

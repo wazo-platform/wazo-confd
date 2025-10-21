@@ -21,14 +21,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.access_features.post
-    error_checks(url)
+    url = confd.access_features
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.access_feature()
 def test_put_errors(access_feature):
-    url = confd.access_features(access_feature['id']).put
-    error_checks(url)
+    url = confd.access_features(access_feature['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

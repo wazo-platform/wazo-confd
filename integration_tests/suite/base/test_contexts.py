@@ -34,30 +34,33 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.contexts.post
-    error_checks(url)
+    url = confd.contexts
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
+    s.check_bogus_field_returns_error(url.post, 'label', 123)
+    s.check_bogus_field_returns_error(url.post, 'label', True)
+    s.check_bogus_field_returns_error(url.post, 'label', None)
+    s.check_bogus_field_returns_error(url.post, 'label', '')
+    s.check_bogus_field_returns_error(url.post, 'label', s.random_string(129))
+    s.check_bogus_field_returns_error(url.post, 'label', [])
+    s.check_bogus_field_returns_error(url.post, 'label', {})
 
-    s.check_bogus_field_returns_error(url, 'label', 123)
-    s.check_bogus_field_returns_error(url, 'label', True)
-    s.check_bogus_field_returns_error(url, 'label', None)
-    s.check_bogus_field_returns_error(url, 'label', '')
-    s.check_bogus_field_returns_error(url, 'label', s.random_string(129))
-    s.check_bogus_field_returns_error(url, 'label', [])
-    s.check_bogus_field_returns_error(url, 'label', {})
-
-    s.check_bogus_field_returns_error(url, 'name', 123, None, 'label')
-    s.check_bogus_field_returns_error(url, 'name', True, None, 'label')
-    s.check_bogus_field_returns_error(url, 'name', None, None, 'label')
-    s.check_bogus_field_returns_error(url, 'name', '', None, 'label')
-    s.check_bogus_field_returns_error(url, 'name', s.random_string(129), None, 'label')
-    s.check_bogus_field_returns_error(url, 'name', [], None, 'label')
-    s.check_bogus_field_returns_error(url, 'name', {}, None, 'label')
+    s.check_bogus_field_returns_error(url.post, 'name', 123, None, 'label')
+    s.check_bogus_field_returns_error(url.post, 'name', True, None, 'label')
+    s.check_bogus_field_returns_error(url.post, 'name', None, None, 'label')
+    s.check_bogus_field_returns_error(url.post, 'name', '', None, 'label')
+    s.check_bogus_field_returns_error(
+        url.post, 'name', s.random_string(129), None, 'label'
+    )
+    s.check_bogus_field_returns_error(url.post, 'name', [], None, 'label')
+    s.check_bogus_field_returns_error(url.post, 'name', {}, None, 'label')
 
 
 @fixtures.context()
 def test_put_errors(context):
-    url = confd.contexts(context['id']).put
-    error_checks(url)
+    url = confd.contexts(context['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

@@ -31,14 +31,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.outcalls.post
-    error_checks(url)
+    url = confd.outcalls
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.outcall()
 def test_put_errors(outcall):
-    url = confd.outcalls(outcall['id']).put
-    error_checks(url)
+    url = confd.outcalls(outcall['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

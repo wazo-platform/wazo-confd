@@ -43,10 +43,11 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.sounds.post
-    error_checks(url)
+    url = confd.sounds
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
-    unique_error_checks(url)
+    unique_error_checks(url.post)
 
 
 @fixtures.sound(wazo_tenant=MAIN_TENANT)

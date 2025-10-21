@@ -5,6 +5,7 @@ import re
 
 from hamcrest import assert_that, has_entries, has_entry, only_contains
 
+from ..helpers import scenarios as s
 from ..helpers.config import TOKEN_SUB_TENANT
 from . import confd, sysconfd
 
@@ -70,6 +71,8 @@ def test_put():
 
 
 def test_put_errors():
+    s.check_missing_body_returns_error(confd.ha, 'PUT')
+
     # missing keys
     body = {}
     result = confd.ha.put(body)

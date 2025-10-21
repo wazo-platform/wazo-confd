@@ -37,14 +37,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.endpoints.sccp.post
-    error_checks(url)
+    url = confd.endpoints.sccp
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.sccp()
 def test_put_errors(sccp):
-    url = confd.endpoints.sccp(sccp['id']).put
-    error_checks(url)
+    url = confd.endpoints.sccp(sccp['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

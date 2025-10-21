@@ -29,11 +29,13 @@ def test_associate_errors(group, user):
     response = confd.groups(FAKE_ID).members.users.put(users=[user])
     response.assert_status(404)
 
-    url = confd.groups(group['id']).members.users.put
-    error_checks(url)
+    url = confd.groups(group['id']).members.users
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    url = confd.groups(group['uuid']).members.users.put
-    error_checks(url)
+    url = confd.groups(group['uuid']).members.users
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

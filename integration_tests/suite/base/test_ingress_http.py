@@ -25,8 +25,9 @@ FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
 def test_post_errors():
-    url = confd.ingresses.http.post
-    error_checks(url)
+    url = confd.ingresses.http
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 def error_checks(url):

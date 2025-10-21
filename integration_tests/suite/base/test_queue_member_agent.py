@@ -22,8 +22,9 @@ def test_associate_errors(queue, agent):
     s.check_resource_not_found(fake_queue, 'Queue')
     s.check_resource_not_found(fake_agent, 'Agent')
 
-    url = confd.queues(queue['id']).members.agents(agent['id']).put
-    error_checks(url)
+    url = confd.queues(queue['id']).members.agents(agent['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

@@ -20,8 +20,9 @@ def test_associate_errors(paging, user):
     response = confd.pagings(FAKE_ID).callers.users.put(users=[user])
     response.assert_status(404)
 
-    url = confd.pagings(paging['id']).callers.users.put
-    error_checks(url)
+    url = confd.pagings(paging['id']).callers.users
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

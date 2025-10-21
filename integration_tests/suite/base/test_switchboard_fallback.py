@@ -22,11 +22,9 @@ def test_put_errors(switchboard, user):
     fake_switchboard = confd.switchboards(FAKE_UUID).fallbacks.put
     s.check_resource_not_found(fake_switchboard, 'Switchboard')
 
-    url = confd.switchboards(switchboard['uuid']).fallbacks.put
-    error_checks(url, user)
-
-    url = confd.switchboards(switchboard['uuid']).fallbacks.put
-    error_checks(url, user)
+    url = confd.switchboards(switchboard['uuid']).fallbacks
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

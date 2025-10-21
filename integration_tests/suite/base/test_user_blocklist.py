@@ -119,6 +119,9 @@ def test_post_bogus_fields(user):
     user_confd_client = create_confd(user_uuid=user['uuid'])
     url = user_confd_client.users.me.blocklist.numbers.post
     error_checks(url)
+    s.check_missing_body_returns_error(
+        user_confd_client.users.me.blocklist.numbers, 'POST'
+    )
 
 
 @fixtures.user()
