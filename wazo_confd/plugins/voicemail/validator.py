@@ -48,6 +48,14 @@ class AssociatedToUser(Validator):
             )
 
 
+class AssociatedToTenant(Validator):
+    def validate(self, voicemail):
+        if voicemail.shared and voicemail.users:
+            raise errors.not_permitted(
+                'A shared voicemail cannot be associated to users.'
+            )
+
+
 def build_validator():
     return ValidationGroup(
         common=[
@@ -59,7 +67,7 @@ def build_validator():
                 ),
             ),
         ],
-        create=[NumberContextExists(voicemail_dao)],
-        edit=[NumberContextChanged(voicemail_dao)],
+        create=[NumberContextExists(voicemail_dao), AssociatedToTenant()],
+        edit=[NumberContextChanged(voicemail_dao), AssociatedToTenant()],
         delete=[AssociatedToUser()],
     )
