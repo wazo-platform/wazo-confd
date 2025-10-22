@@ -29,6 +29,7 @@ class VoicemailSchema(BaseSchema):
     enabled = StrictBoolean()
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('voicemails'))
+    shared = StrictBoolean(missing=False, default=False)
 
     users = Nested(
         'UserSchema',
