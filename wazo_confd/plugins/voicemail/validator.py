@@ -39,6 +39,20 @@ class NumberContextChanged(Validator):
             )
 
 
+class UniqueSharedPerContext(Validator):
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, model):
+        voicemail = self.dao.find_by(shared=True, context=model.context)
+        print(f'voicemail: {voicemail.id} || model: {model.id}')
+        print(f'model: {model}')
+        if voicemail and voicemail.shared and model.shared and voicemail.id != model.id:
+            raise errors.not_permitted(
+                'There can be only one shared voicemail per tenant.'
+            )
+
+
 class AssociatedToUser(Validator):
     def validate(self, voicemail):
         if voicemail.users:
@@ -50,7 +64,7 @@ class AssociatedToUser(Validator):
 
 class AssociatedToTenant(Validator):
     def validate(self, voicemail):
-        if voicemail.shared and voicemail.users:
+        if voicemail.shared and len(voicemail.users) > 0:
             raise errors.not_permitted(
                 'A shared voicemail cannot be associated to users.'
             )
@@ -67,7 +81,15 @@ def build_validator():
                 ),
             ),
         ],
-        create=[NumberContextExists(voicemail_dao), AssociatedToTenant()],
-        edit=[NumberContextChanged(voicemail_dao), AssociatedToTenant()],
+        create=[
+            NumberContextExists(voicemail_dao),
+            UniqueSharedPerContext(voicemail_dao),
+            AssociatedToTenant(),
+        ],
+        edit=[
+            NumberContextChanged(voicemail_dao),
+            UniqueSharedPerContext(voicemail_dao),
+            AssociatedToTenant(),
+        ],
         delete=[AssociatedToUser()],
     )
