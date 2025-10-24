@@ -1,6 +1,7 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from xivo_dao.helpers import errors
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.func_key_template import dao as template_dao_module
 from xivo_dao.resources.user import dao as user_dao_module
@@ -100,6 +101,13 @@ class TemplateService:
     def delete_funckey(self, template, position):
         if position in template.keys:
             del template.keys[position]
+        else:
+            raise errors.not_found(
+                'FuncKey',
+                resource='FuncKey',
+                position=position,
+                template_id=template.id,
+            )
         updated_fields = [position]
         self.edit(template, updated_fields)
 
