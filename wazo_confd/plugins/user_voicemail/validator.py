@@ -25,5 +25,15 @@ class UserHasNoVoicemail(Validator):
             )
 
 
+class VoicemailIsNotShared(Validator):
+    def validate(self, user, voicemail):
+        if voicemail and voicemail.shared:
+            raise errors.not_permitted(
+                'A shared voicemail cannot be associated to users.'
+            )
+
+
 def build_validator():
-    return ValidationAssociation(association=[UserHasNoVoicemail()])
+    return ValidationAssociation(
+        association=[UserHasNoVoicemail(), VoicemailIsNotShared()]
+    )
