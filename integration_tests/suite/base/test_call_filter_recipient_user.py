@@ -20,8 +20,9 @@ def test_associate_errors(call_filter, user):
     response = confd.callfilters(FAKE_ID).recipients.users.put(users=[user])
     response.assert_status(404)
 
-    url = confd.callfilters(call_filter['id']).recipients.users.put
-    error_checks(url)
+    url = confd.callfilters(call_filter['id']).recipients.users
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

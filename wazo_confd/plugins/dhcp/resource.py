@@ -1,4 +1,4 @@
-# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -24,6 +24,6 @@ class DHCPResource(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.dhcp.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         self.service.edit(form)
         return '', 204

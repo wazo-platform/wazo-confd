@@ -33,17 +33,20 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.groups.post
-    error_checks(url)
+    url = confd.groups
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.group()
 def test_put_errors(group):
-    url = confd.groups(group['id']).put
-    error_checks(url)
+    url = confd.groups(group['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    url = confd.groups(group['uuid']).put
-    error_checks(url)
+    url = confd.groups(group['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

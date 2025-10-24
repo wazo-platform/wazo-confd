@@ -48,7 +48,7 @@ class IAXCallNumberLimitsList(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.asterisk.iax.callnumberlimits.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         iax_callnumberlimits = [self.model(**option) for option in form]
         self.service.edit(iax_callnumberlimits)
         return '', 204

@@ -27,14 +27,16 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.callfilters.post
-    error_checks(url)
+    url = confd.callfilters
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.call_filter()
 def test_put_errors(call_filter):
-    url = confd.callfilters(call_filter['id']).put
-    error_checks(url)
+    url = confd.callfilters(call_filter['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

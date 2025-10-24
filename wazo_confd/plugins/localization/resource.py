@@ -30,7 +30,7 @@ class LocalizationResource(ConfdResource):
         return '', 204
 
     def _parse_and_update(self, model, **kwargs):
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model, **kwargs)

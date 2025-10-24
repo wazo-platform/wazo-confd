@@ -44,7 +44,7 @@ class UserMeBlocklistNumberList(MeResourceMixin, ListResource):
 
     @required_acl('confd.users.me.blocklist.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         user_uuid = self._find_user_uuid()
         blocklist = self.service.get_or_create_user_blocklist(user_uuid=user_uuid)
         model = self.model(blocklist_uuid=blocklist.uuid, **form)

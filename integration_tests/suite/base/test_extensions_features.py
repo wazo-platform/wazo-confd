@@ -29,8 +29,9 @@ def test_put_errors(extension):
     url = confd.extensions.features(FAKE_UUID).put
     s.check_resource_not_found(url, 'FeatureExtension')
 
-    url = confd.extensions.features(extension['uuid']).put
-    error_checks(url)
+    url = confd.extensions.features(extension['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

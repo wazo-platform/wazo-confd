@@ -123,10 +123,11 @@ def test_get_errors():
 
 def test_post_errors():
     empty_post = confd.users.post
-    user_post = confd.users(firstname="Jôhn").post
-
     s.check_missing_required_field_returns_error(empty_post, 'firstname')
-    error_checks(user_post)
+
+    url = confd.users(firstname="Jôhn")
+    error_checks(url.post)
+    s.check_missing_body_returns_error(confd.users, 'POST')
 
 
 def error_checks(url):
@@ -301,10 +302,11 @@ def put_error_checks(url):
 
 @fixtures.user()
 def test_put_errors(user):
-    user_put = confd.users(user['id']).put
+    url = confd.users(user['id'])
 
-    error_checks(user_put)
-    put_error_checks(user_put)
+    error_checks(url.put)
+    put_error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 @fixtures.user(firstname='user1', username='unique_username', email='unique@email.com')

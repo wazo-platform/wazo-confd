@@ -118,7 +118,7 @@ class RegisterIAXList(ListResource):
 
     @required_acl('confd.registers.iax.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         model = self.model(
             filename='iax.conf',
             category='general',
@@ -144,7 +144,7 @@ class RegisterIAXItem(ItemResource):
     @required_acl('confd.registers.iax.{id}.update')
     def put(self, id):
         model = self.service.get(id)
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
 
         model_json = self.schema().dump(model)
         for name, value in form.items():

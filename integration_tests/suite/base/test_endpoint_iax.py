@@ -83,12 +83,14 @@ def test_delete_errors(iax):
 def test_post_errors():
     url = confd.endpoints.iax.post
     error_checks(url)
+    s.check_missing_body_returns_error(confd.endpoints.iax, 'POST')
 
 
 @fixtures.iax()
 def test_put_errors(iax):
-    url = confd.endpoints.iax(iax['id']).put
-    error_checks(url)
+    url = confd.endpoints.iax(iax['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

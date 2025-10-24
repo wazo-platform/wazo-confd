@@ -59,12 +59,14 @@ def test_get_errors():
 def test_post_errors(extension):
     url = confd.extensions.post
     error_checks(url)
+    s.check_missing_body_returns_error(confd.extensions, 'POST')
 
 
 @fixtures.extension()
 def test_put_errors(extension):
-    url = confd.extensions(extension['id']).put
-    error_checks(url)
+    url = confd.extensions(extension['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def test_delete_errors():

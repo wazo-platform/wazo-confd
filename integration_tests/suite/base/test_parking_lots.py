@@ -32,14 +32,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.parkinglots.post
-    error_checks(url)
+    url = confd.parkinglots
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.parking_lot()
 def test_put_errors(parking_lot):
-    url = confd.parkinglots(parking_lot['id']).put
-    error_checks(url)
+    url = confd.parkinglots(parking_lot['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

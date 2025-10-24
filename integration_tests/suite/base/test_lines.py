@@ -32,19 +32,21 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.lines.post
-    error_checks(url)
+    url = confd.lines
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.line()
 def test_put_errors(line):
-    url = confd.lines(line['id']).put
-    error_checks(url)
+    url = confd.lines(line['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    s.check_bogus_field_returns_error(url, 'provisioning_code', None)
-    s.check_bogus_field_returns_error(url, 'position', None)
-    s.check_bogus_field_returns_error(url, 'registrar', None)
-    s.check_bogus_field_returns_error(url, 'registrar', 'invalidregistrar')
+    s.check_bogus_field_returns_error(url.put, 'provisioning_code', None)
+    s.check_bogus_field_returns_error(url.put, 'position', None)
+    s.check_bogus_field_returns_error(url.put, 'registrar', None)
+    s.check_bogus_field_returns_error(url.put, 'registrar', 'invalidregistrar')
 
 
 def error_checks(url):

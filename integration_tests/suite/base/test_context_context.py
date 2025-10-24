@@ -16,8 +16,9 @@ def test_associate_errors(context):
     response = confd.contexts(FAKE_ID).contexts.put(contexts=[context])
     response.assert_status(404)
 
-    url = confd.contexts(context['id']).contexts().put
-    error_checks(url)
+    url = confd.contexts(context['id']).contexts()
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

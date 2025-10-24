@@ -31,7 +31,9 @@ class QueueMemberAgentItem(ConfdResource):
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.update')
     def put(self, queue_id, agent_id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.associate(request.get_json(), queue_id, agent_id, tenant_uuids)
+        self._middleware.associate(
+            request.get_json(force=True), queue_id, agent_id, tenant_uuids
+        )
         return '', 204
 
     @required_acl('confd.queues.{queue_id}.members.agents.{agent_id}.delete')
@@ -57,7 +59,7 @@ class QueueMemberUserItem(ConfdResource):
         queue = self.queue_dao.get(queue_id, tenant_uuids=tenant_uuids)
         user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         member = self._find_or_create_member(queue, user)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         setattr(member, 'priority', form['priority'])
         self.service.associate_member_user(queue, member)
         return '', 204

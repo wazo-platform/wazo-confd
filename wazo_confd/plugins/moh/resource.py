@@ -26,7 +26,7 @@ class MohList(ListResource):
 
     @required_acl('confd.moh.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])

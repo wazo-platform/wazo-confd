@@ -61,14 +61,16 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.devices.post
-    error_checks(url)
+    url = confd.devices
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.device()
 def test_put_errors(device):
-    url = confd.devices(device['id']).put
-    error_checks(url)
+    url = confd.devices(device['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

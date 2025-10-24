@@ -92,7 +92,7 @@ class IAXGeneralList(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.asterisk.iax.general.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         iax_general = [StaticIAX(**option) for option in form]
         self.service.edit(iax_general)
         return '', 204

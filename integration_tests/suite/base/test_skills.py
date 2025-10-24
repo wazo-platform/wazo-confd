@@ -32,14 +32,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.agents.skills.post
-    error_checks(url)
+    url = confd.agents.skills
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.skill()
 def test_put_errors(skill):
-    url = confd.agents.skills(skill['id']).put
-    error_checks(url)
+    url = confd.agents.skills(skill['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

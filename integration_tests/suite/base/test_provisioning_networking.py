@@ -23,21 +23,22 @@ def test_get():
 
 
 def test_put_errors():
-    url = confd.provisioning.networking.put
+    url = confd.provisioning.networking
+    s.check_missing_body_returns_error(url, 'PUT')
 
-    s.check_bogus_field_returns_error(url, 'provision_http_base_url', 123)
-    s.check_bogus_field_returns_error(url, 'provision_http_base_url', True)
-    s.check_bogus_field_returns_error(url, 'provision_http_base_url', {})
-    s.check_bogus_field_returns_error(url, 'provision_http_base_url', [])
+    s.check_bogus_field_returns_error(url.put, 'provision_http_base_url', 123)
+    s.check_bogus_field_returns_error(url.put, 'provision_http_base_url', True)
+    s.check_bogus_field_returns_error(url.put, 'provision_http_base_url', {})
+    s.check_bogus_field_returns_error(url.put, 'provision_http_base_url', [])
     s.check_bogus_field_returns_error(
-        url, 'provision_http_base_url', s.random_string(256)
+        url.put, 'provision_http_base_url', s.random_string(256)
     )
 
-    s.check_bogus_field_returns_error(url, 'provision_host', 123)
-    s.check_bogus_field_returns_error(url, 'provision_host', True)
-    s.check_bogus_field_returns_error(url, 'provision_host', {})
-    s.check_bogus_field_returns_error(url, 'provision_host', [])
-    s.check_bogus_field_returns_error(url, 'provision_host', s.random_string(40))
+    s.check_bogus_field_returns_error(url.put, 'provision_host', 123)
+    s.check_bogus_field_returns_error(url.put, 'provision_host', True)
+    s.check_bogus_field_returns_error(url.put, 'provision_host', {})
+    s.check_bogus_field_returns_error(url.put, 'provision_host', [])
+    s.check_bogus_field_returns_error(url.put, 'provision_host', s.random_string(40))
 
 
 def test_put_minimal_parameters():

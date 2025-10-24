@@ -21,8 +21,9 @@ def test_put_errors(user):
     fake_user = confd.users(FAKE_ID).fallbacks.put
     s.check_resource_not_found(fake_user, 'User')
 
-    url = confd.users(user['uuid']).fallbacks.put
-    error_checks(url, user)
+    url = confd.users(user['uuid']).fallbacks
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

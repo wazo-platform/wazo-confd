@@ -30,7 +30,7 @@ class ContextContextList(ConfdResource):
     @required_acl('confd.contexts.{context_id}.contexts.update')
     def put(self, context_id):
         context = self.context_dao.get(context_id)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             contexts = [self.context_dao.get(c['id']) for c in form['contexts']]
         except NotFoundError as e:

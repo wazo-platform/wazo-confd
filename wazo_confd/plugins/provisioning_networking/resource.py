@@ -1,4 +1,4 @@
-# Copyright 2019-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -25,7 +25,7 @@ class ProvisioningNetworkingResource(ConfdResource):
     @required_acl('confd.provisioning.networking.update')
     def put(self):
         model = self.service.get()
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
         for name, value in form.items():
             setattr(model, name, value)
         self.service.edit(model)

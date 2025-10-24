@@ -19,8 +19,9 @@ def test_associate_errors(call_pickup, group):
     response = confd.callpickups(FAKE_ID).interceptors.groups.put(groups=[group])
     response.assert_status(404)
 
-    url = confd.callpickups(call_pickup['id']).interceptors.groups.put
-    error_checks(url)
+    url = confd.callpickups(call_pickup['id']).interceptors.groups
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

@@ -19,14 +19,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.registers.iax.post
-    error_checks(url)
+    url = confd.registers.iax
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.register_iax()
 def test_put_errors(register_iax):
-    url = confd.registers.iax(register_iax['id']).put
-    error_checks(url)
+    url = confd.registers.iax(register_iax['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

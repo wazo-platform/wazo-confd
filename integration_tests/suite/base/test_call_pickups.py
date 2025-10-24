@@ -27,14 +27,16 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.callpickups.post
-    error_checks(url)
+    url = confd.callpickups
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.call_pickup()
 def test_put_errors(call_pickup):
-    url = confd.callpickups(call_pickup['id']).put
-    error_checks(url)
+    url = confd.callpickups(call_pickup['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

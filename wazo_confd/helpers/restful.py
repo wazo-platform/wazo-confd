@@ -97,7 +97,7 @@ class ListResource(ConfdResource):
         return form
 
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
         model = self.service.create(model)
@@ -126,7 +126,7 @@ class ItemResource(ConfdResource):
         return '', 204
 
     def parse_and_update(self, model, **kwargs):
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.items():
             setattr(model, name, value)

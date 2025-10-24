@@ -25,6 +25,18 @@ def check_missing_required_field_returns_error(request, field):
     response.assert_match(400, re.compile(re.escape(field)))
 
 
+def check_missing_body_returns_error(url, method):
+    response = url.client.request(method, str(url))
+    response.assert_match(
+        400,
+        re.compile(
+            re.escape(
+                'The browser (or proxy) sent a request that this server could not understand.'
+            )
+        ),
+    )
+
+
 def check_bogus_field_returns_error(
     request, field, bogus, required_field=None, message=None
 ):

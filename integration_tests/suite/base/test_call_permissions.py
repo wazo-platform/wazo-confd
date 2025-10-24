@@ -27,14 +27,16 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.callpermissions.post
-    error_checks(url)
+    url = confd.callpermissions
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.call_permission()
 def test_put_errors(call_permission):
-    url = confd.callpermissions(call_permission['id']).put
-    error_checks(url)
+    url = confd.callpermissions(call_permission['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

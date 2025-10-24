@@ -26,7 +26,7 @@ class ContextList(ListResource):
 
     @required_acl('confd.contexts.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         form = self.add_tenant_to_form(form)
 
         tenant = self._tenant_dao.get(form['tenant_uuid'])
@@ -61,7 +61,7 @@ class ContextItem(ItemResource):
     @required_acl('confd.contexts.{id}.update')
     def put(self, id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.update(id, request.get_json(), tenant_uuids)
+        self._middleware.update(id, request.get_json(force=True), tenant_uuids)
         return '', 204
 
     @required_acl('confd.contexts.{id}.delete')

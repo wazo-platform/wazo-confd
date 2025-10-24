@@ -6,6 +6,7 @@ import re
 from hamcrest import has_entries
 
 from ..helpers import fixtures
+from ..helpers import scenarios as s
 from ..helpers.bus import BusClient
 from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
@@ -96,6 +97,8 @@ def test_tenant_isolation():
 
 
 def test_put_errors():
+    s.check_missing_body_returns_error(confd.localization, 'PUT')
+
     # invalid country
     result = confd.localization.put({'country': 'ZX'})
     result.assert_match(400, re.compile(re.escape('country')))

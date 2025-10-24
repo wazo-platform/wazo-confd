@@ -116,7 +116,7 @@ class FuncKeyTemplateList(ListResource):
     @required_acl('confd.funckeys.templates.create')
     def post(self):
         schema = self.schema(context=self.context)
-        template = schema.load(request.get_json())
+        template = schema.load(request.get_json(force=True))
         template = self.add_tenant_to_form(template)
         template_model = self._create_template_model(template)
         model = self.service.create(template_model)
@@ -143,7 +143,7 @@ class FuncKeyTemplateItem(ItemResource, FindUpdateFieldsMixin):
     def put(self, id):
         kwargs = self._add_tenant_uuid()
         template = self.service.get(id, **kwargs)
-        template_form = self.schema().load(request.get_json())
+        template_form = self.schema().load(request.get_json(force=True))
         updated_fields = self.find_updated_fields_position(
             template.keys, template_form.get('keys', {})
         )
@@ -177,7 +177,7 @@ class FuncKeyTemplateItemPosition(ItemResource):
     def put(self, id, position):
         kwargs = self._add_tenant_uuid()
         template = self.service.get(id, **kwargs)
-        funckey = self.schema(context=self.context).load(request.get_json())
+        funckey = self.schema(context=self.context).load(request.get_json(force=True))
         funckey_model = _create_funckey_model(funckey)
         self.service.edit_funckey(funckey_model, template, position)
         return '', 204
@@ -216,7 +216,7 @@ class UserFuncKeyList(UserFuncKey, FindUpdateFieldsMixin):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         template = self.template_dao.get(user.private_template_id)
-        template_form = self.schema().load(request.get_json())
+        template_form = self.schema().load(request.get_json(force=True))
         updated_fields = self.find_updated_fields_position(
             template.keys, template_form.get('keys', {})
         )
@@ -240,7 +240,7 @@ class UserFuncKeyItemPosition(UserFuncKey):
         tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         template = self.template_dao.get(user.private_template_id)
-        funckey = self.schema().load(request.get_json())
+        funckey = self.schema().load(request.get_json(force=True))
         funckey_model = _create_funckey_model(funckey)
         self.service.edit_user_funckey(user, funckey_model, template, position)
         return '', 204

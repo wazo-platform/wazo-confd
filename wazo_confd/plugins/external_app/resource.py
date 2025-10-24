@@ -38,7 +38,7 @@ class ExternalAppItem(ItemResource):
 
     @required_acl('confd.external.apps.{name}.create')
     def post(self, name):
-        body = request.get_json()
+        body = request.get_json(force=True)
         form_part = self.name_schema().load({'name': name})
         form = self.schema().load(body)
         form = self.add_tenant_to_form(form)

@@ -45,8 +45,9 @@ def test_put_not_found():
 
 @fixtures.phone_number()
 def test_put_bogus_fields(phone_number):
-    url = confd.phone_numbers(phone_number['uuid']).put
-    error_checks(url)
+    url = confd.phone_numbers(phone_number['uuid'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 @fixtures.phone_number()
@@ -58,8 +59,9 @@ def test_put_conflict(phone_number1, phone_number2):
 
 
 def test_post_bogus_fields():
-    url = confd.phone_numbers.post
-    error_checks(url)
+    url = confd.phone_numbers
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.phone_number(number='+18005551234', main=True)

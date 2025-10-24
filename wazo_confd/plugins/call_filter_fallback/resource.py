@@ -1,4 +1,4 @@
-# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -32,6 +32,6 @@ class CallFilterFallbackList(ConfdResource):
         call_filter = self.call_filter_dao.get(
             call_filter_id, tenant_uuids=tenant_uuids
         )
-        fallbacks = self.schema().load(request.get_json())
+        fallbacks = self.schema().load(request.get_json(force=True))
         self.service.edit(call_filter, fallbacks)
         return '', 204

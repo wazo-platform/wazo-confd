@@ -51,6 +51,6 @@ class OutcallExtensionItem(ConfdResource):
         outcall = self.outcall_dao.get(outcall_id, tenant_uuids=tenant_uuids)
         extension = self.extension_dao.get(extension_id, tenant_uuids=tenant_uuids)
 
-        outcall_extension = self.schema().load(request.get_json())
+        outcall_extension = self.schema().load(request.get_json(force=True))
         self.service.associate(outcall, extension, outcall_extension)
         return '', 204

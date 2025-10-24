@@ -33,14 +33,16 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.trunks.post
-    error_checks(url)
+    url = confd.trunks
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.trunk()
 def test_put_errors(trunk):
-    url = confd.trunks(trunk['id']).put
-    error_checks(url)
+    url = confd.trunks(trunk['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

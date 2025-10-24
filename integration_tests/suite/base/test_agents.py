@@ -32,24 +32,26 @@ def test_delete_errors():
 
 
 def test_post_errors():
-    url = confd.agents.post
-    error_checks(url)
+    url = confd.agents
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
-    s.check_bogus_field_returns_error(url, 'number', 123)
-    s.check_bogus_field_returns_error(url, 'number', True)
-    s.check_bogus_field_returns_error(url, 'number', 'invalid')
-    s.check_bogus_field_returns_error(url, 'number', s.random_string(0))
-    s.check_bogus_field_returns_error(url, 'number', s.random_string(41))
-    s.check_bogus_field_returns_error(url, 'number', [])
-    s.check_bogus_field_returns_error(url, 'number', {})
+    s.check_bogus_field_returns_error(url.post, 'number', 123)
+    s.check_bogus_field_returns_error(url.post, 'number', True)
+    s.check_bogus_field_returns_error(url.post, 'number', 'invalid')
+    s.check_bogus_field_returns_error(url.post, 'number', s.random_string(0))
+    s.check_bogus_field_returns_error(url.post, 'number', s.random_string(41))
+    s.check_bogus_field_returns_error(url.post, 'number', [])
+    s.check_bogus_field_returns_error(url.post, 'number', {})
 
-    unique_error_checks(url)
+    unique_error_checks(url.post)
 
 
 @fixtures.agent()
 def test_put_errors(agent):
-    url = confd.agents(agent['id']).put
-    error_checks(url)
+    url = confd.agents(agent['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

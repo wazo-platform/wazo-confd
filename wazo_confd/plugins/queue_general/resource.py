@@ -51,7 +51,7 @@ class QueueGeneralList(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.asterisk.queue.general.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         queue_general = [StaticQueue(**option) for option in form['options']]
         self.service.edit(queue_general)
         return '', 204

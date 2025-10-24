@@ -51,7 +51,7 @@ class SwitchboardList(_BaseSwitchboardResource, ListResource):
 
     @required_acl('confd.switchboards.create')
     def post(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         form = self.add_tenant_to_form(form)
         form = self._update_moh_fields(form, tenant_uuids=[form['tenant_uuid']])
         model = self.model(**form)
@@ -76,7 +76,7 @@ class SwitchboardItem(_BaseSwitchboardResource, ItemResource):
         return super().put(uuid)
 
     def parse_and_update(self, model, **kwargs):
-        form = self.schema().load(request.get_json(), partial=True)
+        form = self.schema().load(request.get_json(force=True), partial=True)
         form = self._update_moh_fields(form, tenant_uuids=[model.tenant_uuid])
         updated_fields = self.find_updated_fields(model, form)
         for name, value in form.items():

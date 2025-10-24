@@ -36,7 +36,7 @@ class UserLineList(UserLineResource):
     @required_acl('confd.users.{user_id}.lines.update')
     def put(self, user_id):
         user = self.get_user(user_id)
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             lines = [self.line_dao.get(line['id']) for line in form['lines']]
         except NotFoundError as e:

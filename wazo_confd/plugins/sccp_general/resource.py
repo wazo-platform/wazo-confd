@@ -55,7 +55,7 @@ class SCCPGeneralList(ConfdResource):
     @required_master_tenant()
     @required_acl('confd.asterisk.sccp.general.update')
     def put(self):
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         sccp_general = [self.model(**option) for option in form['options']]
         self.service.edit(sccp_general)
         return '', 204

@@ -27,7 +27,7 @@ class CallFilterRecipientUserList(ConfdResource):
         call_filter = self.call_filter_dao.get(
             call_filter_id, tenant_uuids=tenant_uuids
         )
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             recipients = []
             for user_form in form['users']:
@@ -63,7 +63,7 @@ class CallFilterSurrogateUserList(ConfdResource):
         call_filter = self.call_filter_dao.get(
             call_filter_id, tenant_uuids=tenant_uuids
         )
-        form = self.schema().load(request.get_json())
+        form = self.schema().load(request.get_json(force=True))
         try:
             surrogates = []
             for user_form in form['users']:

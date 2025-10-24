@@ -24,8 +24,9 @@ def test_put_errors(call_filter, user):
     fake_call_filter = confd.callfilters(FAKE_ID).fallbacks.put
     s.check_resource_not_found(fake_call_filter, 'CallFilter')
 
-    url = confd.callfilters(call_filter['id']).fallbacks.put
-    error_checks(url, user)
+    url = confd.callfilters(call_filter['id']).fallbacks
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

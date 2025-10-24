@@ -35,15 +35,17 @@ def test_delete_errors():
 
 @fixtures.user()
 def test_post_errors(user):
-    url = confd.schedules.post
-    error_checks(url, user)
+    url = confd.schedules
+    error_checks(url.post, user)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.schedule()
 @fixtures.user()
 def test_put_errors(schedule, user):
-    url = confd.schedules(schedule['id']).put
-    error_checks(url, user)
+    url = confd.schedules(schedule['id'])
+    error_checks(url.put, user)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url, user):

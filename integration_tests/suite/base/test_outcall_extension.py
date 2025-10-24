@@ -22,8 +22,9 @@ def test_associate_errors(outcall, extension):
     s.check_resource_not_found(fake_outcall, 'Outcall')
     s.check_resource_not_found(fake_extension, 'Extension')
 
-    url = confd.outcalls(outcall['id']).extensions(extension['id']).put
-    error_checks(url)
+    url = confd.outcalls(outcall['id']).extensions(extension['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

@@ -46,14 +46,16 @@ def test_get_errors():
 
 
 def test_post_errors():
-    url = confd.registrars.post
-    error_checks(url)
+    url = confd.registrars
+    error_checks(url.post)
+    s.check_missing_body_returns_error(url, 'POST')
 
 
 @fixtures.registrar()
 def test_put_errors(registrar):
-    url = confd.registrars(registrar['id']).put
-    error_checks(url)
+    url = confd.registrars(registrar['id'])
+    error_checks(url.put)
+    s.check_missing_body_returns_error(url, 'PUT')
 
 
 def error_checks(url):

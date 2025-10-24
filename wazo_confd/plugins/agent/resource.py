@@ -26,7 +26,7 @@ class AgentList(ListResource):
         tenant_uuid = build_tenant()
         tenant_uuids = self._build_tenant_list({'recurse': True})
         resource = self._middleware.create(
-            request.get_json(), tenant_uuid, tenant_uuids
+            request.get_json(force=True), tenant_uuid, tenant_uuids
         )
         return resource, 201, self.build_headers(resource)
 
@@ -50,7 +50,7 @@ class AgentItem(ItemResource):
     @required_acl('confd.agents.{id}.update')
     def put(self, id):
         tenant_uuids = self._build_tenant_list({'recurse': True})
-        self._middleware.update(id, request.get_json(), tenant_uuids)
+        self._middleware.update(id, request.get_json(force=True), tenant_uuids)
         return '', 204
 
     @required_acl('confd.agents.{id}.delete')
