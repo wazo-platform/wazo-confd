@@ -52,11 +52,10 @@ def test_get_position_errors(funckey_template):
     s.check_resource_not_found(fake_get, 'FuncKey')
 
 
-# Should raise an error
-# @fixtures.funckey_template()
-# def test_delete_position_errors(funckey_template):
-#     fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
-#     s.check_resource_not_found(fake_delete, 'FuncKey')
+@fixtures.funckey_template()
+def test_delete_position_errors(funckey_template):
+    fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
+    s.check_resource_not_found(fake_delete, 'FuncKey')
 
 
 @fixtures.funckey_template()
