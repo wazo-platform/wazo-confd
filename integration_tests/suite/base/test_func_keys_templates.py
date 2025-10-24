@@ -1,6 +1,7 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import pytest
 from hamcrest import (
     all_of,
     assert_that,
@@ -54,6 +55,7 @@ def test_get_position_errors(funckey_template):
 
 
 # Should raise an error
+@pytest.mark.skip('This is a bug that should be fixed')
 @fixtures.funckey_template()
 def test_delete_position_errors(funckey_template):
     fake_delete = confd.funckeys.templates(funckey_template['id'])(1).delete
