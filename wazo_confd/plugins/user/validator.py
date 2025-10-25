@@ -1,9 +1,10 @@
-# Copyright 2013-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.user import dao as user_dao
+from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from wazo_confd.helpers.validator import (
     MOHExists,
@@ -34,6 +35,19 @@ class NoEmptyFieldWhenEnabled(Validator):
                 raise errors.forward_destination_null()
 
 
+class NonSharedVoicemailAssigned(Validator):
+    def __init__(self, dao):
+        self.dao = dao
+
+    def validate(self, model):
+        if model.voicemail:
+            voicemail = self.dao.find_by(number=model.number, context=model.context)
+            if voicemail and voicemail.shared:
+                raise errors.not_permitted(
+                    'A shared voicemail cannot be associated to users.'
+                )
+
+
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     return ValidationGroup(
@@ -54,6 +68,7 @@ def build_validator():
                 ),
             ),
             moh_validator,
+            NonSharedVoicemailAssigned(voicemail_dao),
         ],
         edit=[
             Optional('email', UniqueFieldChanged('email', user_dao.find_by, 'User')),
@@ -61,6 +76,7 @@ def build_validator():
                 'username', UniqueFieldChanged('username', user_dao.find_by, 'User')
             ),
             moh_validator,
+            NonSharedVoicemailAssigned(voicemail_dao),
         ],
     )
 

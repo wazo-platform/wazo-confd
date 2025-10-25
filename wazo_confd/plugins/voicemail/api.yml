@@ -167,6 +167,10 @@ definitions:
         type: string
         description: The UUID of the tenant
         readOnly: true
+      shared:
+        type: boolean
+        description: Is the voicemail shared between all users of the tenant
+        default: false
       options:
         description: "Advanced configuration options. Options are appended at the\
           \ end of a \nvoicemail line in the file 'voicemail.conf' used by asterisk.\n\
