@@ -40,6 +40,26 @@ def test_associate(user, voicemail):
 
 
 @fixtures.user()
+@fixtures.voicemail(shared=True)
+def test_associate_shared(user, voicemail):
+    response = confd.users(user['id']).voicemails(voicemail['id']).put()
+    response.assert_match(
+        400, e.not_permitted('A shared voicemail cannot be associated to users.')
+    )
+
+
+@fixtures.user()
+@fixtures.voicemail()
+def test_set_shared_when_linked_to_user(user, voicemail):
+    with a.user_voicemail(user, voicemail):
+        response = confd.voicemails(voicemail['id']).put(shared=True)
+        response.assert_match(
+            400,
+            e.not_permitted('A shared voicemail cannot be associated to users.'),
+        )
+
+
+@fixtures.user()
 @fixtures.voicemail()
 def test_associate_using_uuid(user, voicemail):
     response = confd.users(user['id']).voicemails(voicemail['id']).put()
@@ -269,4 +289,21 @@ def test_create_and_associate(user, _):
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),
         ),
+    )
+
+
+@fixtures.user()
+def test_create_shared_voicemail_via_user_endpoint(user):
+    number, context = h.voicemail.generate_number_and_context()
+
+    parameters = {
+        'name': 'shared',
+        'number': number,
+        'context': context,
+        'shared': True,
+    }
+
+    response = confd.users(user['uuid']).voicemails.post(parameters)
+    response.assert_match(
+        400, e.not_permitted('A shared voicemail cannot be associated to users.')
     )

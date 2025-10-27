@@ -10,6 +10,7 @@ def generate_voicemail(**kwargs):
     kwargs.setdefault('name', 'myvoicemail')
     kwargs.setdefault('number', find_available_number(config.CONTEXT))
     kwargs.setdefault('context', config.CONTEXT)
+    kwargs.setdefault('shared', False)
     return add_voicemail(**kwargs)
 
 
