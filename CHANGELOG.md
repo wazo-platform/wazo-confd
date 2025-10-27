@@ -1,10 +1,14 @@
 # Changelog
 
+## 25.16
+
+* the endpoint operation `DELETE /1.1/funckeys/templates/<template_id>/<position>` now returns a 404 error response when `<position>` does not exist currently in the funckey template resource.
+
 ## 25.15
 
 * `POST` and `PUT` request bodies to endpoints accepting JSON payload are systematically parsed as JSON, with or without a proper `Content-Type` header;
 * `POST` and `PUT` requests to endpoints accepting JSON payload and which are missing a body now return a `400` status response;
-  previously those invalid requests could be treated as valid when Content-Type was missing and bodies were not parsed; 
+  previously those invalid requests could be treated as valid when Content-Type was missing and bodies were not parsed;
 
 ## 25.08
 
