@@ -201,6 +201,28 @@ def check_search(url, voicemail, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
+@fixtures.voicemail(shared=True)
+@fixtures.voicemail(shared=False)
+def test_search_by_shared(shared_voicemail, regular_voicemail):
+    url = confd.voicemails
+
+    # Filter by shared=True
+    response = url.get(shared=True)
+    assert_that(response.items, has_item(has_entry('id', shared_voicemail['id'])))
+    assert_that(response.items, has_item(has_entry('shared', True)))
+    assert_that(
+        response.items, is_not(has_item(has_entry('id', regular_voicemail['id'])))
+    )
+
+    # Filter by shared=False
+    response = url.get(shared=False)
+    assert_that(response.items, has_item(has_entry('id', regular_voicemail['id'])))
+    assert_that(response.items, has_item(has_entry('shared', False)))
+    assert_that(
+        response.items, is_not(has_item(has_entry('id', shared_voicemail['id'])))
+    )
+
+
 @fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
 @fixtures.context(label='sub_ctx', wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main_ctx, sub_ctx):
@@ -270,12 +292,49 @@ def test_create_minimal_voicemail():
             name='minimal',
             number=number,
             context=context,
+            shared=False,
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
             options=contains(),
             tenant_uuid=MAIN_TENANT,
         ),
+    )
+
+
+def test_create_minimal_shared_voicemail():
+    number, context = vm_helper.generate_number_and_context()
+    response = confd.voicemails.post(
+        name='minimal', number=number, context=context, shared=True
+    )
+
+    response.assert_created('voicemails')
+    assert_that(
+        response.item,
+        has_entries(
+            name='minimal',
+            number=number,
+            context=context,
+            shared=True,
+            ask_password=True,
+            attach_audio=None,
+            delete_messages=False,
+            options=contains(),
+            tenant_uuid=MAIN_TENANT,
+        ),
+    )
+    confd.voicemails(response.item['id']).delete()
+
+
+@fixtures.voicemail(shared=True)
+def test_create_second_shared_voicemail(_):
+    number, context = vm_helper.generate_number_and_context()
+    response = confd.voicemails.post(
+        name='minimal', number=number, context=context, shared=True
+    )
+
+    response.assert_match(
+        400, e.not_permitted('There can be only one shared voicemail per tenant.')
     )
 
 
@@ -310,6 +369,7 @@ def test_create_voicemail_with_all_parameters(_):
         'ask_password': False,
         'delete_messages': True,
         'enabled': True,
+        'shared': False,
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
 
@@ -331,6 +391,7 @@ def test_create_voicemail_with_all_parameters(_):
             ask_password=False,
             delete_messages=True,
             enabled=True,
+            shared=False,
             options=has_items(
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),
@@ -357,6 +418,7 @@ def test_edit_voicemail(voicemail, _):
         'ask_password': False,
         'delete_messages': True,
         'enabled': False,
+        'shared': True,
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
 
@@ -382,6 +444,7 @@ def test_edit_voicemail(voicemail, _):
             ask_password=False,
             delete_messages=True,
             enabled=False,
+            shared=True,
             options=has_items(
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),

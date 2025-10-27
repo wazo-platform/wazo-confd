@@ -89,3 +89,4 @@ device_corrupted = build_error(
     r"device (?P<device_id>[a-zA-Z0-9_-]+) has a corrupted configuration",
     flags=re.IGNORECASE,
 )
+not_permitted = build_error(r"Operation not permitted. (?P<message>.*)")
