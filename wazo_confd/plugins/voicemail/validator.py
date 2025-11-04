@@ -60,7 +60,7 @@ class AssociatedToUser(Validator):
             )
 
 
-class AssociatedToTenant(Validator):
+class UserVoicemailIsShared(Validator):
     def validate(self, voicemail):
         if voicemail.shared and len(voicemail.users) > 0:
             raise errors.not_permitted(
@@ -82,12 +82,12 @@ def build_validator():
         create=[
             NumberContextExists(voicemail_dao),
             UniqueSharedPerContext(voicemail_dao),
-            AssociatedToTenant(),
+            UserVoicemailIsShared(),
         ],
         edit=[
             NumberContextChanged(voicemail_dao),
             UniqueSharedPerContext(voicemail_dao),
-            AssociatedToTenant(),
+            UserVoicemailIsShared(),
         ],
         delete=[AssociatedToUser()],
     )

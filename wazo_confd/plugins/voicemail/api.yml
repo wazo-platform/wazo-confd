@@ -169,7 +169,7 @@ definitions:
         readOnly: true
       shared:
         type: boolean
-        description: Is the voicemail shared between all users of the tenant
+        description: Indicates that the voicemail is global to the tenant and meant to be shared between all its users.
         default: false
       options:
         description: "Advanced configuration options. Options are appended at the\
