@@ -7,7 +7,7 @@ from wazo_bus.resources.user_blocklist.event import (
     UserBlocklistNumberDeletedEvent,
     UserBlocklistNumberEditedEvent,
 )
-from xivo_dao.alchemy.blocklist import BlocklistNumber
+from xivo_dao.alchemy.blocklist_number import BlocklistNumber
 
 from wazo_confd import bus
 

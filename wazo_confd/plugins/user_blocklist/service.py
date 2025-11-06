@@ -5,7 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Literal
 
-from xivo_dao.alchemy.blocklist import Blocklist, BlocklistNumber
+from xivo_dao.alchemy.blocklist import Blocklist
+from xivo_dao.alchemy.blocklist_number import BlocklistNumber
 from xivo_dao.helpers.errors import NotFoundError
 from xivo_dao.resources.blocklist import dao
 from xivo_dao.resources.user import dao as user_dao

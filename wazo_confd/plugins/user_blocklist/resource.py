@@ -4,7 +4,7 @@
 import logging
 
 from flask import request, url_for
-from xivo_dao.alchemy.blocklist import BlocklistNumber
+from xivo_dao.alchemy.blocklist_number import BlocklistNumber
 from xivo_dao.helpers.exception import NotFoundError
 
 from wazo_confd.auth import required_acl
