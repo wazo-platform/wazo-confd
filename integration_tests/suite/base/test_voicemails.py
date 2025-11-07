@@ -201,25 +201,25 @@ def check_search(url, voicemail, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.voicemail(shared=True)
-@fixtures.voicemail(shared=False)
-def test_search_by_shared(shared_voicemail, regular_voicemail):
+@fixtures.voicemail(global_=True)
+@fixtures.voicemail(global_=False)
+def test_search_by_global(global_voicemail, regular_voicemail):
     url = confd.voicemails
 
-    # Filter by shared=True
-    response = url.get(shared=True)
-    assert_that(response.items, has_item(has_entry('id', shared_voicemail['id'])))
-    assert_that(response.items, has_item(has_entry('shared', True)))
+    # Filter by global=True
+    response = url.get(global_=True)
+    assert_that(response.items, has_item(has_entry('id', global_voicemail['id'])))
+    assert_that(response.items, has_item(has_entry('global', True)))
     assert_that(
         response.items, is_not(has_item(has_entry('id', regular_voicemail['id'])))
     )
 
-    # Filter by shared=False
-    response = url.get(shared=False)
+    # Filter by global=False
+    response = url.get(global_=False)
     assert_that(response.items, has_item(has_entry('id', regular_voicemail['id'])))
-    assert_that(response.items, has_item(has_entry('shared', False)))
+    assert_that(response.items, has_item(has_entry('global', False)))
     assert_that(
-        response.items, is_not(has_item(has_entry('id', shared_voicemail['id'])))
+        response.items, is_not(has_item(has_entry('id', global_voicemail['id'])))
     )
 
 
@@ -292,7 +292,7 @@ def test_create_minimal_voicemail():
             name='minimal',
             number=number,
             context=context,
-            shared=False,
+            global_=False,
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
@@ -302,10 +302,10 @@ def test_create_minimal_voicemail():
     )
 
 
-def test_create_minimal_shared_voicemail():
+def test_create_minimal_global_voicemail():
     number, context = vm_helper.generate_number_and_context()
     response = confd.voicemails.post(
-        name='minimal', number=number, context=context, shared=True
+        name='minimal', number=number, context=context, global_=True
     )
 
     response.assert_created('voicemails')
@@ -315,7 +315,7 @@ def test_create_minimal_shared_voicemail():
             name='minimal',
             number=number,
             context=context,
-            shared=True,
+            global_=True,
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
@@ -326,15 +326,15 @@ def test_create_minimal_shared_voicemail():
     confd.voicemails(response.item['id']).delete()
 
 
-@fixtures.voicemail(shared=True)
-def test_create_second_shared_voicemail(_):
+@fixtures.voicemail(global_=True)
+def test_create_second_global_voicemail(_):
     number, context = vm_helper.generate_number_and_context()
     response = confd.voicemails.post(
-        name='minimal', number=number, context=context, shared=True
+        name='minimal', number=number, context=context, global_=True
     )
 
     response.assert_match(
-        400, e.not_permitted('There can be only one shared voicemail per tenant.')
+        400, e.not_permitted('There can be only one global voicemail per tenant.')
     )
 
 
@@ -369,7 +369,7 @@ def test_create_voicemail_with_all_parameters(_):
         'ask_password': False,
         'delete_messages': True,
         'enabled': True,
-        'shared': False,
+        'global': False,
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
 
@@ -391,7 +391,7 @@ def test_create_voicemail_with_all_parameters(_):
             ask_password=False,
             delete_messages=True,
             enabled=True,
-            shared=False,
+            global_=False,
             options=has_items(
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),
@@ -418,7 +418,7 @@ def test_edit_voicemail(voicemail, _):
         'ask_password': False,
         'delete_messages': True,
         'enabled': False,
-        'shared': True,
+        'global': True,
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
 
@@ -444,7 +444,7 @@ def test_edit_voicemail(voicemail, _):
             ask_password=False,
             delete_messages=True,
             enabled=False,
-            shared=True,
+            global_=True,
             options=has_items(
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),
