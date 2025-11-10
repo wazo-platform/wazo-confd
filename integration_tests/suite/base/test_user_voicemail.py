@@ -40,22 +40,22 @@ def test_associate(user, voicemail):
 
 
 @fixtures.user()
-@fixtures.voicemail(shared=True)
-def test_associate_shared(user, voicemail):
+@fixtures.voicemail(accesstype='global')
+def test_associate_global(user, voicemail):
     response = confd.users(user['id']).voicemails(voicemail['id']).put()
     response.assert_match(
-        400, e.not_permitted('A shared voicemail cannot be associated to users.')
+        400, e.not_permitted('A global voicemail cannot be associated to users.')
     )
 
 
 @fixtures.user()
 @fixtures.voicemail()
-def test_set_shared_when_linked_to_user(user, voicemail):
+def test_set_global_when_linked_to_user(user, voicemail):
     with a.user_voicemail(user, voicemail):
-        response = confd.voicemails(voicemail['id']).put(shared=True)
+        response = confd.voicemails(voicemail['id']).put(accesstype='global')
         response.assert_match(
             400,
-            e.not_permitted('A shared voicemail cannot be associated to users.'),
+            e.not_permitted('A global voicemail cannot be associated to users.'),
         )
 
 
@@ -293,17 +293,17 @@ def test_create_and_associate(user, _):
 
 
 @fixtures.user()
-def test_create_shared_voicemail_via_user_endpoint(user):
+def test_create_global_voicemail_via_user_endpoint(user):
     number, context = h.voicemail.generate_number_and_context()
 
     parameters = {
-        'name': 'shared',
+        'name': 'global',
         'number': number,
         'context': context,
-        'shared': True,
+        'accesstype': 'global',
     }
 
     response = confd.users(user['uuid']).voicemails.post(parameters)
     response.assert_match(
-        400, e.not_permitted('A shared voicemail cannot be associated to users.')
+        400, e.not_permitted('A global voicemail cannot be associated to users.')
     )

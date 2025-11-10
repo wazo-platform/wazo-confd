@@ -25,15 +25,15 @@ class UserHasNoVoicemail(Validator):
             )
 
 
-class VoicemailIsNotShared(Validator):
+class VoicemailIsNotGlobal(Validator):
     def validate(self, user, voicemail):
-        if voicemail and voicemail.shared:
+        if voicemail and voicemail.accesstype == 'global':
             raise errors.not_permitted(
-                'A shared voicemail cannot be associated to users.'
+                'A global voicemail cannot be associated to users.'
             )
 
 
 def build_validator():
     return ValidationAssociation(
-        association=[UserHasNoVoicemail(), VoicemailIsNotShared()]
+        association=[UserHasNoVoicemail(), VoicemailIsNotGlobal()]
     )

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import ValidationError, fields, validates_schema
-from marshmallow.validate import Length, Range, Regexp
+from marshmallow.validate import Length, OneOf, Range, Regexp
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
@@ -29,7 +29,11 @@ class VoicemailSchema(BaseSchema):
     enabled = StrictBoolean()
     options = fields.List(fields.List(fields.String(), validate=Length(equal=2)))
     links = ListLink(Link('voicemails'))
-    shared = StrictBoolean(load_default=False, dump_default=False)
+    accesstype = fields.String(
+        validate=OneOf(['personal', 'global']),
+        load_default='personal',
+        dump_default='personal',
+    )
 
     users = Nested(
         'UserSchema',

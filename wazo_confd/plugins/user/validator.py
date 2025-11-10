@@ -34,11 +34,11 @@ class NoEmptyFieldWhenEnabled(Validator):
                 raise errors.forward_destination_null()
 
 
-class NonSharedVoicemailAssigned(Validator):
+class NonGlobalVoicemailAssigned(Validator):
     def validate(self, model):
-        if model.voicemail and model.voicemail.shared:
+        if model.voicemail and model.voicemail.accesstype == 'global':
             raise errors.not_permitted(
-                'A shared voicemail cannot be associated to users.'
+                'A global voicemail cannot be associated to users.'
             )
 
 
@@ -62,7 +62,7 @@ def build_validator():
                 ),
             ),
             moh_validator,
-            NonSharedVoicemailAssigned(),
+            NonGlobalVoicemailAssigned(),
         ],
         edit=[
             Optional('email', UniqueFieldChanged('email', user_dao.find_by, 'User')),
@@ -70,7 +70,7 @@ def build_validator():
                 'username', UniqueFieldChanged('username', user_dao.find_by, 'User')
             ),
             moh_validator,
-            NonSharedVoicemailAssigned(),
+            NonGlobalVoicemailAssigned(),
         ],
     )
 

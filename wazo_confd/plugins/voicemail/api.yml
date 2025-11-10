@@ -167,10 +167,13 @@ definitions:
         type: string
         description: The UUID of the tenant
         readOnly: true
-      shared:
-        type: boolean
-        description: Indicates that the voicemail is global to the tenant and meant to be shared between all its users.
-        default: false
+      accesstype:
+        type: string
+        enum:
+        - personal
+        - global
+        description: Access type of the voicemail. 'personal' means the voicemail is associated with specific users, 'global' means it is shared across the context. Only one global voicemail can exist per context.
+        default: personal
       options:
         description: "Advanced configuration options. Options are appended at the\
           \ end of a \nvoicemail line in the file 'voicemail.conf' used by asterisk.\n\

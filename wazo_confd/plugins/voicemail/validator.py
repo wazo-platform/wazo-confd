@@ -39,15 +39,15 @@ class NumberContextChanged(Validator):
             )
 
 
-class UniqueSharedPerContext(Validator):
+class UniqueGlobalPerContext(Validator):
     def __init__(self, dao):
         self.dao = dao
 
     def validate(self, model):
-        voicemail = self.dao.find_by(shared=True, context=model.context)
-        if voicemail and model.shared and voicemail.id != model.id:
+        voicemail = self.dao.find_by(accesstype='global', context=model.context)
+        if voicemail and model.accesstype == 'global' and voicemail.id != model.id:
             raise errors.not_permitted(
-                'There can be only one shared voicemail per tenant.'
+                'There can be only one global voicemail per context.'
             )
 
 
@@ -60,11 +60,11 @@ class AssociatedToUser(Validator):
             )
 
 
-class UserVoicemailIsShared(Validator):
+class UserVoicemailIsGlobal(Validator):
     def validate(self, voicemail):
-        if voicemail.shared and len(voicemail.users) > 0:
+        if voicemail.accesstype == 'global' and len(voicemail.users) > 0:
             raise errors.not_permitted(
-                'A shared voicemail cannot be associated to users.'
+                'A global voicemail cannot be associated to users.'
             )
 
 
@@ -81,13 +81,13 @@ def build_validator():
         ],
         create=[
             NumberContextExists(voicemail_dao),
-            UniqueSharedPerContext(voicemail_dao),
-            UserVoicemailIsShared(),
+            UniqueGlobalPerContext(voicemail_dao),
+            UserVoicemailIsGlobal(),
         ],
         edit=[
             NumberContextChanged(voicemail_dao),
-            UniqueSharedPerContext(voicemail_dao),
-            UserVoicemailIsShared(),
+            UniqueGlobalPerContext(voicemail_dao),
+            UserVoicemailIsGlobal(),
         ],
         delete=[AssociatedToUser()],
     )
