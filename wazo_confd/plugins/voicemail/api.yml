@@ -167,7 +167,7 @@ definitions:
         type: string
         description: The UUID of the tenant
         readOnly: true
-      shared:
+      global:
         type: boolean
         description: Indicates that the voicemail is global to the tenant and meant to be shared between all its users.
         default: false
