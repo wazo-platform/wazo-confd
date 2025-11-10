@@ -1,8 +1,7 @@
 # Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import unittest
-
+import pytest
 from hamcrest import (
     assert_that,
     calling,
@@ -51,7 +50,7 @@ def test_create_default_templates_when_not_exist():
     until.assert_(slug_created, tries=5)
 
 
-@unittest.skip
+@pytest.mark.skip(reason="Too flaky because of WAZO-2752")
 @fixtures.context(name='deleted_ctx', wazo_tenant=DELETED_TENANT)
 @fixtures.user(wazo_tenant=DELETED_TENANT)
 @fixtures.line(context='deleted_ctx', wazo_tenant=DELETED_TENANT)
