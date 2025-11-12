@@ -201,25 +201,25 @@ def check_search(url, voicemail, hidden, field, term):
     assert_that(response.items, is_not(has_item(has_entry('id', hidden['id']))))
 
 
-@fixtures.voicemail(shared=True)
-@fixtures.voicemail(shared=False)
-def test_search_by_shared(shared_voicemail, regular_voicemail):
+@fixtures.voicemail(accesstype='global')
+@fixtures.voicemail(accesstype='personal')
+def test_search_by_accesstype(global_voicemail, personal_voicemail):
     url = confd.voicemails
 
-    # Filter by shared=True
-    response = url.get(shared=True)
-    assert_that(response.items, has_item(has_entry('id', shared_voicemail['id'])))
-    assert_that(response.items, has_item(has_entry('shared', True)))
+    # Filter by accesstype=global
+    response = url.get(accesstype='global')
+    assert_that(response.items, has_item(has_entry('id', global_voicemail['id'])))
+    assert_that(response.items, has_item(has_entry('accesstype', 'global')))
     assert_that(
-        response.items, is_not(has_item(has_entry('id', regular_voicemail['id'])))
+        response.items, is_not(has_item(has_entry('id', personal_voicemail['id'])))
     )
 
-    # Filter by shared=False
-    response = url.get(shared=False)
-    assert_that(response.items, has_item(has_entry('id', regular_voicemail['id'])))
-    assert_that(response.items, has_item(has_entry('shared', False)))
+    # Filter by accesstype=personal
+    response = url.get(accesstype='personal')
+    assert_that(response.items, has_item(has_entry('id', personal_voicemail['id'])))
+    assert_that(response.items, has_item(has_entry('accesstype', 'personal')))
     assert_that(
-        response.items, is_not(has_item(has_entry('id', shared_voicemail['id'])))
+        response.items, is_not(has_item(has_entry('id', global_voicemail['id'])))
     )
 
 
@@ -292,7 +292,7 @@ def test_create_minimal_voicemail():
             name='minimal',
             number=number,
             context=context,
-            shared=False,
+            accesstype='personal',
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
@@ -302,10 +302,10 @@ def test_create_minimal_voicemail():
     )
 
 
-def test_create_minimal_shared_voicemail():
+def test_create_minimal_global_voicemail():
     number, context = vm_helper.generate_number_and_context()
     response = confd.voicemails.post(
-        name='minimal', number=number, context=context, shared=True
+        name='minimal', number=number, context=context, accesstype='global'
     )
 
     response.assert_created('voicemails')
@@ -315,7 +315,7 @@ def test_create_minimal_shared_voicemail():
             name='minimal',
             number=number,
             context=context,
-            shared=True,
+            accesstype='global',
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
@@ -326,15 +326,15 @@ def test_create_minimal_shared_voicemail():
     confd.voicemails(response.item['id']).delete()
 
 
-@fixtures.voicemail(shared=True)
-def test_create_second_shared_voicemail(_):
+@fixtures.voicemail(accesstype='global')
+def test_create_second_global_voicemail(_):
     number, context = vm_helper.generate_number_and_context()
     response = confd.voicemails.post(
-        name='minimal', number=number, context=context, shared=True
+        name='minimal', number=number, context=context, accesstype='global'
     )
 
     response.assert_match(
-        400, e.not_permitted('There can be only one shared voicemail per tenant.')
+        400, e.not_permitted('There can be only one global voicemail per context.')
     )
 
 
@@ -369,7 +369,7 @@ def test_create_voicemail_with_all_parameters(_):
         'ask_password': False,
         'delete_messages': True,
         'enabled': True,
-        'shared': False,
+        'accesstype': 'personal',
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
 
@@ -391,7 +391,7 @@ def test_create_voicemail_with_all_parameters(_):
             ask_password=False,
             delete_messages=True,
             enabled=True,
-            shared=False,
+            accesstype='personal',
             options=has_items(
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),
@@ -418,7 +418,7 @@ def test_edit_voicemail(voicemail, _):
         'ask_password': False,
         'delete_messages': True,
         'enabled': False,
-        'shared': True,
+        'accesstype': 'global',
         'options': [["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]],
     }
 
@@ -444,7 +444,7 @@ def test_edit_voicemail(voicemail, _):
             ask_password=False,
             delete_messages=True,
             enabled=False,
-            shared=True,
+            accesstype='global',
             options=has_items(
                 ["saycid", "yes"], ["emailbody", "this\nis\ra\temail|body"]
             ),

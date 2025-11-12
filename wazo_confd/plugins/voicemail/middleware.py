@@ -15,7 +15,9 @@ class VoicemailMiddleWare(ResourceMiddleware):
 
     def create(self, body, tenant_uuids):
         form = self._schema.load(body)
+        accesstype = form.pop('accesstype', 'personal')
         model = Voicemail(**form)
+        model.accesstype = accesstype
         model = self._service.create(model, tenant_uuids)
         return self._schema.dump(model)
 

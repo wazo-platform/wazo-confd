@@ -3,6 +3,7 @@
 ## 25.16
 
 * the endpoint operation `DELETE /1.1/funckeys/templates/<template_id>/<position>` now returns a 404 error response when `<position>` does not exist currently in the funckey template resource.
+* The `voicemail` resource now has a `accesstype` field indicating the type of the voicemail, either `personal` or `global`.
 
 ## 25.15
 
