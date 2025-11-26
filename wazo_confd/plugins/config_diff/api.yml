@@ -29,6 +29,14 @@ paths:
         type: string
         format: date-time
         description: The end date of the diff
+      - name: commit_a
+        in: query
+        type: string
+        description: The commit hash of the first commit
+      - name: commit_b
+        in: query
+        type: string
+        description: The commit hash of the second commit
       responses:
         '200':
           description: Config history diff
