@@ -127,11 +127,15 @@ class SysconfdPublisher:
         response.raise_for_status()
         return response.json()['items']
 
-    def get_config_history_diff(self, start_date: str, end_date: str):
+    def get_config_history_diff(
+        self, start_date: str, end_date: str, commit_a: str, commit_b: str
+    ):
         url = "{}/config-history/diff".format(self.base_url)
         params = {
             'start_date': start_date,
             'end_date': end_date,
+            'commit_a': commit_a,
+            'commit_b': commit_b,
         }
         response = self._session().get(url, params=params)
         response.raise_for_status()

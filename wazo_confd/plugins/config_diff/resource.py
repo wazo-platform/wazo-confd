@@ -33,5 +33,7 @@ class ConfigHistoryDiffResource(ConfdResource):
     def get(self):
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
-        model = self.service.get_diff(start_date, end_date)
+        commit_a = request.args.get('commit_a')
+        commit_b = request.args.get('commit_b')
+        model = self.service.get_diff(start_date, end_date, commit_a, commit_b)
         return self.schema().dump({'item': model})

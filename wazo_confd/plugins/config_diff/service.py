@@ -15,5 +15,7 @@ class ConfigHistoryService:
     def get_history(self):
         return self.sysconfd.get_config_history()
 
-    def get_diff(self, start_date: str, end_date: str):
-        return self.sysconfd.get_config_history_diff(start_date, end_date)
+    def get_diff(self, start_date: str, end_date: str, commit_a: str, commit_b: str):
+        return self.sysconfd.get_config_history_diff(
+            start_date, end_date, commit_a, commit_b
+        )
