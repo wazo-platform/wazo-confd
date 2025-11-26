@@ -9,7 +9,8 @@ paths:
       responses:
         '200':
           description: Config history
-          schema: ConfigHistoryLogItems
+          schema:
+            $ref: '#/definitions/ConfigHistoryLogItems'
   /config_history/diff:
     get:
       operationId: get_config_history_diff
@@ -21,15 +22,18 @@ paths:
       - name: start_date
         in: query
         type: string
+        format: date-time
         description: The start date of the diff
       - name: end_date
         in: query
         type: string
+        format: date-time
         description: The end date of the diff
       responses:
         '200':
           description: Config history diff
-          schema: ConfigHistoryDiff
+          schema:
+            $ref: '#/definitions/ConfigHistoryDiff'
 definitions:
   ConfigHistoryLogItems:
     title: Config history log items
