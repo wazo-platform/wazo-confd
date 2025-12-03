@@ -22,6 +22,9 @@ class TenantList(ListResource):
     def get(self):
         return super().get()
 
+    def post(self):
+        return '', 405
+
 
 class TenantItem(ItemResource):
     schema = TenantSchema
@@ -30,3 +33,9 @@ class TenantItem(ItemResource):
     @required_acl('confd.tenants.{uuid}.read')
     def get(self, uuid):
         return super().get(str(uuid))
+
+    def put(self, uuid):
+        return '', 405
+
+    def delete(self, uuid):
+        return '', 405

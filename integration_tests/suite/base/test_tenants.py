@@ -75,6 +75,21 @@ def test_list_multi_tenant(_):
     )
 
 
+def test_post_unimplemented():
+    response = confd.tenants.post()
+    response.assert_status(405)
+
+
+def test_put_unimplemented():
+    response = confd.tenants(MAIN_TENANT).put()
+    response.assert_status(405)
+
+
+def test_delete_unimplemented():
+    response = confd.tenants(MAIN_TENANT).delete()
+    response.assert_status(405)
+
+
 def test_tenant_deletion_with_event():
     _reset_tenants()
     tables_rows_count_before_deletion = _count_tables_rows()
