@@ -45,6 +45,8 @@ services:
     ports:
       - "9486"
     command: "wazo-confd -d"
+    environment:
+      SQLALCHEMY_WARN_20: "1"
     volumes:
       - "../..:/usr/src/wazo-confd"
       - "./etc/wazo-confd/conf.d/50-default.yml:/etc/wazo-confd/conf.d/50-default.yml"
