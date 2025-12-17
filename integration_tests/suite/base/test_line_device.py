@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from hamcrest import (
     assert_that,
-    contains,
+    contains_exactly,
     equal_to,
     has_entries,
     has_items,
@@ -176,7 +176,7 @@ def check_get_line_associated_to_a_device(line, device):
         response = confd.devices(device['id']).lines.get()
         assert_that(
             response.items,
-            contains(has_entries(line_id=line['id'], device_id=device['id'])),
+            contains_exactly(has_entries(line_id=line['id'], device_id=device['id'])),
         )
 
 

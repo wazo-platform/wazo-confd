@@ -1,7 +1,7 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries, not_
+from hamcrest import assert_that, contains_exactly, empty, has_entries, not_
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -112,7 +112,7 @@ def test_get_call_permissions_associated_to_user(user, perm1, perm2):
             assert_that(
                 response.item,
                 has_entries(
-                    call_permissions=contains(
+                    call_permissions=contains_exactly(
                         has_entries(id=perm1['id'], name=perm1['name']),
                         has_entries(id=perm2['id'], name=perm2['name']),
                     )
@@ -130,7 +130,7 @@ def test_get_users_associated_to_call_permission(user1, user2, call_permission):
             assert_that(
                 response.item,
                 has_entries(
-                    users=contains(
+                    users=contains_exactly(
                         has_entries(
                             uuid=user1['uuid'],
                             firstname=user1['firstname'],

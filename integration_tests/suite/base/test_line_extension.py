@@ -3,7 +3,7 @@
 
 from hamcrest import (
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     equal_to,
@@ -110,7 +110,8 @@ def test_associate_line_and_internal_extension(line, extension):
 
     response = confd.lines(line['id']).get()
     assert_that(
-        response.item['extensions'], contains(has_entries({'id': extension['id']}))
+        response.item['extensions'],
+        contains_exactly(has_entries({'id': extension['id']})),
     )
 
 
@@ -125,7 +126,8 @@ def test_associate_line_and_create_extension(line):
     try:
         response = confd.lines(line['id']).get()
         assert_that(
-            response.item['extensions'], contains(has_entries({'id': extension['id']}))
+            response.item['extensions'],
+            contains_exactly(has_entries({'id': extension['id']})),
         )
     finally:
         confd.lines(line['id']).extensions(extension['id']).delete()
@@ -310,7 +312,7 @@ def test_associate_line_with_endpoint(line, sip, extension):
         response = confd.lines(line['id']).get()
         assert_that(
             response.item['extensions'],
-            contains(has_entries({'id': extension['id']})),
+            contains_exactly(has_entries({'id': extension['id']})),
         )
 
 
@@ -400,7 +402,7 @@ def test_get_extension_relation(line, exten):
         response = confd.lines(line['id']).get()
         assert_that(
             response.item['extensions'],
-            contains(
+            contains_exactly(
                 has_entries(
                     id=exten['id'], exten=exten['exten'], context=exten['context']
                 )
@@ -418,7 +420,7 @@ def test_get_line_relation(line, sip, extension):
             response = confd.extensions(extension['id']).get()
             assert_that(
                 response.item['lines'],
-                contains(has_entries(id=line['id'], name=line['name'])),
+                contains_exactly(has_entries(id=line['id'], name=line['name'])),
             )
 
 
@@ -457,7 +459,7 @@ def test_create_line_with_all_parameters_and_extension(registrar):
                 provisioning_code="887865",
                 provisioning_extension="887865",
                 tenant_uuid=MAIN_TENANT,
-                extensions=contains(
+                extensions=contains_exactly(
                     has_entries(
                         id=greater_than(0),
                         context=CONTEXT,
@@ -470,7 +472,7 @@ def test_create_line_with_all_parameters_and_extension(registrar):
         assert_that(
             confd.lines(response.item['id']).get().item,
             has_entries(
-                extensions=contains(
+                extensions=contains_exactly(
                     has_entries(
                         id=greater_than(0),
                         context=CONTEXT,
@@ -497,7 +499,7 @@ def test_create_line_extension_no_context():
             response.item,
             has_entries(
                 context=CONTEXT,
-                extensions=contains(
+                extensions=contains_exactly(
                     has_entries(
                         context=CONTEXT,
                         exten=exten,
@@ -509,7 +511,7 @@ def test_create_line_extension_no_context():
         assert_that(
             confd.lines(response.item['id']).get().item,
             has_entries(
-                extensions=contains(
+                extensions=contains_exactly(
                     has_entries(
                         context=CONTEXT,
                         exten=exten,

@@ -6,7 +6,7 @@ import uuid
 import pytest
 from hamcrest import (
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     contains_string,
     empty,
@@ -54,7 +54,7 @@ def assert_error(response, expect):
 
 
 def has_error_field(fieldname, row_number=1):
-    return contains(
+    return contains_exactly(
         has_entries(
             timestamp=instance_of(int),
             details=has_entries(row_number=row_number),
@@ -374,8 +374,8 @@ def test_given_csv_has_all_sip_fields_then_sip_endpoint_created():
         has_entries(
             name='sipusername',
             auth_section_options=contains_inanyorder(
-                contains('username', 'sipusername'),
-                contains("password", "sipsecret"),
+                contains_exactly('username', 'sipusername'),
+                contains_exactly("password", "sipsecret"),
             ),
         ),
     )
@@ -398,7 +398,7 @@ def test_given_csv_has_minimal_webrtc_fields_then_sip_endpoint_created():
         has_entries(
             uuid=sip_uuid,
             line=has_entries(id=line_id),
-            templates=contains(
+            templates=contains_exactly(
                 has_entries(uuid=tenant['global_sip_template_uuid']),
                 has_entries(uuid=tenant['webrtc_sip_template_uuid']),
             ),
@@ -556,7 +556,7 @@ def test_given_csv_has_wazo_user_fields_then_wazo_user_created():
             firstname="Thômas",
             lastname="dakin",
             username="thomas1",
-            emails=contains(has_entries(address="thom.dak@user-import.com")),
+            emails=contains_exactly(has_entries(address="thom.dak@user-import.com")),
         ),
     )
 
@@ -587,7 +587,7 @@ def test_update_wazo_user_fields_then_wazo_user_updated(entry):
             firstname="user-import",
             lastname="user-import",
             username="user-import",
-            emails=contains(has_entries(address="user-import@user-import.com")),
+            emails=contains_exactly(has_entries(address="user-import@user-import.com")),
         ),
     )
 
@@ -649,9 +649,10 @@ def test_given_csv_has_call_permission_then_call_permission_associated(call_perm
     response = client.post("/users/import", csv)
     assert_that(
         response.item['created'],
-        contains(
+        contains_exactly(
             has_entries(
-                row_number=1, call_permission_ids=contains(call_permission['id'])
+                row_number=1,
+                call_permission_ids=contains_exactly(call_permission['id']),
             )
         ),
     )
@@ -660,7 +661,7 @@ def test_given_csv_has_call_permission_then_call_permission_associated(call_perm
     response = confd.users(user_id).get()
     assert_that(
         response.item['call_permissions'],
-        contains(has_entries(id=call_permission['id'])),
+        contains_exactly(has_entries(id=call_permission['id'])),
     )
 
 
@@ -675,7 +676,7 @@ def test_given_csv_has_multiple_call_permissions_then_all_call_permission_associ
     response = client.post("/users/import", csv)
     assert_that(
         response.item['created'],
-        contains(
+        contains_exactly(
             has_entries(
                 row_number=1, call_permission_ids=has_items(perm1['id'], perm2['id'])
             )
@@ -737,15 +738,17 @@ def test_given_csv_has_all_resources_then_all_relations_created():
     assert_that(
         response.item,
         has_entries(
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(
                     id=line_id,
-                    extensions=contains(has_entries(id=extension_id)),
+                    extensions=contains_exactly(has_entries(id=extension_id)),
                     endpoint_sip=has_entries(uuid=sip_uuid),
                 )
             ),
-            incalls=contains(
-                has_entries(extensions=contains(has_entries(id=extension_incall_id)))
+            incalls=contains_exactly(
+                has_entries(
+                    extensions=contains_exactly(has_entries(id=extension_incall_id))
+                )
             ),
             voicemail=has_entries(id=voicemail_id),
         ),
@@ -787,16 +790,18 @@ def test_given_resources_already_exist_when_importing_then_resources_associated(
     assert_that(
         response.item,
         has_entries(
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(
                     id=line_id,
-                    extensions=contains(has_entries(id=extension['id'])),
+                    extensions=contains_exactly(has_entries(id=extension['id'])),
                     endpoint_sip=has_entries(uuid=sip['uuid']),
                 )
             ),
-            call_permissions=contains(has_entries(id=call_permission['id'])),
-            incalls=contains(
-                has_entries(extensions=contains(has_entries(id=extension_incall_id)))
+            call_permissions=contains_exactly(has_entries(id=call_permission['id'])),
+            incalls=contains_exactly(
+                has_entries(
+                    extensions=contains_exactly(has_entries(id=extension_incall_id))
+                )
             ),
             voicemail=has_entries(id=voicemail['id']),
         ),
@@ -1262,7 +1267,7 @@ def test_when_updating_call_permission_field_then_call_permissions_updated(
 
     assert_that(
         response.item['updated'],
-        contains(
+        contains_exactly(
             has_entries(
                 row_number=1, call_permission_ids=has_items(perm1['id'], perm2['id'])
             )
@@ -1288,7 +1293,7 @@ def test_when_call_permission_column_is_empty_then_call_permission_is_removed(en
 
     assert_that(
         response.item['updated'],
-        contains(has_entries(row_number=1, call_permission_ids=empty())),
+        contains_exactly(has_entries(row_number=1, call_permission_ids=empty())),
     )
 
     user_id = response.item['updated'][0]['user_id']
@@ -1310,7 +1315,9 @@ def test_when_call_permission_column_is_not_in_csv_then_call_permission_remains_
 
     assert_that(
         response.item['updated'],
-        contains(has_entries(row_number=1, call_permission_ids=contains(perm_id))),
+        contains_exactly(
+            has_entries(row_number=1, call_permission_ids=contains_exactly(perm_id))
+        ),
     )
 
 
@@ -1481,7 +1488,7 @@ def test_given_resources_not_associated_when_updating_then_resources_associated(
     entry = response.item['updated'][0]
 
     response = confd.users(entry['user_id']).lines.get()
-    assert_that(response.items, contains(has_entries(line_id=entry['line_id'])))
+    assert_that(response.items, contains_exactly(has_entries(line_id=entry['line_id'])))
 
     response = confd.lines(entry['line_id']).extensions.get()
     assert_that(

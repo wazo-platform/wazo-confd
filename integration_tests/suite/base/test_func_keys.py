@@ -5,7 +5,7 @@ import unittest
 
 from hamcrest import (
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -756,7 +756,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
         assert_that(
             response.items,
-            contains(
+            contains_exactly(
                 has_entries(user_id=self.user['id'], template_id=self.template['id'])
             ),
         )
@@ -770,7 +770,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
         assert_that(
             response.items,
-            contains(
+            contains_exactly(
                 has_entries(user_id=self.user['id'], template_id=self.template['id'])
             ),
         )
@@ -784,7 +784,7 @@ class TestTemplateAssociation(BaseTestFuncKey):
 
         assert_that(
             response.items,
-            contains(
+            contains_exactly(
                 has_entries(user_id=self.user['id'], template_id=self.template['id'])
             ),
         )

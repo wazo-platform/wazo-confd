@@ -4,7 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -296,7 +296,7 @@ def test_create_minimal_voicemail():
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
-            options=contains(),
+            options=contains_exactly(),
             tenant_uuid=MAIN_TENANT,
         ),
     )
@@ -319,7 +319,7 @@ def test_create_minimal_global_voicemail():
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
-            options=contains(),
+            options=contains_exactly(),
             tenant_uuid=MAIN_TENANT,
         ),
     )

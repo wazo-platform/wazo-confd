@@ -1,7 +1,7 @@
 # Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, has_entries
+from hamcrest import assert_that, contains_exactly, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -143,7 +143,7 @@ def test_get_user_relation(user, schedule):
         assert_that(
             response.item,
             has_entries(
-                schedules=contains(
+                schedules=contains_exactly(
                     has_entries(id=schedule['id'], name=schedule['name'])
                 )
             ),
@@ -156,7 +156,8 @@ def test_get_schedule_relation(schedule, user):
     with a.user_schedule(user, schedule):
         response = confd.schedules(schedule['id']).get()
         assert_that(
-            response.item, has_entries(users=contains(has_entries(uuid=user['uuid'])))
+            response.item,
+            has_entries(users=contains_exactly(has_entries(uuid=user['uuid']))),
         )
 
 

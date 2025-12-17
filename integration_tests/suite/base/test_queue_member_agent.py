@@ -1,7 +1,7 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries
+from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -79,7 +79,7 @@ def test_update_properties(queue, agent):
             response.item,
             has_entries(
                 members=has_entries(
-                    agents=contains(has_entries(penalty=41, priority=42))
+                    agents=contains_exactly(has_entries(penalty=41, priority=42))
                 )
             ),
         )
@@ -181,7 +181,7 @@ def test_get_queue_relation(queue, agent):
             response.item,
             has_entries(
                 members=has_entries(
-                    agents=contains(
+                    agents=contains_exactly(
                         has_entries(
                             id=agent['id'],
                             number=agent['number'],
@@ -205,7 +205,7 @@ def test_get_agent_relation(agent, queue):
         assert_that(
             response.item,
             has_entries(
-                queues=contains(
+                queues=contains_exactly(
                     has_entries(
                         id=queue['id'],
                         name=queue['name'],

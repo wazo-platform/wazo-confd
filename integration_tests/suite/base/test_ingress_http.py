@@ -4,7 +4,6 @@
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
     contains_exactly,
     empty,
     has_entries,
@@ -141,16 +140,16 @@ def test_sorting_offset_limit(ingress_http1, ingress_http2):
     url = confd.ingresses.http.get
 
     response = url(direction='asc', **common_args)
-    assert_that(response.items, contains(ingress_http1, ingress_http2))
+    assert_that(response.items, contains_exactly(ingress_http1, ingress_http2))
 
     response = url(direction='desc', **common_args)
-    assert_that(response.items, contains(ingress_http2, ingress_http1))
+    assert_that(response.items, contains_exactly(ingress_http2, ingress_http1))
 
     response = url(offset=1, **common_args)
-    assert_that(response.items, contains(ingress_http2))
+    assert_that(response.items, contains_exactly(ingress_http2))
 
     response = url(limit=1, **common_args)
-    assert_that(response.items, contains(ingress_http1))
+    assert_that(response.items, contains_exactly(ingress_http1))
 
 
 def test_get_errors():

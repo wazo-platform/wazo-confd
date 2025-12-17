@@ -7,7 +7,7 @@ import wave
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     equal_to,
     has_entries,
@@ -331,7 +331,7 @@ def test_add_update_delete_filename(moh):
     response.assert_content_disposition('foo.wav')
 
     response = confd.moh(moh['uuid']).get()
-    assert_that(response.item, has_entries(files=contains({'name': 'foo.wav'})))
+    assert_that(response.item, has_entries(files=contains_exactly({'name': 'foo.wav'})))
 
     # update/overwrite the file
     response = (

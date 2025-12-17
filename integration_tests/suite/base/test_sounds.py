@@ -5,7 +5,7 @@
 from hamcrest import (
     any_of,
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     equal_to,
@@ -90,7 +90,7 @@ def test_list(sound1, sound2):
     assert_that(response.items, has_items(sound1, sound2, sound_system))
 
     response = confd.sounds.get(wazo_tenant=SUB_TENANT, order='name', limit=1)
-    assert_that(response.items, contains(sound2))
+    assert_that(response.items, contains_exactly(sound2))
     assert_that(response.total, equal_to(2))
 
 
@@ -171,7 +171,7 @@ def test_search_sound_multi_tenant(sound1, sound2):
     response = confd.sounds.get(wazo_tenant=MAIN_TENANT, search='test_category')
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(name="test_category_1"),
         ),
     )
@@ -520,7 +520,9 @@ def test_add_update_delete_file(sound):
     assert_that(response.raw, equal_to('content is not checked'))
 
     response = confd.sounds(sound['name']).get()
-    assert_that(response.item, has_entries(files=contains(has_entries(name='foo'))))
+    assert_that(
+        response.item, has_entries(files=contains_exactly(has_entries(name='foo')))
+    )
 
     # update/overwrite the file
     response = (

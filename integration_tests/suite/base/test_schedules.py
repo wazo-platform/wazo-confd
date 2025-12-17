@@ -4,7 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     has_entries,
@@ -334,7 +334,7 @@ def test_create_open_periods_default_values():
     assert_that(
         response.item,
         has_entries(
-            open_periods=contains(
+            open_periods=contains_exactly(
                 has_entries(
                     hours_start='07:15',
                     hours_end='08:15',
@@ -396,7 +396,7 @@ def test_create_exceptional_periods_default_values():
     assert_that(
         response.item,
         has_entries(
-            exceptional_periods=contains(
+            exceptional_periods=contains_exactly(
                 has_entries(
                     hours_start='07:15',
                     hours_end='08:15',

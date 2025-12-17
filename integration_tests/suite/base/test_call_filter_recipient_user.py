@@ -1,7 +1,7 @@
 # Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries
+from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -111,7 +111,7 @@ def test_get_users_associated_to_call_filter(call_filter, user):
             response.item,
             has_entries(
                 recipients=has_entries(
-                    users=contains(
+                    users=contains_exactly(
                         has_entries(
                             uuid=user['uuid'],
                             firstname=user['firstname'],

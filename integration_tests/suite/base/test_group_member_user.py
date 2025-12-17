@@ -5,7 +5,7 @@ import re
 
 from hamcrest import (
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     has_entries,
@@ -107,7 +107,7 @@ def test_associate_multiple_with_priority(
             response.item,
             has_entries(
                 members=has_entries(
-                    users=contains(
+                    users=contains_exactly(
                         has_entries(uuid=user2['uuid'], priority=1),
                         has_entries(uuid=user3['uuid'], priority=2),
                         has_entries(uuid=user1['uuid'], priority=4),

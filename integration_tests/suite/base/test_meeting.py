@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     equal_to,
@@ -236,7 +236,7 @@ def test_create_no_ingress_http_configured():
         response,
         has_properties(
             status=503,
-            json=contains('no Ingress HTTP configured'),
+            json=contains_exactly('no Ingress HTTP configured'),
         ),
     )
 

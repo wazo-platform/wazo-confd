@@ -1,7 +1,7 @@
 # Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries
+from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
 from ..helpers import fixtures
@@ -58,7 +58,7 @@ def test_associate_multiple(context, sub_context1, sub_context2, sub_context3):
     assert_that(
         response.item,
         has_entries(
-            contexts=contains(
+            contexts=contains_exactly(
                 has_entries(id=sub_context2['id']),
                 has_entries(id=sub_context3['id']),
                 has_entries(id=sub_context1['id']),
@@ -91,7 +91,7 @@ def test_get_contexts_associated_to_context(context, sub_context1, sub_context2)
         assert_that(
             response.item,
             has_entries(
-                contexts=contains(
+                contexts=contains_exactly(
                     has_entries(
                         id=sub_context2['id'],
                         name=sub_context2['name'],

@@ -4,7 +4,7 @@
 import random
 import string
 
-from hamcrest import assert_that, contains, has_entries
+from hamcrest import assert_that, contains_exactly, has_entries
 
 from ..helpers import associations as a
 from ..helpers import fixtures
@@ -124,7 +124,7 @@ def test_associate_multiple_with_priority(group, extension1, extension2, extensi
         response.item,
         has_entries(
             members=has_entries(
-                extensions=contains(
+                extensions=contains_exactly(
                     has_entries(
                         exten=extension2['exten'],
                         context=extension2['context'],
@@ -165,7 +165,7 @@ def test_get_extensions_associated_to_group(group, extension1, extension2):
             response.item,
             has_entries(
                 members=has_entries(
-                    extensions=contains(
+                    extensions=contains_exactly(
                         has_entries(
                             exten=extension2['exten'], context=extension2['context']
                         ),

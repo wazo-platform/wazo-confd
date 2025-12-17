@@ -1,7 +1,7 @@
 # Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, has_entries, has_item
+from hamcrest import assert_that, contains_exactly, has_entries, has_item
 
 from ..helpers import associations as a
 from ..helpers import config, database, fixtures
@@ -89,13 +89,13 @@ def test_given_user_in_another_tenant(user_main, user_sub):
     auth.users.new(uuid=user_sub['uuid'], tenant_uuid=SUB_TENANT)
 
     response = confd_csv.users.export.get()
-    assert_that(response.csv(), contains(has_entries(uuid=user_main['uuid'])))
+    assert_that(response.csv(), contains_exactly(has_entries(uuid=user_main['uuid'])))
 
     response = confd_csv.users.export.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.csv(), contains(has_entries(uuid=user_main['uuid'])))
+    assert_that(response.csv(), contains_exactly(has_entries(uuid=user_main['uuid'])))
 
     response = confd_csv.users.export.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.csv(), contains(has_entries(uuid=user_sub['uuid'])))
+    assert_that(response.csv(), contains_exactly(has_entries(uuid=user_sub['uuid'])))
 
     response = confd_csv.users.export.get(wazo_tenant=UNKNOWN_TENANT)
     response.assert_status(401)

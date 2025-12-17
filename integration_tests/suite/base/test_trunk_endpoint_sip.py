@@ -1,7 +1,7 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, has_entries
+from hamcrest import assert_that, contains_exactly, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -164,11 +164,11 @@ def test_get_endpoint_sip_relation(trunk, sip):
                     uuid=sip['uuid'],
                     label='label',
                     name='label',
-                    auth_section_options=contains(
-                        contains('username', 'my-username'),
+                    auth_section_options=contains_exactly(
+                        contains_exactly('username', 'my-username'),
                     ),
-                    registration_section_options=contains(
-                        contains('client_uri', 'client-uri'),
+                    registration_section_options=contains_exactly(
+                        contains_exactly('client_uri', 'client-uri'),
                     ),
                 )
             ),

@@ -4,7 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -94,7 +94,7 @@ def check_funckey_template_sorting(funckey_template1, funckey_template2, field, 
     response = confd.funckeys.templates.get(search=search, order=field, direction='asc')
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(id=funckey_template1['id']),
             has_entries(id=funckey_template2['id']),
         ),
@@ -105,7 +105,7 @@ def check_funckey_template_sorting(funckey_template1, funckey_template2, field, 
     )
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(id=funckey_template2['id']),
             has_entries(id=funckey_template1['id']),
         ),

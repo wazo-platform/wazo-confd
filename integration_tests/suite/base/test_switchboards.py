@@ -4,7 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -136,7 +136,7 @@ def check_sorting(switchboard1, switchboard2, field, search):
     response = confd.switchboards.get(search=search, order=field, direction='asc')
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(uuid=switchboard1['uuid']),
             has_entries(uuid=switchboard2['uuid']),
         ),
@@ -145,7 +145,7 @@ def check_sorting(switchboard1, switchboard2, field, search):
     response = confd.switchboards.get(search=search, order=field, direction='desc')
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(uuid=switchboard2['uuid']),
             has_entries(uuid=switchboard1['uuid']),
         ),

@@ -8,7 +8,7 @@ from contextlib import ExitStack
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     equal_to,
@@ -555,7 +555,7 @@ def test_search_extensions_in_context():
         es.enter_context(fixtures.extension(exten=exten3, context='from-extern'))
 
         response = confd.extensions.get(search=exten2, context='from-extern')
-        assert_that(response.items, contains(extension2))
+        assert_that(response.items, contains_exactly(extension2))
 
 
 def test_search_list_extensions_in_context():

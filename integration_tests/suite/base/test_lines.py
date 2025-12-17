@@ -6,7 +6,7 @@ import re
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -136,7 +136,7 @@ def test_search(line1, line2):
     )
 
     response = confd.lines.get(search=line1['provisioning_code'])
-    assert_that(response.items, contains(has_entry('id', line1['id'])))
+    assert_that(response.items, contains_exactly(has_entry('id', line1['id'])))
 
 
 @fixtures.context(label='main_ctx', wazo_tenant=MAIN_TENANT)
@@ -343,7 +343,7 @@ def test_delete_line_then_associatons_are_removed(
         assert_that(
             response.item,
             has_entries(
-                lines=contains(
+                lines=contains_exactly(
                     has_entries(id=line1['id']),
                     has_entries(id=line2['id']),
                 )
@@ -360,7 +360,8 @@ def test_delete_line_then_associatons_are_removed(
 
         response = confd.users(user['id']).get()
         assert_that(
-            response.item, has_entries(lines=contains(has_entries(id=line2['id'])))
+            response.item,
+            has_entries(lines=contains_exactly(has_entries(id=line2['id']))),
         )
 
         response = confd.devices(device['id']).lines.get()
@@ -407,7 +408,7 @@ def test_recursive_delete_line_then_user_associaton_removed(user, line1):
         assert_that(
             response.item,
             has_entries(
-                lines=contains(
+                lines=contains_exactly(
                     has_entries(id=line1['id']),
                 )
             ),
