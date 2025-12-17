@@ -46,24 +46,27 @@ class DbHelper:
 
     def recreate(self):
         engine = self.create_engine("postgres", isolate=True)
-        connection = engine.connect()
-        connection.execute(
-            """
-                           SELECT pg_terminate_backend(pg_stat_activity.pid)
-                           FROM pg_stat_activity
-                           WHERE pg_stat_activity.datname = '{db}'
-                           AND pid <> pg_backend_pid()
-                           """.format(
-                db=self.db
+        with engine.connect() as connection:
+            connection.execute(
+                text(
+                    """
+                            SELECT pg_terminate_backend(pg_stat_activity.pid)
+                            FROM pg_stat_activity
+                            WHERE pg_stat_activity.datname = '{db}'
+                            AND pid <> pg_backend_pid()
+                            """.format(
+                        db=self.db
+                    )
+                )
             )
-        )
-        connection.execute("DROP DATABASE IF EXISTS {db}".format(db=self.db))
-        connection.execute(
-            "CREATE DATABASE {db} TEMPLATE {template}".format(
-                db=self.db, template=self.TEMPLATE
+            connection.execute(text("DROP DATABASE IF EXISTS {db}".format(db=self.db)))
+            connection.execute(
+                text(
+                    "CREATE DATABASE {db} TEMPLATE {template}".format(
+                        db=self.db, template=self.TEMPLATE
+                    )
+                )
             )
-        )
-        connection.close()
 
     def execute(self, query, **kwargs):
         with self.connect() as connection:
