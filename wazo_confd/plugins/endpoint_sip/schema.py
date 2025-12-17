@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class OptionsField(fields.List):
     def __init__(self, **kwargs):
-        kwargs.setdefault('missing', [])
+        kwargs.setdefault('load_default', [])
         kwargs.setdefault('validate', Length(max=512))
         option_schema = PJSIPSectionOption(option_regex=None)
         super().__init__(option_schema, **kwargs)
