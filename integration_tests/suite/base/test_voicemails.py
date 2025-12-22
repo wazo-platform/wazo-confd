@@ -122,11 +122,10 @@ def error_required_checks(url):
     s.check_missing_required_field_returns_error(url, 'context')
 
 
-@fixtures.voicemail
-def test_fake_fields(voicemail):
+@fixtures.voicemail()
+def test_fake_fields_not_found(voicemail):
     fake = [
         ('context', 'wrongcontext', 'Context'),
-        ('language', 'fakelanguage', 'Language'),
         ('timezone', 'faketimezone', 'Timezone'),
     ]
     requests = [confd.voicemails.post, confd.voicemails(voicemail['id']).put]
