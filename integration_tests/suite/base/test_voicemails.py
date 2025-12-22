@@ -78,6 +78,7 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'email', s.random_string(81))
     s.check_bogus_field_returns_error(url, 'language', 123)
     s.check_bogus_field_returns_error(url, 'language', True)
+    s.check_bogus_field_returns_error(url, 'language', 'not-allowed-regex')
     s.check_bogus_field_returns_error(url, 'timezone', 123)
     s.check_bogus_field_returns_error(url, 'timezone', True)
     s.check_bogus_field_returns_error(url, 'max_messages', 'string')
