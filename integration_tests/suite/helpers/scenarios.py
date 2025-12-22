@@ -6,7 +6,7 @@ import re
 import string
 from datetime import datetime
 
-from hamcrest import all_of, assert_that, contains, has_entries, has_items
+from hamcrest import all_of, assert_that, contains_exactly, has_entries, has_items
 from wazo_test_helpers import until
 
 from . import errors as e
@@ -108,7 +108,7 @@ def check_sorting(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, direction='asc')
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(**{id_field: resource1[id_field]}),
             has_entries(**{id_field: resource2[id_field]}),
         ),
@@ -117,7 +117,7 @@ def check_sorting(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, direction='desc')
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(**{id_field: resource2[id_field]}),
             has_entries(**{id_field: resource1[id_field]}),
         ),
@@ -127,14 +127,14 @@ def check_sorting(url, resource1, resource2, field, search, id_field='id'):
 def check_offset(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, offset=1)
     assert_that(
-        response.items, contains(has_entries(**{id_field: resource2[id_field]}))
+        response.items, contains_exactly(has_entries(**{id_field: resource2[id_field]}))
     )
 
 
 def check_limit(url, resource1, resource2, field, search, id_field='id'):
     response = url(search=search, order=field, limit=1)
     assert_that(
-        response.items, contains(has_entries(**{id_field: resource1[id_field]}))
+        response.items, contains_exactly(has_entries(**{id_field: resource1[id_field]}))
     )
 
 

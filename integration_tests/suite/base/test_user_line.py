@@ -3,7 +3,7 @@
 
 import re
 
-from hamcrest import assert_that, contains, empty, has_entries
+from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -126,7 +126,7 @@ def test_associate_user_to_multiple_lines(user, line1, line2, line3):
     assert_that(
         response.item,
         has_entries(
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(id=line1['id']),
                 has_entries(id=line2['id']),
                 has_entries(id=line3['id']),
@@ -200,7 +200,7 @@ def test_associate_user_to_line_with_endpoint(user, line, sip):
         response = confd.users(user['id']).get()
         assert_that(
             response.item['lines'],
-            contains(has_entries(id=line['id'])),
+            contains_exactly(has_entries(id=line['id'])),
         )
 
 
@@ -214,7 +214,7 @@ def test_associate_lines_to_user(user, line1, line2):
     response = confd.users(user['uuid']).get()
     assert_that(
         response.item['lines'],
-        contains(has_entries(id=line2['id']), has_entries(id=line1['id'])),
+        contains_exactly(has_entries(id=line2['id']), has_entries(id=line1['id'])),
     )
 
 
@@ -228,7 +228,7 @@ def test_associate_lines_to_swap_main_line(user, line1, line2):
     response = confd.users(user['uuid']).get()
     assert_that(
         response.item['lines'],
-        contains(has_entries(id=line1['id']), has_entries(id=line2['id'])),
+        contains_exactly(has_entries(id=line1['id']), has_entries(id=line2['id'])),
     )
 
     response = confd.users(user['uuid']).lines.put(lines=[line2, line1])
@@ -237,7 +237,7 @@ def test_associate_lines_to_swap_main_line(user, line1, line2):
     response = confd.users(user['uuid']).get()
     assert_that(
         response.item['lines'],
-        contains(has_entries(id=line2['id']), has_entries(id=line1['id'])),
+        contains_exactly(has_entries(id=line2['id']), has_entries(id=line1['id'])),
     )
 
 
@@ -311,7 +311,7 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(
         assert_that(
             response.item,
             has_entries(
-                lines=contains(
+                lines=contains_exactly(
                     has_entries(id=line1['id']),
                     has_entries(id=line2['id']),
                     has_entries(id=line3['id']),
@@ -324,7 +324,7 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(
         assert_that(
             response.item,
             has_entries(
-                lines=contains(
+                lines=contains_exactly(
                     has_entries(id=line2['id']),
                     has_entries(id=line3['id']),
                 )
@@ -335,7 +335,7 @@ def test_dissociate_main_line_then_main_line_fallback_to_secondary(
         response = confd.users(user['uuid']).get()
         assert_that(
             response.item,
-            has_entries(lines=contains(has_entries(id=line3['id']))),
+            has_entries(lines=contains_exactly(has_entries(id=line3['id']))),
         )
 
         confd.users(user['uuid']).lines(line3['id']).delete().assert_deleted()
@@ -391,7 +391,7 @@ def test_get_users_relation(user, line):
         response = confd.lines(line['id']).get()
         assert_that(
             response.item['users'],
-            contains(
+            contains_exactly(
                 has_entries(
                     uuid=user['uuid'],
                     firstname=user['firstname'],
@@ -411,7 +411,7 @@ def test_get_lines_relation(user, line, sip):
             response = confd.users(user['id']).get()
             assert_that(
                 response.item['lines'],
-                contains(
+                contains_exactly(
                     has_entries(
                         id=line['id'],
                         name=line['name'],

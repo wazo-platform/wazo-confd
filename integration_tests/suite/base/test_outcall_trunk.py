@@ -1,7 +1,7 @@
 # Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries, none
+from hamcrest import assert_that, contains_exactly, empty, has_entries, none
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -59,7 +59,7 @@ def test_associate_multiple(outcall, trunk1, trunk2, trunk3):
     assert_that(
         response.item,
         has_entries(
-            trunks=contains(
+            trunks=contains_exactly(
                 has_entries(id=trunk2['id']),
                 has_entries(id=trunk3['id']),
                 has_entries(id=trunk1['id']),
@@ -85,7 +85,7 @@ def test_get_trunks_associated_to_outcall(outcall, trunk1, trunk2):
         assert_that(
             response.item,
             has_entries(
-                trunks=contains(
+                trunks=contains_exactly(
                     has_entries(
                         id=trunk2['id'], endpoint_sip=none(), endpoint_custom=none()
                     ),
@@ -106,7 +106,7 @@ def test_get_outcalls_associated_to_trunk(outcall1, outcall2, trunk):
         assert_that(
             response.item,
             has_entries(
-                outcalls=contains(
+                outcalls=contains_exactly(
                     has_entries(id=outcall2['id'], name=outcall2['name']),
                     has_entries(id=outcall1['id'], name=outcall1['name']),
                 )

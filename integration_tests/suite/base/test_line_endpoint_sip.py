@@ -3,7 +3,7 @@
 
 from hamcrest import (
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     has_entries,
     has_items,
@@ -198,7 +198,7 @@ def test_get_endpoint_sip_relation(line, sip):
                     label='my-endpoint',
                     name='my-endpoint',
                     auth_section_options=contains_inanyorder(
-                        contains('username', 'my-username'),
+                        contains_exactly('username', 'my-username'),
                     ),
                 )
             ),
@@ -325,7 +325,7 @@ def test_create_line_with_endpoint_sip_with_all_parameters(
                     registration_outbound_auth_section_options=registration_outbound_auth_section_options,
                     outbound_auth_section_options=outbound_auth_section_options,
                     transport=has_entries(uuid=transport['uuid']),
-                    templates=contains(
+                    templates=contains_exactly(
                         has_entries(uuid=template_1['uuid'], label=template_1['label']),
                         has_entries(uuid=template_2['uuid'], label=template_2['label']),
                     ),

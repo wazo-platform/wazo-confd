@@ -5,7 +5,7 @@ from hamcrest import (
     all_of,
     assert_that,
     calling,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     equal_to,
@@ -404,7 +404,7 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
-            contains(
+            contains_exactly(
                 has_entries(
                     id=user['id'],
                     uuid=user['uuid'],
@@ -432,7 +432,7 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
-            contains(
+            contains_exactly(
                 has_entries(
                     id=user['id'],
                     uuid=user['uuid'],
@@ -460,7 +460,7 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
         response = confd.users.get(view='summary', id=user['id'])
         assert_that(
             response.items,
-            contains(
+            contains_exactly(
                 has_entries(
                     id=user['id'],
                     uuid=user['uuid'],
@@ -482,7 +482,7 @@ def test_summary_view_on_user_without_line(user):
     response = confd.users.get(view='summary', id=user['id'])
     assert_that(
         response.items,
-        contains(
+        contains_exactly(
             has_entries(
                 id=user['id'],
                 uuid=user['uuid'],
@@ -1191,18 +1191,20 @@ def test_post_update_delete_full_user_no_error(
                 payload,
                 has_entries(
                     uuid=uuid_(),
-                    lines=contains(
+                    lines=contains_exactly(
                         has_entries(
                             id=greater_than(0),
                             endpoint_sip=has_entries(uuid=uuid_()),
-                            extensions=contains(has_entries(id=greater_than(0))),
+                            extensions=contains_exactly(
+                                has_entries(id=greater_than(0))
+                            ),
                             device_id=device['id'],
                         )
                     ),
-                    incalls=contains(
+                    incalls=contains_exactly(
                         has_entries(
                             id=greater_than(0),
-                            extensions=contains(
+                            extensions=contains_exactly(
                                 has_entries(
                                     id=greater_than(0),
                                     context=INCALL_CONTEXT,
@@ -1211,7 +1213,7 @@ def test_post_update_delete_full_user_no_error(
                             ),
                         )
                     ),
-                    groups=contains(
+                    groups=contains_exactly(
                         has_entries(uuid=group['uuid']),
                     ),
                     func_key_template_id=funckey_template['id'],
@@ -1223,7 +1225,7 @@ def test_post_update_delete_full_user_no_error(
                         uuid=payload['uuid'],
                         firstname=user_resources.user['firstname'],
                         lastname=user_resources.user['lastname'],
-                        emails=contains(
+                        emails=contains_exactly(
                             has_entries(address=user_resources.user['email'])
                         ),
                         username=user_resources.auth['username'],
@@ -1231,7 +1233,7 @@ def test_post_update_delete_full_user_no_error(
                     agent=has_entries(
                         number=user_resources.line['extensions'][0]['exten'],
                         firstname=user_resources.user['firstname'],
-                        queues=contains(
+                        queues=contains_exactly(
                             has_entries(
                                 id=user_resources.agent['queues'][0]['id'],
                                 penalty=user_resources.agent['queues'][0]['penalty'],
@@ -1263,9 +1265,13 @@ def test_post_update_delete_full_user_no_error(
             assert_that(
                 confd.users(payload['uuid']).get().item,
                 has_entries(
-                    lines=contains(has_entries(id=payload['lines'][0]['id'])),
-                    incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
-                    groups=contains(has_entries(uuid=payload['groups'][0]['uuid'])),
+                    lines=contains_exactly(has_entries(id=payload['lines'][0]['id'])),
+                    incalls=contains_exactly(
+                        has_entries(id=payload['incalls'][0]['id'])
+                    ),
+                    groups=contains_exactly(
+                        has_entries(uuid=payload['groups'][0]['uuid'])
+                    ),
                     switchboards=contains_inanyorder(
                         has_entries(uuid=payload['switchboards'][0]['uuid']),
                         has_entries(uuid=switchboard2['uuid']),
@@ -1276,7 +1282,9 @@ def test_post_update_delete_full_user_no_error(
             assert_that(
                 confd.lines(payload['lines'][0]['id']).get().item,
                 has_entries(
-                    extensions=contains(has_entries(**user_resources.extension)),
+                    extensions=contains_exactly(
+                        has_entries(**user_resources.extension)
+                    ),
                     endpoint_sip=has_entries(
                         name=user_resources.line['endpoint_sip']['name']
                     ),
@@ -1295,7 +1303,7 @@ def test_post_update_delete_full_user_no_error(
                 confd.groups(payload['groups'][0]['uuid']).get().item,
                 has_entries(
                     members=has_entries(
-                        users=contains(has_entries(uuid=payload['uuid']))
+                        users=contains_exactly(has_entries(uuid=payload['uuid']))
                     )
                 ),
             )
@@ -1304,7 +1312,7 @@ def test_post_update_delete_full_user_no_error(
                 confd.switchboards(payload['switchboards'][0]['uuid']).get().item,
                 has_entries(
                     members=has_entries(
-                        users=contains(has_entries(uuid=payload['uuid']))
+                        users=contains_exactly(has_entries(uuid=payload['uuid']))
                     )
                 ),
             )
@@ -1363,7 +1371,7 @@ def test_post_update_delete_full_user_no_error(
                 has_entries(
                     number=user_resources.line['extensions'][0]['exten'],
                     firstname=user_resources.user['firstname'],
-                    queues=contains(has_entries(id=queue['id'])),
+                    queues=contains_exactly(has_entries(id=queue['id'])),
                 ),
             )
             # retrieve the voicemail (created before) and check its data are correct
@@ -1446,7 +1454,7 @@ def test_post_update_delete_full_user_no_error(
                 confd.groups(new_group['uuid']).get().item,
                 has_entries(
                     members=has_entries(
-                        users=contains(has_entries(uuid=payload['uuid']))
+                        users=contains_exactly(has_entries(uuid=payload['uuid']))
                     )
                 ),
             )
@@ -1463,14 +1471,14 @@ def test_post_update_delete_full_user_no_error(
                         fail_destination=has_entries(**destination),
                     ),
                     forwards=has_entries(**new_forwards),
-                    groups=contains(
+                    groups=contains_exactly(
                         has_entries(
                             id=new_group['id'],
                             uuid=new_group['uuid'],
                             name=new_group['name'],
                         )
                     ),
-                    switchboards=contains(
+                    switchboards=contains_exactly(
                         has_entries(
                             uuid=new_switchboard['uuid'], name=new_switchboard['name']
                         )
@@ -1493,7 +1501,7 @@ def test_post_update_delete_full_user_no_error(
                 confd.switchboards(new_switchboard['uuid']).get().item,
                 has_entries(
                     members=has_entries(
-                        users=contains(has_entries(uuid=payload['uuid']))
+                        users=contains_exactly(has_entries(uuid=payload['uuid']))
                     )
                 ),
             )
@@ -1632,7 +1640,7 @@ def test_post_delete_minimalistic_user_with_unallocated_device_no_error(
         payload,
         has_entries(
             uuid=uuid_(),
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(
                     device_id=device['id'],
                 )
@@ -1692,7 +1700,7 @@ def test_post_delete_minimalistic_user_with_device_on_subtenant_no_error(
         payload,
         has_entries(
             uuid=uuid_(),
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(
                     device_id=device['id'],
                 )
@@ -1837,7 +1845,7 @@ def test_post_incalls_existing_extension_missing_range_no_error(incall, context)
             assert_that(
                 confd.contexts(context['id']).get().item,
                 has_entries(
-                    incall_ranges=contains(
+                    incall_ranges=contains_exactly(
                         has_entries(
                             start=extension['exten'],
                             end=extension['exten'],
@@ -1905,7 +1913,7 @@ def test_update_lines_no_error(device, new_device):
     assert_that(
         confd.lines(new_line['id']).get().item,
         has_entries(
-            extensions=contains(has_entries(**new_user_resources.extension)),
+            extensions=contains_exactly(has_entries(**new_user_resources.extension)),
             endpoint_sip=has_entries(
                 name=new_user_resources.line['endpoint_sip']['name']
             ),
@@ -1925,7 +1933,9 @@ def test_update_lines_no_error(device, new_device):
     assert_that(
         confd.users(payload['uuid']).get().item,
         has_entries(
-            lines=contains(has_entries(endpoint_sip=has_entries(label='new label'))),
+            lines=contains_exactly(
+                has_entries(endpoint_sip=has_entries(label='new label'))
+            ),
         ),
     )
 
@@ -2054,9 +2064,11 @@ def test_update_extension_lines_no_error(device, new_device):
     assert_that(
         user,
         has_entries(
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(
-                    extensions=contains(has_entries(**new_user_resources.extension))
+                    extensions=contains_exactly(
+                        has_entries(**new_user_resources.extension)
+                    )
                 )
             ),
         ),
@@ -2065,9 +2077,11 @@ def test_update_extension_lines_no_error(device, new_device):
         user,
         has_entries(
             lines=not_(
-                contains(
+                contains_exactly(
                     has_entries(
-                        extensions=contains(has_entries(**user_resources.extension))
+                        extensions=contains_exactly(
+                            has_entries(**user_resources.extension)
+                        )
                     )
                 )
             ),
@@ -2137,7 +2151,7 @@ def test_update_agent_no_error(
             agent=has_entries(
                 number=user_resources.line['extensions'][0]['exten'],
                 firstname=user_resources.user['firstname'],
-                queues=contains(
+                queues=contains_exactly(
                     has_entries(
                         id=user_resources.agent['queues'][0]['id'],
                         penalty=user_resources.agent['queues'][0]['penalty'],
@@ -2155,7 +2169,7 @@ def test_update_agent_no_error(
         has_entries(
             number=user_resources.line['extensions'][0]['exten'],
             firstname=user_resources.user['firstname'],
-            queues=contains(has_entries(id=queue['id'])),
+            queues=contains_exactly(has_entries(id=queue['id'])),
         ),
     )
 
@@ -2354,7 +2368,7 @@ def test_update_incall_new_extension():
     assert_that(
         confd.users(payload['uuid']).get().item,
         has_entries(
-            incalls=contains(has_entries(id=payload['incalls'][0]['id'])),
+            incalls=contains_exactly(has_entries(id=payload['incalls'][0]['id'])),
         ),
     )
 
@@ -2362,7 +2376,9 @@ def test_update_incall_new_extension():
     assert_that(
         confd.incalls(payload['incalls'][0]['id']).get().item,
         has_entries(
-            extensions=contains(has_entries(exten=new_user_resources.source_exten))
+            extensions=contains_exactly(
+                has_entries(exten=new_user_resources.source_exten)
+            )
         ),
     )
     confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
@@ -2399,7 +2415,9 @@ def test_update_incall_new_incall():
     assert_that(
         updated_user,
         has_entries(
-            incalls=contains(has_entries(id=is_not(payload['incalls'][0]['id']))),
+            incalls=contains_exactly(
+                has_entries(id=is_not(payload['incalls'][0]['id']))
+            ),
         ),
     )
     confd.users(payload['uuid']).delete(recursive=True).assert_deleted()
@@ -2432,12 +2450,12 @@ def test_post_lines_same_extension_no_error(device, device2):
         payload,
         has_entries(
             uuid=uuid_(),
-            lines=contains(
+            lines=contains_exactly(
                 has_entries(
-                    extensions=contains(has_entries(exten=exten)),
+                    extensions=contains_exactly(has_entries(exten=exten)),
                 ),
                 has_entries(
-                    extensions=contains(has_entries(exten=exten)),
+                    extensions=contains_exactly(has_entries(exten=exten)),
                 ),
             ),
             **user_resources.user,
@@ -2446,11 +2464,11 @@ def test_post_lines_same_extension_no_error(device, device2):
 
     assert_that(
         confd.lines(payload['lines'][0]['id']).get().item,
-        has_entries(extensions=contains(has_entries(exten=exten))),
+        has_entries(extensions=contains_exactly(has_entries(exten=exten))),
     )
     assert_that(
         confd.lines(payload['lines'][1]['id']).get().item,
-        has_entries(extensions=contains(has_entries(exten=exten))),
+        has_entries(extensions=contains_exactly(has_entries(exten=exten))),
     )
 
     confd.users(payload['uuid']).delete(recursive=True).assert_deleted()

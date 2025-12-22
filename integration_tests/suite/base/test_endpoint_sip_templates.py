@@ -6,7 +6,7 @@ import re
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     contains_inanyorder,
     empty,
     has_entries,
@@ -150,7 +150,7 @@ def test_list(template1, template2):
     )
 
     response = confd.endpoints.sip.templates.get(search=template1['name'])
-    assert_that(response.items, contains(has_entry('uuid', template1['uuid'])))
+    assert_that(response.items, contains_exactly(has_entry('uuid', template1['uuid'])))
 
     response = confd.endpoints.sip.get()
     assert_that(
@@ -325,7 +325,7 @@ def test_create_all_parameters(transport, endpoint_1, endpoint_2):
             registration_outbound_auth_section_options=registration_outbound_auth_section_options,
             outbound_auth_section_options=outbound_auth_section_options,
             transport=has_entries(uuid=transport['uuid']),
-            templates=contains(
+            templates=contains_exactly(
                 has_entries(uuid=endpoint_1['uuid'], label=endpoint_1['label']),
                 has_entries(uuid=endpoint_2['uuid'], label=endpoint_2['label']),
             ),

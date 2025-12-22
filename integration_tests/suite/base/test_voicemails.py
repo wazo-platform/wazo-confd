@@ -4,7 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
-    contains,
+    contains_exactly,
     empty,
     has_entries,
     has_entry,
@@ -78,6 +78,7 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'email', s.random_string(81))
     s.check_bogus_field_returns_error(url, 'language', 123)
     s.check_bogus_field_returns_error(url, 'language', True)
+    s.check_bogus_field_returns_error(url, 'language', 'not-allowed-regex')
     s.check_bogus_field_returns_error(url, 'timezone', 123)
     s.check_bogus_field_returns_error(url, 'timezone', True)
     s.check_bogus_field_returns_error(url, 'max_messages', 'string')
@@ -122,11 +123,10 @@ def error_required_checks(url):
     s.check_missing_required_field_returns_error(url, 'context')
 
 
-@fixtures.voicemail
-def test_fake_fields(voicemail):
+@fixtures.voicemail()
+def test_fake_fields_not_found(voicemail):
     fake = [
         ('context', 'wrongcontext', 'Context'),
-        ('language', 'fakelanguage', 'Language'),
         ('timezone', 'faketimezone', 'Timezone'),
     ]
     requests = [confd.voicemails.post, confd.voicemails(voicemail['id']).put]
@@ -296,7 +296,7 @@ def test_create_minimal_voicemail():
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
-            options=contains(),
+            options=contains_exactly(),
             tenant_uuid=MAIN_TENANT,
         ),
     )
@@ -319,7 +319,7 @@ def test_create_minimal_global_voicemail():
             ask_password=True,
             attach_audio=None,
             delete_messages=False,
-            options=contains(),
+            options=contains_exactly(),
             tenant_uuid=MAIN_TENANT,
         ),
     )

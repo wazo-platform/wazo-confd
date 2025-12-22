@@ -3,7 +3,7 @@
 
 import re
 
-from hamcrest import assert_that, contains, has_entries
+from hamcrest import assert_that, contains_exactly, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -72,7 +72,9 @@ def test_update_properties(queue, user, line):
             assert_that(
                 response.item,
                 has_entries(
-                    members=has_entries(users=contains(has_entries(priority=42)))
+                    members=has_entries(
+                        users=contains_exactly(has_entries(priority=42))
+                    )
                 ),
             )
 
@@ -193,7 +195,7 @@ def test_get_queue_relation(queue, user, line):
                 response.item,
                 has_entries(
                     members=has_entries(
-                        users=contains(
+                        users=contains_exactly(
                             has_entries(
                                 uuid=user['uuid'],
                                 firstname=user['firstname'],
@@ -217,7 +219,7 @@ def test_get_user_relation(queue, user, line):
             assert_that(
                 response.item,
                 has_entries(
-                    queues=contains(
+                    queues=contains_exactly(
                         has_entries(
                             id=queue['id'],
                             name=queue['name'],

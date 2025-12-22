@@ -46,24 +46,27 @@ class DbHelper:
 
     def recreate(self):
         engine = self.create_engine("postgres", isolate=True)
-        connection = engine.connect()
-        connection.execute(
-            """
-                           SELECT pg_terminate_backend(pg_stat_activity.pid)
-                           FROM pg_stat_activity
-                           WHERE pg_stat_activity.datname = '{db}'
-                           AND pid <> pg_backend_pid()
-                           """.format(
-                db=self.db
+        with engine.connect() as connection:
+            connection.execute(
+                text(
+                    """
+                            SELECT pg_terminate_backend(pg_stat_activity.pid)
+                            FROM pg_stat_activity
+                            WHERE pg_stat_activity.datname = '{db}'
+                            AND pid <> pg_backend_pid()
+                            """.format(
+                        db=self.db
+                    )
+                )
             )
-        )
-        connection.execute("DROP DATABASE IF EXISTS {db}".format(db=self.db))
-        connection.execute(
-            "CREATE DATABASE {db} TEMPLATE {template}".format(
-                db=self.db, template=self.TEMPLATE
+            connection.execute(text("DROP DATABASE IF EXISTS {db}".format(db=self.db)))
+            connection.execute(
+                text(
+                    "CREATE DATABASE {db} TEMPLATE {template}".format(
+                        db=self.db, template=self.TEMPLATE
+                    )
+                )
             )
-        )
-        connection.close()
 
     def execute(self, query, **kwargs):
         with self.connect() as connection:
@@ -83,23 +86,30 @@ class DatabaseQueries:
         query = text(
             "UPDATE extensions SET type = 'queue', typeval = :queue_id WHERE id = :extension_id"
         )
-        self.connection.execute(query, queue_id=queue_id, extension_id=extension_id)
+        with self.connection.begin():
+            self.connection.execute(
+                query, {"queue_id": queue_id, "extension_id": extension_id}
+            )
 
     def dissociate_queue_extension(self, queue_id, extension_id):
         query = text(
             "UPDATE extensions SET type = 'user', typeval = 0 WHERE id = :extension_id"
         )
-        self.connection.execute(query, extension_id=extension_id)
+        with self.connection.begin():
+            self.connection.execute(query, {"extension_id": extension_id})
 
     def toggle_sip_templates_generated(self, tenant_uuid, generated=False):
         query = text(
             "UPDATE tenant SET sip_templates_generated = :generated WHERE uuid = :tenant_uuid"
         )
-        self.connection.execute(
-            query,
-            generated='true' if generated else 'false',
-            tenant_uuid=tenant_uuid,
-        )
+        with self.connection.begin():
+            self.connection.execute(
+                query,
+                {
+                    "generated": 'true' if generated else 'false',
+                    "tenant_uuid": tenant_uuid,
+                },
+            )
 
     def set_tenant_templates(self, tenant_uuid, **template_uuids):
         for field, template_uuid in template_uuids.items():
@@ -108,11 +118,14 @@ class DatabaseQueries:
                     field
                 )
             )
-            self.connection.execute(
-                query,
-                template_uuid=template_uuid,
-                tenant_uuid=tenant_uuid,
-            )
+            with self.connection.begin():
+                self.connection.execute(
+                    query,
+                    {
+                        "template_uuid": template_uuid,
+                        "tenant_uuid": tenant_uuid,
+                    },
+                )
 
     @contextmanager
     def tenant_guest_sip_template_temporarily_disabled(self, tenant_uuid):
@@ -120,16 +133,19 @@ class DatabaseQueries:
             "SELECT meeting_guest_sip_template_uuid FROM tenant WHERE uuid = :tenant_uuid"
         )
         guest_sip_template_uuid = self.connection.execute(
-            query, tenant_uuid=tenant_uuid
+            query, {"tenant_uuid": tenant_uuid}
         ).scalar()
         query = text(
             'UPDATE tenant SET meeting_guest_sip_template_uuid = :template_uuid WHERE uuid = :tenant_uuid'
         )
-        self.connection.execute(
-            query,
-            template_uuid=None,
-            tenant_uuid=tenant_uuid,
-        )
+        with self.connection.begin():
+            self.connection.execute(
+                query,
+                {
+                    "template_uuid": None,
+                    "tenant_uuid": tenant_uuid,
+                },
+            )
 
         try:
             yield
@@ -137,11 +153,14 @@ class DatabaseQueries:
             query = text(
                 'UPDATE tenant SET meeting_guest_sip_template_uuid = :template_uuid WHERE uuid = :tenant_uuid'
             )
-            self.connection.execute(
-                query,
-                template_uuid=guest_sip_template_uuid,
-                tenant_uuid=tenant_uuid,
-            )
+            with self.connection.begin():
+                self.connection.execute(
+                    query,
+                    {
+                        "template_uuid": guest_sip_template_uuid,
+                        "tenant_uuid": tenant_uuid,
+                    },
+                )
 
     def insert_extension_feature(self, exten='1000', feature='default', enabled=True):
         query = text(
@@ -157,9 +176,10 @@ class DatabaseQueries:
         """
         )
 
-        feature_extension_uuid = self.connection.execute(
-            query, exten=exten, feature=feature, enabled=enabled
-        ).scalar()
+        with self.connection.begin():
+            feature_extension_uuid = self.connection.execute(
+                query, {"exten": exten, "feature": feature, "enabled": enabled}
+            ).scalar()
 
         return feature_extension_uuid
 
@@ -167,7 +187,10 @@ class DatabaseQueries:
         query = text(
             "DELETE FROM feature_extension WHERE uuid = :extension_feature_uuid"
         )
-        self.connection.execute(query, extension_feature_uuid=extension_feature_uuid)
+        with self.connection.begin():
+            self.connection.execute(
+                query, {"extension_feature_uuid": extension_feature_uuid}
+            )
 
     def get_agent(self):
         query = text("SELECT * FROM agentfeatures")
@@ -182,17 +205,20 @@ class DatabaseQueries:
         """
         )
 
-        agent_id = self.connection.execute(query, context=context).scalar()
+        with self.connection.begin():
+            agent_id = self.connection.execute(query, {"context": context}).scalar()
 
         return agent_id
 
     def delete_agent_login_status(self, agent_id):
         query = text("DELETE FROM agent_login_status WHERE agent_id = :agent_id")
-        self.connection.execute(query, agent_id=agent_id)
+        with self.connection.begin():
+            self.connection.execute(query, {"agent_id": agent_id})
 
     def associate_line_device(self, line_id, device_id):
         query = text("UPDATE linefeatures SET device = :device_id WHERE id = :line_id")
-        self.connection.execute(query, device_id=device_id, line_id=line_id)
+        with self.connection.begin():
+            self.connection.execute(query, {"device_id": device_id, "line_id": line_id})
 
     def line_has_sccp_device(self, line_id, sccp_device):
         query = text(
@@ -208,7 +234,7 @@ class DatabaseQueries:
         )
 
         count = self.connection.execute(
-            query, line_id=line_id, sccp_device=sccp_device
+            query, {"line_id": line_id, "sccp_device": sccp_device}
         ).scalar()
 
         return count > 0
@@ -221,7 +247,7 @@ class DatabaseQueries:
                         sccpdevice.device = :sccp_device
                      """
         )
-        count = self.connection.execute(query, sccp_device=sccp_device).scalar()
+        count = self.connection.execute(query, {"sccp_device": sccp_device}).scalar()
         return count > 0
 
     def iax_has_language(self, language):
@@ -233,7 +259,7 @@ class DatabaseQueries:
                         AND var_val = :language
                      """
         )
-        count = self.connection.execute(query, language=language).scalar()
+        count = self.connection.execute(query, {"language": language}).scalar()
 
         return count > 0
 
@@ -246,7 +272,7 @@ class DatabaseQueries:
                         AND option_value = :language
                      """
         )
-        count = self.connection.execute(query, language=language).scalar()
+        count = self.connection.execute(query, {"language": language}).scalar()
 
         return count > 0
 
@@ -258,7 +284,7 @@ class DatabaseQueries:
                         timezone = :timezone
                      """
         )
-        count = self.connection.execute(query, timezone=timezone).scalar()
+        count = self.connection.execute(query, {"timezone": timezone}).scalar()
 
         return count > 0
 
@@ -277,10 +303,12 @@ class DatabaseQueries:
 
         count = self.connection.execute(
             query,
-            hostname=hostname,
-            domain=domain,
-            nameserver1=nameservers[0],
-            nameserver2=nameservers[1],
+            {
+                "hostname": hostname,
+                "domain": domain,
+                "nameserver1": nameservers[0],
+                "nameserver2": nameservers[1],
+            },
         ).scalar()
 
         return count > 0
@@ -304,7 +332,7 @@ class DatabaseQueries:
         )
 
         count = self.connection.execute(
-            query, address=address, gateway=gateway
+            query, {"address": address, "gateway": gateway}
         ).scalar()
 
         return count > 0
@@ -328,24 +356,32 @@ class DatabaseQueries:
 
         count = self.connection.execute(
             query,
-            display_name=display_name,
-            number_start=number_start,
-            number_end=number_end,
+            {
+                "display_name": display_name,
+                "number_start": number_start,
+                "number_end": number_end,
+            },
         ).scalar()
 
         return count > 0
 
     def set_meeting_creation_date(self, meeting_uuid, date):
         query = text("UPDATE meeting SET created_at = :date WHERE uuid = :meeting_uuid")
-        self.connection.execute(query, date=date, meeting_uuid=meeting_uuid)
+        with self.connection.begin():
+            self.connection.execute(query, {"date": date, "meeting_uuid": meeting_uuid})
 
     def set_meeting_authorization_creation_date(self, meeting_authorization_uuid, date):
         query = text(
             "UPDATE meeting_authorization SET created_at = :date WHERE uuid = :meeting_authorization_uuid"
         )
-        self.connection.execute(
-            query, date=date, meeting_authorization_uuid=meeting_authorization_uuid
-        )
+        with self.connection.begin():
+            self.connection.execute(
+                query,
+                {
+                    "date": date,
+                    "meeting_authorization_uuid": meeting_authorization_uuid,
+                },
+            )
 
     @contextmanager
     def insert_max_meeting_authorizations(self, guest_uuid, meeting_uuid):
@@ -360,20 +396,24 @@ class DatabaseQueries:
         """
         )
 
-        for _ in range(128):
-            self.connection.execute(
-                query,
-                meeting_uuid=meeting_uuid,
-                guest_uuid=guest_uuid,
-                guest_name='Dummy guest name',
-            )
+        with self.connection.begin():
+            for _ in range(128):
+                self.connection.execute(
+                    query,
+                    {
+                        "meeting_uuid": meeting_uuid,
+                        "guest_uuid": guest_uuid,
+                        "guest_name": 'Dummy guest name',
+                    },
+                )
 
         yield
 
         query = text(
             "DELETE FROM meeting_authorization WHERE meeting_uuid = :meeting_uuid"
         )
-        self.connection.execute(query, meeting_uuid=meeting_uuid)
+        with self.connection.begin():
+            self.connection.execute(query, {"meeting_uuid": meeting_uuid})
 
 
 def create_helper(

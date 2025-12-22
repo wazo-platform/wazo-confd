@@ -1,7 +1,7 @@
 # Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains, empty, has_entries
+from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
 from ..helpers import errors as e
@@ -157,7 +157,7 @@ def test_get_call_permissions_relation(outcall, call_permission):
         response = confd.outcalls(outcall['id']).get()
         assert_that(
             response.item['call_permissions'],
-            contains(
+            contains_exactly(
                 has_entries(id=call_permission['id'], name=call_permission['name'])
             ),
         )
@@ -170,7 +170,7 @@ def test_get_outcalls_relation(outcall, call_permission):
         response = confd.callpermissions(call_permission['id']).get()
         assert_that(
             response.item['outcalls'],
-            contains(has_entries(id=outcall['id'], name=outcall['name'])),
+            contains_exactly(has_entries(id=outcall['id'], name=outcall['name'])),
         )
 
 
