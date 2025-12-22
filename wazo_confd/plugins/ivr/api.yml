@@ -194,7 +194,8 @@ definitions:
         $ref: '#/definitions/DestinationType'
       exten:
         type: string
-        description: The extension the caller has to dial to select this choice. Can be an extension pattern
+        description: "The extension the caller has to dial to select this choice. Can be an asterisk extension pattern, digits (0-9), * or #"
+        pattern: '^_[*#0-9_XxZzNn\[\].!-]{1,39}$|[*#0-9]{1,40}$'
     required:
     - destination
     - exten
