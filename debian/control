@@ -23,7 +23,6 @@ Depends:
   python3-pycountry,
   python3-requests,
   python3-werkzeug,
-  python3-tz,
   python3-phonenumbers,
   wazo-auth-client-python3,
   wazo-provd-client-python3,
