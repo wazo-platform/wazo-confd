@@ -9,7 +9,7 @@ flask-cors==3.0.10
 flask-restful==0.3.9
 flask==2.2.2
 kombu==5.2.4
-marshmallow==3.18.0
+marshmallow==3.26.2
 netifaces==0.11.0
 psycopg2-binary==2.9.5
 pycountry==22.3.5
