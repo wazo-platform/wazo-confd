@@ -121,6 +121,26 @@ class SysconfdPublisher:
         response.raise_for_status()
         return response.json()['data']
 
+    def get_config_history(self):
+        url = "{}/config-history".format(self.base_url)
+        response = self._session().get(url)
+        response.raise_for_status()
+        return response.json()['items']
+
+    def get_config_history_diff(
+        self, start_date: str, end_date: str, commit_a: str, commit_b: str
+    ):
+        url = "{}/config-history/diff".format(self.base_url)
+        params = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'commit_a': commit_a,
+            'commit_b': commit_b,
+        }
+        response = self._session().get(url, params=params)
+        response.raise_for_status()
+        return response.json()['item']
+
     def _session(self):
         session = requests.Session()
         session.trust_env = False
