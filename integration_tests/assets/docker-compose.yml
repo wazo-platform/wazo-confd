@@ -18,6 +18,7 @@ services:
       - "./keys/wazo-provd-key.yml:/var/lib/wazo-auth-keys/wazo-provd-key.yml"
       - "./provd/null:/var/lib/wazo-provd/plugins/null"
       - "./provd/zero:/var/lib/wazo-provd/plugins/zero"
+    command: "bash -c 'wazo-provd-upgrade-db && twistd --nodaemon --no_save --pidfile= wazo-provd --stderr --verbose'"
 
   postgres:
     image: wazoplatform/wazo-confd-db-test:local

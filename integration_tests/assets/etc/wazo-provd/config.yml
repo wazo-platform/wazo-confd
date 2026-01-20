@@ -2,3 +2,5 @@ rest_api:
   ip: 0.0.0.0
 auth:
   host: auth
+database:
+  uri: postgresql://asterisk:proformatique@postgres/asterisk
