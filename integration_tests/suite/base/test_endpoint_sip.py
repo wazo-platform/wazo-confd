@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -335,7 +335,7 @@ def test_create_all_parameters(transport, template_1, template_2):
         ['username', 'outbound-auth'],
         ['password', 'outbound-password'],
     ]
-    response = confd.endpoints.sip.post(
+    with fixtures.sip(
         name="name",
         label="label",
         aor_section_options=aor_section_options,
@@ -348,29 +348,28 @@ def test_create_all_parameters(transport, template_1, template_2):
         transport=transport,
         templates=[template_1, template_2],
         asterisk_id='asterisk_id',
-    )
-
-    assert_that(
-        response.item,
-        has_entries(
-            tenant_uuid=MAIN_TENANT,
-            name='name',
-            label='label',
-            aor_section_options=aor_section_options,
-            auth_section_options=auth_section_options,
-            endpoint_section_options=endpoint_section_options,
-            identify_section_options=identify_section_options,
-            registration_section_options=registration_section_options,
-            registration_outbound_auth_section_options=registration_outbound_auth_section_options,
-            outbound_auth_section_options=outbound_auth_section_options,
-            transport=has_entries(uuid=transport['uuid']),
-            templates=contains_exactly(
-                has_entries(uuid=template_1['uuid'], label=template_1['label']),
-                has_entries(uuid=template_2['uuid'], label=template_2['label']),
+    ) as sip:
+        assert_that(
+            sip,
+            has_entries(
+                tenant_uuid=MAIN_TENANT,
+                name='name',
+                label='label',
+                aor_section_options=aor_section_options,
+                auth_section_options=auth_section_options,
+                endpoint_section_options=endpoint_section_options,
+                identify_section_options=identify_section_options,
+                registration_section_options=registration_section_options,
+                registration_outbound_auth_section_options=registration_outbound_auth_section_options,
+                outbound_auth_section_options=outbound_auth_section_options,
+                transport=has_entries(uuid=transport['uuid']),
+                templates=contains_exactly(
+                    has_entries(uuid=template_1['uuid'], label=template_1['label']),
+                    has_entries(uuid=template_2['uuid'], label=template_2['label']),
+                ),
+                asterisk_id='asterisk_id',
             ),
-            asterisk_id='asterisk_id',
-        ),
-    )
+        )
 
 
 def test_create_multi_tenant():
