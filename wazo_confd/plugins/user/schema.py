@@ -230,6 +230,7 @@ class UserSummarySchema(BaseSchema):
     protocol = fields.String()
     enabled = StrictBoolean()
     subscription_type = fields.Integer(validate=Range(min=0, max=10))
+    is_webrtc = fields.Boolean()
 
 
 class UserSchemaNullable(UserSchema):
