@@ -44,6 +44,7 @@ class LineSchema(BaseSchema):
         many=True,
         dump_only=True,
     )
+    is_webrtc = fields.Boolean(dump_only=True)
 
     @validates_schema
     def _validate_only_one_endpoint(self, data, **kwargs):
