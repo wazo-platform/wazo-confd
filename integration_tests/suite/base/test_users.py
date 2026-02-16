@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -416,9 +416,72 @@ def test_summary_view_on_sip_endpoint(user, line, sip, extension):
                     context=extension['context'],
                     enabled=True,
                     protocol='sip',
+                    is_webrtc=False,
                 )
             ),
         )
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip(endpoint_section_options=[['webrtc', 'yes']])
+@fixtures.extension()
+def test_summary_view_on_webrtc_endpoint(user, line, sip, extension):
+    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), a.user_line(
+        user, line
+    ):
+        response = confd.users.get(view='summary', id=user['id'])
+        assert_that(
+            response.items,
+            contains_exactly(
+                has_entries(
+                    id=user['id'],
+                    uuid=user['uuid'],
+                    firstname=user['firstname'],
+                    lastname=user['lastname'],
+                    email=user['email'],
+                    provisioning_code=None,
+                    extension=extension['exten'],
+                    context=extension['context'],
+                    enabled=True,
+                    protocol='sip',
+                    is_webrtc=True,
+                )
+            ),
+        )
+
+
+@fixtures.user()
+@fixtures.line()
+@fixtures.sip_template(endpoint_section_options=[['webrtc', 'yes']])
+@fixtures.sip()
+@fixtures.extension()
+def test_summary_view_on_webrtc_endpoint_from_template(
+    user, line, sip_template, sip, extension
+):
+    with a.endpoint_sip_template_sip(sip, sip_template):
+        with a.line_endpoint_sip(line, sip), a.line_extension(
+            line, extension
+        ), a.user_line(user, line):
+            response = confd.users.get(view='summary', id=user['id'])
+            assert_that(
+                response.items,
+                contains_exactly(
+                    has_entries(
+                        id=user['id'],
+                        uuid=user['uuid'],
+                        firstname=user['firstname'],
+                        lastname=user['lastname'],
+                        email=user['email'],
+                        provisioning_code=None,
+                        extension=extension['exten'],
+                        context=extension['context'],
+                        enabled=True,
+                        protocol='sip',
+                        is_webrtc=True,
+                    )
+                ),
+            )
 
 
 @fixtures.user()
@@ -444,6 +507,7 @@ def test_summary_view_on_sccp_endpoint(user, line, sccp, extension):
                     context=extension['context'],
                     enabled=True,
                     protocol='sccp',
+                    is_webrtc=False,
                 )
             ),
         )
@@ -472,6 +536,7 @@ def test_summary_view_on_custom_endpoint(user, line, custom, extension):
                     context=extension['context'],
                     enabled=True,
                     protocol='custom',
+                    is_webrtc=False,
                 )
             ),
         )
@@ -495,6 +560,7 @@ def test_summary_view_on_user_without_line(user):
                 enabled=True,
                 protocol=none(),
                 subscription_type=user['subscription_type'],
+                is_webrtc=False,
             )
         ),
     )
