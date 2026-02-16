@@ -1,5 +1,10 @@
 # Changelog
 
+## 26.03
+
+* `GET /1.1/users` using the summary view now has a read-only `is_webrtc` field for each user. The value is based on the main line of the user.
+* The `line` resource now has a read-only `is_webrtc` field, indicating if the underlying endpoint is WebRTC or not.
+
 ## 25.16
 
 * the endpoint operation `DELETE /1.1/funckeys/templates/<template_id>/<position>` now returns a 404 error response when `<position>` does not exist currently in the funckey template resource.
