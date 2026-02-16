@@ -164,6 +164,10 @@ definitions:
         registrar:
           type: string
           description: Name of the template line used by the device
+        is_webrtc:
+          type: boolean
+          description: Whether the line is a WebRTC line
+          readOnly: true
       required:
       - context
     - $ref: '#/definitions/LineRelationApplication'

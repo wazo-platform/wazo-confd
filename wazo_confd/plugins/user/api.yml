@@ -451,6 +451,10 @@ definitions:
           type: string
           description: The UUID of the tenant
           readOnly: true
+        is_webrtc:
+          type: boolean
+          description: (Summary view only) Whether the user's main line is a WebRTC line
+          readOnly: true
 
   User:
     title: User
