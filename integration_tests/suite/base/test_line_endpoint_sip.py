@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -372,3 +372,56 @@ def test_create_line_with_endpoint_sip_no_context():
         )
     finally:
         confd.lines(line_id).delete().assert_deleted()
+
+
+@fixtures.line()
+@fixtures.sip(
+    label='my-endpoint',
+    name='my-endpoint',
+    endpoint_section_options=[['webrtc', 'yes']],
+)
+def test_get_line_on_webrtc_endpoint(line, sip):
+    with a.line_endpoint_sip(line, sip):
+        response = confd.lines(line['id']).get()
+        assert_that(
+            response.item,
+            has_entries(
+                is_webrtc=True,
+            ),
+        )
+
+
+@fixtures.line()
+@fixtures.sip(
+    label='my-endpoint',
+    name='my-endpoint',
+    endpoint_section_options=[['webrtc', 'no']],
+)
+def test_get_line_on_explicit_no_webrtc_endpoint(line, sip):
+    with a.line_endpoint_sip(line, sip):
+        response = confd.lines(line['id']).get()
+        assert_that(
+            response.item,
+            has_entries(
+                is_webrtc=False,
+            ),
+        )
+
+
+@fixtures.line()
+@fixtures.sip_template(
+    label='webrtc-template',
+    name='webrtc-template',
+    endpoint_section_options=[['webrtc', 'yes']],
+)
+@fixtures.sip(label='my-endpoint', name='my-endpoint')
+def test_get_line_on_webrtc_endpoint_from_template(line, sip_template, sip):
+    with a.endpoint_sip_template_sip(sip, sip_template):
+        with a.line_endpoint_sip(line, sip):
+            response = confd.lines(line['id']).get()
+            assert_that(
+                response.item,
+                has_entries(
+                    is_webrtc=True,
+                ),
+            )

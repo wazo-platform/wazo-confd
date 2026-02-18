@@ -16,6 +16,7 @@ pycountry==22.3.5
 python-consul==1.1.0
 pyyaml==6.0
 requests==2.28.1
+setuptools==66.1.1
 sqlalchemy==1.4.46  # from xivo-dao
 sqlalchemy-utils==0.38.2  # from xivo-dao
 stevedore==4.0.2
