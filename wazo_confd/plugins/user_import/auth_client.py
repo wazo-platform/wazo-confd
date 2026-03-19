@@ -33,7 +33,7 @@ class AuthClientProxy:
 
     def edit_user(self, *args, **kwargs):
         # rollback system can be added here
-        self.auth_client.users.edit(*args, **kwargs)
+        self._auth_client.users.edit(*args, **kwargs)
 
     def rollback(self):
         for user in self._users_created:
