@@ -1,12 +1,12 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 
-from wazo_confd.helpers.validator import ValidationAssociation, Validator
+from wazo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 
 
-class UserHasNoVoicemail(Validator):
+class UserHasNoVoicemail(ValidatorAssociation):
     def validate(self, user, voicemail):
         self.validate_same_tenant(user, voicemail)
         self.validate_user_has_no_voicemail(user, voicemail)
@@ -25,7 +25,7 @@ class UserHasNoVoicemail(Validator):
             )
 
 
-class VoicemailIsNotGlobal(Validator):
+class VoicemailIsNotGlobal(ValidatorAssociation):
     def validate(self, user, voicemail):
         if voicemail and voicemail.accesstype == 'global':
             raise errors.not_permitted(

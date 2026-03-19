@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from collections import Counter
@@ -22,6 +22,7 @@ from wazo_confd.helpers.validator import (
     ValidationAssociation,
     ValidationGroup,
     Validator,
+    ValidatorAssociation,
 )
 
 
@@ -33,7 +34,7 @@ class PrivateTemplateValidator(Validator):
             )
 
 
-class AssociatePrivateTemplateValidator(Validator):
+class AssociatePrivateTemplateValidator(ValidatorAssociation):
     def validate(self, user, template):
         if template.private:
             raise errors.not_permitted(
@@ -42,7 +43,7 @@ class AssociatePrivateTemplateValidator(Validator):
             )
 
 
-class AssociateSameTenant(Validator):
+class AssociateSameTenant(ValidatorAssociation):
     def validate(self, user, template):
         if user.tenant_uuid != template.tenant_uuid:
             raise errors.different_tenants(
@@ -141,7 +142,7 @@ class CustomValidator(FuncKeyValidator):
         self.validate_text(destination.exten, 'exten')
 
 
-class BSFilterValidator(FuncKeyValidator):
+class BSFilterValidator(ValidatorAssociation):
     def validate(self, user, funckey):
         if funckey.destination.type != 'bsfilter':
             return
