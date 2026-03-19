@@ -515,7 +515,7 @@ class UserMiddleWare(ResourceMiddleware):
                     tenant_uuids,
                 )
 
-            if agent:
+            if agent and isinstance(agent, dict):
                 existing_agent_id = user.agentid
                 provided_agent_id = agent.get('id', None)
 
