@@ -434,9 +434,9 @@ class UserMiddleWare(ResourceMiddleware):
         for e in existing_extensions_ids:
             try:
                 self._middleware_handle.get('extension').delete(e, tenant_uuids)
-            except ResourceError as e:
-                if not str(e).startswith('Resource Error - Extension is associated'):
-                    raise e
+            except ResourceError as exc:
+                if not str(exc).startswith('Resource Error - Extension is associated'):
+                    raise exc
 
     def update(self, user_id, body, tenant_uuid, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
