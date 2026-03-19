@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -523,9 +523,9 @@ class DestinationField(Nested):
         self.kwargs["unknown"] = EXCLUDE
         super().__init__(BaseDestinationSchema, **self.kwargs)
 
-    def _deserialize(self, value, attr, data, **kwargs):
+    def _deserialize(self, value, attr, data, partial=None, **kwargs):
         self.schema.context = self.context
-        base = super()._deserialize(value, attr, data, **kwargs)
+        base = super()._deserialize(value, attr, data, partial=partial, **kwargs)
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':

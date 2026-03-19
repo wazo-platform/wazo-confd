@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -265,9 +265,9 @@ class FuncKeyDestinationField(Nested):
         kwargs['unknown'] = EXCLUDE
         super().__init__(*args, **kwargs)
 
-    def _deserialize(self, value, attr, data, **kwargs):
+    def _deserialize(self, value, attr, data, partial=None, **kwargs):
         self.schema.context = self.context
-        base = super()._deserialize(value, attr, data, **kwargs)
+        base = super()._deserialize(value, attr, data, partial=partial, **kwargs)
         return Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
         )._deserialize(value, attr, data, **kwargs)
