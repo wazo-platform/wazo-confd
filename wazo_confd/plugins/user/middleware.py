@@ -1,4 +1,4 @@
-# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from http import HTTPStatus
@@ -369,8 +369,8 @@ class UserMiddleWare(ResourceMiddleware):
                 new_extension = self.create_or_get(extension_body, tenant_uuids)
                 return new_extension
 
-        existing_incalls_ids = {}
-        existing_extensions_ids = {}
+        existing_incalls_ids: dict[int, None] = {}
+        existing_extensions_ids: dict[int, None] = {}
         # dissociate all existing incalls / extensions
         for i in user.incalls:
             existing_incalls_ids[i.id] = None

@@ -1,4 +1,4 @@
-# Copyright 2016-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -8,7 +8,7 @@ from hamcrest import assert_that, equal_to, has_entry
 from ..csv_ import output_csv
 
 SOME_STATUS_CODE = 200
-SOME_INPUT = {'headers': [], 'content': []}
+SOME_INPUT: dict[str, list] = {'headers': [], 'content': []}
 
 
 class TestCSVRepresentation(TestCase):

@@ -1,4 +1,4 @@
-# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -43,7 +43,7 @@ class TestGETQueryStringSchema(TestCase):
         )
 
     def test_view_not_specified(self):
-        query_string = {}
+        query_string: dict[str, str] = {}
 
         loaded = self.schema.load(query_string)
 

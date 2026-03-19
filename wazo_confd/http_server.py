@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -23,7 +23,7 @@ from .helpers.converter import FilenameConverter
 logger = logging.getLogger(__name__)
 app = Flask('wazo_confd')
 api = Api(app, prefix="/1.1")
-_do_not_log_data_endpoints = []
+_do_not_log_data_endpoints: list[str] = []
 
 
 def get_bus_publisher():

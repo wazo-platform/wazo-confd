@@ -37,7 +37,7 @@ class Entry:
         self.extension = None
         self.extension_incall = None
         self.incall = None
-        self.call_permissions = []
+        self.call_permissions: list[Any] = []
 
     def extract_ids(self):
         if self.sip:

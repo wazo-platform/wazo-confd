@@ -1,9 +1,10 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
 import time
 from collections import namedtuple
+from typing import Any
 
 from flask import request
 from xivo_dao.helpers import errors
@@ -183,7 +184,7 @@ class CsvRow:
         }
 
     def parse_rules(self, rules):
-        entry = {}
+        entry: dict[str, Any] = {}
         for rule in rules:
             rule.insert(self.fields, entry)
         return entry
