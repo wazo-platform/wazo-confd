@@ -1,10 +1,10 @@
-# Copyright 2013-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
 
 
-class CRUDService:
+class ReadService:
     def __init__(self, dao, validator, notifier, extra_parameters=None):
         self.dao = dao
         self.validator = validator
@@ -23,6 +23,8 @@ class CRUDService:
     def get_by(self, **criteria):
         return self.dao.get_by(**criteria)
 
+
+class CRUDService(ReadService):
     def create(self, resource):
         self.validator.validate_create(resource)
         created_resource = self.dao.create(resource)

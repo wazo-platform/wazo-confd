@@ -1,4 +1,4 @@
-# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -72,7 +72,7 @@ class GuestMeetingAuthorizationItem(ItemResource):
         try:
             model = self._service.get(
                 ids['meeting_uuid'],
-                ids['authorization_uuid'],
+                authorization_uuid=ids['authorization_uuid'],
                 guest_uuid=ids['guest_uuid'],
             )
         except NotFoundError as e:
@@ -132,7 +132,7 @@ class UserMeetingAuthorizationList(ListResource, _MeResourceMixin):
 
         params = self.search_params()
 
-        total, items = self.service.search(params, ids['meeting_uuid'])
+        total, items = self.service.search(params, meeting_uuid=ids['meeting_uuid'])
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     @required_acl('confd.users.me.meetings.{meeting_uuid}.authorizations.create')

@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -6,13 +6,11 @@ from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.external_app import dao as external_app_dao
 from xivo_dao.resources.user_external_app import dao as user_external_app_dao
 
-from wazo_confd.helpers.resource import CRUDService
-
 from .notifier import build_notifier
 from .validator import build_validator
 
 
-class UserExternalAppService(CRUDService):
+class UserExternalAppService:
     def __init__(self, dao, external_app_dao, validator, notifier):
         self.dao = dao
         self.external_app_dao = external_app_dao

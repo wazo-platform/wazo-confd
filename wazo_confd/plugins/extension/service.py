@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -6,7 +6,7 @@ import logging
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.extension import dao as extension_dao_module
 
-from wazo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.resource import ReadService
 from wazo_confd.plugins.device import builder as device_builder
 
 from .notifier import build_notifier
@@ -15,7 +15,7 @@ from .validator import build_validator
 logger = logging.getLogger(__name__)
 
 
-class ExtensionService(CRUDService):
+class ExtensionService(ReadService):
     def __init__(self, dao, validator, notifier, device_updater):
         super().__init__(dao, validator, notifier)
         self.device_updater = device_updater
@@ -40,6 +40,11 @@ class ExtensionService(CRUDService):
 
         if updated_fields is None or updated_fields:
             self.device_updater.update_for_extension(extension)
+
+    def delete(self, resource):
+        self.validator.validate_delete(resource)
+        self.dao.delete(resource)
+        self.notifier.deleted(resource)
 
 
 def build_service(provd_client):

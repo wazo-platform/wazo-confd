@@ -1,10 +1,10 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.line import dao as line_dao_module
 
-from wazo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.resource import ReadService
 from wazo_confd.plugins.device import builder as device_builder
 from wazo_confd.plugins.line_device.service import (
     build_service as line_device_build_service,
@@ -18,7 +18,7 @@ from .notifier import build_notifier
 from .validator import build_validator
 
 
-class LineService(CRUDService):
+class LineService(ReadService):
     def __init__(
         self,
         dao,

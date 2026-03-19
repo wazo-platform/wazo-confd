@@ -1,17 +1,17 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.resources.voicemail import dao as voicemail_dao
 
 from wazo_confd import sysconfd
-from wazo_confd.helpers.resource import CRUDService
+from wazo_confd.helpers.resource import ReadService
 
 from .notifier import build_notifier
 from .validator import build_validator
 
 
-class VoicemailService(CRUDService):
+class VoicemailService(ReadService):
     def __init__(self, dao, validator, notifier, sysconf, extra=None):
         super().__init__(dao, validator, notifier, extra)
         self.sysconf = sysconf
