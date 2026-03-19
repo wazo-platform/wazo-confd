@@ -1,4 +1,4 @@
-# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from dataclasses import dataclass
@@ -11,14 +11,13 @@ from xivo_dao.resources.user import dao as user_dao
 from .types import CallerIDType
 
 
-class CallerIDAnonymous:
-    type = 'anonymous'
-
-
 @dataclass()
 class CallerID:
     type: CallerIDType
-    number: str
+    number: str = ''
+
+
+CallerIDAnonymous = CallerID(type='anonymous')
 
 
 def same_phone_number(number1: str, number2: str) -> bool:
