@@ -593,7 +593,7 @@ class GetMohFromActionArg2Resource(Validator):
 
 
 class DestinationValidator:
-    _VALIDATORS = {
+    _VALIDATORS: dict[str, list[Validator]] = {
         'application:callbackdisa': [],
         'application:custom': [
             GetResource('actionarg1', application_dao.get, 'Application')

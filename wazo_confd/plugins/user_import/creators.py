@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -27,6 +27,8 @@ from .wazo_user_schema import WazoUserSchema
 
 
 class Creator(metaclass=abc.ABCMeta):
+    schema: type | None = None
+
     def __init__(self, service):
         self.service = service
 
@@ -39,7 +41,7 @@ class Creator(metaclass=abc.ABCMeta):
         pass
 
     def update(self, fields, model):
-        if getattr(self, 'schema', False):
+        if self.schema is not None:
             fields = self.schema(handle_error=False).load(fields, partial=True)
 
         self.update_model(fields, model)

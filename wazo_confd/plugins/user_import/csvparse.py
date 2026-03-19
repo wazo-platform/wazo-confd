@@ -36,6 +36,9 @@ class Rule:
         self.csv_name = csv_name
         self.name = name
 
+    def parse(self, value):
+        raise NotImplementedError
+
     def insert(self, fields, entry):
         if self.csv_name in fields:
             value = fields.get(self.csv_name, "")

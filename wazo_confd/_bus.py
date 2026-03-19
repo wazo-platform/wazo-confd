@@ -1,16 +1,23 @@
 # Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 from collections import deque
-from typing import Any
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 from wazo_bus.base import Base
 from wazo_bus.consumer import BusConsumer as Consumer
 from wazo_bus.mixins import PublisherMixin, WazoEventMixin
 from xivo.status import Status
 
+if TYPE_CHECKING:
+    _FlushMixinBase: TypeAlias = PublisherMixin
+else:
+    _FlushMixinBase: TypeAlias = object
 
-class FlushMixin:
+
+class FlushMixin(_FlushMixinBase):
     __saved_state: dict[str, Any] = {}
 
     def __init__(self, **kwargs):
