@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import marshmallow
@@ -74,14 +74,14 @@ class ListResource(ConfdResource):
         super().__init__()
         self.service = service
 
-    def get(self):
+    def get(self, *args, **kwargs):
         params = self.search_params()
         tenant_uuids = self._build_tenant_list(params)
-        kwargs = {}
+        search_kwargs = {}
         if tenant_uuids is not None:
-            kwargs['tenant_uuids'] = tenant_uuids
+            search_kwargs['tenant_uuids'] = tenant_uuids
 
-        total, items = self.service.search(params, **kwargs)
+        total, items = self.service.search(params, **search_kwargs)
         return {'total': total, 'items': self.schema().dump(items, many=True)}
 
     def search_params(self):
@@ -96,7 +96,7 @@ class ListResource(ConfdResource):
         form['tenant_uuid'] = tenant.uuid
         return form
 
-    def post(self):
+    def post(self, *args, **kwargs):
         form = self.schema().load(request.get_json(force=True))
         form = self.add_tenant_to_form(form)
         model = self.model(**form)
