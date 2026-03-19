@@ -4,7 +4,7 @@ paths:
       summary: Get voicemail transcription configuration
       description: |
         Retrieve the voicemail transcription configuration for the tenant.
-        
+
         Returns the current transcription settings, including whether automatic
         transcription is enabled for the tenant's voicemails.
       operationId: get_voicemail_transcription_config
@@ -18,24 +18,22 @@ paths:
           description: Voicemail transcription configuration
           schema:
             $ref: '#/definitions/VoicemailTranscriptionConfig'
-        '400':
-          $ref: '#/responses/UpdateError'
         '404':
           $ref: '#/responses/NotFoundError'
 
     put:
       summary: Update voicemail transcription configuration
       description: |
-        Create or update the voicemail transcription configuration for the tenant.
-        
+        Update the voicemail transcription configuration for the tenant.
+
         This endpoint is idempotent - calling it multiple times with the same
         configuration will not create duplicates.
-        
+
         When transcription is enabled:
         - All new voicemails will be automatically queued for transcription
         - Transcription occurs asynchronously via the configured backend
         - Results are stored and associated with the voicemail record
-        
+
         When transcription is disabled:
         - New voicemails will not be transcribed
         - Existing transcripts are retained unless explicitly deleted
