@@ -1,9 +1,8 @@
-# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import logging
-from typing import Literal
 
 from xivo_dao.alchemy.phone_number import PhoneNumber
 from xivo_dao.helpers.errors import ResourceError
@@ -11,7 +10,7 @@ from xivo_dao.resources.phone_number import dao
 
 from wazo_confd.helpers.resource import CRUDService
 
-from .notifier import PhoneNumberNotifier, build_notifier
+from .notifier import build_notifier
 from .utils import (
     PhoneNumberMainSpec,
     PhoneNumberRangeSpec,
@@ -23,10 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class PhoneNumberService(CRUDService):
-    dao: Literal[dao] = dao
-    notifier: PhoneNumberNotifier
-
-    def __init__(self, dao: dao, validator, notifier):
+    def __init__(self, dao, validator, notifier):
         super().__init__(dao, validator, notifier)
 
     def find_all_by(self, **criteria) -> list[PhoneNumber]:
