@@ -1,4 +1,4 @@
-# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import gzip
@@ -55,7 +55,7 @@ class AsteriskConfigurationSchema(BaseSchema):
 class AsteriskConfigurationList(ConfdResource):
     model = AsteriskFileVariable
     schema = AsteriskConfigurationSchema
-    section_name = None
+    section_name: str | None = None
 
     def __init__(self, service):
         super().__init__()
@@ -73,7 +73,7 @@ class AsteriskConfigurationList(ConfdResource):
 
 
 class AsteriskConfigurationService:
-    file_name = None
+    file_name: str | None = None
 
     def __init__(self, dao, notifier):
         self.dao = dao
