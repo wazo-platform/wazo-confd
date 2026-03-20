@@ -11,7 +11,7 @@ from xivo_dao.resources.user import dao as user_dao
 from .types import CallerIDType
 
 
-@dataclass()
+@dataclass(frozen=True)
 class CallerID:
     type: CallerIDType
     number: str = ''
