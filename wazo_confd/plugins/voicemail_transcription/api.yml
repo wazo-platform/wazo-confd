@@ -1,12 +1,12 @@
 paths:
   /voicemails/transcription:
     get:
-      summary: Get voicemail transcription configuration
+      summary: Retrieve the voicemail transcription configuration for the tenant
       description: |
-        Retrieve the voicemail transcription configuration for the tenant.
 
         Returns the current transcription settings, including whether automatic
         transcription is enabled for the tenant's voicemails.
+        **required_acl**: confd.voicemails.transcription.read
       operationId: get_voicemail_transcription_config
       tags:
         - voicemails
@@ -22,21 +22,8 @@ paths:
           $ref: '#/responses/NotFoundError'
 
     put:
-      summary: Update voicemail transcription configuration
-      description: |
-        Update the voicemail transcription configuration for the tenant.
-
-        This endpoint is idempotent - calling it multiple times with the same
-        configuration will not create duplicates.
-
-        When transcription is enabled:
-        - All new voicemails will be automatically queued for transcription
-        - Transcription occurs asynchronously via the configured backend
-        - Results are stored and associated with the voicemail record
-
-        When transcription is disabled:
-        - New voicemails will not be transcribed
-        - Existing transcripts are retained unless explicitly deleted
+      summary: Update the voicemail transcription configuration for the tenant.
+      description: **required_acl**: confd.voicemails.transcription.update
       operationId: update_voicemail_transcription_config
       tags:
         - voicemails
@@ -63,8 +50,7 @@ definitions:
     properties:
       enabled:
         type: boolean
-        description: |
-          Enable or disable automatic transcription of voicemails for this tenant.
+        description: Enable or disable automatic transcription of voicemails for this tenant.
         default: false
         example: true
     required:
