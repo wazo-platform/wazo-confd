@@ -37,7 +37,7 @@ class Rule:
         self.name = name
 
     def parse(self, value):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def insert(self, fields, entry):
         if self.csv_name in fields:

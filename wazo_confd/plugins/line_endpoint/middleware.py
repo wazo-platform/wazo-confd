@@ -12,7 +12,7 @@ class _BaseLineEndpointMiddleWare:
         self._service = service
 
     def _get_endpoint(self, endpoint_id, tenant_uuids):
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def associate(self, line_id, endpoint_id, tenant_uuids):
         line = line_dao.get(line_id, tenant_uuids=tenant_uuids)
