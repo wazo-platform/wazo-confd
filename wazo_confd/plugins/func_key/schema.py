@@ -272,7 +272,7 @@ class FuncKeyDestinationField(Nested):
             self.destination_schemas[base['type']], unknown=self.unknown
         )._deserialize(value, attr, data, **kwargs)
 
-    def _serialize(self, nested_obj, attr, obj):
+    def _serialize(self, nested_obj, attr, obj):  # type: ignore[override]
         base = super()._serialize(nested_obj, attr, obj)
         return Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
@@ -312,7 +312,7 @@ class FuncKeyPositionField(fields.Field):
             template[position] = funckey
         return template
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj):  # type: ignore[override]
         template = {}
         for raw_position, raw_funckey in value.items():
             position = self.key_field._serialize(raw_position, attr, obj)

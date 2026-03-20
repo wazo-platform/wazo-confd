@@ -542,7 +542,7 @@ class DestinationField(Nested):
 
         return Nested(schema, **self.kwargs)._deserialize(value, attr, data, **kwargs)
 
-    def _serialize(self, nested_obj, attr, obj):
+    def _serialize(self, nested_obj, attr, obj):  # type: ignore[override]
         base = super()._serialize(nested_obj, attr, obj)
         if not base:
             return base

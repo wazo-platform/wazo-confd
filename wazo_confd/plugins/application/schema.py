@@ -1,4 +1,4 @@
-# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import fields, post_load, pre_dump
@@ -26,7 +26,7 @@ class ApplicationDestinationOptionsField(fields.Field):
             return {}
         return concrete_options._deserialize(value, attr, data, **kwargs)
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj):  # type: ignore[override]
         if not obj.dest_node:
             return {}
         destination = obj.destination

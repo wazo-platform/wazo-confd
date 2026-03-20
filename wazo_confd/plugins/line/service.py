@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -41,13 +41,13 @@ class LineService(CRUDService):
     def find_all_by(self, **criteria):
         return self.dao.find_all_by(**criteria)
 
-    def create(self, resource, tenant_uuids):
+    def create(self, resource, tenant_uuids):  # type: ignore[override]
         self.validator.validate_create(resource, tenant_uuids=tenant_uuids)
         created_resource = self.dao.create(resource)
         self.notifier.created(created_resource)
         return created_resource
 
-    def edit(self, line, tenant_uuids, updated_fields=None):
+    def edit(self, line, tenant_uuids, updated_fields=None):  # type: ignore[override]
         with Session.no_autoflush:
             self.validator.validate_edit(line, tenant_uuids=tenant_uuids)
         self.dao.edit(line)

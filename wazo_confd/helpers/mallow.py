@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -80,7 +80,7 @@ class Link(fields.Field):
         self.field = field
         self.target = target or field
 
-    def _serialize(self, value, key, obj):
+    def _serialize(self, value, key, obj):  # type: ignore[override]
         value = self.extract_value(obj)
         if value:
             options = {self.target: value, '_external': True}
@@ -100,7 +100,7 @@ class ListLink(fields.Field):
         super().__init__(dump_only=True, **kwargs)
         self.links = links
 
-    def _serialize(self, value, key, obj):
+    def _serialize(self, value, key, obj):  # type: ignore[override]
         output = []
         for link in self.links:
             link_obj = link.serialize(key, obj)

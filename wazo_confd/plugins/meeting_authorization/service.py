@@ -1,4 +1,4 @@
-# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.meeting import dao as meeting_dao
@@ -10,7 +10,7 @@ from .validator import build_validator
 
 
 class MeetingAuthorizationService(CRUDService):
-    def search(self, parameters, meeting_uuid):
+    def search(self, parameters, meeting_uuid):  # type: ignore[override]
         return self.dao.search(meeting_uuid, **parameters)
 
     def create(self, meeting_authorization):
@@ -23,7 +23,7 @@ class MeetingAuthorizationService(CRUDService):
             'pending' if meeting.require_authorization else 'accepted'
         )
 
-    def get(self, meeting_uuid, authorization_uuid, **kwargs):
+    def get(self, meeting_uuid, authorization_uuid, **kwargs):  # type: ignore[override]
         return self.dao.get(meeting_uuid, authorization_uuid, **kwargs)
 
     def accept(self, meeting_authorization):
