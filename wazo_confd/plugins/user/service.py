@@ -1,4 +1,4 @@
-# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.func_key import dao as func_key_dao
@@ -14,8 +14,8 @@ from .validator import build_validator, build_validator_forward
 
 
 class UserBaseService(CRUDService):
-    def get(self, resource_id, tenant_uuids=None, **kwargs):
-        return self.dao.get_by_id_uuid(resource_id, tenant_uuids)
+    def get(self, user_id, tenant_uuids=None):
+        return self.dao.get_by_id_uuid(user_id, tenant_uuids)
 
 
 class UserService(UserBaseService):
@@ -69,10 +69,10 @@ def build_service(provd_client, paginated_user_strategy_threshold):
 
 
 class UserCallServiceService(UserBaseService):
-    def edit(self, user, updated_fields=None):
+    def edit(self, user, schema):
         self.validator.validate_edit(user)
         self.dao.edit(user)
-        self.notifier.edited(user, updated_fields)
+        self.notifier.edited(user, schema)
 
 
 def build_service_callservice():
@@ -80,10 +80,10 @@ def build_service_callservice():
 
 
 class UserForwardService(UserBaseService):
-    def edit(self, user, updated_fields=None):
+    def edit(self, user, schema):
         self.validator.validate_edit(user)
         self.dao.edit(user)
-        self.notifier.edited(user, updated_fields)
+        self.notifier.edited(user, schema)
 
 
 def build_service_forward():

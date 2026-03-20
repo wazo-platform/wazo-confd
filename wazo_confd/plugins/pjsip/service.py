@@ -1,4 +1,4 @@
-# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -39,7 +39,7 @@ def build_service(pjsip_doc):
 
 
 class PJSIPTransportService(CRUDService):
-    def delete_with_fallback(self, transport, fallback):
+    def delete(self, transport, fallback):
         for validator in self.validator.delete:
             validator.validate(transport, fallback)
         self.dao.delete(transport, fallback)

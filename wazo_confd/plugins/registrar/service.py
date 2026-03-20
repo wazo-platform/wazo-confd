@@ -1,4 +1,4 @@
-# Copyright 2019-2026 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -19,7 +19,7 @@ class RegistrarService(CRUDService):
         self.device_updater = device_updater
         self.provd_client = provd_client
 
-    def search(self, parameters, tenant_uuids=None):
+    def search(self, parameters):
         return self.dao.search(**parameters)
 
     def create(self, registrar):

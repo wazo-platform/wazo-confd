@@ -1,4 +1,4 @@
-# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -97,5 +97,5 @@ class PJSIPTransportItem(ItemResource):
         fallback = params['fallback']
         if fallback:
             fallback = self.service.get(fallback)
-        self.service.delete_with_fallback(transport, fallback=fallback)
+        self.service.delete(transport, fallback=fallback)
         return '', 204

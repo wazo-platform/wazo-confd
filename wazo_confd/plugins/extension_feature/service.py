@@ -1,4 +1,4 @@
-# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -11,11 +11,11 @@ from .validator import build_validator
 
 
 class FeatureExtensionService(CRUDService):
-    def search(self, parameters, tenant_uuids=None):
+    def search(self, parameters):
         return self.dao.search(**parameters)
 
-    def get(self, resource_id, **kwargs):
-        return self.dao.get_by(uuid=resource_id)
+    def get(self, resource_uuid):
+        return self.dao.get_by(uuid=resource_uuid)
 
     def edit(self, resource, updated_fields=None):
         with Session.no_autoflush:
