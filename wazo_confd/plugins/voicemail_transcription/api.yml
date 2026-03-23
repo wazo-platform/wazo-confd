@@ -1,0 +1,57 @@
+paths:
+  /voicemails/transcription:
+    get:
+      summary: Retrieve the voicemail transcription configuration for the tenant
+      description: |
+
+        Returns the current transcription settings, including whether automatic
+        transcription is enabled for the tenant's voicemails.
+        **required_acl**: `confd.voicemails.transcription.read`
+      operationId: get_voicemail_transcription_config
+      tags:
+        - voicemails
+        - transcription
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+      responses:
+        '200':
+          description: Voicemail transcription configuration
+          schema:
+            $ref: '#/definitions/VoicemailTranscriptionConfig'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+    put:
+      summary: Update the voicemail transcription configuration for the tenant.
+      description: '**required_acl**: `confd.voicemails.transcription.update`'
+      operationId: update_voicemail_transcription_config
+      tags:
+        - voicemails
+        - transcription
+      parameters:
+        - $ref: '#/parameters/tenantuuid'
+        - name: body
+          in: body
+          required: true
+          description: Voicemail transcription configuration
+          schema:
+            $ref: '#/definitions/VoicemailTranscriptionConfig'
+      responses:
+        '204':
+          description: Configuration updated successfully
+        '400':
+          $ref: '#/responses/UpdateError'
+        '404':
+          $ref: '#/responses/NotFoundError'
+
+definitions:
+  VoicemailTranscriptionConfig:
+    type: object
+    properties:
+      enabled:
+        type: boolean
+        description: Enable or disable automatic transcription of voicemails for this tenant.
+        default: false
+        example: true
+    required:
+      - enabled

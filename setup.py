@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2012-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2012-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import find_packages, setup
@@ -130,6 +130,7 @@ setup(
             'user_subscription = wazo_confd.plugins.user_subscription.plugin:Plugin',
             'user_voicemail = wazo_confd.plugins.user_voicemail.plugin:Plugin',
             'voicemail = wazo_confd.plugins.voicemail.plugin:Plugin',
+            'voicemail_transcription = wazo_confd.plugins.voicemail_transcription.plugin:Plugin',
             'voicemail_general = wazo_confd.plugins.voicemail_general.plugin:Plugin',
             'voicemail_zonemessages = wazo_confd.plugins.voicemail_zonemessages.plugin:Plugin',
             'wizard = wazo_confd.plugins.wizard.plugin:Plugin',

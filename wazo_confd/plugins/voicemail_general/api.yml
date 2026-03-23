@@ -6,6 +6,7 @@ paths:
       description: '**Required ACL:** `confd.asterisk.voicemail.general.read`'
       tags:
       - asterisk
+      - voicemails
       responses:
         '200':
           description: Voicemail general
@@ -21,6 +22,7 @@ paths:
         are not defined.'
       tags:
       - asterisk
+      - voicemails
       parameters:
       - name: body
         in: body
