@@ -9,7 +9,7 @@ from flask import request
 from xivo.tenant_flask_helpers import Tenant
 
 from wazo_confd.auth import required_acl
-from wazo_confd.helpers.restful import ConfdResource
+from wazo_confd.helpers.restful import ConfdResource, build_tenant
 
 from .schema import VoicemailTranscriptionConfigSchema
 from .service import VoicemailTranscriptionConfigService
@@ -30,7 +30,7 @@ class VoicemailTranscriptionConfig(ConfdResource):
 
     @required_acl('confd.voicemails.transcription.update')
     def put(self) -> Tuple[str, int]:
-        tenant = Tenant.autodetect()
+        tenant_uuid = build_tenant()
         form = self.schema().load(request.get_json(force=True))
-        self.service.edit(tenant.uuid, form)
+        self.service.edit(tenant_uuid, form)
         return '', 204
