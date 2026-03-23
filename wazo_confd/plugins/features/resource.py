@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request
@@ -120,7 +120,7 @@ class FeaturesApplicationmapSchema(FeaturesConfigurationSchema):
 class FeaturesConfigurationList(ConfdResource):
     model = Features
     schema = FeaturesConfigurationSchema
-    section_name = None
+    section_name: str | None = None
 
     def __init__(self, service):
         super().__init__()

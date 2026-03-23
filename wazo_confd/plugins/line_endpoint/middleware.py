@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.endpoint_custom import dao as endpoint_custom_dao
@@ -10,6 +10,9 @@ from xivo_dao.resources.line import dao as line_dao
 class _BaseLineEndpointMiddleWare:
     def __init__(self, service):
         self._service = service
+
+    def _get_endpoint(self, endpoint_id, tenant_uuids):
+        raise NotImplementedError()
 
     def associate(self, line_id, endpoint_id, tenant_uuids):
         line = line_dao.get(line_id, tenant_uuids=tenant_uuids)

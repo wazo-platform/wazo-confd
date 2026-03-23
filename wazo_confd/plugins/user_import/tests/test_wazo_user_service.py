@@ -1,7 +1,8 @@
-# Copyright 2019-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
+from typing import Any
 from unittest.mock import Mock
 from unittest.mock import sentinel as s
 
@@ -26,7 +27,7 @@ class TestWazoUserService(unittest.TestCase):
         )
 
     def test_that_a_missing_tenant_uuid_does_not_raise(self):
-        user = {}
+        user: dict[str, Any] = {}
 
         self.service.create(user)
 

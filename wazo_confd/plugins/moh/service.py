@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.resources.moh import dao as moh_dao
@@ -21,7 +21,7 @@ class MohService(CRUDService):
             self._update_resource(resource)
         return total, resources
 
-    def get(self, resource_id, tenant_uuids=None):
+    def get(self, resource_id, tenant_uuids=None):  # type: ignore[override]
         resource = self.dao.get(resource_id, tenant_uuids=tenant_uuids)
         self._update_resource(resource)
         return resource

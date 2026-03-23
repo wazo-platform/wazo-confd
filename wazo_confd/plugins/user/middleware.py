@@ -1,4 +1,4 @@
-# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from http import HTTPStatus
@@ -369,8 +369,8 @@ class UserMiddleWare(ResourceMiddleware):
                 new_extension = self.create_or_get(extension_body, tenant_uuids)
                 return new_extension
 
-        existing_incalls_ids = {}
-        existing_extensions_ids = {}
+        existing_incalls_ids: dict[int, None] = {}
+        existing_extensions_ids: dict[int, None] = {}
         # dissociate all existing incalls / extensions
         for i in user.incalls:
             existing_incalls_ids[i.id] = None
@@ -434,9 +434,9 @@ class UserMiddleWare(ResourceMiddleware):
         for e in existing_extensions_ids:
             try:
                 self._middleware_handle.get('extension').delete(e, tenant_uuids)
-            except ResourceError as e:
-                if not str(e).startswith('Resource Error - Extension is associated'):
-                    raise e
+            except ResourceError as exc:
+                if not str(exc).startswith('Resource Error - Extension is associated'):
+                    raise exc
 
     def update(self, user_id, body, tenant_uuid, tenant_uuids, recursive=False):
         user = self._service.get(user_id, tenant_uuids=tenant_uuids)
@@ -515,7 +515,7 @@ class UserMiddleWare(ResourceMiddleware):
                     tenant_uuids,
                 )
 
-            if agent:
+            if agent and isinstance(agent, dict):
                 existing_agent_id = user.agentid
                 provided_agent_id = agent.get('id', None)
 

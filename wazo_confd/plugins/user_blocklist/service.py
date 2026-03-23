@@ -1,9 +1,8 @@
-# Copyright 2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2025-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
 import logging
-from typing import Literal
 
 from xivo_dao.alchemy.blocklist import Blocklist
 from xivo_dao.alchemy.blocklist_number import BlocklistNumber
@@ -13,17 +12,14 @@ from xivo_dao.resources.user import dao as user_dao
 
 from wazo_confd.helpers.resource import CRUDService
 
-from .notifier import UserBlocklistNotifier, build_notifier
+from .notifier import build_notifier
 from .validator import build_validator
 
 logger = logging.getLogger(__name__)
 
 
 class UserBlocklistService(CRUDService):
-    dao: Literal[dao] = dao
-    notifier: UserBlocklistNotifier
-
-    def __init__(self, dao: dao, validator, notifier, user_dao: user_dao):
+    def __init__(self, dao, validator, notifier, user_dao):
         super().__init__(dao, validator, notifier)
         self.user_dao = user_dao
 

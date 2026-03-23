@@ -1,4 +1,4 @@
-# Copyright 2016-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers.db_manager import Session
@@ -16,13 +16,13 @@ class VoicemailService(CRUDService):
         super().__init__(dao, validator, notifier, extra)
         self.sysconf = sysconf
 
-    def create(self, resource, tenant_uuids):
+    def create(self, resource, tenant_uuids):  # type: ignore[override]
         self.validator.validate_create(resource, tenant_uuids=tenant_uuids)
         created_resource = self.dao.create(resource)
         self.notifier.created(created_resource)
         return created_resource
 
-    def edit(self, voicemail, tenant_uuids, updated_fields=None):
+    def edit(self, voicemail, tenant_uuids, updated_fields=None):  # type: ignore[override]
         old_number, old_context = voicemail.get_old_number_context()
         with Session.no_autoflush:
             self.validator.validate_edit(voicemail, tenant_uuids=tenant_uuids)

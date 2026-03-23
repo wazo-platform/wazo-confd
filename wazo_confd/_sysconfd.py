@@ -1,5 +1,7 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+from collections.abc import Sequence
 
 import requests
 from xivo_dao.resources.configuration import dao as configuration_dao
@@ -142,7 +144,9 @@ class SysconfdPublisher:
     def flush_handlers(self, session):
         if len(self.handlers) > 0:
             url = "{}/exec_request_handlers".format(self.base_url)
-            body = {key: tuple(commands) for key, commands in self.handlers.items()}
+            body: dict[str, Sequence] = {
+                key: tuple(commands) for key, commands in self.handlers.items()
+            }
             if self.handlers_contexts:
                 body['context'] = self.handlers_contexts
             response = session.request('POST', url, json=body)

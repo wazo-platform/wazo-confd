@@ -1,4 +1,4 @@
-# Copyright 2021-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2021-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -15,7 +15,7 @@ class TestUserDestinationSchema(TestCase):
     def test_actionarg2_serialisation(self):
         moh_uuid = '53ff7e19-1872-4547-9bb7-bd00a20f840f'
         base_body = {'type': 'user', 'user_id': 42}
-        samples = [
+        samples: list[tuple[dict, str]] = [
             ({}, ''),
             ({'moh_uuid': moh_uuid}, ';{}'.format(moh_uuid)),
             ({'ring_time': 0}, '0.0'),

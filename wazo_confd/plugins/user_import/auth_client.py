@@ -1,7 +1,8 @@
-# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+from typing import Any
 
 from flask import g
 from requests import HTTPError
@@ -12,7 +13,7 @@ from xivo_dao.helpers.exception import ServiceError
 logger = logging.getLogger(__name__)
 
 MINUTE = 60
-auth_config = {}
+auth_config: dict[str, Any] = {}
 
 
 class AuthClientProxy:
@@ -32,7 +33,7 @@ class AuthClientProxy:
 
     def edit_user(self, *args, **kwargs):
         # rollback system can be added here
-        self.auth_client.users.edit(*args, **kwargs)
+        self._auth_client.users.edit(*args, **kwargs)
 
     def rollback(self):
         for user in self._users_created:

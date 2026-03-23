@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -48,6 +48,9 @@ class _TrunkEndpointAssociationValidator(ValidatorAssociation):
                 endpoint=protocol,
                 endpoint_id=protocol_id,
             )
+
+    def validate_not_associated_to_trunk(self, trunk, endpoint):
+        pass
 
     def validate_not_associated_to_line(self, trunk, endpoint):
         pass

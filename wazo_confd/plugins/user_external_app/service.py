@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -19,7 +19,7 @@ class UserExternalAppService(CRUDService):
         self.validator = validator
         self.notifier = notifier
 
-    def search(self, user_uuid, tenant_uuid, parameters):
+    def search(self, user_uuid, tenant_uuid, parameters):  # type: ignore[override]
         if 'fallback' == parameters.get('view'):
             # NOTE(fblackburn): pagination and sorting are disabled with fallback
             _, result_by_user = self.dao.search(user_uuid)
@@ -30,7 +30,7 @@ class UserExternalAppService(CRUDService):
 
         return self.dao.search(user_uuid, **parameters)
 
-    def get(self, user_uuid, tenant_uuid, name, view=None):
+    def get(self, user_uuid, tenant_uuid, name, view=None):  # type: ignore[override]
         result = self.dao.find(user_uuid, name)
         if result:
             return result
@@ -42,7 +42,7 @@ class UserExternalAppService(CRUDService):
 
         raise errors.not_found('UserExternalApp', name=name)
 
-    def create(self, app, tenant_uuid):
+    def create(self, app, tenant_uuid):  # type: ignore[override]
         self.validator.validate_create(app)
         created_resource = self.dao.create(app)
         self.notifier.created(created_resource, tenant_uuid)
@@ -54,7 +54,7 @@ class UserExternalAppService(CRUDService):
         self.dao.edit(app)
         self.notifier.edited(app, tenant_uuid)
 
-    def delete(self, app, tenant_uuid):
+    def delete(self, app, tenant_uuid):  # type: ignore[override]
         self.validator.validate_delete(app)
         self.dao.delete(app)
         self.notifier.deleted(app, tenant_uuid)

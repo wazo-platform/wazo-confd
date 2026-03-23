@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -102,6 +102,7 @@ class RegisterIAXSchema(BaseSchema):
     @pre_dump
     def convert_from_chaniax(self, data, **kwargs):
         register = REGISTER_REGEX.match(data.var_val)
+        assert register is not None
         result = register.groupdict()
         result['id'] = data.id
         result['enabled'] = data.enabled

@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -523,9 +523,9 @@ class DestinationField(Nested):
         self.kwargs["unknown"] = EXCLUDE
         super().__init__(BaseDestinationSchema, **self.kwargs)
 
-    def _deserialize(self, value, attr, data, **kwargs):
+    def _deserialize(self, value, attr, data, partial=None, **kwargs):
         self.schema.context = self.context
-        base = super()._deserialize(value, attr, data, **kwargs)
+        base = super()._deserialize(value, attr, data, partial=partial, **kwargs)
         schema = self.destination_schemas[base['type']]
 
         if base['type'] == 'application':
@@ -542,7 +542,7 @@ class DestinationField(Nested):
 
         return Nested(schema, **self.kwargs)._deserialize(value, attr, data, **kwargs)
 
-    def _serialize(self, nested_obj, attr, obj):
+    def _serialize(self, nested_obj, attr, obj):  # type: ignore[override]
         base = super()._serialize(nested_obj, attr, obj)
         if not base:
             return base
@@ -593,7 +593,7 @@ class GetMohFromActionArg2Resource(Validator):
 
 
 class DestinationValidator:
-    _VALIDATORS = {
+    _VALIDATORS: dict[str, list[Validator]] = {
         'application:callbackdisa': [],
         'application:custom': [
             GetResource('actionarg1', application_dao.get, 'Application')

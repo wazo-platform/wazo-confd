@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -14,7 +14,8 @@ from .schema import SwitchboardSchema
 
 class _BaseSwitchboardResource:
     def __init__(self, service, moh_dao):
-        super().__init__(service)
+        # super() resolves to ListResource or ItemResource in subclasses
+        super().__init__(service)  # type: ignore[call-arg]
         self._moh_dao = moh_dao
 
     def _update_moh_fields(self, form, tenant_uuids):

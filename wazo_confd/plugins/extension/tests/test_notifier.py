@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -75,7 +75,7 @@ class TestExtensionNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(expected_handlers)
 
     def test_when_extension_edited_and_no_change_then_handlers_not_sent(self):
-        updated_fields = []
+        updated_fields: list[str] = []
         self.notifier.edited(self.extension, updated_fields)
 
         self.sysconfd.exec_request_handlers.assert_not_called()

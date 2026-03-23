@@ -1,4 +1,4 @@
-# Copyright 2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_confd.auth import required_acl
@@ -17,7 +17,7 @@ class UserCallerIDList(ListResource):
 
     @required_acl('confd.users.{user_id}.callerids.outgoing.read')
     def get(self, user_id):
-        params = {}  # NOTE(fblackburn): search is not implemented
+        params: dict[str, str] = {}  # NOTE(fblackburn): search is not implemented
         tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.user_dao.get_by_id_uuid(user_id, tenant_uuids=tenant_uuids)
         total, items = self.service.search(user.id, user.tenant_uuid, params)

@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from functools import partial
@@ -12,11 +12,11 @@ from wazo_confd.helpers.validator import (
     UniqueField,
     UniqueFieldChanged,
     ValidationGroup,
-    Validator,
+    ValidatorAssociation,
 )
 
 
-class TransportDeleteValidator(Validator):
+class TransportDeleteValidator(ValidatorAssociation):
     def __init__(self, sip_dao):
         self.sip_dao = sip_dao
 

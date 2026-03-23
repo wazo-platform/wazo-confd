@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -62,7 +62,7 @@ class TestLineNotifier(unittest.TestCase):
         self.sysconfd.exec_request_handlers.assert_called_once_with(SYSCONFD_HANDLERS)
 
     def test_when_line_edited_and_no_change_then_sip_not_reloaded(self):
-        updated_fields = []
+        updated_fields: list[str] = []
         self.notifier.edited(self.line, updated_fields)
 
         self.sysconfd.exec_request_handlers.assert_not_called()

@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import abc
@@ -13,7 +13,7 @@ LANGUAGE_REGEX = r"^[a-z]{2}_[A-Z]{2}$"
 
 class Validator(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def validate(self, model):
+    def validate(self, model, /):
         return
 
     def validate_with_tenant_uuids(self, model, tenant_uuids):
@@ -22,7 +22,7 @@ class Validator(metaclass=abc.ABCMeta):
 
 class ValidatorAssociation(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def validate(self, model1, model2):
+    def validate(self, model1, model2, /):
         return
 
 

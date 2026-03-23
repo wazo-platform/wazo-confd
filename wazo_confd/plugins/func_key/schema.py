@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import url_for
@@ -265,14 +265,14 @@ class FuncKeyDestinationField(Nested):
         kwargs['unknown'] = EXCLUDE
         super().__init__(*args, **kwargs)
 
-    def _deserialize(self, value, attr, data, **kwargs):
+    def _deserialize(self, value, attr, data, partial=None, **kwargs):
         self.schema.context = self.context
-        base = super()._deserialize(value, attr, data, **kwargs)
+        base = super()._deserialize(value, attr, data, partial=partial, **kwargs)
         return Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
         )._deserialize(value, attr, data, **kwargs)
 
-    def _serialize(self, nested_obj, attr, obj):
+    def _serialize(self, nested_obj, attr, obj):  # type: ignore[override]
         base = super()._serialize(nested_obj, attr, obj)
         return Nested(
             self.destination_schemas[base['type']], unknown=self.unknown
@@ -312,7 +312,7 @@ class FuncKeyPositionField(fields.Field):
             template[position] = funckey
         return template
 
-    def _serialize(self, value, attr, obj):
+    def _serialize(self, value, attr, obj):  # type: ignore[override]
         template = {}
         for raw_position, raw_funckey in value.items():
             position = self.key_field._serialize(raw_position, attr, obj)

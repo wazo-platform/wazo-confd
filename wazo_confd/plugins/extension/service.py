@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -20,7 +20,7 @@ class ExtensionService(CRUDService):
         super().__init__(dao, validator, notifier)
         self.device_updater = device_updater
 
-    def create(self, extension, tenant_uuids):
+    def create(self, extension, tenant_uuids):  # type: ignore[override]
         self.validator.validate_create(extension, tenant_uuids)
         created_extension = self.dao.create(extension)
         self.notifier.created(created_extension)

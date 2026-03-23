@@ -1,4 +1,4 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -157,7 +157,7 @@ class TestSysconfdClient(TestCase):
     def test_exec_request_handlers_live_reload_disabled(self):
         self.dao.is_live_reload_enabled.return_value = False
 
-        commands = {'ipbx': []}
+        commands: dict[str, list[str]] = {'ipbx': []}
 
         self.client.exec_request_handlers(commands)
         self.client.flush()

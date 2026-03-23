@@ -1,12 +1,12 @@
-# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
 
-from wazo_confd.helpers.validator import ValidationAssociation, Validator
+from wazo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 
 
-class AssociateOutcallCallPermission(Validator):
+class AssociateOutcallCallPermission(ValidatorAssociation):
     def validate(self, outcall, call_permission):
         self.validate_same_tenant(outcall, call_permission)
 

@@ -1,4 +1,4 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.alchemy.endpoint_sip import EndpointSIP
@@ -7,10 +7,14 @@ from xivo_dao.helpers.exception import NotFoundError
 from xivo_dao.resources.endpoint_sip import dao as sip_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 
+from wazo_confd.helpers.mallow import BaseSchema
+
 from .schema import EndpointSIPSchema, TemplateSIPSchema
 
 
 class BaseSIPMiddleWare:
+    _Schema: type[BaseSchema]
+
     def __init__(self, service):
         self._service = service
 

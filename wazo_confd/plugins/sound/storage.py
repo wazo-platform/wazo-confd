@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import errno
@@ -28,17 +28,17 @@ class _SoundFilesystemStorage:
         self._base_path = base_path
 
     def _build_path(self, *fragments):
-        fragments = [fragment for fragment in fragments if fragment]
+        filtered = [fragment for fragment in fragments if fragment]
 
         dangerous_fragments = [
-            fragment for fragment in fragments if '..' in fragment or '/' in fragment
+            fragment for fragment in filtered if '..' in fragment or '/' in fragment
         ]
         if dangerous_fragments:
             raise errors.not_permitted(
                 'Dangerous path fragment: "{}"'.format(dangerous_fragments)
             )
 
-        return os.path.join(self._base_path, *fragments)
+        return os.path.join(self._base_path, *filtered)
 
     def list_directories(self, parameters, tenant_uuids):
         result = []
