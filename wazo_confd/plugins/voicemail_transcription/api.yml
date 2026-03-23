@@ -6,7 +6,7 @@ paths:
 
         Returns the current transcription settings, including whether automatic
         transcription is enabled for the tenant's voicemails.
-        **required_acl**: confd.voicemails.transcription.read
+        **required_acl**: `confd.voicemails.transcription.read`
       operationId: get_voicemail_transcription_config
       tags:
         - voicemails
@@ -23,7 +23,7 @@ paths:
 
     put:
       summary: Update the voicemail transcription configuration for the tenant.
-      description: **required_acl**: confd.voicemails.transcription.update
+      description: '**required_acl**: `confd.voicemails.transcription.update`'
       operationId: update_voicemail_transcription_config
       tags:
         - voicemails
