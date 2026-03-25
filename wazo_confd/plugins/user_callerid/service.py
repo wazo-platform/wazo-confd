@@ -15,6 +15,7 @@ from .types import CallerIDType
 class CallerID:
     type: CallerIDType
     number: str = ''
+    caller_id_name: str = ''
 
 
 CallerIDAnonymous = CallerID(type='anonymous')
@@ -42,12 +43,18 @@ class UserCallerIDService:
         if main_callerid := self.phone_number_dao.find_by(
             main=True, tenant_uuids=[tenant_uuid]
         ):
-            callerids.append(CallerID(type='main', number=main_callerid.number))
+            callerids.append(
+                CallerID(
+                    type='main',
+                    number=main_callerid.number,
+                    caller_id_name=main_callerid.caller_id_name or '',
+                )
+            )
 
         # consider "associated" caller ids from incalls
         # as having precedence over shared phone numbers
         callerids.extend(
-            callerid
+            CallerID(type='associated', number=callerid.number)
             for callerid in self.user_dao.list_outgoing_callerid_associated(user_id)
             if not any(same_phone_number(callerid.number, c.number) for c in callerids)
         )
@@ -55,7 +62,11 @@ class UserCallerIDService:
             shared=True, main=False, tenant_uuids=[tenant_uuid]
         )
         callerids.extend(
-            CallerID(type='shared', number=callerid.number)
+            CallerID(
+                type='shared',
+                number=callerid.number,
+                caller_id_name=callerid.caller_id_name or '',
+            )
             for callerid in shared_callerids
             if not any(same_phone_number(callerid.number, c.number) for c in callerids)
         )

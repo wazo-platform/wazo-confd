@@ -1,5 +1,9 @@
 # Changelog
 
+## 26.05
+
+* The `/1.1/users/{uuid}/callerids/outgoing` now has a `caller_id_name` field for `main`, `associated`, and `shared` caller ID types.
+
 ## 26.03
 
 * `GET /1.1/users` using the summary view now has a read-only `is_webrtc` field for each user. The value is based on the main line of the user.
