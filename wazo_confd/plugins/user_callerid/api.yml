@@ -22,6 +22,9 @@ definitions:
       number:
         type: string
         description: Caller ID number. Only valid for `main` `associated` and `shared` types
+      caller_id_name:
+        type: string
+        description: Caller ID name. Only valid for `main` and `shared` types
       type:
         type: string
         description: |
