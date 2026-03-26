@@ -21,7 +21,7 @@ definitions:
     properties:
       number:
         type: string
-        description: Caller ID number. Only valid for `main` `associated` type
+        description: Caller ID number. Only valid for `main` `associated` and `shared` types
       type:
         type: string
         description: |
