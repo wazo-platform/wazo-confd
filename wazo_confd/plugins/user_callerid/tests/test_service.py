@@ -44,7 +44,7 @@ class TestUserCallerIDService(unittest.TestCase):
             number='5551234', caller_id_name='Acme Corp'
         )
 
-        total, callerids = self.service.search(1, 'tenant-uuid', {})
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
 
         main = [c for c in callerids if c.type == 'main'][0]
         self.assertEqual(main.caller_id_name, 'Acme Corp')
@@ -54,7 +54,7 @@ class TestUserCallerIDService(unittest.TestCase):
             number='5551234', caller_id_name=None
         )
 
-        total, callerids = self.service.search(1, 'tenant-uuid', {})
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
 
         main = [c for c in callerids if c.type == 'main'][0]
         self.assertEqual(main.caller_id_name, '')
@@ -64,13 +64,13 @@ class TestUserCallerIDService(unittest.TestCase):
             SimpleNamespace(number='5559876', caller_id_name='Support Line')
         ]
 
-        total, callerids = self.service.search(1, 'tenant-uuid', {})
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
 
         shared = [c for c in callerids if c.type == 'shared'][0]
         self.assertEqual(shared.caller_id_name, 'Support Line')
 
     def test_anonymous_callerid_has_empty_caller_id_name(self):
-        total, callerids = self.service.search(1, 'tenant-uuid', {})
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
 
         anon = [c for c in callerids if c.type == 'anonymous'][0]
         self.assertEqual(anon.caller_id_name, '')
@@ -80,7 +80,7 @@ class TestUserCallerIDService(unittest.TestCase):
             SimpleNamespace(type='associated', number='5555678')
         ]
 
-        total, callerids = self.service.search(1, 'tenant-uuid', {})
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
 
         associated = [c for c in callerids if c.type == 'associated'][0]
         self.assertEqual(associated.caller_id_name, '')
