@@ -29,7 +29,7 @@ def test_list_with_associated_type(extension, incall, user):
         response = confd.users(user['uuid']).callerids.outgoing.get()
 
     expected = [
-        {'type': 'associated', 'number': '5555556789'},
+        {'type': 'associated', 'number': '5555556789', 'caller_id_name': ''},
         {'type': 'anonymous'},
     ]
     assert_that(response.items, contains_inanyorder(*expected))
@@ -46,7 +46,7 @@ def test_list_with_main_type(phone_number, extension, incall, user):
 
     # The first created is the main and other are ignored
     expected = [
-        {'type': 'main', 'number': '5555551234'},
+        {'type': 'main', 'number': '5555551234', 'caller_id_name': ''},
         {'type': 'anonymous'},
     ]
     assert_that(response.items, contains_inanyorder(*expected))
@@ -60,16 +60,16 @@ def test_list_with_shared(phone_number, user):
 
     # The first created is the main and other are ignored
     expected = [
-        {'type': 'shared', 'number': '5555551234'},
+        {'type': 'shared', 'number': '5555551234', 'caller_id_name': ''},
         {'type': 'anonymous'},
     ]
     assert_that(response.items, contains_inanyorder(*expected))
     assert_that(response.total, equal_to(2))
 
 
-@fixtures.phone_number(main=True, number='5555551234')
+@fixtures.phone_number(main=True, number='5555551234', caller_id_name='Acme Corp')
 @fixtures.phone_number(shared=True, number='5555551235')
-@fixtures.phone_number(shared=True, number='5555551236')
+@fixtures.phone_number(shared=True, number='5555551236', caller_id_name='Support Line')
 @fixtures.extension(exten='5555551235', context=INCALL_CONTEXT)
 @fixtures.incall()
 @fixtures.user()
@@ -83,9 +83,9 @@ def test_list_with_all_type(
         response = confd.users(user['uuid']).callerids.outgoing.get()
 
     expected = [
-        {'type': 'main', 'number': '5555551234'},
-        {'type': 'associated', 'number': '5555551235'},
-        {'type': 'shared', 'number': '5555551236'},
+        {'type': 'main', 'number': '5555551234', 'caller_id_name': 'Acme Corp'},
+        {'type': 'associated', 'number': '5555551235', 'caller_id_name': ''},
+        {'type': 'shared', 'number': '5555551236', 'caller_id_name': 'Support Line'},
         {'type': 'anonymous'},
     ]
     assert_that(response.items, contains_inanyorder(*expected))

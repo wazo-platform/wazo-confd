@@ -9,9 +9,11 @@ from wazo_confd.helpers.mallow import BaseSchema
 class UserCallerIDSchema(BaseSchema):
     number = fields.String(dump_only=True)
     type = fields.String(dump_only=True)
+    caller_id_name = fields.String(dump_only=True)
 
     @post_dump
-    def omit_number_for_anonymous(self, data, **kwargs):
+    def omit_fields_for_anonymous(self, data, **kwargs):
         if data.get('type') == 'anonymous':
             data.pop('number', None)
+            data.pop('caller_id_name', None)
         return data
