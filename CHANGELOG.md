@@ -2,6 +2,7 @@
 
 ## 26.05
 
+* Removed `calllistening` function key service destination.
 * The `/1.1/users/{uuid}/callerids/outgoing` now has a `caller_id_name` field for `main`, `associated`, and `shared` caller ID types.
 
 ## 26.03

@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -282,35 +282,34 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                 'value': '*735{user_id}***225'.format(user_id=self.user['id']),
             },
             '11': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*8'},
-            '12': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*34'},
-            '13': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*36'},
-            '14': {
+            '12': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*36'},
+            '13': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': '*735{user_id}***290'.format(user_id=self.user['id']),
             },
-            '15': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*98'},
-            '16': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*92'},
-            '17': {
+            '14': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*98'},
+            '15': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*92'},
+            '16': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': '*735{user_id}***222'.format(user_id=self.user['id']),
             },
-            '18': {
+            '17': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': '*735{user_id}***223'.format(user_id=self.user['id']),
             },
-            '19': {
+            '18': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': '*735{user_id}***221'.format(user_id=self.user['id']),
             },
-            '20': {
+            '19': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
@@ -318,55 +317,55 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     user_id=self.user['id'], fwd=forward_number
                 ),
             },
-            '21': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*1'},
-            '22': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*2'},
-            '23': {
+            '20': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*1'},
+            '21': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*2'},
+            '22': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': f'*735{self.user["id"]}***231***3{self.agent["id"]}',
             },
-            '24': {
+            '23': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': f'*735{self.user["id"]}***232***3{self.agent["id"]}',
             },
-            '25': {
+            '24': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': f'*735{self.user["id"]}***230***3{self.agent["id"]}',
             },
-            '26': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
-            '27': {'label': '', 'type': 'park', 'line': 1, 'value': self.parking_exten},
-            '28': {
+            '25': {'label': '', 'type': 'speeddial', 'line': 1, 'value': str(park_pos)},
+            '26': {'label': '', 'type': 'park', 'line': 1, 'value': self.parking_exten},
+            '27': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': '*11{paging}'.format(paging=paging_number),
             },
-            '29': {
+            '28': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': '*37{member_id}'.format(member_id=self.filter_member_id),
             },
-            '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
-            '31': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
-            '32': {
+            '29': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*3'},
+            '30': {'label': '', 'type': 'speeddial', 'line': 1, 'value': '*20'},
+            '31': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': f'*735{self.user["id"]}***251*{self.group["id"]}',
             },
-            '33': {
+            '32': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
                 'value': f'*735{self.user["id"]}***252*{self.group["id"]}',
             },
-            '34': {
+            '33': {
                 'label': '',
                 'type': 'speeddial',
                 'line': 1,
@@ -424,34 +423,30 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
             },
             '12': {
                 'blf': False,
-                'destination': {'type': 'service', 'service': 'calllistening'},
+                'destination': {'type': 'service', 'service': 'directoryaccess'},
             },
             '13': {
                 'blf': False,
-                'destination': {'type': 'service', 'service': 'directoryaccess'},
+                'destination': {'type': 'service', 'service': 'enablevm'},
             },
             '14': {
                 'blf': False,
-                'destination': {'type': 'service', 'service': 'enablevm'},
+                'destination': {'type': 'service', 'service': 'vmusermsg'},
             },
             '15': {
                 'blf': False,
-                'destination': {'type': 'service', 'service': 'vmusermsg'},
+                'destination': {'type': 'service', 'service': 'vmuserpurge'},
             },
             '16': {
                 'blf': False,
-                'destination': {'type': 'service', 'service': 'vmuserpurge'},
-            },
-            '17': {
-                'blf': False,
                 'destination': {'type': 'forward', 'forward': 'noanswer'},
             },
-            '18': {'blf': False, 'destination': {'type': 'forward', 'forward': 'busy'}},
-            '19': {
+            '17': {'blf': False, 'destination': {'type': 'forward', 'forward': 'busy'}},
+            '18': {
                 'blf': False,
                 'destination': {'type': 'forward', 'forward': 'unconditional'},
             },
-            '20': {
+            '19': {
                 'blf': False,
                 'destination': {
                     'type': 'forward',
@@ -459,15 +454,15 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'exten': forward_number,
                 },
             },
-            '21': {
+            '20': {
                 'blf': False,
                 'destination': {'type': 'transfer', 'transfer': 'blind'},
             },
-            '22': {
+            '21': {
                 'blf': False,
                 'destination': {'type': 'transfer', 'transfer': 'attended'},
             },
-            '23': {
+            '22': {
                 'blf': False,
                 'destination': {
                     'type': 'agent',
@@ -475,7 +470,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'agent_id': self.agent['id'],
                 },
             },
-            '24': {
+            '23': {
                 'blf': False,
                 'destination': {
                     'type': 'agent',
@@ -483,7 +478,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'agent_id': self.agent['id'],
                 },
             },
-            '25': {
+            '24': {
                 'blf': False,
                 'destination': {
                     'type': 'agent',
@@ -491,7 +486,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'agent_id': self.agent['id'],
                 },
             },
-            '26': {
+            '25': {
                 'blf': False,
                 'destination': {
                     'type': 'park_position',
@@ -499,30 +494,30 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'position': park_pos,
                 },
             },
-            '27': {
+            '26': {
                 'blf': False,
                 'destination': {
                     'type': 'parking',
                     'parking_lot_id': self.parking_lot['id'],
                 },
             },
-            '28': {
+            '27': {
                 'blf': False,
                 'destination': {'type': 'paging', 'paging_id': self.paging['id']},
             },
-            '29': {
+            '28': {
                 'blf': False,
                 'destination': {
                     'type': 'bsfilter',
                     'filter_member_id': self.filter_member_id,
                 },
             },
-            '30': {'blf': False, 'destination': {'type': 'onlinerec'}},
-            '31': {
+            '29': {'blf': False, 'destination': {'type': 'onlinerec'}},
+            '30': {
                 'blf': False,
                 'destination': {'type': 'service', 'service': 'fwdundoall'},
             },
-            '32': {
+            '31': {
                 'blf': False,
                 'destination': {
                     'type': 'groupmember',
@@ -530,7 +525,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'group_id': self.group['id'],
                 },
             },
-            '33': {
+            '32': {
                 'blf': False,
                 'destination': {
                     'type': 'groupmember',
@@ -538,7 +533,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
                     'group_id': self.group['id'],
                 },
             },
-            '34': {
+            '33': {
                 'blf': False,
                 'destination': {
                     'type': 'groupmember',
@@ -548,7 +543,7 @@ class TestAllFuncKeyDestinations(BaseTestFuncKey):
             },
         }
 
-        self.exclude_for_template = ['23', '24', '25', '29']
+        self.exclude_for_template = ['22', '23', '24', '28']
 
     def tearDown(self):
         super().tearDown()

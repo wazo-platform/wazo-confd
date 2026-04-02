@@ -138,7 +138,6 @@ class ServiceDestinationSchema(BaseDestinationSchema):
                 "vmuserpurge",
                 "phonestatus",
                 "recsnd",
-                "calllistening",
                 "directoryaccess",
                 "fwdundoall",
                 "pickup",
