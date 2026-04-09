@@ -53,22 +53,17 @@ def test_create_default_templates_when_not_exist():
 @fixtures.trunk(wazo_tenant=DELETED_TENANT)
 @fixtures.sip(wazo_tenant=DELETED_TENANT)
 def test_delete_tenant_reloads_pjsip_for_trunks(trunk, sip):
+    sysconfd.clear()
     with associations.trunk_endpoint_sip(trunk, sip, check=False):
-        sysconfd.clear()
-
         with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
             BusClient.send_tenant_deleted(DELETED_TENANT, 'slug3')
 
         def pjsip_reloaded_and_trunk_deleted():
-            results = sysconfd.requests_matching(
-                '/exec_request_handlers', method='POST'
+            sysconfd.assert_request(
+                '/exec_request_handlers',
+                method='POST',
+                json={'ipbx': ['module reload res_pjsip.so']},
             )
-            ipbx_commands = []
-            for result in results:
-                ipbx_commands.extend(result.get('json', {}).get('ipbx', []))
-            assert (
-                'module reload res_pjsip.so' in ipbx_commands
-            ), f'Expected pjsip reload in sysconfd requests, got: {ipbx_commands}'
 
             response = confd.trunks(trunk['id']).get(wazo_tenant=DELETED_TENANT)
             response.assert_status(404)
