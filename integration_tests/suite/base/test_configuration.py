@@ -39,6 +39,9 @@ def test_live_reload_false():
     response = confd.configuration.live_reload.get()
     assert_that(response.item, expected)
 
+    # Reset to True so tests using sysconfd are not noop
+    confd.configuration.live_reload.put({'enabled': True})
+
 
 def test_restrict_only_master_tenant():
     response = confd.configuration.live_reload.get(token=TOKEN_SUB_TENANT)
