@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
@@ -18,7 +18,7 @@ from wazo_test_helpers import until
 from ..helpers import associations, fixtures
 from ..helpers.bus import BusClient
 from ..helpers.config import CREATED_TENANT, DELETED_TENANT
-from . import BaseIntegrationTest, confd, provd
+from . import BaseIntegrationTest, confd, provd, sysconfd
 
 
 def test_create_default_templates_when_not_exist():
@@ -48,6 +48,32 @@ def test_create_default_templates_when_not_exist():
 
     until.assert_(templates_created, tries=5)
     until.assert_(slug_created, tries=5)
+
+
+@fixtures.trunk(wazo_tenant=DELETED_TENANT)
+@fixtures.sip(wazo_tenant=DELETED_TENANT)
+def test_delete_tenant_reloads_pjsip_for_trunks(trunk, sip):
+    with associations.trunk_endpoint_sip(trunk, sip, check=False):
+        sysconfd.clear()
+
+        with BaseIntegrationTest.delete_auth_tenant(DELETED_TENANT):
+            BusClient.send_tenant_deleted(DELETED_TENANT, 'slug3')
+
+        def pjsip_reloaded_and_trunk_deleted():
+            results = sysconfd.requests_matching(
+                '/exec_request_handlers', method='POST'
+            )
+            ipbx_commands = []
+            for result in results:
+                ipbx_commands.extend(result.get('json', {}).get('ipbx', []))
+            assert (
+                'module reload res_pjsip.so' in ipbx_commands
+            ), f'Expected pjsip reload in sysconfd requests, got: {ipbx_commands}'
+
+            response = confd.trunks(trunk['id']).get(wazo_tenant=DELETED_TENANT)
+            response.assert_status(404)
+
+        until.assert_(pjsip_reloaded_and_trunk_deleted, tries=5, interval=5)
 
 
 @pytest.mark.skip(reason="Too flaky because of WAZO-2752")
