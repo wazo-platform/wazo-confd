@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import argparse
@@ -18,6 +18,7 @@ from xivo_dao.resources.moh import dao as moh_dao
 from xivo_dao.resources.pjsip_transport import dao as transport_dao
 from xivo_dao.resources.queue import dao as queue_dao
 from xivo_dao.resources.tenant import dao as tenant_resources_dao
+from xivo_dao.resources.trunk import dao as trunk_dao
 
 from wazo_confd._sysconfd import SysconfdPublisher
 from wazo_confd.config import DEFAULT_CONFIG, _load_key_file
@@ -139,6 +140,15 @@ def remove_tenant(tenant_uuid, sysconfd):
         groups_list = group_dao.search(tenant_uuids=[tenant_uuid])
         for group in groups_list.items:
             group_dao.delete(group)
+
+        logger.debug('Deleting all trunks for tenant: %s', tenant_uuid)
+        trunks_list = trunk_dao.search(tenant_uuids=[tenant_uuid])
+        for trunk in trunks_list.items:
+            if trunk.endpoint_sip_uuid:
+                sysconfd.exec_request_handlers({'ipbx': ['module reload res_pjsip.so']})
+            if trunk.endpoint_iax_id:
+                sysconfd.exec_request_handlers({'ipbx': ['iax2 reload']})
+            trunk_dao.delete(trunk)
 
         tenant = tenant_resources_dao.get(tenant_uuid)
         tenant_resources_dao.delete(tenant)
