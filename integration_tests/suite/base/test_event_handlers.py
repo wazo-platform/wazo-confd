@@ -68,7 +68,7 @@ def test_delete_tenant_reloads_pjsip_for_trunks(trunk, sip):
             response = confd.trunks(trunk['id']).get(wazo_tenant=DELETED_TENANT)
             response.assert_status(404)
 
-        until.assert_(pjsip_reloaded_and_trunk_deleted, tries=5, interval=5)
+        until.assert_(pjsip_reloaded_and_trunk_deleted, tries=5)
 
 
 @pytest.mark.skip(reason="Too flaky because of WAZO-2752")
