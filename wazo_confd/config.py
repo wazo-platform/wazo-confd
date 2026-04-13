@@ -70,6 +70,7 @@ DEFAULT_CONFIG = {
         'conference': True,
         'conference_extension': True,
         'configuration': True,
+        'config_diff': True,
         'context': True,
         'context_context': True,
         'context_range': True,
