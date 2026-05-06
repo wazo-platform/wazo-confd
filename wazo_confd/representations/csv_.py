@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -8,8 +8,8 @@ from flask import json, make_response
 
 
 def output_csv(data, code, http_headers=None):
-    # A 401 might happen when trying to find the tenant if the specified tenant is not authorized
-    if code == 401:
+    # auth errors return a list, not the expected CSV dict
+    if not isinstance(data, dict):
         return make_response(json.dumps(data), code)
 
     csv_headers = data['headers']
