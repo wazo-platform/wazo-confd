@@ -24,14 +24,15 @@ class NoVoicemailAssociated(Validator):
 
 
 class NoEmptyFieldWhenEnabled(Validator):
-    def __init__(self, field, enabled):
+    def __init__(self, field, enabled, error_func=None):
         self.field = field
         self.enabled = enabled
+        self._error_func = error_func or errors.forward_destination_null
 
     def validate(self, model):
         if getattr(model, self.enabled):
             if getattr(model, self.field) is None:
-                raise errors.forward_destination_null()
+                raise self._error_func()
 
 
 class NonGlobalVoicemailAssigned(Validator):
@@ -45,7 +46,9 @@ class NonGlobalVoicemailAssigned(Validator):
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
     pstn_fallback_validator = NoEmptyFieldWhenEnabled(
-        'mobile_phone_number', 'mobile_fallback_enabled'
+        'mobile_phone_number',
+        'mobile_fallback_enabled',
+        error_func=errors.mobile_fallback_number_null,
     )
     return ValidationGroup(
         delete=[NoVoicemailAssociated()],
