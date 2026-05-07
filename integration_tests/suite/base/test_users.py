@@ -46,6 +46,7 @@ FULL_USER = {
     "username": "jsmeth",
     "email": "jsmeth@smeth.com",
     "mobile_phone_number": "+4185551234*2",
+    "mobile_fallback_enabled": True,
     "userfield": "userfield",
     "caller_id": '"Jôhnny Smith" <4185551234>',
     "outgoing_caller_id": '"Johnny" <123>',
@@ -76,6 +77,7 @@ NULL_USER = {
     "username": None,
     "email": None,
     "mobile_phone_number": None,
+    "mobile_fallback_enabled": False,
     "userfield": None,
     "outgoing_caller_id": None,
     "music_on_hold": None,
@@ -171,6 +173,10 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'mobile_phone_number', s.random_string(81))
     s.check_bogus_field_returns_error(url, 'mobile_phone_number', {})
     s.check_bogus_field_returns_error(url, 'mobile_phone_number', [])
+    s.check_bogus_field_returns_error(url, 'mobile_fallback_enabled', 'yeah')
+    s.check_bogus_field_returns_error(url, 'mobile_fallback_enabled', 123)
+    s.check_bogus_field_returns_error(url, 'mobile_fallback_enabled', {})
+    s.check_bogus_field_returns_error(url, 'mobile_fallback_enabled', [])
     s.check_bogus_field_returns_error(url, 'username', 123)
     s.check_bogus_field_returns_error(url, 'username', 'invalid_régex')
     s.check_bogus_field_returns_error(url, 'username', s.random_string(1))
@@ -294,6 +300,7 @@ def put_error_checks(url):
     )
     s.check_bogus_field_returns_error(url, 'online_call_record_enabled', None)
     s.check_bogus_field_returns_error(url, 'supervision_enabled', None)
+    s.check_bogus_field_returns_error(url, 'mobile_fallback_enabled', None)
     s.check_bogus_field_returns_error(url, 'ring_seconds', None)
     s.check_bogus_field_returns_error(url, 'simultaneous_calls', None)
     s.check_bogus_field_returns_error(url, 'ring_seconds', None)

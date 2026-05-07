@@ -1,4 +1,4 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
@@ -44,6 +44,9 @@ class NonGlobalVoicemailAssigned(Validator):
 
 def build_validator():
     moh_validator = MOHExists('music_on_hold', moh_dao.get_by)
+    pstn_fallback_validator = NoEmptyFieldWhenEnabled(
+        'mobile_phone_number', 'mobile_fallback_enabled'
+    )
     return ValidationGroup(
         delete=[NoVoicemailAssociated()],
         create=[
@@ -63,6 +66,7 @@ def build_validator():
             ),
             moh_validator,
             NonGlobalVoicemailAssigned(),
+            Optional('mobile_fallback_enabled', pstn_fallback_validator),
         ],
         edit=[
             Optional('email', UniqueFieldChanged('email', user_dao.find_by, 'User')),
@@ -71,6 +75,7 @@ def build_validator():
             ),
             moh_validator,
             NonGlobalVoicemailAssigned(),
+            Optional('mobile_fallback_enabled', pstn_fallback_validator),
         ],
     )
 
