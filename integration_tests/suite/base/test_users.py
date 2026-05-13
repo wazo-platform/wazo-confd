@@ -36,6 +36,7 @@ from ..helpers.config import (
     OUTCALL_CONTEXT,
     SUB_TENANT,
 )
+from ..helpers.helpers.line_fellowship import line_fellowship
 from . import BaseIntegrationTest
 from . import auth as authentication
 from . import confd, provd
@@ -1688,6 +1689,38 @@ def test_delete_simple_user_with_recursive_true(user):
     # check that the user does not exist anymore
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.device()
+def test_delete_user_with_shared_device_keeps_other_user_associated(device):
+    # Two SIP lines on the same device require distinct backup hosts on the registrar
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    registrar['backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar).assert_updated()
+
+    with line_fellowship('sip', generate_username_password=True) as (
+        user1,
+        line1,
+        _,
+        _,
+    ), line_fellowship('sip', generate_username_password=True) as (
+        user2,
+        line2,
+        _,
+        _,
+    ):
+        confd.lines(line2['id']).put(position=2).assert_updated()
+        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+        confd.lines(line2['id']).devices(device['id']).put().assert_updated()
+
+        confd.users(user1['uuid']).delete(recursive=True).assert_deleted()
+
+        confd.lines(line1['id']).get().assert_status(404)
+        assert_that(
+            confd.lines(line2['id']).get().item,
+            has_entries(device_id=device['id']),
+        )
 
 
 @fixtures.device(wazo_tenant=MAIN_TENANT)

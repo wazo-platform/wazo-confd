@@ -279,7 +279,9 @@ class UserMiddleWare(ResourceMiddleware):
 
     def delete_line(self, device_id, line_id, user_id, tenant_uuid, tenant_uuids):
         if device_id:
-            self._middleware_handle.get('device').reset_autoprov(device_id, tenant_uuid)
+            self._middleware_handle.get('line_device_association').dissociate(
+                line_id, device_id, tenant_uuid, tenant_uuids
+            )
 
         self._middleware_handle.get('line').delete(
             line_id, tenant_uuid, tenant_uuids, recursive=True
