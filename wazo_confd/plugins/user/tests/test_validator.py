@@ -1,4 +1,4 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import unittest
@@ -30,6 +30,17 @@ class TestNoEmptyFieldWhenEnabled(unittest.TestCase):
     def setUp(self):
         self.validator = NoEmptyFieldWhenEnabled('destination_field', 'enabled_field')
         self.model = Mock()
+
+    def test_custom_error_func_is_called_when_provided(self):
+        custom_error_func = Mock(return_value=ResourceError('custom message'))
+        validator = NoEmptyFieldWhenEnabled(
+            'destination_field', 'enabled_field', error_func=custom_error_func
+        )
+        self.model.destination_field = None
+        self.model.enabled_field = True
+
+        self.assertRaises(ResourceError, validator.validate, self.model)
+        custom_error_func.assert_called_once()
 
     def test_given_required_field_are_none_and_enabled_true_when_validating_then_raises_error(
         self,

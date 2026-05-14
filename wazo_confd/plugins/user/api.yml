@@ -404,6 +404,10 @@ definitions:
         mobile_phone_number:
           type: string
           description: Phone number for the user’s mobile device
+        mobile_fallback_enabled:
+          type: boolean
+          default: false
+          description: Enable PSTN fallback when push notification is not answered in time
         username:
           type: string
           description: Username for connecting to the CTI (deprecated)
@@ -692,6 +696,10 @@ definitions:
       mobile_phone_number:
         type: string
         description: Phone number for the user’s mobile device
+      mobile_fallback_enabled:
+        type: boolean
+        default: false
+        description: Enable PSTN fallback when push notification is not answered in time
       username:
         type: string
         description: Username for connecting to the CTI (deprecated)

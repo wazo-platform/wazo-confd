@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from marshmallow import (
@@ -55,6 +55,7 @@ class UserSchema(BaseSchema):
     mobile_phone_number = fields.String(
         validate=(Regexp(MOBILE_PHONE_NUMBER_REGEX), Length(max=80)), allow_none=True
     )
+    mobile_fallback_enabled = StrictBoolean()
     username = fields.String(validate=Regexp(USERNAME_REGEX), allow_none=True)
     password = fields.String(validate=Regexp(PASSWORD_REGEX), allow_none=True)
     music_on_hold = fields.String(validate=Length(max=128), allow_none=True)
