@@ -36,6 +36,7 @@ from ..helpers.config import (
     OUTCALL_CONTEXT,
     SUB_TENANT,
 )
+from ..helpers.helpers.line_fellowship import line_fellowship
 from . import BaseIntegrationTest
 from . import auth as authentication
 from . import confd, provd
@@ -1688,6 +1689,89 @@ def test_delete_simple_user_with_recursive_true(user):
     # check that the user does not exist anymore
     response = confd.users(user['uuid']).get()
     response.assert_status(404)
+
+
+@fixtures.device()
+def test_delete_user_with_shared_device_keeps_other_user_associated(device):
+    # Two SIP lines on the same device require distinct backup hosts on the registrar
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    registrar['backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar).assert_updated()
+
+    with line_fellowship('sip', generate_username_password=True) as (
+        user1,
+        line1,
+        _,
+        _,
+    ), line_fellowship('sip', generate_username_password=True) as (
+        user2,
+        line2,
+        _,
+        _,
+    ):
+        confd.lines(line2['id']).put(position=2).assert_updated()
+        confd.lines(line1['id']).devices(device['id']).put().assert_updated()
+        confd.lines(line2['id']).devices(device['id']).put().assert_updated()
+
+        confd.users(user1['uuid']).delete(recursive=True).assert_deleted()
+
+        confd.lines(line1['id']).get().assert_status(404)
+        assert_that(
+            confd.lines(line2['id']).get().item,
+            has_entries(device_id=device['id']),
+        )
+
+
+@fixtures.device()
+@fixtures.device()
+def test_update_user_line_device_with_shared_device_keeps_other_user_associated(
+    shared_device, new_device
+):
+    # Two SIP lines on the same device require distinct backup hosts on the registrar
+    registrar = confd.registrars('default').get().item
+    registrar['proxy_backup_host'] = '127.0.0.2'
+    registrar['backup_host'] = '127.0.0.2'
+    confd.registrars(registrar['id']).put(registrar).assert_updated()
+
+    user_resources = generate_user_resources_bodies(
+        context_name=CONTEXT, device=shared_device, endpoint_name='abc'
+    )
+    user_a = confd.users.post(
+        {'lines': [user_resources.line], **user_resources.user},
+    ).item
+
+    with line_fellowship('sip', generate_username_password=True) as (
+        _,
+        line_b,
+        _,
+        _,
+    ):
+        confd.lines(line_b['id']).put(position=2).assert_updated()
+        confd.lines(line_b['id']).devices(shared_device['id']).put().assert_updated()
+
+        user_a_payload = confd.users(user_a['uuid']).get().item
+        user_a_payload.pop('call_record_enabled', None)
+        user_a_payload['lines'][0].pop('caller_id', None)
+        user_a_payload['lines'][0].pop('caller_id_name', None)
+        user_a_payload['lines'][0].pop('caller_id_num', None)
+        user_a_payload['lines'][0]['device_id'] = new_device['id']
+
+        confd.users(user_a['uuid']).put(
+            user_a_payload,
+            query_string="recursive=True",
+        ).assert_updated()
+
+        assert_that(
+            confd.lines(user_a_payload['lines'][0]['id']).get().item,
+            has_entries(device_id=new_device['id']),
+        )
+        assert_that(
+            confd.lines(line_b['id']).get().item,
+            has_entries(device_id=shared_device['id']),
+        )
+
+    confd.users(user_a['uuid']).delete(recursive=True).assert_deleted()
 
 
 @fixtures.device(wazo_tenant=MAIN_TENANT)

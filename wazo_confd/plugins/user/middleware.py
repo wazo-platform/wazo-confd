@@ -279,7 +279,9 @@ class UserMiddleWare(ResourceMiddleware):
 
     def delete_line(self, device_id, line_id, user_id, tenant_uuid, tenant_uuids):
         if device_id:
-            self._middleware_handle.get('device').reset_autoprov(device_id, tenant_uuid)
+            self._middleware_handle.get('line_device_association').dissociate(
+                line_id, device_id, tenant_uuid, tenant_uuids
+            )
 
         self._middleware_handle.get('line').delete(
             line_id, tenant_uuid, tenant_uuids, recursive=True
@@ -489,9 +491,11 @@ class UserMiddleWare(ResourceMiddleware):
                         recursive=True,
                     )
                     # if device_id not the same, so we must dissociate the old one and associate the new line
-                    if device_id != old_device_id:
-                        self._middleware_handle.get('device').reset_autoprov(
-                            old_device_id, tenant_uuid
+                    if device_id != old_device_id and old_device_id:
+                        self._middleware_handle.get(
+                            'line_device_association'
+                        ).dissociate(
+                            line_body['id'], old_device_id, tenant_uuid, tenant_uuids
                         )
                     self.associate_line_device(
                         {'id': line_body['id']}, device_id, tenant_uuid, tenant_uuids
