@@ -116,17 +116,67 @@ class GroupMemberDestinationSchema(BaseDestinationSchema):
     group_id = fields.Integer(required=True)
     action = fields.String(validate=OneOf(['join', 'leave', 'toggle']), required=True)
 
+    group = Nested(
+        'GroupSchema', attribute='groupfeatures', only=['label', 'name'], dump_only=True
+    )
+
+    @post_dump
+    def make_group_fields_flat(self, data, **kwargs):
+        if data.get('group'):
+            # TODO(pc-m): Label was added in 21.04 group_name should be remove when we remove
+            #             the compatibility logic in group schema
+            data['group_name'] = data['group']['name']
+            data['group_label'] = data['group']['label']
+
+        data.pop('group', None)
+        return data
 
 class QueueDestinationSchema(BaseDestinationSchema):
     queue_id = fields.Integer(required=True)
+
+    queue = Nested(
+        'QueueSchema', attribute='queuefeatures', only=['name'], dump_only=True
+    )
+
+    @post_dump
+    def make_queue_fields_flat(self, data, **kwargs):
+        if data.get('queue'):
+            data['queue_name'] = data['queue']['name']
+
+        data.pop('queue', None)
+        return data
 
 
 class ConferenceDestinationSchema(BaseDestinationSchema):
     conference_id = fields.Integer(required=True)
 
+    conference = Nested(
+        'ConferenceSchema', attribute='conferencefeatures', only=['name'], dump_only=True
+    )
+
+    @post_dump
+    def make_conference_fields_flat(self, data, **kwargs):
+        if data.get('conference'):
+            data['conference_name'] = data['conference']['name']
+
+        data.pop('conference', None)
+        return data
+
 
 class PagingDestinationSchema(BaseDestinationSchema):
     paging_id = fields.Integer(required=True)
+
+    paging = Nested(
+        'PagingSchema', attribute='pagingfeatures', only=['name'], dump_only=True
+    )
+
+    @post_dump
+    def make_paging_fields_flat(self, data, **kwargs):
+        if data.get('paging'):
+            data['paging_name'] = data['paging']['name']
+
+        data.pop('paging', None)
+        return data
 
 
 class ServiceDestinationSchema(BaseDestinationSchema):
