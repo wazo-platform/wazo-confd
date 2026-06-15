@@ -18,6 +18,8 @@ from wazo_confd.plugins.agent.schema import NUMBER_REGEX, AgentSchema
 from wazo_confd.plugins.endpoint_sip.schema import EndpointSIPSchema
 from wazo_confd.plugins.line.schema import LineSchema
 
+from .sub_resources.schema import ServicesSchema
+
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
 USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
@@ -232,6 +234,22 @@ class UserSummarySchema(BaseSchema):
     enabled = StrictBoolean()
     subscription_type = fields.Integer(validate=Range(min=0, max=10))
     is_webrtc = fields.Boolean()
+
+
+class LinePresenceSchema(BaseSchema):
+    id = fields.Integer(dump_only=True)
+    name = fields.String(dump_only=True)
+    protocol = fields.String(dump_only=True)
+
+
+class UserLinePresenceSchema(BaseSchema):
+    uuid = fields.String(dump_only=True)
+    tenant_uuid = fields.String(dump_only=True)
+    lines = Nested(LinePresenceSchema, many=True, dump_only=True)
+    services = fields.Method('_dump_services', dump_only=True)
+
+    def _dump_services(self, user):
+        return ServicesSchema(only=['dnd']).dump(user)
 
 
 class UserSchemaNullable(UserSchema):

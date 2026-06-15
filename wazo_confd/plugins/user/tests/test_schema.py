@@ -9,11 +9,60 @@ from marshmallow import ValidationError
 
 from wazo_confd.helpers.mallow import BaseSchema, StrictBoolean
 
-from ..schema import UserSchema
+from ..schema import UserLinePresenceSchema, UserSchema
 
 
 class _MobileFallbackSchema(BaseSchema):
     mobile_fallback_enabled = StrictBoolean()
+
+
+class TestUserLinePresenceSchema(unittest.TestCase):
+    def setUp(self):
+        self.schema = UserLinePresenceSchema()
+
+    def test_dump_lines_and_dnd_service(self):
+        user = Mock(
+            uuid='abcd-uuid',
+            tenant_uuid='tenant-uuid',
+            dnd_enabled=True,
+            lines=[{'id': 1, 'name': 'line1', 'protocol': 'sip'}],
+        )
+
+        result = self.schema.dump(user)
+
+        assert_that(
+            result,
+            equal_to(
+                {
+                    'uuid': 'abcd-uuid',
+                    'tenant_uuid': 'tenant-uuid',
+                    'lines': [{'id': 1, 'name': 'line1', 'protocol': 'sip'}],
+                    'services': {'dnd': {'enabled': True}},
+                }
+            ),
+        )
+
+    def test_dump_without_line_and_dnd_disabled(self):
+        user = Mock(
+            uuid='abcd-uuid',
+            tenant_uuid='tenant-uuid',
+            dnd_enabled=False,
+            lines=[],
+        )
+
+        result = self.schema.dump(user)
+
+        assert_that(
+            result,
+            equal_to(
+                {
+                    'uuid': 'abcd-uuid',
+                    'tenant_uuid': 'tenant-uuid',
+                    'lines': [],
+                    'services': {'dnd': {'enabled': False}},
+                }
+            ),
+        )
 
 
 class TestSchema(unittest.TestCase):
