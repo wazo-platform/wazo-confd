@@ -243,13 +243,15 @@ class LinePresenceSchema(BaseSchema):
 
 
 class UserLinePresenceSchema(BaseSchema):
+    _services_schema = ServicesSchema(only=['dnd'])
+
     uuid = fields.String(dump_only=True)
     tenant_uuid = fields.String(dump_only=True)
     lines = Nested(LinePresenceSchema, many=True, dump_only=True)
     services = fields.Method('_dump_services', dump_only=True)
 
     def _dump_services(self, user):
-        return ServicesSchema(only=['dnd']).dump(user)
+        return self._services_schema.dump(user)
 
 
 class UserSchemaNullable(UserSchema):
