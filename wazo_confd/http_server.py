@@ -1,8 +1,12 @@
 # Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from __future__ import annotations
+
 import logging
 import os
+import socket
+from typing import TYPE_CHECKING, Union
 
 from flask import Flask, g
 from flask_cors import CORS
@@ -20,10 +24,34 @@ from ._bus import BusPublisher
 from ._sysconfd import SysconfdPublisher
 from .helpers.converter import FilenameConverter
 
+if TYPE_CHECKING:
+    from cheroot.ssl import Adapter
+
+BindAddr = Union[tuple[str, int], str, bytes]
+
 logger = logging.getLogger(__name__)
 app = Flask('wazo_confd')
 api = Api(app, prefix="/1.1")
 _do_not_log_data_endpoints: list[str] = []
+
+
+class ReusePortWSGIServer(wsgi.WSGIServer):
+    @staticmethod
+    def prepare_socket(
+        bind_addr: BindAddr,
+        family: int,
+        type_: int,
+        proto: int,
+        nodelay: bool,
+        ssl_adapter: Adapter | None,
+    ) -> socket.socket:
+        """Set SO_REUSEPORT so several wazo-confd processes can bind the same
+        port and let the kernel load-balance connections across them."""
+        sock = wsgi.WSGIServer.prepare_socket(
+            bind_addr, family, type_, proto, nodelay, ssl_adapter
+        )
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        return sock
 
 
 def get_bus_publisher():
@@ -104,14 +132,19 @@ class HTTPServer:
 
     def run(self):
         if self.config['profile']:
-            app.wsgi_app = ProfilerMiddleware(
+            app.wsgi_app = ProfilerMiddleware(  # type: ignore[method-assign]
                 app.wsgi_app, profile_dir=self.config['profile']
             )
 
         wsgi_app = ReverseProxied(ProxyFix(wsgi.WSGIPathInfoDispatcher({'/': app})))
 
         bind_addr = (self.config['listen'], self.config['port'])
-        self.server = wsgi.WSGIServer(
+        server_class = (
+            ReusePortWSGIServer
+            if self.config.get('reuse_port', False)
+            else wsgi.WSGIServer
+        )
+        self.server = server_class(
             bind_addr=bind_addr,
             wsgi_app=wsgi_app,
             numthreads=self.config['max_threads'],

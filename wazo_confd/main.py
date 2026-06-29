@@ -1,4 +1,4 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -34,6 +34,9 @@ def main(argv=None):
     except UUIDNotFound:
         if config['service_discovery']['enabled']:
             raise
+
+    worker_suffix = ' (http worker)' if config.get('http_worker') else ''
+    logger.info('wazo-confd%s starting...', worker_suffix)
 
     controller = Controller(config)
     controller.run()

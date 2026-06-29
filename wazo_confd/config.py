@@ -22,6 +22,7 @@ DEFAULT_CONFIG = {
         'profile': None,
         'listen': '127.0.0.1',
         'port': 9486,
+        'reuse_port': False,
         'certificate': None,
         'private_key': None,
         'cors': {
@@ -256,6 +257,12 @@ def _parse_cli_args(argv):
         help="Write profiling stats to directory (for debugging performance issues)",
         action='store',
     )
+    parser.add_argument(
+        '--http-worker',
+        action='store_true',
+        default=False,
+        help='Run as an additional HTTP-only worker (no bus consumer)',
+    )
     parsed_args = parser.parse_args(argv)
 
     result = {}
@@ -269,6 +276,7 @@ def _parse_cli_args(argv):
         result['log_level'] = parsed_args.log_level
     if parsed_args.user:
         result['user'] = parsed_args.user
+    result['http_worker'] = parsed_args.http_worker
 
     return result
 

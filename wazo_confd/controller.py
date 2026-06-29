@@ -1,8 +1,10 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import contextlib
 import logging
 import signal
+import sys
 import threading
 from functools import partial
 
@@ -17,17 +19,21 @@ from wazo_confd.helpers.asterisk import PJSIPDoc
 from wazo_confd.helpers.middleware import MiddleWareHandle
 
 from . import auth
-from ._bus import BusConsumer, BusPublisher
+from ._bus import BusConsumer, BusPublisher, NoopConsumer
 from .http_server import HTTPServer, api, app
 from .service_discovery import self_check
 
 logger = logging.getLogger(__name__)
 
+MISCONFIGURATION_EXIT_CODE = 78
+
 
 class Controller:
     def __init__(self, config):
         self.config = config
-        self._bus_consumer = BusConsumer.from_config(config['bus'])
+        self._http_worker = config.get('http_worker', False)
+        self._stopping_thread = None
+        self._bus_consumer = self._build_bus_consumer()
         self._bus_publisher = BusPublisher.from_config(config['uuid'], config['bus'])
         self._bus_publisher.set_as_reference()
         self.status_aggregator = StatusAggregator()
@@ -72,16 +78,34 @@ class Controller:
             },
         )
 
+    def _build_bus_consumer(self):
+        consumer_class = NoopConsumer if self._http_worker else BusConsumer
+        return consumer_class.from_config(self.config['bus'])
+
     def run(self):
-        logger.info('wazo-confd starting...')
+        if self._http_worker and not self.config['rest_api']['reuse_port']:
+            logger.error(
+                'Cannot start as an HTTP worker: rest_api.reuse_port must be '
+                'enabled so the worker can share the listen port with the main '
+                'wazo-confd process'
+            )
+            sys.exit(MISCONFIGURATION_EXIT_CODE)
+
         xivo_dao.init_db_from_config(self.config)
         signal.signal(signal.SIGTERM, partial(_signal_handler, self))
         signal.signal(signal.SIGINT, partial(_signal_handler, self))
 
+        if self._http_worker:
+            service_discovery = contextlib.nullcontext()
+        else:
+            service_discovery = ServiceCatalogRegistration(
+                *self._service_discovery_args
+            )
+
         try:
             with self.token_renewer:
                 with self._bus_consumer:
-                    with ServiceCatalogRegistration(*self._service_discovery_args):
+                    with service_discovery:
                         self.http_server.run()
         finally:
             if self._stopping_thread:
