@@ -1,4 +1,4 @@
-# Copyright 2018-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -67,6 +67,12 @@ ALL_OPTIONS = [
     ['keyrotate', 'yes'],
     ['requirecalltoken', 'yes'],
 ]
+
+
+def iax_matches(endpoint):
+    expected = dict(endpoint)
+    options = expected.pop('options')
+    return has_entries(options=has_items(*options), **expected)
 
 
 def test_get_errors():
@@ -170,7 +176,7 @@ def test_get_multi_tenant(main, sub):
     response.assert_match(404, e.not_found(resource='IAXEndpoint'))
 
     response = confd.endpoints.iax(sub['id']).get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.item, has_entries(**sub))
+    assert_that(response.item, iax_matches(sub))
 
 
 @fixtures.iax(name='search', type='friend', host='search')
@@ -207,13 +213,19 @@ def test_sorting_offset_limit(iax1, iax2):
 @fixtures.iax(wazo_tenant=SUB_TENANT)
 def test_list_multi_tenant(main, sub):
     response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT)
-    assert_that(response.items, all_of(has_items(main)), not_(has_items(sub)))
+    assert_that(
+        response.items,
+        all_of(has_items(iax_matches(main)), not_(has_items(iax_matches(sub)))),
+    )
 
     response = confd.endpoints.iax.get(wazo_tenant=SUB_TENANT)
-    assert_that(response.items, all_of(has_items(sub), not_(has_items(main))))
+    assert_that(
+        response.items,
+        all_of(has_items(iax_matches(sub)), not_(has_items(iax_matches(main)))),
+    )
 
     response = confd.endpoints.iax.get(wazo_tenant=MAIN_TENANT, recurse=True)
-    assert_that(response.items, has_items(main, sub))
+    assert_that(response.items, has_items(iax_matches(main), iax_matches(sub)))
 
 
 def test_create_minimal_parameters():
