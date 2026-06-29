@@ -1,5 +1,10 @@
 # Changelog
 
+## 26.08
+
+* Added a `--http-worker` flag to spawn extra HTTP-only wazo-confd instances, enabled on demand with `systemctl enable --now wazo-confd-worker@<N>`.
+    * Requires `rest_api.reuse_port: true` (default `false`).
+
 ## 26.05
 
 * Removed `calllistening` function key service destination.
