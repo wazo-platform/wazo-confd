@@ -1,0 +1,17 @@
+[Unit]
+Description=wazo-confd HTTP worker %i
+After=network.target postgresql.service wazo-confd.service
+PartOf=wazo-confd.service
+StartLimitBurst=15
+StartLimitIntervalSec=150
+
+[Service]
+ExecStartPre=/usr/bin/wazo-confd-wait
+ExecStart=/usr/bin/wazo-confd --http-worker
+Restart=on-failure
+RestartPreventExitStatus=78
+RestartSec=5
+SyslogIdentifier=wazo-confd-worker@%i
+
+[Install]
+WantedBy=wazo-confd.service
