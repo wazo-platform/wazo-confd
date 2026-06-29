@@ -1,13 +1,14 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
 import random
 import string
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 
 import yaml
 from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from wazo_test_helpers.asset_launching_test_case import _run_cmd as run_command
 from wazo_test_helpers.auth import AuthClient as MockAuthClient
 from wazo_test_helpers.auth import MockCredentials, MockUserToken
 from wazo_test_helpers.bus import BusClient
@@ -224,22 +225,69 @@ class IntegrationTest(AssetLaunchingTestCase):
         return TenantFileSystemClient(base_path=base_path, execute=cls.docker_exec)
 
     @classmethod
+    def _docker_compose(cls, *args, stderr=True):
+        return run_command(
+            ['docker', 'compose', *cls._docker_compose_options(), *args],
+            stderr=stderr,
+        )
+
+    @classmethod
+    def _worker_container_ids(cls):
+        result = cls._docker_compose('ps', '-q', 'confd-worker', stderr=False)
+        return result.stdout.decode('utf-8').split()
+
+    @classmethod
+    def has_worker(cls):
+        return bool(cls._worker_container_ids())
+
+    @classmethod
+    def worker_logs(cls, since=None):
+        args = ['logs', '--no-log-prefix', 'confd-worker']
+        if since is not None:
+            args.append(f'--since={since}')
+        return cls._docker_compose(*args).stdout.decode('utf-8')
+
+    @classmethod
+    def confd_logs(cls, since=None):
+        logs = cls.service_logs('confd', since=since)
+        if cls.has_worker():
+            logs += cls.worker_logs(since=since)
+        return logs
+
+    @classmethod
+    def _exec_in_container(cls, container_id):
+        def execute(command, *args, **kwargs):
+            return run_command(['docker', 'exec', container_id, *command])
+
+        return execute
+
+    @classmethod
     def restart_confd(cls):
+        # Workers share the confd network namespace (network_mode:
+        # service:confd), so they must be stopped before confd is recreated and
+        # restarted afterwards to re-attach to the new namespace.
+        has_worker = cls.has_worker()
+        if has_worker:
+            cls._docker_compose('stop', 'confd-worker')
         cls.restart_service('confd')
+        if has_worker:
+            cls._docker_compose('start', 'confd-worker')
 
     @classmethod
     @contextmanager
     def confd_with_config(cls, config):
-        filesystem = GenericFileSystemClient(
-            execute=cls.docker_exec,
-            service_name='confd',
-            root=True,
-        )
+        container_ids = [cls._container_id('confd'), *cls._worker_container_ids()]
         name = ''.join(random.choice(string.ascii_lowercase) for _ in range(6))
         config_file = f'/etc/wazo-confd/conf.d/10-{name}.yml'
         content = yaml.dump(config)
         try:
-            with filesystem.file_(config_file, content=content):
+            with ExitStack() as stack:
+                for container_id in container_ids:
+                    filesystem = GenericFileSystemClient(
+                        execute=cls._exec_in_container(container_id),
+                        root=True,
+                    )
+                    stack.enter_context(filesystem.file_(config_file, content=content))
                 cls.restart_confd()
                 yield
         finally:

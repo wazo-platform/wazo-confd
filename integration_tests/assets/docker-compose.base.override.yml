@@ -7,6 +7,7 @@ services:
       - rabbitmq
       - sysconfd
       - confd
+      - confd-worker
       - ari
     environment:
       TARGETS: "ari:5039,postgres:5432,rabbitmq:5672,provd:8666,sysconfd:8668,auth:9497,confd:9486"

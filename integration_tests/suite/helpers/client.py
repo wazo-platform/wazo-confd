@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import csv
@@ -21,7 +21,7 @@ from hamcrest import (
 )
 from hamcrest.library.collection.isdict_containingentries import has_entries
 
-from .config import TOKEN
+from .config import TOKEN, WORKERS_ENABLED
 from .urls import UrlFragment
 
 requests.packages.urllib3.disable_warnings()
@@ -58,6 +58,8 @@ class ConfdClient:
         self.session.headers.update(headers or self.DEFAULT_HEADERS)
         if token:
             self.session.headers.update({'X-Auth-Token': token})
+        if WORKERS_ENABLED:
+            self.session.headers['Connection'] = 'close'
 
     def request(self, method, url, parameters=None, data=None, headers=None):
         full_url = self._build_url(url)

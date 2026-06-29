@@ -1,5 +1,9 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+
+import os
+
+WORKERS_ENABLED = int(os.environ.get('INTEGRATION_TEST_CONFD_WORKERS') or 0) > 0
 
 CONTEXT = 'default'
 INCALL_CONTEXT = 'from-extern'
