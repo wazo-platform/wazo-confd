@@ -4,6 +4,7 @@
 from hamcrest import (
     all_of,
     assert_that,
+    contains_inanyorder,
     has_entries,
     has_entry,
     has_item,
@@ -72,7 +73,7 @@ ALL_OPTIONS = [
 def iax_matches(endpoint):
     expected = dict(endpoint)
     options = expected.pop('options')
-    return has_entries(options=has_items(*options), **expected)
+    return has_entries(options=contains_inanyorder(*options), **expected)
 
 
 def test_get_errors():

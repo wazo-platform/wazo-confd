@@ -7,7 +7,10 @@ import json
 import logging
 import socket
 import threading
+import time
 from collections import deque
+from collections.abc import Iterator
+from functools import partial
 from typing import TYPE_CHECKING, Any, TypeAlias
 
 from wazo_bus.base import Base
@@ -21,6 +24,7 @@ STATUS_IPC_ADDRESS = '\0wazo-confd-status'
 STATUS_IPC_TIMEOUT = 2.0
 _STATUS_IPC_ACCEPT_TIMEOUT = 0.5
 _STATUS_IPC_RECV_SIZE = 4096
+_STATUS_IPC_MAX_PAYLOAD = 64 * 1024
 
 if TYPE_CHECKING:
     _FlushMixinBase: TypeAlias = PublisherMixin
@@ -66,6 +70,17 @@ class BusPublisher(WazoEventMixin, FlushMixin, PublisherMixin, Base):
         return cls(name='wazo-confd', service_uuid=service_uuid, **bus_config)
 
 
+def _read_chunks(chunks: Iterator[bytes], max_size: int) -> bytes:
+    buffer: list[bytes] = []
+    size = 0
+    for chunk in chunks:
+        buffer.append(chunk)
+        size += len(chunk)
+        if size > max_size:
+            raise ValueError('status IPC payload exceeds the maximum size')
+    return b''.join(buffer)
+
+
 class _StatusIPCServer:
     def __init__(self, status_provider):
         self._status_provider = status_provider
@@ -97,7 +112,11 @@ class _StatusIPCServer:
             except socket.timeout:
                 continue
             except OSError:
-                break
+                if self._stopping.is_set():
+                    break
+                logger.exception('error accepting a status IPC connection')
+                time.sleep(_STATUS_IPC_ACCEPT_TIMEOUT)
+                continue
             with conn:
                 try:
                     status: dict[str, Any] = {'bus_consumer': {}}
@@ -105,6 +124,10 @@ class _StatusIPCServer:
                     conn.sendall(json.dumps(status).encode('utf-8'))
                 except OSError:
                     logger.debug('status IPC client disconnected', exc_info=True)
+                except Exception:
+                    logger.exception(
+                        'unexpected error while serving a status IPC request'
+                    )
 
     def stop(self):
         self._stopping.set()
@@ -116,7 +139,10 @@ class _StatusIPCServer:
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as sock:
             sock.settimeout(STATUS_IPC_TIMEOUT)
             sock.connect(STATUS_IPC_ADDRESS)
-            payload = b''.join(iter(lambda: sock.recv(_STATUS_IPC_RECV_SIZE), b''))
+            payload = _read_chunks(
+                iter(partial(sock.recv, _STATUS_IPC_RECV_SIZE), b''),
+                _STATUS_IPC_MAX_PAYLOAD,
+            )
         return json.loads(payload)
 
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import contextlib
+import errno
 import logging
 import signal
 import sys
@@ -32,6 +33,13 @@ class Controller:
     def __init__(self, config):
         self.config = config
         self._http_worker = config.get('http_worker', False)
+        if self._http_worker and not config['rest_api']['reuse_port']:
+            logger.error(
+                'Cannot start as an HTTP worker: rest_api.reuse_port must be '
+                'enabled so the worker can share the listen port with the main '
+                'wazo-confd process'
+            )
+            sys.exit(MISCONFIGURATION_EXIT_CODE)
         self._stopping_thread = None
         self._bus_consumer = self._build_bus_consumer()
         self._bus_publisher = BusPublisher.from_config(config['uuid'], config['bus'])
@@ -83,14 +91,6 @@ class Controller:
         return consumer_class.from_config(self.config['bus'])
 
     def run(self):
-        if self._http_worker and not self.config['rest_api']['reuse_port']:
-            logger.error(
-                'Cannot start as an HTTP worker: rest_api.reuse_port must be '
-                'enabled so the worker can share the listen port with the main '
-                'wazo-confd process'
-            )
-            sys.exit(MISCONFIGURATION_EXIT_CODE)
-
         xivo_dao.init_db_from_config(self.config)
         signal.signal(signal.SIGTERM, partial(_signal_handler, self))
         signal.signal(signal.SIGINT, partial(_signal_handler, self))
@@ -102,14 +102,26 @@ class Controller:
                 *self._service_discovery_args
             )
 
-        try:
-            with self.token_renewer:
-                with self._bus_consumer:
-                    with service_discovery:
-                        self.http_server.run()
-        finally:
-            if self._stopping_thread:
-                self._stopping_thread.join()
+        with contextlib.ExitStack() as stack:
+            stack.callback(self._join_stopping_thread)
+            stack.enter_context(self.token_renewer)
+            stack.enter_context(self._bus_consumer)
+            stack.enter_context(service_discovery)
+            try:
+                self.http_server.run()
+            except OSError as e:
+                if self._http_worker and e.errno == errno.EADDRINUSE:
+                    logger.error(
+                        'Cannot bind the HTTP worker to the listen port: '
+                        'the main wazo-confd process must also enable '
+                        'rest_api.reuse_port'
+                    )
+                    sys.exit(MISCONFIGURATION_EXIT_CODE)
+                raise
+
+    def _join_stopping_thread(self):
+        if self._stopping_thread:
+            self._stopping_thread.join()
 
     def stop(self, reason):
         logger.warning('Stopping wazo-confd: %s', reason)

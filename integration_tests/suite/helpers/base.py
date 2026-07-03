@@ -248,13 +248,6 @@ class IntegrationTest(AssetLaunchingTestCase):
         return cls._docker_compose(*args).stdout.decode('utf-8')
 
     @classmethod
-    def confd_logs(cls, since=None):
-        logs = cls.service_logs('confd', since=since)
-        if cls.has_worker():
-            logs += cls.worker_logs(since=since)
-        return logs
-
-    @classmethod
     def _exec_in_container(cls, container_id):
         def execute(command, *args, **kwargs):
             return run_command(['docker', 'exec', container_id, *command])

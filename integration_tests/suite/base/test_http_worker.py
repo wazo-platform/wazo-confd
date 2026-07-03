@@ -2,11 +2,10 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import pytest
-import requests
 from wazo_test_helpers import until
 
-from ..helpers.config import TOKEN, WORKERS_ENABLED
-from . import BaseIntegrationTest
+from ..helpers.config import WORKERS_ENABLED
+from . import BaseIntegrationTest, confd
 
 pytestmark = pytest.mark.skipif(
     not WORKERS_ENABLED,
@@ -16,16 +15,9 @@ pytestmark = pytest.mark.skipif(
 WORKER_MARKER = 'wazo-confd (http worker) starting...'
 
 
-def _status_url():
-    port = BaseIntegrationTest.service_port(9486, 'confd')
-    return f'http://127.0.0.1:{port}/1.1/status'
-
-
 def test_requests_are_load_balanced_across_main_and_worker():
-    url = _status_url()
-
     def both_instances_served():
-        requests.get(url, headers={'X-Auth-Token': TOKEN, 'Connection': 'close'})
+        confd.status.get()
         return (
             '/1.1/status' in BaseIntegrationTest.service_logs('confd')
             and '/1.1/status' in BaseIntegrationTest.worker_logs()
@@ -44,9 +36,17 @@ def test_only_the_worker_runs_in_http_worker_mode():
 
 
 def test_worker_reports_bus_consumer_status_through_ipc():
-    url = _status_url()
-    headers = {'X-Auth-Token': TOKEN, 'Connection': 'close'}
+    def worker_status_count():
+        return BaseIntegrationTest.worker_logs().count('/1.1/status')
 
-    for _ in range(20):
-        status = requests.get(url, headers=headers).json()
-        assert status.get('bus_consumer', {}).get('status') == 'ok', status
+    baseline = worker_status_count()
+
+    def worker_served_ok_status():
+        status = confd.status.get().json['bus_consumer']['status']
+        return status == 'ok' and worker_status_count() > baseline
+
+    until.true(
+        worker_served_ok_status,
+        timeout=30,
+        message='Worker never served an ok bus_consumer status through the IPC path',
+    )
