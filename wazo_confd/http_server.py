@@ -111,10 +111,11 @@ class HTTPServer:
         wsgi_app = ReverseProxied(ProxyFix(wsgi.WSGIPathInfoDispatcher({'/': app})))
 
         bind_addr = (self.config['listen'], self.config['port'])
-        self.server = wsgi.WSGIServer(
+        self.server = wsgi.DynamicWSGIServer(
             bind_addr=bind_addr,
             wsgi_app=wsgi_app,
-            numthreads=self.config['max_threads'],
+            numthreads=self.config['min_threads'],
+            max=self.config['max_threads'],
         )
         if self.config['certificate'] and self.config['private_key']:
             logger.warning(
