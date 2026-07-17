@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from flask import request, url_for
@@ -14,6 +14,7 @@ from wazo_confd.helpers.restful import (
 
 from .schema import (
     UserDirectorySchema,
+    UserLinePresenceSchema,
     UserListItemSchema,
     UserSchema,
     UserSummarySchema,
@@ -23,7 +24,11 @@ from .schema import (
 class UserList(ListResource):
     model = User
     schema = UserListItemSchema
-    view_schemas = {'directory': UserDirectorySchema, 'summary': UserSummarySchema}
+    view_schemas = {
+        'directory': UserDirectorySchema,
+        'summary': UserSummarySchema,
+        'line_presence': UserLinePresenceSchema,
+    }
 
     def __init__(self, service, middleware):
         super().__init__(service)

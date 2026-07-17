@@ -1,5 +1,9 @@
 # Changelog
 
+## 26.07
+
+* The `line_presence` view has been added to `/users` (GET `/users?view=line_presence`)
+
 ## 26.05
 
 * Removed `calllistening` function key service destination.
