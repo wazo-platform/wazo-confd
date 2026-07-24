@@ -157,6 +157,7 @@ parameters:
     enum:
     - directory
     - summary
+    - line_presence
     description: Different view of the list of users.
 responses:
   AlreadyConfiguredError:

@@ -6,6 +6,8 @@
   `max_threads` is now a ceiling the pool grows to under load, not a fixed
   thread count.
 
+* The `line_presence` view has been added to `/users` (GET `/users?view=line_presence`)
+
 ## 26.05
 
 * Removed `calllistening` function key service destination.

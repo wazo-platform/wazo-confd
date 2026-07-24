@@ -574,6 +574,66 @@ def test_summary_view_on_user_without_line(user):
     )
 
 
+@fixtures.user(services={'dnd': {'enabled': True}})
+@fixtures.line()
+@fixtures.sip()
+@fixtures.extension()
+def test_line_presence_view_on_sip_endpoint(user, line, sip, extension):
+    with a.line_endpoint_sip(line, sip), a.line_extension(line, extension), a.user_line(
+        user, line
+    ):
+        # the line's name is only generated server-side once a SIP endpoint
+        # is associated, so the original `line` fixture dict is stale here
+        updated_line = confd.lines(line['id']).get().item
+        response = confd.users.get(view='line_presence', id=user['id'])
+        assert_that(
+            response.items,
+            contains_exactly(
+                has_entries(
+                    uuid=user['uuid'],
+                    tenant_uuid=user['tenant_uuid'],
+                    lines=contains_exactly(
+                        has_entries(
+                            id=line['id'], name=updated_line['name'], protocol='sip'
+                        )
+                    ),
+                    services=has_entries(dnd=has_entries(enabled=True)),
+                )
+            ),
+        )
+
+
+@fixtures.user()
+def test_line_presence_view_on_user_without_line(user):
+    response = confd.users.get(view='line_presence', id=user['id'])
+    assert_that(
+        response.items,
+        contains_exactly(
+            has_entries(
+                uuid=user['uuid'],
+                tenant_uuid=user['tenant_uuid'],
+                lines=empty(),
+                services=has_entries(dnd=has_entries(enabled=False)),
+            )
+        ),
+    )
+
+
+@fixtures.user(firstname='Zoé-Alice')
+@fixtures.user(firstname='Zoé-Bob')
+@fixtures.user(firstname='Zoé-Charlie')
+def test_line_presence_view_collated_sort(user_a, user_b, user_c):
+    response = confd.users.get(view='line_presence', order='firstname', direction='asc')
+    created_uuids = {user_a['uuid'], user_b['uuid'], user_c['uuid']}
+    ordered_created = [
+        item['uuid'] for item in response.items if item['uuid'] in created_uuids
+    ]
+    assert_that(
+        ordered_created,
+        contains_exactly(user_a['uuid'], user_b['uuid'], user_c['uuid']),
+    )
+
+
 @fixtures.user(
     firstname="Léeroy",
     lastname="Jénkins",
