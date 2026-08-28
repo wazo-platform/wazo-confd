@@ -37,6 +37,7 @@ setup(
             'confbridge = wazo_confd.plugins.confbridge.plugin:Plugin',
             'conference = wazo_confd.plugins.conference.plugin:Plugin',
             'conference_extension = wazo_confd.plugins.conference_extension.plugin:Plugin',
+            'config_diff = wazo_confd.plugins.config_diff.plugin:Plugin',
             'configuration = wazo_confd.plugins.configuration.plugin:Plugin',
             'context = wazo_confd.plugins.context.plugin:Plugin',
             'context_context = wazo_confd.plugins.context_context.plugin:Plugin',
