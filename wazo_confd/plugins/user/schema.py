@@ -22,6 +22,11 @@ from .sub_resources.schema import ServicesSchema
 
 MOBILE_PHONE_NUMBER_REGEX = r"^\+?[0-9\*#]+$"
 CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
+# mirrors wazo-agid's CALLERID_MATCHER, which is what has to parse this value,
+# plus the empty string meaning unset. `default` and `anonymous` parse as names.
+OUTGOING_CALLER_ID_REGEX = (
+    r'^(?: *(?:".+"|[\w\-\.\!%\*\+`\'\~ ]*[^ "]) *(?:<\+?[0-9\*#]+>)?)?$'
+)
 USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
 PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
 CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
@@ -53,7 +58,9 @@ class UserSchema(BaseSchema):
     language = fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
     description = fields.String(allow_none=True)
     caller_id = fields.String(validate=(Regexp(CALLER_ID_REGEX), Length(max=160)))
-    outgoing_caller_id = fields.String(validate=Length(max=80), allow_none=True)
+    outgoing_caller_id = fields.String(
+        validate=(Regexp(OUTGOING_CALLER_ID_REGEX), Length(max=80)), allow_none=True
+    )
     mobile_phone_number = fields.String(
         validate=(Regexp(MOBILE_PHONE_NUMBER_REGEX), Length(max=80)), allow_none=True
     )

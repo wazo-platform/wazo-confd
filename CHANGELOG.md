@@ -4,6 +4,12 @@
 
 * Requests to wazo-auth now default to `localhost:80`, through nginx.
 
+* The `outgoing_caller_id` field of the `user` resource is now validated. It accepts what the
+  dialplan can parse: a bare number, a name, or a name followed by a number in angle brackets,
+  with the name either quoted or not. Values the dialplan could never have used, such as a
+  number in angle brackets with no name, an unclosed quote, or a name containing characters
+  like `;` or `@`, are now rejected with a `400` instead of being stored.
+
 * New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT) to read and
   set the caller ID a user presents on outgoing calls when nothing overrides it for that
   particular call. Applications override the caller ID per call with the
