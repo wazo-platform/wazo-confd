@@ -1,14 +1,26 @@
 # Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, replace
 
 import phonenumbers
+from xivo_dao.helpers import errors
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.phone_number import dao as phone_number_dao
+from xivo_dao.resources.tenant import dao as tenant_dao
 from xivo_dao.resources.user import dao as user_dao
 
-from .types import CallerIDType
+from .notifier import build_notifier_default
+from .types import CallerIDDefaultType, CallerIDType
+
+# Magic values stored in `userfeatures.outcallerid`, understood by wazo-agid.
+DEFAULT_TOKEN = 'default'
+ANONYMOUS_TOKEN = 'anonymous'
+
+# the `"Name" <number>` form documented for `outgoing_caller_id`, which
+# wazo-agid's CallerIDFormatter parses back out
+CALLER_ID_ALL_REGEX = re.compile(r'^"(.*)" <(\+?\d{3,15})>$')
 
 
 @dataclass(frozen=True)
@@ -18,7 +30,16 @@ class CallerID:
     caller_id_name: str = ''
 
 
+@dataclass(frozen=True)
+class CallerIDDefault:
+    type: CallerIDDefaultType
+    number: str = ''
+    caller_id_name: str = ''
+
+
 CallerIDAnonymous = CallerID(type='anonymous')
+CallerIDDefaultAnonymous = CallerIDDefault(type='anonymous')
+CallerIDDefaultDialplan = CallerIDDefault(type='default')
 
 
 def same_phone_number(number1: str, number2: str) -> bool:
@@ -30,6 +51,40 @@ def same_phone_number(number1: str, number2: str) -> bool:
         phonenumbers.MatchType.EXACT_MATCH,
         phonenumbers.MatchType.NSN_MATCH,
     )
+
+
+def normalize_e164(number: str, country: str | None) -> str:
+    '''
+    best effort conversion to +E.164, returning the number unchanged when it
+    cannot be parsed, as wazo-agid formats it per trunk anyway
+    '''
+    try:
+        parsed = phonenumbers.parse(number, country)
+    except phonenumbers.NumberParseException:
+        return number
+    if not phonenumbers.is_valid_number(parsed):
+        return number
+    return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+
+
+def format_caller_id(number: str, caller_id_name: str = '') -> str:
+    '''
+    Render the value stored in `userfeatures.outcallerid`.
+    '''
+    if caller_id_name:
+        # `"` would break the `"Name" <number>` form the dialplan parses back out
+        sanitized = caller_id_name.replace('"', '')
+        return f'"{sanitized}" <{number}>'
+    return number
+
+
+def parse_caller_id(stored: str) -> tuple[str, str]:
+    '''
+    Inverse of `format_caller_id`, returning (number, caller_id_name).
+    '''
+    if match := CALLER_ID_ALL_REGEX.match(stored):
+        return match.group(2), match.group(1)
+    return stored, ''
 
 
 class UserCallerIDService:
@@ -74,5 +129,103 @@ class UserCallerIDService:
         return len(callerids), callerids
 
 
+class UserCallerIDDefaultService:
+    '''
+    the caller ID a user presents when nothing overrides it for that call
+
+    Applications override per call with the `X-Wazo-Selected-Caller-ID` SIP
+    header. A desk phone cannot, so it presents this stored value.
+    '''
+
+    def __init__(self, callerid_service, user_dao, tenant_dao, notifier):
+        self.callerid_service = callerid_service
+        self.user_dao = user_dao
+        self.tenant_dao = tenant_dao
+        self.notifier = notifier
+
+    def get(self, user) -> CallerIDDefault:
+        stored = user.outgoing_caller_id
+        if not stored or stored == DEFAULT_TOKEN:
+            return CallerIDDefaultDialplan
+        if stored == ANONYMOUS_TOKEN:
+            return CallerIDDefaultAnonymous
+
+        number, caller_id_name = parse_caller_id(stored)
+        if available := self._find_available(user, number):
+            return CallerIDDefault(
+                type=available.type,
+                number=number,
+                caller_id_name=caller_id_name or available.caller_id_name,
+            )
+        # removed from the tenant since, or set through the user API
+        return CallerIDDefault(
+            type='custom', number=number, caller_id_name=caller_id_name
+        )
+
+    def edit(self, user, caller_id_default: CallerIDDefault) -> CallerIDDefault:
+        if caller_id_default.type == 'default':
+            resolved = CallerIDDefaultDialplan
+            user.outgoing_caller_id = DEFAULT_TOKEN
+        elif caller_id_default.type == 'anonymous':
+            resolved = CallerIDDefaultAnonymous
+            user.outgoing_caller_id = ANONYMOUS_TOKEN
+        else:
+            resolved = self._resolve(user, caller_id_default.number)
+            user.outgoing_caller_id = format_caller_id(
+                resolved.number, resolved.caller_id_name
+            )
+
+        self.user_dao.edit(user)
+        self.notifier.edited(user)
+        return resolved
+
+    def _resolve(self, user, number: str) -> CallerIDDefault:
+        '''
+        accept a number only when the user may already present it, so an end
+        user cannot assert an arbitrary caller ID
+        '''
+        available = self._available(user)
+        if match := self._match(available, number):
+            country = self._tenant_country(user.tenant_uuid)
+            return replace(match, number=normalize_e164(match.number, country))
+
+        raise errors.invalid_choice('number', [c.number for c in available])
+
+    def _find_available(self, user, number: str) -> CallerIDDefault | None:
+        return self._match(self._available(user), number)
+
+    def _available(self, user) -> list[CallerIDDefault]:
+        _, callerids = self.callerid_service.search(user.id, user.tenant_uuid, {})
+        return [
+            CallerIDDefault(
+                type=callerid.type,
+                number=callerid.number,
+                caller_id_name=callerid.caller_id_name,
+            )
+            for callerid in callerids
+            # `anonymous` carries no number, it is selected by type instead
+            if callerid.type != 'anonymous'
+        ]
+
+    @staticmethod
+    def _match(available, number: str) -> CallerIDDefault | None:
+        if not number:
+            return None
+        for callerid in available:
+            if same_phone_number(callerid.number, number):
+                return callerid
+        return None
+
+    def _tenant_country(self, tenant_uuid) -> str | None:
+        tenant = self.tenant_dao.find(tenant_uuid)
+        return tenant.country if tenant else None
+
+
 def build_service():
     return UserCallerIDService(user_dao, incall_dao, phone_number_dao)
+
+
+def build_service_default():
+    return UserCallerIDDefaultService(
+        build_service(), user_dao, tenant_dao, build_notifier_default()
+    )

@@ -4,6 +4,17 @@
 
 * Requests to wazo-auth now default to `localhost:80`, through nginx.
 
+* New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT) to read and
+  set the caller ID a user presents on outgoing calls when nothing overrides it for that
+  particular call. Applications override the caller ID per call with the
+  `X-Wazo-Selected-Caller-ID` SIP header; a hardware phone cannot, so it presents this
+  stored caller ID. On update, the number must be one of those returned by
+  `/1.1/users/{user_id}/callerids/outgoing`.
+
+* New `/1.1/users/me/callerids/outgoing` and `/1.1/users/me/callerids/outgoing/default`
+  endpoints, letting an end user list and set their own outgoing caller ID without the
+  tenant-wide `confd.users.{user_id}.update` ACL.
+
 ## 26.08
 
 * New `rest_api.min_threads` option: threads kept ready at all times.

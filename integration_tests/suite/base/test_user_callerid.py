@@ -1,4 +1,4 @@
-# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, equal_to, has_entries
@@ -7,7 +7,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers.config import INCALL_CONTEXT, MAIN_TENANT, SUB_TENANT
-from . import confd
+from . import confd, create_confd
 
 
 @fixtures.user()
@@ -100,3 +100,148 @@ def test_list_multi_tenant(main, sub):
 
     response = confd.users(sub['uuid']).callerids.outgoing.get(wazo_tenant=MAIN_TENANT)
     assert_that(response.items[0], has_entries(type='anonymous'))
+
+
+@fixtures.user()
+def test_get_default_when_never_set(user):
+    response = confd.users(user['uuid']).callerids.outgoing.default.get()
+
+    assert_that(response.item, equal_to({'type': 'default'}))
+
+
+@fixtures.user()
+def test_put_default_token(user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'default'}).assert_updated()
+
+    assert_that(url.get().item, equal_to({'type': 'default'}))
+
+
+@fixtures.user()
+def test_put_anonymous(user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'anonymous'}).assert_updated()
+
+    assert_that(url.get().item, equal_to({'type': 'anonymous'}))
+
+
+@fixtures.phone_number(main=True, number='+15555551234', caller_id_name='Acme Corp')
+@fixtures.user()
+def test_put_available_number(phone_number, user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'main', 'number': '+15555551234'}).assert_updated()
+
+    assert_that(
+        url.get().item,
+        has_entries(type='main', number='+15555551234', caller_id_name='Acme Corp'),
+    )
+
+
+@fixtures.phone_number(shared=True, number='+15555551234')
+@fixtures.user()
+def test_put_number_matching_semantically(phone_number, user):
+    # the same number, sent without the country code
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'shared', 'number': '5555551234'}).assert_updated()
+
+    assert_that(url.get().item, has_entries(type='shared', number='+15555551234'))
+
+
+@fixtures.phone_number(shared=True, number='+15555551234')
+@fixtures.user()
+def test_put_number_not_available_is_rejected(phone_number, user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    response = url.put({'type': 'shared', 'number': '+15550000000'})
+
+    response.assert_status(400)
+    # unchanged
+    assert_that(url.get().item, equal_to({'type': 'default'}))
+
+
+@fixtures.user()
+def test_put_errors(user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+
+    url.put({}).assert_status(400)
+    url.put({'type': 'nonsense'}).assert_status(400)
+    # `custom` is reported by the API but must never be accepted
+    url.put({'type': 'custom', 'number': '+15555551234'}).assert_status(400)
+    # a number is required for the types that carry one
+    url.put({'type': 'shared'}).assert_status(400)
+    url.put({'type': 'main'}).assert_status(400)
+    url.put({'type': 'associated'}).assert_status(400)
+    url.put({'type': 'shared', 'number': 'not-a-number'}).assert_status(400)
+
+
+@fixtures.phone_number(shared=True, number='+15555551234')
+@fixtures.user()
+def test_get_default_reports_custom_when_no_longer_available(phone_number, user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'shared', 'number': '+15555551234'}).assert_updated()
+
+    confd.phone_numbers(phone_number['uuid']).delete().assert_deleted()
+
+    assert_that(url.get().item, has_entries(type='custom', number='+15555551234'))
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_default_multi_tenant(main, sub):
+    response = confd.users(main['uuid']).callerids.outgoing.default.get(
+        wazo_tenant=SUB_TENANT
+    )
+    response.assert_match(404, e.not_found(resource='User'))
+
+    response = confd.users(main['uuid']).callerids.outgoing.default.put(
+        {'type': 'default'}, wazo_tenant=SUB_TENANT
+    )
+    response.assert_match(404, e.not_found(resource='User'))
+
+
+@fixtures.phone_number(shared=True, number='+15555551234')
+@fixtures.user()
+def test_users_me_list(phone_number, user):
+    user_confd = create_confd(user_uuid=user['uuid'])
+
+    response = user_confd.users.me.callerids.outgoing.get()
+
+    expected = [
+        {'type': 'shared', 'number': '+15555551234', 'caller_id_name': ''},
+        {'type': 'anonymous'},
+    ]
+    assert_that(response.items, contains_inanyorder(*expected))
+
+
+@fixtures.phone_number(shared=True, number='+15555551234')
+@fixtures.user()
+def test_users_me_default_round_trip(phone_number, user):
+    user_confd = create_confd(user_uuid=user['uuid'])
+    url = user_confd.users.me.callerids.outgoing.default
+
+    assert_that(url.get().item, equal_to({'type': 'default'}))
+
+    url.put({'type': 'shared', 'number': '+15555551234'}).assert_updated()
+
+    assert_that(url.get().item, has_entries(type='shared', number='+15555551234'))
+    # and the admin API sees the same value
+    assert_that(
+        confd.users(user['uuid']).callerids.outgoing.default.get().item,
+        has_entries(type='shared', number='+15555551234'),
+    )
+
+
+@fixtures.phone_number(shared=True, number='+15555551234')
+@fixtures.user()
+@fixtures.user()
+def test_users_me_default_is_per_user(phone_number, user1, user2):
+    user1_confd = create_confd(user_uuid=user1['uuid'])
+    user2_confd = create_confd(user_uuid=user2['uuid'])
+
+    user1_confd.users.me.callerids.outgoing.default.put(
+        {'type': 'shared', 'number': '+15555551234'}
+    ).assert_updated()
+
+    assert_that(
+        user2_confd.users.me.callerids.outgoing.default.get().item,
+        equal_to({'type': 'default'}),
+    )
