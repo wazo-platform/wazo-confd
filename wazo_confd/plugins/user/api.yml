@@ -396,11 +396,24 @@ definitions:
             Lastname" < number >
         outgoing_caller_id:
           type: string
-          enum:
-          - default
-          - anonymous
-          - '"Firstname Lastname" < number >'
-          description: Name that appears on the phone when calling
+          maxLength: 80
+          pattern: '^(?: *(?:".+"|[\w\-\.\!%\*\+`\''\~ ]*[^ "]) *(?:<\+?[0-9\*#]+>)?)?$'
+          description: |
+            Caller ID presented on outgoing calls, unless the call overrides it.
+
+            Two values are routing tokens rather than caller IDs:
+
+            * `default`: use the outgoing call's caller ID, then the user's own caller ID
+            * `anonymous`: present an anonymous caller ID
+
+            Any other value is a caller ID itself, in one of these forms, where the
+            name may be quoted or unquoted:
+
+            * `5551234567` or `+15555551234`: a number alone
+            * `"Firstname Lastname"` or `Firstname Lastname`: a name alone
+            * `"Firstname Lastname" <+15555551234>`: a name and a number
+
+            An empty string or null means unset.
         mobile_phone_number:
           type: string
           description: Phone number for the user’s mobile device
@@ -688,11 +701,24 @@ definitions:
           Lastname" < number >
       outgoing_caller_id:
         type: string
-        enum:
-        - default
-        - anonymous
-        - '"Firstname Lastname" < number >'
-        description: Name that appears on the phone when calling
+        maxLength: 80
+        pattern: '^(?: *(?:".+"|[\w\-\.\!%\*\+`\''\~ ]*[^ "]) *(?:<\+?[0-9\*#]+>)?)?$'
+        description: |
+          Caller ID presented on outgoing calls, unless the call overrides it.
+
+          Two values are routing tokens rather than caller IDs:
+
+          * `default`: use the outgoing call's caller ID, then the user's own caller ID
+          * `anonymous`: present an anonymous caller ID
+
+          Any other value is a caller ID itself, in one of these forms, where the
+          name may be quoted or unquoted:
+
+          * `5551234567` or `+15555551234`: a number alone
+          * `"Firstname Lastname"` or `Firstname Lastname`: a name alone
+          * `"Firstname Lastname" <+15555551234>`: a name and a number
+
+          An empty string or null means unset.
       mobile_phone_number:
         type: string
         description: Phone number for the user’s mobile device

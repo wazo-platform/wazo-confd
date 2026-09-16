@@ -9,6 +9,8 @@
   with the name either quoted or not. Values the dialplan could never have used, such as a
   number in angle brackets with no name, an unclosed quote, or a name containing characters
   like `;` or `@`, are now rejected with a `400` instead of being stored.
+  The enum previously documented for this field did not describe what the dialplan
+  accepts and has been replaced by a pattern and a description of the real forms.
 
 * New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT) to read and
   set the caller ID a user presents on outgoing calls when nothing overrides it for that
