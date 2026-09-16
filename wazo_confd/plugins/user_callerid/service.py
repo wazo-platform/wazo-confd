@@ -24,9 +24,12 @@ ANONYMOUS_TOKEN = 'anonymous'
 # alone can overflow the column the composed value is stored in
 OUTGOING_CALLER_ID_MAX_LENGTH = UserFeatures.outcallerid.type.length
 
-# the `"Name" <number>` form documented for `outgoing_caller_id`, which
-# wazo-agid's CallerIDFormatter parses back out
-CALLER_ID_ALL_REGEX = re.compile(r'^"(.*)" <(\+?\d{3,15})>$')
+# mirrors wazo-agid's CALLERID_MATCHER: the name may be quoted or not, and the
+# number may be absent, in which case a name that looks like one is the number
+CALLER_ID_ALL_REGEX = re.compile(
+    r'^ *(?:"(.*)"|([\w\-\.\!%\*\+`\'\~ ]*[^ "])) *(?:<(\+?[0-9\*#]+)>)?$'
+)
+CALLER_ID_NUMBER_REGEX = re.compile(r'^\+?[0-9\*#]+$')
 
 
 @dataclass(frozen=True)
@@ -89,11 +92,17 @@ def format_caller_id(number: str, caller_id_name: str = '') -> str:
 
 def parse_caller_id(stored: str) -> tuple[str, str]:
     '''
-    Inverse of `format_caller_id`, returning (number, caller_id_name).
+    inverse of `format_caller_id`, returning (number, caller_id_name)
     '''
-    if match := CALLER_ID_ALL_REGEX.match(stored):
-        return match.group(2), match.group(1)
-    return stored, ''
+    match = CALLER_ID_ALL_REGEX.match(stored)
+    if not match:
+        return stored, ''
+
+    quoted, unquoted, number = match.groups()
+    name = quoted if quoted is not None else (unquoted or '')
+    if not number and CALLER_ID_NUMBER_REGEX.match(name):
+        return name, ''
+    return number or '', name
 
 
 class UserCallerIDService:

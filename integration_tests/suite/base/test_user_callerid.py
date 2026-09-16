@@ -266,3 +266,17 @@ def test_put_number_too_long_for_the_column_is_rejected(phone_number, user):
 
     response.assert_status(400)
     assert_that(url.get().item, equal_to({'type': 'default'}))
+
+
+@fixtures.phone_number(shared=True, number='+14445551234', caller_id_name='Acme')
+@fixtures.user()
+def test_get_default_set_through_the_user_api_with_an_unquoted_name(phone_number, user):
+    # the user API and the dialplan both accept an unquoted name, and the number
+    # must still be reported as a number rather than as the whole stored string
+    confd.users(user['uuid']).put(
+        outgoing_caller_id='Hursule <4445551234>'
+    ).assert_updated()
+
+    item = confd.users(user['uuid']).callerids.outgoing.default.get().item
+
+    assert_that(item, has_entries(type='shared', number='4445551234'))

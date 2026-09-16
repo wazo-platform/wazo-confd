@@ -75,6 +75,21 @@ class TestFormatCallerID(unittest.TestCase):
         self.assertEqual(len(result), OUTGOING_CALLER_ID_MAX_LENGTH)
         self.assertTrue(result.startswith(f'"{name}"'))
 
+    def test_parses_an_unquoted_name(self):
+        # the user API and the dialplan both accept an unquoted name, so a value
+        # set through PUT /users/{id} can arrive in this form
+        self.assertEqual(
+            parse_caller_id('Hursule <4445551234>'), ('4445551234', 'Hursule')
+        )
+
+    def test_parses_a_name_with_no_number(self):
+        self.assertEqual(parse_caller_id('Acme Corp'), ('', 'Acme Corp'))
+        self.assertEqual(parse_caller_id('"Acme Corp"'), ('', 'Acme Corp'))
+
+    def test_parses_a_bare_number(self):
+        self.assertEqual(parse_caller_id('5551234567'), ('5551234567', ''))
+        self.assertEqual(parse_caller_id('+14445551234'), ('+14445551234', ''))
+
 
 class BaseDefaultServiceTestCase(unittest.TestCase):
     def setUp(self):
