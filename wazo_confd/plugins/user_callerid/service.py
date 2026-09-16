@@ -5,7 +5,9 @@ import re
 from dataclasses import dataclass, replace
 
 import phonenumbers
+from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.helpers import errors
+from xivo_dao.helpers.exception import InputError
 from xivo_dao.resources.incall import dao as incall_dao
 from xivo_dao.resources.phone_number import dao as phone_number_dao
 from xivo_dao.resources.tenant import dao as tenant_dao
@@ -17,6 +19,10 @@ from .types import CallerIDDefaultType, CallerIDType
 # Magic values stored in `userfeatures.outcallerid`, understood by wazo-agid.
 DEFAULT_TOKEN = 'default'
 ANONYMOUS_TOKEN = 'anonymous'
+
+# a caller ID name is allowed 256 characters and a number 128, either of which
+# alone can overflow the column the composed value is stored in
+OUTGOING_CALLER_ID_MAX_LENGTH = UserFeatures.outcallerid.type.length
 
 # the `"Name" <number>` form documented for `outgoing_caller_id`, which
 # wazo-agid's CallerIDFormatter parses back out
@@ -69,12 +75,15 @@ def normalize_e164(number: str, country: str | None) -> str:
 
 def format_caller_id(number: str, caller_id_name: str = '') -> str:
     '''
-    Render the value stored in `userfeatures.outcallerid`.
+    render the value stored in `userfeatures.outcallerid`, dropping the name when
+    the pair would not fit the column
     '''
     if caller_id_name:
         # `"` would break the `"Name" <number>` form the dialplan parses back out
         sanitized = caller_id_name.replace('"', '')
-        return f'"{sanitized}" <{number}>'
+        formatted = f'"{sanitized}" <{number}>'
+        if len(formatted) <= OUTGOING_CALLER_ID_MAX_LENGTH:
+            return formatted
     return number
 
 
@@ -187,7 +196,13 @@ class UserCallerIDDefaultService:
         available = self._available(user)
         if match := self._match(available, number):
             country = self._tenant_country(user.tenant_uuid)
-            return replace(match, number=normalize_e164(match.number, country))
+            resolved = replace(match, number=normalize_e164(match.number, country))
+            if len(resolved.number) > OUTGOING_CALLER_ID_MAX_LENGTH:
+                raise InputError(
+                    'number is too long to be used as a caller ID, maximum is '
+                    f'{OUTGOING_CALLER_ID_MAX_LENGTH} characters'
+                )
+            return resolved
 
         raise errors.invalid_choice('number', [c.number for c in available])
 

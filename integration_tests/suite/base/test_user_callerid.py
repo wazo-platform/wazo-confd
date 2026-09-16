@@ -245,3 +245,24 @@ def test_users_me_default_is_per_user(phone_number, user1, user2):
         user2_confd.users.me.callerids.outgoing.default.get().item,
         equal_to({'type': 'default'}),
     )
+
+
+@fixtures.phone_number(shared=True, number='+15555551234', caller_id_name='N' * 256)
+@fixtures.user()
+def test_put_number_whose_caller_id_name_would_overflow(phone_number, user):
+    # the column holding the composed value is shorter than a caller_id_name is
+    # allowed to be, so the name is dropped rather than the write failing
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'shared', 'number': '+15555551234'}).assert_updated()
+
+    assert_that(url.get().item, has_entries(type='shared', number='+15555551234'))
+
+
+@fixtures.phone_number(shared=True, number='+' + '1' * 100)
+@fixtures.user()
+def test_put_number_too_long_for_the_column_is_rejected(phone_number, user):
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    response = url.put({'type': 'shared', 'number': '+' + '1' * 100})
+
+    response.assert_status(400)
+    assert_that(url.get().item, equal_to({'type': 'default'}))

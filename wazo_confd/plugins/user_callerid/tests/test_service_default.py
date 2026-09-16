@@ -8,6 +8,7 @@ from unittest.mock import Mock
 from xivo_dao.helpers.exception import InputError
 
 from ..service import (
+    OUTGOING_CALLER_ID_MAX_LENGTH,
     CallerID,
     CallerIDDefault,
     UserCallerIDDefaultService,
@@ -55,6 +56,24 @@ class TestFormatCallerID(unittest.TestCase):
     def test_round_trip_without_name(self):
         stored = format_caller_id('+14185551234')
         self.assertEqual(parse_caller_id(stored), ('+14185551234', ''))
+
+    def test_name_is_dropped_when_the_pair_would_not_fit_the_column(self):
+        # a phone number's caller_id_name is allowed 256 characters, the column
+        # holding the composed value only 80
+        result = format_caller_id('+14185551234', 'N' * 256)
+
+        self.assertEqual(result, '+14185551234')
+        self.assertLessEqual(len(result), OUTGOING_CALLER_ID_MAX_LENGTH)
+
+    def test_name_is_kept_when_the_pair_just_fits(self):
+        number = '+14185551234'
+        # two quotes, a space and two angle brackets around the number
+        name = 'N' * (OUTGOING_CALLER_ID_MAX_LENGTH - len(number) - 5)
+
+        result = format_caller_id(number, name)
+
+        self.assertEqual(len(result), OUTGOING_CALLER_ID_MAX_LENGTH)
+        self.assertTrue(result.startswith(f'"{name}"'))
 
 
 class BaseDefaultServiceTestCase(unittest.TestCase):
@@ -163,6 +182,20 @@ class TestEditDefault(BaseDefaultServiceTestCase):
         )
 
         self.assertEqual(user.outgoing_caller_id, '+14185559999')
+
+    def test_number_too_long_for_the_column_is_rejected(self):
+        long_number = '+' + '1' * 100
+        self.available.append(CallerID(type='shared', number=long_number))
+        self.callerid_service.search.return_value = (
+            len(self.available),
+            self.available,
+        )
+        user = self.a_user()
+
+        with self.assertRaises(InputError):
+            self.service.edit(user, CallerIDDefault(type='shared', number=long_number))
+
+        self.user_dao.edit.assert_not_called()
 
     def test_number_not_available_is_rejected(self):
         user = self.a_user()
