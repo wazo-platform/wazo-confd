@@ -1,4 +1,4 @@
-# Copyright 2020-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2020-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from unittest import TestCase
@@ -109,6 +109,47 @@ class TestTransportSchema(TestCase):
 
     def test_that_name_is_not_empty(self):
         body = {'name': '', 'options': []}
+        assert_that(
+            calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
+        )
+
+    def test_load_ipv6_options(self):
+        body = {
+            'name': 'my-transport',
+            'options': [
+                ['bind', '[::]:5060'],
+                ['bind', '[fe80::1]:5060'],
+                ['bind', 'fe80::1%eth0'],
+                ['external_media_address', '[2001:db8::1]'],
+            ],
+        }
+
+        result = PJSIPTransportSchema().load(body)
+        assert_that(
+            result,
+            has_entries(
+                options=contains_exactly(
+                    contains_exactly('bind', '[::]:5060'),
+                    contains_exactly('bind', '[fe80::1]:5060'),
+                    contains_exactly('bind', 'fe80::1%eth0'),
+                    contains_exactly('external_media_address', '[2001:db8::1]'),
+                ),
+            ),
+        )
+
+    def test_injection_with_brackets(self):
+        body = {
+            'name': 'my-transport',
+            'options': [['bind', '[::]:5060\n[global]\nkey = value']],
+        }
+        assert_that(
+            calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
+        )
+
+        body = {
+            'name': 'my-transport',
+            'options': [['bind', '[::]:5060\n']],
+        }
         assert_that(
             calling(PJSIPTransportSchema().load).with_args(body), raises(BadRequest)
         )

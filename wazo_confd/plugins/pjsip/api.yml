@@ -305,6 +305,11 @@ definitions:
         type: string
       options:
         type: array
+        description: >
+          Asterisk pjsip.conf transport options as key/value pairs.
+          An IPv6 address must be enclosed in square brackets when it is
+          followed by a port, as in `[::]:5060`. Without brackets, Asterisk
+          reads the whole value as the address and uses the default port.
         items:
           $ref: '#/definitions/KeyValueOption'
     required:
