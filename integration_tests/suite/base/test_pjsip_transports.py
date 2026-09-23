@@ -51,6 +51,18 @@ def error_checks(url):
     s.check_bogus_field_returns_error(
         url, 'options', [['one', 'two', 'three']], {'name': 'transport'}
     )
+    s.check_bogus_field_returns_error(
+        url, 'options', [['bind', '[::]:5060\n']], {'name': 'transport'}
+    )
+    s.check_bogus_field_returns_error(
+        url,
+        'options',
+        [['bind', '[::]:5060\n[global]\nkey = value']],
+        {'name': 'transport'},
+    )
+    s.check_bogus_field_returns_error(
+        url, 'options', [['[global]', 'value']], {'name': 'transport'}
+    )
 
     unique_error_checks(url)
 
