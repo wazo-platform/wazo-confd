@@ -116,7 +116,7 @@ class ScheduleSchema(BaseSchema):
     enabled = fields.Boolean()
     links = ListLink(Link('schedules'))
 
-    incalls = Nested('IncallSchema', only=['id', 'links'], many=True, dump_only=True)
+    incalls = Nested('IncallSchema', only=['id', 'description', 'extensions', 'links'], many=True, dump_only=True)
     users = Nested(
         'UserSchema',
         only=['uuid', 'firstname', 'lastname', 'links'],
@@ -124,7 +124,7 @@ class ScheduleSchema(BaseSchema):
         dump_only=True,
     )
     groups = Nested(
-        'GroupSchema', only=['id', 'uuid', 'name', 'links'], many=True, dump_only=True
+        'GroupSchema', only=['id', 'uuid', 'name', 'label', 'links'], many=True, dump_only=True
     )
     queues = Nested(
         'QueueSchema', only=['id', 'name', 'label', 'links'], many=True, dump_only=True

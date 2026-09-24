@@ -22,7 +22,7 @@ class ExtensionSchema(BaseSchema):
     parking_lot = Nested(
         'ParkingLotSchema', only=['id', 'name', 'links'], dump_only=True
     )
-    group = Nested('GroupSchema', only=['uuid', 'id', 'name', 'links'], dump_only=True)
+    group = Nested('GroupSchema', only=['uuid', 'id', 'name', 'label', 'links'], dump_only=True)
     incall = Nested('IncallSchema', only=['id', 'links'], dump_only=True)
     lines = Nested(
         'LineSchema', only=['id', 'name', 'links'], many=True, dump_only=True
