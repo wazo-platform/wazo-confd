@@ -49,6 +49,7 @@ class CallerIDDefault:
 CallerIDAnonymous = CallerID(type='anonymous')
 CallerIDDefaultAnonymous = CallerIDDefault(type='anonymous')
 CallerIDDefaultDialplan = CallerIDDefault(type='default')
+CallerIDDefaultUnset = CallerIDDefault(type='unset')
 
 
 def same_phone_number(number1: str, number2: str) -> bool:
@@ -163,7 +164,9 @@ class UserCallerIDDefaultService:
 
     def get(self, user) -> CallerIDDefault:
         stored = user.outgoing_caller_id
-        if not stored or stored == DEFAULT_TOKEN:
+        if not stored:
+            return CallerIDDefaultUnset
+        if stored == DEFAULT_TOKEN:
             return CallerIDDefaultDialplan
         if stored == ANONYMOUS_TOKEN:
             return CallerIDDefaultAnonymous

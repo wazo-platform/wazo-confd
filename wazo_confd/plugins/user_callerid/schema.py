@@ -10,7 +10,7 @@ from .service import CallerIDDefault
 
 # types that carry a number, as opposed to the routing tokens
 NUMBER_TYPES = ('main', 'associated', 'shared')
-# `custom` is reported by the API, never accepted
+# `custom` and `unset` are reported by the API, never accepted
 SETTABLE_TYPES = NUMBER_TYPES + ('default', 'anonymous')
 
 
@@ -46,7 +46,7 @@ class UserCallerIDDefaultSchema(BaseSchema):
 
     @post_dump
     def omit_number_for_tokens(self, data, **kwargs):
-        if data.get('type') in ('default', 'anonymous'):
+        if data.get('type') in ('default', 'anonymous', 'unset'):
             data.pop('number', None)
             data.pop('caller_id_name', None)
         return data

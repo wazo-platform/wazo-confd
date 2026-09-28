@@ -159,6 +159,7 @@ definitions:
           - `associated`: An incall associated to the user
           - `shared`: A phone number(`/1.1/phone-numbers`) flagged as `shared`
           - `custom`: Read-only. The stored caller ID is no longer one of the caller IDs available to this user.
+          - `unset`: Read-only. The user never chose a default. The dialplan behaves as for `default`, but a client can tell this from an explicit `default`.
         enum:
         - default
         - anonymous
@@ -166,5 +167,6 @@ definitions:
         - associated
         - shared
         - custom
+        - unset
     required:
     - type

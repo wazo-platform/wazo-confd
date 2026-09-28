@@ -39,6 +39,10 @@ class TestUserCallerIDDefaultSchemaLoad(unittest.TestCase):
         with self.assertRaises(ValidationError):
             self.schema.load({'type': 'custom', 'number': '+14185551234'})
 
+    def test_unset_cannot_be_set(self):
+        with self.assertRaises(ValidationError):
+            self.schema.load({'type': 'unset'})
+
     def test_unknown_type_is_rejected(self):
         with self.assertRaises(ValidationError):
             self.schema.load({'type': 'nonsense'})
@@ -55,6 +59,10 @@ class TestUserCallerIDDefaultSchemaDump(unittest.TestCase):
     def test_default_omits_number(self):
         result = self.schema.dump(CallerIDDefault(type='default'))
         self.assertEqual(result, {'type': 'default'})
+
+    def test_unset_omits_number(self):
+        result = self.schema.dump(CallerIDDefault(type='unset'))
+        self.assertEqual(result, {'type': 'unset'})
 
     def test_anonymous_omits_number(self):
         result = self.schema.dump(CallerIDDefault(type='anonymous'))

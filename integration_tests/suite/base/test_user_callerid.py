@@ -103,10 +103,10 @@ def test_list_multi_tenant(main, sub):
 
 
 @fixtures.user()
-def test_get_default_when_never_set(user):
+def test_get_default_when_never_set_reports_unset(user):
     response = confd.users(user['uuid']).callerids.outgoing.default.get()
 
-    assert_that(response.item, equal_to({'type': 'default'}))
+    assert_that(response.item, equal_to({'type': 'unset'}))
 
 
 @fixtures.user()
@@ -155,7 +155,7 @@ def test_put_number_not_available_is_rejected(phone_number, user):
 
     response.assert_status(400)
     # unchanged
-    assert_that(url.get().item, equal_to({'type': 'default'}))
+    assert_that(url.get().item, equal_to({'type': 'unset'}))
 
 
 @fixtures.user()
@@ -166,6 +166,8 @@ def test_put_errors(user):
     url.put({'type': 'nonsense'}).assert_status(400)
     # `custom` is reported by the API but must never be accepted
     url.put({'type': 'custom', 'number': '+15555551234'}).assert_status(400)
+    # `unset` is only reported for a user who never chose a default
+    url.put({'type': 'unset'}).assert_status(400)
     # a number is required for the types that carry one
     url.put({'type': 'shared'}).assert_status(400)
     url.put({'type': 'main'}).assert_status(400)
@@ -218,7 +220,7 @@ def test_users_me_default_round_trip(phone_number, user):
     user_confd = create_confd(user_uuid=user['uuid'])
     url = user_confd.users.me.callerids.outgoing.default
 
-    assert_that(url.get().item, equal_to({'type': 'default'}))
+    assert_that(url.get().item, equal_to({'type': 'unset'}))
 
     url.put({'type': 'shared', 'number': '+15555551234'}).assert_updated()
 
@@ -243,7 +245,7 @@ def test_users_me_default_is_per_user(phone_number, user1, user2):
 
     assert_that(
         user2_confd.users.me.callerids.outgoing.default.get().item,
-        equal_to({'type': 'default'}),
+        equal_to({'type': 'unset'}),
     )
 
 
@@ -265,7 +267,7 @@ def test_put_number_too_long_for_the_column_is_rejected(phone_number, user):
     response = url.put({'type': 'shared', 'number': '+' + '1' * 100})
 
     response.assert_status(400)
-    assert_that(url.get().item, equal_to({'type': 'default'}))
+    assert_that(url.get().item, equal_to({'type': 'unset'}))
 
 
 @fixtures.phone_number(shared=True, number='+14445551234', caller_id_name='Acme')

@@ -121,17 +121,17 @@ class BaseDefaultServiceTestCase(unittest.TestCase):
 
 
 class TestGetDefault(BaseDefaultServiceTestCase):
-    def test_unset_reads_as_default(self):
+    def test_never_set_reads_as_unset(self):
         result = self.service.get(self.a_user(''))
-        self.assertEqual(result, CallerIDDefault(type='default'))
+        self.assertEqual(result, CallerIDDefault(type='unset'))
 
-    def test_none_reads_as_default(self):
+    def test_none_reads_as_unset(self):
         result = self.service.get(self.a_user(None))
-        self.assertEqual(result, CallerIDDefault(type='default'))
+        self.assertEqual(result, CallerIDDefault(type='unset'))
 
     def test_default_token(self):
         result = self.service.get(self.a_user('default'))
-        self.assertEqual(result.type, 'default')
+        self.assertEqual(result, CallerIDDefault(type='default'))
 
     def test_anonymous_token(self):
         result = self.service.get(self.a_user('anonymous'))

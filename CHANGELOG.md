@@ -17,7 +17,8 @@
   particular call. Applications override the caller ID per call with the
   `X-Wazo-Selected-Caller-ID` SIP header; a hardware phone cannot, so it presents this
   stored caller ID. On update, the number must be one of those returned by
-  `/1.1/users/{user_id}/callerids/outgoing`.
+  `/1.1/users/{user_id}/callerids/outgoing`. A user who never chose a default reads as
+  `unset`, which behaves as `default` but lets a client tell an explicit choice from none.
 
 * New `/1.1/users/me/callerids/outgoing` and `/1.1/users/me/callerids/outgoing/default`
   endpoints, letting an end user list and set their own outgoing caller ID without the
