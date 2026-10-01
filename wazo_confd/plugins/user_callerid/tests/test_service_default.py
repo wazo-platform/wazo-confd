@@ -91,8 +91,8 @@ class TestFormatCallerID(unittest.TestCase):
         self.assertEqual(parse_caller_id('+14445551234'), ('+14445551234', ''))
 
     def test_does_not_parse_what_the_dialplan_cannot(self):
-        # wazo-agid rejects an empty quoted name, so the value is not split
-        self.assertEqual(parse_caller_id('"" <4445551234>'), ('"" <4445551234>', ''))
+        # wazo-agid rejects an empty quoted name
+        self.assertIsNone(parse_caller_id('"" <4445551234>'))
 
 
 class BaseDefaultServiceTestCase(unittest.TestCase):
@@ -151,6 +151,14 @@ class TestGetDefault(BaseDefaultServiceTestCase):
         result = self.service.get(self.a_user('+14185551234'))
         self.assertEqual(result.type, 'main')
         self.assertEqual(result.caller_id_name, 'Acme Corp')
+
+    def test_value_the_dialplan_cannot_parse_reads_as_custom(self):
+        # stored before outgoing_caller_id was validated, and its number is
+        # still available, but the dialplan cannot parse it
+        result = self.service.get(self.a_user('"" <+14185551234>'))
+        self.assertEqual(
+            result, CallerIDDefault(type='custom', number='"" <+14185551234>')
+        )
 
     def test_number_no_longer_available_reads_as_custom(self):
         result = self.service.get(self.a_user('"Gone" <+14180000000>'))

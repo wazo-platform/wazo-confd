@@ -84,14 +84,14 @@ def format_caller_id(number: str, caller_id_name: str = '') -> str:
     return number
 
 
-def parse_caller_id(stored: str) -> tuple[str, str]:
+def parse_caller_id(stored: str) -> tuple[str, str] | None:
     '''
-    inverse of `format_caller_id`, returning (number, caller_id_name)
+    inverse of `format_caller_id`, returning (number, caller_id_name), or None
+    when wazo-agid could not parse the value when placing the call
     '''
-    # parsed the way wazo-agid parses it when placing the call
     parsed = xivo_parse_caller_id(stored)
     if not parsed:
-        return stored, ''
+        return None
 
     name, number = parsed
     if number is None:
@@ -167,7 +167,11 @@ class UserCallerIDDefaultService:
         if stored == ANONYMOUS_TOKEN:
             return CallerIDDefaultAnonymous
 
-        number, caller_id_name = parse_caller_id(stored)
+        if not (parsed := parse_caller_id(stored)):
+            # stored before outgoing_caller_id was validated
+            return CallerIDDefault(type='custom', number=stored)
+
+        number, caller_id_name = parsed
         if available := self._find_available(user, number):
             return CallerIDDefault(
                 type=available.type,
