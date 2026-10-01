@@ -90,6 +90,10 @@ class TestFormatCallerID(unittest.TestCase):
         self.assertEqual(parse_caller_id('5551234567'), ('5551234567', ''))
         self.assertEqual(parse_caller_id('+14445551234'), ('+14445551234', ''))
 
+    def test_does_not_parse_what_the_dialplan_cannot(self):
+        # wazo-agid rejects an empty quoted name, so the value is not split
+        self.assertEqual(parse_caller_id('"" <4445551234>'), ('"" <4445551234>', ''))
+
 
 class BaseDefaultServiceTestCase(unittest.TestCase):
     def setUp(self):

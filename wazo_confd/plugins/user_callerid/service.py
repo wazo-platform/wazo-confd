@@ -1,10 +1,10 @@
 # Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import re
 from dataclasses import dataclass, replace
 
 import phonenumbers
+from xivo.caller_id import parse_caller_id as xivo_parse_caller_id
 from xivo_dao.alchemy.userfeatures import UserFeatures
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import InputError
@@ -23,13 +23,6 @@ ANONYMOUS_TOKEN = 'anonymous'
 # a caller ID name is allowed 256 characters and a number 128, either of which
 # alone can overflow the column the composed value is stored in
 OUTGOING_CALLER_ID_MAX_LENGTH = UserFeatures.outcallerid.type.length
-
-# mirrors wazo-agid's CALLERID_MATCHER: the name may be quoted or not, and the
-# number may be absent, in which case a name that looks like one is the number
-CALLER_ID_ALL_REGEX = re.compile(
-    r'^ *(?:"(.*)"|([\w\-\.\!%\*\+`\'\~ ]*[^ "])) *(?:<(\+?[0-9\*#]+)>)?$'
-)
-CALLER_ID_NUMBER_REGEX = re.compile(r'^\+?[0-9\*#]+$')
 
 
 @dataclass(frozen=True)
@@ -95,15 +88,18 @@ def parse_caller_id(stored: str) -> tuple[str, str]:
     '''
     inverse of `format_caller_id`, returning (number, caller_id_name)
     '''
-    match = CALLER_ID_ALL_REGEX.match(stored)
-    if not match:
+    # parsed the way wazo-agid parses it when placing the call
+    parsed = xivo_parse_caller_id(stored)
+    if not parsed:
         return stored, ''
 
-    quoted, unquoted, number = match.groups()
-    name = quoted if quoted is not None else (unquoted or '')
-    if not number and CALLER_ID_NUMBER_REGEX.match(name):
-        return name, ''
-    return number or '', name
+    name, number = parsed
+    if number is None:
+        return '', name
+    if number == name and '<' not in stored:
+        # a bare number, which the parser reports as both name and number
+        return number, ''
+    return number, name
 
 
 class UserCallerIDService:
