@@ -1,4 +1,46 @@
 paths:
+  /users/me/callerids/outgoing:
+    get:
+      operationId: list_user_me_callerid_outgoing
+      summary: List the outgoing callerids available to the authenticated user
+      description: '**Required ACL:** `confd.users.me.callerids.outgoing.read`'
+      tags:
+      - users
+      responses:
+        '200':
+          description: User Outgoing Caller ID list
+          schema:
+            $ref: '#/definitions/UserCallerIDItems'
+  /users/me/callerids/outgoing/default:
+    get:
+      operationId: get_user_me_callerid_outgoing_default
+      summary: Get the authenticated user's default outgoing caller ID
+      description: '**Required ACL:** `confd.users.me.callerids.outgoing.default.read`'
+      tags:
+      - users
+      responses:
+        '200':
+          description: The user's default outgoing caller ID
+          schema:
+            $ref: '#/definitions/UserCallerIDDefault'
+    put:
+      operationId: update_user_me_callerid_outgoing_default
+      summary: Update the authenticated user's default outgoing caller ID
+      description: '**Required ACL:** `confd.users.me.callerids.outgoing.default.update`'
+      tags:
+      - users
+      parameters:
+      - name: body
+        in: body
+        description: The default outgoing caller ID
+        required: true
+        schema:
+          $ref: '#/definitions/UserCallerIDDefault'
+      responses:
+        '204':
+          description: The default outgoing caller ID has been updated
+        '400':
+          description: The number is not one of the caller IDs available to this user
   /users/{user_id}/callerids/outgoing:
     get:
       operationId: list_user_callerid_outgoing
@@ -14,6 +56,41 @@ paths:
           description: User Outgoing Caller ID list
           schema:
             $ref: '#/definitions/UserCallerIDItems'
+  /users/{user_id}/callerids/outgoing/default:
+    get:
+      operationId: get_user_callerid_outgoing_default
+      summary: Get a user's default outgoing caller ID
+      description: '**Required ACL:** `confd.users.{user_id}.callerids.outgoing.default.read`'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useriduuid'
+      responses:
+        '200':
+          description: The user's default outgoing caller ID
+          schema:
+            $ref: '#/definitions/UserCallerIDDefault'
+    put:
+      operationId: update_user_callerid_outgoing_default
+      summary: Update a user's default outgoing caller ID
+      description: '**Required ACL:** `confd.users.{user_id}.callerids.outgoing.default.update`'
+      tags:
+      - users
+      parameters:
+      - $ref: '#/parameters/tenantuuid'
+      - $ref: '#/parameters/useriduuid'
+      - name: body
+        in: body
+        description: The default outgoing caller ID
+        required: true
+        schema:
+          $ref: '#/definitions/UserCallerIDDefault'
+      responses:
+        '204':
+          description: The default outgoing caller ID has been updated
+        '400':
+          description: The number is not one of the caller IDs available to this user
 
 definitions:
   UserCallerID:
@@ -50,3 +127,46 @@ definitions:
         type: integer
     required:
     - total
+  UserCallerIDDefault:
+    title: UserCallerIDDefault
+    description: |
+      The caller ID the user presents on outgoing calls when nothing overrides it
+      for that particular call.
+
+      Applications override the caller ID per call with the
+      `X-Wazo-Selected-Caller-ID` SIP header. A hardware phone cannot, so this is
+      the caller ID it presents.
+
+      On update, `number` must be one of the numbers returned by
+      `/users/{user_id}/callerids/outgoing`, otherwise the request is rejected.
+      The number is stored in `+E.164` form whenever it can be parsed.
+    properties:
+      number:
+        type: string
+        description: Caller ID number. Required for `main` `associated` and `shared` types, and absent otherwise.
+      caller_id_name:
+        type: string
+        description: Caller ID name. Read-only, taken from the matching phone number.
+        readOnly: true
+      type:
+        type: string
+        description: |
+          Caller ID type.
+
+          - `default`: Defer to the dialplan, which uses the outcall caller ID, then the user's own caller ID.
+          - `anonymous`: Anonymous caller ID
+          - `main`: The phone number(`/1.1/phone-numbers`) currently flagged as `main`
+          - `associated`: An incall associated to the user
+          - `shared`: A phone number(`/1.1/phone-numbers`) flagged as `shared`
+          - `custom`: Read-only. The stored caller ID is no longer one of the caller IDs available to this user.
+          - `unset`: Read-only. The user never chose a default. The user's own caller ID is presented: unlike `default`, the outcall caller ID is never applied.
+        enum:
+        - default
+        - anonymous
+        - main
+        - associated
+        - shared
+        - custom
+        - unset
+    required:
+    - type

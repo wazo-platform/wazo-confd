@@ -4,6 +4,27 @@
 
 * Requests to wazo-auth now default to `localhost:80`, through nginx.
 
+* The `outgoing_caller_id` field of the `user` resource is now validated. It accepts what the
+  dialplan can parse: a bare number, a name, or a name followed by a number in angle brackets,
+  with the name either quoted or not. Values the dialplan could never have used, such as a
+  number in angle brackets with no name, an unclosed quote, or a name containing characters
+  like `;` or `@`, are now rejected with a `400` instead of being stored.
+  The enum previously documented for this field did not describe what the dialplan
+  accepts and has been replaced by a pattern and a description of the real forms.
+
+* New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT) to read and
+  set the caller ID a user presents on outgoing calls when nothing overrides it for that
+  particular call. Applications override the caller ID per call with the
+  `X-Wazo-Selected-Caller-ID` SIP header; a hardware phone cannot, so it presents this
+  stored caller ID. On update, the number must be one of those returned by
+  `/1.1/users/{user_id}/callerids/outgoing`. A user who never chose a default reads as
+  `unset`: their own caller ID is presented and, unlike `default`, the outcall caller ID is
+  never applied.
+
+* New `/1.1/users/me/callerids/outgoing` and `/1.1/users/me/callerids/outgoing/default`
+  endpoints, letting an end user list and set their own outgoing caller ID without the
+  tenant-wide `confd.users.{user_id}.update` ACL.
+
 ## 26.08
 
 * New `rest_api.min_threads` option: threads kept ready at all times.
