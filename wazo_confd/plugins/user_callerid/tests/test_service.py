@@ -84,3 +84,24 @@ class TestUserCallerIDService(unittest.TestCase):
 
         associated = [c for c in callerids if c.type == 'associated'][0]
         self.assertEqual(associated.caller_id_name, '')
+
+    def test_associated_pattern_with_only_a_leading_underscore_is_stripped(self):
+        self.user_dao.list_outgoing_callerid_associated.return_value = [
+            SimpleNamespace(type='associated', number='_5555678')
+        ]
+
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
+
+        associated = [c for c in callerids if c.type == 'associated']
+        self.assertEqual([c.number for c in associated], ['5555678'])
+
+    def test_associated_pattern_matching_many_numbers_is_omitted(self):
+        # not one number a caller could be shown
+        self.user_dao.list_outgoing_callerid_associated.return_value = [
+            SimpleNamespace(type='associated', number=exten)
+            for exten in ('_555XXXX', '_555NZ12', '_5[1-3]5', '_555.', '_555!', '_x5')
+        ]
+
+        _, callerids = self.service.search(1, 'tenant-uuid', {})
+
+        self.assertEqual([c for c in callerids if c.type == 'associated'], [])

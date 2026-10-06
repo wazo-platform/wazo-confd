@@ -168,6 +168,10 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'outgoing_caller_id', s.random_string(81))
     s.check_bogus_field_returns_error(url, 'outgoing_caller_id', {})
     s.check_bogus_field_returns_error(url, 'outgoing_caller_id', [])
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', '"" <>')
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', '"Unclosed <123>')
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', 'semi;colon')
+    s.check_bogus_field_returns_error(url, 'outgoing_caller_id', 'at@sign')
     s.check_bogus_field_returns_error(url, 'mobile_phone_number', 123)
     s.check_bogus_field_returns_error(url, 'mobile_phone_number', 'invalid_regex')
     s.check_bogus_field_returns_error(url, 'mobile_phone_number', '123abcd')
@@ -1095,6 +1099,14 @@ def test_update_by_uuid(user):
 
     response = confd.users(user['uuid']).get()
     assert_that(response.item, has_entries(firstname='Fôo', lastname='Bâr'))
+
+
+@fixtures.user()
+def test_edit_outgoing_caller_id_without_a_name(user):
+    url = confd.users(user['uuid'])
+    for value in ('"" <+15555551234>', '<+15555551234>'):
+        url.put(outgoing_caller_id=value).assert_updated()
+        assert_that(url.get().item, has_entries(outgoing_caller_id=value))
 
 
 @fixtures.user(firstname='main', wazo_tenant=MAIN_TENANT)

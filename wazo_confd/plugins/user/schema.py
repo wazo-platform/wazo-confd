@@ -11,6 +11,7 @@ from marshmallow import (
 )
 from marshmallow.exceptions import ValidationError
 from marshmallow.validate import Length, OneOf, Range, Regexp
+from xivo.caller_id import is_valid_caller_id
 
 from wazo_confd.helpers.mallow import BaseSchema, Link, ListLink, Nested, StrictBoolean
 from wazo_confd.helpers.validator import LANGUAGE_REGEX
@@ -25,6 +26,13 @@ CALLER_ID_REGEX = r'^"(.*)"( <\+?\d+>)?$'
 USERNAME_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%@]{2,254}$"
 PASSWORD_REGEX = r"^[a-zA-Z0-9-\._~\!\$&\'\(\)\*\+,;=%]{4,64}$"
 CALL_PERMISSION_PASSWORD_REGEX = r"^[0-9#\*]{1,16}$"
+
+
+def validate_outgoing_caller_id(value: str) -> None:
+    # wazo-agid has to parse this value. The empty string means unset, and
+    # `default` and `anonymous` parse as names.
+    if value and not is_valid_caller_id(value):
+        raise ValidationError('Not a caller ID the dialplan can parse')
 
 
 class WazoAuthUserSchema(BaseSchema):
@@ -53,7 +61,9 @@ class UserSchema(BaseSchema):
     language = fields.String(validate=Regexp(LANGUAGE_REGEX), allow_none=True)
     description = fields.String(allow_none=True)
     caller_id = fields.String(validate=(Regexp(CALLER_ID_REGEX), Length(max=160)))
-    outgoing_caller_id = fields.String(validate=Length(max=80), allow_none=True)
+    outgoing_caller_id = fields.String(
+        validate=(validate_outgoing_caller_id, Length(max=80)), allow_none=True
+    )
     mobile_phone_number = fields.String(
         validate=(Regexp(MOBILE_PHONE_NUMBER_REGEX), Length(max=80)), allow_none=True
     )

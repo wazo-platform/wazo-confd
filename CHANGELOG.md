@@ -1,5 +1,15 @@
 # Changelog
 
+## 26.10
+
+* New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT): the caller ID a
+  user presents by default when not overridden per-call. The number must
+  be one listed by `/1.1/users/{user_id}/callerids/outgoing`.
+* New `/1.1/users/me/callerids/outgoing` and `/1.1/users/me/callerids/outgoing/default`
+  endpoints.
+* The `outgoing_caller_id` field of the `user` resource now only accepts values the dialplan
+  can parse.
+
 ## 26.09
 
 * Requests to wazo-auth now default to `localhost:80`, through nginx.
