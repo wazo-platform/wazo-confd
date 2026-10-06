@@ -100,3 +100,38 @@ class TestMobileFallbackEnabledField(unittest.TestCase):
         self.assertRaises(
             ValidationError, self.schema.load, {'mobile_fallback_enabled': 1}
         )
+
+
+class TestUserSchemaOutgoingCallerID(unittest.TestCase):
+    def setUp(self):
+        self.field = UserSchema._declared_fields['outgoing_caller_id']
+
+    def test_accepts_what_the_dialplan_parses(self):
+        for value in (
+            '',
+            'default',
+            'anonymous',
+            '"Acme Corp" <+14185551234>',
+            'Hursule <4445551234>',
+            'Acme Corp',
+            '5551234567',
+            '"" <5551234567>',
+            '<5551234567>',
+        ):
+            assert_that(self.field.deserialize(value), equal_to(value), value)
+
+    def test_accepts_none(self):
+        assert_that(self.field.deserialize(None), equal_to(None))
+
+    def test_rejects_what_the_dialplan_cannot_parse(self):
+        for value in (
+            '"Unclosed <123>',
+            '""',
+            '"" <>',
+            '"" <123> extra',
+            '   ',
+            'semi;colon',
+            'at@sign',
+        ):
+            with self.assertRaises(ValidationError, msg=value):
+                self.field.deserialize(value)

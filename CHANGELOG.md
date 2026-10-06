@@ -1,5 +1,10 @@
 # Changelog
 
+## 26.10
+
+* The `outgoing_caller_id` field of the `user` resource now only accepts values the dialplan
+  can parse.
+
 ## 26.09
 
 * Requests to wazo-auth now default to `localhost:80`, through nginx.

@@ -396,11 +396,18 @@ definitions:
             Lastname" < number >
         outgoing_caller_id:
           type: string
-          enum:
-          - default
-          - anonymous
-          - '"Firstname Lastname" < number >'
-          description: Name that appears on the phone when calling
+          maxLength: 80
+          pattern: '^(?: *(?:".+"|[\w.!%*+`''~ -]*[^ "]) *(?:<\+?[0-9*#]+>)?| *(?:"")? *<\+?[0-9*#]+>)?$'
+          description: |
+            Caller ID presented on outgoing calls, unless the call overrides it:
+
+            * `default`: the outgoing call's caller ID, else the user's own.
+            * `anonymous`: an anonymous caller ID.
+            * `+15555551234`: a number alone.
+            * `"Firstname Lastname"`: a name alone, quotes optional.
+            * `"Firstname Lastname" <+15555551234>`: a name and a number, quotes optional.
+            * `"" <+15555551234>` or `<+15555551234>`: a number without a name.
+            * empty or null: unset.
         mobile_phone_number:
           type: string
           description: Phone number for the user’s mobile device
@@ -688,11 +695,18 @@ definitions:
           Lastname" < number >
       outgoing_caller_id:
         type: string
-        enum:
-        - default
-        - anonymous
-        - '"Firstname Lastname" < number >'
-        description: Name that appears on the phone when calling
+        maxLength: 80
+        pattern: '^(?: *(?:".+"|[\w.!%*+`''~ -]*[^ "]) *(?:<\+?[0-9*#]+>)?| *(?:"")? *<\+?[0-9*#]+>)?$'
+        description: |
+          Caller ID presented on outgoing calls, unless the call overrides it:
+
+          * `default`: the outgoing call's caller ID, else the user's own.
+          * `anonymous`: an anonymous caller ID.
+          * `+15555551234`: a number alone.
+          * `"Firstname Lastname"`: a name alone, quotes optional.
+          * `"Firstname Lastname" <+15555551234>`: a name and a number, quotes optional.
+          * `"" <+15555551234>` or `<+15555551234>`: a number without a name.
+          * empty or null: unset.
       mobile_phone_number:
         type: string
         description: Phone number for the user’s mobile device
