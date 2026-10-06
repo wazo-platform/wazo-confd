@@ -1,4 +1,4 @@
-# Copyright 2024-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, equal_to, has_entries
@@ -28,6 +28,33 @@ def test_list_with_associated_type(extension, incall, user):
     with a.incall_extension(incall, extension):
         response = confd.users(user['uuid']).callerids.outgoing.get()
 
+    expected = [
+        {'type': 'associated', 'number': '5555556789', 'caller_id_name': ''},
+        {'type': 'anonymous'},
+    ]
+    assert_that(response.items, contains_inanyorder(*expected))
+    assert_that(response.total, equal_to(2))
+
+
+@fixtures.extension(exten='_5555556789', context=INCALL_CONTEXT)
+@fixtures.extension(exten='_555555XXXX', context=INCALL_CONTEXT)
+@fixtures.incall()
+@fixtures.incall()
+@fixtures.user()
+def test_list_with_associated_pattern(
+    literal_pattern, wildcard_pattern, incall1, incall2, user
+):
+    destination = {'type': 'user', 'user_id': user['id']}
+    confd.incalls(incall1['id']).put(destination=destination).assert_updated()
+    confd.incalls(incall2['id']).put(destination=destination).assert_updated()
+
+    with a.incall_extension(incall1, literal_pattern), a.incall_extension(
+        incall2, wildcard_pattern
+    ):
+        response = confd.users(user['uuid']).callerids.outgoing.get()
+
+    # a leading `_` alone still names one number, but a pattern matching many
+    # numbers is not a caller ID anyone could be shown
     expected = [
         {'type': 'associated', 'number': '5555556789', 'caller_id_name': ''},
         {'type': 'anonymous'},

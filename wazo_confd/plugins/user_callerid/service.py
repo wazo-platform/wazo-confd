@@ -1,6 +1,7 @@
 # Copyright 2024-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import re
 from dataclasses import dataclass
 
 import phonenumbers
@@ -9,6 +10,10 @@ from xivo_dao.resources.phone_number import dao as phone_number_dao
 from xivo_dao.resources.user import dao as user_dao
 
 from .types import CallerIDType
+
+# an incall extension may be an Asterisk pattern, which starts with `_`
+EXTEN_PATTERN_PREFIX = '_'
+CALLER_ID_NUMBER_REGEX = re.compile(r'^\+?[0-9*#]+$')
 
 
 @dataclass(frozen=True)
@@ -19,6 +24,15 @@ class CallerID:
 
 
 CallerIDAnonymous = CallerID(type='anonymous')
+
+
+def number_from_exten(exten: str) -> str | None:
+    '''
+    the number an incall extension presents as a caller ID, or None when it is a
+    pattern matching more than one number, such as `_555XXXX`
+    '''
+    number = exten.removeprefix(EXTEN_PATTERN_PREFIX)
+    return number if CALLER_ID_NUMBER_REGEX.match(number) else None
 
 
 def same_phone_number(number1: str, number2: str) -> bool:
@@ -54,9 +68,10 @@ class UserCallerIDService:
         # consider "associated" caller ids from incalls
         # as having precedence over shared phone numbers
         callerids.extend(
-            CallerID(type='associated', number=callerid.number)
+            CallerID(type='associated', number=number)
             for callerid in self.user_dao.list_outgoing_callerid_associated(user_id)
-            if not any(same_phone_number(callerid.number, c.number) for c in callerids)
+            if (number := number_from_exten(callerid.number))
+            and not any(same_phone_number(number, c.number) for c in callerids)
         )
         shared_callerids = self.phone_number_dao.find_all_by(
             shared=True, main=False, tenant_uuids=[tenant_uuid]

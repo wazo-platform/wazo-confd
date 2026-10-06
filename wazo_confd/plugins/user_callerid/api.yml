@@ -31,7 +31,7 @@ definitions:
           Caller ID type.
 
           - `main`: The phone number(`/1.1/phone-numbers`) currently flagged as `main`, which should correspond to the organisation number.
-          - `associated`: An incall associated to the user
+          - `associated`: An incall associated to the user. An incall extension that is a pattern presents its number without the leading `_`, and a pattern matching more than one number, such as `_555XXXX`, is not listed.
           - `anonymous`: Anonymous caller ID
           - `shared`: A phone number(`/1.1/phone-numbers`) flagged as `shared`
         enum:
