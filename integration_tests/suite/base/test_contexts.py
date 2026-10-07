@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import concurrent.futures
@@ -261,7 +261,7 @@ def test_create_out_of_tree_tenant():
     response = confd.contexts.post(
         label='MyContext', wazo_tenant='00000000-0000-0000-0000-000000000000'
     )
-    response.assert_status(401)
+    response.assert_status(403)
 
 
 def test_create_in_authorized_tenant():
