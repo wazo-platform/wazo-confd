@@ -11,6 +11,12 @@ class TestSamePhoneNumber(unittest.TestCase):
         for number in numbers:
             self.assertTrue(same_phone_number(number, number), number)
 
+    def test_identical_numbers_phonenumbers_cannot_parse(self):
+        # a country code alone is not a number to phonenumbers, but a phone
+        # number resource may hold one
+        for number in ('+55', '+42'):
+            self.assertTrue(same_phone_number(number, number), number)
+
     def test_actually_different(self):
         number1 = '11234567890'
         number2 = '11234567891'
