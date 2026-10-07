@@ -53,6 +53,10 @@ def same_phone_number(number1: str, number2: str) -> bool:
     '''
     compare two strings semantically as phone numbers
     '''
+    # phonenumbers does not match what it cannot parse, such as a country code
+    # alone, even against itself
+    if number1 == number2:
+        return True
     result = phonenumbers.is_number_match(number1, number2)
     return result in (
         phonenumbers.MatchType.EXACT_MATCH,

@@ -164,6 +164,16 @@ def test_put_available_number(phone_number, user):
     )
 
 
+@fixtures.phone_number(shared=True, number='+55')
+@fixtures.user()
+def test_put_listed_number_phonenumbers_cannot_parse(phone_number, user):
+    # a country code alone is not a number to phonenumbers
+    url = confd.users(user['uuid']).callerids.outgoing.default
+    url.put({'type': 'shared', 'number': '+55'}).assert_updated()
+
+    assert_that(url.get().item, has_entries(type='shared', number='+55'))
+
+
 @fixtures.phone_number(shared=True, number='+15555551234')
 @fixtures.user()
 def test_put_number_matching_semantically(phone_number, user):

@@ -190,6 +190,18 @@ class TestEditDefault(BaseDefaultServiceTestCase):
         self.assertEqual(user.outgoing_caller_id, '"Acme Corp" <+14185551234>')
         self.assertEqual(result.type, 'main')
 
+    def test_listed_number_phonenumbers_cannot_parse_is_accepted(self):
+        self.available.append(CallerID(type='shared', number='+55'))
+        self.callerid_service.search.return_value = (
+            len(self.available),
+            self.available,
+        )
+        user = self.a_user()
+
+        self.service.edit(user, CallerID(type='shared', number='+55'))
+
+        self.assertEqual(user.outgoing_caller_id, '+55')
+
     def test_number_is_stored_as_listed(self):
         # wazo-agid formats it for the trunk when placing the call
         user = self.a_user()
