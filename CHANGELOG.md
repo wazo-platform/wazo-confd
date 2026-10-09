@@ -9,6 +9,11 @@
   endpoints.
 * The `outgoing_caller_id` field of the `user` resource now only accepts values the dialplan
   can parse.
+* `/1.1/users/{user_id}/callerids/outgoing` no longer lists an incall extension that is a pattern
+  matching more than one number; a pattern naming a single number is listed without its leading
+  `_`.
+* The `options` of `/1.1/sip/transports` now accept IPv6 address syntax: bracketed addresses with a
+  port (e.g. `[::]:5060`) and scope identifiers (e.g. `fe80::1%eth0`).
 
 ## 26.09
 
