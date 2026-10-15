@@ -1,5 +1,13 @@
 # Changelog
 
+## 26.11
+
+* wazo-confd now serves Prometheus metrics itself at `GET /1.1/metrics`, on its
+  REST API port (127.0.0.1:9486). The route has no authentication and is not
+  exposed through nginx. It replaces the route added by the
+  wazo-prometheus-exporter plugin, at the same URL. Disable it with
+  `metrics.enabled: false`.
+
 ## 26.10
 
 * New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT): the caller ID a

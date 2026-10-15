@@ -186,6 +186,9 @@ DEFAULT_CONFIG = {
     'pjsip_config_doc_filename': '/usr/share/doc/asterisk-doc/json/pjsip.json.gz',
     'sync_db': {'quiet': False},
     'paginated_user_strategy_threshold': 101,
+    'metrics': {
+        'enabled': True,
+    },
 }
 
 
