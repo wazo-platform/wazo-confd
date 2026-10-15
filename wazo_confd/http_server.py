@@ -12,6 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.middleware.profiler import ProfilerMiddleware
 from werkzeug.middleware.proxy_fix import ProxyFix
 from xivo import http_helpers, wsgi
+from xivo.flask.metrics import init_flask_metrics
 from xivo.http_helpers import ReverseProxied
 from xivo_dao.helpers.db_manager import Session
 from xivo_dao.helpers.db_utils import session_scope
@@ -95,6 +96,8 @@ class HTTPServer:
         app.config['MAX_CONTENT_LENGTH'] = 40 * 1024 * 1024
 
         self._load_cors()
+        if global_config['metrics']['enabled']:
+            init_flask_metrics(app, api)
         self.server = None
         self._stopped = threading.Event()
 
