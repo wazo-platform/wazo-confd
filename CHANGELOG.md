@@ -5,6 +5,12 @@
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`
   as `ring_strategy`. Existing groups using it are migrated to `random`.
 
+* wazo-confd now serves Prometheus metrics itself at `GET /1.1/metrics`, on its
+  REST API port (127.0.0.1:9486). The route has no authentication and is not
+  exposed through nginx. It replaces the route added by the
+  wazo-prometheus-exporter plugin, at the same URL. Disable it with
+  `metrics.enabled: false`.
+
 ## 26.10
 
 * New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT): the caller ID a

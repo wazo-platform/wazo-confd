@@ -1,3 +1,8 @@
+# Metrics are not authenticated: only serve them on 127.0.0.1:9486
+location = /api/confd/1.1/metrics {
+    deny all;
+}
+
 location ^~ /api/confd/1.1/guests {
     proxy_pass http://127.0.0.1:9486/1.1/guests;
     include /etc/nginx/wazo-confd-shared.conf;
