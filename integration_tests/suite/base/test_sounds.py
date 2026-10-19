@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
@@ -292,7 +292,7 @@ def test_create_all_parameters():
 
 def test_create_unauthorized_tenant():
     response = confd.sounds.post(wazo_tenant='wrong_tenant', name='sound1')
-    response.assert_status(401)
+    response.assert_status(403)
 
 
 @fixtures.sound()
