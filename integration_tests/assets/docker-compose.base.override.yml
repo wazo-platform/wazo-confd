@@ -14,6 +14,10 @@ services:
   postgres:
     command: "-c 'log_min_duration_statement=0'"
 
+  confd:
+    volumes:
+      - "./etc/wazo-confd/conf.d/metrics.yml:/etc/wazo-confd/conf.d/metrics.yml"
+
   ari:
     image: wazoplatform/flask
     ports:

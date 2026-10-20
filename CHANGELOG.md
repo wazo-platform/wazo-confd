@@ -1,5 +1,11 @@
 # Changelog
 
+## 26.11
+
+* New endpoint `GET /1.1/metrics`: Prometheus metrics, without authentication.
+  It is served by the `metrics` plugin, disabled by default; enable it with
+  `enabled_plugins: {metrics: true}`.
+
 ## 26.10
 
 * New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT): the caller ID a
