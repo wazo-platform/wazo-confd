@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import (
@@ -63,6 +63,7 @@ def error_checks(url):
     s.check_bogus_field_returns_error(url, 'preprocess_subroutine', {})
     s.check_bogus_field_returns_error(url, 'ring_strategy', 123)
     s.check_bogus_field_returns_error(url, 'ring_strategy', 'invalid')
+    s.check_bogus_field_returns_error(url, 'ring_strategy', 'weight_random')
     s.check_bogus_field_returns_error(url, 'ring_strategy', True)
     s.check_bogus_field_returns_error(url, 'ring_strategy', None)
     s.check_bogus_field_returns_error(url, 'ring_strategy', [])
@@ -314,7 +315,7 @@ def test_create_all_parameters():
         'music_on_hold': 'default',
         'preprocess_subroutine': 'subroutien',
         'ring_in_use': False,
-        'ring_strategy': 'weight_random',
+        'ring_strategy': 'memorized_round_robin',
         'mark_answered_elsewhere': False,
         'user_timeout': 24,
         'retry_delay': 12,

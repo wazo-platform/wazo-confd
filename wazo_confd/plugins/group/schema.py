@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -33,7 +33,6 @@ class GroupSchema(BaseSchema):
                 'linear',  # Issue when editing to this value: ASTERISK-17049
                 'fewest_calls',
                 'memorized_round_robin',
-                'weight_random',
             ]
         )
     )
@@ -97,8 +96,6 @@ class GroupSchema(BaseSchema):
             data['ring_strategy'] = 'fewest_calls'
         elif ring_strategy == 'rrmemory':
             data['ring_strategy'] = 'memorized_round_robin'
-        elif ring_strategy == 'wrandom':
-            data['ring_strategy'] = 'weight_random'
         return data
 
     @post_dump
@@ -120,8 +117,6 @@ class GroupSchema(BaseSchema):
             data['ring_strategy'] = 'fewestcalls'
         elif ring_strategy == 'memorized_round_robin':
             data['ring_strategy'] = 'rrmemory'
-        elif ring_strategy == 'weight_random':
-            data['ring_strategy'] = 'wrandom'
         return data
 
     @post_load
