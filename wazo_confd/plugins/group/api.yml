@@ -129,7 +129,6 @@ definitions:
             - `memorized_round_robin`: ring members in a round-robin fashion, starting with the member following
               the one who answered last
             - `random`: ring a random member
-            - `weight_random`: ring a random member, weighed by a per-member penalty factor
           enum:
           - all
           - random
@@ -137,7 +136,6 @@ definitions:
           - linear
           - fewest_calls
           - memorized_round_robin
-          - weight_random
         preprocess_subroutine:
           type: string
         timeout:
