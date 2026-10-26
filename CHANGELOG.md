@@ -5,6 +5,10 @@
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`
   as `ring_strategy`. Existing groups using it are migrated to `random`.
 
+* New endpoint `GET /1.1/metrics`: Prometheus metrics, without authentication.
+  It is served by the `metrics` plugin, disabled by default; enable it with
+  `enabled_plugins: {metrics: true}`.
+
 ## 26.10
 
 * New `/1.1/users/{user_id}/callerids/outgoing/default` endpoint (GET, PUT): the caller ID a
