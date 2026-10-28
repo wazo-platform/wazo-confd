@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import os
@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import yaml
 from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 from wazo_test_helpers.auth import AuthClient as MockAuthClient
-from wazo_test_helpers.auth import MockCredentials, MockUserToken
+from wazo_test_helpers.auth import MockUserToken
 from wazo_test_helpers.bus import BusClient
 from wazo_test_helpers.filesystem import FileSystemClient as GenericFileSystemClient
 
@@ -22,9 +22,7 @@ from .config import (
     DEFAULT_TENANTS,
     MAIN_TENANT,
     SUB_TENANT,
-    TOKEN,
     TOKEN_SUB_TENANT,
-    USER_UUID,
 )
 from .database import create_helper as db_create_helper
 from .filesystem import FileSystemClient, TenantFileSystemClient
@@ -46,24 +44,12 @@ class IntegrationTest(AssetLaunchingTestCase):
     def setup_token(cls):
         cls.mock_auth = MockAuthClient('127.0.0.1', cls.service_port(9497, 'auth'))
         token = MockUserToken(
-            TOKEN,
-            'user_uuid',
-            metadata={'uuid': USER_UUID, 'tenant_uuid': MAIN_TENANT},
-        )
-        cls.mock_auth.set_token(token)
-        token = MockUserToken(
             TOKEN_SUB_TENANT,
             'user_uuid',
             metadata={'uuid': 'user_uuid', 'tenant_uuid': SUB_TENANT},
         )
         cls.mock_auth.set_token(token)
         cls._reset_auth_tenants()
-
-    @classmethod
-    def setup_service_token(cls):
-        auth = MockAuthClient('127.0.0.1', cls.service_port(9497, 'auth'))
-        credential = MockCredentials('confd-service', 'confd-password')
-        auth.set_valid_credentials(credential, str(TOKEN))
 
     @classmethod
     def sync_db(cls):

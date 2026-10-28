@@ -8,6 +8,8 @@ services:
     image: wazoplatform/wazo-auth-mock
     ports:
       - 9497
+    volumes:
+      - ./etc/wazo-auth-mock/init.yml:/etc/wazo-auth-mock/init.yml:ro
 
   provd:
     image: wazoplatform/wazo-provd

@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from contextlib import contextmanager
@@ -19,7 +19,6 @@ class BaseIntegrationTest(IntegrationTest):
     def setUpClass(cls):
         super().setUpClass()
         cls.setup_token()
-        cls.setup_service_token()
         cls.confd = cls.make_confd()
         cls.wait_strategy.wait(cls)
         cls.setup_provd()

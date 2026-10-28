@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import copy
@@ -101,7 +101,6 @@ class IntegrationTest(BaseIntegrationTest):
     def setUpClass(cls):
         super().setUpClass()
         cls.setup_token()
-        cls.setup_service_token()
         cls.confd = cls.create_confd()
         cls.wait_strategy.wait(cls)
         cls.setup_helpers()

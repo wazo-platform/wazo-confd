@@ -1,0 +1,11 @@
+tokens:
+  - token: 00000000-0000-4000-9000-000000070435
+    auth_id: user_uuid
+    metadata:
+      uuid: d1534a6c-3e35-44db-b4df-0e2957cdea77
+      tenant_uuid: eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1
+
+valid_credentials:
+  - username: confd-service
+    password: confd-password
+    token: 00000000-0000-4000-9000-000000070435

@@ -1,8 +1,9 @@
-# Copyright 2022-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2022-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, has_entries
 from wazo_test_helpers import until
+from wazo_test_helpers.auth import MockCredentials
 
 from ..helpers.bus import BusClient as bus_client
 from ..helpers.bus import setup_bus
@@ -66,7 +67,7 @@ def test_confd_status_fails_when_rabbitmq_is_down():
     until.assert_(_bus_consumer_status_is_ok, tries=10)
 
 
-def test_confd_status_fails_when_wazo_auth_is_down():
+def test_confd_status_fails_when_service_credentials_are_rejected():
     expected_status_fail_entries = {
         'bus_consumer': {
             'status': 'ok',
@@ -81,18 +82,19 @@ def test_confd_status_fails_when_wazo_auth_is_down():
             'status': 'fail',
         },
     }
+    BaseIntegrationTest.mock_auth.set_invalid_credentials(
+        MockCredentials('confd-service', 'confd-password')
+    )
     BaseIntegrationTest.restart_confd()
     reset_confd_clients()
+
+    response = until.return_(confd.status.get, timeout=5)
+    assert_that(response.item, has_entries(**expected_status_fail_entries))
 
     BaseIntegrationTest.restart_service('auth')
     auth._reset()
     until.true(auth.is_up, tries=10)
     BaseIntegrationTest.setup_token()
-
-    response = until.return_(confd.status.get, timeout=5)
-    assert_that(response.item, has_entries(**expected_status_fail_entries))
-
-    BaseIntegrationTest.setup_service_token()
 
     def _status_is_all_ok():
         response = confd.status.get()
