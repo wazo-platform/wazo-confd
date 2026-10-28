@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, equal_to, has_entries
@@ -8,7 +8,7 @@ from ..helpers import scenarios as s
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 from . import confd
 
-FAKE_UUID = '99999999-9999-9999-9999-999999999999'
+FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
 def test_get_errors():

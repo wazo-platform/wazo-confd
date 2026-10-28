@@ -1,4 +1,4 @@
-# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import re
@@ -20,7 +20,7 @@ from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
 
 FAKE_ID = 999999999
-FAKE_UUID = '99999999-9999-9999-9999-999999999999'
+FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
 @fixtures.group()

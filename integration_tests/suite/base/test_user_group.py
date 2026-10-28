@@ -1,4 +1,4 @@
-# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_inanyorder, has_entries
@@ -10,7 +10,7 @@ from ..helpers import scenarios as s
 from . import confd
 
 FAKE_ID = 999999999
-FAKE_UUID = '99999999-9999-9999-9999-999999999999'
+FAKE_UUID = '99999999-9999-4999-9999-999999999999'
 
 
 @fixtures.group()

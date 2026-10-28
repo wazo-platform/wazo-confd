@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 CONTEXT = 'default'
@@ -10,8 +10,8 @@ EXTEN_OUTSIDE_RANGE = str('99999')
 EXTEN_QUEUE_RANGE = range(3000, 4000)
 EXTEN_USER_RANGE = range(1000, 2000)
 MAIN_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'
-SUB_TENANT = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'
-SUB_TENANT2 = 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3'
+SUB_TENANT = 'eeeeeeee-eeee-4eee-aeee-eeeeeeeeeee2'
+SUB_TENANT2 = 'eeeeeeee-eeee-4eee-aeee-eeeeeeeeeee3'
 TOKEN = '00000000-0000-4000-9000-000000070435'
 TOKEN_SUB_TENANT = '00000000-0000-4000-9000-000000000222'
 DELETED_TENANT = '66666666-6666-4666-8666-666666666666'
