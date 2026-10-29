@@ -23,7 +23,11 @@ paths:
     post:
       operationId: create_endpoint_custom
       summary: Create Custom endpoint
-      description: '**Required ACL:** `confd.endpoints.custom.create`'
+      description: |
+        **Required ACL:** `confd.endpoints.custom.create`
+
+        Some features may be missing or incomplete on lines using custom
+        endpoints (e.g. call logs).
       tags:
       - endpoints
       - custom
