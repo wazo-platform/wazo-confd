@@ -19,6 +19,8 @@ class Extension:
 
 
 class GroupMemberItem(ConfdResource):
+    has_tenant_uuid = True
+
     def __init__(self, service, group_dao):
         super().__init__()
         self.service = service
@@ -27,7 +29,6 @@ class GroupMemberItem(ConfdResource):
 
 class GroupMemberUserItem(GroupMemberItem):
     schema = GroupUsersSchema
-    has_tenant_uuid = True
 
     def __init__(self, service, group_dao, user_dao):
         super().__init__(service, group_dao)
@@ -66,7 +67,8 @@ class GroupMemberExtensionItem(GroupMemberItem):
 
     @required_acl('confd.groups.{group_uuid}.members.extensions.update')
     def put(self, group_uuid):
-        group = self.group_dao.get(group_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         members = []
         for member_form in form['extensions']:

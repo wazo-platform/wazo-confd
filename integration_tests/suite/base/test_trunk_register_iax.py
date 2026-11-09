@@ -7,6 +7,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
 
 FAKE_ID = 999999999
@@ -146,3 +147,26 @@ def test_bus_events(trunk, register):
 
     s.check_event('trunk_register_iax_associated', headers, url.put)
     s.check_event('trunk_register_iax_dissociated', headers, url.delete)
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.register_iax()
+def test_associate_multi_tenant(main_trunk, register):
+    response = (
+        confd.trunks(main_trunk['id'])
+        .registers.iax(register['id'])
+        .put(wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('Trunk'))
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.register_iax()
+def test_dissociate_multi_tenant(main_trunk, register):
+    with a.trunk_register_iax(main_trunk, register):
+        response = (
+            confd.trunks(main_trunk['id'])
+            .registers.iax(register['id'])
+            .delete(wazo_tenant=SUB_TENANT)
+        )
+        response.assert_match(404, e.not_found('Trunk'))

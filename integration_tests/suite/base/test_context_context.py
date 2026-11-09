@@ -4,8 +4,10 @@
 from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
+from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
 
 FAKE_ID = 999999999
@@ -148,3 +150,36 @@ def test_delete_sub_context_when_context_and_sub_context_associated(
 
         response = confd.contexts(context2['id']).get()
         assert_that(response.item['contexts'], empty())
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(main_context, sub_context, sub_context2):
+    response = (
+        confd.contexts(main_context['id'])
+        .contexts()
+        .put(contexts=[sub_context], wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('Context'))
+
+    response = (
+        confd.contexts(sub_context['id'])
+        .contexts()
+        .put(contexts=[main_context], wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(400, e.not_found('Context'))
+
+    response = (
+        confd.contexts(main_context['id'])
+        .contexts()
+        .put(contexts=[sub_context], wazo_tenant=MAIN_TENANT)
+    )
+    response.assert_match(400, e.different_tenant())
+
+    response = (
+        confd.contexts(sub_context['id'])
+        .contexts()
+        .put(contexts=[sub_context2], wazo_tenant=SUB_TENANT)
+    )
+    response.assert_updated()

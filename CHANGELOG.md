@@ -4,6 +4,12 @@
 
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`
   as `ring_strategy`. Existing groups using it are migrated to `random`.
+* The following endpoints now return 404 for a user, line, context, group or trunk outside the
+  tenants visible to the caller: `GET /1.1/users/{user_uuid}/lines/{line_id}/associated/endpoints/sip`,
+  `PUT /1.1/users/{user_id}/lines`, `PUT /1.1/contexts/{context_id}/contexts`,
+  `PUT /1.1/groups/{group_uuid}/members/extensions`, `GET` and `PUT /1.1/groups/{group_uuid}/fallbacks`,
+  `PUT` and `DELETE /1.1/trunks/{trunk_id}/registers/iax/{register_id}`.
+* `PUT /1.1/contexts/{context_id}/contexts` now rejects including a context from another tenant.
 
 ## 26.10
 

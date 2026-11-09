@@ -10,6 +10,7 @@ from .schema import GroupFallbackSchema
 
 
 class GroupFallbackList(ConfdResource):
+    has_tenant_uuid = True
     schema = GroupFallbackSchema
 
     def __init__(self, service, group_dao):
@@ -19,12 +20,14 @@ class GroupFallbackList(ConfdResource):
 
     @required_acl('confd.groups.{group_uuid}.fallbacks.read')
     def get(self, group_uuid):
-        group = self.group_dao.get(group_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         return self.schema().dump(group.fallbacks)
 
     @required_acl('confd.groups.{group_uuid}.fallbacks.update')
     def put(self, group_uuid):
-        group = self.group_dao.get(group_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         fallbacks = self.schema().load(request.get_json(force=True))
         self.service.edit(group, fallbacks)
         return '', 204

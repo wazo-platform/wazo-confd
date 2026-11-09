@@ -443,3 +443,29 @@ def test_bus_events(user, line):
 
     (s.check_event('user_line_associated', headers, url.put))
     (s.check_event('user_line_dissociated', headers, url.delete))
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_lines_multi_tenant(main_context, sub_context, main_user, sub_user):
+    @fixtures.line_sip(context=main_context, wazo_tenant=MAIN_TENANT)
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    def aux(main_line, sub_line):
+        response = confd.users(main_user['uuid']).lines.put(
+            lines=[main_line], wazo_tenant=SUB_TENANT
+        )
+        response.assert_match(404, e.not_found('User'))
+
+        response = confd.users(sub_user['uuid']).lines.put(
+            lines=[main_line], wazo_tenant=SUB_TENANT
+        )
+        response.assert_match(400, e.not_found('Line'))
+
+        response = confd.users(main_user['uuid']).lines.put(
+            lines=[sub_line], wazo_tenant=MAIN_TENANT
+        )
+        response.assert_match(400, e.different_tenant())
+
+    aux()
