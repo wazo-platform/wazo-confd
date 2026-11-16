@@ -1,4 +1,4 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from hamcrest import assert_that, contains_exactly, has_entries, has_item
@@ -98,7 +98,7 @@ def test_given_user_in_another_tenant(user_main, user_sub):
     assert_that(response.csv(), contains_exactly(has_entries(uuid=user_sub['uuid'])))
 
     response = confd_csv.users.export.get(wazo_tenant=UNKNOWN_TENANT)
-    response.assert_status(401)
+    response.assert_status(403)
 
 
 @database.reset(db)
