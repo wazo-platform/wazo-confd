@@ -109,6 +109,7 @@ DEFAULT_CONFIG = {
         'localization': True,
         'meeting': True,
         'meeting_authorization': True,
+        'metrics': False,
         'moh': True,
         'outcall': True,
         'outcall_call_permission': True,

@@ -1,5 +1,11 @@
 # Changelog
 
+## 26.12
+
+* New endpoint `GET /1.1/metrics`: Prometheus metrics, without authentication.
+  It is served by the `metrics` plugin, disabled by default; enable it with
+  `enabled_plugins: {metrics: true}`.
+
 ## 26.11
 
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`
