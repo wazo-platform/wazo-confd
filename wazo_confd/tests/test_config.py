@@ -153,3 +153,30 @@ def test_load_rejects_every_role_disabled(config_files):
 
     with pytest.raises(ValueError):
         load([])
+
+
+def test_cli_listen_port_sets_the_rest_api_port():
+    result = _parse_cli_args(['--listen-port', '19486'])
+
+    assert result['rest_api'] == {'port': 19486}
+
+
+def test_cli_listen_port_and_profile_are_both_kept():
+    result = _parse_cli_args(['--listen-port', '19486', '--profile', '/tmp/profile'])
+
+    assert result['rest_api'] == {'port': 19486, 'profile': '/tmp/profile'}
+
+
+def test_cli_no_listen_port_leaves_rest_api_unset():
+    result = _parse_cli_args([])
+
+    assert 'rest_api' not in result
+
+
+def test_load_cli_listen_port_overrides_file_port_but_keeps_listen(config_files):
+    config_files.return_value = {'rest_api': {'port': 9486, 'listen': '0.0.0.0'}}
+
+    config = load(['--listen-port', '19486'])
+
+    assert config['rest_api']['port'] == 19486
+    assert config['rest_api']['listen'] == '0.0.0.0'

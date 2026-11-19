@@ -259,6 +259,12 @@ def _parse_cli_args(argv):
         action='store',
     )
     parser.add_argument(
+        '--listen-port',
+        action='store',
+        type=int,
+        help='Port on which the REST API will listen',
+    )
+    parser.add_argument(
         '--role',
         action='append',
         dest='roles',
@@ -273,8 +279,13 @@ def _parse_cli_args(argv):
         result['config_file'] = parsed_args.config_file
     if parsed_args.debug:
         result['debug'] = parsed_args.debug
+    rest_api = {}
     if parsed_args.profile:
-        result['rest_api'] = {'profile': parsed_args.profile}
+        rest_api['profile'] = parsed_args.profile
+    if parsed_args.listen_port is not None:
+        rest_api['port'] = parsed_args.listen_port
+    if rest_api:
+        result['rest_api'] = rest_api
     if parsed_args.log_level:
         result['log_level'] = parsed_args.log_level
     if parsed_args.user:
