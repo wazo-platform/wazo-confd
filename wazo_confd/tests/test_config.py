@@ -180,3 +180,27 @@ def test_load_cli_listen_port_overrides_file_port_but_keeps_listen(config_files)
 
     assert config['rest_api']['port'] == 19486
     assert config['rest_api']['listen'] == '0.0.0.0'
+
+
+def test_load_advertise_port_defaults_to_the_rest_api_port(config_files):
+    config = load([])
+
+    assert config['service_discovery']['advertise_port'] == 9486
+    assert config['service_discovery']['advertise_address'] == 'auto'
+
+
+def test_load_advertise_port_follows_the_cli_port(config_files):
+    config = load(['--listen-port', '19486'])
+
+    assert config['service_discovery']['advertise_port'] == 19486
+
+
+def test_load_explicit_advertise_port_is_respected(config_files):
+    config_files.return_value = {
+        'rest_api': {'port': 9600},
+        'service_discovery': {'advertise_port': 12345},
+    }
+
+    config = load([])
+
+    assert config['service_discovery']['advertise_port'] == 12345

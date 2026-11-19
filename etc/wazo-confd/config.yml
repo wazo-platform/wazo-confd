@@ -109,6 +109,7 @@ service_discovery:
 #   # If advertise_address is "auto" this interface will be used to find the ip
 #   # address to advertise. Ignored otherwise
 #   advertise_address_interface: eth0
+#   # Defaults to rest_api.port
 #   advertise_port: 9486
 #   # The number of seconds that consul will wait between 2 ttl messages to mark
 #   # this service as up

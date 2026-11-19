@@ -178,7 +178,7 @@ DEFAULT_CONFIG = {
         'enabled': False,
         'advertise_address': 'auto',
         'advertise_address_interface': 'eth0',
-        'advertise_port': 9486,
+        'advertise_port': None,  # None: advertise rest_api.port
         'ttl_interval': 30,
         'refresh_interval': 25,
         'retry_interval': 2,
@@ -316,5 +316,10 @@ def _get_reinterpreted_raw_values(config):
         result['log_level'] = get_log_level_by_name(log_level)
 
     result['roles'] = _normalize_roles(config['roles'])
+
+    if config['service_discovery']['advertise_port'] is None:
+        result['service_discovery'] = {
+            'advertise_port': config['rest_api']['port'],
+        }
 
     return result
