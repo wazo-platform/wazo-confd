@@ -1,6 +1,7 @@
-# Copyright 2023-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import argparse
 import socket
 import sys
 import time
@@ -38,8 +39,20 @@ def get_wazo_confd_port():
     return config['rest_api']['port']
 
 
+def _parse_cli_args(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--port',
+        type=int,
+        help='TCP port to wait on '
+        '(default: rest_api.port from the configuration files)',
+    )
+    return parser.parse_args(argv)
+
+
 def main():
-    port = get_wazo_confd_port()
+    args = _parse_cli_args(sys.argv[1:])
+    port = args.port if args.port is not None else get_wazo_confd_port()
 
     for _ in iterations(TIMEOUT, INTERVAL):
         if tcp_port_is_open(HOST, port):
