@@ -10,6 +10,7 @@ from xivo.xivo_logging import get_log_level_by_name
 
 API_VERSION = '1.1'
 WIZARD_KEY_FILE = '/var/lib/wazo-auth-keys/wazo-wizard-key.yml'
+VALID_ROLES = ('api', 'consumer')
 
 DEFAULT_CONFIG = {
     'debug': False,
@@ -18,6 +19,7 @@ DEFAULT_CONFIG = {
     'config_file': '/etc/wazo-confd/config.yml',
     'extra_config_files': '/etc/wazo-confd/conf.d/',
     'log_filename': '/var/log/wazo-confd.log',
+    'roles': {role: True for role in VALID_ROLES},  # dict: lists accumulate in conf.d
     'rest_api': {
         'profile': None,
         'listen': '127.0.0.1',
@@ -256,6 +258,14 @@ def _parse_cli_args(argv):
         help="Write profiling stats to directory (for debugging performance issues)",
         action='store',
     )
+    parser.add_argument(
+        '--role',
+        action='append',
+        dest='roles',
+        choices=VALID_ROLES,
+        help='Restrict this process to the given role (repeatable). '
+        'Default: all roles (api, consumer)',
+    )
     parsed_args = parser.parse_args(argv)
 
     result = {}
@@ -269,8 +279,22 @@ def _parse_cli_args(argv):
         result['log_level'] = parsed_args.log_level
     if parsed_args.user:
         result['user'] = parsed_args.user
+    if parsed_args.roles:
+        result['roles'] = {role: role in parsed_args.roles for role in VALID_ROLES}
 
     return result
+
+
+def _normalize_roles(roles):
+    if not isinstance(roles, dict):
+        raise ValueError(f'roles must be a map of role name to boolean, got {roles!r}')
+    unknown = sorted(set(roles) - set(VALID_ROLES))
+    if unknown:
+        raise ValueError(f'invalid roles {unknown}, must be one of {list(VALID_ROLES)}')
+    enabled = sorted(role for role, is_enabled in roles.items() if is_enabled)
+    if not enabled:
+        raise ValueError('roles must contain at least one enabled role')
+    return enabled
 
 
 def _get_reinterpreted_raw_values(config):
@@ -279,5 +303,7 @@ def _get_reinterpreted_raw_values(config):
     log_level = config.get('log_level')
     if log_level:
         result['log_level'] = get_log_level_by_name(log_level)
+
+    result['roles'] = _normalize_roles(config['roles'])
 
     return result

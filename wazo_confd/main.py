@@ -9,6 +9,7 @@ from xivo import xivo_logging
 from xivo.config_helper import UUIDNotFound, set_xivo_uuid
 from xivo.user_rights import change_user
 
+from wazo_confd.config import VALID_ROLES
 from wazo_confd.config import load as load_config
 from wazo_confd.controller import Controller
 
@@ -21,7 +22,7 @@ def main(argv=None):
         config = load_config(argv)
     except ValueError as e:
         print(f'invalid configuration: {e}', file=sys.stderr)  # journald gets stderr
-        sys.exit(os.EX_CONFIG)  # 78: matches RestartPreventExitStatus in the unit
+        sys.exit(os.EX_CONFIG)  # 78: matches RestartPreventExitStatus in the units
 
     xivo_logging.setup_logging(
         config['log_filename'],
@@ -30,6 +31,9 @@ def main(argv=None):
     )
     xivo_logging.silence_loggers(['Flask-Cors'], logging.WARNING)
     xivo_logging.silence_loggers(['amqp'], logging.INFO)
+
+    if set(config['roles']) != set(VALID_ROLES):
+        logger.info('Starting wazo-confd with roles: %s', ', '.join(config['roles']))
 
     if config['user']:
         change_user(config['user'])

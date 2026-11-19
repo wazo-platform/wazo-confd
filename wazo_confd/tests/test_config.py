@@ -6,7 +6,13 @@ from unittest.mock import patch
 
 import pytest
 
-from ..config import _parse_cli_args, load
+from ..config import (
+    DEFAULT_CONFIG,
+    VALID_ROLES,
+    _normalize_roles,
+    _parse_cli_args,
+    load,
+)
 
 
 @pytest.fixture
@@ -76,3 +82,74 @@ def test_load_keeps_the_configured_credentials(config_files):
 def test_load_rejects_an_unknown_log_level(config_files):
     with pytest.raises(ValueError):
         load(['--log-level', 'bogus'])
+
+
+def test_default_config_roles():
+    assert DEFAULT_CONFIG['roles'] == {'api': True, 'consumer': True}
+    assert VALID_ROLES == ('api', 'consumer')
+
+
+def test_cli_role_disables_the_others():
+    result = _parse_cli_args(['--role', 'api'])
+
+    assert result['roles'] == {'api': True, 'consumer': False}
+
+
+def test_cli_role_is_repeatable():
+    result = _parse_cli_args(['--role', 'api', '--role', 'consumer'])
+
+    assert result['roles'] == {'api': True, 'consumer': True}
+
+
+def test_cli_unknown_role_is_rejected():
+    with pytest.raises(SystemExit):
+        _parse_cli_args(['--role', 'bogus'])
+
+
+def test_normalize_roles_keeps_enabled_roles_sorted():
+    assert _normalize_roles({'consumer': True, 'api': True}) == ['api', 'consumer']
+    assert _normalize_roles({'consumer': False, 'api': True}) == ['api']
+
+
+def test_normalize_roles_rejects_unknown_role():
+    with pytest.raises(ValueError):
+        _normalize_roles({'api': True, 'bogus': True})
+
+
+def test_normalize_roles_rejects_all_roles_disabled():
+    with pytest.raises(ValueError):
+        _normalize_roles({'api': False, 'consumer': False})
+
+
+def test_normalize_roles_rejects_a_list():
+    with pytest.raises(ValueError):
+        _normalize_roles(['api'])
+
+
+def test_load_enables_every_role_by_default(config_files):
+    config = load([])
+
+    assert config['roles'] == ['api', 'consumer']
+
+
+def test_load_merges_a_role_disabled_in_a_file(config_files):
+    config_files.return_value = {'roles': {'consumer': False}}
+
+    config = load([])
+
+    assert config['roles'] == ['api']
+
+
+def test_load_cli_role_overrides_the_files(config_files):
+    config_files.return_value = {'roles': {'api': False}}
+
+    config = load(['--role', 'api'])
+
+    assert config['roles'] == ['api']
+
+
+def test_load_rejects_every_role_disabled(config_files):
+    config_files.return_value = {'roles': {'api': False, 'consumer': False}}
+
+    with pytest.raises(ValueError):
+        load([])

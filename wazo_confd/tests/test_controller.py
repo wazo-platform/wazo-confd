@@ -48,8 +48,9 @@ def components():
         stopping.set()
 
 
-def make_controller():
+def make_controller(roles=('api', 'consumer')):
     config = dict(DEFAULT_CONFIG, uuid='00000000-0000-4000-8000-000000000001')
+    config['roles'] = list(roles)
     return Controller(config)
 
 
@@ -80,3 +81,46 @@ def test_status_reports_the_bus_consumer(components):
     controller.status_aggregator.status()
 
     components['bus_consumer'].provide_status.assert_called_once()
+
+
+def test_api_role_serves_without_the_bus_consumer(components):
+    controller = make_controller(roles=['api'])
+    running = threading.Thread(target=controller.run)
+
+    running.start()
+    assert components['serving'].wait(timeout=5)
+    controller.stop(reason='test')
+    running.join(timeout=5)
+
+    assert not running.is_alive()
+    components['token_renewer'].__enter__.assert_called_once()
+    components['registration'].return_value.__enter__.assert_called_once()
+    components['bus_consumer'].__enter__.assert_not_called()
+
+
+def test_api_role_status_does_not_report_the_bus_consumer(components):
+    controller = make_controller(roles=['api'])
+
+    controller.status_aggregator.status()
+
+    components['bus_consumer'].provide_status.assert_not_called()
+
+
+def test_consumer_role_does_not_serve_the_api_and_runs_until_stopped(components):
+    controller = make_controller(roles=['consumer'])
+    running = threading.Thread(target=controller.run)
+
+    running.start()
+    running.join(timeout=0.5)
+    assert running.is_alive()
+
+    controller.stop(reason='test')
+    running.join(timeout=5)
+
+    assert not running.is_alive()
+    components['token_renewer'].__enter__.assert_called_once()
+    components['bus_consumer'].__enter__.assert_called_once()
+    components['bus_consumer'].__exit__.assert_called_once()
+    components['registration'].assert_not_called()
+    components['http_server'].run.assert_not_called()
+    components['http_server'].stop.assert_not_called()

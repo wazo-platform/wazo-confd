@@ -1,9 +1,10 @@
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 import signal
 import threading
+from contextlib import ExitStack
 from functools import partial
 
 import xivo_dao
@@ -27,6 +28,9 @@ logger = logging.getLogger(__name__)
 class Controller:
     def __init__(self, config):
         self.config = config
+        self._roles = set(config['roles'])
+        self._stopping_thread = None
+        self._stopped = threading.Event()
         self._bus_consumer = BusConsumer.from_config(config['bus'])
         self._bus_publisher = BusPublisher.from_config(config['uuid'], config['bus'])
         self._bus_publisher.set_as_reference()
@@ -54,7 +58,8 @@ class Controller:
         )
         self.status_aggregator.add_provider(auth.provide_status)
         self.status_aggregator.add_provider(self.token_status.provide_status)
-        self.status_aggregator.add_provider(self._bus_consumer.provide_status)
+        if 'consumer' in self._roles:
+            self.status_aggregator.add_provider(self._bus_consumer.provide_status)
 
         plugin_helpers.load(
             namespace='wazo_confd.plugins',
@@ -79,20 +84,29 @@ class Controller:
         signal.signal(signal.SIGINT, partial(_signal_handler, self))
 
         try:
-            with self.token_renewer:
-                with self._bus_consumer:
-                    with ServiceCatalogRegistration(*self._service_discovery_args):
-                        self.http_server.run()
+            with ExitStack() as components:
+                components.enter_context(self.token_renewer)
+                if 'consumer' in self._roles:
+                    components.enter_context(self._bus_consumer)
+                if 'api' in self._roles:
+                    components.enter_context(
+                        ServiceCatalogRegistration(*self._service_discovery_args)
+                    )
+                    self.http_server.run()
+                else:
+                    self._stopped.wait()
         finally:
             if self._stopping_thread:
                 self._stopping_thread.join()
 
     def stop(self, reason):
         logger.warning('Stopping wazo-confd: %s', reason)
-        self._stopping_thread = threading.Thread(
-            target=self.http_server.stop, name=reason
-        )
-        self._stopping_thread.start()
+        if 'api' in self._roles:
+            self._stopping_thread = threading.Thread(
+                target=self.http_server.stop, name=reason
+            )
+            self._stopping_thread.start()
+        self._stopped.set()
 
 
 def _signal_handler(controller, signum, frame):
