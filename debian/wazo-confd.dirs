@@ -1,3 +1,4 @@
+etc/nginx/locations/http-enabled
 etc/nginx/locations/https-enabled
 etc/rsyslog.d
 etc/wazo-confd/conf.d
