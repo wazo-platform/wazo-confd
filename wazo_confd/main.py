@@ -1,7 +1,8 @@
-# Copyright 2013-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2013-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
+import os
 import sys
 
 from xivo import xivo_logging
@@ -16,7 +17,11 @@ logger = logging.getLogger(__name__)
 
 def main(argv=None):
     argv = argv or sys.argv[1:]
-    config = load_config(argv)
+    try:
+        config = load_config(argv)
+    except ValueError as e:
+        print(f'invalid configuration: {e}', file=sys.stderr)  # journald gets stderr
+        sys.exit(os.EX_CONFIG)  # 78: matches RestartPreventExitStatus in the unit
 
     xivo_logging.setup_logging(
         config['log_filename'],

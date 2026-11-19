@@ -8,6 +8,7 @@ StartLimitIntervalSec=150
 ExecStart=/usr/bin/wazo-confd
 ExecStartPost=/usr/bin/wazo-confd-wait
 Restart=on-failure
+RestartPreventExitStatus=78
 RestartSec=5
 SyslogIdentifier=wazo-confd
 

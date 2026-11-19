@@ -38,6 +38,17 @@ def test_main_runs_the_controller_as_the_configured_user(environment):
     environment['controller_class'].return_value.run.assert_called_once()
 
 
+def test_main_exits_with_ex_config_on_an_invalid_configuration(environment, capsys):
+    environment['load_config'].side_effect = ValueError('Unknown log level BOGUS')
+
+    with pytest.raises(SystemExit) as raised:
+        main([])
+
+    assert raised.value.code == 78
+    assert 'invalid configuration: Unknown log level BOGUS' in capsys.readouterr().err
+    environment['controller_class'].assert_not_called()
+
+
 def test_main_runs_without_a_uuid_when_service_discovery_is_disabled(environment):
     environment['set_xivo_uuid'].side_effect = UUIDNotFound
 
