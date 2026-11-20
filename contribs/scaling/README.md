@@ -79,4 +79,5 @@ services:
 ```
 
 Or split the roles completely: `wazo-confd --role consumer` in one container
-(it serves no API) and `wazo-confd --role api` in N replicas.
+(it handles the bus events and starts no HTTP server) and
+`wazo-confd --role api` in N replicas.
