@@ -1,5 +1,20 @@
 # Changelog
 
+## 26.12
+
+* The REST API can be served by several processes. See
+  `contribs/scaling/README.md`:
+  * New `roles` config (map of `api`, `consumer` to booleans) and repeatable
+    `--role` CLI option; default unchanged (both roles, one process)
+  * New `--listen-port` CLI option; `wazo-confd-wait` accepts `--port`
+  * New `wazo-confd-worker@.service` template:
+    `systemctl enable --now wazo-confd-worker@19486` adds an API-only process
+    on port 19486
+  * nginx serves the API on its internal entry point as well:
+    `http://localhost/api/confd`
+* `service_discovery.advertise_port` defaults to `rest_api.port` instead of a
+  static 9486
+
 ## 26.11
 
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`

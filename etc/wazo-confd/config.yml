@@ -5,6 +5,16 @@
 # Directory in which to place config overrides
 extra_config_files: /etc/wazo-confd/conf.d/
 
+# Roles this process runs. Default: all of them.
+# api: serve the REST API
+# consumer: handle the events of the other services (tenant added or
+#   deleted, meeting ready). Must run in a single process.
+# Each role merges independently: to restrict a process to one role,
+# explicitly disable the others in a conf.d override.
+roles:
+  api: true
+  consumer: true
+
 # Change the log level to debug level.
 debug: false
 
@@ -99,6 +109,7 @@ service_discovery:
 #   # If advertise_address is "auto" this interface will be used to find the ip
 #   # address to advertise. Ignored otherwise
 #   advertise_address_interface: eth0
+#   # Defaults to rest_api.port
 #   advertise_port: 9486
 #   # The number of seconds that consul will wait between 2 ttl messages to mark
 #   # this service as up

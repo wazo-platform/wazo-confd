@@ -23,6 +23,13 @@ case "$1" in
                     /etc/nginx/locations/https-enabled/$DAEMONNAME
         fi
 
+        if [[ -z "${previous_version}" ]] || dpkg --compare-versions "${previous_version}" lt '26.12'; then
+            ln -sf /etc/nginx/locations/http-available/$DAEMONNAME \
+                    /etc/nginx/locations/http-enabled/$DAEMONNAME
+            # the symlink is not shipped by dpkg: ask for the nginx reload
+            dpkg-trigger --no-await /etc/nginx/locations/http-enabled || true
+        fi
+
     ;;
     abort-upgrade|abort-remove|abort-deconfigure)
 
