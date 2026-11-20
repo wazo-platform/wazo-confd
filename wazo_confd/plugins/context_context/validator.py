@@ -10,6 +10,7 @@ class ContextContextAssociationValidator(ValidatorAssociation):
     def validate(self, context, contexts):
         self.validate_no_duplicate_context(contexts)
         self.validate_no_self_context(context, contexts)
+        self.validate_same_tenant(context, contexts)
 
     def validate_no_duplicate_context(self, contexts):
         if len(contexts) != len(set(contexts)):
@@ -18,6 +19,14 @@ class ContextContextAssociationValidator(ValidatorAssociation):
     def validate_no_self_context(self, context, contexts):
         if context in contexts:
             raise errors.not_permitted('Cannot include context inside itself')
+
+    def validate_same_tenant(self, context, contexts):
+        for included in contexts:
+            if included.tenant_uuid != context.tenant_uuid:
+                raise errors.different_tenants(
+                    context_tenant_uuid=context.tenant_uuid,
+                    included_context_tenant_uuid=included.tenant_uuid,
+                )
 
 
 def build_validator():

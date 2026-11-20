@@ -3,8 +3,10 @@
 
 from hamcrest import assert_that, has_entries
 
+from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 from . import confd
 
@@ -251,3 +253,20 @@ def test_get_fallbacks_relation(user):
             )
         ),
     )
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+def test_get_multi_tenant(main_user):
+    response = confd.users(main_user['uuid']).fallbacks.get(wazo_tenant=SUB_TENANT)
+    response.assert_match(404, e.not_found('User'))
+
+    response = confd.users(main_user['uuid']).fallbacks.get(wazo_tenant=MAIN_TENANT)
+    response.assert_ok()
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+def test_edit_multi_tenant(main_user):
+    response = confd.users(main_user['uuid']).fallbacks.put(
+        noanswer_destination={'type': 'none'}, wazo_tenant=SUB_TENANT
+    )
+    response.assert_match(404, e.not_found('User'))

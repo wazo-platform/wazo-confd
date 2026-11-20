@@ -6,6 +6,8 @@ from wazo_confd.helpers.restful import ConfdResource
 
 
 class TrunkRegisterAssociation(ConfdResource):
+    has_tenant_uuid = True
+
     def __init__(self, service, trunk_dao, register_dao):
         super().__init__()
         self.service = service
@@ -13,13 +15,15 @@ class TrunkRegisterAssociation(ConfdResource):
         self.register_dao = register_dao
 
     def put(self, trunk_id, register_id):
-        trunk = self.trunk_dao.get(trunk_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
         register = self.register_dao.get(register_id)
         self.service.associate(trunk, register)
         return '', 204
 
     def delete(self, trunk_id, register_id):
-        trunk = self.trunk_dao.get(trunk_id)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        trunk = self.trunk_dao.get(trunk_id, tenant_uuids=tenant_uuids)
         register = self.register_dao.get(register_id)
         self.service.dissociate(trunk, register)
         return '', 204

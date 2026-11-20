@@ -7,10 +7,11 @@ import string
 from hamcrest import assert_that, contains_exactly, has_entries
 
 from ..helpers import associations as a
+from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers import wrappers
-from ..helpers.config import MAIN_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
 
 FAKE_ID = 999999999
@@ -208,3 +209,23 @@ def test_bus_events(group, extension):
     headers = {'tenant_uuid': MAIN_TENANT}
 
     s.check_event('group_member_extensions_associated', headers, url, body)
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@extension()
+def test_associate_multi_tenant(main_group, extension):
+    response = confd.groups(main_group['uuid']).members.extensions.put(
+        extensions=[extension], wazo_tenant=SUB_TENANT
+    )
+    response.assert_match(404, e.not_found('Group'))
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+def test_associate_extension_in_other_tenant_context(sub_context, main_group):
+    exten = ''.join(random.choice(string.digits) for _ in range(10))
+    response = confd.groups(main_group['uuid']).members.extensions.put(
+        extensions=[{'exten': exten, 'context': sub_context['name']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
