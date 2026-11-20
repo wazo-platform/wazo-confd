@@ -8,7 +8,7 @@ from hamcrest import assert_that, contains_inanyorder, equal_to, has_entries
 from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 
@@ -134,5 +134,19 @@ def test_get_associated_endpoints_sip_multi_tenant(main_context, main_user):
 
                 response = url.associated.endpoints.sip.get(wazo_tenant=MAIN_TENANT)
                 response.assert_ok()
+
+    aux()
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+@fixtures.user(wazo_tenant=SUB_TENANT2)
+def test_get_associated_endpoints_sip_sibling_tenant(sibling_context, sibling_user):
+    @fixtures.line_sip(context=sibling_context, wazo_tenant=SUB_TENANT2)
+    def aux(sibling_line):
+        with a.user_line(sibling_user, sibling_line):
+            for line_id in (sibling_line['id'], 'main'):
+                url = confd.users(sibling_user['uuid']).lines(line_id)
+                response = url.associated.endpoints.sip.get(wazo_tenant=SUB_TENANT)
+                response.assert_match(404, e.not_found('UserFeatures'))
 
     aux()

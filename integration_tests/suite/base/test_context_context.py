@@ -7,7 +7,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 FAKE_ID = 999999999
@@ -183,3 +183,29 @@ def test_associate_multi_tenant(main_context, sub_context, sub_context2):
         .put(contexts=[sub_context2], wazo_tenant=SUB_TENANT)
     )
     response.assert_updated()
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+def test_associate_sibling_tenant(sub_context, sibling_context, sibling_context2):
+    response = (
+        confd.contexts(sibling_context['id'])
+        .contexts()
+        .put(contexts=[sub_context], wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('Context'))
+
+    response = (
+        confd.contexts(sub_context['id'])
+        .contexts()
+        .put(contexts=[sibling_context], wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(400, e.not_found('Context'))
+
+    response = (
+        confd.contexts(sibling_context['id'])
+        .contexts()
+        .put(contexts=[sibling_context2], wazo_tenant=SUB_TENANT)
+    )
+    response.assert_match(404, e.not_found('Context'))

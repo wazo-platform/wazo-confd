@@ -4,12 +4,19 @@
 
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`
   as `ring_strategy`. Existing groups using it are migrated to `random`.
-* The following endpoints now return 404 for a user, line, context, group or trunk outside the
-  tenants visible to the caller: `GET /1.1/users/{user_uuid}/lines/{line_id}/associated/endpoints/sip`,
-  `PUT /1.1/users/{user_id}/lines`, `PUT /1.1/contexts/{context_id}/contexts`,
+* The following endpoints now return 404 when the user, line, context, group or trunk in the URL
+  is outside the tenants visible to the caller, and 400 when a line, context or group in the
+  request body is: `GET /1.1/users/{user_uuid}/lines/{line_id}/associated/endpoints/sip`,
+  `PUT /1.1/users/{user_id}/lines`, `GET` and `PUT /1.1/users/{user_id}/fallbacks`,
+  `PUT /1.1/users/{user_id}/groups`, `PUT /1.1/contexts/{context_id}/contexts`,
   `PUT /1.1/groups/{group_uuid}/members/extensions`, `GET` and `PUT /1.1/groups/{group_uuid}/fallbacks`,
-  `PUT` and `DELETE /1.1/trunks/{trunk_id}/registers/iax/{register_id}`.
-* `PUT /1.1/contexts/{context_id}/contexts` now rejects including a context from another tenant.
+  `PUT` and `DELETE /1.1/trunks/{trunk_id}/registers/iax/{register_id}`. The `groups` of
+  `POST /1.1/users` and `PUT /1.1/users/{user_id}` are checked the same way.
+* `PUT /1.1/users/{user_id}/groups` now rejects a group from another tenant than the user.
+* `PUT /1.1/contexts/{context_id}/contexts` now rejects including a context from another tenant:
+  the new list must not contain one, even if the context already includes it.
+* `PUT /1.1/groups/{group_uuid}/members/extensions` now rejects an extension whose context belongs
+  to another tenant than the group.
 
 ## 26.10
 

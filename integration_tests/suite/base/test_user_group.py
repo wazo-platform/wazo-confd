@@ -7,6 +7,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT
 from . import confd
 
 FAKE_ID = 999999999
@@ -136,3 +137,37 @@ def test_bus_events(group, user, line):
         }
 
         s.check_event('user_groups_associated', headers, url, body)
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_multi_tenant(
+    main_context, main_group, sub_group, main_user, sub_user
+):
+    @fixtures.line_sip(context=main_context, wazo_tenant=MAIN_TENANT)
+    def aux(main_line):
+        with a.user_line(main_user, main_line):
+            response = confd.users(main_user['uuid']).groups.put(
+                groups=[sub_group], wazo_tenant=SUB_TENANT
+            )
+            response.assert_match(404, e.not_found('User'))
+
+            response = confd.users(sub_user['uuid']).groups.put(
+                groups=[main_group], wazo_tenant=SUB_TENANT
+            )
+            response.assert_match(400, e.not_found('Group'))
+
+            response = confd.users(main_user['uuid']).groups.put(
+                groups=[sub_group], wazo_tenant=MAIN_TENANT
+            )
+            response.assert_match(400, e.different_tenant())
+
+            response = confd.users(main_user['uuid']).groups.put(
+                groups=[main_group], wazo_tenant=MAIN_TENANT
+            )
+            response.assert_updated()
+
+    aux()

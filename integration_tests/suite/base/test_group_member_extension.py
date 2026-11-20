@@ -218,3 +218,14 @@ def test_associate_multi_tenant(main_group, extension):
         extensions=[extension], wazo_tenant=SUB_TENANT
     )
     response.assert_match(404, e.not_found('Group'))
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+def test_associate_extension_in_other_tenant_context(sub_context, main_group):
+    exten = ''.join(random.choice(string.digits) for _ in range(10))
+    response = confd.groups(main_group['uuid']).members.extensions.put(
+        extensions=[{'exten': exten, 'context': sub_context['name']}],
+        wazo_tenant=MAIN_TENANT,
+    )
+    response.assert_match(400, e.different_tenant())
