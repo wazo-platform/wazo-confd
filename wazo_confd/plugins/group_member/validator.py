@@ -52,8 +52,8 @@ class GroupMemberExtensionAssociationValidator(ValidatorAssociation):
         self.validate_same_tenant(group, extensions)
 
     def validate_same_tenant(self, group, extensions):
-        for extension in extensions:
-            context = context_dao.find_by(name=extension['context'])
+        for name in {extension['context'] for extension in extensions}:
+            context = context_dao.find_by(name=name)
             if context and context.tenant_uuid != group.tenant_uuid:
                 raise errors.different_tenants(
                     group_tenant_uuid=group.tenant_uuid,

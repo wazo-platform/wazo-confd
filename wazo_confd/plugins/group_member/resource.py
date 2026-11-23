@@ -71,10 +71,12 @@ class GroupMemberExtensionItem(GroupMemberItem):
         tenant_uuids = self._build_tenant_list_from_query()
         group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
+        contexts = {member['extension']['context'] for member in form['extensions']}
+        for context_name in contexts:
+            self._check_context(context_name, tenant_uuids)
         members = []
         for member_form in form['extensions']:
             extension = Extension(**member_form['extension'])
-            self._check_context(extension.context, tenant_uuids)
             member = self._find_or_create_member(group, extension)
             member.priority = member_form['priority']
             members.append(member)

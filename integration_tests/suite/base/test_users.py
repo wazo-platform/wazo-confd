@@ -1127,6 +1127,36 @@ def test_edit_multi_tenant_moh(main, sub, main_moh, sub_moh):
     response.assert_updated()
 
 
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_nested_groups_of_different_tenants(context, main_group, sub_group):
+    def post_user(group):
+        line = {
+            'context': context['name'],
+            'endpoint_sip': {'name': s.random_string(8)},
+        }
+        body = {
+            'firstname': 'nestedgroups',
+            'lines': [line],
+            'groups': [{'uuid': group['uuid']}],
+        }
+        return confd.users.post(body, wazo_tenant=MAIN_TENANT)
+
+    post_user(sub_group).assert_match(400, e.different_tenant())
+    response = confd.users.get(search='nestedgroups', wazo_tenant=MAIN_TENANT)
+    assert_that(response.total, equal_to(0))
+
+    response = post_user(main_group)
+    response.assert_created('users')
+    user = response.item
+    try:
+        groups = confd.users(user['uuid']).get().item['groups']
+        assert_that(groups, contains_exactly(has_entries(uuid=main_group['uuid'])))
+    finally:
+        confd.users(user['uuid']).delete(recursive=True).assert_deleted()
+
+
 @fixtures.user()
 def test_delete(user):
     response = confd.users(user['id']).delete()
