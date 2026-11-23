@@ -1,13 +1,19 @@
 # Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from hamcrest import assert_that, contains_inanyorder, has_entries
+from hamcrest import (
+    assert_that,
+    contains_exactly,
+    contains_inanyorder,
+    empty,
+    has_entries,
+)
 
 from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 FAKE_ID = 999999999
@@ -139,35 +145,103 @@ def test_bus_events(group, user, line):
         s.check_event('user_groups_associated', headers, url, body)
 
 
+def put_groups(user, groups):
+    def call(query=None, **kwargs):
+        url = confd.users(user['uuid']).groups
+        return url.put(groups=groups, query_string=query, **kwargs)
+
+    return call
+
+
+def group_ids_of(user):
+    return [group['id'] for group in confd.users(user['uuid']).get().item['groups']]
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT2)
+def test_associate_user_outside_tenant(main_user, sibling_user):
+    for user in (main_user, sibling_user):
+        s.check_outside_tenant_not_found(put_groups(user, []), 'User', SUB_TENANT)
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_sub_tenant_user_from_main_tenant(sub_context, sub_group, sub_user):
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    def aux(sub_line):
+        with a.user_line(sub_user, sub_line):
+            call = put_groups(sub_user, [sub_group])
+            s.check_sub_tenant_found_only_with_recurse(call, 'User', MAIN_TENANT, 204)
+            assert_that(group_ids_of(sub_user), contains_exactly(sub_group['id']))
+
+            put_groups(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
+
+    aux()
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT2)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_group_outside_tenant(
+    sub_context, main_group, sub_group, sibling_group, sub_user
+):
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    def aux(sub_line):
+        with a.user_line(sub_user, sub_line):
+            put_groups(sub_user, [sub_group])(wazo_tenant=SUB_TENANT).assert_updated()
+
+            for outside in (main_group, sibling_group):
+                for query in (None, {'recurse': 'true'}):
+                    call = put_groups(sub_user, [outside])
+                    response = call(query, wazo_tenant=SUB_TENANT)
+                    response.assert_match(400, e.not_found('Group'))
+                    assert_that(
+                        group_ids_of(sub_user), contains_exactly(sub_group['id'])
+                    )
+
+            put_groups(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
+
+    aux()
+
+
 @fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
 @fixtures.group(wazo_tenant=MAIN_TENANT)
 @fixtures.group(wazo_tenant=SUB_TENANT)
 @fixtures.user(wazo_tenant=MAIN_TENANT)
 @fixtures.user(wazo_tenant=SUB_TENANT)
-def test_associate_multi_tenant(
-    main_context, main_group, sub_group, main_user, sub_user
+def test_associate_groups_of_different_tenants(
+    main_context, sub_context, main_group, sub_group, main_user, sub_user
 ):
     @fixtures.line_sip(context=main_context, wazo_tenant=MAIN_TENANT)
-    def aux(main_line):
-        with a.user_line(main_user, main_line):
-            response = confd.users(main_user['uuid']).groups.put(
-                groups=[sub_group], wazo_tenant=SUB_TENANT
-            )
-            response.assert_match(404, e.not_found('User'))
-
-            response = confd.users(sub_user['uuid']).groups.put(
-                groups=[main_group], wazo_tenant=SUB_TENANT
-            )
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    def aux(main_line, sub_line):
+        with a.user_line(main_user, main_line), a.user_line(sub_user, sub_line):
+            response = put_groups(main_user, [sub_group])(wazo_tenant=MAIN_TENANT)
             response.assert_match(400, e.not_found('Group'))
 
-            response = confd.users(main_user['uuid']).groups.put(
-                groups=[sub_group], wazo_tenant=MAIN_TENANT
-            )
+            recurse = {'recurse': 'true'}
+            call = put_groups(main_user, [sub_group])
+            response = call(recurse, wazo_tenant=MAIN_TENANT)
+            response.assert_match(400, e.different_tenant())
+            call = put_groups(sub_user, [main_group])
+            response = call(recurse, wazo_tenant=MAIN_TENANT)
             response.assert_match(400, e.different_tenant())
 
-            response = confd.users(main_user['uuid']).groups.put(
-                groups=[main_group], wazo_tenant=MAIN_TENANT
-            )
-            response.assert_updated()
+            assert_that(group_ids_of(main_user), empty())
+            assert_that(group_ids_of(sub_user), empty())
 
     aux()
+
+
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_recurse_is_boolean(sub_user):
+    s.check_recurse_is_boolean(put_groups(sub_user, []), SUB_TENANT)
+
+
+@fixtures.user(wazo_tenant=SUB_TENANT2)
+def test_associate_wazo_tenant_not_visible(sibling_user):
+    s.check_wazo_tenant_not_visible_refused(put_groups(sibling_user, []))

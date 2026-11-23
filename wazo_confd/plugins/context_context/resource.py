@@ -30,7 +30,7 @@ class ContextContextList(ConfdResource):
 
     @required_acl('confd.contexts.{context_id}.contexts.update')
     def put(self, context_id):
-        tenant_uuids = self._build_tenant_list({'recurse': True})
+        tenant_uuids = self._build_tenant_list_from_query()
         context = self.context_dao.get(context_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         try:

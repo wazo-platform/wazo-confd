@@ -8,11 +8,16 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/recurse'
       responses:
         '200':
           description: Fallbacks for user
           schema:
             $ref: '#/definitions/UserFallbacks'
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
     put:
       operationId: update_user_fallback
       summary: Update user's fallbacks
@@ -24,6 +29,7 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
+      - $ref: '#/parameters/recurse'
       - name: body
         in: body
         description: Fallbacks for user

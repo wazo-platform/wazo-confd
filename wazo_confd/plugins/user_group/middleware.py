@@ -15,6 +15,7 @@ class UserGroupAssociationMiddleWare:
         self._schema = GroupsIDUUIDSchema()
 
     def associate_all_groups(self, body, user_id, tenant_uuids):
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids)
         form = self._schema.load(body)
         try:
             groups = [
@@ -24,7 +25,4 @@ class UserGroupAssociationMiddleWare:
         except NotFoundError as e:
             raise errors.param_not_found('groups', 'Group', **e.metadata)
 
-        self._service.associate_all_groups(
-            user_dao.get_by_id_uuid(user_id, tenant_uuids),
-            groups,
-        )
+        self._service.associate_all_groups(user, groups)

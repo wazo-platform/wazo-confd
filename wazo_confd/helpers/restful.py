@@ -30,6 +30,13 @@ class ListSchema(BaseSchema):
         unknown = marshmallow.INCLUDE
 
 
+class TenantScopeSchema(BaseSchema):
+    recurse = fields.Boolean()
+
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+
 class ConfdResource(ErrorCatchingResource):
     method_decorators = [
         auth_verifier.verify_tenant,
@@ -67,6 +74,9 @@ class ConfdResource(ErrorCatchingResource):
             return [tenant_uuid]
 
         return [tenant.uuid for tenant in token.visible_tenants(tenant_uuid)]
+
+    def _build_tenant_list_from_query(self):
+        return self._build_tenant_list(TenantScopeSchema().load(request.args))
 
 
 class ListResource(ConfdResource):

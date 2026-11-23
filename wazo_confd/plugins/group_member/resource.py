@@ -5,6 +5,7 @@ from flask import request
 from xivo_dao.alchemy.queuemember import QueueMember
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.resources.context import dao as context_dao
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
@@ -67,18 +68,25 @@ class GroupMemberExtensionItem(GroupMemberItem):
 
     @required_acl('confd.groups.{group_uuid}.members.extensions.update')
     def put(self, group_uuid):
-        tenant_uuids = self._build_tenant_list({'recurse': True})
+        tenant_uuids = self._build_tenant_list_from_query()
         group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         members = []
         for member_form in form['extensions']:
             extension = Extension(**member_form['extension'])
+            self._check_context(extension.context, tenant_uuids)
             member = self._find_or_create_member(group, extension)
             member.priority = member_form['priority']
             members.append(member)
 
         self.service.associate_all_extensions(group, members)
         return '', 204
+
+    def _check_context(self, context_name, tenant_uuids):
+        try:
+            context_dao.get_by_name(context_name, tenant_uuids=tenant_uuids)
+        except NotFoundError as e:
+            raise errors.param_not_found('extensions', 'Context', **e.metadata)
 
     def _find_or_create_member(self, group, extension):
         member = self.service.find_member_extension(group, extension)

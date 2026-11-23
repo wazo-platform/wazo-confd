@@ -20,13 +20,13 @@ class GroupFallbackList(ConfdResource):
 
     @required_acl('confd.groups.{group_uuid}.fallbacks.read')
     def get(self, group_uuid):
-        tenant_uuids = self._build_tenant_list({'recurse': True})
+        tenant_uuids = self._build_tenant_list_from_query()
         group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         return self.schema().dump(group.fallbacks)
 
     @required_acl('confd.groups.{group_uuid}.fallbacks.update')
     def put(self, group_uuid):
-        tenant_uuids = self._build_tenant_list({'recurse': True})
+        tenant_uuids = self._build_tenant_list_from_query()
         group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         fallbacks = self.schema().load(request.get_json(force=True))
         self.service.edit(group, fallbacks)
