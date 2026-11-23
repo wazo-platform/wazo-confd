@@ -33,9 +33,6 @@ class ListSchema(BaseSchema):
 class TenantScopeSchema(BaseSchema):
     recurse = fields.Boolean()
 
-    class Meta:
-        unknown = marshmallow.EXCLUDE
-
 
 class ConfdResource(ErrorCatchingResource):
     method_decorators = [
