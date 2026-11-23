@@ -14,14 +14,15 @@ class UserGroupAssociationMiddleWare:
         self._service = service
         self._schema = GroupsIDUUIDSchema()
 
-    def associate_all_groups(self, body, user_id):
+    def associate_all_groups(self, body, user_id, tenant_uuids):
+        user = user_dao.get_by_id_uuid(user_id, tenant_uuids)
         form = self._schema.load(body)
         try:
-            groups = [group_dao.get_by(**group) for group in form['groups']]
+            groups = [
+                group_dao.get_by(tenant_uuids=tenant_uuids, **group)
+                for group in form['groups']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('groups', 'Group', **e.metadata)
 
-        self._service.associate_all_groups(
-            user_dao.get_by_id_uuid(user_id),
-            groups,
-        )
+        self._service.associate_all_groups(user, groups)

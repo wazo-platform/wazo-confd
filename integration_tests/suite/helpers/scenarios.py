@@ -6,11 +6,19 @@ import re
 import string
 from datetime import datetime
 
-from hamcrest import all_of, assert_that, contains_exactly, has_entries, has_items
+from hamcrest import (
+    all_of,
+    assert_that,
+    contains_exactly,
+    contains_string,
+    has_entries,
+    has_items,
+)
 from wazo_test_helpers import until
 
 from . import errors as e
 from .bus import BusClient
+from .config import SUB_TENANT, SUB_TENANT2, TOKEN_SUB_TENANT
 
 OVERHEAD_DB_REQUESTS = 3  # BEGIN, SELECT 1, COMMIT
 
@@ -18,6 +26,36 @@ OVERHEAD_DB_REQUESTS = 3  # BEGIN, SELECT 1, COMMIT
 def check_resource_not_found(request, resource):
     response = request()
     response.assert_match(404, e.not_found(resource=resource))
+
+
+# A tenant-scoped call is `call(query, **kwargs)`: `query` the query string,
+# `kwargs` the `wazo_tenant` and `token` of the request.
+def check_outside_tenant_not_found(call, resource, wazo_tenant):
+    for query in (None, {'recurse': 'true'}):
+        response = call(query, wazo_tenant=wazo_tenant)
+        response.assert_match(404, e.not_found(resource=resource))
+
+
+def check_sub_tenant_found_only_with_recurse(call, resource, wazo_tenant, status):
+    for query in (None, {'recurse': 'false'}):
+        response = call(query, wazo_tenant=wazo_tenant)
+        response.assert_match(404, e.not_found(resource=resource))
+
+    response = call({'recurse': 'true'}, wazo_tenant=wazo_tenant)
+    response.assert_status(status)
+
+
+def check_recurse_is_boolean(call, wazo_tenant):
+    response = call({'recurse': 'maybe'}, wazo_tenant=wazo_tenant)
+    response.assert_status(400)
+    assert_that(response.raw, contains_string('recurse'))
+
+
+def check_wazo_tenant_not_visible_refused(call):
+    response = call(None, token=TOKEN_SUB_TENANT, wazo_tenant=SUB_TENANT2)
+    response.assert_status(401)
+    response = call(None, token=TOKEN_SUB_TENANT, wazo_tenant=SUB_TENANT)
+    assert response.status != 401
 
 
 def check_missing_required_field_returns_error(request, field):

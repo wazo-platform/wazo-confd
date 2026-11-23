@@ -8,11 +8,16 @@ paths:
       - groups
       parameters:
       - $ref: '#/parameters/groupuuid'
+      - $ref: '#/parameters/recurse'
       responses:
         '200':
           description: Fallbacks for group
           schema:
             $ref: '#/definitions/GroupFallbacks'
+        '400':
+          $ref: '#/responses/GenericError'
+        '404':
+          $ref: '#/responses/NotFoundError'
     put:
       operationId: update_group_fallback
       summary: Update group's fallbacks
@@ -24,6 +29,7 @@ paths:
       - groups
       parameters:
       - $ref: '#/parameters/groupuuid'
+      - $ref: '#/parameters/recurse'
       - name: body
         in: body
         description: Fallbacks for group

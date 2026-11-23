@@ -4,13 +4,14 @@
 import random
 import string
 
-from hamcrest import assert_that, contains_exactly, has_entries
+from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
+from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
 from ..helpers import wrappers
-from ..helpers.config import MAIN_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 FAKE_ID = 999999999
@@ -208,3 +209,101 @@ def test_bus_events(group, extension):
     headers = {'tenant_uuid': MAIN_TENANT}
 
     s.check_event('group_member_extensions_associated', headers, url, body)
+
+
+def put_extensions(group, extensions):
+    def call(query=None, **kwargs):
+        url = confd.groups(group['uuid']).members.extensions
+        return url.put(extensions=extensions, query_string=query, **kwargs)
+
+    return call
+
+
+def extension_in(context):
+    return {'exten': generate_extension()['exten'], 'context': context['name']}
+
+
+def extensions_of(group):
+    response = confd.groups(group['uuid']).get()
+    return [
+        (extension['exten'], extension['context'])
+        for extension in response.item['members']['extensions']
+    ]
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT2)
+def test_associate_group_outside_tenant(main_group, sibling_group):
+    for group in (main_group, sibling_group):
+        call = put_extensions(group, [])
+        s.check_outside_tenant_not_found(call, 'Group', SUB_TENANT)
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_associate_sub_tenant_group_from_main_tenant(sub_context, sub_group):
+    extension = extension_in(sub_context)
+    call = put_extensions(sub_group, [extension])
+    s.check_sub_tenant_found_only_with_recurse(call, 'Group', MAIN_TENANT, 204)
+    assert_that(
+        extensions_of(sub_group),
+        contains_exactly((extension['exten'], sub_context['name'])),
+    )
+
+    put_extensions(sub_group, [])(wazo_tenant=SUB_TENANT).assert_updated()
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_associate_extension_context_outside_tenant(
+    main_context, sub_context, sibling_context, sub_group
+):
+    extension = extension_in(sub_context)
+    put_extensions(sub_group, [extension])(wazo_tenant=SUB_TENANT).assert_updated()
+
+    unknown_context = {'name': 'unknown-context'}
+    for outside in (main_context, sibling_context, unknown_context):
+        for query in (None, {'recurse': 'true'}):
+            call = put_extensions(sub_group, [extension_in(outside)])
+            response = call(query, wazo_tenant=SUB_TENANT)
+            response.assert_match(400, e.not_found('Context'))
+            assert_that(
+                extensions_of(sub_group),
+                contains_exactly((extension['exten'], sub_context['name'])),
+            )
+
+    put_extensions(sub_group, [])(wazo_tenant=SUB_TENANT).assert_updated()
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_associate_extensions_of_different_tenants(
+    main_context, sub_context, main_group, sub_group
+):
+    call = put_extensions(main_group, [extension_in(sub_context)])
+    response = call(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.not_found('Context'))
+
+    recurse = {'recurse': 'true'}
+    response = call(recurse, wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+    call = put_extensions(sub_group, [extension_in(main_context)])
+    response = call(recurse, wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+    assert_that(extensions_of(main_group), empty())
+    assert_that(extensions_of(sub_group), empty())
+
+
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_associate_recurse_is_boolean(sub_group):
+    s.check_recurse_is_boolean(put_extensions(sub_group, []), SUB_TENANT)
+
+
+@fixtures.group(wazo_tenant=SUB_TENANT2)
+def test_associate_wazo_tenant_not_visible(sibling_group):
+    s.check_wazo_tenant_not_visible_refused(put_extensions(sibling_group, []))

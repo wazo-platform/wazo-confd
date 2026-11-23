@@ -20,6 +20,7 @@ class ContextsSchema(BaseSchema):
 
 
 class ContextContextList(ConfdResource):
+    has_tenant_uuid = True
     schema = ContextsSchema
 
     def __init__(self, service, context_dao):
@@ -29,10 +30,14 @@ class ContextContextList(ConfdResource):
 
     @required_acl('confd.contexts.{context_id}.contexts.update')
     def put(self, context_id):
-        context = self.context_dao.get(context_id)
+        tenant_uuids = self._build_tenant_list_from_query()
+        context = self.context_dao.get(context_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         try:
-            contexts = [self.context_dao.get(c['id']) for c in form['contexts']]
+            contexts = [
+                self.context_dao.get(c['id'], tenant_uuids=tenant_uuids)
+                for c in form['contexts']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('contexts', 'Context', **e.metadata)
 

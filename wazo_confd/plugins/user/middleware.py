@@ -221,7 +221,7 @@ class UserMiddleWare(ResourceMiddleware):
 
         if groups:
             self._middleware_handle.get('user_group_association').associate_all_groups(
-                {'groups': groups}, user_dict['uuid']
+                {'groups': groups}, user_dict['uuid'], tenant_uuids
             )
         user_dict['groups'] = groups
 
@@ -264,11 +264,11 @@ class UserMiddleWare(ResourceMiddleware):
 
         if fallbacks:
             self._middleware_handle.get('user_fallback_association').associate(
-                user_dict['uuid'], fallbacks
+                user_dict['uuid'], fallbacks, tenant_uuids
             )
             user_dict['fallbacks'] = self._middleware_handle.get(
                 'user_fallback_association'
-            ).get(user_dict['uuid'])
+            ).get(user_dict['uuid'], tenant_uuids)
 
         if auth:
             auth['uuid'] = user_dict['uuid']
@@ -303,7 +303,7 @@ class UserMiddleWare(ResourceMiddleware):
                 # dissociation
                 self._middleware_handle.get(
                     'user_group_association'
-                ).associate_all_groups({'groups': []}, user.uuid)
+                ).associate_all_groups({'groups': []}, user.uuid, tenant_uuids)
 
             if user.voicemail:
                 self._middleware_handle.get('user_voicemail').delete_voicemail(
@@ -459,7 +459,7 @@ class UserMiddleWare(ResourceMiddleware):
 
             if fallbacks:
                 self._middleware_handle.get('user_fallback_association').associate(
-                    user_id, fallbacks
+                    user_id, fallbacks, tenant_uuids
                 )
 
             if forwards:
@@ -472,7 +472,7 @@ class UserMiddleWare(ResourceMiddleware):
 
             # groups
             self._middleware_handle.get('user_group_association').associate_all_groups(
-                {'groups': groups}, user_id
+                {'groups': groups}, user_id, tenant_uuids
             )
 
             # lines

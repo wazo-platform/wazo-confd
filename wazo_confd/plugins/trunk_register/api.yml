@@ -11,6 +11,7 @@ paths:
       parameters:
       - $ref: '#/parameters/trunkid'
       - $ref: '#/parameters/iaxid'
+      - $ref: '#/parameters/recurse'
       responses:
         '204':
           description: Trunk and IAX register associated
@@ -29,6 +30,7 @@ paths:
       parameters:
       - $ref: '#/parameters/trunkid'
       - $ref: '#/parameters/iaxid'
+      - $ref: '#/parameters/recurse'
       responses:
         '204':
           description: Trunk and IAX register dissociated

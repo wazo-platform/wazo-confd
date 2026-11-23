@@ -20,6 +20,8 @@ class LinesIDSchema(BaseSchema):
 
 
 class UserLineResource(ConfdResource):
+    has_tenant_uuid = True
+
     def __init__(self, service, user_dao, line_dao):
         super().__init__()
         self.service = service
@@ -35,10 +37,14 @@ class UserLineList(UserLineResource):
 
     @required_acl('confd.users.{user_id}.lines.update')
     def put(self, user_id):
-        user = self.get_user(user_id)
+        tenant_uuids = self._build_tenant_list_from_query()
+        user = self.get_user(user_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         try:
-            lines = [self.line_dao.get(line['id']) for line in form['lines']]
+            lines = [
+                self.line_dao.get(line['id'], tenant_uuids=tenant_uuids)
+                for line in form['lines']
+            ]
         except NotFoundError as e:
             raise errors.param_not_found('lines', 'Line', **e.metadata)
 
@@ -47,8 +53,6 @@ class UserLineList(UserLineResource):
 
 
 class UserLineItem(UserLineResource):
-    has_tenant_uuid = True
-
     def __init__(self, service, user_dao, line_dao, middleware):
         super().__init__(service, user_dao, line_dao)
         self._middleware = middleware

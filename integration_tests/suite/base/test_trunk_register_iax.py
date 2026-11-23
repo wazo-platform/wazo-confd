@@ -7,6 +7,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 FAKE_ID = 999999999
@@ -146,3 +147,67 @@ def test_bus_events(trunk, register):
 
     s.check_event('trunk_register_iax_associated', headers, url.put)
     s.check_event('trunk_register_iax_dissociated', headers, url.delete)
+
+
+def put_register(trunk, register):
+    def call(query=None, **kwargs):
+        url = confd.trunks(trunk['id']).registers.iax(register['id'])
+        return url.put(query_string=query, **kwargs)
+
+    return call
+
+
+def delete_register(trunk, register):
+    def call(query=None, **kwargs):
+        url = confd.trunks(trunk['id']).registers.iax(register['id'])
+        return url.delete(**(query or {}), **kwargs)
+
+    return call
+
+
+@fixtures.trunk(wazo_tenant=MAIN_TENANT)
+@fixtures.trunk(wazo_tenant=SUB_TENANT2)
+@fixtures.register_iax()
+@fixtures.register_iax()
+def test_register_trunk_outside_tenant(main_trunk, sibling_trunk, register, register2):
+    for trunk in (main_trunk, sibling_trunk):
+        s.check_outside_tenant_not_found(
+            put_register(trunk, register), 'Trunk', SUB_TENANT
+        )
+
+    with a.trunk_register_iax(main_trunk, register):
+        put_register(sibling_trunk, register2)(wazo_tenant=SUB_TENANT2).assert_updated()
+        for trunk, associated in ((main_trunk, register), (sibling_trunk, register2)):
+            call = delete_register(trunk, associated)
+            s.check_outside_tenant_not_found(call, 'Trunk', SUB_TENANT)
+        delete_register(sibling_trunk, register2)(
+            wazo_tenant=SUB_TENANT2
+        ).assert_deleted()
+
+
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.register_iax()
+def test_register_sub_tenant_trunk_from_main_tenant(sub_trunk, register):
+    call = put_register(sub_trunk, register)
+    s.check_sub_tenant_found_only_with_recurse(call, 'Trunk', MAIN_TENANT, 204)
+    response = confd.trunks(sub_trunk['id']).get()
+    assert_that(response.item['register_iax'], has_entries(id=register['id']))
+
+    call = delete_register(sub_trunk, register)
+    s.check_sub_tenant_found_only_with_recurse(call, 'Trunk', MAIN_TENANT, 204)
+    response = confd.trunks(sub_trunk['id']).get()
+    assert_that(response.item['register_iax'], none())
+
+
+@fixtures.trunk(wazo_tenant=SUB_TENANT)
+@fixtures.register_iax()
+def test_register_recurse_is_boolean(sub_trunk, register):
+    for request in (put_register, delete_register):
+        s.check_recurse_is_boolean(request(sub_trunk, register), SUB_TENANT)
+
+
+@fixtures.trunk(wazo_tenant=SUB_TENANT2)
+@fixtures.register_iax()
+def test_register_wazo_tenant_not_visible(sibling_trunk, register):
+    for request in (put_register, delete_register):
+        s.check_wazo_tenant_not_visible_refused(request(sibling_trunk, register))

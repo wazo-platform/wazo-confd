@@ -136,10 +136,13 @@ class RestUrlClient(UrlFragment):
     def get(self, token=None, wazo_tenant=None, **params):
         url = str(self)
         params = self._merge_params(params, self.body)
+        headers = {}
         if wazo_tenant:
-            params['headers'] = {'Wazo-Tenant': wazo_tenant}
+            headers['Wazo-Tenant'] = wazo_tenant
         if token:
-            params['headers'] = {'X-Auth-Token': token}
+            headers['X-Auth-Token'] = token
+        if headers:
+            params['headers'] = headers
         return self.client.get(url, **params)
 
     def post(self, body=None, token=None, wazo_tenant=None, **params):

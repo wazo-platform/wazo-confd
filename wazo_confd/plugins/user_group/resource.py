@@ -31,6 +31,7 @@ class GroupsIDUUIDSchema(BaseSchema):
 
 
 class UserGroupItem(ConfdResource):
+    has_tenant_uuid = True
     schema = GroupsIDUUIDSchema
 
     def __init__(self, service, middleware):
@@ -40,5 +41,8 @@ class UserGroupItem(ConfdResource):
 
     @required_acl('confd.users.{user_id}.groups.update')
     def put(self, user_id):
-        self._middleware.associate_all_groups(request.get_json(force=True), user_id)
+        tenant_uuids = self._build_tenant_list_from_query()
+        self._middleware.associate_all_groups(
+            request.get_json(force=True), user_id, tenant_uuids
+        )
         return '', 204

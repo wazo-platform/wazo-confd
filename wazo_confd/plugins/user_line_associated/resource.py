@@ -13,6 +13,7 @@ from wazo_confd.plugins.endpoint_sip.schema import (
 
 
 class UserLineAssociatedEndpointSipItem(ConfdResource):
+    has_tenant_uuid = True
     schema = EndpointSIPSchema
     view_schemas = {
         'merged': MergedEndpointSIPSchema,
@@ -27,7 +28,8 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
         'confd.users.{user_uuid}.lines.{line_id}.associated.endpoints.sip.read'
     )
     def get(self, user_uuid, line_id):
-        user = self.user_dao.get_by(uuid=str(user_uuid))
+        tenant_uuids = self._build_tenant_list_from_query()
+        user = self.user_dao.get_by(uuid=str(user_uuid), tenant_uuids=tenant_uuids)
         view = GETQueryStringSchema().load(request.args)['view']
         schema = self.view_schemas.get(view, self.schema)
 
@@ -36,7 +38,7 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
                 return 'Resource Not Found.', 404
             line = user.lines[0]
         else:
-            line = self.line_dao.get(line_id)
+            line = self.line_dao.get(line_id, tenant_uuids=tenant_uuids)
             if line not in user.lines:
                 return 'Resource Not Found.', 404
 

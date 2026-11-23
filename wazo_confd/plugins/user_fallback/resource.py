@@ -10,6 +10,7 @@ from .schema import UserFallbackSchema
 
 
 class UserFallbackList(ConfdResource):
+    has_tenant_uuid = True
     schema = UserFallbackSchema
 
     def __init__(self, service, user_dao, user_fallback_middleware):
@@ -20,9 +21,13 @@ class UserFallbackList(ConfdResource):
 
     @required_acl('confd.users.{user_id}.fallbacks.read')
     def get(self, user_id):
-        return self._user_fallback_middleware.get(user_id)
+        tenant_uuids = self._build_tenant_list_from_query()
+        return self._user_fallback_middleware.get(user_id, tenant_uuids)
 
     @required_acl('confd.users.{user_id}.fallbacks.update')
     def put(self, user_id):
-        self._user_fallback_middleware.associate(user_id, request.get_json(force=True))
+        tenant_uuids = self._build_tenant_list_from_query()
+        self._user_fallback_middleware.associate(
+            user_id, request.get_json(force=True), tenant_uuids
+        )
         return '', 204
