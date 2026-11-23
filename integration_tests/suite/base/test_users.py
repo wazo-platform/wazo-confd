@@ -1153,6 +1153,20 @@ def test_nested_groups_of_different_tenants(context, main_group, sub_group):
     try:
         groups = confd.users(user['uuid']).get().item['groups']
         assert_that(groups, contains_exactly(has_entries(uuid=main_group['uuid'])))
+
+        # the user's line, else the recursive update drops it; no null device_id
+        lines = [
+            {key: value for key, value in line.items() if value is not None}
+            for line in confd.users(user['uuid']).get().item['lines']
+        ]
+        user.pop('call_record_enabled', None)
+        body = {**user, 'lines': lines, 'groups': [{'uuid': sub_group['uuid']}]}
+        response = confd.users(user['uuid']).put(
+            body, query_string='recursive=True', wazo_tenant=MAIN_TENANT
+        )
+        response.assert_match(400, e.different_tenant())
+        groups = confd.users(user['uuid']).get().item['groups']
+        assert_that(groups, contains_exactly(has_entries(uuid=main_group['uuid'])))
     finally:
         confd.users(user['uuid']).delete(recursive=True).assert_deleted()
 
