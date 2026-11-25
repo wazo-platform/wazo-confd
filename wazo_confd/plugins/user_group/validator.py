@@ -12,6 +12,7 @@ class UserGroupAssociationValidator(ValidatorAssociation):
         if groups:
             self.validate_user_has_endpoint(user)
         self.validate_no_duplicate_group(groups)
+        self.validate_same_tenant(user, groups)
 
     def validate_user_has_endpoint(self, user):
         if not user.lines:
@@ -20,6 +21,14 @@ class UserGroupAssociationValidator(ValidatorAssociation):
     def validate_no_duplicate_group(self, groups):
         if len(groups) != len(set(groups)):
             raise errors.not_permitted('Cannot associate same group more than once')
+
+    def validate_same_tenant(self, user, groups):
+        for group in groups:
+            if group.tenant_uuid != user.tenant_uuid:
+                raise errors.different_tenants(
+                    user_tenant_uuid=user.tenant_uuid,
+                    group_tenant_uuid=group.tenant_uuid,
+                )
 
 
 def build_validator():

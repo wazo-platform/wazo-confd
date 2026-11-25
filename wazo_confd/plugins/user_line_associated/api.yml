@@ -19,6 +19,8 @@ paths:
             $ref: '#/definitions/EndpointSIP'
         '400':
           description: Invalid `view`
+        '404':
+          $ref: '#/responses/NotFoundError'
 
   /users/{user_uuid}/lines/main/associated/endpoints/sip:
     get:
@@ -38,4 +40,6 @@ paths:
           schema:
             $ref: '#/definitions/EndpointSIP'
         '400':
-            description: Invalid `view`
+          description: Invalid `view`
+        '404':
+          $ref: '#/responses/NotFoundError'

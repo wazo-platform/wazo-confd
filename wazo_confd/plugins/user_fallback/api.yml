@@ -13,6 +13,8 @@ paths:
           description: Fallbacks for user
           schema:
             $ref: '#/definitions/UserFallbacks'
+        '404':
+          $ref: '#/responses/NotFoundError'
     put:
       operationId: update_user_fallback
       summary: Update user's fallbacks

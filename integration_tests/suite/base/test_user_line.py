@@ -9,7 +9,7 @@ from ..helpers import associations as a
 from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT, SUB_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 secondary_user_regex = re.compile(r"There are secondary users associated to the line")
@@ -443,3 +443,86 @@ def test_bus_events(user, line):
 
     (s.check_event('user_line_associated', headers, url.put))
     (s.check_event('user_line_dissociated', headers, url.delete))
+
+
+def put_lines(user, lines):
+    def call(**kwargs):
+        url = confd.users(user['uuid']).lines
+        return url.put(lines=lines, **kwargs)
+
+    return call
+
+
+def line_ids_of(user):
+    return [line['id'] for line in confd.users(user['uuid']).get().item['lines']]
+
+
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT2)
+def test_associate_lines_user_outside_tenant(main_user, sibling_user):
+    for user in (main_user, sibling_user):
+        s.check_outside_tenant_not_found(put_lines(user, []), 'User', SUB_TENANT)
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_lines_sub_tenant_user_from_main_tenant(sub_context, sub_user):
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    def aux(sub_line):
+        call = put_lines(sub_user, [sub_line])
+        s.check_sub_tenant_found(call, MAIN_TENANT, 204)
+        assert_that(line_ids_of(sub_user), contains_exactly(sub_line['id']))
+
+        put_lines(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
+
+    aux()
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_lines_line_outside_tenant(
+    main_context, sub_context, sibling_context, sub_user
+):
+    @fixtures.line_sip(context=main_context, wazo_tenant=MAIN_TENANT)
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    @fixtures.line_sip(context=sibling_context, wazo_tenant=SUB_TENANT2)
+    def aux(main_line, sub_line, sibling_line):
+        put_lines(sub_user, [sub_line])(wazo_tenant=SUB_TENANT).assert_updated()
+
+        for outside in (main_line, sibling_line):
+            call = put_lines(sub_user, [outside])
+            response = call(wazo_tenant=SUB_TENANT)
+            response.assert_match(400, e.not_found('Line'))
+            assert_that(line_ids_of(sub_user), contains_exactly(sub_line['id']))
+
+        put_lines(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
+
+    aux()
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.user(wazo_tenant=MAIN_TENANT)
+@fixtures.user(wazo_tenant=SUB_TENANT)
+def test_associate_lines_of_different_tenants(
+    main_context, sub_context, main_user, sub_user
+):
+    @fixtures.line_sip(context=main_context, wazo_tenant=MAIN_TENANT)
+    @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
+    def aux(main_line, sub_line):
+        response = put_lines(main_user, [sub_line])(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+        response = put_lines(sub_user, [main_line])(wazo_tenant=MAIN_TENANT)
+        response.assert_match(400, e.different_tenant())
+
+        assert_that(line_ids_of(main_user), empty())
+        assert_that(line_ids_of(sub_user), empty())
+
+    aux()
+
+
+@fixtures.user(wazo_tenant=SUB_TENANT2)
+def test_associate_lines_wazo_tenant_not_visible(sibling_user):
+    s.check_wazo_tenant_not_visible_refused(put_lines(sibling_user, []))

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from xivo_dao.helpers import errors
+from xivo_dao.resources.context import dao as context_dao
 
 from wazo_confd.helpers.validator import ValidationAssociation, ValidatorAssociation
 
@@ -48,6 +49,16 @@ class GroupMemberExtensionAssociationValidator(ValidatorAssociation):
             for member in members
         ]
         self.validate_no_duplicate_extension(extensions)
+        self.validate_same_tenant(group, extensions)
+
+    def validate_same_tenant(self, group, extensions):
+        for name in {extension['context'] for extension in extensions}:
+            context = context_dao.find_by(name=name)
+            if context and context.tenant_uuid != group.tenant_uuid:
+                raise errors.different_tenants(
+                    group_tenant_uuid=group.tenant_uuid,
+                    context_tenant_uuid=context.tenant_uuid,
+                )
 
     def validate_no_duplicate_extension(self, extensions):
         if any(extensions.count(extension) > 1 for extension in extensions):

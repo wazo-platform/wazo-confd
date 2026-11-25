@@ -13,6 +13,8 @@ paths:
           description: Fallbacks for group
           schema:
             $ref: '#/definitions/GroupFallbacks'
+        '404':
+          $ref: '#/responses/NotFoundError'
     put:
       operationId: update_group_fallback
       summary: Update group's fallbacks

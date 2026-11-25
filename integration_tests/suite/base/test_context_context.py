@@ -4,8 +4,10 @@
 from hamcrest import assert_that, contains_exactly, empty, has_entries
 
 from ..helpers import associations as a
+from ..helpers import errors as e
 from ..helpers import fixtures
 from ..helpers import scenarios as s
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from . import confd
 
 FAKE_ID = 999999999
@@ -148,3 +150,78 @@ def test_delete_sub_context_when_context_and_sub_context_associated(
 
         response = confd.contexts(context2['id']).get()
         assert_that(response.item['contexts'], empty())
+
+
+def put_contexts(context, contexts):
+    def call(**kwargs):
+        url = confd.contexts(context['id']).contexts()
+        return url.put(contexts=contexts, **kwargs)
+
+    return call
+
+
+def included_context_ids(context):
+    response = confd.contexts(context['id']).get()
+    return [included['id'] for included in response.item['contexts']]
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+def test_associate_context_outside_tenant(main_context, sub_context, sibling_context):
+    for context in (main_context, sibling_context):
+        call = put_contexts(context, [sub_context])
+        s.check_outside_tenant_not_found(call, 'Context', SUB_TENANT)
+        assert_that(included_context_ids(context), empty())
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+def test_associate_sub_tenant_context_from_main_tenant(sub_context, sub_context2):
+    call = put_contexts(sub_context, [sub_context2])
+    s.check_sub_tenant_found(call, MAIN_TENANT, 204)
+    assert_that(included_context_ids(sub_context), contains_exactly(sub_context2['id']))
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+def test_associate_included_context_outside_tenant(
+    main_context, sub_context, sub_context2, sibling_context
+):
+    put_contexts(sub_context, [sub_context2])(wazo_tenant=SUB_TENANT).assert_updated()
+
+    for outside in (main_context, sibling_context):
+        call = put_contexts(sub_context, [outside])
+        response = call(wazo_tenant=SUB_TENANT)
+        response.assert_match(400, e.not_found('Context'))
+        assert_that(
+            included_context_ids(sub_context),
+            contains_exactly(sub_context2['id']),
+        )
+
+
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=MAIN_TENANT)
+@fixtures.context(wazo_tenant=SUB_TENANT)
+def test_associate_contexts_of_different_tenants(
+    main_context, main_context2, sub_context
+):
+    call = put_contexts(main_context, [main_context2])
+    call(wazo_tenant=MAIN_TENANT).assert_updated()
+
+    response = put_contexts(main_context, [sub_context])(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+    response = put_contexts(sub_context, [main_context2])(wazo_tenant=MAIN_TENANT)
+    response.assert_match(400, e.different_tenant())
+
+    assert_that(
+        included_context_ids(main_context), contains_exactly(main_context2['id'])
+    )
+    assert_that(included_context_ids(sub_context), empty())
+
+
+@fixtures.context(wazo_tenant=SUB_TENANT2)
+def test_associate_wazo_tenant_not_visible(sibling_context):
+    s.check_wazo_tenant_not_visible_refused(put_contexts(sibling_context, []))

@@ -5,7 +5,7 @@ from hamcrest import assert_that, equal_to, has_entries
 
 from ..helpers import fixtures
 from ..helpers import scenarios as s
-from ..helpers.config import MAIN_TENANT
+from ..helpers.config import MAIN_TENANT, SUB_TENANT, SUB_TENANT2
 from ..helpers.helpers.destination import invalid_destinations, valid_destinations
 from . import confd
 
@@ -231,3 +231,39 @@ def test_get_fallbacks_relation(group):
             )
         ),
     )
+
+
+def get_fallbacks(group):
+    def call(**kwargs):
+        url = confd.groups(group['uuid']).fallbacks
+        return url.get(**kwargs)
+
+    return call
+
+
+def put_fallbacks(group):
+    def call(**kwargs):
+        url = confd.groups(group['uuid']).fallbacks
+        return url.put(noanswer_destination={'type': 'none'}, **kwargs)
+
+    return call
+
+
+@fixtures.group(wazo_tenant=MAIN_TENANT)
+@fixtures.group(wazo_tenant=SUB_TENANT2)
+def test_fallbacks_outside_tenant(main_group, sibling_group):
+    for group in (main_group, sibling_group):
+        for request in (get_fallbacks, put_fallbacks):
+            s.check_outside_tenant_not_found(request(group), 'Group', SUB_TENANT)
+
+
+@fixtures.group(wazo_tenant=SUB_TENANT)
+def test_fallbacks_sub_tenant_from_main_tenant(sub_group):
+    for request, status in ((get_fallbacks, 200), (put_fallbacks, 204)):
+        s.check_sub_tenant_found(request(sub_group), MAIN_TENANT, status)
+
+
+@fixtures.group(wazo_tenant=SUB_TENANT2)
+def test_fallbacks_wazo_tenant_not_visible(sibling_group):
+    for request in (get_fallbacks, put_fallbacks):
+        s.check_wazo_tenant_not_visible_refused(request(sibling_group))

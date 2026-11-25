@@ -1,5 +1,23 @@
 # Changelog
 
+## 26.12
+
+* These endpoints return 404 when the resource in the URL is outside the `Wazo-Tenant` tenant
+  and its sub-tenants: `GET /1.1/users/{user_uuid}/lines/{line_id}/associated/endpoints/sip`,
+  `PUT /1.1/users/{user_id}/lines`, `GET` and `PUT /1.1/users/{user_id}/fallbacks`,
+  `PUT /1.1/users/{user_id}/groups`, `PUT /1.1/contexts/{context_id}/contexts`,
+  `PUT /1.1/groups/{group_uuid}/members/extensions`, `GET` and `PUT /1.1/groups/{group_uuid}/fallbacks`,
+  `PUT` and `DELETE /1.1/trunks/{trunk_id}/registers/iax/{register_id}`.
+* `PUT /1.1/users/{user_id}/lines`, `PUT /1.1/users/{user_id}/groups` and
+  `PUT /1.1/contexts/{context_id}/contexts` return 400 when a line, group or context in the body
+  is outside those tenants.
+* `PUT /1.1/users/{user_id}/groups`, and the `groups` of `POST /1.1/users` and
+  `PUT /1.1/users/{user_id}?recursive=true`, now reject a group from another tenant than the user.
+* `PUT /1.1/contexts/{context_id}/contexts` now rejects including a context from another tenant:
+  the new list must not contain one, even if the context already includes it.
+* `PUT /1.1/groups/{group_uuid}/members/extensions` now rejects an extension whose context is
+  unknown, outside those tenants, or of another tenant than the group.
+
 ## 26.11
 
 * `POST /1.1/groups` and `PUT /1.1/groups/{group_uuid}` no longer accept `weight_random`

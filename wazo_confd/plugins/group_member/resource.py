@@ -5,6 +5,7 @@ from flask import request
 from xivo_dao.alchemy.queuemember import QueueMember
 from xivo_dao.helpers import errors
 from xivo_dao.helpers.exception import NotFoundError
+from xivo_dao.resources.context import dao as context_dao
 
 from wazo_confd.auth import required_acl
 from wazo_confd.helpers.restful import ConfdResource
@@ -19,6 +20,8 @@ class Extension:
 
 
 class GroupMemberItem(ConfdResource):
+    has_tenant_uuid = True
+
     def __init__(self, service, group_dao):
         super().__init__()
         self.service = service
@@ -27,7 +30,6 @@ class GroupMemberItem(ConfdResource):
 
 class GroupMemberUserItem(GroupMemberItem):
     schema = GroupUsersSchema
-    has_tenant_uuid = True
 
     def __init__(self, service, group_dao, user_dao):
         super().__init__(service, group_dao)
@@ -66,8 +68,12 @@ class GroupMemberExtensionItem(GroupMemberItem):
 
     @required_acl('confd.groups.{group_uuid}.members.extensions.update')
     def put(self, group_uuid):
-        group = self.group_dao.get(group_uuid)
+        tenant_uuids = self._build_tenant_list({'recurse': True})
+        group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
+        contexts = {member['extension']['context'] for member in form['extensions']}
+        for context_name in contexts:
+            self._check_context(context_name, tenant_uuids)
         members = []
         for member_form in form['extensions']:
             extension = Extension(**member_form['extension'])
@@ -77,6 +83,12 @@ class GroupMemberExtensionItem(GroupMemberItem):
 
         self.service.associate_all_extensions(group, members)
         return '', 204
+
+    def _check_context(self, context_name, tenant_uuids):
+        try:
+            context_dao.get_by_name(context_name, tenant_uuids=tenant_uuids)
+        except NotFoundError as e:
+            raise errors.param_not_found('extensions', 'Context', **e.metadata)
 
     def _find_or_create_member(self, group, extension):
         member = self.service.find_member_extension(group, extension)
