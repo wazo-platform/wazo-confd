@@ -12,7 +12,6 @@ paths:
       - users
       parameters:
       - $ref: '#/parameters/useriduuid'
-      - $ref: '#/parameters/recurse'
       - name: body
         in: body
         description: Users to associated

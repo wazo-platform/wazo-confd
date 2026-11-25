@@ -153,9 +153,9 @@ def test_delete_sub_context_when_context_and_sub_context_associated(
 
 
 def put_contexts(context, contexts):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.contexts(context['id']).contexts()
-        return url.put(contexts=contexts, query_string=query, **kwargs)
+        return url.put(contexts=contexts, **kwargs)
 
     return call
 
@@ -179,7 +179,7 @@ def test_associate_context_outside_tenant(main_context, sub_context, sibling_con
 @fixtures.context(wazo_tenant=SUB_TENANT)
 def test_associate_sub_tenant_context_from_main_tenant(sub_context, sub_context2):
     call = put_contexts(sub_context, [sub_context2])
-    s.check_sub_tenant_found_only_with_recurse(call, 'Context', MAIN_TENANT, 204)
+    s.check_sub_tenant_found(call, MAIN_TENANT, 204)
     assert_that(included_context_ids(sub_context), contains_exactly(sub_context2['id']))
 
 
@@ -193,14 +193,13 @@ def test_associate_included_context_outside_tenant(
     put_contexts(sub_context, [sub_context2])(wazo_tenant=SUB_TENANT).assert_updated()
 
     for outside in (main_context, sibling_context):
-        for query in (None, {'recurse': 'true'}):
-            call = put_contexts(sub_context, [outside])
-            response = call(query, wazo_tenant=SUB_TENANT)
-            response.assert_match(400, e.not_found('Context'))
-            assert_that(
-                included_context_ids(sub_context),
-                contains_exactly(sub_context2['id']),
-            )
+        call = put_contexts(sub_context, [outside])
+        response = call(wazo_tenant=SUB_TENANT)
+        response.assert_match(400, e.not_found('Context'))
+        assert_that(
+            included_context_ids(sub_context),
+            contains_exactly(sub_context2['id']),
+        )
 
 
 @fixtures.context(wazo_tenant=MAIN_TENANT)
@@ -213,27 +212,14 @@ def test_associate_contexts_of_different_tenants(
     call(wazo_tenant=MAIN_TENANT).assert_updated()
 
     response = put_contexts(main_context, [sub_context])(wazo_tenant=MAIN_TENANT)
-    response.assert_match(400, e.not_found('Context'))
-
-    recurse = {'recurse': 'true'}
-    response = put_contexts(main_context, [sub_context])(
-        recurse, wazo_tenant=MAIN_TENANT
-    )
     response.assert_match(400, e.different_tenant())
-    response = put_contexts(sub_context, [main_context2])(
-        recurse, wazo_tenant=MAIN_TENANT
-    )
+    response = put_contexts(sub_context, [main_context2])(wazo_tenant=MAIN_TENANT)
     response.assert_match(400, e.different_tenant())
 
     assert_that(
         included_context_ids(main_context), contains_exactly(main_context2['id'])
     )
     assert_that(included_context_ids(sub_context), empty())
-
-
-@fixtures.context(wazo_tenant=SUB_TENANT)
-def test_associate_recurse_is_boolean(sub_context):
-    s.check_recurse_is_boolean(put_contexts(sub_context, []), SUB_TENANT)
 
 
 @fixtures.context(wazo_tenant=SUB_TENANT2)

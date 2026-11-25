@@ -122,9 +122,9 @@ def test_get_user_line_main_associated_endpoints_sip_when_line_does_not_exist(us
 
 
 def get_endpoint_sip(user, line_id):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.users(user['uuid']).lines(line_id).associated.endpoints.sip
-        return url.get(**(query or {}), **kwargs)
+        return url.get(**kwargs)
 
     return call
 
@@ -164,16 +164,9 @@ def test_get_associated_endpoints_sip_sub_tenant_from_main_tenant(
         with a.user_line(sub_user, sub_line):
             for line_id in (sub_line['id'], 'main'):
                 call = get_endpoint_sip(sub_user, line_id)
-                s.check_sub_tenant_found_only_with_recurse(
-                    call, 'UserFeatures', MAIN_TENANT, 200
-                )
+                s.check_sub_tenant_found(call, MAIN_TENANT, 200)
 
     aux()
-
-
-@fixtures.user(wazo_tenant=SUB_TENANT)
-def test_get_associated_endpoints_sip_recurse_is_boolean(sub_user):
-    s.check_recurse_is_boolean(get_endpoint_sip(sub_user, 'main'), SUB_TENANT)
 
 
 @fixtures.user(wazo_tenant=SUB_TENANT2)

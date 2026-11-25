@@ -28,7 +28,7 @@ class UserLineAssociatedEndpointSipItem(ConfdResource):
         'confd.users.{user_uuid}.lines.{line_id}.associated.endpoints.sip.read'
     )
     def get(self, user_uuid, line_id):
-        tenant_uuids = self._build_tenant_list_from_query()
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.user_dao.get_by(uuid=str(user_uuid), tenant_uuids=tenant_uuids)
         view = GETQueryStringSchema().load(request.args)['view']
         schema = self.view_schemas.get(view, self.schema)

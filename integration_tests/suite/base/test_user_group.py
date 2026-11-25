@@ -146,9 +146,9 @@ def test_bus_events(group, user, line):
 
 
 def put_groups(user, groups):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.users(user['uuid']).groups
-        return url.put(groups=groups, query_string=query, **kwargs)
+        return url.put(groups=groups, **kwargs)
 
     return call
 
@@ -172,7 +172,7 @@ def test_associate_sub_tenant_user_from_main_tenant(sub_context, sub_group, sub_
     def aux(sub_line):
         with a.user_line(sub_user, sub_line):
             call = put_groups(sub_user, [sub_group])
-            s.check_sub_tenant_found_only_with_recurse(call, 'User', MAIN_TENANT, 204)
+            s.check_sub_tenant_found(call, MAIN_TENANT, 204)
             assert_that(group_ids_of(sub_user), contains_exactly(sub_group['id']))
 
             put_groups(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
@@ -194,13 +194,10 @@ def test_associate_group_outside_tenant(
             put_groups(sub_user, [sub_group])(wazo_tenant=SUB_TENANT).assert_updated()
 
             for outside in (main_group, sibling_group):
-                for query in (None, {'recurse': 'true'}):
-                    call = put_groups(sub_user, [outside])
-                    response = call(query, wazo_tenant=SUB_TENANT)
-                    response.assert_match(400, e.not_found('Group'))
-                    assert_that(
-                        group_ids_of(sub_user), contains_exactly(sub_group['id'])
-                    )
+                call = put_groups(sub_user, [outside])
+                response = call(wazo_tenant=SUB_TENANT)
+                response.assert_match(400, e.not_found('Group'))
+                assert_that(group_ids_of(sub_user), contains_exactly(sub_group['id']))
 
             put_groups(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
 
@@ -221,25 +218,14 @@ def test_associate_groups_of_different_tenants(
     def aux(main_line, sub_line):
         with a.user_line(main_user, main_line), a.user_line(sub_user, sub_line):
             response = put_groups(main_user, [sub_group])(wazo_tenant=MAIN_TENANT)
-            response.assert_match(400, e.not_found('Group'))
-
-            recurse = {'recurse': 'true'}
-            call = put_groups(main_user, [sub_group])
-            response = call(recurse, wazo_tenant=MAIN_TENANT)
             response.assert_match(400, e.different_tenant())
-            call = put_groups(sub_user, [main_group])
-            response = call(recurse, wazo_tenant=MAIN_TENANT)
+            response = put_groups(sub_user, [main_group])(wazo_tenant=MAIN_TENANT)
             response.assert_match(400, e.different_tenant())
 
             assert_that(group_ids_of(main_user), empty())
             assert_that(group_ids_of(sub_user), empty())
 
     aux()
-
-
-@fixtures.user(wazo_tenant=SUB_TENANT)
-def test_associate_recurse_is_boolean(sub_user):
-    s.check_recurse_is_boolean(put_groups(sub_user, []), SUB_TENANT)
 
 
 @fixtures.user(wazo_tenant=SUB_TENANT2)

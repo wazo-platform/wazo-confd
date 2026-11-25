@@ -150,17 +150,17 @@ def test_bus_events(trunk, register):
 
 
 def put_register(trunk, register):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.trunks(trunk['id']).registers.iax(register['id'])
-        return url.put(query_string=query, **kwargs)
+        return url.put(**kwargs)
 
     return call
 
 
 def delete_register(trunk, register):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.trunks(trunk['id']).registers.iax(register['id'])
-        return url.delete(**(query or {}), **kwargs)
+        return url.delete(**kwargs)
 
     return call
 
@@ -189,21 +189,14 @@ def test_register_trunk_outside_tenant(main_trunk, sibling_trunk, register, regi
 @fixtures.register_iax()
 def test_register_sub_tenant_trunk_from_main_tenant(sub_trunk, register):
     call = put_register(sub_trunk, register)
-    s.check_sub_tenant_found_only_with_recurse(call, 'Trunk', MAIN_TENANT, 204)
+    s.check_sub_tenant_found(call, MAIN_TENANT, 204)
     response = confd.trunks(sub_trunk['id']).get()
     assert_that(response.item['register_iax'], has_entries(id=register['id']))
 
     call = delete_register(sub_trunk, register)
-    s.check_sub_tenant_found_only_with_recurse(call, 'Trunk', MAIN_TENANT, 204)
+    s.check_sub_tenant_found(call, MAIN_TENANT, 204)
     response = confd.trunks(sub_trunk['id']).get()
     assert_that(response.item['register_iax'], none())
-
-
-@fixtures.trunk(wazo_tenant=SUB_TENANT)
-@fixtures.register_iax()
-def test_register_recurse_is_boolean(sub_trunk, register):
-    for request in (put_register, delete_register):
-        s.check_recurse_is_boolean(request(sub_trunk, register), SUB_TENANT)
 
 
 @fixtures.trunk(wazo_tenant=SUB_TENANT2)

@@ -37,7 +37,7 @@ class UserLineList(UserLineResource):
 
     @required_acl('confd.users.{user_id}.lines.update')
     def put(self, user_id):
-        tenant_uuids = self._build_tenant_list_from_query()
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         user = self.get_user(user_id, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         try:

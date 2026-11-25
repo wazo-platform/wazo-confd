@@ -49,7 +49,6 @@ paths:
       - lines
       parameters:
       - $ref: '#/parameters/useriduuid'
-      - $ref: '#/parameters/recurse'
       - name: body
         in: body
         required: true

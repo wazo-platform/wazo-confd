@@ -8,7 +8,6 @@ paths:
       - contexts
       parameters:
       - $ref: '#/parameters/contextid'
-      - $ref: '#/parameters/recurse'
       - name: body
         in: body
         description: Contexts to associated

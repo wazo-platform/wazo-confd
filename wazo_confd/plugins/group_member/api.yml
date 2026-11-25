@@ -45,7 +45,6 @@ paths:
       - groups
       parameters:
       - $ref: '#/parameters/groupuuid'
-      - $ref: '#/parameters/recurse'
       - name: body
         in: body
         description: Extensions to associated

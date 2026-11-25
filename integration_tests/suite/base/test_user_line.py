@@ -446,9 +446,9 @@ def test_bus_events(user, line):
 
 
 def put_lines(user, lines):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.users(user['uuid']).lines
-        return url.put(lines=lines, query_string=query, **kwargs)
+        return url.put(lines=lines, **kwargs)
 
     return call
 
@@ -470,7 +470,7 @@ def test_associate_lines_sub_tenant_user_from_main_tenant(sub_context, sub_user)
     @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
     def aux(sub_line):
         call = put_lines(sub_user, [sub_line])
-        s.check_sub_tenant_found_only_with_recurse(call, 'User', MAIN_TENANT, 204)
+        s.check_sub_tenant_found(call, MAIN_TENANT, 204)
         assert_that(line_ids_of(sub_user), contains_exactly(sub_line['id']))
 
         put_lines(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
@@ -492,11 +492,10 @@ def test_associate_lines_line_outside_tenant(
         put_lines(sub_user, [sub_line])(wazo_tenant=SUB_TENANT).assert_updated()
 
         for outside in (main_line, sibling_line):
-            for query in (None, {'recurse': 'true'}):
-                call = put_lines(sub_user, [outside])
-                response = call(query, wazo_tenant=SUB_TENANT)
-                response.assert_match(400, e.not_found('Line'))
-                assert_that(line_ids_of(sub_user), contains_exactly(sub_line['id']))
+            call = put_lines(sub_user, [outside])
+            response = call(wazo_tenant=SUB_TENANT)
+            response.assert_match(400, e.not_found('Line'))
+            assert_that(line_ids_of(sub_user), contains_exactly(sub_line['id']))
 
         put_lines(sub_user, [])(wazo_tenant=SUB_TENANT).assert_updated()
 
@@ -514,23 +513,14 @@ def test_associate_lines_of_different_tenants(
     @fixtures.line_sip(context=sub_context, wazo_tenant=SUB_TENANT)
     def aux(main_line, sub_line):
         response = put_lines(main_user, [sub_line])(wazo_tenant=MAIN_TENANT)
-        response.assert_match(400, e.not_found('Line'))
-
-        recurse = {'recurse': 'true'}
-        response = put_lines(main_user, [sub_line])(recurse, wazo_tenant=MAIN_TENANT)
         response.assert_match(400, e.different_tenant())
-        response = put_lines(sub_user, [main_line])(recurse, wazo_tenant=MAIN_TENANT)
+        response = put_lines(sub_user, [main_line])(wazo_tenant=MAIN_TENANT)
         response.assert_match(400, e.different_tenant())
 
         assert_that(line_ids_of(main_user), empty())
         assert_that(line_ids_of(sub_user), empty())
 
     aux()
-
-
-@fixtures.user(wazo_tenant=SUB_TENANT)
-def test_associate_lines_recurse_is_boolean(sub_user):
-    s.check_recurse_is_boolean(put_lines(sub_user, []), SUB_TENANT)
 
 
 @fixtures.user(wazo_tenant=SUB_TENANT2)

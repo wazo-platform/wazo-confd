@@ -255,19 +255,17 @@ def test_get_fallbacks_relation(user):
 
 
 def get_fallbacks(user):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.users(user['uuid']).fallbacks
-        return url.get(**(query or {}), **kwargs)
+        return url.get(**kwargs)
 
     return call
 
 
 def put_fallbacks(user):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.users(user['uuid']).fallbacks
-        return url.put(
-            noanswer_destination={'type': 'none'}, query_string=query, **kwargs
-        )
+        return url.put(noanswer_destination={'type': 'none'}, **kwargs)
 
     return call
 
@@ -283,15 +281,7 @@ def test_fallbacks_outside_tenant(main_user, sibling_user):
 @fixtures.user(wazo_tenant=SUB_TENANT)
 def test_fallbacks_sub_tenant_from_main_tenant(sub_user):
     for request, status in ((get_fallbacks, 200), (put_fallbacks, 204)):
-        s.check_sub_tenant_found_only_with_recurse(
-            request(sub_user), 'User', MAIN_TENANT, status
-        )
-
-
-@fixtures.user(wazo_tenant=SUB_TENANT)
-def test_fallbacks_recurse_is_boolean(sub_user):
-    for request in (get_fallbacks, put_fallbacks):
-        s.check_recurse_is_boolean(request(sub_user), SUB_TENANT)
+        s.check_sub_tenant_found(request(sub_user), MAIN_TENANT, status)
 
 
 @fixtures.user(wazo_tenant=SUB_TENANT2)

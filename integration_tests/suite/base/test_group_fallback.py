@@ -234,19 +234,17 @@ def test_get_fallbacks_relation(group):
 
 
 def get_fallbacks(group):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.groups(group['uuid']).fallbacks
-        return url.get(**(query or {}), **kwargs)
+        return url.get(**kwargs)
 
     return call
 
 
 def put_fallbacks(group):
-    def call(query=None, **kwargs):
+    def call(**kwargs):
         url = confd.groups(group['uuid']).fallbacks
-        return url.put(
-            noanswer_destination={'type': 'none'}, query_string=query, **kwargs
-        )
+        return url.put(noanswer_destination={'type': 'none'}, **kwargs)
 
     return call
 
@@ -262,15 +260,7 @@ def test_fallbacks_outside_tenant(main_group, sibling_group):
 @fixtures.group(wazo_tenant=SUB_TENANT)
 def test_fallbacks_sub_tenant_from_main_tenant(sub_group):
     for request, status in ((get_fallbacks, 200), (put_fallbacks, 204)):
-        s.check_sub_tenant_found_only_with_recurse(
-            request(sub_group), 'Group', MAIN_TENANT, status
-        )
-
-
-@fixtures.group(wazo_tenant=SUB_TENANT)
-def test_fallbacks_recurse_is_boolean(sub_group):
-    for request in (get_fallbacks, put_fallbacks):
-        s.check_recurse_is_boolean(request(sub_group), SUB_TENANT)
+        s.check_sub_tenant_found(request(sub_group), MAIN_TENANT, status)
 
 
 @fixtures.group(wazo_tenant=SUB_TENANT2)

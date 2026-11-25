@@ -2,9 +2,8 @@
 
 ## 26.12
 
-* These endpoints accept a new `recurse` query parameter (default `false`) and return 404 when
-  the resource in the URL is outside the `Wazo-Tenant` tenant (or its sub-tenants with
-  `recurse=true`): `GET /1.1/users/{user_uuid}/lines/{line_id}/associated/endpoints/sip`,
+* These endpoints return 404 when the resource in the URL is outside the `Wazo-Tenant` tenant
+  and its sub-tenants: `GET /1.1/users/{user_uuid}/lines/{line_id}/associated/endpoints/sip`,
   `PUT /1.1/users/{user_id}/lines`, `GET` and `PUT /1.1/users/{user_id}/fallbacks`,
   `PUT /1.1/users/{user_id}/groups`, `PUT /1.1/contexts/{context_id}/contexts`,
   `PUT /1.1/groups/{group_uuid}/members/extensions`, `GET` and `PUT /1.1/groups/{group_uuid}/fallbacks`,

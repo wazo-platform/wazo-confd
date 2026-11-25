@@ -68,7 +68,7 @@ class GroupMemberExtensionItem(GroupMemberItem):
 
     @required_acl('confd.groups.{group_uuid}.members.extensions.update')
     def put(self, group_uuid):
-        tenant_uuids = self._build_tenant_list_from_query()
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         group = self.group_dao.get(group_uuid, tenant_uuids=tenant_uuids)
         form = self.schema().load(request.get_json(force=True))
         contexts = {member['extension']['context'] for member in form['extensions']}

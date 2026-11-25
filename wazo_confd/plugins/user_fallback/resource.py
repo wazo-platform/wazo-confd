@@ -21,12 +21,12 @@ class UserFallbackList(ConfdResource):
 
     @required_acl('confd.users.{user_id}.fallbacks.read')
     def get(self, user_id):
-        tenant_uuids = self._build_tenant_list_from_query()
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         return self._user_fallback_middleware.get(user_id, tenant_uuids)
 
     @required_acl('confd.users.{user_id}.fallbacks.update')
     def put(self, user_id):
-        tenant_uuids = self._build_tenant_list_from_query()
+        tenant_uuids = self._build_tenant_list({'recurse': True})
         self._user_fallback_middleware.associate(
             user_id, request.get_json(force=True), tenant_uuids
         )

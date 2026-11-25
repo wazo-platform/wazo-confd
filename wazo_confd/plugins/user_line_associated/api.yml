@@ -12,14 +12,13 @@ paths:
         - $ref: '#/parameters/useruuid'
         - $ref: '#/parameters/lineid'
         - $ref: '#/parameters/endpoint_sip_view'
-        - $ref: '#/parameters/recurse'
       responses:
         '200':
           description: SIP endpoint of a line for a user
           schema:
             $ref: '#/definitions/EndpointSIP'
         '400':
-          description: Invalid `view` or `recurse`
+          description: Invalid `view`
         '404':
           $ref: '#/responses/NotFoundError'
 
@@ -35,13 +34,12 @@ paths:
       parameters:
         - $ref: '#/parameters/useruuid'
         - $ref: '#/parameters/endpoint_sip_view'
-        - $ref: '#/parameters/recurse'
       responses:
         '200':
           description: SIP endpoint of main line for a user
           schema:
             $ref: '#/definitions/EndpointSIP'
         '400':
-          description: Invalid `view` or `recurse`
+          description: Invalid `view`
         '404':
           $ref: '#/responses/NotFoundError'
