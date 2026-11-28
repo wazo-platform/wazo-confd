@@ -1,0 +1,73 @@
+paths:
+  /config_history:
+    get:
+      operationId: get_config_history
+      summary: Get config history
+      description: '**Required ACL:** `confd.config_history.read`'
+      tags:
+      - config_history
+      responses:
+        '200':
+          description: Config history
+          schema:
+            $ref: '#/definitions/ConfigHistoryLogItems'
+  /config_history/diff:
+    get:
+      operationId: get_config_history_diff
+      summary: Get config history diff
+      description: '**Required ACL:** `confd.config_history.diff.read`'
+      tags:
+      - config_history
+      parameters:
+      - name: start_date
+        in: query
+        type: string
+        format: date-time
+        description: The start date of the diff
+      - name: end_date
+        in: query
+        type: string
+        format: date-time
+        description: The end date of the diff
+      - name: commit_a
+        in: query
+        type: string
+        description: The commit hash of the first commit
+      - name: commit_b
+        in: query
+        type: string
+        description: The commit hash of the second commit
+      responses:
+        '200':
+          description: Config history diff
+          schema:
+            $ref: '#/definitions/ConfigHistoryDiff'
+definitions:
+  ConfigHistoryLogItems:
+    title: Config history log items
+    description: Description of config history log items
+    items:
+      $ref: '#/definitions/ConfigHistoryLogItem'
+    type: array
+  ConfigHistoryLogItem:
+    title: Config history log item
+    type: object
+    properties:
+      commit:
+        type: string
+        description: The commit hash
+      date:
+        type: string
+        description: The date of the commit
+      files_changed:
+        type: array
+        items:
+          type: string
+        description: The files that were changed
+  ConfigHistoryDiff:
+    title: Config history diff
+    type: object
+    properties:
+      item:
+        type: string
+        description: The diff of the config history
